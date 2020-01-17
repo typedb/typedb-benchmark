@@ -9,15 +9,3 @@ java_library(
 )
 
 
-
-java_library(
-    name = "protobuf-lite",
-    exports = [
-        "//external:jar/com/google/protobuf/protobuf-lite"
-    ],
-    visibility = [
-        "//dependencies/maven/artifacts:__subpackages__"
-    ]
-)
-
-

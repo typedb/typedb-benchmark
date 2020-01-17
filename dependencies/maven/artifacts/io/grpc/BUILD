@@ -26,21 +26,23 @@ java_library(
         ":grpc-context"
     ],
     visibility = [
-        "//dependencies/maven/artifacts:__subpackages__"
+        "//visibility:public"
     ]
 )
 
 
 
 java_library(
-    name = "grpc-netty",
+    name = "grpc-protobuf",
     exports = [
-        "//external:jar/io/grpc/grpc-netty"
+        "//external:jar/io/grpc/grpc-protobuf"
     ],
     runtime_deps = [
-        "//dependencies/maven/artifacts/io/netty:netty-codec-http2",
-        "//dependencies/maven/artifacts/io/netty:netty-handler-proxy",
-        ":grpc-core"
+        "//dependencies/maven/artifacts/com/google/api/grpc:proto-google-common-protos",
+        "//dependencies/maven/artifacts/com/google/guava:guava",
+        "//dependencies/maven/artifacts/com/google/protobuf:protobuf-java",
+        ":grpc-core",
+        ":grpc-protobuf-lite"
     ],
     visibility = [
         "//visibility:public"
@@ -56,7 +58,21 @@ java_library(
     ],
     runtime_deps = [
         "//dependencies/maven/artifacts/com/google/guava:guava",
-        "//dependencies/maven/artifacts/com/google/protobuf:protobuf-lite",
+        ":grpc-core"
+    ],
+    visibility = [
+        "//dependencies/maven/artifacts:__subpackages__"
+    ]
+)
+
+
+
+java_library(
+    name = "grpc-stub",
+    exports = [
+        "//external:jar/io/grpc/grpc-stub"
+    ],
+    runtime_deps = [
         ":grpc-core"
     ],
     visibility = [
