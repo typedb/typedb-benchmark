@@ -1,0 +1,19 @@
+define
+
+continent-name sub attribute,
+  datatype string;
+
+country-name sub attribute,
+  datatype string;
+
+continent sub entity,
+  has continent-name,
+  plays container;
+
+country sub entity,
+  has country-name,
+  plays containee;
+
+contains sub relation,
+  relates container,
+  relates containee;
