@@ -1,20 +1,22 @@
 java_library(
-    name = "csv_loader",
+    name = "yaml_tool",
     srcs = glob(["**/*.java"]),
     deps = [
         "@graknlabs_client_java//:client-java",
         "@graknlabs_graql//java:graql",
+        "//dependencies/maven/artifacts/org/yaml:snakeyaml",
         "//dependencies/maven/artifacts/org/apache/commons:commons-csv",
+        "//dependencies/maven/artifacts/org/apache/commons:commons-lang3",
         "//dependencies/maven/artifacts/args4j:args4j",
     ],
     visibility = ["//visibility:public"],
 )
 
 java_binary(
-    name = "csv_loader-binary",
-    main_class = "grakn.simulation.csv_loader.GraknCSVLoaderCLI",
+    name = "yaml_tool-binary",
+    main_class = "grakn.simulation.yaml_tool.GraknYAMLToolCLI",
     runtime_deps = [
-        ":csv_loader",
+        ":yaml_tool",
     ],
     visibility = ["//visibility:public"],
 )

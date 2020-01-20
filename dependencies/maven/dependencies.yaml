@@ -42,8 +42,16 @@ dependencies:
     commons-csv:
       version: "1.7"
       lang: java
+    commons-lang3:
+      version: "3.9"
+      lang: java
 
   args4j:
     args4j:
       version: "2.33"
+      lang: java
+
+  org.yaml:
+    snakeyaml:
+      version: "1.25"
       lang: java

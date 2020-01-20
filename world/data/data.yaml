@@ -1,0 +1,23 @@
+---
+template: |
+  insert $x isa continent, has continent-name <0>;
+data: |
+  North America
+  South America
+  Europe
+  Africa
+  Asia
+  Australia
+  Antarctica
+---
+template: |
+  match
+    $c isa continent, has continent-name <1>;
+  insert
+    $x isa country, has country-name <0>;
+    (container: $c, containee: $x) isa contains;
+data: |
+  USA,North America
+  United Kingdom,Europe
+  Germany,Europe
+...
