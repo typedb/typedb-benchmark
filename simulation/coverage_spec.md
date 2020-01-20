@@ -28,12 +28,12 @@
 
 ### Attributes
 
-- [ ] Relation to attribute
+- [x] Attribute playing a (non-implicit) role in a relation
 - [x] Attribute of attribute
 - [ ] ~~Attribute of attribute of attribute~~
 - [x] Attribute hierarchies
 - [ ] All attribute datatypes
-- Implicit relations, 
+- Implicit relations:
   - [ ] adding new roleplayers to them
   - [x] adding attributes to them
 - [x] Regex for strings

@@ -53,7 +53,8 @@ currency-code sub attribute,
 currency sub attribute, 
     datatype string,
     regex "^(Great British Pound|Euro|American Dollar|Indian Rupee|Malaysian Ringgit|Indonesian Rupiah)$",
-    has currency-code;
+    has currency-code,
+    plays currency-adoption_currency-adopted;
 
 data-signed sub attribute,
     datatype date;
@@ -157,11 +158,17 @@ location sub entity,
 
 area sub location,
     plays born-in_place-of-birth;
+
 city sub location,
     plays born-in_place-of-birth;
+
 county sub location;
-country sub location;
+
+country sub location,
+    plays currency-adoption_adopting-country;
+
 state sub location;
+
 continent sub location;
 
 location-hierarchy sub relation,
@@ -205,6 +212,12 @@ legal-contract sub legal-document;
 employment-contract sub legal-contract,
     # plays employment_employment-contract,
     has contracted-hours;
+
+currency-adoption sub relation,
+    has start-date,
+    has end-date,
+    relates currency-adoption_adopting-country,
+    relates currency-adoption_currency-adopted;
 
 insert $x "Great British Pound" isa currency, has currency-code "GBP";
 insert $x "Euro" isa currency, has currency-code "EUR";
