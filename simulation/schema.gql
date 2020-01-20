@@ -1,0 +1,135 @@
+define
+
+name sub attribute,
+    datatype string;
+
+organisation-name sub name;
+
+forename sub name;
+surname sub name;
+
+date-of-event sub attribute,
+    datatype date;
+
+date-of-birth sub date-of-event,
+    datatype date;
+
+date-of-marriage sub date-of-event,
+    datatype date;
+
+gender sub attribute,
+    datatype string;
+
+annual-wage-pounds sub attribute,
+    datatype double;
+
+contracted-hours sub attribute,
+    datatype double;
+
+person sub entity,
+    has forename,
+    has surname,
+    has gender,
+    has date-of-birth,
+    plays employment_employee,
+    plays volunteering_volunteer,
+    plays studentship_student,
+    plays parentship_parent,
+    plays parentship_child,
+    plays marriage_husband,
+    plays marriage_wife,
+    plays friendship_friend,
+    plays born-in_child;
+
+parentship sub relation,
+    relates parentship_parent,  # Could have two parents playing parent in a single parentship for interesting cardinality
+    relates parentship_child;
+
+friendship sub relation,
+    relates friendship_friend; # Could be N-ary, though in a real-world context this is imperfect
+
+marriage sub relation,
+    relates marriage_husband,
+    relates marriage_wife,
+    has date-of-marriage,
+    plays locates_located;
+
+membership sub relation,
+    relates membership_member,
+    relates membership_group;
+
+employment sub membership,
+    relates employment_employee as membership_member,
+    relates employment_employer as membership_group,
+    # relates employment_profession,  # https://github.com/graknlabs/grakn/issues/5553
+    has annual-wage-pounds,
+    has contracted-hours,
+    plays locates_located;
+
+studentship sub membership,
+    relates studentship_student as membership_member,
+    relates studentship_school as membership_group;
+
+volunteering sub membership,
+    relates volunteering_volunteer as membership_member,
+    relates volunteering_cause as membership_group;
+
+occupation sub entity,
+    has name;
+#    plays employment_profession;
+
+organisation sub entity,
+    key organisation-name;
+
+company sub organisation,
+    plays employment_employer;
+
+university sub organisation,
+    plays employment_employer,
+    plays studentship_school;
+
+charity sub organisation,
+    plays volunteering_cause;
+
+location sub entity,
+    has name,
+    plays location-hierarchy_superior,
+    plays location-hierarchy_subordinate;
+
+area sub location,
+    plays born-in_place-of-birth;
+city sub location,
+    plays born-in_place-of-birth;
+county sub location;
+country sub location;
+state sub location;
+continent sub location;
+
+location-hierarchy sub relation,
+    relates location-hierarchy_superior,
+    relates location-hierarchy_subordinate;
+
+locates sub relation,
+    relates locates_location,
+    relates locates_located;
+
+location-hierarchy-transitivity sub rule,
+when {
+    $lh1(location-hierarchy_superior: $a, location-hierarchy_subordinate: $b) isa location-hierarchy;
+    $lh2(location-hierarchy_superior: $b, location-hierarchy_subordinate: $c) isa location-hierarchy;
+}, then {
+    (location-hierarchy_superior: $a, location-hierarchy_subordinate: $c) isa location-hierarchy;
+};
+
+born-in sub locates,
+    relates born-in_place-of-birth as locates_location,
+    relates born-in_child as locates_located;
+
+born-in-transitivity sub rule,
+when {
+    $lh1(location-hierarchy_superior: $a, location-hierarchy_subordinate: $b) isa location-hierarchy;
+    $bi(born-in_child: $p, born-in_place-of-birth: $b) isa born-in;
+}, then {
+    (born-in_child: $p, born-in_place-of-birth: $a) isa born-in;
+};
+
