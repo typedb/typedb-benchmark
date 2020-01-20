@@ -9,6 +9,13 @@ forename sub name;
 surname sub name;
 
 date-of-event sub attribute,
+    abstract,
+    datatype date;
+
+start-date sub date-of-event,
+    datatype date;
+
+end-date sub date-of-event,
     datatype date;
 
 date-of-birth sub date-of-event,
@@ -20,18 +27,48 @@ date-of-marriage sub date-of-event,
 gender sub attribute,
     datatype string;
 
-annual-wage-pounds sub attribute,
-    datatype double;
-
 contracted-hours sub attribute,
     datatype double;
 
+language sub attribute, 
+    datatype string,
+    regex "^(English|French|German|Cantonese|Hindi|Malaysian|Indonesian)$";
+
+num-characters sub attribute,
+    datatype long;
+
+text-content sub attribute, 
+    datatype string,
+    has language,
+    has num-characters;
+
+annual-wage sub attribute,
+    datatype double;
+
+currency-code sub attribute,
+    datatype string,
+    regex "^(GBP|EUR|USD|INR|MYR|IDR)$";
+
+currency sub attribute, 
+    datatype string,
+    regex "^(Great British Pound|Euro|American Dollar|Indian Rupee|Malaysian Ringgit|Indonesian Rupiah)$",
+    has currency-code;
+
+data-signed sub attribute,
+    datatype date;
+
+identifier sub attribute,
+    datatype string;
+
 person sub entity,
+    has identifier,
     has forename,
     has surname,
     has gender,
     has date-of-birth,
     plays employment_employee,
+    plays employment_full-time-employee,
+    plays employment_part-time-employee,
     plays volunteering_volunteer,
     plays studentship_student,
     plays parentship_parent,
@@ -46,6 +83,8 @@ parentship sub relation,
     relates parentship_child;
 
 friendship sub relation,
+    has start-date,
+    has end-date,
     relates friendship_friend; # Could be N-ary, though in a real-world context this is imperfect
 
 marriage sub relation,
@@ -55,16 +94,30 @@ marriage sub relation,
     plays locates_located;
 
 membership sub relation,
+    abstract,
     relates membership_member,
     relates membership_group;
 
 employment sub membership,
     relates employment_employee as membership_member,
+    relates employment_part-time-employee as employment_employee,
+    relates employment_full-time-employee as employment_employee,
     relates employment_employer as membership_group,
+    # relates employment_employment-contract,
     # relates employment_profession,  # https://github.com/graknlabs/grakn/issues/5553
-    has annual-wage-pounds,
+    
+    # For wages in different currencies, either:
+    # - subtype for the different currencies,
+    # - add currency as attribute to implicit relation,
+    # - model the wage as an entity,
+    # The attribute on an implicit relation is a pattern we would like to stress-test
+    has annual-wage, 
     has contracted-hours,
+    # Nested relation
     plays locates_located;
+
+# @has-annual-wage sub @has-attribute,
+#     has currency;
 
 studentship sub membership,
     relates studentship_student as membership_member,
@@ -79,6 +132,7 @@ occupation sub entity,
 #    plays employment_profession;
 
 organisation sub entity,
+    abstract,
     key organisation-name;
 
 company sub organisation,
@@ -113,6 +167,7 @@ locates sub relation,
     relates locates_location,
     relates locates_located;
 
+# Transitive hierarchy
 location-hierarchy-transitivity sub rule,
 when {
     $lh1(location-hierarchy_superior: $a, location-hierarchy_subordinate: $b) isa location-hierarchy;
@@ -125,6 +180,9 @@ born-in sub locates,
     relates born-in_place-of-birth as locates_location,
     relates born-in_child as locates_located;
 
+# Transitive group membership
+# Here we realise that it's common to say that when something takes place in a location it also takes place in the superior places. 
+# This will lead to many rules of this kind. Can this be generified, and should it be?
 born-in-transitivity sub rule,
 when {
     $lh1(location-hierarchy_superior: $a, location-hierarchy_subordinate: $b) isa location-hierarchy;
@@ -132,4 +190,21 @@ when {
 }, then {
     (born-in_child: $p, born-in_place-of-birth: $a) isa born-in;
 };
+
+legal-document sub entity,
+    has data-signed,
+    has text-content;
+
+legal-contract sub legal-document;
+
+employment-contract sub legal-contract,
+    # plays employment_employment-contract,
+    has contracted-hours;
+
+insert $x "Great British Pound" isa currency, has currency-code "GBP";
+insert $x "Euro" isa currency, has currency-code "EUR";
+insert $x "American Dollar" isa currency, has currency-code "USD";
+insert $x "Indian Rupee" isa currency, has currency-code "INR";
+insert $x "Malaysian Ringgit" isa currency, has currency-code "MYR";
+insert $x "Indonesian Rupiah" isa currency, has currency-code "IDR";
 
