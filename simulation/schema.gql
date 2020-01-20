@@ -6,6 +6,7 @@ name sub attribute,
 organisation-name sub name;
 
 forename sub name;
+
 surname sub name;
 
 date-of-event sub attribute,
@@ -58,10 +59,12 @@ data-signed sub attribute,
     datatype date;
 
 identifier sub attribute,
-    datatype string;
+    datatype long;
+
+membership-id sub identifier;
 
 person sub entity,
-    has identifier,
+    key identifier,
     has forename,
     has surname,
     has gender,
@@ -88,13 +91,15 @@ friendship sub relation,
     relates friendship_friend; # Could be N-ary, though in a real-world context this is imperfect
 
 marriage sub relation,
+    key identifier,
+    has date-of-marriage,
     relates marriage_husband,
     relates marriage_wife,
-    has date-of-marriage,
     plays locates_located;
 
 membership sub relation,
     abstract,
+    key membership-id,
     relates membership_member,
     relates membership_group;
 
@@ -128,12 +133,12 @@ volunteering sub membership,
     relates volunteering_cause as membership_group;
 
 occupation sub entity,
-    has name;
+    key name;
 #    plays employment_profession;
 
 organisation sub entity,
     abstract,
-    key organisation-name;
+    has organisation-name;
 
 company sub organisation,
     plays employment_employer;
@@ -146,7 +151,7 @@ charity sub organisation,
     plays volunteering_cause;
 
 location sub entity,
-    has name,
+    key name,
     plays location-hierarchy_superior,
     plays location-hierarchy_subordinate;
 

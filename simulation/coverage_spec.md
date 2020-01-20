@@ -13,11 +13,18 @@
 
 - [x] Abstract type and non-abstract type hierarchies
 ### Keys 
-- [ ] Different types using the same attribute as their key
-- [ ] Different types owning the same attribute, one as its key, the other not keyed
+- [x] Different types using the same attribute as their key
+- [x] Different types owning the same attribute, one as its key, the other not keyed
 - [ ] Types using attributes as keys where the attribute types form a hierarchy
-- [ ] Keying on Date types
-- [ ] What about keying on booleans?!?!
+- Keying with each datatype:
+	- [x] long
+	- [ ] double
+	- [x] string
+	- [ ] boolean
+	- [ ] date
+- [ ] Multiple keys for one thing type
+- [ ] Multiple keys for one thing type, with different datatypes
+- [x] Disallowed ~~An attribute owned by the parent but used as key by the child~~
 
 ### Attributes
 
@@ -69,7 +76,7 @@ Ternary and N-ary relations, with interesting numbers of roleplayers per role
 - [ ] Currency
 - [ ] Scientific measurements
 - [ ] Immigration/emmigration, residency
-- [ ] Phone numbers
+- [ ] Phone numbers for regex and country extensions
 
 ## Other concerns
 
