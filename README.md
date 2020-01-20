@@ -1,14 +1,13 @@
 # Grakn Simulation World
 
-### Test the CSV-Loader
+### Test the YAML-Tool
 ```shell script
 # Load the schema into Grakn
 grakn console -k world -f world/schema/schema.gql
 
 # Build the CSV-Loader CLI Tool
-bazel build //csv_loader:csv_loader-binary
+bazel build //yaml_tool:yaml_tool-binary
 
 # Run the tool
-csv_loader/csv_loader-binary -k world -f world/data/continent.csv
-csv_loader/csv_loader-binary -k world -f world/data/country.csv
+bazel-bin/yaml_tool/yaml_tool-binary -k world world/data/data.yaml
 ```
