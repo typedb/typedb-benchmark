@@ -2,6 +2,8 @@
 
 ## Design patterns to cover
 
+Here we have some classic design patterns that recur commonly in Graql schemas for all domains.
+
 - [x] Group membership
 - [x] Transitive hierarchy
 - [x] Transitive group membership
@@ -9,7 +11,9 @@
 
 ## Patterns
 
-### General
+Following are schema/data patterns that are cases that we would like to ensure work correctly and quickly. This may skip over obvious cases which have been assumed and already added to the World Simulation schema, in effect making this more of a running TODO.
+
+### Abstract
 
 - [x] Abstract type and non-abstract type hierarchies
 ### Keys 
@@ -25,6 +29,8 @@
 - [x] Multiple keys for one thing type
 - [ ] Multiple keys for one thing type, with different datatypes
 - [x] Disallowed ~~An attribute owned by the parent but used as key by the child~~
+- [ ] Keying on both of two attributes that are in a hierarchy together
+- [ ] Can a subtype of a key be used to key the thing keyed by its super type (at insertion time)?
 
 ### Attributes
 
@@ -43,13 +49,14 @@
   - [x] adding attributes to them
 - [x] Regex for strings
 - [ ] Attribute value updates (deletion of implicit relations with via and adding new attribute)
+- [ ] Box shape where two things are in a hierarchy each owning an attribute, where the attributes are also in a hierarchy
 
 ### Relations
 
 Ternary and N-ary relations, with interesting numbers of roleplayers per role
 
 - [x] One entity playing 3+ roles
-- [x] One relation playing 3+ roles (`university`)
+- [ ] One relation playing 3+ roles
 - [x] One relation with 3+ roles played
 - [ ] Unary relation, where a thing instance plays one role once and there are no other roleplayers
 - [x] Symmetric and antisymmetric relation
@@ -60,7 +67,7 @@ Ternary and N-ary relations, with interesting numbers of roleplayers per role
 - [x] The anti-transitive and anti-reflexive are defined easily by the lack of a transitive rule or a reflexive role
 - [x] Relation/entity/attribute types playing two roles in a relation, where the instances only play one role each (`person` playing `husband` and `wife` in a marriage)
 - [x] Ragged role hierarchy: a relation that inherits from a parent subtypes the parent's roles, but also introduces new roles not yet seen in the hierarchy
-- [x] Inheriting from a role declared in the current relation (not the parent)
+- [x] Inheriting from a role declared in the current relation (not the parent) (`part-time-employee` and `employee`)
 - [ ] Inherit role from grandparent relation, skipping the parent (allowed?)
 
 ## Rule formulations
@@ -73,6 +80,8 @@ Ternary and N-ary relations, with interesting numbers of roleplayers per role
 - [ ] Inferred entity (useless but why not)
 - [ ] Successive/compound/recursive rules
 - [ ] Rules for relations that also have materialised instances
+- [ ] `when` bodies with a relation(s) where the relation(s) don't have a variable ascribed to them
+- [ ] Utilising explanations of rules, also recursively
 
 ## World elements to model
 

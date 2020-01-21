@@ -29,6 +29,9 @@ date-of-birth sub date-of-event,
 date-of-marriage sub date-of-event,
     datatype date;
 
+relocation-date sub date-of-event,
+    datatype date;
+
 gender sub attribute,
     datatype string;
 
@@ -99,7 +102,9 @@ person sub entity,
     plays marriage_husband,
     plays marriage_wife,
     plays friendship_friend,
-    plays born-in_child;
+    plays born-in_child,
+    plays residency_resident,
+    plays relocation_relocated-person;
 
 parentship sub relation,
     relates parentship_parent,  # Could have two parents playing parent in a single parentship for interesting cardinality
@@ -180,13 +185,17 @@ charity sub organisation,
 location sub entity,
     key name,
     plays location-hierarchy_superior,
-    plays location-hierarchy_subordinate;
+    plays location-hierarchy_subordinate,
+    plays relocation_previous-location,
+    plays relocation_new-location;
 
 area sub location,
-    plays born-in_place-of-birth;
+    plays born-in_place-of-birth,
+    plays residency_location;
 
 city sub location,
-    plays born-in_place-of-birth;
+    plays born-in_place-of-birth,
+    plays residency_location;
 
 county sub location;
 
@@ -294,9 +303,58 @@ when {
     $transaction isa transaction;
     $l(locates_located: $t, locates_location: $transaction-location) isa locates;
     $transaction-country isa country;
-    (currency-adoption_adopting-country: $transaction-country, currency-adoption_currency-adopted: $currency) isa current-currency;
+    $cc(currency-adoption_adopting-country: $transaction-country, currency-adoption_currency-adopted: $currency) isa current-currency;
 }, then {
     $transaction has currency $currency;
+};
+
+residency sub relation,
+    has start-date,
+    has end-date,
+    relates residency_resident,
+    relates residency_location;
+
+relocation sub relation,
+    has relocation-date,
+    relates relocation_previous-location,
+    relates relocation_new-location,
+    relates relocation_relocated-person;
+
+# Causes of residency 
+# - born in a location
+# - move to a location
+# - can be inferred from where someone works or studies at school or university
+
+born-in-location-implies-residency sub rule,
+when {
+    $bi(born-in_place-of-birth: $place, born-in_child: $person) isa born-in;
+}, then {
+    (residency_resident: $person, residency_location: $place) isa residency;
+};
+
+# This rule can be triggered by a person moving back to their hometown having moved away, and add an incorrect start-date
+born-in-location-implies-residency-date sub rule,
+when {
+    $bi(born-in_place-of-birth: $place, born-in_child: $person) isa born-in;
+    $person isa person, has date-of-birth $dob;
+    $r(residency_resident: $person, residency_location: $place) isa residency;
+}, then {
+    $r has start-date $dob;
+};
+
+person-relocating-adds-new-residency sub rule,
+when {
+    $rel(relocation_relocated-person: $person, relocation_new-location: $place) isa relocation;
+}, then {
+    (residency_resident: $person, residency_location: $place) isa residency;
+};
+
+person-relocating-ends-old-residency sub rule,
+when {
+    $rel(relocation_relocated-person: $person, relocation_previous-location: $place) isa relocation, has relocation-date $rel-date;
+    $old-residency(residency_resident: $person, residency_location: $place) isa residency;
+}, then {
+    $old-residency has end-date $rel-date;
 };
 
 # =========================================================================================
