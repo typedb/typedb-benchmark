@@ -7,7 +7,6 @@ java_library(
         "//dependencies/maven/artifacts/org/yaml:snakeyaml",
         "//dependencies/maven/artifacts/org/apache/commons:commons-csv",
         "//dependencies/maven/artifacts/org/apache/commons:commons-lang3",
-        "//dependencies/maven/artifacts/args4j:args4j",
     ],
     visibility = ["//visibility:public"],
 )

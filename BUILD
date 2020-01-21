@@ -12,6 +12,7 @@ java_library(
     deps = [
         "@graknlabs_client_java//:client-java",
         "@graknlabs_graql//java:graql",
+        "//dependencies/maven/artifacts/commons-cli:commons-cli",
         "//common:common",
         "//yaml_tool:yaml_tool",
         "//agents:agents",
