@@ -13,16 +13,16 @@
 
 - [x] Abstract type and non-abstract type hierarchies
 ### Keys 
-- [x] Different types using the same attribute as their key
-- [x] Different types owning the same attribute, one as its key, the other not keyed
-- [ ] Types using attributes as keys where the attribute types form a hierarchy
+- [x] Different types using the same attribute as their key (`identifier`)
+- [x] Different types owning the same attribute, one as its key, the other not keyed (`name`)
+- [x] Types using attributes as keys where the attribute types form a hierarchy (`identifier-double`)
 - Keying with each datatype:
 	- [x] long
-	- [ ] double
+	- [x] double
 	- [x] string
 	- [ ] boolean
 	- [ ] date
-- [ ] Multiple keys for one thing type
+- [x] Multiple keys for one thing type
 - [ ] Multiple keys for one thing type, with different datatypes
 - [x] Disallowed ~~An attribute owned by the parent but used as key by the child~~
 
@@ -32,7 +32,12 @@
 - [x] Attribute of attribute
 - [ ] ~~Attribute of attribute of attribute~~
 - [x] Attribute hierarchies
-- [ ] All attribute datatypes
+- All attribute datatypes:
+	- [ ] long
+	- [ ] double
+	- [ ] string
+	- [ ] boolean
+	- [ ] date
 - Implicit relations:
   - [ ] adding new roleplayers to them
   - [x] adding attributes to them
@@ -60,12 +65,13 @@ Ternary and N-ary relations, with interesting numbers of roleplayers per role
 ## Rule formulations
 - [x] Inferred relation
 - [ ] Inferred relation where the rule is written for the parent relation type
-- [ ] Inferred role, existing relation
+- [ ] Inferred role for an existing relation
 - [x] Inferred attribute
 - [ ] Inferred attribute using value from the `when`, transposing to a different type
 - [ ] Inferred complex type
 - [ ] Inferred entity (useless but why not)
 - [ ] Successive/compound/recursive rules
+- [ ] Rules for relations that also have materialised instances
 
 ## World elements to model
 

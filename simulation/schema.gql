@@ -9,6 +9,10 @@ forename sub name;
 
 surname sub name;
 
+product-name sub name;
+
+service-name sub name;
+
 date-of-event sub attribute,
     abstract,
     datatype date;
@@ -65,7 +69,19 @@ data-signed sub attribute,
 identifier sub attribute,
     datatype long;
 
-membership-id sub identifier;
+identifier-double sub attribute, 
+    datatype double;
+
+service-id sub identifier-double;
+
+product-barcode sub identifier-double;
+
+description sub attribute,
+    datatype string;
+    
+product-description sub description;
+
+service-description sub description;
 
 person sub entity,
     key identifier,
@@ -103,11 +119,12 @@ marriage sub relation,
 
 membership sub relation,
     abstract,
-    key membership-id,
+    key identifier,
     relates membership_member,
     relates membership_group;
 
 employment sub membership,
+    # key employment-id as membership-id, # We might want to say this?
     relates employment_employee as membership_member,
     relates employment_part-time-employee as employment_employee,
     relates employment_full-time-employee as employment_employee,
@@ -233,6 +250,18 @@ transaction sub relation,
     has currency,
     has value,
     plays locates_located;
+
+product sub entity,
+    key product-barcode,
+    key product-name,
+    has product-description,
+    plays transaction_merchandise;
+
+service sub entity,
+    key service-id,
+    key service-name,
+    has service-description,
+    plays transaction_merchandise;
 
 country-currently-uses-currency sub rule,
 when {
