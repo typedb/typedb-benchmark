@@ -125,6 +125,8 @@ marriage sub relation,
 membership sub relation,
     abstract,
     key identifier,
+    has start-date,
+    has end-date,
     relates membership_member,
     relates membership_group;
 
@@ -327,34 +329,51 @@ relocation sub relation,
 
 born-in-location-implies-residency sub rule,
 when {
-    $bi(born-in_place-of-birth: $place, born-in_child: $person) isa born-in;
+    $bi(born-in_place-of-birth: $location, born-in_child: $person) isa born-in;
 }, then {
-    (residency_resident: $person, residency_location: $place) isa residency;
+    (residency_resident: $person, residency_location: $location) isa residency;
 };
 
 # This rule can be triggered by a person moving back to their hometown having moved away, and add an incorrect start-date
 born-in-location-implies-residency-date sub rule,
 when {
-    $bi(born-in_place-of-birth: $place, born-in_child: $person) isa born-in;
+    $bi(born-in_place-of-birth: $location, born-in_child: $person) isa born-in;
     $person isa person, has date-of-birth $dob;
-    $r(residency_resident: $person, residency_location: $place) isa residency;
+    $r(residency_resident: $person, residency_location: $location) isa residency;
 }, then {
     $r has start-date $dob;
 };
 
 person-relocating-adds-new-residency sub rule,
 when {
-    $rel(relocation_relocated-person: $person, relocation_new-location: $place) isa relocation;
+    $rel(relocation_relocated-person: $person, relocation_new-location: $location) isa relocation;
 }, then {
-    (residency_resident: $person, residency_location: $place) isa residency;
+    (residency_resident: $person, residency_location: $location) isa residency;
 };
 
 person-relocating-ends-old-residency sub rule,
 when {
-    $rel(relocation_relocated-person: $person, relocation_previous-location: $place) isa relocation, has relocation-date $rel-date;
-    $old-residency(residency_resident: $person, residency_location: $place) isa residency;
+    $rel(relocation_relocated-person: $person, relocation_previous-location: $location) isa relocation, has relocation-date $rel-date;
+    $old-residency(residency_resident: $person, residency_location: $location) isa residency;
 }, then {
     $old-residency has end-date $rel-date;
+};
+
+person-membership-of-organisation-means-relocation sub rule,
+when {
+    (membership_member: $person, membership_group: $group) isa membership;
+    (locates_located: $group, locates_location: $location) isa locates;
+}, then {
+    (relocation_relocated-person: $person, relocation_previous-location: $location) isa relocation;
+};
+
+person-membership-of-organisation-means-relocation-date sub rule,
+when {
+    (membership_member: $person, membership_group: $group) isa membership, has start-date $membership-start-date;
+    (locates_located: $group, locates_location: $location) isa locates;
+    $rel(relocation_relocated-person: $person, relocation_previous-location: $location) isa relocation;
+}, then {
+    $rel has relocation-date $membership-start-date;
 };
 
 # =========================================================================================

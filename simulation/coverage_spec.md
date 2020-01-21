@@ -75,12 +75,12 @@ Ternary and N-ary relations, with interesting numbers of roleplayers per role
 - [ ] Inferred relation where the rule is written for the parent relation type
 - [ ] Inferred role for an existing relation
 - [x] Inferred attribute
-- [ ] Inferred attribute using value from the `when`, transposing to a different type
+- [x] Inferred attribute using value from the `when`, transposing to a different type
 - [x] Inferred complex type
 - [ ] Inferred entity (useless but why not)
-- [ ] Successive/compound/recursive rules
+- [x] Successive/compound/recursive rules
 - [ ] Rules for relations that also have materialised instances
-- [ ] `when` bodies with a relation(s) where the relation(s) don't have a variable ascribed to them
+- [x] `when` bodies with a relation(s) where the relation(s) don't have a variable ascribed to them
 - [ ] Utilising explanations of rules, also recursively
 
 ## World elements to model
