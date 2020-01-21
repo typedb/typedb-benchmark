@@ -78,7 +78,7 @@ product-barcode sub identifier-double;
 
 description sub attribute,
     datatype string;
-    
+
 product-description sub description;
 
 service-description sub description;
@@ -162,14 +162,20 @@ organisation sub entity,
     has organisation-name;
 
 company sub organisation,
-    plays employment_employer;
+    # We may want to say `has company-name as organisation-name;`
+    plays employment_employer,
+    plays transaction_vendor,
+    plays transaction_buyer;
 
 university sub organisation,
     plays employment_employer,
-    plays studentship_school;
+    plays studentship_school,
+    plays transaction_vendor,
+    plays transaction_buyer;
 
 charity sub organisation,
-    plays volunteering_cause;
+    plays volunteering_cause,
+    plays transaction_buyer;
 
 location sub entity,
     key name,
@@ -303,4 +309,3 @@ insert $x "American Dollar" isa currency, has currency-code "USD";
 insert $x "Indian Rupee" isa currency, has currency-code "INR";
 insert $x "Malaysian Ringgit" isa currency, has currency-code "MYR";
 insert $x "Indonesian Rupiah" isa currency, has currency-code "IDR";
-

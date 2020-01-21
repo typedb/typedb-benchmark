@@ -35,20 +35,21 @@
 - All attribute datatypes:
 	- [ ] long
 	- [ ] double
-	- [ ] string
+	- [x] string
 	- [ ] boolean
 	- [ ] date
 - Implicit relations:
   - [ ] adding new roleplayers to them
   - [x] adding attributes to them
 - [x] Regex for strings
+- [ ] Attribute value updates (deletion of implicit relations with via and adding new attribute)
 
 ### Relations
 
 Ternary and N-ary relations, with interesting numbers of roleplayers per role
 
 - [x] One entity playing 3+ roles
-- [ ] One relation playing 3+ roles
+- [x] One relation playing 3+ roles (`university`)
 - [x] One relation with 3+ roles played
 - [ ] Unary relation, where a thing instance plays one role once and there are no other roleplayers
 - [x] Symmetric and antisymmetric relation
@@ -68,7 +69,7 @@ Ternary and N-ary relations, with interesting numbers of roleplayers per role
 - [ ] Inferred role for an existing relation
 - [x] Inferred attribute
 - [ ] Inferred attribute using value from the `when`, transposing to a different type
-- [ ] Inferred complex type
+- [x] Inferred complex type
 - [ ] Inferred entity (useless but why not)
 - [ ] Successive/compound/recursive rules
 - [ ] Rules for relations that also have materialised instances
@@ -88,7 +89,6 @@ Ternary and N-ary relations, with interesting numbers of roleplayers per role
 
 - [ ] Data Deletion
 - [ ] New schema additions or undefine statements
-- [ ] Attribute value updates (deletion of implicit relations with via and adding new attribute)
 - [ ] (Future) see how quickly an indexed schema pattern comes into effect and the speed improvement
 - Matching across data and schema in single queries, e.g.:
   - [ ] `match $d type my-attribute; $d datatype string; get;`
