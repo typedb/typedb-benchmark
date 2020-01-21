@@ -56,7 +56,7 @@ public class Simulation implements AgentContext {
         try {
             commandLine = parser.parse(options, args);
         } catch (ParseException e) {
-            e.printStackTrace();
+            System.err.println(e.getMessage());
             System.exit(1);
             return;
         }
