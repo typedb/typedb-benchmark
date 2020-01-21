@@ -38,17 +38,17 @@ public class Simulation implements AgentContext {
         //////////////////////////
 
         Options options = new Options();
-        options.addOption(Option.builder()
-                .argName("g").longOpt("grakn-uri").desc("Grakn server URI").hasArg()
+        options.addOption(Option.builder("g")
+                .longOpt("grakn-uri").desc("Grakn server URI").hasArg().argName("uri")
                 .build());
-        options.addOption(Option.builder()
-                .argName("s").longOpt("seed").desc("Simulation randomization seed").hasArg()
+        options.addOption(Option.builder("s")
+                .longOpt("seed").desc("Simulation randomization seed").hasArg().argName("seed")
                 .build());
-        options.addOption(Option.builder()
-                .argName("i").longOpt("iterations").desc("Number of simulation iterations").hasArg()
+        options.addOption(Option.builder("i")
+                .longOpt("iterations").desc("Number of simulation iterations").hasArg().argName("iterations")
                 .build());
-        options.addOption(Option.builder()
-                .argName("k").longOpt("keyspace").desc("Grakn keyspace").hasArg().required()
+        options.addOption(Option.builder("k")
+                .longOpt("keyspace").desc("Grakn keyspace").hasArg().required().argName("keyspace")
                 .build());
 
         CommandLineParser parser = new DefaultParser();
@@ -62,7 +62,11 @@ public class Simulation implements AgentContext {
         }
 
         String graknHostUri = getOption(commandLine, "g").orElse(GraknClient.DEFAULT_URI);
-        long seed = getOption(commandLine, "s").map(Long::parseLong).orElse(new Random().nextLong());
+        long seed = getOption(commandLine, "s").map(Long::parseLong).orElseGet(() -> {
+            long s = new Random().nextLong();
+            System.out.println("No seed supplied, using random seed: " + s);
+            return s;
+        });
         int iterations = getOption(commandLine, "i").map(Integer::parseInt).orElse(10);
         String graknKeyspace = commandLine.getOptionValue("k");
 
@@ -74,28 +78,27 @@ public class Simulation implements AgentContext {
         System.out.println("Connecting to Grakn...");
 
         GraknClient client = new GraknClient(graknHostUri);
-        Session session = client.session(graknKeyspace);
+        try (Session session = client.session(graknKeyspace)) {
 
-        Simulation simulation = new Simulation(
-                session,
-                AgentList.AGENTS,
-                new RandomSource(seed)
-        );
+            Simulation simulation = new Simulation(
+                    session,
+                    AgentList.AGENTS,
+                    new RandomSource(seed)
+            );
 
-        try {
             simulation.loadSchema(Paths.get("schema/schema.gql"));
             simulation.loadData(Paths.get("data/data.yaml"));
+
+            ///////////////
+            // MAIN LOOP //
+            ///////////////
+
+            for (int i = 0; i < iterations; ++i) {
+                simulation.iterate();
+            }
         } catch (Exception ex) {
             ex.printStackTrace();
             System.exit(1);
-        }
-
-        ///////////////
-        // MAIN LOOP //
-        ///////////////
-
-        for (int i = 0; i < iterations; ++i) {
-            simulation.iterate();
         }
     }
 
