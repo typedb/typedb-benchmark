@@ -4,7 +4,6 @@ java_library(
     deps = [
         "@graknlabs_client_java//:client-java",
         "@graknlabs_graql//java:graql",
-        "//agents/entities:entities",
         "//common:common",
     ],
     visibility = ["//visibility:public"],

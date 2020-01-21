@@ -1,6 +1,5 @@
 package grakn.simulation.agents;
 
-import grakn.client.GraknClient;
 import grakn.simulation.common.RandomSource;
 
 /**
@@ -8,5 +7,5 @@ import grakn.simulation.common.RandomSource;
  */
 public interface Agent {
 
-    void iterate(GraknClient.Session session, RandomSource randomSource);
+    void iterate(AgentContext context, RandomSource randomSource);
 }

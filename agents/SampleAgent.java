@@ -1,16 +1,15 @@
 package grakn.simulation.agents;
 
-import grakn.client.GraknClient.Session;
 import grakn.simulation.common.RandomSource;
-import grakn.simulation.agents.entities.Continent;
 
 public class SampleAgent implements ContinentAgent {
 
     @Override
-    public void iterate(Session session, RandomSource randomSource, Continent continent) {
+    public void iterate(AgentContext context, RandomSource randomSource, String continentName) {
         System.out.println(
                 Thread.currentThread().getName() + ": " +
-                continent.getContinentName() + ": " +
+                continentName + ": " +
+                context.getDate() + ": " +
                 randomSource.startNewRandom().nextInt(100)
         );
     }

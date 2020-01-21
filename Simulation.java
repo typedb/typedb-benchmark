@@ -4,6 +4,7 @@ import grakn.client.GraknClient;
 import grakn.client.GraknClient.Session;
 import grakn.client.GraknClient.Transaction;
 import grakn.simulation.agents.Agent;
+import grakn.simulation.agents.AgentContext;
 import grakn.simulation.common.RandomSource;
 import grakn.simulation.common.StringPrettyBox;
 import grakn.simulation.yaml_tool.GraknYAMLException;
@@ -16,9 +17,10 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDate;
 import java.util.*;
 
-public class Simulation {
+public class Simulation implements AgentContext {
 
     public static void main(String[] args) {
         System.out.println(StringPrettyBox.blocked("Welcome to the Simulation!"));
@@ -65,7 +67,7 @@ public class Simulation {
         System.out.println(StringPrettyBox.simple("Simulation step: " + simulationStep, '*'));
 
         for (Agent agent : agents) {
-            agent.iterate(session, RandomSource.nextSource(random));
+            agent.iterate(this, RandomSource.nextSource(random));
         }
 
         simulationStep++;
@@ -82,5 +84,15 @@ public class Simulation {
 
     private void loadData(Path dataPath) throws IOException, GraknYAMLException {
         loader.loadFile(dataPath.toFile());
+    }
+
+    @Override
+    public Session getGraknSession() {
+        return session;
+    }
+
+    @Override
+    public LocalDate getDate() {
+        return LocalDate.ofEpochDay(simulationStep);
     }
 }
