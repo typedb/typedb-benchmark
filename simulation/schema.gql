@@ -56,6 +56,9 @@ currency sub attribute,
     has currency-code,
     plays currency-adoption_currency-adopted;
 
+value sub attribute,
+    datatype double;
+
 data-signed sub attribute,
     datatype date;
 
@@ -218,6 +221,52 @@ currency-adoption sub relation,
     has end-date,
     relates currency-adoption_adopting-country,
     relates currency-adoption_currency-adopted;
+
+current-currency sub currency-adoption,
+    relates currency-adoption_adopting-country,
+    relates currency-adoption_currency-adopted;
+
+transaction sub relation,
+    relates transaction_buyer,
+    relates transaction_vendor,
+    relates transaction_merchandise,
+    has currency,
+    has value,
+    plays locates_located;
+
+country-currently-uses-currency sub rule,
+when {
+    $ca isa currency-adoption;
+    not {$ca has end-date $ed;};
+}, then {
+    $ca isa current-currency;
+};
+
+transaction-currency-is-that-of-the-location sub rule,
+when {
+    $transaction isa transaction;
+    $l(locates_located: $transaction, locates_location: $transaction-location) isa locates;
+    $lh(location-hierarchy_subordinate: $transaction-location, location-hierarchy_superior: $loc-country) isa location-hierarchy;
+    $loc-country isa country;
+    $cc(currency-adoption_adopting-country: $loc-country, currency-adoption_currency-adopted: $currency) isa current-currency;
+}, then {
+    $transaction has currency $currency;
+};
+
+# This rule could be avoided by a disjunction in the rule body of `transaction-currency-is-that-of-the-location`
+transaction-currency-is-that-of-the-country sub rule,
+when {
+    $transaction isa transaction;
+    $l(locates_located: $t, locates_location: $transaction-location) isa locates;
+    $transaction-country isa country;
+    (currency-adoption_adopting-country: $transaction-country, currency-adoption_currency-adopted: $currency) isa current-currency;
+}, then {
+    $transaction has currency $currency;
+};
+
+# =========================================================================================
+# DATA
+# =========================================================================================
 
 insert $x "Great British Pound" isa currency, has currency-code "GBP";
 insert $x "Euro" isa currency, has currency-code "EUR";
