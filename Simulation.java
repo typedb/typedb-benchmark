@@ -11,6 +11,7 @@ import grakn.simulation.yaml_tool.GraknYAMLException;
 import grakn.simulation.yaml_tool.GraknYAMLLoader;
 import graql.lang.Graql;
 import graql.lang.query.GraqlDefine;
+import org.apache.commons.cli.*;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -22,30 +23,82 @@ import java.util.*;
 
 public class Simulation implements AgentContext {
 
+    private static Optional<String> getOption(CommandLine commandLine, String option) {
+        if (commandLine.hasOption(option)) {
+            return Optional.of(commandLine.getOptionValue(option));
+        } else {
+            return Optional.empty();
+        }
+    }
+
     public static void main(String[] args) {
+
+        //////////////////////////
+        // COMMAND LINE OPTIONS //
+        //////////////////////////
+
+        Options options = new Options();
+        options.addOption(Option.builder("g")
+                .longOpt("grakn-uri").desc("Grakn server URI").hasArg().argName("uri")
+                .build());
+        options.addOption(Option.builder("s")
+                .longOpt("seed").desc("Simulation randomization seed").hasArg().argName("seed")
+                .build());
+        options.addOption(Option.builder("i")
+                .longOpt("iterations").desc("Number of simulation iterations").hasArg().argName("iterations")
+                .build());
+        options.addOption(Option.builder("k")
+                .longOpt("keyspace").desc("Grakn keyspace").hasArg().required().argName("keyspace")
+                .build());
+
+        CommandLineParser parser = new DefaultParser();
+        CommandLine commandLine;
+        try {
+            commandLine = parser.parse(options, args);
+        } catch (ParseException e) {
+            System.err.println(e.getMessage());
+            System.exit(1);
+            return;
+        }
+
+        String graknHostUri = getOption(commandLine, "g").orElse(GraknClient.DEFAULT_URI);
+        long seed = getOption(commandLine, "s").map(Long::parseLong).orElseGet(() -> {
+            long s = new Random().nextLong();
+            System.out.println("No seed supplied, using random seed: " + s);
+            return s;
+        });
+        int iterations = getOption(commandLine, "i").map(Integer::parseInt).orElse(10);
+        String graknKeyspace = commandLine.getOptionValue("k");
+
+        ////////////////////
+        // INITIALIZATION //
+        ////////////////////
+
         System.out.println(StringPrettyBox.blocked("Welcome to the Simulation!"));
         System.out.println("Connecting to Grakn...");
 
-        GraknClient client = new GraknClient();
-        Session session = client.session("world");
+        GraknClient client = new GraknClient(graknHostUri);
+        try (Session session = client.session(graknKeyspace)) {
 
-        Simulation simulation = new Simulation(
-                session,
-                AgentList.AGENTS,
-                new RandomSource(1)
-        );
+            Simulation simulation = new Simulation(
+                    session,
+                    AgentList.AGENTS,
+                    new RandomSource(seed)
+            );
 
-        try {
             simulation.loadSchema(Paths.get("schema/schema.gql"));
             simulation.loadData(Paths.get("data/data.yaml"));
+
+            ///////////////
+            // MAIN LOOP //
+            ///////////////
+
+            for (int i = 0; i < iterations; ++i) {
+                simulation.iterate();
+            }
         } catch (Exception ex) {
             ex.printStackTrace();
             System.exit(1);
-        }
-
-        int times = 100;
-        for (int i = 0; i < times; ++i) {
-            simulation.iterate();
         }
     }
 

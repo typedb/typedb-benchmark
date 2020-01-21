@@ -1,7 +1,7 @@
 java_library(
-    name = "args4j",
+    name = "commons-cli",
     exports = [
-        "//external:jar/args4j/args4j"
+        "//external:jar/commons-cli/commons-cli"
     ],
     visibility = [
         "//visibility:public"
