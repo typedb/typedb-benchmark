@@ -1,13 +1,8 @@
 # Grakn Simulation World
 
-### Test the YAML-Tool
+### Build and run Simulation
 ```shell script
-# Load the schema into Grakn
-grakn console -k world -f world/schema/schema.gql
-
-# Build the CSV-Loader CLI Tool
-bazel build //yaml_tool:yaml_tool-binary
-
-# Run the tool
-bazel-bin/yaml_tool/yaml_tool-binary -k world world/data/data.yaml
+bazel run //:world
 ```
+
+The expected `stdout` output should contain statements from multiple threads contain a continent name and random number, which should be the same each execution.

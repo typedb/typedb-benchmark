@@ -1,0 +1,10 @@
+java_library(
+    name = "entities",
+    srcs = glob(["*.java"]),
+    deps = [
+        "@graknlabs_client_java//:client-java",
+        "@graknlabs_graql//java:graql",
+        "//common:common",
+    ],
+    visibility = ["//visibility:public"],
+)

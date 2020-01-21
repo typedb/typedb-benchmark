@@ -1,6 +1,6 @@
 java_library(
     name = "yaml_tool",
-    srcs = glob(["**/*.java"]),
+    srcs = glob(["*.java"]),
     deps = [
         "@graknlabs_client_java//:client-java",
         "@graknlabs_graql//java:graql",
@@ -8,15 +8,6 @@ java_library(
         "//dependencies/maven/artifacts/org/apache/commons:commons-csv",
         "//dependencies/maven/artifacts/org/apache/commons:commons-lang3",
         "//dependencies/maven/artifacts/args4j:args4j",
-    ],
-    visibility = ["//visibility:public"],
-)
-
-java_binary(
-    name = "yaml_tool-binary",
-    main_class = "grakn.simulation.yaml_tool.GraknYAMLToolCLI",
-    runtime_deps = [
-        ":yaml_tool",
     ],
     visibility = ["//visibility:public"],
 )
