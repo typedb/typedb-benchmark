@@ -1,0 +1,28 @@
+version: 2.1
+commands:
+  install-bazel-linux-rbe:
+    steps:
+      - run: curl -OL https://raw.githubusercontent.com/graknlabs/build-tools/master/ci/install-bazel-linux.sh
+      - run: bash ./install-bazel-linux.sh && rm ./install-bazel-linux.sh
+      - run: curl -OL https://raw.githubusercontent.com/graknlabs/build-tools/master/ci/install-bazel-rbe.sh
+      - run: bash ./install-bazel-rbe.sh && rm ./install-bazel-rbe.sh
+
+  run-bazel-rbe:
+    parameters:
+      command:
+        type: string
+    steps:
+      - run:
+          command: bazel run @graknlabs_build_tools//ci:run-bazel-rbe -- << parameters.command >>
+          no_output_timeout: 1h
+
+jobs:
+  build:
+    machine: true
+    working_directory: ~/simulation
+    steps:
+      - install-bazel-linux-rbe
+      - checkout
+      - run-bazel-rbe:
+          command: bazel build //...
+      - run: bazel run @graknlabs_build_tools//unused_deps -- list
