@@ -16,7 +16,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 
-workspace(name = "adam_onboarding")
+workspace(name = "simulation")
 
 
 ################################
