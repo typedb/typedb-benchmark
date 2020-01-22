@@ -1,0 +1,22 @@
+define
+
+employment sub membership,
+    relates employment_employment-contract,
+    relates employment_profession;
+
+occupation sub entity,
+   plays employment_profession;
+
+employment-contract sub legal-contract,
+    plays employment_employment-contract;
+
+contracted-hours-apply-to-employment sub rule,
+when {
+    $emp(employment_employment-contract: $c) isa employment;
+    $c isa employment-contract, has contracted-hours $hours;
+}, then {
+    $emp has contracted-hours $hours;
+};
+
+@has-annual-wage sub @has-attribute,
+    has currency;
