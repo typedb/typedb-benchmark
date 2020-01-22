@@ -17,27 +17,6 @@ options:
 
 
 dependencies:
-  com.google.guava:
-    guava:
-      version: "23.0"
-      lang: java
-
-  com.google.protobuf:
-    protobuf-java:
-      version: "3.4.0"
-      lang: java
-
-  io.grpc:
-    grpc-protobuf:
-      version: "1.16.0"
-      lang: java
-    grpc-stub:
-      version: "1.16.0"
-      lang: java
-    grpc-core:
-      version: "1.16.0"
-      lang: java
-
   org.apache.commons:
     commons-csv:
       version: "1.7"
