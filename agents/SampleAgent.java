@@ -9,7 +9,7 @@ public class SampleAgent implements ContinentAgent {
         System.out.println(
                 Thread.currentThread().getName() + ": " +
                 continent.getName() + ": " +
-                context.getDate() + ": " +
+                context.getLocalDateTime() + ": " +
                 randomSource.startNewRandom().nextInt(100)
         );
     }

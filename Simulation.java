@@ -20,6 +20,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -184,8 +186,13 @@ public class Simulation implements AgentContext, AutoCloseable {
     }
 
     @Override
-    public LocalDate getDate() {
-        return LocalDate.ofEpochDay(simulationStep);
+    public int getSimulationStep() {
+        return simulationStep;
+    }
+
+    @Override
+    public LocalDateTime getLocalDateTime() {
+        return LocalDateTime.of(LocalDate.ofEpochDay(simulationStep), LocalTime.of(0, 0, 0));
     }
 
     @Override
