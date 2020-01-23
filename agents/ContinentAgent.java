@@ -17,7 +17,7 @@ public interface ContinentAgent extends ParallelAgent<String> {
 
         List<ConceptMap> conceptMapList = tx.execute(
                 Graql.match(
-                        Graql.var("x").isa("continent-name")
+                        Graql.var().isa("continent").has("name", Graql.var("x"))
                 ).get("x").sort("x", ASC)
         );
 

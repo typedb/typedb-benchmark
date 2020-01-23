@@ -88,6 +88,7 @@ public class Simulation implements AgentContext {
 
             simulation.loadSchema(Paths.get("schema/schema.gql"));
             simulation.loadData(Paths.get("data/data.yaml"));
+            simulation.loadData(Paths.get("data/currencies.yaml"));
 
             ///////////////
             // MAIN LOOP //
