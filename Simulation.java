@@ -5,6 +5,7 @@ import grakn.client.GraknClient.Session;
 import grakn.client.GraknClient.Transaction;
 import grakn.simulation.agents.Agent;
 import grakn.simulation.agents.AgentContext;
+import grakn.simulation.agents.World;
 import grakn.simulation.common.RandomSource;
 import grakn.simulation.common.StringPrettyBox;
 import grakn.simulation.yaml_tool.GraknYAMLException;
@@ -20,8 +21,10 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
-public class Simulation implements AgentContext {
+public class Simulation implements AgentContext, AutoCloseable {
 
     private static Optional<String> getOption(CommandLine commandLine, String option) {
         if (commandLine.hasOption(option)) {
@@ -75,16 +78,28 @@ public class Simulation implements AgentContext {
         ////////////////////
 
         System.out.println(StringPrettyBox.blocked("Welcome to the Simulation!"));
-        System.out.println("Connecting to Grakn...");
-
-        GraknClient client = new GraknClient(graknHostUri);
-        try (Session session = client.session(graknKeyspace)) {
-
-            Simulation simulation = new Simulation(
-                    session,
-                    AgentList.AGENTS,
-                    new RandomSource(seed)
+        System.out.println("Parsing world data...");
+        World world;
+        try {
+            world = new World(
+                    Paths.get("data/continents.csv"),
+                    Paths.get("data/countries.csv"),
+                    Paths.get("data/cities.csv")
             );
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.exit(1);
+            return;
+        }
+
+        System.out.println("Connecting to Grakn...");
+        try (Simulation simulation = new Simulation(
+                    graknHostUri,
+                    graknKeyspace,
+                    AgentList.AGENTS,
+                    new RandomSource(seed),
+                    world
+            )) {
 
             simulation.loadSchema(Paths.get("schema/schema.gql"));
             simulation.loadData(Paths.get("data/data.yaml"));
@@ -102,18 +117,27 @@ public class Simulation implements AgentContext {
         }
     }
 
-    private final Session session;
+    private final GraknClient client;
+    private final String keyspace;
+    private final Session defaultSession;
     private final GraknYAMLLoader loader;
     private final Agent[] agents;
     private final Random random;
+    private final World world;
 
     private int simulationStep = 0;
 
-    private Simulation(Session session, Agent[] agents, RandomSource randomSource) {
-        this.session = session;
-        this.loader = new GraknYAMLLoader(session);
+    private final ConcurrentMap<String, Session> sessionMap;
+
+    private Simulation(String graknUri, String keyspace, Agent[] agents, RandomSource randomSource, World world) {
+        client = new GraknClient(graknUri);
+        this.keyspace = keyspace;
+        defaultSession = client.session(keyspace);
+        loader = new GraknYAMLLoader(defaultSession);
         this.agents = agents;
-        this.random = randomSource.startNewRandom();
+        random = randomSource.startNewRandom();
+        sessionMap = new ConcurrentHashMap<>();
+        this.world = world;
     }
 
     private void iterate() {
@@ -123,13 +147,15 @@ public class Simulation implements AgentContext {
             agent.iterate(this, RandomSource.nextSource(random));
         }
 
+        closeAllSessionsInMap(); // We want to test opening new sessions each iteration.
+
         simulationStep++;
     }
 
     private void loadSchema(Path schemaPath) throws IOException {
         String schemaQuery = new String(Files.readAllBytes(schemaPath), StandardCharsets.UTF_8);
 
-        try (Transaction tx = session.transaction().write()) {
+        try (Transaction tx = defaultSession.transaction().write()) {
             tx.execute((GraqlDefine) Graql.parse(schemaQuery));
             tx.commit();
         }
@@ -139,13 +165,41 @@ public class Simulation implements AgentContext {
         loader.loadFile(dataPath.toFile());
     }
 
+    private void closeAllSessionsInMap() {
+        for (Session session : sessionMap.values()) {
+            session.close();
+        }
+        sessionMap.clear();
+    }
+
     @Override
     public Session getGraknSession() {
-        return session;
+        return defaultSession;
+    }
+
+    @Override
+    public Session getIterationGraknSessionFor(String key) {
+        return sessionMap.computeIfAbsent(key, k -> client.session(keyspace)); // Open sessions for new keys
     }
 
     @Override
     public LocalDate getDate() {
         return LocalDate.ofEpochDay(simulationStep);
+    }
+
+    @Override
+    public World getWorld() {
+        return world;
+    }
+
+    @Override
+    public void close() {
+        closeAllSessionsInMap();
+
+        defaultSession.close();
+
+        if (client != null) {
+            client.close();
+        }
     }
 }

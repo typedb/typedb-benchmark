@@ -1,14 +1,7 @@
 ---
 template: |
   insert $x isa continent, has continent-name <0>;
-data: |
-  North America
-  South America
-  Europe
-  Africa
-  Asia
-  Australia
-  Antarctica
+data_file: continents.csv
 ---
 template: |
   match
@@ -16,8 +9,5 @@ template: |
   insert
     $x isa country, has country-name <0>;
     (container: $c, containee: $x) isa contains;
-data: |
-  USA,North America
-  United Kingdom,Europe
-  Germany,Europe
+data_file: countries.csv
 ...
