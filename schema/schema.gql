@@ -375,14 +375,3 @@ when {
 }, then {
     $rel has relocation-date $membership-start-date;
 };
-
-# =========================================================================================
-# DATA
-# =========================================================================================
-
-insert $x "Great British Pound" isa currency, has currency-code "GBP";
-insert $x "Euro" isa currency, has currency-code "EUR";
-insert $x "American Dollar" isa currency, has currency-code "USD";
-insert $x "Indian Rupee" isa currency, has currency-code "INR";
-insert $x "Malaysian Ringgit" isa currency, has currency-code "MYR";
-insert $x "Indonesian Rupiah" isa currency, has currency-code "IDR";
