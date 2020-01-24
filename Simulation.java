@@ -104,6 +104,7 @@ public class Simulation implements AgentContext, AutoCloseable {
             )) {
 
             simulation.loadSchema(Paths.get("schema/schema.gql"));
+            simulation.loadSchema(Paths.get("schema/schema-pt2.gql"));
             simulation.loadData(Paths.get("data/data.yaml"));
             simulation.loadData(Paths.get("data/currencies.yaml"));
 
