@@ -4,6 +4,7 @@ java_library(
     data = glob([
         "schema/*.gql",
         "data/*.yaml",
+        "data/*.csv",
     ]),
     resources = [
         "conf/logback.xml",

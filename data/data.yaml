@@ -1,14 +1,6 @@
 ---
-template: |
-  insert $x isa continent, has name <0>;
-data: |
-  North America
-  South America
-  Europe
-  Africa
-  Asia
-  Australia
-  Antarctica
+template: insert $x isa continent, has name <0>;
+data_file: continents.csv
 ---
 template: |
   match
@@ -16,8 +8,5 @@ template: |
   insert
     $x isa country, has name <0>;
     (location-hierarchy_superior: $c, location-hierarchy_subordinate: $x) isa location-hierarchy;
-data: |
-  USA,North America
-  United Kingdom,Europe
-  Germany,Europe
+data_file: countries.csv
 ...

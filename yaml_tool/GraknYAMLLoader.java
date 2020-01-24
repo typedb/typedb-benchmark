@@ -10,6 +10,9 @@ import org.yaml.snakeyaml.Yaml;
 import grakn.client.GraknClient.Session;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 
 /**
@@ -31,21 +34,21 @@ public class GraknYAMLLoader {
         this.session = session;
     }
 
-    public void loadFile(File file) throws FileNotFoundException, GraknYAMLException {
-        loadInputStream(new FileInputStream(file));
+    public void loadFile(File file) throws GraknYAMLException, FileNotFoundException {
+        loadInputStream(new FileInputStream(file), file.toPath().getParent());
     }
 
-    public void loadInputStream(InputStream inputStream) throws GraknYAMLException {
+    public void loadInputStream(InputStream inputStream, Path workingDir) throws GraknYAMLException {
         try (Transaction tx = session.transaction().write()) {
             for (Object document : THREAD_YAML.get().loadAll(inputStream)) {
-                loadDocument(tx, document);
+                loadDocument(tx, document, workingDir);
             }
 
             tx.commit();
         }
     }
 
-    private void loadDocument(Transaction tx, Object document) throws GraknYAMLException {
+    private void loadDocument(Transaction tx, Object document, Path workingDir) throws GraknYAMLException {
         Map documentMap;
         try {
             documentMap = (Map) document;
@@ -53,19 +56,41 @@ public class GraknYAMLLoader {
             throw new GraknYAMLException("Document was not a Map.");
         }
 
-        GraqlQueryTemplate template = new GraqlQueryTemplate(getString(documentMap, "template"));
-        String data = getString(documentMap, "data");
+        // Get template
+        String templateString = getString(documentMap, "template");
+        if (templateString == null) {
+            throw new GraknYAMLException("No template was supplied.");
+        }
+        GraqlQueryTemplate template = new GraqlQueryTemplate(templateString);
 
-        try {
-            CSVParser parser = CSVParser.parse(data, CSVFormat.DEFAULT);
-
-            for (CSVRecord record : parser.getRecords()) {
-                String interpolatedQuery = template.interpolate(record::get);
-                GraqlInsert insert = Graql.parse(interpolatedQuery);
-                tx.execute(insert);
+        // Try data_file
+        String dataFile = getString(documentMap, "data_file");
+        if (dataFile != null) {
+            try {
+                CSVParser parser = CSVParser.parse(workingDir.resolve(dataFile), StandardCharsets.UTF_8, CSVFormat.DEFAULT);
+                parseCSV(tx, template, parser);
+            } catch (IOException e) {
+                throw new GraknYAMLException("Could not parse CSV data.", e);
             }
-        } catch (IOException e) {
-            throw new GraknYAMLException("Could not parse CSV data.", e);
+        }
+
+        // Try data attrib
+        String data = getString(documentMap, "data");
+        if (data != null) {
+            try {
+                CSVParser parser = CSVParser.parse(data, CSVFormat.DEFAULT);
+                parseCSV(tx, template, parser);
+            } catch (IOException e) {
+                throw new GraknYAMLException("Could not parse CSV data.", e);
+            }
+        }
+    }
+
+    private void parseCSV(Transaction tx, GraqlQueryTemplate template, CSVParser parser) throws IOException {
+        for (CSVRecord record : parser.getRecords()) {
+            String interpolatedQuery = template.interpolate(record::get);
+            GraqlInsert insert = Graql.parse(interpolatedQuery);
+            tx.execute(insert);
         }
     }
 
@@ -79,6 +104,9 @@ public class GraknYAMLLoader {
      */
     private static String getString(Map object, String key) throws GraknYAMLException {
         Object result = object.get(key);
+        if (result == null) {
+            return null;
+        }
         if (!(result instanceof String)) {
             throw new GraknYAMLException("Did not find a String for '" + key + "'");
         }

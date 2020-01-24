@@ -1,28 +1,15 @@
 package grakn.simulation.agents;
 
-import grakn.client.GraknClient;
-import grakn.client.answer.ConceptMap;
-import graql.lang.Graql;
+import grakn.simulation.agents.World.Continent;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
-import static graql.lang.Graql.Token.Order.ASC;
+import static java.util.stream.Collectors.toList;
 
-public interface ContinentAgent extends ParallelAgent<String> {
+public interface ContinentAgent extends ParallelAgent<Continent> {
 
     @Override
-    default List<String> getParallelItems(AgentContext agentContext) {
-        GraknClient.Transaction tx = agentContext.getGraknSession().transaction().read();
-
-        List<ConceptMap> conceptMapList = tx.execute(
-                Graql.match(
-                        Graql.var().isa("continent").has("name", Graql.var("x"))
-                ).get("x").sort("x", ASC)
-        );
-
-        return conceptMapList.stream()
-                .map(c -> (String) c.get("x").asAttribute().value())
-                .collect(Collectors.toList());
+    default List<Continent> getParallelItems(AgentContext agentContext) {
+        return agentContext.getWorld().getContinents().collect(toList());
     }
 }

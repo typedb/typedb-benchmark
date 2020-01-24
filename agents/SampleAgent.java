@@ -5,10 +5,10 @@ import grakn.simulation.common.RandomSource;
 public class SampleAgent implements ContinentAgent {
 
     @Override
-    public void iterate(AgentContext context, RandomSource randomSource, String continentName) {
+    public void iterate(AgentContext context, RandomSource randomSource, World.Continent continent) {
         System.out.println(
                 Thread.currentThread().getName() + ": " +
-                continentName + ": " +
+                continent.getName() + ": " +
                 context.getDate() + ": " +
                 randomSource.startNewRandom().nextInt(100)
         );
