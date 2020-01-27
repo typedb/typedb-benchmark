@@ -68,7 +68,7 @@ public class Simulation implements AgentContext, AutoCloseable {
 
         String graknHostUri = getOption(commandLine, "g").orElse(GraknClient.DEFAULT_URI);
         long seed = getOption(commandLine, "s").map(Long::parseLong).orElseGet(() -> {
-            long s = new Random().nextLong();
+            long s = 1;
             System.out.println("No seed supplied, using random seed: " + s);
             return s;
         });

@@ -26,7 +26,7 @@ public class PersonBirthAgent implements CityAgent {
         LocalDateTime dateToday = context.getLocalDateTime();
 
         int numBirths = 5;
-        for (int i = 0; i <= numBirths; i++) {
+        for (int i = 0; i < numBirths; i++) {
             String gender;
             String forename;
             String surname = surnames.get(random.nextInt(surnames.size()));
