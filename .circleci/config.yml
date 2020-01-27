@@ -36,9 +36,9 @@ jobs:
   test-end-to-end:
     machine: true
     working_directory: ~/simulation
-      steps:
-        - install-bazel-linux-rbe
-        - checkout
-        - run-grakn-server
-        - bazel run //:simulation-binary -- -k world
-        - bazel test //agents/test/...
+    steps:
+      - install-bazel-linux-rbe
+      - checkout
+      - run-grakn-server
+      - bazel run //:simulation-binary -- -k world
+      - bazel test //agents/test/...
