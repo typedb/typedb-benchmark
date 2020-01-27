@@ -36,8 +36,6 @@ public class Simulation implements AgentContext, AutoCloseable {
         }
     }
 
-    public static int numIterations = 10;
-
     public static void main(String[] args) {
 
         //////////////////////////
@@ -74,6 +72,7 @@ public class Simulation implements AgentContext, AutoCloseable {
             System.out.println("No seed supplied, using random seed: " + s);
             return s;
         });
+        int numIterations = 10;
         int iterations = getOption(commandLine, "i").map(Integer::parseInt).orElse(numIterations);
         String graknKeyspace = commandLine.getOptionValue("k");
 

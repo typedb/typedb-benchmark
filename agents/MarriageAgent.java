@@ -16,7 +16,6 @@ import java.util.Random;
 public class MarriageAgent implements CityAgent {
 
     private AgentContext context;
-    public static int numMarriages = 5;
 
     @Override
     public void iterate(AgentContext context, RandomSource randomSource, World.City city) {
@@ -34,6 +33,7 @@ public class MarriageAgent implements CityAgent {
         Collections.shuffle(womenAnswers, rnd);
         Collections.shuffle(menAnswers, rnd);
 
+        int numMarriages = 5;
         int numMarriagesPossible = Math.min(numMarriages, Math.min(womenAnswers.size(), menAnswers.size()));
 
         if (numMarriagesPossible > 0) {
