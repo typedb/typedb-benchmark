@@ -7,9 +7,11 @@ import org.apache.commons.csv.CSVRecord;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class World {
@@ -19,12 +21,20 @@ public class World {
     private Map<String, Continent> continentMap = new HashMap<>();
     private Map<String, Country> countryMap = new HashMap<>();
     private Map<String, City> cityMap = new HashMap<>();
+
+    private List<FemaleForename> femaleForenames = new ArrayList<>();
+    private List<MaleForename> maleForenames = new ArrayList<>();
+    private List<Surname> surnames = new ArrayList<>();
+
     public static int ageOfAdulthood = 2;
 
-    public World(Path continentsPath, Path countriesPath, Path citiesPath) throws IOException {
+    public World(Path continentsPath, Path countriesPath, Path citiesPath, Path femaleForenamesPath, Path maleForenamesPath, Path surnamesPath) throws IOException {
         iterateCSV(continentsPath, Continent::new);
         iterateCSV(countriesPath, Country::new);
         iterateCSV(citiesPath, City::new);
+        iterateCSV(femaleForenamesPath, FemaleForename::new);
+        iterateCSV(maleForenamesPath, MaleForename::new);
+        iterateCSV(surnamesPath, Surname::new);
     }
 
     private static void iterateCSV(Path path, Consumer<CSVRecord> action) throws IOException {
@@ -41,6 +51,18 @@ public class World {
 
     public Stream<City> getCities() {
         return continents.stream().flatMap(Continent::getCountries).flatMap(Country::getCities);
+    }
+
+    public Stream<FemaleForename> getFemaleForenames() {
+        return femaleForenames.stream();
+    }
+
+    public Stream<MaleForename> getMaleForenames() {
+        return maleForenames.stream();
+    }
+
+    public Stream<Surname> getSurnames() {
+        return surnames.stream();
     }
 
     public class Continent {
@@ -84,6 +106,45 @@ public class World {
 
         public Stream<City> getCities() {
             return cities.stream();
+        }
+    }
+
+    public class FemaleForename {
+        private String value;
+
+        public FemaleForename(CSVRecord record) {
+            value = record.get(0);
+            femaleForenames.add(this);
+        }
+
+        public String getValue() {
+            return value;
+        }
+    }
+
+    public class MaleForename {
+        private String value;
+
+        public MaleForename(CSVRecord record) {
+            value = record.get(0);
+            maleForenames.add(this);
+        }
+
+        public String getValue() {
+            return value;
+        }
+    }
+
+    public class Surname {
+        private String value;
+
+        public Surname(CSVRecord record) {
+            value = record.get(0);
+            surnames.add(this);
+        }
+
+        public String getValue() {
+            return value;
         }
     }
 

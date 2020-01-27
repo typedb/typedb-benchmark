@@ -7,19 +7,20 @@ import graql.lang.Graql;
 import graql.lang.query.GraqlInsert;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
-public class PersonBirthAgent implements CityAgent {
+import static java.util.stream.Collectors.toList;
 
-    private static List<String> maleForenames = new ArrayList<>(Arrays.asList("a", "b"));
-    private static List<String> femaleForenames = new ArrayList<>(Arrays.asList("a", "b"));
-    private static List<String> surnames = new ArrayList<>(Arrays.asList("a", "b"));
+public class PersonBirthAgent implements CityAgent {
 
     @Override
     public void iterate(AgentContext context, RandomSource randomSource, World.City city) {
+
+        List<String> femaleForenames = context.getWorld().getFemaleForenames().map(World.FemaleForename::getValue).collect(toList());
+        List<String> maleForenames = context.getWorld().getMaleForenames().map(World.MaleForename::getValue).collect(toList());
+        List<String> surnames = context.getWorld().getSurnames().map(World.Surname::getValue).collect(toList());
+
         Transaction tx = context.getGraknSession().transaction().write();
         Random random = randomSource.startNewRandom();
         LocalDateTime dateToday = context.getLocalDateTime();

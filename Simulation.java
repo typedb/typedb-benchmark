@@ -87,7 +87,10 @@ public class Simulation implements AgentContext, AutoCloseable {
             world = new World(
                     Paths.get("data/continents.csv"),
                     Paths.get("data/countries.csv"),
-                    Paths.get("data/cities.csv")
+                    Paths.get("data/cities.csv"),
+                    Paths.get("data/female_forenames.csv"),
+                    Paths.get("data/male_forenames.csv"),
+                    Paths.get("data/surnames.csv")
             );
         } catch (IOException e) {
             e.printStackTrace();
