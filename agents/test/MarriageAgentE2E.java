@@ -20,7 +20,7 @@ public class MarriageAgentE2E {
     private GraknClient graknClient;
 
     @Test
-    public void clientJavaE2E() {
+    public void testMarriageAgentInsertsTheExpectedNumberOfMarriages() {
         localhostGraknTx(tx -> {
             GraqlGet.Aggregate marriagesCountQuery = Graql.match(
                     var("m").isa("marriage").rel("marriage_husband", "husband").rel("marriage_wife", "wife")

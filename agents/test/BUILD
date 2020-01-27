@@ -8,8 +8,6 @@ java_test(
         # External dependencies from @graknlabs
         "@graknlabs_client_java//:client-java",
         "@graknlabs_graql//java:graql",
-        "//:simulation",
-        "//agents:agents",
 
         # External dependencies from Maven
         "//dependencies/maven/artifacts/org/hamcrest:hamcrest-library",
