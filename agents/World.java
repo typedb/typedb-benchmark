@@ -9,6 +9,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class World {
@@ -18,6 +19,7 @@ public class World {
     private Map<String, Continent> continentMap = new HashMap<>();
     private Map<String, Country> countryMap = new HashMap<>();
     private Map<String, City> cityMap = new HashMap<>();
+    public static int ageOfAdulthood = 2;
 
     public World(Path continentsPath, Path countriesPath, Path citiesPath) throws IOException {
         iterateCSV(continentsPath, Continent::new);

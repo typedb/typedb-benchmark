@@ -36,6 +36,8 @@ public class Simulation implements AgentContext, AutoCloseable {
         }
     }
 
+    public static int numIterations = 10;
+
     public static void main(String[] args) {
 
         //////////////////////////
@@ -72,7 +74,7 @@ public class Simulation implements AgentContext, AutoCloseable {
             System.out.println("No seed supplied, using random seed: " + s);
             return s;
         });
-        int iterations = getOption(commandLine, "i").map(Integer::parseInt).orElse(10);
+        int iterations = getOption(commandLine, "i").map(Integer::parseInt).orElse(numIterations);
         String graknKeyspace = commandLine.getOptionValue("k");
 
         ////////////////////
@@ -193,7 +195,7 @@ public class Simulation implements AgentContext, AutoCloseable {
 
     @Override
     public LocalDateTime getLocalDateTime() {
-        return LocalDateTime.of(LocalDate.ofEpochDay(simulationStep), LocalTime.of(0, 0, 0));
+        return LocalDateTime.of(LocalDate.ofYearDay(simulationStep, 1), LocalTime.of(0, 0, 0));
     }
 
     @Override
