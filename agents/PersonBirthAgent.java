@@ -14,19 +14,20 @@ import static java.util.stream.Collectors.toList;
 
 public class PersonBirthAgent implements CityAgent {
 
+    private static final int NUM_BIRTHS = 5;
+
     @Override
     public void iterate(AgentContext context, RandomSource randomSource, World.City city) {
 
-        List<String> femaleForenames = context.getWorld().getFemaleForenames().map(World.FemaleForename::getValue).collect(toList());
-        List<String> maleForenames = context.getWorld().getMaleForenames().map(World.MaleForename::getValue).collect(toList());
-        List<String> surnames = context.getWorld().getSurnames().map(World.Surname::getValue).collect(toList());
+        List<String> femaleForenames = context.getWorld().getFemaleForenames();
+        List<String> maleForenames = context.getWorld().getMaleForenames();
+        List<String> surnames = context.getWorld().getSurnames();
 
         Transaction tx = context.getGraknSession().transaction().write();
         Random random = randomSource.startNewRandom();
         LocalDateTime dateToday = context.getLocalDateTime();
 
-        int numBirths = 5;
-        for (int i = 0; i < numBirths; i++) {
+        for (int i = 0; i < NUM_BIRTHS; i++) {
             String gender;
             String forename;
             String surname = surnames.get(random.nextInt(surnames.size()));

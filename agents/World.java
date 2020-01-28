@@ -8,13 +8,18 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
+import static java.util.stream.Collectors.toList;
+
 public class World {
+
+    public static final int AGE_OF_ADULTHOOD = 2;
 
     private List<Continent> continents = new ArrayList<>();
 
@@ -25,8 +30,6 @@ public class World {
     private List<FemaleForename> femaleForenames = new ArrayList<>();
     private List<MaleForename> maleForenames = new ArrayList<>();
     private List<Surname> surnames = new ArrayList<>();
-
-    public static int ageOfAdulthood = 2;
 
     public World(Path continentsPath, Path countriesPath, Path citiesPath, Path femaleForenamesPath, Path maleForenamesPath, Path surnamesPath) throws IOException {
         iterateCSV(continentsPath, Continent::new);
@@ -53,16 +56,16 @@ public class World {
         return continents.stream().flatMap(Continent::getCountries).flatMap(Country::getCities);
     }
 
-    public Stream<FemaleForename> getFemaleForenames() {
-        return femaleForenames.stream();
+    public List<String> getFemaleForenames() {
+        return Collections.unmodifiableList(femaleForenames.stream().map(World.FemaleForename::getValue).collect(toList()));
     }
 
-    public Stream<MaleForename> getMaleForenames() {
-        return maleForenames.stream();
+    public List<String> getMaleForenames() {
+        return Collections.unmodifiableList(maleForenames.stream().map(World.MaleForename::getValue).collect(toList()));
     }
 
-    public Stream<Surname> getSurnames() {
-        return surnames.stream();
+    public List<String> getSurnames() {
+        return Collections.unmodifiableList(surnames.stream().map(World.Surname::getValue).collect(toList()));
     }
 
     public class Continent {

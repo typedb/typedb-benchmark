@@ -28,6 +28,9 @@ import java.util.concurrent.ConcurrentMap;
 
 public class Simulation implements AgentContext, AutoCloseable {
 
+    private final static long RANDOM_SEED = 1;
+    private final static int NUM_ITERATIONS = 10;
+
     private static Optional<String> getOption(CommandLine commandLine, String option) {
         if (commandLine.hasOption(option)) {
             return Optional.of(commandLine.getOptionValue(option));
@@ -68,12 +71,11 @@ public class Simulation implements AgentContext, AutoCloseable {
 
         String graknHostUri = getOption(commandLine, "g").orElse(GraknClient.DEFAULT_URI);
         long seed = getOption(commandLine, "s").map(Long::parseLong).orElseGet(() -> {
-            long s = 1;
-            System.out.println("No seed supplied, using random seed: " + s);
-            return s;
+            System.out.println("No seed supplied, using random seed: " + RANDOM_SEED);
+            return RANDOM_SEED;
         });
-        int numIterations = 10;
-        int iterations = getOption(commandLine, "i").map(Integer::parseInt).orElse(numIterations);
+
+        int iterations = getOption(commandLine, "i").map(Integer::parseInt).orElse(NUM_ITERATIONS);
         String graknKeyspace = commandLine.getOptionValue("k");
 
         ////////////////////

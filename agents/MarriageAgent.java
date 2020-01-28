@@ -15,6 +15,7 @@ import java.util.Random;
 
 public class MarriageAgent implements CityAgent {
 
+    private static final int NUM_MARRIAGES = 5;
     private AgentContext context;
 
     @Override
@@ -33,8 +34,7 @@ public class MarriageAgent implements CityAgent {
         Collections.shuffle(womenAnswers, rnd);
         Collections.shuffle(menAnswers, rnd);
 
-        int numMarriages = 5;
-        int numMarriagesPossible = Math.min(numMarriages, Math.min(womenAnswers.size(), menAnswers.size()));
+        int numMarriagesPossible = Math.min(NUM_MARRIAGES, Math.min(womenAnswers.size(), menAnswers.size()));
 
         if (numMarriagesPossible > 0) {
 
@@ -65,7 +65,7 @@ public class MarriageAgent implements CityAgent {
         Statement personVar = Graql.var("p");
         Statement cityVar = Graql.var("city");
 
-        LocalDateTime dobOfAdults = context.getLocalDateTime().minusYears(World.ageOfAdulthood);
+        LocalDateTime dobOfAdults = context.getLocalDateTime().minusYears(World.AGE_OF_ADULTHOOD);
 
         return Graql.match(
                 personVar.isa("person").has("gender", gender).has("email", Graql.var("email")).has("date-of-birth", Graql.var("dob")),
