@@ -10,8 +10,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Random;
 
-import static java.util.stream.Collectors.toList;
-
 public class PersonBirthAgent implements CityAgent {
 
     private static final int NUM_BIRTHS = 5;
