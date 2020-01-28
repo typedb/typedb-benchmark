@@ -183,12 +183,7 @@ public class Simulation implements AgentContext, AutoCloseable {
         }
         sessionMap.clear();
     }
-
-    @Override
-    public Session getGraknSession() {
-        return defaultSession;
-    }
-
+    
     @Override
     public Session getIterationGraknSessionFor(String key) {
         return sessionMap.computeIfAbsent(key, k -> client.session(keyspace)); // Open sessions for new keys
