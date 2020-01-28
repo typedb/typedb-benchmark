@@ -46,12 +46,14 @@ public class MarriageAgent implements CityAgent {
 
                     GraqlInsert query = Graql.match(
                             Graql.var("husband").isa("person").has("email", husbandEmail),
-                            Graql.var("wife").isa("person").has("email", wifeEmail)
+                            Graql.var("wife").isa("person").has("email", wifeEmail),
+                            Graql.var("city").isa("city").has("name", city.getName())
                     ).insert(
                             Graql.var("m").isa("marriage")
                                     .rel("marriage_husband", "husband")
                                     .rel("marriage_wife", "wife")
-                                    .has("identifier", marriageIdentifier)
+                                    .has("marriage-id", marriageIdentifier),
+                            Graql.var().isa("locates").rel("locates_located", Graql.var("m")).rel("locates_location", Graql.var("city"))
                     );
                     List<ConceptMap> answers = tx.execute(query);
                 }

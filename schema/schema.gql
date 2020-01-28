@@ -75,6 +75,8 @@ email sub attribute,
 identifier sub attribute,
     datatype long;
 
+marriage-id sub identifier;
+
 identifier-double sub attribute, 
     datatype double;
 
@@ -119,7 +121,7 @@ friendship sub relation,
     relates friendship_friend; # Could be N-ary, though in a real-world context this is imperfect
 
 marriage sub relation,
-    key identifier,
+    key marriage-id,
     has date-of-marriage,
     relates marriage_husband,
     relates marriage_wife,
