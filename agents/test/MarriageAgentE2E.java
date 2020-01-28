@@ -17,6 +17,7 @@ import static org.hamcrest.Matchers.equalTo;
 
 public class MarriageAgentE2E {
 
+    private static final String[] args = System.getProperty("sun.java.command").split(" ");
     private GraknClient graknClient;
 
     @Test
@@ -35,7 +36,14 @@ public class MarriageAgentE2E {
 
     @Before
     public void createClient() {
-        String host = "localhost:48555";
+        String host;
+        if (args.length == 1) {
+            host = "localhost:48555";
+        } else if (args.length == 2) {
+            host = args[1];
+        } else {
+            throw new IllegalArgumentException("Received more arguments than expected. Accepts one argument, `grakn-uri`, or no arguments to use the default Grakn host.");
+        }
         graknClient = new GraknClient(host);
     }
 
