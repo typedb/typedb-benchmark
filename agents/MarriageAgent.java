@@ -1,5 +1,6 @@
 package grakn.simulation.agents;
 
+import grakn.client.GraknClient;
 import grakn.client.GraknClient.Transaction;
 import grakn.client.answer.ConceptMap;
 import grakn.simulation.common.RandomSource;
@@ -16,18 +17,18 @@ import java.util.Random;
 public class MarriageAgent implements CityAgent {
 
     private static final int NUM_MARRIAGES = 5;
-    private AgentContext context;
 
     @Override
     public void iterate(AgentContext context, RandomSource randomSource, World.City city) {
 
-        this.context = context;
+        String sessionKey = city.getCountry().getContinent().getName();
+        GraknClient.Session session = context.getIterationGraknSessionFor(sessionKey);
 
         // Find bachelors and bachelorettes who are considered adults and who are not in a marriage and pair them off randomly
-        try ( Transaction tx = context.getGraknSession().transaction().write()) {
+        try ( Transaction tx = session.transaction().write()) {
 
-            List<ConceptMap> womenAnswers = tx.execute(getSinglePeople(city, "female", "marriage_wife"));
-            List<ConceptMap> menAnswers = tx.execute(getSinglePeople(city, "male", "marriage_husband"));
+            List<ConceptMap> womenAnswers = tx.execute(getSinglePeople(context, city, "female", "marriage_wife"));
+            List<ConceptMap> menAnswers = tx.execute(getSinglePeople(context, city, "male", "marriage_husband"));
 
             Random rnd = randomSource.startNewRandom();
 
@@ -60,7 +61,7 @@ public class MarriageAgent implements CityAgent {
         }
     }
 
-    private GraqlGet.Unfiltered getSinglePeople(World.City city, String gender, String marriageRole) {
+    private GraqlGet.Unfiltered getSinglePeople(AgentContext context, World.City city, String gender, String marriageRole) {
         Statement personVar = Graql.var("p");
         Statement cityVar = Graql.var("city");
 

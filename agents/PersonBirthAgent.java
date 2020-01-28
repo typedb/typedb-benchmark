@@ -1,5 +1,6 @@
 package grakn.simulation.agents;
 
+import grakn.client.GraknClient;
 import grakn.client.GraknClient.Transaction;
 import grakn.client.answer.ConceptMap;
 import grakn.simulation.common.RandomSource;
@@ -21,7 +22,11 @@ public class PersonBirthAgent implements CityAgent {
         List<String> maleForenames = context.getWorld().getMaleForenames();
         List<String> surnames = context.getWorld().getSurnames();
 
-        try (Transaction tx = context.getGraknSession().transaction().write()) {
+        String sessionKey = city.getCountry().getContinent().getName();
+        GraknClient.Session session = context.getIterationGraknSessionFor(sessionKey);
+
+        // Find bachelors and bachelorettes who are considered adults and who are not in a marriage and pair them off randomly
+        try ( Transaction tx = session.transaction().write()) {
             Random random = randomSource.startNewRandom();
             LocalDateTime dateToday = context.getLocalDateTime();
 
