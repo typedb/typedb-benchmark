@@ -24,40 +24,39 @@ public class MarriageAgent implements CityAgent {
         this.context = context;
 
         // Find bachelors and bachelorettes who are considered adults and who are not in a marriage and pair them off randomly
-        Transaction tx = context.getGraknSession().transaction().write();
+        try ( Transaction tx = context.getGraknSession().transaction().write()) {
 
-        List<ConceptMap> womenAnswers = tx.execute(getSinglePeople(city, "female", "marriage_wife"));
-        List<ConceptMap> menAnswers = tx.execute(getSinglePeople(city, "male", "marriage_husband"));
+            List<ConceptMap> womenAnswers = tx.execute(getSinglePeople(city, "female", "marriage_wife"));
+            List<ConceptMap> menAnswers = tx.execute(getSinglePeople(city, "male", "marriage_husband"));
 
-        Random rnd = randomSource.startNewRandom();
+            Random rnd = randomSource.startNewRandom();
 
-        Collections.shuffle(womenAnswers, rnd);
-        Collections.shuffle(menAnswers, rnd);
+            Collections.shuffle(womenAnswers, rnd);
+            Collections.shuffle(menAnswers, rnd);
 
-        int numMarriagesPossible = Math.min(NUM_MARRIAGES, Math.min(womenAnswers.size(), menAnswers.size()));
+            int numMarriagesPossible = Math.min(NUM_MARRIAGES, Math.min(womenAnswers.size(), menAnswers.size()));
 
-        if (numMarriagesPossible > 0) {
+            if (numMarriagesPossible > 0) {
 
-            for (int i = 0; i < numMarriagesPossible; i++) {
-                String wifeEmail = (String) womenAnswers.get(i).get("email").asAttribute().value();
-                String husbandEmail = (String) menAnswers.get(i).get("email").asAttribute().value();
+                for (int i = 0; i < numMarriagesPossible; i++) {
+                    String wifeEmail = (String) womenAnswers.get(i).get("email").asAttribute().value();
+                    String husbandEmail = (String) menAnswers.get(i).get("email").asAttribute().value();
 
-                int marriageIdentifier = (wifeEmail + husbandEmail).hashCode();
+                    int marriageIdentifier = (wifeEmail + husbandEmail).hashCode();
 
-                GraqlInsert query = Graql.match(
-                        Graql.var("husband").isa("person").has("email", husbandEmail),
-                        Graql.var("wife").isa("person").has("email", wifeEmail)
-                ).insert(
-                        Graql.var("m").isa("marriage")
-                                .rel("marriage_husband", "husband")
-                                .rel("marriage_wife", "wife")
-                                .has("identifier", marriageIdentifier)
-                );
-                List<ConceptMap> answers = tx.execute(query);
+                    GraqlInsert query = Graql.match(
+                            Graql.var("husband").isa("person").has("email", husbandEmail),
+                            Graql.var("wife").isa("person").has("email", wifeEmail)
+                    ).insert(
+                            Graql.var("m").isa("marriage")
+                                    .rel("marriage_husband", "husband")
+                                    .rel("marriage_wife", "wife")
+                                    .has("identifier", marriageIdentifier)
+                    );
+                    List<ConceptMap> answers = tx.execute(query);
+                }
+                tx.commit();
             }
-            tx.commit();
-        } else {
-            tx.close();
         }
     }
 
