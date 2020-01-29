@@ -15,8 +15,6 @@ import java.util.Map;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
-import static java.util.stream.Collectors.toList;
-
 public class World {
 
     public static final int AGE_OF_ADULTHOOD = 2;
@@ -27,17 +25,26 @@ public class World {
     private Map<String, Country> countryMap = new HashMap<>();
     private Map<String, City> cityMap = new HashMap<>();
 
-    private List<FemaleForename> femaleForenames = new ArrayList<>();
-    private List<MaleForename> maleForenames = new ArrayList<>();
-    private List<Surname> surnames = new ArrayList<>();
+    private final List<String> femaleForenames;
+    private final List<String> maleForenames;
+    private final List<String> surnames;
 
     public World(Path continentsPath, Path countriesPath, Path citiesPath, Path femaleForenamesPath, Path maleForenamesPath, Path surnamesPath) throws IOException {
         iterateCSV(continentsPath, Continent::new);
         iterateCSV(countriesPath, Country::new);
         iterateCSV(citiesPath, City::new);
-        iterateCSV(femaleForenamesPath, FemaleForename::new);
-        iterateCSV(maleForenamesPath, MaleForename::new);
-        iterateCSV(surnamesPath, Surname::new);
+
+        List<String> femaleForenames = new ArrayList<>();
+        iterateCSV(femaleForenamesPath, r -> femaleForenames.add(r.get(0)));
+        this.femaleForenames = Collections.unmodifiableList(femaleForenames);
+
+        List<String> maleForenames = new ArrayList<>();
+        iterateCSV(maleForenamesPath, r -> maleForenames.add(r.get(0)));
+        this.maleForenames = Collections.unmodifiableList(maleForenames);
+
+        List<String> surnames = new ArrayList<>();
+        iterateCSV(surnamesPath, r -> surnames.add(r.get(0)));
+        this.surnames = Collections.unmodifiableList(surnames);
     }
 
     private static void iterateCSV(Path path, Consumer<CSVRecord> action) throws IOException {
@@ -57,15 +64,15 @@ public class World {
     }
 
     public List<String> getFemaleForenames() {
-        return Collections.unmodifiableList(femaleForenames.stream().map(World.FemaleForename::getValue).collect(toList()));
+        return femaleForenames;
     }
 
     public List<String> getMaleForenames() {
-        return Collections.unmodifiableList(maleForenames.stream().map(World.MaleForename::getValue).collect(toList()));
+        return maleForenames;
     }
 
     public List<String> getSurnames() {
-        return Collections.unmodifiableList(surnames.stream().map(World.Surname::getValue).collect(toList()));
+        return surnames;
     }
 
     public class Continent {
@@ -109,45 +116,6 @@ public class World {
 
         public Stream<City> getCities() {
             return cities.stream();
-        }
-    }
-
-    public class FemaleForename {
-        private String value;
-
-        public FemaleForename(CSVRecord record) {
-            value = record.get(0);
-            femaleForenames.add(this);
-        }
-
-        public String getValue() {
-            return value;
-        }
-    }
-
-    public class MaleForename {
-        private String value;
-
-        public MaleForename(CSVRecord record) {
-            value = record.get(0);
-            maleForenames.add(this);
-        }
-
-        public String getValue() {
-            return value;
-        }
-    }
-
-    public class Surname {
-        private String value;
-
-        public Surname(CSVRecord record) {
-            value = record.get(0);
-            surnames.add(this);
-        }
-
-        public String getValue() {
-            return value;
         }
     }
 
