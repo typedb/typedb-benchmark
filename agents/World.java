@@ -7,11 +7,17 @@ import org.apache.commons.csv.CSVRecord;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 public class World {
+
+    public static final int AGE_OF_ADULTHOOD = 2;
 
     private List<Continent> continents = new ArrayList<>();
 
@@ -19,10 +25,26 @@ public class World {
     private Map<String, Country> countryMap = new HashMap<>();
     private Map<String, City> cityMap = new HashMap<>();
 
-    public World(Path continentsPath, Path countriesPath, Path citiesPath) throws IOException {
+    private final List<String> femaleForenames;
+    private final List<String> maleForenames;
+    private final List<String> surnames;
+
+    public World(Path continentsPath, Path countriesPath, Path citiesPath, Path femaleForenamesPath, Path maleForenamesPath, Path surnamesPath) throws IOException {
         iterateCSV(continentsPath, Continent::new);
         iterateCSV(countriesPath, Country::new);
         iterateCSV(citiesPath, City::new);
+
+        List<String> femaleForenames = new ArrayList<>();
+        iterateCSV(femaleForenamesPath, r -> femaleForenames.add(r.get(0)));
+        this.femaleForenames = Collections.unmodifiableList(femaleForenames);
+
+        List<String> maleForenames = new ArrayList<>();
+        iterateCSV(maleForenamesPath, r -> maleForenames.add(r.get(0)));
+        this.maleForenames = Collections.unmodifiableList(maleForenames);
+
+        List<String> surnames = new ArrayList<>();
+        iterateCSV(surnamesPath, r -> surnames.add(r.get(0)));
+        this.surnames = Collections.unmodifiableList(surnames);
     }
 
     private static void iterateCSV(Path path, Consumer<CSVRecord> action) throws IOException {
@@ -39,6 +61,18 @@ public class World {
 
     public Stream<City> getCities() {
         return continents.stream().flatMap(Continent::getCountries).flatMap(Country::getCities);
+    }
+
+    public List<String> getFemaleForenames() {
+        return femaleForenames;
+    }
+
+    public List<String> getMaleForenames() {
+        return maleForenames;
+    }
+
+    public List<String> getSurnames() {
+        return surnames;
     }
 
     public class Continent {

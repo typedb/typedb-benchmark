@@ -69,6 +69,9 @@ value sub attribute,
 data-signed sub attribute,
     datatype date;
 
+email sub attribute,
+    datatype string;
+
 identifier sub attribute,
     datatype long;
 
@@ -87,7 +90,7 @@ product-description sub description;
 service-description sub description;
 
 person sub entity,
-    key identifier,
+    key email,
     has forename,
     has surname,
     has gender,

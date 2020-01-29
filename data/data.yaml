@@ -9,4 +9,12 @@ template: |
     $x isa country, has name <0>;
     (location-hierarchy_superior: $c, location-hierarchy_subordinate: $x) isa location-hierarchy;
 data_file: countries.csv
+---
+template: |
+  match
+    $c isa country, has name <1>;
+  insert
+    $x isa city, has name <0>;
+    (location-hierarchy_superior: $c, location-hierarchy_subordinate: $x) isa location-hierarchy;
+data_file: cities.csv
 ...

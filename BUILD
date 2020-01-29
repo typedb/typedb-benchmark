@@ -18,6 +18,7 @@ java_library(
         "//yaml_tool:yaml_tool",
         "//agents:agents",
     ],
+    visibility = ["//visibility:public"],
 )
 
 java_binary(

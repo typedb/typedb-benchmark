@@ -7,5 +7,6 @@ java_library(
         "//dependencies/maven/artifacts/commons-cli",
         "//dependencies/maven/artifacts/org/apache/commons:commons-csv",
         "@graknlabs_client_java//:client-java",
+        "@graknlabs_graql//java:graql",
     ],
 )

@@ -20,11 +20,16 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 public class Simulation implements AgentContext, AutoCloseable {
+
+    private final static long RANDOM_SEED = 1;
+    private final static int NUM_ITERATIONS = 10;
 
     private static Optional<String> getOption(CommandLine commandLine, String option) {
         if (commandLine.hasOption(option)) {
@@ -66,11 +71,11 @@ public class Simulation implements AgentContext, AutoCloseable {
 
         String graknHostUri = getOption(commandLine, "g").orElse(GraknClient.DEFAULT_URI);
         long seed = getOption(commandLine, "s").map(Long::parseLong).orElseGet(() -> {
-            long s = new Random().nextLong();
-            System.out.println("No seed supplied, using random seed: " + s);
-            return s;
+            System.out.println("No seed supplied, using random seed: " + RANDOM_SEED);
+            return RANDOM_SEED;
         });
-        int iterations = getOption(commandLine, "i").map(Integer::parseInt).orElse(10);
+
+        int iterations = getOption(commandLine, "i").map(Integer::parseInt).orElse(NUM_ITERATIONS);
         String graknKeyspace = commandLine.getOptionValue("k");
 
         ////////////////////
@@ -84,7 +89,10 @@ public class Simulation implements AgentContext, AutoCloseable {
             world = new World(
                     Paths.get("data/continents.csv"),
                     Paths.get("data/countries.csv"),
-                    Paths.get("data/cities.csv")
+                    Paths.get("data/cities.csv"),
+                    Paths.get("data/female_forenames.csv"),
+                    Paths.get("data/male_forenames.csv"),
+                    Paths.get("data/surnames.csv")
             );
         } catch (IOException e) {
             e.printStackTrace();
@@ -101,7 +109,10 @@ public class Simulation implements AgentContext, AutoCloseable {
                     world
             )) {
 
+            // TODO: merge these two schema files once this issue is fixed
+            // https://github.com/graknlabs/grakn/issues/5553
             simulation.loadSchema(Paths.get("schema/schema.gql"));
+            simulation.loadSchema(Paths.get("schema/schema-pt2.gql"));
             simulation.loadData(Paths.get("data/data.yaml"));
             simulation.loadData(Paths.get("data/currencies.yaml"));
 
@@ -172,20 +183,20 @@ public class Simulation implements AgentContext, AutoCloseable {
         }
         sessionMap.clear();
     }
-
-    @Override
-    public Session getGraknSession() {
-        return defaultSession;
-    }
-
+    
     @Override
     public Session getIterationGraknSessionFor(String key) {
         return sessionMap.computeIfAbsent(key, k -> client.session(keyspace)); // Open sessions for new keys
     }
 
     @Override
-    public LocalDate getDate() {
-        return LocalDate.ofEpochDay(simulationStep);
+    public int getSimulationStep() {
+        return simulationStep;
+    }
+
+    @Override
+    public LocalDateTime getLocalDateTime() {
+        return LocalDateTime.of(LocalDate.ofYearDay(simulationStep, 1), LocalTime.of(0, 0, 0));
     }
 
     @Override
