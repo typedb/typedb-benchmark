@@ -42,3 +42,10 @@ jobs:
       - run-grakn-server
       - bazel run //:simulation-binary -- -k world
       - bazel test //agents/test/... --test_arg=localhost:48555 --cache_test_results=no
+
+workflows:
+  version: 2
+  simulation:
+    jobs:
+      - build
+      - test-end-to-end
