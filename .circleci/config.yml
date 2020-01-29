@@ -16,6 +16,12 @@ commands:
           command: bazel run @graknlabs_build_tools//ci:run-bazel-rbe -- << parameters.command >>
           no_output_timeout: 1h
 
+  run-grakn-server:
+    steps:
+      - run: bazel build @graknlabs_grakn_core//:assemble-linux-targz
+      - run: mkdir dist && tar -xvzf bazel-genfiles/external/graknlabs_grakn_core/grakn-core-all-linux.tar.gz -C ./dist/
+      - run: nohup ./dist/grakn-core-all-linux/grakn server start
+
 jobs:
   build:
     machine: true
@@ -26,3 +32,24 @@ jobs:
       - run-bazel-rbe:
           command: bazel build //...
       - run: bazel run @graknlabs_build_tools//unused_deps -- list
+
+  test-end-to-end:
+    machine: true
+    working_directory: ~/simulation
+    steps:
+      - install-bazel-linux-rbe
+      - checkout
+      - run-grakn-server
+      - run-bazel-rbe:
+          command: bazel run //:simulation-binary -- -k world
+      - run-bazel-rbe:
+          command: bazel test //agents/test/... --test_arg=localhost:48555 --cache_test_results=no
+
+workflows:
+  version: 2
+  simulation:
+    jobs:
+      - build
+      - test-end-to-end:
+          requires:
+            - build
