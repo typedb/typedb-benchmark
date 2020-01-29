@@ -194,7 +194,8 @@ location sub entity,
     plays location-hierarchy_superior,
     plays location-hierarchy_subordinate,
     plays relocation_previous-location,
-    plays relocation_new-location;
+    plays relocation_new-location,
+    plays locates_location;
 
 area sub location,
     plays born-in_place-of-birth,

@@ -57,36 +57,40 @@ public class ParentshipAgent implements CityAgent {
 
         Random random = randomSource.startNewRandom();
 
-        try (GraknClient.Transaction tx = context.getGraknSession().transaction().write()) {
+        GraknClient.Session session = context.getIterationGraknSessionFor(city.getCountry().getContinent().getName());
+
+        try (GraknClient.Transaction tx = session.transaction().write()) {
 
             List<ConceptMap> childrenAnswers = tx.execute(childrenQuery);
             List<ConceptMap> marriageAnswers = tx.execute(marriageQuery);
 
-            Collections.shuffle(marriageAnswers, random);
+            if (marriageAnswers.size() > 0) {
+                Collections.shuffle(marriageAnswers, random);
 
-            int numChildrenPerMarriage = childrenAnswers.size() / marriageAnswers.size();
-            int remainder = childrenAnswers.size() % marriageAnswers.size();
+                int numChildrenPerMarriage = childrenAnswers.size() / marriageAnswers.size();
+                int remainder = childrenAnswers.size() % marriageAnswers.size();
 
-            // Distribute the children among the marriage results
-            int childrenIndex = 0;
+                // Distribute the children among the marriage results
+                int childrenIndex = 0;
 
-            for (int i = 0; i < marriageAnswers.size(); i++) {
-                int childrenToAdd = numChildrenPerMarriage;
-                if (i < remainder) {
-                    childrenToAdd++;
+                for (int i = 0; i < marriageAnswers.size(); i++) {
+                    int childrenToAdd = numChildrenPerMarriage;
+                    if (i < remainder) {
+                        childrenToAdd++;
+                    }
+                    List<String> childEmails = new ArrayList<>();
+                    for (int j = 0; j < childrenToAdd; j++) {
+                        childEmails.add((String) childrenAnswers.get(childrenIndex).get("email").asAttribute().value());
+                        childrenIndex++;
+                    }
+
+                    String motherEmail = (String) marriageAnswers.get(i).get("wife-email").asAttribute().value();
+                    String husbandEmail = (String) marriageAnswers.get(i).get("husband-email").asAttribute().value();
+
+                    tx.execute(buildParentshipInsertQuery(motherEmail, husbandEmail, childEmails));
                 }
-                List<String> childEmails = new ArrayList<>();
-                for (int j = 0; j < childrenToAdd; j++) {
-                    childEmails.add((String) childrenAnswers.get(childrenIndex).get("email").asAttribute().value());
-                    childrenIndex ++;
-                }
-
-                String motherEmail = (String) marriageAnswers.get(i).get("wife-email").asAttribute().value();
-                String husbandEmail = (String) marriageAnswers.get(i).get("husband-email").asAttribute().value();
-
-                tx.execute(buildParentshipInsertQuery(motherEmail, husbandEmail, childEmails));
+                tx.commit();
             }
-            tx.commit();
         }
     }
 
