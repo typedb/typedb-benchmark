@@ -1,6 +1,8 @@
+
 java_test(
     name = "MarriageAgentE2E",
     srcs = [
+        "AgentE2E.java",
         "MarriageAgentE2E.java",
     ],
     test_class = "grakn.simulation.agents.test.MarriageAgentE2E",
@@ -17,6 +19,7 @@ java_test(
 java_test(
     name = "ParentshipAgentE2E",
     srcs = [
+        "AgentE2E.java",
         "ParentshipAgentE2E.java",
     ],
     test_class = "grakn.simulation.agents.test.ParentshipAgentE2E",

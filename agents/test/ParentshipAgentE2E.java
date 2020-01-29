@@ -1,23 +1,17 @@
 package grakn.simulation.agents.test;
 
-import grakn.client.GraknClient;
 import grakn.client.answer.Numeric;
 import graql.lang.Graql;
 import graql.lang.query.GraqlGet;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
 import java.util.List;
-import java.util.function.Consumer;
 
 import static graql.lang.Graql.var;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
-public class ParentshipAgentE2E {
-
-    private GraknClient graknClient;
+public class ParentshipAgentE2E extends AgentE2E {
 
     @Test
     public void testParentshipAgentInsertsTheExpectedNumberOfParentships() {
@@ -33,25 +27,5 @@ public class ParentshipAgentE2E {
             int expectedNumParentships = 520;
             assertThat(numParentships, equalTo(expectedNumParentships));
         });
-    }
-
-    @Before
-    public void createClient() {
-        String host = "localhost:48555";
-        graknClient = new GraknClient(host);
-    }
-
-    @After
-    public void closeClient() {
-        graknClient.close();
-    }
-
-    private void localhostGraknTx(Consumer<GraknClient.Transaction> fn) {
-        String keyspace = "world";
-        try (GraknClient.Session session = graknClient.session(keyspace)) {
-            try (GraknClient.Transaction transaction = session.transaction().write()) {
-                fn.accept(transaction);
-            }
-        }
     }
 }
