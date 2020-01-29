@@ -2,7 +2,7 @@
 
 ## Build and run Simulation
 ```shell script
-bazel run //:simulation-binary -- -k world
+bazel run //:simulation -- -k world
 ```
 
 ## CLI options
