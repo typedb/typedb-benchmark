@@ -109,6 +109,8 @@ public class Simulation implements AgentContext, AutoCloseable {
                     world
             )) {
 
+            // TODO: merge these two schema files once this issue is fixed
+            // https://github.com/graknlabs/grakn/issues/5553
             simulation.loadSchema(Paths.get("schema/schema.gql"));
             simulation.loadSchema(Paths.get("schema/schema-pt2.gql"));
             simulation.loadData(Paths.get("data/data.yaml"));
@@ -181,12 +183,7 @@ public class Simulation implements AgentContext, AutoCloseable {
         }
         sessionMap.clear();
     }
-
-    @Override
-    public Session getGraknSession() {
-        return defaultSession;
-    }
-
+    
     @Override
     public Session getIterationGraknSessionFor(String key) {
         return sessionMap.computeIfAbsent(key, k -> client.session(keyspace)); // Open sessions for new keys

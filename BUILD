@@ -1,5 +1,5 @@
 java_library(
-    name = "simulation",
+    name = "simulation-lib",
     srcs = glob(["*.java"]),
     data = glob([
         "schema/*.gql",
@@ -22,15 +22,15 @@ java_library(
 )
 
 java_binary(
-    name = "simulation-binary",
+    name = "simulation",
     main_class = "grakn.simulation.Simulation",
-    runtime_deps = [":simulation"],
+    runtime_deps = [":simulation-lib"],
 )
 
 java_binary(
-    name = "simulation-binary-debug",
+    name = "simulation-debug",
     main_class = "grakn.simulation.Simulation",
-    runtime_deps = [":simulation"],
+    runtime_deps = [":simulation-lib"],
     jvm_flags = [
         "-Xdebug",
         "-Xrunjdwp:transport=dt_socket,server=y,address=5005",

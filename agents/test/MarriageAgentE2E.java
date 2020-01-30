@@ -11,7 +11,7 @@ import static graql.lang.Graql.var;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
-public class MarriageAgentE2E extends AgentE2E{
+public class MarriageAgentE2E extends AgentE2E {
 
     @Test
     public void testMarriageAgentInsertsTheExpectedNumberOfMarriages() {
