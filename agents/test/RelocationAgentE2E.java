@@ -28,7 +28,7 @@ public class RelocationAgentE2E extends AgentE2E {
 
             List<Numeric> answer = tx.execute(parentshipsCountQuery);
             int numParentships = answer.get(0).number().intValue();
-            int expectedNumParentships = 10;
+            int expectedNumParentships = 100;
             assertThat(numParentships, equalTo(expectedNumParentships));
         });
     }

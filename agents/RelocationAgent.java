@@ -76,9 +76,6 @@ public class RelocationAgent implements CityAgent {
                     .stream()
                     .map(conceptMap -> conceptMap.get("city-name").asAttribute().value().toString())
                     .collect(toList());
-            tx.commit();
-        }
-        try (GraknClient.Transaction tx = session.transaction().write()) {
 
             if (relocationCityNames.size() > 0 && residentEmails.size() > 0) {
                 List<Integer> cityAllocationPerPerson = new ArrayList<>();
@@ -105,7 +102,7 @@ public class RelocationAgent implements CityAgent {
                     System.out.println(relocatePersonQuery);
                     tx.execute(relocatePersonQuery);
                 }
-                tx. commit();
+                tx.commit();
             }
         }
     }
