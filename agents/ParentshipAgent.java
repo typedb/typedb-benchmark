@@ -80,12 +80,12 @@ public class ParentshipAgent implements CityAgent {
                     }
                     List<String> childEmails = new ArrayList<>();
                     for (int j = 0; j < childrenToAdd; j++) {
-                        childEmails.add((String) childrenAnswers.get(childrenIndex).get("email").asAttribute().value());
+                        childEmails.add(childrenAnswers.get(childrenIndex).get("email").asAttribute().value().toString());
                         childrenIndex++;
                     }
 
-                    String motherEmail = (String) marriageAnswers.get(i).get("wife-email").asAttribute().value();
-                    String husbandEmail = (String) marriageAnswers.get(i).get("husband-email").asAttribute().value();
+                    String motherEmail = marriageAnswers.get(i).get("wife-email").asAttribute().value().toString();
+                    String husbandEmail = marriageAnswers.get(i).get("husband-email").asAttribute().value().toString();
 
                     tx.execute(buildParentshipInsertQuery(motherEmail, husbandEmail, childEmails));
                 }

@@ -6,6 +6,7 @@ public class AgentList {
     static Agent[] AGENTS = {
         new MarriageAgent(),
         new PersonBirthAgent(),
-        new ParentshipAgent()
+        new ParentshipAgent(),
+        new RelocationAgent(),
     };
 }

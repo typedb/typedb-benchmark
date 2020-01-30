@@ -39,8 +39,8 @@ public class MarriageAgent implements CityAgent {
             if (numMarriagesPossible > 0) {
 
                 for (int i = 0; i < numMarriagesPossible; i++) {
-                    String wifeEmail = (String) womenAnswers.get(i).get("email").asAttribute().value();
-                    String husbandEmail = (String) menAnswers.get(i).get("email").asAttribute().value();
+                    String wifeEmail = womenAnswers.get(i).get("email").asAttribute().value().toString();
+                    String husbandEmail = menAnswers.get(i).get("email").asAttribute().value().toString();
 
                     int marriageIdentifier = (wifeEmail + husbandEmail).hashCode();
 
@@ -73,6 +73,7 @@ public class MarriageAgent implements CityAgent {
                 Graql.var("dob").lte(dobOfAdults),
                 Graql.not(Graql.var("m").isa("marriage").rel(marriageRole, personVar)),
                 Graql.var("r").isa("residency").rel("residency_resident", personVar).rel("residency_location", cityVar),
+                Graql.not(Graql.var("r").has("end-date")),
                 cityVar.isa("city").has("name", city.getName())
         ).get("email");
     }
