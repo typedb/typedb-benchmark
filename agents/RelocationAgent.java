@@ -54,7 +54,6 @@ public class RelocationAgent implements CityAgent {
                     Graql.not(Graql.var("r").has("end-date")),
                     Graql.var("start-date").lte(earliestDate)
             ).get();
-            System.out.println(cityResidentsQuery);
             List<ConceptMap> residentsAnswers = tx.execute(cityResidentsQuery);
 
             Collections.shuffle(residentsAnswers, random);
@@ -71,7 +70,6 @@ public class RelocationAgent implements CityAgent {
                     Graql.var("city-name").neq(city.getName())
             ).get();
 
-            System.out.println(relocationCitiesQuery);
             relocationCityNames = tx.execute(relocationCitiesQuery)
                     .stream()
                     .map(conceptMap -> conceptMap.get("city-name").asAttribute().value().toString())
@@ -99,7 +97,6 @@ public class RelocationAgent implements CityAgent {
                                     .rel("relocation_relocated-person", "p")
                                     .has("relocation-date", context.getLocalDateTime())
                     );
-                    System.out.println(relocatePersonQuery);
                     tx.execute(relocatePersonQuery);
                 }
                 tx.commit();
