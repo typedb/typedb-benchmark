@@ -2,6 +2,7 @@ package grakn.simulation.agents;
 
 import grakn.client.GraknClient;
 import grakn.client.answer.ConceptMap;
+import grakn.simulation.common.Allocation;
 import grakn.simulation.common.RandomSource;
 import graql.lang.Graql;
 import graql.lang.query.GraqlGet;
@@ -10,12 +11,9 @@ import graql.lang.query.GraqlInsert;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
-import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
 
@@ -76,10 +74,8 @@ public class RelocationAgent implements CityAgent {
                     .collect(toList());
 
             if (relocationCityNames.size() > 0 && residentEmails.size() > 0) {
-                List<Integer> cityAllocationPerPerson = new ArrayList<>();
-                for (int i = 0; i < residentEmails.size(); i++) {
-                    cityAllocationPerPerson.add(i % relocationCityNames.size());
-                }
+
+                List<Integer> cityAllocationPerPerson = Allocation.allocateEvenly(residentEmails.size(), relocationCityNames.size());
 
                 for (int i = 0; i < cityAllocationPerPerson.size(); i++) {
 
