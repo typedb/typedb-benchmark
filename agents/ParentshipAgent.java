@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -73,7 +73,7 @@ public class ParentshipAgent implements CityAgent {
             List<ConceptMap> marriageAnswers = tx.execute(marriageQuery);
 
             if (marriageAnswers.size() > 0 && childrenEmails.size() > 0) {
-                HashMap<Integer, List<Integer>> childrenPerMarriage = Allocation.allocateEvenlyToHashMap(childrenEmails.size(), marriageAnswers.size());
+                LinkedHashMap<Integer, List<Integer>> childrenPerMarriage = Allocation.allocateEvenlyToMap(childrenEmails.size(), marriageAnswers.size());
                 Collections.shuffle(marriageAnswers, random);
 
                 for (Map.Entry<Integer, List<Integer>> entry : childrenPerMarriage.entrySet()) {

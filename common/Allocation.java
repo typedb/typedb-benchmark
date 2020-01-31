@@ -1,7 +1,7 @@
 package grakn.simulation.common;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 public class Allocation {
@@ -14,8 +14,8 @@ public class Allocation {
         return allocations;
     }
 
-    public static HashMap<Integer, List<Integer>> allocateEvenlyToHashMap(Integer numThingsToAllocate, Integer numBuckets){
-        HashMap<Integer, List<Integer>> allocationMap = new HashMap<>();
+    public static LinkedHashMap<Integer, List<Integer>> allocateEvenlyToMap(Integer numThingsToAllocate, Integer numBuckets){
+        LinkedHashMap<Integer, List<Integer>> allocationMap = new LinkedHashMap<>();
         List<Integer> allocations = allocateEvenly(numThingsToAllocate, numBuckets);
         for (int i = 0; i < allocations.size(); i++) {
             Integer allocation = allocations.get(i);
