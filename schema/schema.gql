@@ -195,7 +195,8 @@ location sub entity,
     plays location-hierarchy_subordinate,
     plays relocation_previous-location,
     plays relocation_new-location,
-    plays locates_location;
+    plays locates_location,
+    plays born-in_place-of-birth;  # TODO Can we avoid using this but also avoid validation errors?
 
 area sub location,
     plays born-in_place-of-birth,
