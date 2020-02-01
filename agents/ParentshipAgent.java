@@ -66,10 +66,12 @@ public class ParentshipAgent implements CityAgent {
 
         try (GraknClient.Transaction tx = session.transaction().write()) {
 
+            city.logQuery(childrenQuery);
             List<String> childrenEmails = tx.execute(childrenQuery)
                     .stream()
                     .map(conceptMap -> conceptMap.get("email").asAttribute().value().toString())
                     .collect(toList());
+            city.logQuery(marriageQuery);
             List<ConceptMap> marriageAnswers = tx.execute(marriageQuery);
 
             if (marriageAnswers.size() > 0 && childrenEmails.size() > 0) {
@@ -87,7 +89,9 @@ public class ParentshipAgent implements CityAgent {
                     for (Integer childIndex : children) {
                         childEmails.add(childrenEmails.get(childIndex));
                     }
-                    tx.execute(buildParentshipInsertQuery(motherEmail, husbandEmail, childEmails));
+                    GraqlInsert parentshipQuery = buildParentshipInsertQuery(motherEmail, husbandEmail, childEmails);
+                    city.logQuery(parentshipQuery);
+                    tx.execute(parentshipQuery);
                 }
                 tx.commit();
             }

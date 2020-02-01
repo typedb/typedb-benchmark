@@ -27,8 +27,13 @@ public class MarriageAgent implements CityAgent {
         // Find bachelors and bachelorettes who are considered adults and who are not in a marriage and pair them off randomly
         try ( Transaction tx = session.transaction().write()) {
 
-            List<ConceptMap> womenAnswers = tx.execute(getSinglePeople(context, city, "female", "marriage_wife"));
-            List<ConceptMap> menAnswers = tx.execute(getSinglePeople(context, city, "male", "marriage_husband"));
+            GraqlGet.Unfiltered singleWomenQuery = getSinglePeople(context, city, "female", "marriage_wife");
+            city.logQuery(singleWomenQuery);
+            List<ConceptMap> womenAnswers = tx.execute(singleWomenQuery);
+
+            GraqlGet.Unfiltered singleMenQuery = getSinglePeople(context, city, "male", "marriage_husband");
+            city.logQuery(singleMenQuery);
+            List<ConceptMap> menAnswers = tx.execute(singleMenQuery);
 
             Random rnd = randomSource.startNewRandom();
 
