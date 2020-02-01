@@ -1,10 +1,14 @@
 package grakn.simulation.agents;
 
+import graql.lang.query.GraqlQuery;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 
+import java.io.BufferedWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -18,6 +22,7 @@ import java.util.stream.Stream;
 public class World {
 
     public static final int AGE_OF_ADULTHOOD = 2;
+    Path logDirPath;
 
     private List<Continent> continents = new ArrayList<>();
 
@@ -29,7 +34,8 @@ public class World {
     private final List<String> maleForenames;
     private final List<String> surnames;
 
-    public World(Path continentsPath, Path countriesPath, Path citiesPath, Path femaleForenamesPath, Path maleForenamesPath, Path surnamesPath) throws IOException {
+    public World(Path continentsPath, Path countriesPath, Path citiesPath, Path femaleForenamesPath, Path maleForenamesPath, Path surnamesPath, Path logDirPath) throws IOException {
+        this.logDirPath = logDirPath;
         iterateCSV(continentsPath, Continent::new);
         iterateCSV(countriesPath, Country::new);
         iterateCSV(citiesPath, City::new);
@@ -120,6 +126,7 @@ public class World {
     }
 
     public class City {
+        private BufferedWriter logWriter;
         private String cityName;
         private Country country;
 
@@ -128,6 +135,37 @@ public class World {
             country = countryMap.get(record.get(1));
             country.cities.add(this);
             cityMap.put(cityName, this);
+            Path path = logDirPath.resolve(cityName + ".txt");
+            try {
+                logWriter = new BufferedWriter(new OutputStreamWriter(
+                        new FileOutputStream(path.toString()), "utf-8"));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        public void logQuery(GraqlQuery query) {
+            try {
+                logWriter.write(query.toString() + "\n---\n");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        public void log(String message) {
+            try {
+                logWriter.write(message);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        public void close() {
+            try {
+                logWriter.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
 
         public String getName() {

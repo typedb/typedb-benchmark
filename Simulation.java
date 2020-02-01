@@ -14,17 +14,21 @@ import graql.lang.Graql;
 import graql.lang.query.GraqlDefine;
 import org.apache.commons.cli.*;
 
+import java.io.BufferedWriter;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.stream.Collectors;
 
 public class Simulation implements AgentContext, AutoCloseable {
 
@@ -92,7 +96,8 @@ public class Simulation implements AgentContext, AutoCloseable {
                     Paths.get("data/cities.csv"),
                     Paths.get("data/female_forenames.csv"),
                     Paths.get("data/male_forenames.csv"),
-                    Paths.get("data/surnames.csv")
+                    Paths.get("data/surnames.csv"),
+                    Paths.get("/Users/jamesfletcher/programming/simulation/transaction-logs")
             );
         } catch (IOException e) {
             e.printStackTrace();
@@ -141,7 +146,7 @@ public class Simulation implements AgentContext, AutoCloseable {
 
     private final ConcurrentMap<String, Session> sessionMap;
 
-    private Simulation(String graknUri, String keyspace, Agent[] agents, RandomSource randomSource, World world) {
+    private Simulation(String graknUri, String keyspace, Agent[] agents, RandomSource randomSource, World world) throws IOException {
         client = new GraknClient(graknUri);
         this.keyspace = keyspace;
         defaultSession = client.session(keyspace);
@@ -153,7 +158,9 @@ public class Simulation implements AgentContext, AutoCloseable {
     }
 
     private void iterate() {
-        System.out.println(StringPrettyBox.simple("Simulation step: " + simulationStep, '*'));
+        for (World.City city: this.world.getCities().collect(Collectors.toList())) {
+            city.log(StringPrettyBox.simple("Simulation step: " + simulationStep, '*') + "\n");
+        }
 
         for (Agent agent : agents) {
             agent.iterate(this, RandomSource.nextSource(random));
@@ -212,6 +219,10 @@ public class Simulation implements AgentContext, AutoCloseable {
 
         if (client != null) {
             client.close();
+        }
+
+        for (World.City city: this.world.getCities().collect(Collectors.toList())) {
+            city.close();
         }
     }
 }

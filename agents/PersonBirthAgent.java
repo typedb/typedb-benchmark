@@ -69,7 +69,7 @@ public class PersonBirthAgent implements CityAgent {
                                                 .rel("born-in_child", "p")
                                                 .rel("born-in_place-of-birth", "c")
                                 );
-
+                city.logQuery(query);
                 List<ConceptMap> answers = tx.execute(query);
             }
             tx.commit();
