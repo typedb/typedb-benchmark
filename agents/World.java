@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -35,7 +36,12 @@ public class World {
     private final List<String> surnames;
 
     public World(Path continentsPath, Path countriesPath, Path citiesPath, Path femaleForenamesPath, Path maleForenamesPath, Path surnamesPath, Path logDirPath) throws IOException {
-        this.logDirPath = logDirPath;
+        try {
+            this.logDirPath = Paths.get(System.getenv("LOG_DIR_PATH"));
+        } catch (NullPointerException n){
+            this.logDirPath = null;
+        }
+
         iterateCSV(continentsPath, Continent::new);
         iterateCSV(countriesPath, Country::new);
         iterateCSV(citiesPath, City::new);
@@ -135,36 +141,45 @@ public class World {
             country = countryMap.get(record.get(1));
             country.cities.add(this);
             cityMap.put(cityName, this);
-            Path path = logDirPath.resolve(cityName + ".txt");
-            try {
-                logWriter = new BufferedWriter(new OutputStreamWriter(
-                        new FileOutputStream(path.toString()), "utf-8"));
-            } catch (IOException e) {
-                e.printStackTrace();
+
+            if (logDirPath != null) {
+                Path path = logDirPath.resolve(cityName + ".txt");
+                try {
+                    logWriter = new BufferedWriter(new OutputStreamWriter(
+                            new FileOutputStream(path.toString()), "utf-8"));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         }
 
         public void logQuery(GraqlQuery query) {
-            try {
-                logWriter.write(query.toString() + "\n---\n");
-            } catch (IOException e) {
-                e.printStackTrace();
+            if (logWriter != null) {
+                try {
+                    logWriter.write(query.toString() + "\n---\n");
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         }
 
         public void log(String message) {
-            try {
-                logWriter.write(message + "\n");
-            } catch (IOException e) {
-                e.printStackTrace();
+            if (logWriter != null) {
+                try {
+                    logWriter.write(message + "\n");
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         }
 
         public void close() {
-            try {
-                logWriter.close();
-            } catch (IOException e) {
-                e.printStackTrace();
+            if (logWriter != null) {
+                try {
+                    logWriter.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         }
 
