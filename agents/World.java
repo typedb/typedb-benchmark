@@ -22,8 +22,8 @@ import java.util.stream.Stream;
 
 public class World {
 
-    public static final int AGE_OF_ADULTHOOD = 2;
-    Path logDirPath;
+    static final int AGE_OF_ADULTHOOD = 2;
+    private Path logDirPath;
 
     private List<Continent> continents = new ArrayList<>();
 
@@ -131,19 +131,34 @@ public class World {
         }
     }
 
-    public class City {
-        private BufferedWriter logWriter;
+    public class City extends Loggable {
         private String cityName;
         private Country country;
 
         public City(CSVRecord record) {
+            super(record.get(0));
             cityName = record.get(0);
             country = countryMap.get(record.get(1));
             country.cities.add(this);
             cityMap.put(cityName, this);
+        }
 
+        public String getName() {
+            return cityName;
+        }
+
+        public Country getCountry() {
+            return country;
+        }
+    }
+
+    private class Loggable {
+
+        private BufferedWriter logWriter;
+
+        Loggable(String logName) {
             if (logDirPath != null) {
-                Path path = logDirPath.resolve(cityName + ".txt");
+                Path path = logDirPath.resolve(logName + ".txt");
                 try {
                     logWriter = new BufferedWriter(new OutputStreamWriter(
                             new FileOutputStream(path.toString()), "utf-8"));
@@ -181,14 +196,6 @@ public class World {
                     e.printStackTrace();
                 }
             }
-        }
-
-        public String getName() {
-            return cityName;
-        }
-
-        public Country getCountry() {
-            return country;
         }
     }
 }
