@@ -22,7 +22,7 @@ public class MarriageAgentE2E extends AgentE2E {
 
             List<Numeric> answer = tx.execute(marriagesCountQuery);
             int numMarriages = answer.get(0).number().intValue();
-            int expectedNumMarriages = 123;
+            int expectedNumMarriages = 119;
             assertThat(numMarriages, equalTo(expectedNumMarriages));
         });
     }
