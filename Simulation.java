@@ -158,6 +158,9 @@ public class Simulation implements AgentContext, AutoCloseable {
     }
 
     private void iterate() {
+
+        System.out.println(StringPrettyBox.simple("Simulation step: " + simulationStep, '*'));
+
         for (World.City city: this.world.getCities().collect(Collectors.toList())) {
             city.log(StringPrettyBox.simple("Simulation step: " + simulationStep, '*') + "\n");
         }

@@ -1,7 +1,6 @@
 package grakn.simulation.agents;
 
 import grakn.client.GraknClient;
-import grakn.client.answer.ConceptMap;
 import grakn.simulation.common.Allocation;
 import grakn.simulation.common.RandomSource;
 import graql.lang.Graql;
@@ -52,15 +51,15 @@ public class RelocationAgent implements CityAgent {
                     Graql.not(Graql.var("r").has("end-date")),
                     Graql.var("start-date").lte(earliestDate)
             ).get();
+
             city.logQuery(cityResidentsQuery);
-            List<ConceptMap> residentsAnswers = tx.execute(cityResidentsQuery);
-
-            Collections.shuffle(residentsAnswers, random);
-
-            residentEmails = residentsAnswers.stream()
-                    .limit(NUM_RELOCATIONS)
+            residentEmails = tx.execute(cityResidentsQuery).stream()
                     .map(conceptMap -> conceptMap.get("email").asAttribute().value().toString())
+                    .sorted()
+                    .limit(NUM_RELOCATIONS)
                     .collect(toList());
+
+            Collections.shuffle(residentEmails, random);
 
             GraqlGet.Unfiltered relocationCitiesQuery = Graql.match(
                     Graql.var("city").isa("city").has("name", Graql.var("city-name")),

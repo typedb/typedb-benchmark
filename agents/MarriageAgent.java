@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 public class MarriageAgent implements CityAgent {
 
@@ -29,11 +30,11 @@ public class MarriageAgent implements CityAgent {
 
             GraqlGet.Unfiltered singleWomenQuery = getSinglePeople(context, city, "female", "marriage_wife");
             city.logQuery(singleWomenQuery);
-            List<ConceptMap> womenAnswers = tx.execute(singleWomenQuery);
+            List<String> womenAnswers = tx.execute(singleWomenQuery).stream().map(a -> a.get("email").asAttribute().value().toString()).sorted().collect(Collectors.toList());
 
             GraqlGet.Unfiltered singleMenQuery = getSinglePeople(context, city, "male", "marriage_husband");
             city.logQuery(singleMenQuery);
-            List<ConceptMap> menAnswers = tx.execute(singleMenQuery);
+            List<String> menAnswers = tx.execute(singleMenQuery).stream().map(a -> a.get("email").asAttribute().value().toString()).sorted().collect(Collectors.toList());
 
             Random rnd = randomSource.startNewRandom();
 
@@ -45,12 +46,12 @@ public class MarriageAgent implements CityAgent {
             if (numMarriagesPossible > 0) {
 
                 for (int i = 0; i < numMarriagesPossible; i++) {
-                    String wifeEmail = womenAnswers.get(i).get("email").asAttribute().value().toString();
-                    String husbandEmail = menAnswers.get(i).get("email").asAttribute().value().toString();
+                    String wifeEmail = womenAnswers.get(i);
+                    String husbandEmail = menAnswers.get(i);
 
                     int marriageIdentifier = (wifeEmail + husbandEmail).hashCode();
 
-                    GraqlInsert query = Graql.match(
+                    GraqlInsert marriageQuery = Graql.match(
                             Graql.var("husband").isa("person").has("email", husbandEmail),
                             Graql.var("wife").isa("person").has("email", wifeEmail),
                             Graql.var("city").isa("city").has("name", city.getName())
@@ -61,7 +62,8 @@ public class MarriageAgent implements CityAgent {
                                     .has("marriage-id", marriageIdentifier),
                             Graql.var().isa("locates").rel("locates_located", Graql.var("m")).rel("locates_location", Graql.var("city"))
                     );
-                    List<ConceptMap> answers = tx.execute(query);
+                    city.logQuery(marriageQuery);
+                    List<ConceptMap> answers = tx.execute(marriageQuery);
                 }
                 tx.commit();
             }

@@ -12,11 +12,10 @@ import graql.lang.statement.Statement;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
+import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
 
@@ -39,13 +38,13 @@ public class ParentshipAgent implements CityAgent {
         ).get();
 
         // Query for married couples in the city who are not already in a parentship relation together
-        GraqlGet.Unfiltered marriageQuery = Graql.match(
+        GraqlGet.Sorted marriageQuery = Graql.match(
                 Graql.var("city").isa("city")
                         .has("name", city.getName()),
                 Graql.var("m").isa("marriage")
                         .rel("marriage_husband", Graql.var("husband"))
                         .rel("marriage_wife", Graql.var("wife"))
-                        .has("identifier", Graql.var("marriage-id")),
+                        .has("marriage-id", Graql.var("marriage-id")),
                 Graql.not(
                         Graql.var("par").isa("parentship")
                                 .rel("parentship_parent", "husband")
@@ -58,9 +57,7 @@ public class ParentshipAgent implements CityAgent {
                 Graql.var().isa("locates")
                         .rel("locates_located", Graql.var("m"))
                         .rel("locates_location", Graql.var("city"))
-        ).get();
-
-        Random random = randomSource.startNewRandom();
+        ).get().sort("marriage-id");
 
         GraknClient.Session session = context.getIterationGraknSessionFor(city.getCountry().getContinent().getName());
 
@@ -70,20 +67,33 @@ public class ParentshipAgent implements CityAgent {
             List<String> childrenEmails = tx.execute(childrenQuery)
                     .stream()
                     .map(conceptMap -> conceptMap.get("email").asAttribute().value().toString())
-                    .collect(toList());
+                    .sorted()
+                    .collect(Collectors.toList());
+
             city.logQuery(marriageQuery);
             List<ConceptMap> marriageAnswers = tx.execute(marriageQuery);
 
+            List<String> wifeEmails = marriageAnswers
+                    .stream()
+                    .map(a -> a.get("wife-email").asAttribute().value().toString())
+                    .sorted()
+                    .collect(toList());
+
+            List<String> husbandEmails = marriageAnswers
+                    .stream()
+                    .map(a -> a.get("husband-email").asAttribute().value().toString())
+                    .sorted()
+                    .collect(toList());
+
             if (marriageAnswers.size() > 0 && childrenEmails.size() > 0) {
                 LinkedHashMap<Integer, List<Integer>> childrenPerMarriage = Allocation.allocateEvenlyToMap(childrenEmails.size(), marriageAnswers.size());
-                Collections.shuffle(marriageAnswers, random);
 
                 for (Map.Entry<Integer, List<Integer>> entry : childrenPerMarriage.entrySet()) {
                     Integer marriageIndex = entry.getKey();
                     List<Integer> children = entry.getValue();
 
-                    String motherEmail = marriageAnswers.get(marriageIndex).get("wife-email").asAttribute().value().toString();
-                    String husbandEmail = marriageAnswers.get(marriageIndex).get("husband-email").asAttribute().value().toString();
+                    String motherEmail = wifeEmails.get(marriageIndex);
+                    String husbandEmail = husbandEmails.get(marriageIndex);
 
                     List<String> childEmails = new ArrayList<>();
                     for (Integer childIndex : children) {
