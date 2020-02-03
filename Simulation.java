@@ -99,7 +99,7 @@ public class Simulation implements AgentContext, AutoCloseable {
                     Paths.get("data/cities.csv"),
                     Paths.get("data/female_forenames.csv"),
                     Paths.get("data/male_forenames.csv"),
-                    Paths.get("data/surnames.csv"),
+                    Paths.get("data/surnames.csv")
             );
         } catch (IOException e) {
             e.printStackTrace();
