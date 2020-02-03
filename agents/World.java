@@ -154,7 +154,7 @@ public class World {
 
         public void log(String message) {
             try {
-                logWriter.write(message);
+                logWriter.write(message + "\n");
             } catch (IOException e) {
                 e.printStackTrace();
             }

@@ -23,7 +23,7 @@ public class ParentshipAgent implements CityAgent {
 
     @Override
     public void iterate(AgentContext context, RandomSource randomSource, World.City city) {
-
+        city.log("-- Parentship Agent --");
         // Find all people born today
         LocalDateTime dateToday = context.getLocalDateTime();
         GraqlGet.Unfiltered childrenQuery = Graql.match(

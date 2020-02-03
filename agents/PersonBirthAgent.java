@@ -17,7 +17,7 @@ public class PersonBirthAgent implements CityAgent {
 
     @Override
     public void iterate(AgentContext context, RandomSource randomSource, World.City city) {
-
+        city.log("-- Person Birth Agent --");
         List<String> femaleForenames = context.getWorld().getFemaleForenames();
         List<String> maleForenames = context.getWorld().getMaleForenames();
         List<String> surnames = context.getWorld().getSurnames();

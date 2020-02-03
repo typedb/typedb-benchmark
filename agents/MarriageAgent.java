@@ -21,7 +21,7 @@ public class MarriageAgent implements CityAgent {
 
     @Override
     public void iterate(AgentContext context, RandomSource randomSource, World.City city) {
-
+        city.log("-- Marriage Agent --");
         String sessionKey = city.getCountry().getContinent().getName();
         GraknClient.Session session = context.getIterationGraknSessionFor(sessionKey);
 
@@ -81,7 +81,7 @@ public class MarriageAgent implements CityAgent {
                 Graql.var("dob").lte(dobOfAdults),
                 Graql.not(Graql.var("m").isa("marriage").rel(marriageRole, personVar)),
                 Graql.var("r").isa("residency").rel("residency_resident", personVar).rel("residency_location", cityVar),
-                Graql.not(Graql.var("r").has("end-date")),
+                Graql.not(Graql.var("r").has("end-date", Graql.var("ed"))),
                 cityVar.isa("city").has("name", city.getName())
         ).get("email");
     }

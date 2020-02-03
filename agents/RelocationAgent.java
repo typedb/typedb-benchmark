@@ -21,6 +21,7 @@ public class RelocationAgent implements CityAgent {
 
     @Override
     public void iterate(AgentContext context, RandomSource randomSource, World.City city) {
+        city.log("-- Relocation Agent --");
         /*
         Find people currently resident the city
         Find other cities in the continent
@@ -48,7 +49,7 @@ public class RelocationAgent implements CityAgent {
                             .rel("residency_resident", "person")
                             .rel("residency_location", "city")
                             .has("start-date", Graql.var("start-date")),
-                    Graql.not(Graql.var("r").has("end-date")),
+                    Graql.not(Graql.var("r").has("end-date", Graql.var("ed"))),
                     Graql.var("start-date").lte(earliestDate)
             ).get();
 
