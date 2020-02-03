@@ -100,7 +100,6 @@ public class Simulation implements AgentContext, AutoCloseable {
                     Paths.get("data/female_forenames.csv"),
                     Paths.get("data/male_forenames.csv"),
                     Paths.get("data/surnames.csv"),
-                    Paths.get("/Users/jamesfletcher/programming/simulation/transaction-logs")
             );
         } catch (IOException e) {
             e.printStackTrace();

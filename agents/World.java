@@ -35,7 +35,7 @@ public class World {
     private final List<String> maleForenames;
     private final List<String> surnames;
 
-    public World(Path continentsPath, Path countriesPath, Path citiesPath, Path femaleForenamesPath, Path maleForenamesPath, Path surnamesPath, Path logDirPath) throws IOException {
+    public World(Path continentsPath, Path countriesPath, Path citiesPath, Path femaleForenamesPath, Path maleForenamesPath, Path surnamesPath) throws IOException {
         try {
             this.logDirPath = Paths.get(System.getenv("LOG_DIR_PATH"));
         } catch (NullPointerException n){
