@@ -22,15 +22,11 @@ import static java.util.stream.Collectors.toList;
 
 public class ParentshipAgent implements CityAgent {
 
-    private World.City city;
-    private LocalDateTime dateToday;
-
     @Override
     public void iterate(AgentContext context, RandomSource randomSource, World.City city) {
-        this.city = city;
         city.log("-- Parentship Agent --");
         // Find all people born today
-        dateToday = context.getLocalDateTime();
+        LocalDateTime dateToday = context.getLocalDateTime();
 
         // Query for married couples in the city who are not already in a parentship relation together
 
@@ -38,9 +34,9 @@ public class ParentshipAgent implements CityAgent {
 
         try (GraknClient.Transaction tx = session.transaction().write()) {
 
-            List<String> childrenEmails = getChildrenEmails(tx);
+            List<String> childrenEmails = getChildrenEmails(tx, city, dateToday);
 
-            List<HashMap<String, String>> marriageEmails = getMarriageEmails(tx);
+            List<HashMap<String, String>> marriageEmails = getMarriageEmails(tx, city);
 
             if (marriageEmails.size() > 0 && childrenEmails.size() > 0) {
                 LinkedHashMap<Integer, List<Integer>> childrenPerMarriage = Allocation.allocateEvenlyToMap(childrenEmails.size(), marriageEmails.size());
@@ -56,14 +52,14 @@ public class ParentshipAgent implements CityAgent {
                         childEmails.add(childrenEmails.get(childIndex));
                     }
 
-                    insertParentShip(tx, marriage, childEmails);
+                    insertParentShip(tx, city, marriage, childEmails);
                 }
                 tx.commit();
             }
         }
     }
 
-    private List<HashMap<String, String>> getMarriageEmails(GraknClient.Transaction tx) {
+    private List<HashMap<String, String>> getMarriageEmails(GraknClient.Transaction tx, World.City city) {
         GraqlGet.Sorted marriageQuery = Graql.match(
                 Graql.var("city").isa("city")
                         .has("name", city.getName()),
@@ -97,7 +93,7 @@ public class ParentshipAgent implements CityAgent {
                 .collect(toList());
     }
 
-    private List<String> getChildrenEmails(GraknClient.Transaction tx) {
+    private List<String> getChildrenEmails(GraknClient.Transaction tx, World.City city, LocalDateTime dateToday) {
 
         GraqlGet.Unfiltered childrenQuery = Graql.match(
                 Graql.var("c").isa("city")
@@ -118,7 +114,7 @@ public class ParentshipAgent implements CityAgent {
                 .collect(Collectors.toList());
     }
 
-    private void insertParentShip(GraknClient.Transaction tx, HashMap<String, String> marriage, List<String> childEmails) {
+    private void insertParentShip(GraknClient.Transaction tx, World.City city, HashMap<String, String> marriage, List<String> childEmails) {
         ArrayList<Statement> matchStatements = new ArrayList<>(Arrays.asList(
                 Graql.var("mother").isa("person").has("email", marriage.get("wife-email")),
                 Graql.var("father").isa("person").has("email", marriage.get("husband-email"))

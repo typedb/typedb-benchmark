@@ -2,7 +2,6 @@ package grakn.simulation.agents;
 
 import grakn.client.GraknClient;
 import grakn.client.GraknClient.Transaction;
-import grakn.client.answer.ConceptMap;
 import grakn.simulation.common.RandomSource;
 import graql.lang.Graql;
 import graql.lang.query.GraqlInsert;
@@ -15,24 +14,13 @@ public class PersonBirthAgent implements CityAgent {
 
     private static final int NUM_BIRTHS = 5;
 
-    private Random random;
-    private LocalDateTime dateToday;
-    private List<String> femaleForenames;
-    private List<String> maleForenames;
-    private List<String> surnames;
-    private World.City city;
-    private AgentContext context;
-
     @Override
     public void iterate(AgentContext context, RandomSource randomSource, World.City city) {
         city.log("-- Person Birth Agent --");
-        this.city = city;
-        this.context = context;
-        femaleForenames = context.getWorld().getFemaleForenames();
-        maleForenames = context.getWorld().getMaleForenames();
-        surnames = context.getWorld().getSurnames();
-        dateToday = context.getLocalDateTime();
-        random = randomSource.startNewRandom();
+        List<String> femaleForenames = context.getWorld().getFemaleForenames();
+        List<String> maleForenames = context.getWorld().getMaleForenames();
+        List<String> surnames = context.getWorld().getSurnames();
+        Random random = randomSource.startNewRandom();
 
         String sessionKey = city.getCountry().getContinent().getName();
         GraknClient.Session session = context.getIterationGraknSessionFor(sessionKey);
@@ -40,16 +28,17 @@ public class PersonBirthAgent implements CityAgent {
         // Find bachelors and bachelorettes who are considered adults and who are not in a marriage and pair them off randomly
         try ( Transaction tx = session.transaction().write()) {
             for (int i = 0; i < NUM_BIRTHS; i++) {
-                insertPerson(tx, i);
+                insertPerson(tx, city, context, random, surnames, femaleForenames, maleForenames, i);
             }
             tx.commit();
         }
     }
 
-    private void insertPerson(Transaction tx, int i) {
+    private void insertPerson(Transaction tx, World.City city, AgentContext context, Random random, List<String> surnames, List<String> femaleForenames, List<String> maleForenames, int i) {
         String gender;
         String forename;
         String surname = surnames.get(random.nextInt(surnames.size()));
+        LocalDateTime dateToday = context.getLocalDateTime();
 
         boolean genderBool = random.nextBoolean();
         if (genderBool) {

@@ -17,13 +17,9 @@ import java.util.stream.Collectors;
 public class MarriageAgent implements CityAgent {
 
     private static final int NUM_MARRIAGES = 5;
-    private World.City city;
-    private AgentContext context;
 
     @Override
     public void iterate(AgentContext context, RandomSource randomSource, World.City city) {
-        this.city = city;
-        this.context = context;
         city.log("-- Marriage Agent --");
         String sessionKey = city.getCountry().getContinent().getName();
         GraknClient.Session session = context.getIterationGraknSessionFor(sessionKey);
@@ -33,10 +29,12 @@ public class MarriageAgent implements CityAgent {
 
             Random rnd = randomSource.startNewRandom();
 
-            List<String> womenEmails = getSingleWomen(tx);
+            LocalDateTime dobOfAdults = context.getLocalDateTime().minusYears(World.AGE_OF_ADULTHOOD);
+
+            List<String> womenEmails = getSingleWomen(tx, dobOfAdults, city);
             Collections.shuffle(womenEmails, rnd);
 
-            List<String> menEmails = getSingleMen(tx);
+            List<String> menEmails = getSingleMen(tx, dobOfAdults, city);
             Collections.shuffle(menEmails, rnd);
 
             int numMarriagesPossible = Math.min(NUM_MARRIAGES, Math.min(womenEmails.size(), menEmails.size()));
@@ -44,30 +42,28 @@ public class MarriageAgent implements CityAgent {
             if (numMarriagesPossible > 0) {
 
                 for (int i = 0; i < numMarriagesPossible; i++) {
-                    insertMarriage(tx, womenEmails.get(i), menEmails.get(i));
+                    insertMarriage(tx, city, womenEmails.get(i), menEmails.get(i));
                 }
                 tx.commit();
             }
         }
     }
 
-    private List<String> getSingleWomen(Transaction tx) {
-        GraqlGet.Unfiltered singleWomenQuery = getSinglePeopleOfGenderQuery(context, city, "female", "marriage_wife");
+    private List<String> getSingleWomen(Transaction tx, LocalDateTime dobOfAdults, World.City city) {
+        GraqlGet.Unfiltered singleWomenQuery = getSinglePeopleOfGenderQuery(dobOfAdults, city, "female", "marriage_wife");
         city.logQuery(singleWomenQuery);
         return tx.execute(singleWomenQuery).stream().map(a -> a.get("email").asAttribute().value().toString()).sorted().collect(Collectors.toList());
     }
 
-    private List<String> getSingleMen(Transaction tx) {
-        GraqlGet.Unfiltered singleMenQuery = getSinglePeopleOfGenderQuery(context, city, "male", "marriage_husband");
+    private List<String> getSingleMen(Transaction tx, LocalDateTime dobOfAdults, World.City city) {
+        GraqlGet.Unfiltered singleMenQuery = getSinglePeopleOfGenderQuery(dobOfAdults, city, "male", "marriage_husband");
         city.logQuery(singleMenQuery);
         return tx.execute(singleMenQuery).stream().map(a -> a.get("email").asAttribute().value().toString()).sorted().collect(Collectors.toList());
     }
 
-    private GraqlGet.Unfiltered getSinglePeopleOfGenderQuery(AgentContext context, World.City city, String gender, String marriageRole) {
+    private GraqlGet.Unfiltered getSinglePeopleOfGenderQuery(LocalDateTime dobOfAdults, World.City city, String gender, String marriageRole) {
         Statement personVar = Graql.var("p");
         Statement cityVar = Graql.var("city");
-
-        LocalDateTime dobOfAdults = context.getLocalDateTime().minusYears(World.AGE_OF_ADULTHOOD);
 
         return Graql.match(
                 personVar.isa("person").has("gender", gender).has("email", Graql.var("email")).has("date-of-birth", Graql.var("dob")),
@@ -79,7 +75,7 @@ public class MarriageAgent implements CityAgent {
         ).get("email");
     }
 
-    private void insertMarriage(Transaction tx, String wifeEmail, String husbandEmail) {
+    private void insertMarriage(Transaction tx, World.City city, String wifeEmail, String husbandEmail) {
         int marriageIdentifier = (wifeEmail + husbandEmail).hashCode();
 
         GraqlInsert marriageQuery = Graql.match(
