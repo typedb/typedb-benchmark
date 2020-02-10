@@ -2,8 +2,8 @@
 java_test(
     name = "MarriageAgentE2E",
     srcs = [
-        "AgentE2E.java",
         "MarriageAgentE2E.java",
+        "common/TestArgsInterpreter.java",
     ],
     test_class = "grakn.simulation.agents.test.MarriageAgentE2E",
     deps = [
@@ -19,8 +19,8 @@ java_test(
 java_test(
     name = "ParentshipAgentE2E",
     srcs = [
-        "AgentE2E.java",
         "ParentshipAgentE2E.java",
+        "common/TestArgsInterpreter.java",
     ],
     test_class = "grakn.simulation.agents.test.ParentshipAgentE2E",
     deps = [
@@ -36,8 +36,8 @@ java_test(
 java_test(
     name = "RelocationAgentE2E",
     srcs = [
-        "AgentE2E.java",
         "RelocationAgentE2E.java",
+        "common/TestArgsInterpreter.java",
     ],
     test_class = "grakn.simulation.agents.test.RelocationAgentE2E",
     deps = [
