@@ -18,9 +18,13 @@ import java.util.stream.Collectors;
 public class MarriageAgent implements CityAgent {
 
     private static final int NUM_MARRIAGES = 5;
+    private World.City city;
+    private AgentContext context;
 
     @Override
     public void iterate(AgentContext context, RandomSource randomSource, World.City city) {
+        this.city = city;
+        this.context = context;
         city.log("-- Marriage Agent --");
         String sessionKey = city.getCountry().getContinent().getName();
         GraknClient.Session session = context.getIterationGraknSessionFor(sessionKey);
@@ -28,49 +32,57 @@ public class MarriageAgent implements CityAgent {
         // Find bachelors and bachelorettes who are considered adults and who are not in a marriage and pair them off randomly
         try ( Transaction tx = session.transaction().write()) {
 
-            GraqlGet.Unfiltered singleWomenQuery = getSinglePeople(context, city, "female", "marriage_wife");
-            city.logQuery(singleWomenQuery);
-            List<String> womenAnswers = tx.execute(singleWomenQuery).stream().map(a -> a.get("email").asAttribute().value().toString()).sorted().collect(Collectors.toList());
-
-            GraqlGet.Unfiltered singleMenQuery = getSinglePeople(context, city, "male", "marriage_husband");
-            city.logQuery(singleMenQuery);
-            List<String> menAnswers = tx.execute(singleMenQuery).stream().map(a -> a.get("email").asAttribute().value().toString()).sorted().collect(Collectors.toList());
-
             Random rnd = randomSource.startNewRandom();
 
-            Collections.shuffle(womenAnswers, rnd);
-            Collections.shuffle(menAnswers, rnd);
+            List<String> womenEmails = getSingleWomen(tx);
+            Collections.shuffle(womenEmails, rnd);
 
-            int numMarriagesPossible = Math.min(NUM_MARRIAGES, Math.min(womenAnswers.size(), menAnswers.size()));
+            List<String> menEmails = getSingleMen(tx);
+            Collections.shuffle(menEmails, rnd);
+
+            int numMarriagesPossible = Math.min(NUM_MARRIAGES, Math.min(womenEmails.size(), menEmails.size()));
 
             if (numMarriagesPossible > 0) {
 
                 for (int i = 0; i < numMarriagesPossible; i++) {
-                    String wifeEmail = womenAnswers.get(i);
-                    String husbandEmail = menAnswers.get(i);
-
-                    int marriageIdentifier = (wifeEmail + husbandEmail).hashCode();
-
-                    GraqlInsert marriageQuery = Graql.match(
-                            Graql.var("husband").isa("person").has("email", husbandEmail),
-                            Graql.var("wife").isa("person").has("email", wifeEmail),
-                            Graql.var("city").isa("city").has("name", city.getName())
-                    ).insert(
-                            Graql.var("m").isa("marriage")
-                                    .rel("marriage_husband", "husband")
-                                    .rel("marriage_wife", "wife")
-                                    .has("marriage-id", marriageIdentifier),
-                            Graql.var().isa("locates").rel("locates_located", Graql.var("m")).rel("locates_location", Graql.var("city"))
-                    );
-                    city.logQuery(marriageQuery);
-                    List<ConceptMap> answers = tx.execute(marriageQuery);
+                    insertMarriage(tx, womenEmails.get(i), menEmails.get(i));
                 }
                 tx.commit();
             }
         }
     }
 
-    private GraqlGet.Unfiltered getSinglePeople(AgentContext context, World.City city, String gender, String marriageRole) {
+    private void insertMarriage(Transaction tx, String wifeEmail, String husbandEmail) {
+        int marriageIdentifier = (wifeEmail + husbandEmail).hashCode();
+
+        GraqlInsert marriageQuery = Graql.match(
+                Graql.var("husband").isa("person").has("email", husbandEmail),
+                Graql.var("wife").isa("person").has("email", wifeEmail),
+                Graql.var("city").isa("city").has("name", city.getName())
+        ).insert(
+                Graql.var("m").isa("marriage")
+                        .rel("marriage_husband", "husband")
+                        .rel("marriage_wife", "wife")
+                        .has("marriage-id", marriageIdentifier),
+                Graql.var().isa("locates").rel("locates_located", Graql.var("m")).rel("locates_location", Graql.var("city"))
+        );
+        city.logQuery(marriageQuery);
+        tx.execute(marriageQuery);
+    }
+
+    private List<String> getSingleWomen(Transaction tx) {
+        GraqlGet.Unfiltered singleWomenQuery = getSinglePeopleOfGenderQuery(context, city, "female", "marriage_wife");
+        city.logQuery(singleWomenQuery);
+        return tx.execute(singleWomenQuery).stream().map(a -> a.get("email").asAttribute().value().toString()).sorted().collect(Collectors.toList());
+    }
+
+    private List<String> getSingleMen(Transaction tx) {
+        GraqlGet.Unfiltered singleMenQuery = getSinglePeopleOfGenderQuery(context, city, "male", "marriage_husband");
+        city.logQuery(singleMenQuery);
+        return tx.execute(singleMenQuery).stream().map(a -> a.get("email").asAttribute().value().toString()).sorted().collect(Collectors.toList());
+    }
+
+    private GraqlGet.Unfiltered getSinglePeopleOfGenderQuery(AgentContext context, World.City city, String gender, String marriageRole) {
         Statement personVar = Graql.var("p");
         Statement cityVar = Graql.var("city");
 
