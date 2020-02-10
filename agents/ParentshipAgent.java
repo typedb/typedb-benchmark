@@ -12,6 +12,7 @@ import graql.lang.statement.Statement;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,23 +22,49 @@ import static java.util.stream.Collectors.toList;
 
 public class ParentshipAgent implements CityAgent {
 
+    private World.City city;
+    private LocalDateTime dateToday;
+
     @Override
     public void iterate(AgentContext context, RandomSource randomSource, World.City city) {
+        this.city = city;
         city.log("-- Parentship Agent --");
         // Find all people born today
-        LocalDateTime dateToday = context.getLocalDateTime();
-        GraqlGet.Unfiltered childrenQuery = Graql.match(
-                Graql.var("c").isa("city")
-                        .has("name", city.getName()),
-                Graql.var("child").isa("person")
-                        .has("email", Graql.var("email"))
-                        .has("date-of-birth", dateToday),
-                Graql.var("bi").isa("born-in")
-                        .rel("born-in_place-of-birth", "c")
-                        .rel("born-in_child", "child")
-        ).get();
+        dateToday = context.getLocalDateTime();
 
         // Query for married couples in the city who are not already in a parentship relation together
+
+        GraknClient.Session session = context.getIterationGraknSessionFor(city.getCountry().getContinent().getName());
+
+        try (GraknClient.Transaction tx = session.transaction().write()) {
+
+            List<String> childrenEmails = getChildrenEmails(tx);
+
+            List<HashMap<String, String>> marriageEmails = getMarriageEmails(tx);
+
+            if (marriageEmails.size() > 0 && childrenEmails.size() > 0) {
+                LinkedHashMap<Integer, List<Integer>> childrenPerMarriage = Allocation.allocateEvenlyToMap(childrenEmails.size(), marriageEmails.size());
+
+                for (Map.Entry<Integer, List<Integer>> childrenForMarriage : childrenPerMarriage.entrySet()) {
+                    Integer marriageIndex = childrenForMarriage.getKey();
+                    List<Integer> children = childrenForMarriage.getValue();
+
+                    HashMap<String, String> marriage = marriageEmails.get(marriageIndex);
+
+                    List<String> childEmails = new ArrayList<>();
+                    for (Integer childIndex : children) {
+                        childEmails.add(childrenEmails.get(childIndex));
+                    }
+                    GraqlInsert parentshipQuery = buildParentshipInsertQuery(marriage.get("wife-email"), marriage.get("husband-email"), childEmails);
+                    city.logQuery(parentshipQuery);
+                    tx.execute(parentshipQuery);
+                }
+                tx.commit();
+            }
+        }
+    }
+
+    private List<HashMap<String, String>> getMarriageEmails(GraknClient.Transaction tx) {
         GraqlGet.Sorted marriageQuery = Graql.match(
                 Graql.var("city").isa("city")
                         .has("name", city.getName()),
@@ -59,53 +86,37 @@ public class ParentshipAgent implements CityAgent {
                         .rel("locates_location", Graql.var("city"))
         ).get().sort("marriage-id");
 
-        GraknClient.Session session = context.getIterationGraknSessionFor(city.getCountry().getContinent().getName());
+        city.logQuery(marriageQuery);
+        List<ConceptMap> marriageAnswers = tx.execute(marriageQuery);
 
-        try (GraknClient.Transaction tx = session.transaction().write()) {
+        return marriageAnswers
+                .stream()
+                .map(a -> new HashMap<String, String>() {{
+                    put("wife-email", a.get("wife-email").asAttribute().value().toString());
+                    put("husband-email", a.get("husband-email").asAttribute().value().toString());
+                }})
+                .collect(toList());
+    }
 
-            city.logQuery(childrenQuery);
-            List<String> childrenEmails = tx.execute(childrenQuery)
-                    .stream()
-                    .map(conceptMap -> conceptMap.get("email").asAttribute().value().toString())
-                    .sorted()
-                    .collect(Collectors.toList());
+    private List<String> getChildrenEmails(GraknClient.Transaction tx) {
 
-            city.logQuery(marriageQuery);
-            List<ConceptMap> marriageAnswers = tx.execute(marriageQuery);
+        GraqlGet.Unfiltered childrenQuery = Graql.match(
+                Graql.var("c").isa("city")
+                        .has("name", city.getName()),
+                Graql.var("child").isa("person")
+                        .has("email", Graql.var("email"))
+                        .has("date-of-birth", dateToday),
+                Graql.var("bi").isa("born-in")
+                        .rel("born-in_place-of-birth", "c")
+                        .rel("born-in_child", "child")
+        ).get();
 
-            List<String> wifeEmails = marriageAnswers
-                    .stream()
-                    .map(a -> a.get("wife-email").asAttribute().value().toString())
-                    .sorted()
-                    .collect(toList());
-
-            List<String> husbandEmails = marriageAnswers
-                    .stream()
-                    .map(a -> a.get("husband-email").asAttribute().value().toString())
-                    .sorted()
-                    .collect(toList());
-
-            if (marriageAnswers.size() > 0 && childrenEmails.size() > 0) {
-                LinkedHashMap<Integer, List<Integer>> childrenPerMarriage = Allocation.allocateEvenlyToMap(childrenEmails.size(), marriageAnswers.size());
-
-                for (Map.Entry<Integer, List<Integer>> entry : childrenPerMarriage.entrySet()) {
-                    Integer marriageIndex = entry.getKey();
-                    List<Integer> children = entry.getValue();
-
-                    String motherEmail = wifeEmails.get(marriageIndex);
-                    String husbandEmail = husbandEmails.get(marriageIndex);
-
-                    List<String> childEmails = new ArrayList<>();
-                    for (Integer childIndex : children) {
-                        childEmails.add(childrenEmails.get(childIndex));
-                    }
-                    GraqlInsert parentshipQuery = buildParentshipInsertQuery(motherEmail, husbandEmail, childEmails);
-                    city.logQuery(parentshipQuery);
-                    tx.execute(parentshipQuery);
-                }
-                tx.commit();
-            }
-        }
+        city.logQuery(childrenQuery);
+        return tx.execute(childrenQuery)
+                .stream()
+                .map(conceptMap -> conceptMap.get("email").asAttribute().value().toString())
+                .sorted()
+                .collect(Collectors.toList());
     }
 
     private GraqlInsert buildParentshipInsertQuery(String motherEmail, String fatherEmail, List<String> childEmails) {

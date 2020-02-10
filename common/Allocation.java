@@ -4,6 +4,10 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 
+/**
+ * Tools to allocate items to some number of buckets
+ * Example use-case: for a set of newborns and a set of marriages, evenly allocate the newborns across the marriages
+ */
 public class Allocation {
 
     public static List<Integer> allocateEvenly(Integer numThingsToAllocate, Integer numBuckets){
