@@ -163,9 +163,7 @@ public class Simulation implements AgentContext, AutoCloseable {
 
         System.out.println(StringPrettyBox.simple("Simulation step: " + simulationStep, '*'));
 
-        for (World.City city: this.world.getCities().collect(Collectors.toList())) {
-            city.log(StringPrettyBox.simple("Simulation step: " + simulationStep, '*'));
-        }
+        this.world.getCities().forEach(city -> city.log(StringPrettyBox.simple("Simulation step: " + simulationStep, '*')));
 
         for (Agent agent : agents) {
             agent.iterate(this, RandomSource.nextSource(random));
@@ -225,9 +223,6 @@ public class Simulation implements AgentContext, AutoCloseable {
         if (client != null) {
             client.close();
         }
-
-        for (World.City city: this.world.getCities().collect(Collectors.toList())) {
-            city.close();
-        }
+        this.world.getCities().forEach(city -> city.close());
     }
 }
