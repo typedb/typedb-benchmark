@@ -1,8 +1,8 @@
 package grakn.simulation.agents.test;
 
+import agents.test.common.TestArgsInterpreter;
 import grakn.client.GraknClient;
 import grakn.client.answer.Numeric;
-import agents.test.common.TestArgsInterpreter;
 import graql.lang.Graql;
 import graql.lang.query.GraqlGet;
 import org.junit.After;
@@ -15,7 +15,7 @@ import static graql.lang.Graql.var;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
-public class MarriageAgentE2E {
+public class ParentshipAgentE2E {
 
     private GraknClient graknClient;
     private final String KEYSPACE = "world";
@@ -27,17 +27,18 @@ public class MarriageAgentE2E {
     }
 
     @Test
-    public void testMarriageAgentInsertsTheExpectedNumberOfMarriages() {
+    public void testParentshipAgentInsertsTheExpectedNumberOfParentships() {
+        // Note that that parentships with additional children will be counted a number of times equal to the number of children
         try (GraknClient.Session session = graknClient.session(KEYSPACE)) {
             try (GraknClient.Transaction tx = session.transaction().write()) {
-                GraqlGet.Aggregate marriagesCountQuery = Graql.match(
-                        var("m").isa("marriage").rel("marriage_husband", "husband").rel("marriage_wife", "wife")
+                GraqlGet.Aggregate parentshipsCountQuery = Graql.match(
+                        var("p").isa("parentship").rel("parentship_parent", "p1").rel("parentship_parent", "p2").rel("parentship_child", "ch")
                 ).get().count();
 
-                List<Numeric> answer = tx.execute(marriagesCountQuery);
-                int numMarriages = answer.get(0).number().intValue();
-                int expectedNumMarriages = 119;
-                assertThat(numMarriages, equalTo(expectedNumMarriages));
+                List<Numeric> answer = tx.execute(parentshipsCountQuery);
+                int numParentships = answer.get(0).number().intValue();
+                int expectedNumParentships = 550;
+                assertThat(numParentships, equalTo(expectedNumParentships));
             }
         }
     }

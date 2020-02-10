@@ -12,7 +12,12 @@ import grakn.simulation.yaml_tool.GraknYAMLException;
 import grakn.simulation.yaml_tool.GraknYAMLLoader;
 import graql.lang.Graql;
 import graql.lang.query.GraqlDefine;
-import org.apache.commons.cli.*;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -22,7 +27,8 @@ import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.*;
+import java.util.Optional;
+import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -141,7 +147,7 @@ public class Simulation implements AgentContext, AutoCloseable {
 
     private final ConcurrentMap<String, Session> sessionMap;
 
-    private Simulation(String graknUri, String keyspace, Agent[] agents, RandomSource randomSource, World world) {
+    private Simulation(String graknUri, String keyspace, Agent[] agents, RandomSource randomSource, World world) throws IOException {
         client = new GraknClient(graknUri);
         this.keyspace = keyspace;
         defaultSession = client.session(keyspace);
@@ -153,7 +159,10 @@ public class Simulation implements AgentContext, AutoCloseable {
     }
 
     private void iterate() {
+
         System.out.println(StringPrettyBox.simple("Simulation step: " + simulationStep, '*'));
+
+        this.world.getCities().forEach(city -> city.log(StringPrettyBox.simple("Simulation step: " + simulationStep, '*')));
 
         for (Agent agent : agents) {
             agent.iterate(this, RandomSource.nextSource(random));
@@ -213,5 +222,6 @@ public class Simulation implements AgentContext, AutoCloseable {
         if (client != null) {
             client.close();
         }
+        this.world.getCities().forEach(city -> city.close());
     }
 }

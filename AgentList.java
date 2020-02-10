@@ -5,6 +5,8 @@ import grakn.simulation.agents.*;
 public class AgentList {
     static Agent[] AGENTS = {
         new MarriageAgent(),
-        new PersonBirthAgent()
+        new PersonBirthAgent(),
+        new ParentshipAgent(),
+        new RelocationAgent(),
     };
 }

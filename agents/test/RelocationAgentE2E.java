@@ -15,7 +15,7 @@ import static graql.lang.Graql.var;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
-public class MarriageAgentE2E {
+public class RelocationAgentE2E {
 
     private GraknClient graknClient;
     private final String KEYSPACE = "world";
@@ -27,17 +27,23 @@ public class MarriageAgentE2E {
     }
 
     @Test
-    public void testMarriageAgentInsertsTheExpectedNumberOfMarriages() {
+    public void testParentshipAgentInsertsTheExpectedNumberOfParentships() {
+
+        // Note that that parentships with additional children will be counted a number of times equal to the number of children
         try (GraknClient.Session session = graknClient.session(KEYSPACE)) {
             try (GraknClient.Transaction tx = session.transaction().write()) {
-                GraqlGet.Aggregate marriagesCountQuery = Graql.match(
-                        var("m").isa("marriage").rel("marriage_husband", "husband").rel("marriage_wife", "wife")
+                GraqlGet.Aggregate parentshipsCountQuery = Graql.match(
+                        var("r").isa("relocation")
+                                .rel("relocation_previous-location", "l1")
+                                .rel("relocation_new-location", "l2")
+                                .rel("relocation_relocated-person", "p")
+                                .has("relocation-date", Graql.var("d"))
                 ).get().count();
 
-                List<Numeric> answer = tx.execute(marriagesCountQuery);
-                int numMarriages = answer.get(0).number().intValue();
-                int expectedNumMarriages = 119;
-                assertThat(numMarriages, equalTo(expectedNumMarriages));
+                List<Numeric> answer = tx.execute(parentshipsCountQuery);
+                int numParentships = answer.get(0).number().intValue();
+                int expectedNumParentships = 80;
+                assertThat(numParentships, equalTo(expectedNumParentships));
             }
         }
     }

@@ -1,12 +1,17 @@
 package grakn.simulation.agents;
 
+import graql.lang.query.GraqlQuery;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 
+import java.io.BufferedWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -17,7 +22,8 @@ import java.util.stream.Stream;
 
 public class World {
 
-    public static final int AGE_OF_ADULTHOOD = 2;
+    static final int AGE_OF_ADULTHOOD = 2;
+    private Path logDirPath;
 
     private List<Continent> continents = new ArrayList<>();
 
@@ -30,6 +36,12 @@ public class World {
     private final List<String> surnames;
 
     public World(Path continentsPath, Path countriesPath, Path citiesPath, Path femaleForenamesPath, Path maleForenamesPath, Path surnamesPath) throws IOException {
+        try {
+            this.logDirPath = Paths.get(System.getenv("LOG_DIR_PATH"));
+        } catch (NullPointerException n){
+            this.logDirPath = null;
+        }
+
         iterateCSV(continentsPath, Continent::new);
         iterateCSV(countriesPath, Country::new);
         iterateCSV(citiesPath, City::new);
@@ -119,11 +131,12 @@ public class World {
         }
     }
 
-    public class City {
+    public class City extends Loggable {
         private String cityName;
         private Country country;
 
         public City(CSVRecord record) {
+            super(record.get(0));
             cityName = record.get(0);
             country = countryMap.get(record.get(1));
             country.cities.add(this);
@@ -136,6 +149,53 @@ public class World {
 
         public Country getCountry() {
             return country;
+        }
+    }
+
+    private class Loggable {
+
+        private BufferedWriter logWriter;
+
+        Loggable(String logName) {
+            if (logDirPath != null) {
+                Path path = logDirPath.resolve(logName + ".txt");
+                try {
+                    logWriter = new BufferedWriter(new OutputStreamWriter(
+                            new FileOutputStream(path.toString()), "utf-8"));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        public void logQuery(GraqlQuery query) {
+            if (logWriter != null) {
+                try {
+                    logWriter.write(query.toString() + "\n---\n");
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        public void log(String message) {
+            if (logWriter != null) {
+                try {
+                    logWriter.write(message + "\n");
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        public void close() {
+            if (logWriter != null) {
+                try {
+                    logWriter.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 }
