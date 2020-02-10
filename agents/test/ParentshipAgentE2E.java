@@ -37,7 +37,7 @@ public class ParentshipAgentE2E {
 
                 List<Numeric> answer = tx.execute(parentshipsCountQuery);
                 int numParentships = answer.get(0).number().intValue();
-                int expectedNumParentships = 560;
+                int expectedNumParentships = 530;
                 assertThat(numParentships, equalTo(expectedNumParentships));
             }
         }
