@@ -2,7 +2,6 @@ package grakn.simulation.agents;
 
 import grakn.client.GraknClient;
 import grakn.client.GraknClient.Transaction;
-import grakn.client.answer.ConceptMap;
 import grakn.simulation.common.RandomSource;
 import graql.lang.Graql;
 import graql.lang.query.GraqlGet;
@@ -52,24 +51,6 @@ public class MarriageAgent implements CityAgent {
         }
     }
 
-    private void insertMarriage(Transaction tx, String wifeEmail, String husbandEmail) {
-        int marriageIdentifier = (wifeEmail + husbandEmail).hashCode();
-
-        GraqlInsert marriageQuery = Graql.match(
-                Graql.var("husband").isa("person").has("email", husbandEmail),
-                Graql.var("wife").isa("person").has("email", wifeEmail),
-                Graql.var("city").isa("city").has("name", city.getName())
-        ).insert(
-                Graql.var("m").isa("marriage")
-                        .rel("marriage_husband", "husband")
-                        .rel("marriage_wife", "wife")
-                        .has("marriage-id", marriageIdentifier),
-                Graql.var().isa("locates").rel("locates_located", Graql.var("m")).rel("locates_location", Graql.var("city"))
-        );
-        city.logQuery(marriageQuery);
-        tx.execute(marriageQuery);
-    }
-
     private List<String> getSingleWomen(Transaction tx) {
         GraqlGet.Unfiltered singleWomenQuery = getSinglePeopleOfGenderQuery(context, city, "female", "marriage_wife");
         city.logQuery(singleWomenQuery);
@@ -96,5 +77,23 @@ public class MarriageAgent implements CityAgent {
                 Graql.not(Graql.var("r").has("end-date", Graql.var("ed"))),
                 cityVar.isa("city").has("name", city.getName())
         ).get("email");
+    }
+
+    private void insertMarriage(Transaction tx, String wifeEmail, String husbandEmail) {
+        int marriageIdentifier = (wifeEmail + husbandEmail).hashCode();
+
+        GraqlInsert marriageQuery = Graql.match(
+                Graql.var("husband").isa("person").has("email", husbandEmail),
+                Graql.var("wife").isa("person").has("email", wifeEmail),
+                Graql.var("city").isa("city").has("name", city.getName())
+        ).insert(
+                Graql.var("m").isa("marriage")
+                        .rel("marriage_husband", "husband")
+                        .rel("marriage_wife", "wife")
+                        .has("marriage-id", marriageIdentifier),
+                Graql.var().isa("locates").rel("locates_located", Graql.var("m")).rel("locates_location", Graql.var("city"))
+        );
+        city.logQuery(marriageQuery);
+        tx.execute(marriageQuery);
     }
 }

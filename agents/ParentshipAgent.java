@@ -55,9 +55,8 @@ public class ParentshipAgent implements CityAgent {
                     for (Integer childIndex : children) {
                         childEmails.add(childrenEmails.get(childIndex));
                     }
-                    GraqlInsert parentshipQuery = buildParentshipInsertQuery(marriage.get("wife-email"), marriage.get("husband-email"), childEmails);
-                    city.logQuery(parentshipQuery);
-                    tx.execute(parentshipQuery);
+
+                    insertParentShip(tx, marriage, childEmails);
                 }
                 tx.commit();
             }
@@ -119,19 +118,18 @@ public class ParentshipAgent implements CityAgent {
                 .collect(Collectors.toList());
     }
 
-    private GraqlInsert buildParentshipInsertQuery(String motherEmail, String fatherEmail, List<String> childEmails) {
-
+    private void insertParentShip(GraknClient.Transaction tx, HashMap<String, String> marriage, List<String> childEmails) {
         ArrayList<Statement> matchStatements = new ArrayList<>(Arrays.asList(
-                Graql.var("mother").isa("person").has("email", motherEmail),
-                Graql.var("father").isa("person").has("email", fatherEmail)
+                Graql.var("mother").isa("person").has("email", marriage.get("wife-email")),
+                Graql.var("father").isa("person").has("email", marriage.get("husband-email"))
         ));
 
         Statement parentship = Graql.var("par");
 
         ArrayList<Statement> insertStatements = new ArrayList<>(Arrays.asList(
                 parentship.isa("parentship")
-                .rel("parentship_parent", "father")
-                .rel("parentship_parent", "mother")
+                        .rel("parentship_parent", "father")
+                        .rel("parentship_parent", "mother")
         ));
 
         for (int i = 0; i < childEmails.size(); i++) {
@@ -141,10 +139,13 @@ public class ParentshipAgent implements CityAgent {
             insertStatements.add(parentship.rel("parentship_child", childVar));
         }
 
-        return Graql.match(
+        GraqlInsert parentshipQuery = Graql.match(
                 matchStatements
         ).insert(
                 insertStatements
         );
+
+        city.logQuery(parentshipQuery);
+        tx.execute(parentshipQuery);
     }
 }
