@@ -1,5 +1,6 @@
 package grakn.simulation;
 
+import grabl.tracing.client.GrablTracing;
 import grakn.client.GraknClient;
 import grakn.client.GraknClient.Session;
 import grakn.client.GraknClient.Transaction;
@@ -27,6 +28,8 @@ import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
@@ -55,6 +58,24 @@ public class Simulation implements AgentContext, AutoCloseable {
         options.addOption(Option.builder("g")
                 .longOpt("grakn-uri").desc("Grakn server URI").hasArg().argName("uri")
                 .build());
+        options.addOption(Option.builder("t")
+                .longOpt("tracing-uri").desc("Grabl tracing server URI").hasArg().argName("uri")
+                .build());
+        options.addOption(Option.builder("o")
+                .longOpt("org").desc("Repository organisation").hasArg().argName("name").required()
+                .build());
+        options.addOption(Option.builder("r")
+                .longOpt("repo").desc("Grabl tracing repository").hasArg().argName("name").required()
+                .build());
+        options.addOption(Option.builder("c")
+                .longOpt("commit").desc("Grabl tracing commit").hasArg().argName("sha").required()
+                .build());
+        options.addOption(Option.builder("u")
+                .longOpt("username").desc("Grabl tracing username").hasArg().argName("username").required()
+                .build());
+        options.addOption(Option.builder("a")
+                .longOpt("api-token").desc("Grabl tracing API token").hasArg().argName("token").required()
+                .build());
         options.addOption(Option.builder("s")
                 .longOpt("seed").desc("Simulation randomization seed").hasArg().argName("seed")
                 .build());
@@ -76,6 +97,13 @@ public class Simulation implements AgentContext, AutoCloseable {
         }
 
         String graknHostUri = getOption(commandLine, "g").orElse(GraknClient.DEFAULT_URI);
+        String grablTracingUri = getOption(commandLine, "t").orElse("localhost:7979");
+        String grablTracingOrganisation = commandLine.getOptionValue("o");
+        String grablTracingRepository = commandLine.getOptionValue("r");
+        String grablTracingCommit = commandLine.getOptionValue("c");
+        String grablTracingUsername = commandLine.getOptionValue("u");
+        String grablTracingToken = commandLine.getOptionValue("a");
+
         long seed = getOption(commandLine, "s").map(Long::parseLong).orElseGet(() -> {
             System.out.println("No seed supplied, using random seed: " + RANDOM_SEED);
             return RANDOM_SEED;
@@ -83,6 +111,13 @@ public class Simulation implements AgentContext, AutoCloseable {
 
         int iterations = getOption(commandLine, "i").map(Integer::parseInt).orElse(NUM_ITERATIONS);
         String graknKeyspace = commandLine.getOptionValue("k");
+
+        Map<String, Path> files = new HashMap<>();
+        for (String filepath : commandLine.getArgList()) {
+            Path path = Paths.get(filepath);
+            String filename = path.getFileName().toString();
+            files.put(filename, path);
+        }
 
         ////////////////////
         // INITIALIZATION //
@@ -93,12 +128,12 @@ public class Simulation implements AgentContext, AutoCloseable {
         World world;
         try {
             world = new World(
-                    Paths.get("data/continents.csv"),
-                    Paths.get("data/countries.csv"),
-                    Paths.get("data/cities.csv"),
-                    Paths.get("data/female_forenames.csv"),
-                    Paths.get("data/male_forenames.csv"),
-                    Paths.get("data/surnames.csv")
+                    files.get("continents.csv"),
+                    files.get("countries.csv"),
+                    files.get("cities.csv"),
+                    files.get("female_forenames.csv"),
+                    files.get("male_forenames.csv"),
+                    files.get("surnames.csv")
             );
         } catch (IOException e) {
             e.printStackTrace();
@@ -107,31 +142,75 @@ public class Simulation implements AgentContext, AutoCloseable {
         }
 
         System.out.println("Connecting to Grakn...");
-        try (Simulation simulation = new Simulation(
-                    graknHostUri,
-                    graknKeyspace,
-                    AgentList.AGENTS,
-                    new RandomSource(seed),
-                    world
-            )) {
 
-            // TODO: merge these two schema files once this issue is fixed
-            // https://github.com/graknlabs/grakn/issues/5553
-            simulation.loadSchema(Paths.get("schema/schema.gql"));
-            simulation.loadSchema(Paths.get("schema/schema-pt2.gql"));
-            simulation.loadData(Paths.get("data/data.yaml"));
-            simulation.loadData(Paths.get("data/currencies.yaml"));
+        try {
+            GraknClient grakn = null;
+            GrablTracing tracing = null;
+            GrablTracing.Analysis analysis = null;
+            try {
+                grakn = new GraknClient(graknHostUri);
 
-            ///////////////
-            // MAIN LOOP //
-            ///////////////
+                try (Session session = grakn.session(graknKeyspace)) {
+                    // TODO: merge these two schema files once this issue is fixed
+                    // https://github.com/graknlabs/grakn/issues/5553
+                    loadSchema(session,
+                            files.get("schema.gql"),
+                            files.get("schema-pt2.gql"));
+                    loadData(session,
+                            files.get("data.yaml"),
+                            files.get("currencies.yaml"));
+                }
 
-            for (int i = 0; i < iterations; ++i) {
-                simulation.iterate();
+                tracing = new GrablTracing(grablTracingUri, grablTracingUsername, grablTracingToken);
+                analysis = tracing.analysis(grablTracingOrganisation, grablTracingRepository, grablTracingCommit);
+
+                try (Simulation simulation = new Simulation(
+                        grakn,
+                        graknKeyspace,
+                        analysis,
+                        AgentList.AGENTS,
+                        new RandomSource(seed),
+                        world
+                )) {
+                    ///////////////
+                    // MAIN LOOP //
+                    ///////////////
+
+                    for (int i = 0; i < iterations; ++i) {
+                        simulation.iterate();
+                    }
+                }
+            } finally {
+                //analysis.close();
+                if (grakn != null) {
+                    grakn.close();
+                }
+
+                if (tracing != null) {
+                    tracing.close();
+                }
             }
         } catch (Exception ex) {
             ex.printStackTrace();
             System.exit(1);
+        }
+    }
+
+    private static void loadSchema(Session session, Path... schemaPath) throws IOException {
+        for (Path path : schemaPath) {
+            String schemaQuery = new String(Files.readAllBytes(path), StandardCharsets.UTF_8);
+
+            try (Transaction tx = session.transaction().write()) {
+                tx.execute((GraqlDefine) Graql.parse(schemaQuery));
+                tx.commit();
+            }
+        }
+    }
+
+    private static void loadData(Session session, Path... dataPath) throws IOException, GraknYAMLException {
+        GraknYAMLLoader loader = new GraknYAMLLoader(session);
+        for (Path path : dataPath) {
+            loader.loadFile(path.toFile());
         }
     }
 
@@ -147,8 +226,10 @@ public class Simulation implements AgentContext, AutoCloseable {
 
     private final ConcurrentMap<String, Session> sessionMap;
 
-    private Simulation(String graknUri, String keyspace, Agent[] agents, RandomSource randomSource, World world) throws IOException {
-        client = new GraknClient(graknUri);
+    private final GrablTracing.Analysis analysis;
+
+    private Simulation(GraknClient grakn, String keyspace, GrablTracing.Analysis analysis, Agent[] agents, RandomSource randomSource, World world) throws IOException {
+        client = grakn;
         this.keyspace = keyspace;
         defaultSession = client.session(keyspace);
         loader = new GraknYAMLLoader(defaultSession);
@@ -156,6 +237,7 @@ public class Simulation implements AgentContext, AutoCloseable {
         random = randomSource.startNewRandom();
         sessionMap = new ConcurrentHashMap<>();
         this.world = world;
+        this.analysis = analysis;
     }
 
     private void iterate() {
@@ -171,19 +253,6 @@ public class Simulation implements AgentContext, AutoCloseable {
         closeAllSessionsInMap(); // We want to test opening new sessions each iteration.
 
         simulationStep++;
-    }
-
-    private void loadSchema(Path schemaPath) throws IOException {
-        String schemaQuery = new String(Files.readAllBytes(schemaPath), StandardCharsets.UTF_8);
-
-        try (Transaction tx = defaultSession.transaction().write()) {
-            tx.execute((GraqlDefine) Graql.parse(schemaQuery));
-            tx.commit();
-        }
-    }
-
-    private void loadData(Path dataPath) throws IOException, GraknYAMLException {
-        loader.loadFile(dataPath.toFile());
     }
 
     private void closeAllSessionsInMap() {
@@ -211,6 +280,11 @@ public class Simulation implements AgentContext, AutoCloseable {
     @Override
     public World getWorld() {
         return world;
+    }
+
+    @Override
+    public GrablTracing.Analysis getAnalysis() {
+        return analysis;
     }
 
     @Override

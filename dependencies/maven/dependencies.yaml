@@ -34,3 +34,13 @@ dependencies:
     snakeyaml:
       version: "1.25"
       lang: java
+
+  io.netty:
+    netty-tcnative-boringssl-static:
+      version: "2.0.25.Final"
+      lang: java
+
+  org.hamcrest:
+    hamcrest:
+      version: "2.2"
+      lang: java

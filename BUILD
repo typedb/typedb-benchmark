@@ -1,11 +1,6 @@
 java_library(
     name = "simulation-lib",
     srcs = glob(["*.java"]),
-    data = glob([
-        "schema/*.gql",
-        "data/*.yaml",
-        "data/*.csv",
-    ]),
     resources = [
         "conf/logback.xml",
     ],
@@ -13,6 +8,8 @@ java_library(
     deps = [
         "@graknlabs_client_java//:client-java",
         "@graknlabs_graql//java:graql",
+        "@graknlabs_grabl_tracing//protocol:protocol",
+        "@graknlabs_grabl_tracing//client:grabl-tracing",
         "//dependencies/maven/artifacts/commons-cli:commons-cli",
         "//common:common",
         "//yaml_tool:yaml_tool",
@@ -25,6 +22,14 @@ java_binary(
     name = "simulation",
     main_class = "grakn.simulation.Simulation",
     runtime_deps = [":simulation-lib"],
+    data = [
+        "//data",
+        "//schema",
+    ],
+    args = [
+        "$(locations //data)",
+        "$(locations //schema)",
+    ],
 )
 
 java_binary(
