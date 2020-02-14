@@ -12,7 +12,7 @@ java_test(
         "@graknlabs_graql//java:graql",
 
         # External dependencies from Maven
-        "//dependencies/maven/artifacts/org/hamcrest:hamcrest-library",
+        "//dependencies/maven/artifacts/org/hamcrest:hamcrest",
     ],
 )
 
@@ -29,7 +29,7 @@ java_test(
         "@graknlabs_graql//java:graql",
 
         # External dependencies from Maven
-        "//dependencies/maven/artifacts/org/hamcrest:hamcrest-library",
+        "//dependencies/maven/artifacts/org/hamcrest:hamcrest",
     ],
 )
 
@@ -46,6 +46,6 @@ java_test(
         "@graknlabs_graql//java:graql",
 
         # External dependencies from Maven
-        "//dependencies/maven/artifacts/org/hamcrest:hamcrest-library",
+        "//dependencies/maven/artifacts/org/hamcrest:hamcrest",
     ],
 )

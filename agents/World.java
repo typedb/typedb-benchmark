@@ -104,6 +104,10 @@ public class World {
         public Stream<Country> getCountries() {
             return countries.stream();
         }
+
+        public String getTracker() {
+            return getName();
+        }
     }
 
     public class Country {
@@ -129,6 +133,10 @@ public class World {
         public Stream<City> getCities() {
             return cities.stream();
         }
+
+        public String getTracker() {
+            return getContinent().getTracker() + ":" + getName();
+        }
     }
 
     public class City extends Loggable {
@@ -149,6 +157,10 @@ public class World {
 
         public Country getCountry() {
             return country;
+        }
+
+        public String getTracker() {
+            return getCountry().getTracker() + ":" + getName();
         }
     }
 

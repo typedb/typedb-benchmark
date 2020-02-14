@@ -2,11 +2,12 @@
 
 ## Build and run Simulation
 ```shell script
-bazel run //:simulation -- -k world
+bazel run //:simulation -- -d -k world
 ```
 
 ## CLI options
 
+### Standard Options
 ```
 -k,--keyspace <keyspace>
     Grakn keyspace
@@ -23,4 +24,27 @@ bazel run //:simulation -- -k world
 -i,--iterations <iterations>
     Number of simulation iterations
     default: 10
+```
+
+### Grabl Tracing Options
+```
+-d,--disable-tracing
+    Disable Grabl Tracing
+
+REQUIRED OPTIONS (if tracing is enabled):
+
+-o,--organisation <name>
+    Grabl/GitHub organisation for Grabl Tracing
+
+-r,--respository <name>
+    Grabl/GitHub repository for Grabl Tracing
+
+-c,--commit <sha>
+    Grabl/GitHub commit for Grabl Tracing
+
+-u,--username <username>
+    Grabl/GitHub username for Grabl Tracing
+
+-a,--api-token <token>
+    Grabl API token for Grabl Tracing
 ```
