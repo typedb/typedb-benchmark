@@ -8,8 +8,8 @@ java_library(
     deps = [
         "@graknlabs_client_java//:client-java",
         "@graknlabs_graql//java:graql",
-        "@graknlabs_grabl_tracing//protocol:protocol",
-        "@graknlabs_grabl_tracing//client:grabl-tracing",
+        "@graknlabs_grabl_tracing//protocol",
+        "@graknlabs_grabl_tracing//client",
         "//dependencies/maven/artifacts/commons-cli:commons-cli",
         "//common:common",
         "//yaml_tool:yaml_tool",

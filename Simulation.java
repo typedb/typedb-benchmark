@@ -1,6 +1,7 @@
 package grakn.simulation;
 
 import grabl.tracing.client.GrablTracing;
+import grabl.tracing.client.GrablTracingFactory;
 import grakn.client.GraknClient;
 import grakn.client.GraknClient.Session;
 import grakn.client.GraknClient.Transaction;
@@ -62,19 +63,19 @@ public class Simulation implements AgentContext, AutoCloseable {
                 .longOpt("tracing-uri").desc("Grabl tracing server URI").hasArg().argName("uri")
                 .build());
         options.addOption(Option.builder("o")
-                .longOpt("org").desc("Repository organisation").hasArg().argName("name").required()
+                .longOpt("org").desc("Repository organisation").hasArg().argName("name")
                 .build());
         options.addOption(Option.builder("r")
-                .longOpt("repo").desc("Grabl tracing repository").hasArg().argName("name").required()
+                .longOpt("repo").desc("Grabl tracing repository").hasArg().argName("name")
                 .build());
         options.addOption(Option.builder("c")
-                .longOpt("commit").desc("Grabl tracing commit").hasArg().argName("sha").required()
+                .longOpt("commit").desc("Grabl tracing commit").hasArg().argName("sha")
                 .build());
         options.addOption(Option.builder("u")
-                .longOpt("username").desc("Grabl tracing username").hasArg().argName("username").required()
+                .longOpt("username").desc("Grabl tracing username").hasArg().argName("username")
                 .build());
         options.addOption(Option.builder("a")
-                .longOpt("api-token").desc("Grabl tracing API token").hasArg().argName("token").required()
+                .longOpt("api-token").desc("Grabl tracing API token").hasArg().argName("token")
                 .build());
         options.addOption(Option.builder("s")
                 .longOpt("seed").desc("Simulation randomization seed").hasArg().argName("seed")
@@ -85,6 +86,8 @@ public class Simulation implements AgentContext, AutoCloseable {
         options.addOption(Option.builder("k")
                 .longOpt("keyspace").desc("Grakn keyspace").hasArg().required().argName("keyspace")
                 .build());
+        options.addOption(Option.builder("d")
+                .longOpt("disable-tracing").desc("Disable grabl tracing").build());
 
         CommandLineParser parser = new DefaultParser();
         CommandLine commandLine;
@@ -108,6 +111,8 @@ public class Simulation implements AgentContext, AutoCloseable {
             System.out.println("No seed supplied, using random seed: " + RANDOM_SEED);
             return RANDOM_SEED;
         });
+
+        boolean disableTracing = commandLine.hasOption("d");
 
         int iterations = getOption(commandLine, "i").map(Integer::parseInt).orElse(NUM_ITERATIONS);
         String graknKeyspace = commandLine.getOptionValue("k");
@@ -161,7 +166,11 @@ public class Simulation implements AgentContext, AutoCloseable {
                             files.get("currencies.yaml"));
                 }
 
-                tracing = new GrablTracing(grablTracingUri, grablTracingUsername, grablTracingToken);
+                if (disableTracing) {
+                    tracing = GrablTracingFactory.noopTracing();
+                } else {
+                    tracing = GrablTracingFactory.secureTracing(grablTracingUri, grablTracingUsername, grablTracingToken);
+                }
                 analysis = tracing.analysis(grablTracingOrganisation, grablTracingRepository, grablTracingCommit);
 
                 try (Simulation simulation = new Simulation(
@@ -181,7 +190,6 @@ public class Simulation implements AgentContext, AutoCloseable {
                     }
                 }
             } finally {
-                //analysis.close();
                 if (grakn != null) {
                     grakn.close();
                 }
@@ -280,11 +288,6 @@ public class Simulation implements AgentContext, AutoCloseable {
     @Override
     public World getWorld() {
         return world;
-    }
-
-    @Override
-    public GrablTracing.Analysis getAnalysis() {
-        return analysis;
     }
 
     @Override
