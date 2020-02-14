@@ -36,7 +36,7 @@ public class MarriageAgentE2E {
 
                 List<Numeric> answer = tx.execute(marriagesCountQuery);
                 int numMarriages = answer.get(0).number().intValue();
-                int expectedNumMarriages = 119;
+                int expectedNumMarriages = 115;
                 assertThat(numMarriages, equalTo(expectedNumMarriages));
             }
         }

@@ -46,7 +46,7 @@ public class CompanyAgent implements CountryAgent {
                 + i
                 + context.getSimulationStep() + "_"
                 + country.getName();
-        int companyRegistrationNumber = companyNumberString.hashCode();
+        int companyNumber = companyNumberString.hashCode();
 
         GraqlInsert query =
                 Graql.match(
@@ -54,7 +54,7 @@ public class CompanyAgent implements CountryAgent {
                                 .has("name", country.getName()))
                         .insert(Graql.var("company").isa("company")
                                         .has("company-name", companyName)
-                                        .has("company-number", companyRegistrationNumber),
+                                        .has("company-number", companyNumber),
                                 Graql.var("reg").isa("company-incorporation")
                                         .rel("incorporated-company", Graql.var("company"))
                                         .rel("incorporating-country", Graql.var("country"))
