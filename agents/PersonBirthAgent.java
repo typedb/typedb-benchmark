@@ -2,6 +2,7 @@ package grakn.simulation.agents;
 
 import grakn.client.GraknClient;
 import grakn.client.GraknClient.Transaction;
+import grakn.simulation.common.LogWrapper;
 import grakn.simulation.common.RandomSource;
 import graql.lang.Graql;
 import graql.lang.query.GraqlInsert;
@@ -14,12 +15,12 @@ import java.util.Random;
 
 public class PersonBirthAgent implements CityAgent {
 
-    private static final Logger LOG = LoggerFactory.getLogger(PersonBirthAgent.class);
+    private static final LogWrapper<World.City> LOG = new LogWrapper<>(LoggerFactory.getLogger(PersonBirthAgent.class), World.City::getTracker);
     private static final int NUM_BIRTHS = 5;
 
     @Override
     public void iterate(AgentContext context, RandomSource randomSource, World.City city) {
-        city.log("-- Person Birth Agent --");
+        LOG.message(city, "-- Person Birth Agent --");
         List<String> femaleForenames = context.getWorld().getFemaleForenames();
         List<String> maleForenames = context.getWorld().getMaleForenames();
         List<String> surnames = context.getWorld().getSurnames();
@@ -31,7 +32,6 @@ public class PersonBirthAgent implements CityAgent {
         // Find bachelors and bachelorettes who are considered adults and who are not in a marriage and pair them off randomly
         try ( Transaction tx = session.transaction().write()) {
             for (int i = 0; i < NUM_BIRTHS; i++) {
-                LOG.info("Person iteration {}", i);
                 insertPerson(tx, city, context, random, surnames, femaleForenames, maleForenames, i);
             }
             tx.commit();
@@ -79,7 +79,7 @@ public class PersonBirthAgent implements CityAgent {
                                         .rel("born-in_place-of-birth", "c")
                         );
         city.logQuery(query);
-        LOG.info("Insert person \n{}", query);
+        LOG.query(city, "Insert person", query);
         tx.execute(query);
     }
 }
