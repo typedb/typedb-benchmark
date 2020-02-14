@@ -1,10 +1,12 @@
 package grakn.simulation.agents;
 
 import grakn.client.GraknClient;
+import grakn.simulation.common.LogWrapper;
 import grakn.simulation.common.RandomSource;
 import graql.lang.Graql;
 import graql.lang.query.GraqlInsert;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.LoggerFactory;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -13,6 +15,8 @@ import java.util.Random;
 public class CompanyAgent implements CountryAgent {
 
     private static final int NUM_COMPANIES = 5;
+    private static final LogWrapper<World.Country> LOG = new LogWrapper<>(LoggerFactory.getLogger(PersonBirthAgent.class), World.Country::getTracker);
+
 
     @Override
     public void iterate(AgentContext context, RandomSource randomSource, World.Country country) {
@@ -56,7 +60,7 @@ public class CompanyAgent implements CountryAgent {
                                         .rel("incorporating-country", Graql.var("country"))
                                         .has("date-of-incorporation", dateToday)
                         );
-//        city.logQuery(query);
+        LOG.query(country, "insertCompany", query);
         tx.execute(query);
     }
 }
