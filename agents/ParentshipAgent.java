@@ -3,11 +3,13 @@ package grakn.simulation.agents;
 import grakn.client.GraknClient;
 import grakn.client.answer.ConceptMap;
 import grakn.simulation.common.Allocation;
+import grakn.simulation.common.LogWrapper;
 import grakn.simulation.common.RandomSource;
 import graql.lang.Graql;
 import graql.lang.query.GraqlGet;
 import graql.lang.query.GraqlInsert;
 import graql.lang.statement.Statement;
+import org.slf4j.LoggerFactory;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -22,9 +24,10 @@ import static java.util.stream.Collectors.toList;
 
 public class ParentshipAgent implements CityAgent {
 
+    private static final LogWrapper<World.City> LOG = new LogWrapper<>(LoggerFactory.getLogger(PersonBirthAgent.class), World.City::getTracker);
+
     @Override
     public void iterate(AgentContext context, RandomSource randomSource, World.City city) {
-        city.log("-- Parentship Agent --");
         // Find all people born today
         LocalDateTime dateToday = context.getLocalDateTime();
 
@@ -81,7 +84,7 @@ public class ParentshipAgent implements CityAgent {
                         .rel("locates_location", Graql.var("city"))
         ).get().sort("marriage-id");
 
-        city.logQuery(marriageQuery);
+        LOG.query(city, "getMarriageEmails", marriageQuery);
         List<ConceptMap> marriageAnswers = tx.execute(marriageQuery);
 
         return marriageAnswers
@@ -106,7 +109,7 @@ public class ParentshipAgent implements CityAgent {
                         .rel("born-in_child", "child")
         ).get();
 
-        city.logQuery(childrenQuery);
+        LOG.query(city, "getChildrenEmails", childrenQuery);
         return tx.execute(childrenQuery)
                 .stream()
                 .map(conceptMap -> conceptMap.get("email").asAttribute().value().toString())
@@ -141,7 +144,7 @@ public class ParentshipAgent implements CityAgent {
                 insertStatements
         );
 
-        city.logQuery(parentshipQuery);
+        LOG.query(city, "insertParentShip", parentshipQuery);
         tx.execute(parentshipQuery);
     }
 }
