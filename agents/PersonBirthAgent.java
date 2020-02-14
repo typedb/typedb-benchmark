@@ -5,6 +5,8 @@ import grakn.client.GraknClient.Transaction;
 import grakn.simulation.common.RandomSource;
 import graql.lang.Graql;
 import graql.lang.query.GraqlInsert;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -12,6 +14,7 @@ import java.util.Random;
 
 public class PersonBirthAgent implements CityAgent {
 
+    private static final Logger LOG = LoggerFactory.getLogger(PersonBirthAgent.class);
     private static final int NUM_BIRTHS = 5;
 
     @Override
@@ -28,6 +31,7 @@ public class PersonBirthAgent implements CityAgent {
         // Find bachelors and bachelorettes who are considered adults and who are not in a marriage and pair them off randomly
         try ( Transaction tx = session.transaction().write()) {
             for (int i = 0; i < NUM_BIRTHS; i++) {
+                LOG.info("Person iteration {}", i);
                 insertPerson(tx, city, context, random, surnames, femaleForenames, maleForenames, i);
             }
             tx.commit();
@@ -75,6 +79,7 @@ public class PersonBirthAgent implements CityAgent {
                                         .rel("born-in_place-of-birth", "c")
                         );
         city.logQuery(query);
+        LOG.info("Insert person \n{}", query);
         tx.execute(query);
     }
 }

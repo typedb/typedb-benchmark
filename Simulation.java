@@ -9,7 +9,6 @@ import grakn.simulation.agents.Agent;
 import grakn.simulation.agents.AgentContext;
 import grakn.simulation.agents.World;
 import grakn.simulation.common.RandomSource;
-import grakn.simulation.common.StringPrettyBox;
 import grakn.simulation.yaml_tool.GraknYAMLException;
 import grakn.simulation.yaml_tool.GraknYAMLLoader;
 import graql.lang.Graql;
@@ -20,6 +19,8 @@ import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -40,6 +41,7 @@ public class Simulation implements AgentContext, AutoCloseable {
 
     private final static long RANDOM_SEED = 1;
     private final static int NUM_ITERATIONS = 10;
+    private final static Logger LOG = LoggerFactory.getLogger(Simulation.class);
 
     private static Optional<String> getOption(CommandLine commandLine, String option) {
         if (commandLine.hasOption(option)) {
@@ -128,8 +130,8 @@ public class Simulation implements AgentContext, AutoCloseable {
         // INITIALIZATION //
         ////////////////////
 
-        System.out.println(StringPrettyBox.blocked("Welcome to the Simulation!"));
-        System.out.println("Parsing world data...");
+        LOG.info("Welcome to the Simulation!");
+        LOG.info("Parsing world data...");
         World world;
         try {
             world = new World(
@@ -146,7 +148,7 @@ public class Simulation implements AgentContext, AutoCloseable {
             return;
         }
 
-        System.out.println("Connecting to Grakn...");
+        LOG.info("Connecting to Grakn...");
 
         try {
             GraknClient grakn = null;
@@ -250,9 +252,9 @@ public class Simulation implements AgentContext, AutoCloseable {
 
     private void iterate() {
 
-        System.out.println(StringPrettyBox.simple("Simulation step: " + simulationStep, '*'));
+        LOG.info("Simulation step: {}", simulationStep);
 
-        this.world.getCities().forEach(city -> city.log(StringPrettyBox.simple("Simulation step: " + simulationStep, '*')));
+        this.world.getCities().forEach(city -> city.log("Simulation step: " + simulationStep));
 
         for (Agent agent : agents) {
             agent.iterate(this, RandomSource.nextSource(random));
