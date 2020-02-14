@@ -4,6 +4,10 @@ import org.slf4j.Logger;
 
 import java.util.function.Function;
 
+/**
+ * A wrapper class to provide common utilities for formatting logs from the Simulation
+ * @param <T> The class type that should be used to scope the context of the log
+ */
 public class LogWrapper<T> {
     private final Logger logger;
     private final Function<T, String> getContext;
