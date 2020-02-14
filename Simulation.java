@@ -140,7 +140,9 @@ public class Simulation implements AgentContext, AutoCloseable {
                     files.get("cities.csv"),
                     files.get("female_forenames.csv"),
                     files.get("male_forenames.csv"),
-                    files.get("surnames.csv")
+                    files.get("surnames.csv"),
+                    files.get("adjectives.csv"),
+                    files.get("nouns.csv")
             );
         } catch (IOException e) {
             e.printStackTrace();
