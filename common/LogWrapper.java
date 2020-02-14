@@ -15,7 +15,7 @@ public class LogWrapper<T> {
 
     public void query(T item, String scope, Object query) {
         if (logger.isInfoEnabled()) {
-            logger.info("{}:{}:\n{}", getContext.apply(item), scope, query);
+            logger.info("({}):{}:\n{}", getContext.apply(item), scope, query);
         }
     }
 

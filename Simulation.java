@@ -238,7 +238,7 @@ public class Simulation implements AgentContext, AutoCloseable {
 
     private final GrablTracing.Analysis analysis;
 
-    private Simulation(GraknClient grakn, String keyspace, GrablTracing.Analysis analysis, Agent[] agents, RandomSource randomSource, World world) throws IOException {
+    private Simulation(GraknClient grakn, String keyspace, GrablTracing.Analysis analysis, Agent[] agents, RandomSource randomSource, World world) {
         client = grakn;
         this.keyspace = keyspace;
         defaultSession = client.session(keyspace);
@@ -253,8 +253,6 @@ public class Simulation implements AgentContext, AutoCloseable {
     private void iterate() {
 
         LOG.info("Simulation step: {}", simulationStep);
-
-        this.world.getCities().forEach(city -> city.log("Simulation step: " + simulationStep));
 
         for (Agent agent : agents) {
             agent.iterate(this, RandomSource.nextSource(random));
@@ -301,6 +299,5 @@ public class Simulation implements AgentContext, AutoCloseable {
         if (client != null) {
             client.close();
         }
-        this.world.getCities().forEach(city -> city.close());
     }
 }

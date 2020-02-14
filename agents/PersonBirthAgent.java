@@ -6,7 +6,6 @@ import grakn.simulation.common.LogWrapper;
 import grakn.simulation.common.RandomSource;
 import graql.lang.Graql;
 import graql.lang.query.GraqlInsert;
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.LocalDateTime;
@@ -20,7 +19,6 @@ public class PersonBirthAgent implements CityAgent {
 
     @Override
     public void iterate(AgentContext context, RandomSource randomSource, World.City city) {
-        LOG.message(city, "-- Person Birth Agent --");
         List<String> femaleForenames = context.getWorld().getFemaleForenames();
         List<String> maleForenames = context.getWorld().getMaleForenames();
         List<String> surnames = context.getWorld().getSurnames();
@@ -78,8 +76,7 @@ public class PersonBirthAgent implements CityAgent {
                                         .rel("born-in_child", "p")
                                         .rel("born-in_place-of-birth", "c")
                         );
-        city.logQuery(query);
-        LOG.query(city, "Insert person", query);
+        LOG.query(city, "insertPerson", query);
         tx.execute(query);
     }
 }

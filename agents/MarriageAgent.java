@@ -2,11 +2,13 @@ package grakn.simulation.agents;
 
 import grakn.client.GraknClient;
 import grakn.client.GraknClient.Transaction;
+import grakn.simulation.common.LogWrapper;
 import grakn.simulation.common.RandomSource;
 import graql.lang.Graql;
 import graql.lang.query.GraqlGet;
 import graql.lang.query.GraqlInsert;
 import graql.lang.statement.Statement;
+import org.slf4j.LoggerFactory;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -16,11 +18,11 @@ import java.util.stream.Collectors;
 
 public class MarriageAgent implements CityAgent {
 
+    private static final LogWrapper<World.City> LOG = new LogWrapper<>(LoggerFactory.getLogger(PersonBirthAgent.class), World.City::getTracker);
     private static final int NUM_MARRIAGES = 5;
 
     @Override
     public void iterate(AgentContext context, RandomSource randomSource, World.City city) {
-        city.log("-- Marriage Agent --");
         String sessionKey = city.getCountry().getContinent().getName();
         GraknClient.Session session = context.getIterationGraknSessionFor(sessionKey);
 
@@ -51,13 +53,13 @@ public class MarriageAgent implements CityAgent {
 
     private List<String> getSingleWomen(Transaction tx, LocalDateTime dobOfAdults, World.City city) {
         GraqlGet.Unfiltered singleWomenQuery = getSinglePeopleOfGenderQuery(dobOfAdults, city, "female", "marriage_wife");
-        city.logQuery(singleWomenQuery);
+        LOG.query(city, "getSingleWomen", singleWomenQuery);
         return tx.execute(singleWomenQuery).stream().map(a -> a.get("email").asAttribute().value().toString()).sorted().collect(Collectors.toList());
     }
 
     private List<String> getSingleMen(Transaction tx, LocalDateTime dobOfAdults, World.City city) {
         GraqlGet.Unfiltered singleMenQuery = getSinglePeopleOfGenderQuery(dobOfAdults, city, "male", "marriage_husband");
-        city.logQuery(singleMenQuery);
+        LOG.query(city, "getSingleMen", singleMenQuery);
         return tx.execute(singleMenQuery).stream().map(a -> a.get("email").asAttribute().value().toString()).sorted().collect(Collectors.toList());
     }
 
@@ -89,7 +91,7 @@ public class MarriageAgent implements CityAgent {
                         .has("marriage-id", marriageIdentifier),
                 Graql.var().isa("locates").rel("locates_located", Graql.var("m")).rel("locates_location", Graql.var("city"))
         );
-        city.logQuery(marriageQuery);
+        LOG.query(city, "insertMarriage", marriageQuery);
         tx.execute(marriageQuery);
     }
 }

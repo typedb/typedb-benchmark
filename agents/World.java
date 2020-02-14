@@ -1,14 +1,10 @@
 package grakn.simulation.agents;
 
-import graql.lang.query.GraqlQuery;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 
-import java.io.BufferedWriter;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -139,12 +135,11 @@ public class World {
         }
     }
 
-    public class City extends Loggable {
+    public class City {
         private String cityName;
         private Country country;
 
         public City(CSVRecord record) {
-            super(record.get(0));
             cityName = record.get(0);
             country = countryMap.get(record.get(1));
             country.cities.add(this);
@@ -161,53 +156,6 @@ public class World {
 
         public String getTracker() {
             return getCountry().getTracker() + ":" + getName();
-        }
-    }
-
-    private class Loggable {
-
-        private BufferedWriter logWriter;
-
-        Loggable(String logName) {
-            if (logDirPath != null) {
-                Path path = logDirPath.resolve(logName + ".txt");
-                try {
-                    logWriter = new BufferedWriter(new OutputStreamWriter(
-                            new FileOutputStream(path.toString()), "utf-8"));
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-
-        public void logQuery(GraqlQuery query) {
-            if (logWriter != null) {
-                try {
-                    logWriter.write(query.toString() + "\n---\n");
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-
-        public void log(String message) {
-            if (logWriter != null) {
-                try {
-                    logWriter.write(message + "\n");
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-
-        public void close() {
-            if (logWriter != null) {
-                try {
-                    logWriter.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
         }
     }
 }

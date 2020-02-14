@@ -2,10 +2,12 @@ package grakn.simulation.agents;
 
 import grakn.client.GraknClient;
 import grakn.simulation.common.Allocation;
+import grakn.simulation.common.LogWrapper;
 import grakn.simulation.common.RandomSource;
 import graql.lang.Graql;
 import graql.lang.query.GraqlGet;
 import graql.lang.query.GraqlInsert;
+import org.slf4j.LoggerFactory;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -17,11 +19,12 @@ import java.util.Random;
 import static java.util.stream.Collectors.toList;
 
 public class RelocationAgent implements CityAgent {
+
+    private static final LogWrapper<World.City> LOG = new LogWrapper<>(LoggerFactory.getLogger(PersonBirthAgent.class), World.City::getTracker);
     private static final int NUM_RELOCATIONS = 5;
 
     @Override
     public void iterate(AgentContext context, RandomSource randomSource, World.City city) {
-        city.log("-- Relocation Agent --");
         /*
         Find people currently resident the city
         Find other cities in the continent
@@ -75,7 +78,7 @@ public class RelocationAgent implements CityAgent {
                 Graql.var("start-date").lte(earliestDate)
         ).get();
 
-        city.logQuery(cityResidentsQuery);
+        LOG.query(city, "getResidentEmails", cityResidentsQuery);
         return tx.execute(cityResidentsQuery).stream()
                 .map(conceptMap -> conceptMap.get("email").asAttribute().value().toString())
                 .sorted()
@@ -92,7 +95,7 @@ public class RelocationAgent implements CityAgent {
                 Graql.var("city-name").neq(city.getName())
         ).get();
 
-        city.logQuery(relocationCitiesQuery);
+        LOG.query(city, "getRelocationCityNames", relocationCitiesQuery);
         return tx.execute(relocationCitiesQuery)
                 .stream()
                 .map(conceptMap -> conceptMap.get("city-name").asAttribute().value().toString())
@@ -111,7 +114,8 @@ public class RelocationAgent implements CityAgent {
                         .rel("relocation_relocated-person", "p")
                         .has("relocation-date", dateToday)
         );
-        city.logQuery(relocatePersonQuery);
+
+        LOG.query(city, "insertRelocation", relocatePersonQuery);
         tx.execute(relocatePersonQuery);
     }
 }
