@@ -182,7 +182,7 @@ company sub organisation,
     plays employment_employer,
     plays transaction_vendor,
     plays transaction_buyer,
-    plays incorporated-company;
+    plays incorporation_incorporated;
 
 university sub organisation,
     has university-name,
@@ -217,7 +217,7 @@ county sub location;
 
 country sub location,
     plays currency-adoption_adopting-country,
-    plays incorporating-country;
+    plays incorporation_incorporating;
 
 state sub location;
 
@@ -391,7 +391,7 @@ when {
     $rel has relocation-date $membership-start-date;
 };
 
-company-incorporation sub relation,
+incorporation sub relation,
     has date-of-incorporation,
-    relates incorporated-company,
-    relates incorporating-country;
+    relates incorporation_incorporated,
+    relates incorporation_incorporating;

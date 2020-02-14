@@ -55,9 +55,9 @@ public class CompanyAgent implements CountryAgent {
                         .insert(Graql.var("company").isa("company")
                                         .has("company-name", companyName)
                                         .has("company-number", companyNumber),
-                                Graql.var("reg").isa("company-incorporation")
-                                        .rel("incorporated-company", Graql.var("company"))
-                                        .rel("incorporating-country", Graql.var("country"))
+                                Graql.var("reg").isa("incorporation")
+                                        .rel("incorporation_incorporated", Graql.var("company"))
+                                        .rel("incorporation_incorporating", Graql.var("country"))
                                         .has("date-of-incorporation", dateToday)
                         );
         LOG.query(country, "insertCompany", query);

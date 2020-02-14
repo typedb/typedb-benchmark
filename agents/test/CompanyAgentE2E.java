@@ -35,9 +35,9 @@ public class CompanyAgentE2E {
                         var("company").isa("company")
                                 .has("company-name", var("company-name"))
                                 .has("company-number", var("company-number")),
-                        var("reg").isa("company-incorporation")
-                                .rel("incorporated-company", var("company"))
-                                .rel("incorporating-country", var("country"))
+                        var("reg").isa("incorporation")
+                                .rel("incorporation_incorporated", var("company"))
+                                .rel("incorporation_incorporating", var("country"))
                                 .has("date-of-incorporation", var("date-today"))
                 ).get().count();
 
