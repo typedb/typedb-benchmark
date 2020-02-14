@@ -23,8 +23,7 @@ local logs = setmetatable({}, {
 local tracker
 for line in lines(io.stdin) do
     local logline
-    if line:find("%d%d:%d%d:%d%d.%d%d%d") then
-        --tracker = line:match("%((.*)%)")
+    if line:find("^%d%d:%d%d:%d%d.%d%d%d%s%[.+%]%s%u+%s.+%s%-%s") then
         local s, e = line:find("%s%-%s%(.*%)")
         if s then
             tracker = line:sub(s+4,e-1)
