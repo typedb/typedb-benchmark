@@ -6,16 +6,15 @@ bazel run //:simulation -- -d -k world
 ```
 
 ## Running with Logsplit
-Logsplit is a simple Lua script designed to split the logs of simulation based on a tracker for ease of testing.
+Logsplit is a simple Python 3 script designed to split the logs of simulation based on a tracker for ease of testing.
 
-Ensure Lua is installed and the logs directory exists:
+Ensure the `logs/` directory exists.
 ```shell script
-brew install lua
 mkdir logs
 ```
 Pipe the output of simulation to logsplit:
 ```shell script
-bazel run //:simulation -- -d -k world | lua logsplit.lua
+bazel run //:simulation -- -d -k world | python3 logsplit.py
 ```
 The separated logs can then be found in the `logs/` directory.
 
