@@ -4,6 +4,12 @@ name sub attribute,
     datatype string;
 
 organisation-name sub name;
+company-name sub organisation-name;
+university-name sub organisation-name;
+charity-name sub organisation-name;
+
+company-number sub attribute,
+    datatype long;
 
 forename sub name;
 
@@ -17,20 +23,17 @@ date-of-event sub attribute,
     abstract,
     datatype date;
 
-start-date sub date-of-event,
-    datatype date;
+date-of-incorporation sub date-of-event;
 
-end-date sub date-of-event,
-    datatype date;
+start-date sub date-of-event;
 
-date-of-birth sub date-of-event,
-    datatype date;
+end-date sub date-of-event;
 
-date-of-marriage sub date-of-event,
-    datatype date;
+date-of-birth sub date-of-event;
 
-relocation-date sub date-of-event,
-    datatype date;
+date-of-marriage sub date-of-event;
+
+relocation-date sub date-of-event;
 
 gender sub attribute,
     datatype string;
@@ -170,22 +173,26 @@ occupation sub entity,
 #    plays employment_profession;
 
 organisation sub entity,
-    abstract,
-    has organisation-name;
+    abstract;
 
 company sub organisation,
     # We may want to say `has company-name as organisation-name;`
+    has company-name,
+    key company-number,
     plays employment_employer,
     plays transaction_vendor,
-    plays transaction_buyer;
+    plays transaction_buyer,
+    plays incorporation_incorporated;
 
 university sub organisation,
+    has university-name,
     plays employment_employer,
     plays studentship_school,
     plays transaction_vendor,
     plays transaction_buyer;
 
 charity sub organisation,
+    has charity-name,
     plays volunteering_cause,
     plays transaction_buyer;
 
@@ -209,7 +216,8 @@ city sub location,
 county sub location;
 
 country sub location,
-    plays currency-adoption_adopting-country;
+    plays currency-adoption_adopting-country,
+    plays incorporation_incorporating;
 
 state sub location;
 
@@ -382,3 +390,8 @@ when {
 }, then {
     $rel has relocation-date $membership-start-date;
 };
+
+incorporation sub relation,
+    has date-of-incorporation,
+    relates incorporation_incorporated,
+    relates incorporation_incorporating;

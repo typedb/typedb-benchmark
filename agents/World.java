@@ -30,8 +30,10 @@ public class World {
     private final List<String> femaleForenames;
     private final List<String> maleForenames;
     private final List<String> surnames;
+    private final List<String> adjectives;
+    private final List<String> nouns;
 
-    public World(Path continentsPath, Path countriesPath, Path citiesPath, Path femaleForenamesPath, Path maleForenamesPath, Path surnamesPath) throws IOException {
+    public World(Path continentsPath, Path countriesPath, Path citiesPath, Path femaleForenamesPath, Path maleForenamesPath, Path surnamesPath, Path adjectivesPath, Path nounsPath) throws IOException {
         try {
             this.logDirPath = Paths.get(System.getenv("LOG_DIR_PATH"));
         } catch (NullPointerException n){
@@ -53,6 +55,14 @@ public class World {
         List<String> surnames = new ArrayList<>();
         iterateCSV(surnamesPath, r -> surnames.add(r.get(0)));
         this.surnames = Collections.unmodifiableList(surnames);
+
+        List<String> adjectives = new ArrayList<>();
+        iterateCSV(adjectivesPath, r -> adjectives.add(r.get(0)));
+        this.adjectives = Collections.unmodifiableList(adjectives);
+
+        List<String> nouns = new ArrayList<>();
+        iterateCSV(nounsPath, r -> nouns.add(r.get(0)));
+        this.nouns = Collections.unmodifiableList(nouns);
     }
 
     private static void iterateCSV(Path path, Consumer<CSVRecord> action) throws IOException {
@@ -81,6 +91,14 @@ public class World {
 
     public List<String> getSurnames() {
         return surnames;
+    }
+
+    public List<String> getAdjectives() {
+        return adjectives;
+    }
+
+    public List<String> getNouns() {
+        return nouns;
     }
 
     public class Continent {

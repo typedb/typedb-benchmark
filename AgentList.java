@@ -8,5 +8,6 @@ public class AgentList {
         new PersonBirthAgent(),
         new ParentshipAgent(),
         new RelocationAgent(),
+        new CompanyAgent(),
     };
 }

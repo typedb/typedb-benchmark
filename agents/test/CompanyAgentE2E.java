@@ -15,8 +15,7 @@ import static graql.lang.Graql.var;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
-public class ParentshipAgentE2E {
-
+public class CompanyAgentE2E {
     private GraknClient graknClient;
     private final String KEYSPACE = "world";
 
@@ -27,18 +26,24 @@ public class ParentshipAgentE2E {
     }
 
     @Test
-    public void testParentshipAgentInsertsTheExpectedNumberOfParentships() {
-        // Note that that parentships with additional children will be counted a number of times equal to the number of children
+    public void testCompanyAgentInsertsTheExpectedNumberOfCompanies() {
         try (GraknClient.Session session = graknClient.session(KEYSPACE)) {
             try (GraknClient.Transaction tx = session.transaction().write()) {
-                GraqlGet.Aggregate parentshipsCountQuery = Graql.match(
-                        var("p").isa("parentship").rel("parentship_parent", "p1").rel("parentship_parent", "p2").rel("parentship_child", "ch")
+                GraqlGet.Aggregate countryCountQuery = Graql.match(
+                        var("country").isa("country")
+                                .has("name", var("country-name")),
+                        var("company").isa("company")
+                                .has("company-name", var("company-name"))
+                                .has("company-number", var("company-number")),
+                        var("reg").isa("incorporation")
+                                .rel("incorporation_incorporated", var("company"))
+                                .rel("incorporation_incorporating", var("country"))
+                                .has("date-of-incorporation", var("date-today"))
                 ).get().count();
 
-                List<Numeric> answer = tx.execute(parentshipsCountQuery);
-                int numParentships = answer.get(0).number().intValue();
-                int expectedNumParentships = 530;
-                assertThat(numParentships, equalTo(expectedNumParentships));
+                List<Numeric> answer = tx.execute(countryCountQuery);
+                int num = answer.get(0).number().intValue();
+                assertThat(num, equalTo(350));
             }
         }
     }
