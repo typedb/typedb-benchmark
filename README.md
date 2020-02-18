@@ -5,6 +5,19 @@
 bazel run //:simulation -- -d -k world
 ```
 
+## Running with Logsplit
+Logsplit is a simple Python 3 script designed to split the logs of simulation based on a tracker for ease of testing.
+
+Ensure the `logs/` directory exists.
+```shell script
+mkdir logs
+```
+Pipe the output of simulation to logsplit:
+```shell script
+bazel run //:simulation -- -d -k world | python3 logsplit.py
+```
+The separated logs can then be found in the `logs/` directory.
+
 ## CLI options
 
 ### Standard Options
