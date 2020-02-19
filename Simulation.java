@@ -181,7 +181,7 @@ public class Simulation implements AgentContext, AutoCloseable {
                         grakn,
                         graknKeyspace,
                         analysis,
-                        AgentList.AGENTS,
+                        AgentRunnerList.AGENTS,
                         new RandomSource(seed),
                         world
                 )) {

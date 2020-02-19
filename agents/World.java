@@ -1,8 +1,11 @@
 package grakn.simulation.agents;
 
+import grakn.simulation.common.LogWrapper;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -101,7 +104,7 @@ public class World {
         return nouns;
     }
 
-    public class Continent {
+    public class Continent implements AgentItem {
         private String continentName;
         private List<Country> countries = new ArrayList<>();
 
@@ -119,12 +122,18 @@ public class World {
             return countries.stream();
         }
 
+        @Override
         public String getTracker() {
             return getName();
         }
+
+        @Override
+        public String getSessionKey() {
+            return continentName;
+        }
     }
 
-    public class Country {
+    public class Country implements AgentItem {
         private String countryName;
         private Continent continent;
         private List<City> cities = new ArrayList<>();
@@ -148,12 +157,18 @@ public class World {
             return cities.stream();
         }
 
+        @Override
         public String getTracker() {
             return getContinent().getTracker() + ":" + getName();
         }
+
+        @Override
+        public String getSessionKey() {
+            return continent.getSessionKey();
+        }
     }
 
-    public class City {
+    public class City implements AgentItem {
         private String cityName;
         private Country country;
 
@@ -172,8 +187,25 @@ public class World {
             return country;
         }
 
+        @Override
         public String getTracker() {
             return getCountry().getTracker() + ":" + getName();
+        }
+
+        @Override
+        public String getSessionKey() {
+            return country.getSessionKey();
+        }
+    }
+
+    public static WorldLogWrapper log(Class<?> clazz) {
+        return new WorldLogWrapper(LoggerFactory.getLogger(clazz));
+    }
+
+    public static class WorldLogWrapper extends LogWrapper<AgentItem> {
+
+        private WorldLogWrapper(Logger logger) {
+            super(logger, AgentItem::getTracker);
         }
     }
 }
