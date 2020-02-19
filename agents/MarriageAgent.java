@@ -16,6 +16,8 @@ import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
 
+import static grakn.simulation.common.ExecutorUtils.getOrderedAttribute;
+
 public class MarriageAgent implements CityAgent {
 
     private static final LogWrapper<World.City> LOG = new LogWrapper<>(LoggerFactory.getLogger(PersonBirthAgent.class), World.City::getTracker);
@@ -54,13 +56,13 @@ public class MarriageAgent implements CityAgent {
     private List<String> getSingleWomen(Transaction tx, LocalDateTime dobOfAdults, World.City city) {
         GraqlGet.Unfiltered singleWomenQuery = getSinglePeopleOfGenderQuery(dobOfAdults, city, "female", "marriage_wife");
         LOG.query(city, "getSingleWomen", singleWomenQuery);
-        return tx.execute(singleWomenQuery).stream().map(a -> a.get("email").asAttribute().value().toString()).sorted().collect(Collectors.toList());
+        return getOrderedAttribute(tx, singleWomenQuery, "email");
     }
 
     private List<String> getSingleMen(Transaction tx, LocalDateTime dobOfAdults, World.City city) {
         GraqlGet.Unfiltered singleMenQuery = getSinglePeopleOfGenderQuery(dobOfAdults, city, "male", "marriage_husband");
         LOG.query(city, "getSingleMen", singleMenQuery);
-        return tx.execute(singleMenQuery).stream().map(a -> a.get("email").asAttribute().value().toString()).sorted().collect(Collectors.toList());
+        return getOrderedAttribute(tx, singleMenQuery, "email");
     }
 
     private GraqlGet.Unfiltered getSinglePeopleOfGenderQuery(LocalDateTime dobOfAdults, World.City city, String gender, String marriageRole) {

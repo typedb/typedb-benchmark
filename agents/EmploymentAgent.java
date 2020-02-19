@@ -81,14 +81,14 @@ public class EmploymentAgent implements CityAgent {
         GraqlGet companyNumbersQuery = CompanyAgent.getCompanyNumbersInCountryQuery(city.getCountry());
         LOG.query(city, "getEmployeeEmails", companyNumbersQuery);
 
-        return ExecutorUtils.getOrderedAttribute(tx, companyNumbersQuery, NUM_COMPANIES, "company-number");
+        return ExecutorUtils.getOrderedLimitedAttribute(tx, companyNumbersQuery, "company-number", NUM_COMPANIES);
     }
 
     private List<String> getEmployeeEmails(GraknClient.Transaction tx, World.City city, LocalDateTime earliestDate) {
 
         GraqlGet.Unfiltered getEmployeeEmailsQuery = cityResidentsQuery(city, earliestDate);
         LOG.query(city, "getEmployeeEmails", getEmployeeEmailsQuery);
-        return ExecutorUtils.getOrderedAttribute(tx, getEmployeeEmailsQuery, NUM_EMPLOYMENTS, "email");
+        return ExecutorUtils.getOrderedLimitedAttribute(tx, getEmployeeEmailsQuery, "email", NUM_EMPLOYMENTS);
     }
 
     private void insertEmployment(GraknClient.Transaction tx, LocalDateTime employmentDate, World.City city, RandomValueGenerator randomAttributeGenerator, String employeeEmail, Long companyNumber){

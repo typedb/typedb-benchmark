@@ -18,8 +18,8 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
+import static grakn.simulation.common.ExecutorUtils.getOrderedAttribute;
 import static java.util.stream.Collectors.toList;
 
 public class ParentshipAgent implements CityAgent {
@@ -110,11 +110,7 @@ public class ParentshipAgent implements CityAgent {
         ).get();
 
         LOG.query(city, "getChildrenEmails", childrenQuery);
-        return tx.execute(childrenQuery)
-                .stream()
-                .map(conceptMap -> conceptMap.get("email").asAttribute().value().toString())
-                .sorted()
-                .collect(Collectors.toList());
+        return getOrderedAttribute(tx, childrenQuery, "email");
     }
 
     private void insertParentShip(GraknClient.Transaction tx, World.City city, HashMap<String, String> marriage, List<String> childEmails) {

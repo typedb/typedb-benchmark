@@ -12,12 +12,21 @@ import java.util.stream.Collectors;
 public class ExecutorUtils {
 
     @SuppressWarnings("unchecked")
-    public static <T> List<T> getOrderedAttribute(GraknClient.Transaction tx, GraqlGet query, Integer limit, String attributeName){
+    public static <T> List<T> getOrderedLimitedAttribute(GraknClient.Transaction tx, GraqlGet query, String attributeName, Integer limit){
         return tx.execute(query)
                 .stream()
                 .map(conceptMap -> (T) conceptMap.get(attributeName).asAttribute().value())
                 .sorted()
                 .limit(limit)
+                .collect(Collectors.toList());
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <T> List<T> getOrderedAttribute(GraknClient.Transaction tx, GraqlGet query, String attributeName){
+        return tx.execute(query)
+                .stream()
+                .map(conceptMap -> (T) conceptMap.get(attributeName).asAttribute().value())
+                .sorted()
                 .collect(Collectors.toList());
     }
 }
