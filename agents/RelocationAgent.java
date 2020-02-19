@@ -2,6 +2,7 @@ package grakn.simulation.agents;
 
 import grakn.client.GraknClient;
 import grakn.simulation.common.Allocation;
+import grakn.simulation.common.ExecutorUtils;
 import grakn.simulation.common.LogWrapper;
 import grakn.simulation.common.RandomSource;
 import graql.lang.Graql;
@@ -17,7 +18,6 @@ import java.util.List;
 import java.util.Random;
 
 import static grakn.simulation.common.ExecutorUtils.getOrderedAttribute;
-import static grakn.simulation.common.ExecutorUtils.getOrderedLimitedAttribute;
 import static java.util.stream.Collectors.toList;
 
 public class RelocationAgent implements CityAgent {
@@ -73,7 +73,7 @@ public class RelocationAgent implements CityAgent {
     private List<String> getResidentEmails(GraknClient.Transaction tx, World.City city, LocalDateTime earliestDate) {
         GraqlGet.Unfiltered cityResidentsQuery = cityResidentsQuery(city, earliestDate);
         LOG.query(city, "getResidentEmails", cityResidentsQuery);
-        return getOrderedLimitedAttribute(tx, cityResidentsQuery, "email", NUM_RELOCATIONS);
+        return ExecutorUtils.getOrderedAttribute(tx, cityResidentsQuery, "email", NUM_RELOCATIONS);
     }
 
     private List<String> getRelocationCityNames(GraknClient.Transaction tx, World.City city) {
@@ -86,7 +86,11 @@ public class RelocationAgent implements CityAgent {
         ).get();
 
         LOG.query(city, "getRelocationCityNames", relocationCitiesQuery);
-        return getOrderedAttribute(tx, relocationCitiesQuery, "city-name");
+//        return getOrderedAttribute(tx, relocationCitiesQuery, "city-name");
+        return tx.execute(relocationCitiesQuery)
+                                .stream()
+                                .map(conceptMap -> conceptMap.get("city-name").asAttribute().value().toString())
+                                .collect(toList());
     }
 
     private void insertRelocation(GraknClient.Transaction tx, LocalDateTime dateToday, World.City city, String email, String newCityName) {

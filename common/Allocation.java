@@ -33,11 +33,11 @@ public class Allocation {
     public static <T, U> void allocate(List<T> toAllocate, List<U> buckets, BiConsumer<T, U> insertFunction) {
         if (toAllocate.size() > 0 && buckets.size() > 0) {
 
-            List<Integer> allocations = Allocation.allocateEvenly(buckets.size(), toAllocate.size());
+            List<Integer> allocations = Allocation.allocateEvenly(toAllocate.size(), buckets.size());
 
             for (int i = 0; i < allocations.size(); i++) {
-                T item = toAllocate.get(allocations.get(i));
-                U bucket = buckets.get(i);
+                T item = toAllocate.get(i);
+                U bucket = buckets.get(allocations.get(i));
                 insertFunction.accept(item, bucket);
             }
         }

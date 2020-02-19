@@ -14,7 +14,6 @@ import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
-import java.util.stream.Collectors;
 
 import static grakn.simulation.common.ExecutorUtils.getOrderedAttribute;
 
