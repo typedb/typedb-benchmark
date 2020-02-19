@@ -4,6 +4,7 @@ import grakn.client.GraknClient;
 import grakn.simulation.common.LogWrapper;
 import grakn.simulation.common.RandomSource;
 import graql.lang.Graql;
+import graql.lang.query.GraqlGet;
 import graql.lang.query.GraqlInsert;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
@@ -62,5 +63,17 @@ public class CompanyAgent implements CountryAgent {
                         );
         LOG.query(country, "insertCompany", query);
         tx.execute(query);
+    }
+
+    static GraqlGet getCompanyNumbersInCountryQuery(World.Country country) {
+        return Graql.match(
+                Graql.var("country").isa("country")
+                        .has("name", country.getName()),
+                Graql.var("company").isa("company")
+                        .has("company-number", Graql.var("company-number")),
+                Graql.var("reg").isa("incorporation")
+                        .rel("incorporation_incorporated", Graql.var("company"))
+                        .rel("incorporation_incorporating", Graql.var("country"))
+        ).get();
     }
 }

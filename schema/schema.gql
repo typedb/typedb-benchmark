@@ -41,6 +41,9 @@ gender sub attribute,
 contracted-hours sub attribute,
     datatype double;
 
+contract-content sub attribute,
+    datatype string;
+
 language sub attribute, 
     datatype string,
     regex "^(English|French|German|Cantonese|Hindi|Malaysian|Indonesian)$";
@@ -132,7 +135,7 @@ marriage sub relation,
 
 membership sub relation,
     abstract,
-    key identifier,
+#    key identifier,
     has start-date,
     has end-date,
     relates membership_member,
@@ -144,7 +147,7 @@ employment sub membership,
     relates employment_part-time-employee as employment_employee,
     relates employment_full-time-employee as employment_employee,
     relates employment_employer as membership_group,
-    # relates employment_employment-contract,
+    # relates employment_contract,
     # relates employment_profession,  # https://github.com/graknlabs/grakn/issues/5553
     
     # For wages in different currencies, either:
@@ -262,7 +265,8 @@ legal-document sub entity,
 legal-contract sub legal-document;
 
 employment-contract sub legal-contract,
-    # plays employment_employment-contract,
+    # plays employment_contract,
+    has contract-content,
     has contracted-hours;
 
 currency-adoption sub relation,

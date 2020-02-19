@@ -9,5 +9,6 @@ public class AgentList {
         new ParentshipAgent(),
         new RelocationAgent(),
         new CompanyAgent(),
+        new EmploymentAgent(),
     };
 }
