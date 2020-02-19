@@ -1,6 +1,7 @@
-package grakn.simulation.agents;
+package grakn.simulation.agents.base;
 
 import grakn.client.GraknClient;
+import grakn.simulation.agents.World;
 
 import java.time.LocalDateTime;
 import java.util.Collections;

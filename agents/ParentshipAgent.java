@@ -1,6 +1,7 @@
 package grakn.simulation.agents;
 
 import grakn.client.answer.ConceptMap;
+import grakn.simulation.agents.common.CityAgent;
 import grakn.simulation.common.Allocation;
 import graql.lang.Graql;
 import graql.lang.query.GraqlGet;

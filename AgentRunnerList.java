@@ -1,9 +1,8 @@
 package grakn.simulation;
 
 import grakn.simulation.agents.*;
-
-import java.util.Arrays;
-import java.util.List;
+import grakn.simulation.agents.base.AgentRunner;
+import grakn.simulation.agents.common.CityAgentRunner;
 
 public class AgentRunnerList {
     static AgentRunner[] AGENTS = {

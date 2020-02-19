@@ -1,4 +1,4 @@
-package grakn.simulation.agents;
+package grakn.simulation.agents.base;
 
 public interface AgentItem {
     String getTracker();

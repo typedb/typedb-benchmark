@@ -1,5 +1,6 @@
 package grakn.simulation.agents;
 
+import grakn.simulation.agents.common.CityAgent;
 import grakn.simulation.common.Allocation;
 import grakn.simulation.common.LogWrapper;
 import graql.lang.Graql;

@@ -1,5 +1,6 @@
 package grakn.simulation.agents;
 
+import grakn.simulation.agents.base.AgentItem;
 import grakn.simulation.common.LogWrapper;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;

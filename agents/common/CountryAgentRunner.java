@@ -1,4 +1,9 @@
-package grakn.simulation.agents;
+package grakn.simulation.agents.common;
+
+import grakn.simulation.agents.World;
+import grakn.simulation.agents.base.Agent;
+import grakn.simulation.agents.base.AgentContext;
+import grakn.simulation.agents.base.AgentRunner;
 
 import java.util.List;
 

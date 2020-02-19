@@ -1,5 +1,6 @@
 package grakn.simulation.agents;
 
+import grakn.simulation.agents.common.CountryAgent;
 import graql.lang.Graql;
 import graql.lang.query.GraqlInsert;
 import org.apache.commons.lang3.StringUtils;

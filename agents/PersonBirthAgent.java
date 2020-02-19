@@ -1,5 +1,6 @@
 package grakn.simulation.agents;
 
+import grakn.simulation.agents.common.CityAgent;
 import graql.lang.Graql;
 import graql.lang.query.GraqlInsert;
 

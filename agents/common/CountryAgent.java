@@ -1,4 +1,7 @@
-package grakn.simulation.agents;
+package grakn.simulation.agents.common;
+
+import grakn.simulation.agents.World;
+import grakn.simulation.agents.base.Agent;
 
 public abstract class CountryAgent extends Agent<World.Country> {
 
