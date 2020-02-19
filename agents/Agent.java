@@ -11,10 +11,15 @@ import java.util.Random;
  * An agent that will execute some logic across the
  */
 public abstract class Agent<T extends AgentItem> implements AutoCloseable {
-
     private AgentContext agentContext;
     private Random random;
     private T item;
+
+    public void init(AgentContext agentContext, Random random, T item) {
+        this.agentContext = agentContext;
+        this.random = random;
+        this.item = item;
+    }
 
     private GraknClient.Transaction tx;
 
@@ -91,5 +96,5 @@ public abstract class Agent<T extends AgentItem> implements AutoCloseable {
         closeTx();
     }
 
-    protected abstract void iterate();
+    public abstract void iterate();
 }

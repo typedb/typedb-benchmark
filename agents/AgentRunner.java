@@ -12,24 +12,12 @@ import java.util.Random;
 public abstract class AgentRunner<T extends AgentItem> {
 
     private Constructor<? extends Agent<T>> agentConstructor;
-    private Field agentContextField;
-    private Field agentRandom;
-    private Field agentItem;
 
     protected AgentRunner(Class<? extends Agent<T>> agentClass) {
         try {
             agentConstructor = agentClass.getDeclaredConstructor();
             agentConstructor.setAccessible(true);
-
-            agentContextField = agentClass.getDeclaredField("agentContext");
-            agentContextField.setAccessible(true);
-
-            agentRandom = agentClass.getDeclaredField("agentRandom");
-            agentRandom.setAccessible(true);
-
-            agentItem = agentClass.getDeclaredField("agentItem");
-            agentItem.setAccessible(true);
-        } catch (NoSuchMethodException | NoSuchFieldException e) {
+        } catch (NoSuchMethodException e) {
             throw new RuntimeException(e);
         }
     }
@@ -37,9 +25,7 @@ public abstract class AgentRunner<T extends AgentItem> {
     private Agent<T> constructAgent(AgentContext context, Random random, T item) {
         try {
             Agent<T> agent = agentConstructor.newInstance();
-            agentContextField.set(agent, context);
-            agentRandom.set(agent, random);
-            agentItem.set(agent, item);
+            agent.init(context, random, item);
             return agent;
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
             throw new RuntimeException(e);
@@ -54,7 +40,7 @@ public abstract class AgentRunner<T extends AgentItem> {
 
         Pair.zip(sources, items).parallelStream().forEach(
                 pair -> {
-                    try(Agent<T> agent = constructAgent(
+                    try (Agent<T> agent = constructAgent(
                             agentContext,
                             pair.getFirst().startNewRandom(),
                             pair.getSecond()
