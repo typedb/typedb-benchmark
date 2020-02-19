@@ -80,17 +80,4 @@ public class PersonBirthAgent implements CityAgent {
         LOG.query(city, "insertPerson", query);
         tx.execute(query);
     }
-
-    static GraqlGet.Unfiltered cityResidentsQuery(World.City city, LocalDateTime earliestDate) {
-        return Graql.match(
-                Graql.var("person").isa("person").has("email", Graql.var("email")),
-                Graql.var("city").isa("city").has("name", city.getName()),
-                Graql.var("r").isa("residency")
-                        .rel("residency_resident", "person")
-                        .rel("residency_location", "city")
-                        .has("start-date", Graql.var("start-date")),
-                Graql.not(Graql.var("r").has("end-date", Graql.var("ed"))),
-                Graql.var("start-date").lte(earliestDate)
-        ).get();
-    }
 }

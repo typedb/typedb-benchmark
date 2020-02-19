@@ -66,8 +66,8 @@ public class RelocationAgent implements CityAgent {
         }
     }
 
-    private List<String> getResidentEmails(GraknClient.Transaction tx, World.City city, LocalDateTime earliestDate) {
-        GraqlGet.Unfiltered cityResidentsQuery = Graql.match(
+    static GraqlGet.Unfiltered cityResidentsQuery(World.City city, LocalDateTime earliestDate) {
+        return Graql.match(
                 Graql.var("person").isa("person").has("email", Graql.var("email")),
                 Graql.var("city").isa("city").has("name", city.getName()),
                 Graql.var("r").isa("residency")
@@ -77,7 +77,10 @@ public class RelocationAgent implements CityAgent {
                 Graql.not(Graql.var("r").has("end-date", Graql.var("ed"))),
                 Graql.var("start-date").lte(earliestDate)
         ).get();
+    }
 
+    private List<String> getResidentEmails(GraknClient.Transaction tx, World.City city, LocalDateTime earliestDate) {
+        GraqlGet.Unfiltered cityResidentsQuery = cityResidentsQuery(city, earliestDate);
         LOG.query(city, "getResidentEmails", cityResidentsQuery);
         return tx.execute(cityResidentsQuery).stream()
                 .map(conceptMap -> conceptMap.get("email").asAttribute().value().toString())

@@ -1,7 +1,7 @@
 package grakn.simulation.agents;
 
 import grakn.client.GraknClient;
-import grakn.simulation.common.DeterministicExecute;
+import grakn.simulation.common.ExecutorUtils;
 import grakn.simulation.common.LogWrapper;
 import grakn.simulation.common.RandomSource;
 import graql.lang.Graql;
@@ -14,7 +14,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Random;
 
-import static grakn.simulation.common.Allocation.doAllocation;
+import static grakn.simulation.agents.RelocationAgent.cityResidentsQuery;
+import static grakn.simulation.common.Allocation.allocate;
 
 public class EmploymentAgent implements CityAgent {
 
@@ -27,7 +28,6 @@ public class EmploymentAgent implements CityAgent {
     private static final double MAX_CONTRACTED_HOURS = 70.0;
     private static final int MIN_CONTRACT_CHARACTER_LENGTH = 200;
     private static final int MAX_CONTRACT_CHARACTER_LENGTH = 600;
-
 
 
     private static class RandomValueGenerator {
@@ -72,7 +72,7 @@ public class EmploymentAgent implements CityAgent {
             List<String> employeeEmails = getEmployeeEmails(tx, city, employmentDate);
             List<Long> companyNumbers = getCompanyNumbers(tx, city);
 
-            doAllocation(employeeEmails, companyNumbers, (employeeEmail, companyNumber) -> insertEmployment(tx, employmentDate, city, randomAttributeGenerator, employeeEmail, companyNumber));
+            allocate(employeeEmails, companyNumbers, (employeeEmail, companyNumber) -> insertEmployment(tx, employmentDate, city, randomAttributeGenerator, employeeEmail, companyNumber));
             tx.commit();
         }
     }
@@ -81,14 +81,14 @@ public class EmploymentAgent implements CityAgent {
         GraqlGet companyNumbersQuery = CompanyAgent.getCompanyNumbersInCountryQuery(city.getCountry());
         LOG.query(city, "getEmployeeEmails", companyNumbersQuery);
 
-        return DeterministicExecute.getAttributeAnswers(tx, companyNumbersQuery, "company-number", NUM_COMPANIES);
+        return ExecutorUtils.getOrderedAttribute(tx, companyNumbersQuery, NUM_COMPANIES, "company-number");
     }
 
     private List<String> getEmployeeEmails(GraknClient.Transaction tx, World.City city, LocalDateTime earliestDate) {
 
-        GraqlGet.Unfiltered getEmployeeEmailsQuery = PersonBirthAgent.cityResidentsQuery(city, earliestDate);
+        GraqlGet.Unfiltered getEmployeeEmailsQuery = cityResidentsQuery(city, earliestDate);
         LOG.query(city, "getEmployeeEmails", getEmployeeEmailsQuery);
-        return DeterministicExecute.getAttributeAnswers(tx, getEmployeeEmailsQuery, "email", NUM_EMPLOYMENTS);
+        return ExecutorUtils.getOrderedAttribute(tx, getEmployeeEmailsQuery, NUM_EMPLOYMENTS, "email");
     }
 
     private void insertEmployment(GraknClient.Transaction tx, LocalDateTime employmentDate, World.City city, RandomValueGenerator randomAttributeGenerator, String employeeEmail, Long companyNumber){
