@@ -18,7 +18,6 @@ import java.util.List;
 import java.util.Random;
 
 import static grakn.simulation.common.ExecutorUtils.getOrderedAttribute;
-import static java.util.stream.Collectors.toList;
 
 public class RelocationAgent implements CityAgent {
 
@@ -86,11 +85,7 @@ public class RelocationAgent implements CityAgent {
         ).get();
 
         LOG.query(city, "getRelocationCityNames", relocationCitiesQuery);
-//        return getOrderedAttribute(tx, relocationCitiesQuery, "city-name");
-        return tx.execute(relocationCitiesQuery)
-                                .stream()
-                                .map(conceptMap -> conceptMap.get("city-name").asAttribute().value().toString())
-                                .collect(toList());
+        return getOrderedAttribute(tx, relocationCitiesQuery, "city-name");
     }
 
     private void insertRelocation(GraknClient.Transaction tx, LocalDateTime dateToday, World.City city, String email, String newCityName) {
