@@ -1,7 +1,6 @@
 package grakn.simulation;
 
 import grabl.tracing.client.GrablTracing;
-import grabl.tracing.client.GrablTracingFactory;
 import grabl.tracing.client.StaticThreadTracing;
 import grakn.client.GraknClient;
 import grakn.client.GraknClient.Session;
@@ -37,6 +36,8 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+
+import static grabl.tracing.client.GrablTracingFactory.*;
 
 public class Simulation implements AgentContext, AutoCloseable {
 
@@ -158,9 +159,9 @@ public class Simulation implements AgentContext, AutoCloseable {
             GrablTracing tracing = null;
             try {
                 if (disableTracing) {
-                    tracing = GrablTracingFactory.withSlf4jLogging(GrablTracingFactory.noopTracing());
+                    tracing = withLogging(noOpTracing());
                 } else {
-                    tracing = GrablTracingFactory.withSlf4jLogging(GrablTracingFactory.secureTracing(grablTracingUri, grablTracingUsername, grablTracingToken));
+                    tracing = withLogging(tracing(grablTracingUri, grablTracingUsername, grablTracingToken));
                 }
                 GrablTracing.Analysis analysis = tracing.analysis(grablTracingOrganisation, grablTracingRepository, grablTracingCommit);
                 StaticThreadTracing.setAnalysis(analysis);
