@@ -1,65 +1,55 @@
 package grakn.simulation.agents;
 
-import grakn.client.GraknClient;
+import grakn.simulation.agents.common.CityAgent;
 import grakn.simulation.common.Allocation;
 import grakn.simulation.common.ExecutorUtils;
-import grakn.simulation.common.LogWrapper;
-import grakn.simulation.common.RandomSource;
 import graql.lang.Graql;
 import graql.lang.query.GraqlGet;
 import graql.lang.query.GraqlInsert;
-import org.slf4j.LoggerFactory;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.Collections;
 import java.util.List;
-import java.util.Random;
 
 import static grakn.simulation.common.ExecutorUtils.getOrderedAttribute;
 
-public class RelocationAgent implements CityAgent {
+public class RelocationAgent extends CityAgent {
 
-    private static final LogWrapper<World.City> LOG = new LogWrapper<>(LoggerFactory.getLogger(PersonBirthAgent.class), World.City::getTracker);
     private static final int NUM_RELOCATIONS = 5;
 
     @Override
-    public void iterate(AgentContext context, RandomSource randomSource, World.City city) {
+    public void iterate() {
         /*
         Find people currently resident the city
         Find other cities in the continent
         Distribute the people among those cities via a relocation
          */
-        Random random = randomSource.startNewRandom();
-        GraknClient.Session session = context.getIterationGraknSessionFor(city.getCountry().getContinent().getName());
 
         LocalDateTime earliestDate;
-        if (context.getLocalDateTime().minusYears(2).isBefore(LocalDateTime.of(LocalDate.ofYearDay(0, 1), LocalTime.of(0, 0, 0))))
-            earliestDate = context.getLocalDateTime();
+        if (today().minusYears(2).isBefore(LocalDateTime.of(LocalDate.ofYearDay(0, 1), LocalTime.of(0, 0, 0))))
+            earliestDate = today();
         else {
-            earliestDate = context.getLocalDateTime().minusYears(2);
+            earliestDate = today().minusYears(2);
         }
 
-        LocalDateTime dateToday = context.getLocalDateTime();
+        List<String> residentEmails;
+        List<String> relocationCityNames;
 
-        try (GraknClient.Transaction tx = session.transaction().write()) {
+        residentEmails = getResidentEmails(earliestDate);
+        shuffle(residentEmails);
 
-            List<String> residentEmails = getResidentEmails(tx, city, earliestDate);
-            Collections.shuffle(residentEmails, random);
+        relocationCityNames = getRelocationCityNames();
 
-            List<String> relocationCityNames = getRelocationCityNames(tx, city);
+        Allocation.allocate(residentEmails, relocationCityNames, this::insertRelocation);
 
-            Allocation.allocate(residentEmails, relocationCityNames, (residentEmail, relocationCityName) ->insertRelocation(tx, dateToday, city, residentEmail, relocationCityName));
-
-            tx.commit();
-        }
+        tx().commit();
     }
 
     static GraqlGet.Unfiltered cityResidentsQuery(World.City city, LocalDateTime earliestDate) {
         return Graql.match(
                 Graql.var("person").isa("person").has("email", Graql.var("email")),
-                Graql.var("city").isa("city").has("name", city.getName()),
+                Graql.var("city").isa("city").has("name", city.name()),
                 Graql.var("r").isa("residency")
                         .rel("residency_resident", "person")
                         .rel("residency_location", "city")
@@ -69,39 +59,39 @@ public class RelocationAgent implements CityAgent {
         ).get();
     }
 
-    private List<String> getResidentEmails(GraknClient.Transaction tx, World.City city, LocalDateTime earliestDate) {
-        GraqlGet.Unfiltered cityResidentsQuery = cityResidentsQuery(city, earliestDate);
-        LOG.query(city, "getResidentEmails", cityResidentsQuery);
-        return ExecutorUtils.getOrderedAttribute(tx, cityResidentsQuery, "email", NUM_RELOCATIONS);
+    private List<String> getResidentEmails(LocalDateTime earliestDate) {
+        GraqlGet.Unfiltered cityResidentsQuery = cityResidentsQuery(city(), earliestDate);
+        log().query("getResidentEmails", cityResidentsQuery);
+        return ExecutorUtils.getOrderedAttribute(tx(), cityResidentsQuery, "email", NUM_RELOCATIONS);
     }
 
-    private List<String> getRelocationCityNames(GraknClient.Transaction tx, World.City city) {
+    private List<String> getRelocationCityNames() {
 
         GraqlGet.Unfiltered relocationCitiesQuery = Graql.match(
                 Graql.var("city").isa("city").has("name", Graql.var("city-name")),
-                Graql.var("continent").isa("continent").has("name", city.getCountry().getContinent().getName()),
+                Graql.var("continent").isa("continent").has("name", city().country().continent().name()),
                 Graql.var("lh1").isa("location-hierarchy").rel("city").rel("continent"),
-                Graql.var("city-name").neq(city.getName())
+                Graql.var("city-name").neq(city().name())
         ).get();
 
-        LOG.query(city, "getRelocationCityNames", relocationCitiesQuery);
-        return getOrderedAttribute(tx, relocationCitiesQuery, "city-name");
+        log().query("getRelocationCityNames", relocationCitiesQuery);
+        return getOrderedAttribute(tx(), relocationCitiesQuery, "city-name");
     }
 
-    private void insertRelocation(GraknClient.Transaction tx, LocalDateTime dateToday, World.City city, String email, String newCityName) {
+    private void insertRelocation(String email, String newCityName) {
         GraqlInsert relocatePersonQuery = Graql.match(
                 Graql.var("p").isa("person").has("email", email),
                 Graql.var("new-city").isa("city").has("name", newCityName),
-                Graql.var("old-city").isa("city").has("name", city.getName())
+                Graql.var("old-city").isa("city").has("name", city().name())
         ).insert(
                 Graql.var("r").isa("relocation")
                         .rel("relocation_previous-location", "old-city")
                         .rel("relocation_new-location", "new-city")
                         .rel("relocation_relocated-person", "p")
-                        .has("relocation-date", dateToday)
+                        .has("relocation-date", today())
         );
 
-        LOG.query(city, "insertRelocation", relocatePersonQuery);
-        tx.execute(relocatePersonQuery);
+        log().query("insertRelocation", relocatePersonQuery);
+        tx().execute(relocatePersonQuery);
     }
 }

@@ -7,10 +7,10 @@ import java.util.Random;
 /**
  * Helpers for generating values based on a given random generator
  */
-class RandomValueGenerator {
+public class RandomValueGenerator {
     private final Random random;
 
-    RandomValueGenerator(Random random) {
+    public RandomValueGenerator(Random random) {
         this.random = random;
     }
 

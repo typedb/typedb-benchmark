@@ -74,11 +74,11 @@ public class World {
     }
 
     public Stream<Country> getCountries() {
-        return continents.stream().flatMap(Continent::getCountries);
+        return continents.stream().flatMap(Continent::countries);
     }
 
     public Stream<City> getCities() {
-        return continents.stream().flatMap(Continent::getCountries).flatMap(Country::getCities);
+        return continents.stream().flatMap(Continent::countries).flatMap(Country::cities);
     }
 
     public List<String> getFemaleForenames() {
@@ -111,16 +111,17 @@ public class World {
             continentMap.put(continentName, this);
         }
 
-        public String getName() {
+        @Override
+        public String toString() {
             return continentName;
         }
 
-        public Stream<Country> getCountries() {
-            return countries.stream();
+        public String name() {
+            return continentName;
         }
 
-        public String getTracker() {
-            return getName();
+        public Stream<Country> countries() {
+            return countries.stream();
         }
     }
 
@@ -136,20 +137,21 @@ public class World {
             countryMap.put(countryName, this);
         }
 
-        public String getName() {
+        @Override
+        public String toString() {
             return countryName;
         }
 
-        public Continent getContinent() {
+        public String name() {
+            return countryName;
+        }
+
+        public Continent continent() {
             return continent;
         }
 
-        public Stream<City> getCities() {
+        public Stream<City> cities() {
             return cities.stream();
-        }
-
-        public String getTracker() {
-            return getContinent().getTracker() + ":" + getName();
         }
     }
 
@@ -164,16 +166,17 @@ public class World {
             cityMap.put(cityName, this);
         }
 
-        public String getName() {
+        @Override
+        public String toString() {
             return cityName;
         }
 
-        public Country getCountry() {
-            return country;
+        public String name() {
+            return cityName;
         }
 
-        public String getTracker() {
-            return getCountry().getTracker() + ":" + getName();
+        public Country country() {
+            return country;
         }
     }
 }
