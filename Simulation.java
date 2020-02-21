@@ -206,6 +206,8 @@ public class Simulation implements AgentContext, AutoCloseable {
             ex.printStackTrace();
             System.exit(1);
         }
+
+        LOG.info("Simulation complete");
     }
 
     private static void loadSchema(Session session, Path... schemaPath) throws IOException {

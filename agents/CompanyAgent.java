@@ -2,6 +2,7 @@ package grakn.simulation.agents;
 
 import grakn.simulation.agents.common.CountryAgent;
 import graql.lang.Graql;
+import graql.lang.query.GraqlGet;
 import graql.lang.query.GraqlInsert;
 import org.apache.commons.lang3.StringUtils;
 
@@ -43,5 +44,17 @@ public class CompanyAgent extends CountryAgent {
                         );
         log().query("insertCompany", query);
         tx().execute(query);
+    }
+
+    static GraqlGet getCompanyNumbersInCountryQuery(World.Country country) {
+        return Graql.match(
+                Graql.var("country").isa("country")
+                        .has("name", country.name()),
+                Graql.var("company").isa("company")
+                        .has("company-number", Graql.var("company-number")),
+                Graql.var("reg").isa("incorporation")
+                        .rel("incorporation_incorporated", Graql.var("company"))
+                        .rel("incorporation_incorporating", Graql.var("country"))
+        ).get();
     }
 }

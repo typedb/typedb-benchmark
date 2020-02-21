@@ -1,6 +1,7 @@
 package grakn.simulation.agents.base;
 
 import grakn.client.GraknClient;
+import grakn.simulation.agents.RandomValueGenerator;
 import grakn.simulation.agents.World;
 import graql.lang.query.GraqlQuery;
 import org.slf4j.Logger;
@@ -47,6 +48,10 @@ public abstract class Agent<T> implements AutoCloseable {
 
     protected Random random() {
         return random;
+    }
+
+    protected RandomValueGenerator randomAttributeGenerator() {
+        return new RandomValueGenerator(random());
     }
 
     protected T item() {

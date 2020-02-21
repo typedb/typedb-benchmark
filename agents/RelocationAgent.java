@@ -2,6 +2,7 @@ package grakn.simulation.agents;
 
 import grakn.simulation.agents.common.CityAgent;
 import grakn.simulation.common.Allocation;
+import grakn.simulation.common.ExecutorUtils;
 import graql.lang.Graql;
 import graql.lang.query.GraqlGet;
 import graql.lang.query.GraqlInsert;
@@ -11,7 +12,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 
-import static java.util.stream.Collectors.toList;
+import static grakn.simulation.common.ExecutorUtils.getOrderedAttribute;
 
 public class RelocationAgent extends CityAgent {
 
@@ -40,24 +41,15 @@ public class RelocationAgent extends CityAgent {
 
         relocationCityNames = getRelocationCityNames();
 
-        if (relocationCityNames.size() > 0 && residentEmails.size() > 0) {
+        Allocation.allocate(residentEmails, relocationCityNames, this::insertRelocation);
 
-            List<Integer> cityAllocationPerPerson = Allocation.allocateEvenly(residentEmails.size(), relocationCityNames.size());
-
-            for (int i = 0; i < cityAllocationPerPerson.size(); i++) {
-                String email = residentEmails.get(i);
-                String newCityName = relocationCityNames.get(cityAllocationPerPerson.get(i));
-
-                insertRelocation(email, newCityName);
-            }
-            tx().commit();
-        }
+        tx().commit();
     }
 
-    private List<String> getResidentEmails(LocalDateTime earliestDate) {
-        GraqlGet.Unfiltered cityResidentsQuery = Graql.match(
+    static GraqlGet.Unfiltered cityResidentsQuery(World.City city, LocalDateTime earliestDate) {
+        return Graql.match(
                 Graql.var("person").isa("person").has("email", Graql.var("email")),
-                Graql.var("city").isa("city").has("name", city().name()),
+                Graql.var("city").isa("city").has("name", city.name()),
                 Graql.var("r").isa("residency")
                         .rel("residency_resident", "person")
                         .rel("residency_location", "city")
@@ -65,13 +57,12 @@ public class RelocationAgent extends CityAgent {
                 Graql.not(Graql.var("r").has("end-date", Graql.var("ed"))),
                 Graql.var("start-date").lte(earliestDate)
         ).get();
+    }
 
+    private List<String> getResidentEmails(LocalDateTime earliestDate) {
+        GraqlGet.Unfiltered cityResidentsQuery = cityResidentsQuery(city(), earliestDate);
         log().query("getResidentEmails", cityResidentsQuery);
-        return tx().execute(cityResidentsQuery).stream()
-                .map(conceptMap -> conceptMap.get("email").asAttribute().value().toString())
-                .sorted()
-                .limit(NUM_RELOCATIONS)
-                .collect(toList());
+        return ExecutorUtils.getOrderedAttribute(tx(), cityResidentsQuery, "email", NUM_RELOCATIONS);
     }
 
     private List<String> getRelocationCityNames() {
@@ -84,10 +75,7 @@ public class RelocationAgent extends CityAgent {
         ).get();
 
         log().query("getRelocationCityNames", relocationCitiesQuery);
-        return tx().execute(relocationCitiesQuery)
-                .stream()
-                .map(conceptMap -> conceptMap.get("city-name").asAttribute().value().toString())
-                .collect(toList());
+        return getOrderedAttribute(tx(), relocationCitiesQuery, "city-name");
     }
 
     private void insertRelocation(String email, String newCityName) {

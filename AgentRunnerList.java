@@ -11,6 +11,7 @@ public class AgentRunnerList {
             new CityAgentRunner(PersonBirthAgent.class),
             new CityAgentRunner(ParentshipAgent.class),
             new CityAgentRunner(RelocationAgent.class),
-            new CountryAgentRunner(CompanyAgent.class)
+            new CountryAgentRunner(CompanyAgent.class),
+            new CityAgentRunner(EmploymentAgent.class)
     };
 }

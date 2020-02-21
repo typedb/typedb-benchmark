@@ -3,6 +3,7 @@ package grakn.simulation.common;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.function.BiConsumer;
 
 /**
  * Tools to allocate items to some number of buckets
@@ -27,5 +28,18 @@ public class Allocation {
             list.add(i);
         }
         return allocationMap;
+    }
+
+    public static <T, U> void allocate(List<T> toAllocate, List<U> buckets, BiConsumer<T, U> insertFunction) {
+        if (toAllocate.size() > 0 && buckets.size() > 0) {
+
+            List<Integer> allocations = Allocation.allocateEvenly(toAllocate.size(), buckets.size());
+
+            for (int i = 0; i < allocations.size(); i++) {
+                T item = toAllocate.get(i);
+                U bucket = buckets.get(allocations.get(i));
+                insertFunction.accept(item, bucket);
+            }
+        }
     }
 }

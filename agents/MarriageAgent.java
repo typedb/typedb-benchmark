@@ -8,7 +8,8 @@ import graql.lang.statement.Statement;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
+
+import static grakn.simulation.common.ExecutorUtils.getOrderedAttribute;
 
 public class MarriageAgent extends CityAgent {
 
@@ -41,13 +42,13 @@ public class MarriageAgent extends CityAgent {
     private List<String> getSingleWomen() {
         GraqlGet.Unfiltered singleWomenQuery = getSinglePeopleOfGenderQuery("female", "marriage_wife");
         log().query("getSingleWomen", singleWomenQuery);
-        return tx().execute(singleWomenQuery).stream().map(a -> a.get("email").asAttribute().value().toString()).sorted().collect(Collectors.toList());
+        return getOrderedAttribute(tx(), singleWomenQuery, "email");
     }
 
     private List<String> getSingleMen() {
         GraqlGet.Unfiltered singleMenQuery = getSinglePeopleOfGenderQuery("male", "marriage_husband");
         log().query("getSingleMen", singleMenQuery);
-        return tx().execute(singleMenQuery).stream().map(a -> a.get("email").asAttribute().value().toString()).sorted().collect(Collectors.toList());
+        return getOrderedAttribute(tx(), singleMenQuery, "email");
     }
 
     private GraqlGet.Unfiltered getSinglePeopleOfGenderQuery(String gender, String marriageRole) {
