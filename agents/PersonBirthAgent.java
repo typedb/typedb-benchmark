@@ -6,7 +6,6 @@ import graql.lang.query.GraqlInsert;
 
 public class PersonBirthAgent extends CityAgent {
 
-    private static final World.WorldLogWrapper LOG = World.log(PersonBirthAgent.class);
     private static final int NUM_BIRTHS = 5;
 
     @Override
@@ -38,15 +37,15 @@ public class PersonBirthAgent extends CityAgent {
                 + today().toString() + "_"
                 + i + "_"
                 + simulationStep() + "_"
-                + city().getName() + "_"
-                + city().getCountry().getName() + "_"
-                + city().getCountry().getContinent().getName()
+                + city() + "_"
+                + city().country() + "_"
+                + city().country().continent()
                 + "@gmail.com";
 
         GraqlInsert query =
                 Graql.match(
                         Graql.var("c").isa("city")
-                                .has("name", city().getName()))
+                                .has("name", city().toString()))
                         .insert(Graql.var("p").isa("person")
                                         .has("email", email)
                                         .has("date-of-birth", today())
@@ -57,7 +56,7 @@ public class PersonBirthAgent extends CityAgent {
                                         .rel("born-in_child", "p")
                                         .rel("born-in_place-of-birth", "c")
                         );
-        LOG.query(city(), "insertPerson", query);
+        log().query("insertPerson", query);
         tx().execute(query);
     }
 }

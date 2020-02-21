@@ -2,11 +2,9 @@ package grakn.simulation.agents;
 
 import grakn.simulation.agents.common.CityAgent;
 import grakn.simulation.common.Allocation;
-import grakn.simulation.common.LogWrapper;
 import graql.lang.Graql;
 import graql.lang.query.GraqlGet;
 import graql.lang.query.GraqlInsert;
-import org.slf4j.LoggerFactory;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -17,7 +15,6 @@ import static java.util.stream.Collectors.toList;
 
 public class RelocationAgent extends CityAgent {
 
-    private static final LogWrapper<World.City> LOG = new LogWrapper<>(LoggerFactory.getLogger(PersonBirthAgent.class), World.City::getTracker);
     private static final int NUM_RELOCATIONS = 5;
 
     @Override
@@ -60,7 +57,7 @@ public class RelocationAgent extends CityAgent {
     private List<String> getResidentEmails(LocalDateTime earliestDate) {
         GraqlGet.Unfiltered cityResidentsQuery = Graql.match(
                 Graql.var("person").isa("person").has("email", Graql.var("email")),
-                Graql.var("city").isa("city").has("name", city().getName()),
+                Graql.var("city").isa("city").has("name", city().name()),
                 Graql.var("r").isa("residency")
                         .rel("residency_resident", "person")
                         .rel("residency_location", "city")
@@ -69,7 +66,7 @@ public class RelocationAgent extends CityAgent {
                 Graql.var("start-date").lte(earliestDate)
         ).get();
 
-        LOG.query(city(), "getResidentEmails", cityResidentsQuery);
+        log().query("getResidentEmails", cityResidentsQuery);
         return tx().execute(cityResidentsQuery).stream()
                 .map(conceptMap -> conceptMap.get("email").asAttribute().value().toString())
                 .sorted()
@@ -81,12 +78,12 @@ public class RelocationAgent extends CityAgent {
 
         GraqlGet.Unfiltered relocationCitiesQuery = Graql.match(
                 Graql.var("city").isa("city").has("name", Graql.var("city-name")),
-                Graql.var("continent").isa("continent").has("name", city().getCountry().getContinent().getName()),
+                Graql.var("continent").isa("continent").has("name", city().country().continent().name()),
                 Graql.var("lh1").isa("location-hierarchy").rel("city").rel("continent"),
-                Graql.var("city-name").neq(city().getName())
+                Graql.var("city-name").neq(city().name())
         ).get();
 
-        LOG.query(city(), "getRelocationCityNames", relocationCitiesQuery);
+        log().query("getRelocationCityNames", relocationCitiesQuery);
         return tx().execute(relocationCitiesQuery)
                 .stream()
                 .map(conceptMap -> conceptMap.get("city-name").asAttribute().value().toString())
@@ -97,7 +94,7 @@ public class RelocationAgent extends CityAgent {
         GraqlInsert relocatePersonQuery = Graql.match(
                 Graql.var("p").isa("person").has("email", email),
                 Graql.var("new-city").isa("city").has("name", newCityName),
-                Graql.var("old-city").isa("city").has("name", city().getName())
+                Graql.var("old-city").isa("city").has("name", city().name())
         ).insert(
                 Graql.var("r").isa("relocation")
                         .rel("relocation_previous-location", "old-city")
@@ -106,7 +103,7 @@ public class RelocationAgent extends CityAgent {
                         .has("relocation-date", today())
         );
 
-        LOG.query(city(), "insertRelocation", relocatePersonQuery);
+        log().query("insertRelocation", relocatePersonQuery);
         tx().execute(relocatePersonQuery);
     }
 }

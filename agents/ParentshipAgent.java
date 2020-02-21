@@ -21,8 +21,6 @@ import static java.util.stream.Collectors.toList;
 
 public class ParentshipAgent extends CityAgent {
 
-    private static final World.WorldLogWrapper LOG = World.log(PersonBirthAgent.class);
-
     @Override
     public void iterate() {
         // Query for married couples in the city who are not already in a parentship relation together
@@ -54,7 +52,7 @@ public class ParentshipAgent extends CityAgent {
     private List<HashMap<String, String>> getMarriageEmails() {
         GraqlGet.Sorted marriageQuery = Graql.match(
                 Graql.var("city").isa("city")
-                        .has("name", city().getName()),
+                        .has("name", city().name()),
                 Graql.var("m").isa("marriage")
                         .rel("marriage_husband", Graql.var("husband"))
                         .rel("marriage_wife", Graql.var("wife"))
@@ -73,7 +71,7 @@ public class ParentshipAgent extends CityAgent {
                         .rel("locates_location", Graql.var("city"))
         ).get().sort("marriage-id");
 
-        LOG.query(city(), "getMarriageEmails", marriageQuery);
+        log().query("getMarriageEmails", marriageQuery);
         List<ConceptMap> marriageAnswers = tx().execute(marriageQuery);
 
         return marriageAnswers
@@ -89,7 +87,7 @@ public class ParentshipAgent extends CityAgent {
 
         GraqlGet.Unfiltered childrenQuery = Graql.match(
                 Graql.var("c").isa("city")
-                        .has("name", city().getName()),
+                        .has("name", city().name()),
                 Graql.var("child").isa("person")
                         .has("email", Graql.var("email"))
                         .has("date-of-birth", dateToday),
@@ -98,7 +96,7 @@ public class ParentshipAgent extends CityAgent {
                         .rel("born-in_child", "child")
         ).get();
 
-        LOG.query(city(), "getChildrenEmails", childrenQuery);
+        log().query("getChildrenEmails", childrenQuery);
         return tx().execute(childrenQuery)
                 .stream()
                 .map(conceptMap -> conceptMap.get("email").asAttribute().value().toString())
@@ -133,7 +131,7 @@ public class ParentshipAgent extends CityAgent {
                 insertStatements
         );
 
-        LOG.query(city(), "insertParentShip", parentshipQuery);
+        log().query("insertParentShip", parentshipQuery);
         tx().execute(parentshipQuery);
     }
 }

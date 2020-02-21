@@ -1,12 +1,8 @@
 package grakn.simulation.agents;
 
-import grakn.simulation.agents.base.AgentItem;
-import grakn.simulation.common.LogWrapper;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -78,11 +74,11 @@ public class World {
     }
 
     public Stream<Country> getCountries() {
-        return continents.stream().flatMap(Continent::getCountries);
+        return continents.stream().flatMap(Continent::countries);
     }
 
     public Stream<City> getCities() {
-        return continents.stream().flatMap(Continent::getCountries).flatMap(Country::getCities);
+        return continents.stream().flatMap(Continent::countries).flatMap(Country::cities);
     }
 
     public List<String> getFemaleForenames() {
@@ -105,7 +101,7 @@ public class World {
         return nouns;
     }
 
-    public class Continent implements AgentItem {
+    public class Continent {
         private String continentName;
         private List<Country> countries = new ArrayList<>();
 
@@ -115,26 +111,21 @@ public class World {
             continentMap.put(continentName, this);
         }
 
-        public String getName() {
+        @Override
+        public String toString() {
             return continentName;
         }
 
-        public Stream<Country> getCountries() {
+        public String name() {
+            return continentName;
+        }
+
+        public Stream<Country> countries() {
             return countries.stream();
-        }
-
-        @Override
-        public String getTracker() {
-            return getName();
-        }
-
-        @Override
-        public String getSessionKey() {
-            return continentName;
         }
     }
 
-    public class Country implements AgentItem {
+    public class Country {
         private String countryName;
         private Continent continent;
         private List<City> cities = new ArrayList<>();
@@ -146,30 +137,25 @@ public class World {
             countryMap.put(countryName, this);
         }
 
-        public String getName() {
+        @Override
+        public String toString() {
             return countryName;
         }
 
-        public Continent getContinent() {
+        public String name() {
+            return countryName;
+        }
+
+        public Continent continent() {
             return continent;
         }
 
-        public Stream<City> getCities() {
+        public Stream<City> cities() {
             return cities.stream();
-        }
-
-        @Override
-        public String getTracker() {
-            return getContinent().getTracker() + ":" + getName();
-        }
-
-        @Override
-        public String getSessionKey() {
-            return continent.getSessionKey();
         }
     }
 
-    public class City implements AgentItem {
+    public class City {
         private String cityName;
         private Country country;
 
@@ -180,33 +166,17 @@ public class World {
             cityMap.put(cityName, this);
         }
 
-        public String getName() {
+        @Override
+        public String toString() {
             return cityName;
         }
 
-        public Country getCountry() {
+        public String name() {
+            return cityName;
+        }
+
+        public Country country() {
             return country;
-        }
-
-        @Override
-        public String getTracker() {
-            return getCountry().getTracker() + ":" + getName();
-        }
-
-        @Override
-        public String getSessionKey() {
-            return country.getSessionKey();
-        }
-    }
-
-    public static WorldLogWrapper log(Class<?> clazz) {
-        return new WorldLogWrapper(LoggerFactory.getLogger(clazz));
-    }
-
-    public static class WorldLogWrapper extends LogWrapper<AgentItem> {
-
-        private WorldLogWrapper(Logger logger) {
-            super(logger, AgentItem::getTracker);
         }
     }
 }

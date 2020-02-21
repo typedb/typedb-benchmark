@@ -8,8 +8,6 @@ import org.apache.commons.lang3.StringUtils;
 public class CompanyAgent extends CountryAgent {
 
     private static final int NUM_COMPANIES = 5;
-    private static final World.WorldLogWrapper LOG = World.log(CompanyAgent.class);
-
 
     @Override
     public void iterate() {
@@ -28,13 +26,13 @@ public class CompanyAgent extends CountryAgent {
         String companyNumberString = companyName
                 + i
                 + simulationStep() + "_"
-                + country().getName();
+                + country().name();
         int companyNumber = companyNumberString.hashCode();
 
         GraqlInsert query =
                 Graql.match(
                         Graql.var("country").isa("country")
-                                .has("name", country().getName()))
+                                .has("name", country().name()))
                         .insert(Graql.var("company").isa("company")
                                         .has("company-name", companyName)
                                         .has("company-number", companyNumber),
@@ -43,7 +41,7 @@ public class CompanyAgent extends CountryAgent {
                                         .rel("incorporation_incorporating", Graql.var("country"))
                                         .has("date-of-incorporation", today())
                         );
-        LOG.query(country(), "insertCompany", query);
+        log().query("insertCompany", query);
         tx().execute(query);
     }
 }

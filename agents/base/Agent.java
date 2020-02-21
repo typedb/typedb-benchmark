@@ -2,6 +2,8 @@ package grakn.simulation.agents.base;
 
 import grakn.client.GraknClient;
 import grakn.simulation.agents.World;
+import graql.lang.query.GraqlQuery;
+import org.slf4j.Logger;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -13,23 +15,35 @@ import java.util.Random;
  * this class.
  *
  * This class is instantiated via reflection by {@link AgentRunner} and initialized using
- * {@link #init(AgentContext, Random, AgentItem)}.
+ * {@link #init(AgentContext, Random, Object, String, String, Logger)}.
  *
  * The protected methods of this class provide useful simple methods for writing Agents as concisely as possible.
  */
-public abstract class Agent<T extends AgentItem> implements AutoCloseable {
+public abstract class Agent<T> implements AutoCloseable {
+
     private AgentContext agentContext;
     private Random random;
     private T item;
+    private String sessionKey;
+    private String tracker;
+    private LogWrapper logWrapper;
 
-    void init(AgentContext agentContext, Random random, T item) {
+    void init(AgentContext agentContext, Random random, T item, String sessionKey, String tracker, Logger logger) {
         this.agentContext = agentContext;
         this.random = random;
         this.item = item;
+        this.sessionKey = sessionKey;
+        this.tracker = tracker;
+
+        this.logWrapper = new LogWrapper(logger);
     }
 
     private GraknClient.Transaction tx;
     private LocalDateTime today;
+
+    protected LogWrapper log() {
+        return logWrapper;
+    }
 
     protected Random random() {
         return random;
@@ -40,7 +54,7 @@ public abstract class Agent<T extends AgentItem> implements AutoCloseable {
     }
 
     protected String tracker() {
-        return item.getTracker();
+        return tracker;
     }
 
     protected GraknClient.Session session() {
@@ -52,7 +66,7 @@ public abstract class Agent<T extends AgentItem> implements AutoCloseable {
     }
 
     protected String getSessionKey() {
-        return item.getSessionKey();
+        return sessionKey;
     }
 
     protected GraknClient.Transaction tx() {
@@ -103,4 +117,20 @@ public abstract class Agent<T extends AgentItem> implements AutoCloseable {
     }
 
     public abstract void iterate();
+
+    public class LogWrapper {
+        private final Logger logger;
+
+        private LogWrapper(Logger logger) {
+            this.logger = logger;
+        }
+
+        public void query(String scope, GraqlQuery query) {
+            logger.info("({}):{}:\n{}", tracker, scope, query);
+        }
+
+        public void message(String message) {
+            logger.info("({}):{}", tracker, message);
+        }
+    }
 }

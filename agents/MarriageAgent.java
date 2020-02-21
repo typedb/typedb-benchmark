@@ -12,7 +12,6 @@ import java.util.stream.Collectors;
 
 public class MarriageAgent extends CityAgent {
 
-    private static final World.WorldLogWrapper LOG = World.log(MarriageAgent.class);
     private static final int NUM_MARRIAGES = 5;
 
     @Override
@@ -41,13 +40,13 @@ public class MarriageAgent extends CityAgent {
 
     private List<String> getSingleWomen() {
         GraqlGet.Unfiltered singleWomenQuery = getSinglePeopleOfGenderQuery("female", "marriage_wife");
-        LOG.query(city(), "getSingleWomen", singleWomenQuery);
+        log().query("getSingleWomen", singleWomenQuery);
         return tx().execute(singleWomenQuery).stream().map(a -> a.get("email").asAttribute().value().toString()).sorted().collect(Collectors.toList());
     }
 
     private List<String> getSingleMen() {
         GraqlGet.Unfiltered singleMenQuery = getSinglePeopleOfGenderQuery("male", "marriage_husband");
-        LOG.query(city(), "getSingleMen", singleMenQuery);
+        log().query("getSingleMen", singleMenQuery);
         return tx().execute(singleMenQuery).stream().map(a -> a.get("email").asAttribute().value().toString()).sorted().collect(Collectors.toList());
     }
 
@@ -61,7 +60,7 @@ public class MarriageAgent extends CityAgent {
                 Graql.not(Graql.var("m").isa("marriage").rel(marriageRole, personVar)),
                 Graql.var("r").isa("residency").rel("residency_resident", personVar).rel("residency_location", cityVar),
                 Graql.not(Graql.var("r").has("end-date", Graql.var("ed"))),
-                cityVar.isa("city").has("name", city().getName())
+                cityVar.isa("city").has("name", city().name())
         ).get("email");
     }
 
@@ -71,7 +70,7 @@ public class MarriageAgent extends CityAgent {
         GraqlInsert marriageQuery = Graql.match(
                 Graql.var("husband").isa("person").has("email", husbandEmail),
                 Graql.var("wife").isa("person").has("email", wifeEmail),
-                Graql.var("city").isa("city").has("name", city().getName())
+                Graql.var("city").isa("city").has("name", city().name())
         ).insert(
                 Graql.var("m").isa("marriage")
                         .rel("marriage_husband", "husband")
@@ -79,7 +78,7 @@ public class MarriageAgent extends CityAgent {
                         .has("marriage-id", marriageIdentifier),
                 Graql.var().isa("locates").rel("locates_located", Graql.var("m")).rel("locates_location", Graql.var("city"))
         );
-        LOG.query(city(), "insertMarriage", marriageQuery);
+        log().query("insertMarriage", marriageQuery);
         tx().execute(marriageQuery);
     }
 }

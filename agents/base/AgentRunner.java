@@ -2,15 +2,27 @@ package grakn.simulation.agents.base;
 
 import grakn.simulation.common.Pair;
 import grakn.simulation.common.RandomSource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.Random;
 
-public abstract class AgentRunner<T extends AgentItem> {
+/**
+ * AgentRunner constructs agents of a given class and runs them in parallel, providing them with the appropriate item,
+ * a deterministic random and the tracker and session key for tracing and grakn transactions.
+ *
+ * This class must be extended to provide the source of the random items and the methods to obtain the session key and
+ * tracker from them.
+ *
+ * @param <T> The type of item used by the agent.
+ */
+public abstract class AgentRunner<T> {
 
     private Constructor<? extends Agent<T>> agentConstructor;
+    private Logger logger;
 
     protected AgentRunner(Class<? extends Agent<T>> agentClass) {
         try {
@@ -19,34 +31,38 @@ public abstract class AgentRunner<T extends AgentItem> {
         } catch (NoSuchMethodException e) {
             throw new RuntimeException(e);
         }
+
+        logger = LoggerFactory.getLogger(agentClass);
     }
 
-    private Agent<T> constructAgent(AgentContext context, Random random, T item) {
-        try {
-            Agent<T> agent = agentConstructor.newInstance();
-            agent.init(context, random, item);
-            return agent;
-        } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-            throw new RuntimeException(e);
-        }
-    }
+    abstract protected List<T> getParallelItems(AgentContext agentContext, RandomSource randomSource);
 
-    abstract protected List<T> getParallelItems(AgentContext agentContext);
+    abstract protected String getSessionKey(AgentContext agentContext, RandomSource randomSource, T item);
+
+    abstract protected String getTracker(AgentContext agentContext, RandomSource randomSource, T item);
 
     public void iterate(AgentContext agentContext, RandomSource randomSource) {
-        List<T> items = getParallelItems(agentContext);
+        List<T> items = getParallelItems(agentContext, randomSource);
         List<RandomSource> sources = randomSource.split(items.size());
 
         Pair.zip(sources, items).parallelStream().forEach(
-                pair -> {
-                    try (Agent<T> agent = constructAgent(
-                            agentContext,
-                            pair.getFirst().startNewRandom(),
-                            pair.getSecond()
-                    )) {
-                        agent.iterate();
-                    }
-                }
+                pair -> runAgent(agentContext, pair.getFirst(), pair.getSecond())
         );
+    }
+
+    private void runAgent(AgentContext agentContext, RandomSource source, T item) {
+        Random random = source.startNewRandom();
+        Random agentRandom = RandomSource.nextSource(random).startNewRandom();
+        String sessionKey = getSessionKey(agentContext, RandomSource.nextSource(random), item);
+        String tracker = getTracker(agentContext, RandomSource.nextSource(random), item);
+
+        try (Agent<T> agent = agentConstructor.newInstance()) {
+
+            agent.init(agentContext, agentRandom, item, sessionKey, tracker, logger);
+            agent.iterate();
+
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
