@@ -68,10 +68,13 @@ public class EmploymentAgent implements CityAgent {
 
         LocalDateTime employmentDate = context.getLocalDateTime().minusYears(2);
 
+        List<String> employeeEmails;
+        List<Long> companyNumbers;
         try ( GraknClient.Transaction tx = session.transaction().write()) {
-            List<String> employeeEmails = getEmployeeEmails(tx, city, employmentDate);
-            List<Long> companyNumbers = getCompanyNumbers(tx, city);
-
+            employeeEmails = getEmployeeEmails(tx, city, employmentDate);
+            companyNumbers = getCompanyNumbers(tx, city);
+        }  // A second transaction is being used to circumvent graknlabs/grakn issue #5585
+        try ( GraknClient.Transaction tx = session.transaction().write()) {
             allocate(employeeEmails, companyNumbers, (employeeEmail, companyNumber) -> insertEmployment(tx, employmentDate, city, randomAttributeGenerator, employeeEmail, companyNumber));
             tx.commit();
         }

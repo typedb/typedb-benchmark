@@ -5,7 +5,6 @@ import grakn.client.GraknClient.Transaction;
 import grakn.simulation.common.LogWrapper;
 import grakn.simulation.common.RandomSource;
 import graql.lang.Graql;
-import graql.lang.query.GraqlGet;
 import graql.lang.query.GraqlInsert;
 import org.slf4j.LoggerFactory;
 

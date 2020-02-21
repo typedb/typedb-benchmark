@@ -42,7 +42,7 @@ public class EmploymentAgentE2E {
 
                 List<Numeric> answer = tx.execute(parentshipsCountQuery);
                 int numAnswers = answer.get(0).number().intValue();
-                int expectedNumAnswers = 80;
+                int expectedNumAnswers = 200;
                 assertThat(numAnswers, equalTo(expectedNumAnswers));
             }
         }
