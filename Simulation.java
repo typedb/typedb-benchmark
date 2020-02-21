@@ -2,6 +2,7 @@ package grakn.simulation;
 
 import grabl.tracing.client.GrablTracing;
 import grabl.tracing.client.GrablTracingFactory;
+import grabl.tracing.client.StaticThreadTracing;
 import grakn.client.GraknClient;
 import grakn.client.GraknClient.Session;
 import grakn.client.GraknClient.Transaction;
@@ -155,32 +156,35 @@ public class Simulation implements AgentContext, AutoCloseable {
         try {
             GraknClient grakn = null;
             GrablTracing tracing = null;
-            GrablTracing.Analysis analysis = null;
             try {
+                if (disableTracing) {
+                    tracing = GrablTracingFactory.withSlf4jLogging(GrablTracingFactory.noopTracing());
+                } else {
+                    tracing = GrablTracingFactory.withSlf4jLogging(GrablTracingFactory.secureTracing(grablTracingUri, grablTracingUsername, grablTracingToken));
+                }
+                GrablTracing.Analysis analysis = tracing.analysis(grablTracingOrganisation, grablTracingRepository, grablTracingCommit);
+                StaticThreadTracing.setAnalysis(analysis);
+
                 grakn = new GraknClient(graknHostUri);
 
                 try (Session session = grakn.session(graknKeyspace)) {
                     // TODO: merge these two schema files once this issue is fixed
                     // https://github.com/graknlabs/grakn/issues/5553
-                    loadSchema(session,
-                            files.get("schema.gql"),
-                            files.get("schema-pt2.gql"));
-                    loadData(session,
-                            files.get("data.yaml"),
-                            files.get("currencies.yaml"));
+                    try (StaticThreadTracing.ThreadContext context = StaticThreadTracing.contextOnThread("schema", 0)) {
+                        loadSchema(session,
+                                files.get("schema.gql"),
+                                files.get("schema-pt2.gql"));
+                    }
+                    try (StaticThreadTracing.ThreadContext context = StaticThreadTracing.contextOnThread("data", 0)) {
+                        loadData(session,
+                                files.get("data.yaml"),
+                                files.get("currencies.yaml"));
+                    }
                 }
-
-                if (disableTracing) {
-                    tracing = GrablTracingFactory.noopTracing();
-                } else {
-                    tracing = GrablTracingFactory.secureTracing(grablTracingUri, grablTracingUsername, grablTracingToken);
-                }
-                analysis = tracing.analysis(grablTracingOrganisation, grablTracingRepository, grablTracingCommit);
 
                 try (Simulation simulation = new Simulation(
                         grakn,
                         graknKeyspace,
-                        analysis,
                         AgentRunnerList.AGENTS,
                         new RandomSource(seed),
                         world
@@ -236,13 +240,11 @@ public class Simulation implements AgentContext, AutoCloseable {
     private final Random random;
     private final World world;
 
-    private int simulationStep = 0;
+    private int simulationStep = 1;
 
     private final ConcurrentMap<String, Session> sessionMap;
 
-    private final GrablTracing.Analysis analysis;
-
-    private Simulation(GraknClient grakn, String keyspace, GrablTracing.Analysis analysis, AgentRunner[] agents, RandomSource randomSource, World world) {
+    private Simulation(GraknClient grakn, String keyspace, AgentRunner[] agents, RandomSource randomSource, World world) {
         client = grakn;
         this.keyspace = keyspace;
         defaultSession = client.session(keyspace);
@@ -251,7 +253,6 @@ public class Simulation implements AgentContext, AutoCloseable {
         random = randomSource.startNewRandom();
         sessionMap = new ConcurrentHashMap<>();
         this.world = world;
-        this.analysis = analysis;
     }
 
     private void iterate() {
