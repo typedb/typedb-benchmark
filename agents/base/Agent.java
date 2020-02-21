@@ -9,21 +9,26 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * An agent that will execute some logic across the
+ * An agent that performs some unit of work across an object in the simulation world. Agent definitions must extend
+ * this class.
+ *
+ * This class is instantiated via reflection by {@link AgentRunner} and initialized using
+ * {@link #init(AgentContext, Random, AgentItem)}.
+ *
+ * The protected methods of this class provide useful simple methods for writing Agents as concisely as possible.
  */
 public abstract class Agent<T extends AgentItem> implements AutoCloseable {
     private AgentContext agentContext;
     private Random random;
     private T item;
 
-    public void init(AgentContext agentContext, Random random, T item) {
+    void init(AgentContext agentContext, Random random, T item) {
         this.agentContext = agentContext;
         this.random = random;
         this.item = item;
     }
 
     private GraknClient.Transaction tx;
-
     private LocalDateTime today;
 
     protected Random random() {
