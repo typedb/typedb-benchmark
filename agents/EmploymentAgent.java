@@ -46,7 +46,7 @@ public class EmploymentAgent implements CityAgent {
         }
 
         private String getContractContent() {
-            return RandomStringUtils.random(boundRandomInt(random, MIN_CONTRACT_CHARACTER_LENGTH, MAX_CONTRACT_CHARACTER_LENGTH), 0, Character.MAX_CODE_POINT, true, true, null, random);
+            return RandomStringUtils.random(boundRandomInt(random, MIN_CONTRACT_CHARACTER_LENGTH, MAX_CONTRACT_CHARACTER_LENGTH), 0, 0, true, true, null, random);
         }
 
         private double getContractedHours() {
