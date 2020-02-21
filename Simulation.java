@@ -235,7 +235,6 @@ public class Simulation implements AgentContext, AutoCloseable {
     private final GraknClient client;
     private final String keyspace;
     private final Session defaultSession;
-    private final GraknYAMLLoader loader;
     private final AgentRunner[] agents;
     private final Random random;
     private final World world;
@@ -248,7 +247,6 @@ public class Simulation implements AgentContext, AutoCloseable {
         client = grakn;
         this.keyspace = keyspace;
         defaultSession = client.session(keyspace);
-        loader = new GraknYAMLLoader(defaultSession);
         this.agents = agents;
         random = randomSource.startNewRandom();
         sessionMap = new ConcurrentHashMap<>();
