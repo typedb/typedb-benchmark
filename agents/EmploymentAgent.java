@@ -7,7 +7,6 @@ import grakn.simulation.common.RandomSource;
 import graql.lang.Graql;
 import graql.lang.query.GraqlGet;
 import graql.lang.query.GraqlInsert;
-import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.LoggerFactory;
 
 import java.time.LocalDateTime;
@@ -29,34 +28,7 @@ public class EmploymentAgent implements CityAgent {
     private static final int MIN_CONTRACT_CHARACTER_LENGTH = 200;
     private static final int MAX_CONTRACT_CHARACTER_LENGTH = 600;
 
-
-    private static class RandomValueGenerator {
-        private final Random random;
-
-        private static double doubleInterpolate(double in, double min, double max) {
-            return (in * (max - min)) + min;
-        }
-
-        private static int boundRandomInt(Random random, int min, int max) {
-            return random.nextInt(max - min) + min;
-        }
-
-        private RandomValueGenerator(Random random) {
-            this.random = random;
-        }
-
-        private String getContractContent() {
-            return RandomStringUtils.random(boundRandomInt(random, MIN_CONTRACT_CHARACTER_LENGTH, MAX_CONTRACT_CHARACTER_LENGTH), 0, 0, true, true, null, random);
-        }
-
-        private double getContractedHours() {
-            return doubleInterpolate(random.nextDouble(), MIN_CONTRACTED_HOURS, MAX_CONTRACTED_HOURS);
-        }
-
-        private double getAnnualWage() {
-            return doubleInterpolate(random.nextDouble(), MIN_ANNUAL_WAGE, MAX_ANNUAL_WAGE);
-        }
-    }
+    private RandomValueGenerator randomAttributeGenerator;
 
     @Override
     public void iterate(AgentContext context, RandomSource randomSource, World.City city) {
@@ -64,7 +36,7 @@ public class EmploymentAgent implements CityAgent {
         GraknClient.Session session = context.getIterationGraknSessionFor(sessionKey);
 
         Random random = randomSource.startNewRandom();
-        RandomValueGenerator randomAttributeGenerator = new RandomValueGenerator(random);
+        randomAttributeGenerator = new RandomValueGenerator(random);
 
         LocalDateTime employmentDate = context.getLocalDateTime().minusYears(2);
 
@@ -105,13 +77,13 @@ public class EmploymentAgent implements CityAgent {
                         .rel("employment_employer", Graql.var("company"))
                         .rel("employment_contract", Graql.var("contract"))
                         .has("start-date", employmentDate)
-                        .has("annual-wage", randomAttributeGenerator.getAnnualWage()),
+                        .has("annual-wage", randomAttributeGenerator.boundRandomDouble(MIN_ANNUAL_WAGE, MAX_ANNUAL_WAGE)),
                 Graql.var("locates").isa("locates")
                         .rel("locates_located", Graql.var("emp"))
                         .rel("locates_location", Graql.var("city")),
                 Graql.var("contract").isa("employment-contract")
-                        .has("contract-content", randomAttributeGenerator.getContractContent())
-                        .has("contracted-hours", randomAttributeGenerator.getContractedHours())
+                        .has("contract-content", randomAttributeGenerator.boundRandomLengthRandomString(MIN_CONTRACT_CHARACTER_LENGTH, MAX_CONTRACT_CHARACTER_LENGTH))
+                        .has("contracted-hours", randomAttributeGenerator.boundRandomDouble(MIN_CONTRACTED_HOURS, MAX_CONTRACTED_HOURS))
         );
         LOG.query(city, "insertEmployment", insertEmploymentQuery);
         tx.execute(insertEmploymentQuery);
