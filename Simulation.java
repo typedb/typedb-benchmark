@@ -5,8 +5,8 @@ import grabl.tracing.client.GrablTracingFactory;
 import grakn.client.GraknClient;
 import grakn.client.GraknClient.Session;
 import grakn.client.GraknClient.Transaction;
-import grakn.simulation.agents.Agent;
-import grakn.simulation.agents.AgentContext;
+import grakn.simulation.agents.base.AgentContext;
+import grakn.simulation.agents.base.AgentRunner;
 import grakn.simulation.agents.World;
 import grakn.simulation.common.RandomSource;
 import grakn.simulation.yaml_tool.GraknYAMLException;
@@ -181,7 +181,7 @@ public class Simulation implements AgentContext, AutoCloseable {
                         grakn,
                         graknKeyspace,
                         analysis,
-                        AgentList.AGENTS,
+                        AgentRunnerList.AGENTS,
                         new RandomSource(seed),
                         world
                 )) {
@@ -230,7 +230,7 @@ public class Simulation implements AgentContext, AutoCloseable {
     private final String keyspace;
     private final Session defaultSession;
     private final GraknYAMLLoader loader;
-    private final Agent[] agents;
+    private final AgentRunner[] agents;
     private final Random random;
     private final World world;
 
@@ -240,7 +240,7 @@ public class Simulation implements AgentContext, AutoCloseable {
 
     private final GrablTracing.Analysis analysis;
 
-    private Simulation(GraknClient grakn, String keyspace, GrablTracing.Analysis analysis, Agent[] agents, RandomSource randomSource, World world) {
+    private Simulation(GraknClient grakn, String keyspace, GrablTracing.Analysis analysis, AgentRunner[] agents, RandomSource randomSource, World world) {
         client = grakn;
         this.keyspace = keyspace;
         defaultSession = client.session(keyspace);
@@ -256,8 +256,8 @@ public class Simulation implements AgentContext, AutoCloseable {
 
         LOG.info("Simulation step: {}", simulationStep);
 
-        for (Agent agent : agents) {
-            agent.iterate(this, RandomSource.nextSource(random));
+        for (AgentRunner agentRunner : agents) {
+            agentRunner.iterate(this, RandomSource.nextSource(random));
         }
 
         closeAllSessionsInMap(); // We want to test opening new sessions each iteration.

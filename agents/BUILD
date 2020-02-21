@@ -1,6 +1,10 @@
 java_library(
     name = "agents",
-    srcs = glob(["*.java"]),
+    srcs = glob([
+        "*.java",
+        "base/*.java",
+        "common/*.java",
+    ]),
     visibility = ["//visibility:public"],
     deps = [
         "//common",
