@@ -31,14 +31,13 @@ public class EmploymentAgent extends CityAgent {
 
         List<String> employeeEmails;
         List<Long> companyNumbers;
-//        try ( GraknClient.Transaction tx = session.transaction().write()) {
-            employeeEmails = getEmployeeEmails(employmentDate);
-            companyNumbers = getCompanyNumbers();
-//        }  // A second transaction is being used to circumvent graknlabs/grakn issue #5585
-//        try ( GraknClient.Transaction tx = session.transaction().write()) {
-            allocate(employeeEmails, companyNumbers, this::insertEmployment);
-            tx().commit();
-//        }
+        employeeEmails = getEmployeeEmails(employmentDate);
+        companyNumbers = getCompanyNumbers();
+        tx().commit();
+        closeTx();
+        // A second transaction is being used to circumvent graknlabs/grakn issue #5585
+        allocate(employeeEmails, companyNumbers, this::insertEmployment);
+        tx().commit();
     }
 
     private List<Long> getCompanyNumbers() {
