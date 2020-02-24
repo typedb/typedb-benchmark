@@ -1,7 +1,7 @@
 package grakn.simulation;
 
 import grabl.tracing.client.GrablTracing;
-import grabl.tracing.client.StaticThreadTracing;
+import grabl.tracing.client.GrablTracingThreadStatic;
 import grakn.client.GraknClient;
 import grakn.client.GraknClient.Session;
 import grakn.client.GraknClient.Transaction;
@@ -37,7 +37,7 @@ import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import static grabl.tracing.client.GrablTracingFactory.*;
+import static grabl.tracing.client.GrablTracing.*;
 
 public class Simulation implements AgentContext, AutoCloseable {
 
@@ -164,19 +164,19 @@ public class Simulation implements AgentContext, AutoCloseable {
                     tracing = withLogging(tracing(grablTracingUri, grablTracingUsername, grablTracingToken));
                 }
                 GrablTracing.Analysis analysis = tracing.analysis(grablTracingOrganisation, grablTracingRepository, grablTracingCommit);
-                StaticThreadTracing.setAnalysis(analysis);
+                GrablTracingThreadStatic.setAnalysis(analysis);
 
                 grakn = new GraknClient(graknHostUri);
 
                 try (Session session = grakn.session(graknKeyspace)) {
                     // TODO: merge these two schema files once this issue is fixed
                     // https://github.com/graknlabs/grakn/issues/5553
-                    try (StaticThreadTracing.ThreadContext context = StaticThreadTracing.contextOnThread("schema", 0)) {
+                    try (GrablTracingThreadStatic.ThreadContext context = GrablTracingThreadStatic.contextOnThread("schema", 0)) {
                         loadSchema(session,
                                 files.get("schema.gql"),
                                 files.get("schema-pt2.gql"));
                     }
-                    try (StaticThreadTracing.ThreadContext context = StaticThreadTracing.contextOnThread("data", 0)) {
+                    try (GrablTracingThreadStatic.ThreadContext context = GrablTracingThreadStatic.contextOnThread("data", 0)) {
                         loadData(session,
                                 files.get("data.yaml"),
                                 files.get("currencies.yaml"));

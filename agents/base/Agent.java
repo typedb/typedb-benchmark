@@ -1,6 +1,6 @@
 package grakn.simulation.agents.base;
 
-import grabl.tracing.client.StaticThreadTracing.ThreadContext;
+import grabl.tracing.client.GrablTracingThreadStatic.ThreadContext;
 import grakn.client.GraknClient;
 import grakn.simulation.agents.RandomValueGenerator;
 import grakn.simulation.agents.World;
@@ -12,7 +12,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
-import static grabl.tracing.client.StaticThreadTracing.contextOnThread;
+import static grabl.tracing.client.GrablTracingThreadStatic.contextOnThread;
 
 /**
  * An agent that performs some unit of work across an object in the simulation world. Agent definitions must extend
