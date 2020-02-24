@@ -1,5 +1,6 @@
 package grakn.simulation.agents.base;
 
+import grabl.tracing.client.GrablTracingThreadStatic.ThreadContext;
 import grakn.client.GraknClient;
 import grakn.simulation.agents.RandomValueGenerator;
 import grakn.simulation.agents.World;
@@ -10,6 +11,8 @@ import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
+
+import static grabl.tracing.client.GrablTracingThreadStatic.contextOnThread;
 
 /**
  * An agent that performs some unit of work across an object in the simulation world. Agent definitions must extend
@@ -28,6 +31,7 @@ public abstract class Agent<T> implements AutoCloseable {
     private String sessionKey;
     private String tracker;
     private LogWrapper logWrapper;
+    private ThreadContext context;
 
     void init(AgentContext agentContext, Random random, T item, String sessionKey, String tracker, Logger logger) {
         this.agentContext = agentContext;
@@ -37,6 +41,7 @@ public abstract class Agent<T> implements AutoCloseable {
         this.tracker = tracker;
 
         this.logWrapper = new LogWrapper(logger);
+        context = contextOnThread(tracker(), simulationStep());
     }
 
     private GraknClient.Transaction tx;
@@ -112,13 +117,14 @@ public abstract class Agent<T> implements AutoCloseable {
         Collections.shuffle(list, random);
     }
 
-    protected <T> T pickOne(List<T> list) {
+    protected <U> U pickOne(List<U> list) {
         return list.get(random().nextInt(list.size()));
     }
 
     @Override
     public void close() {
         closeTx();
+        context.close();
     }
 
     public abstract void iterate();
