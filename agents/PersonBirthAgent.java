@@ -45,7 +45,7 @@ public class PersonBirthAgent extends CityAgent {
         GraqlInsert query =
                 Graql.match(
                         Graql.var("c").isa("city")
-                                .has("name", city().toString()))
+                                .has("location-name", city().toString()))
                         .insert(Graql.var("p").isa("person")
                                         .has("email", email)
                                         .has("date-of-birth", today())

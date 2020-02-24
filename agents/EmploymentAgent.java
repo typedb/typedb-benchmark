@@ -54,7 +54,7 @@ public class EmploymentAgent extends CityAgent {
 
     private void insertEmployment(String employeeEmail, Long companyNumber){
         GraqlInsert insertEmploymentQuery = Graql.match(
-                Graql.var("city").isa("city").has("name", city().name()),
+                Graql.var("city").isa("city").has("location-name", city().name()),
                 Graql.var("p").isa("person").has("email", employeeEmail),
                 Graql.var("company").isa("company").has("company-number", companyNumber)
         ).insert(

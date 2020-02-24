@@ -61,7 +61,7 @@ public class MarriageAgent extends CityAgent {
                 Graql.not(Graql.var("m").isa("marriage").rel(marriageRole, personVar)),
                 Graql.var("r").isa("residency").rel("residency_resident", personVar).rel("residency_location", cityVar),
                 Graql.not(Graql.var("r").has("end-date", Graql.var("ed"))),
-                cityVar.isa("city").has("name", city().name())
+                cityVar.isa("city").has("location-name", city().name())
         ).get("email");
     }
 
@@ -71,7 +71,7 @@ public class MarriageAgent extends CityAgent {
         GraqlInsert marriageQuery = Graql.match(
                 Graql.var("husband").isa("person").has("email", husbandEmail),
                 Graql.var("wife").isa("person").has("email", wifeEmail),
-                Graql.var("city").isa("city").has("name", city().name())
+                Graql.var("city").isa("city").has("location-name", city().name())
         ).insert(
                 Graql.var("m").isa("marriage")
                         .rel("marriage_husband", "husband")

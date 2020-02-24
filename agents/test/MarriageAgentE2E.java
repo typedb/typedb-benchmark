@@ -30,14 +30,14 @@ public class MarriageAgentE2E {
     public void testMarriageAgentInsertsTheExpectedNumberOfMarriages() {
         try (GraknClient.Session session = graknClient.session(KEYSPACE)) {
             try (GraknClient.Transaction tx = session.transaction().write()) {
-                GraqlGet.Aggregate marriagesCountQuery = Graql.match(
+                GraqlGet.Aggregate countQuery = Graql.match(
                         var("m").isa("marriage").rel("marriage_husband", "husband").rel("marriage_wife", "wife")
                 ).get().count();
 
-                List<Numeric> answer = tx.execute(marriagesCountQuery);
-                int numMarriages = answer.get(0).number().intValue();
-                int expectedNumMarriages = 122;
-                assertThat(numMarriages, equalTo(expectedNumMarriages));
+                List<Numeric> answer = tx.execute(countQuery);
+                int numAnswers = answer.get(0).number().intValue();
+                int expectedNumAnswers = 129;
+                assertThat(numAnswers, equalTo(expectedNumAnswers));
             }
         }
     }

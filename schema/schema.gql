@@ -3,6 +3,8 @@ define
 name sub attribute,
     datatype string;
 
+location-name sub name;
+
 organisation-name sub name;
 company-name sub organisation-name;
 university-name sub organisation-name;
@@ -200,7 +202,7 @@ charity sub organisation,
     plays transaction_buyer;
 
 location sub entity,
-    key name,
+    key location-name,
     plays location-hierarchy_superior,
     plays location-hierarchy_subordinate,
     plays relocation_previous-location,
@@ -224,7 +226,8 @@ country sub location,
 
 state sub location;
 
-continent sub location;
+continent sub location,
+    plays produced-in_continent;
 
 location-hierarchy sub relation,
     relates location-hierarchy_superior,
@@ -289,9 +292,14 @@ transaction sub relation,
 
 product sub entity,
     key product-barcode,
-    key product-name,
+    has product-name,
     has product-description,
-    plays transaction_merchandise;
+    plays transaction_merchandise,
+    plays produced-in_product;
+
+produced-in sub relation,
+    relates produced-in_product,
+    relates produced-in_continent;
 
 service sub entity,
     key service-id,

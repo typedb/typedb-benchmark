@@ -31,14 +31,14 @@ public class ParentshipAgentE2E {
         // Note that that parentships with additional children will be counted a number of times equal to the number of children
         try (GraknClient.Session session = graknClient.session(KEYSPACE)) {
             try (GraknClient.Transaction tx = session.transaction().write()) {
-                GraqlGet.Aggregate parentshipsCountQuery = Graql.match(
+                GraqlGet.Aggregate countQuery = Graql.match(
                         var("p").isa("parentship").rel("parentship_parent", "p1").rel("parentship_parent", "p2").rel("parentship_child", "ch")
                 ).get().count();
 
-                List<Numeric> answer = tx.execute(parentshipsCountQuery);
-                int numParentships = answer.get(0).number().intValue();
-                int expectedNumParentships = 540;
-                assertThat(numParentships, equalTo(expectedNumParentships));
+                List<Numeric> answer = tx.execute(countQuery);
+                int numAnswers = answer.get(0).number().intValue();
+                int expectedNumAnswers = 540;
+                assertThat(numAnswers, equalTo(expectedNumAnswers));
             }
         }
     }

@@ -49,7 +49,7 @@ public class RelocationAgent extends CityAgent {
     static GraqlGet.Unfiltered cityResidentsQuery(World.City city, LocalDateTime earliestDate) {
         return Graql.match(
                 Graql.var("person").isa("person").has("email", Graql.var("email")),
-                Graql.var("city").isa("city").has("name", city.name()),
+                Graql.var("city").isa("city").has("location-name", city.name()),
                 Graql.var("r").isa("residency")
                         .rel("residency_resident", "person")
                         .rel("residency_location", "city")
@@ -68,8 +68,8 @@ public class RelocationAgent extends CityAgent {
     private List<String> getRelocationCityNames() {
 
         GraqlGet.Unfiltered relocationCitiesQuery = Graql.match(
-                Graql.var("city").isa("city").has("name", Graql.var("city-name")),
-                Graql.var("continent").isa("continent").has("name", city().country().continent().name()),
+                Graql.var("city").isa("city").has("location-name", Graql.var("city-name")),
+                Graql.var("continent").isa("continent").has("location-name", city().country().continent().name()),
                 Graql.var("lh1").isa("location-hierarchy").rel("city").rel("continent"),
                 Graql.var("city-name").neq(city().name())
         ).get();
@@ -81,8 +81,8 @@ public class RelocationAgent extends CityAgent {
     private void insertRelocation(String email, String newCityName) {
         GraqlInsert relocatePersonQuery = Graql.match(
                 Graql.var("p").isa("person").has("email", email),
-                Graql.var("new-city").isa("city").has("name", newCityName),
-                Graql.var("old-city").isa("city").has("name", city().name())
+                Graql.var("new-city").isa("city").has("location-name", newCityName),
+                Graql.var("old-city").isa("city").has("location-name", city().name())
         ).insert(
                 Graql.var("r").isa("relocation")
                         .rel("relocation_previous-location", "old-city")

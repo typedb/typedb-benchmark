@@ -29,9 +29,9 @@ public class CompanyAgentE2E {
     public void testCompanyAgentInsertsTheExpectedNumberOfCompanies() {
         try (GraknClient.Session session = graknClient.session(KEYSPACE)) {
             try (GraknClient.Transaction tx = session.transaction().write()) {
-                GraqlGet.Aggregate countryCountQuery = Graql.match(
+                GraqlGet.Aggregate countQuery = Graql.match(
                         var("country").isa("country")
-                                .has("name", var("country-name")),
+                                .has("location-name", var("country-name")),
                         var("company").isa("company")
                                 .has("company-name", var("company-name"))
                                 .has("company-number", var("company-number")),
@@ -41,9 +41,10 @@ public class CompanyAgentE2E {
                                 .has("date-of-incorporation", var("date-today"))
                 ).get().count();
 
-                List<Numeric> answer = tx.execute(countryCountQuery);
-                int num = answer.get(0).number().intValue();
-                assertThat(num, equalTo(350));
+                List<Numeric> answer = tx.execute(countQuery);
+                int numAnswers = answer.get(0).number().intValue();
+                int expectedNumAnswers = 350;
+                assertThat(numAnswers, equalTo(expectedNumAnswers));
             }
         }
     }

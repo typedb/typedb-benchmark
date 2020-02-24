@@ -83,3 +83,20 @@ java_test(
         "//dependencies/maven/artifacts/org/hamcrest:hamcrest",
     ],
 )
+
+java_test(
+    name = "ProductAgentE2E",
+    srcs = [
+        "ProductAgentE2E.java",
+        "common/TestArgsInterpreter.java",
+    ],
+    test_class = "grakn.simulation.agents.test.ProductAgentE2E",
+    deps = [
+        # External dependencies from @graknlabs
+        "@graknlabs_client_java//:client-java",
+        "@graknlabs_graql//java:graql",
+
+        # External dependencies from Maven
+        "//dependencies/maven/artifacts/org/hamcrest:hamcrest",
+    ],
+)

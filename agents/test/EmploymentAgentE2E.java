@@ -26,12 +26,12 @@ public class EmploymentAgentE2E {
     }
 
     @Test
-    public void testParentshipAgentInsertsTheExpectedNumberOfParentships() {
+    public void testEmploymentAgentInsertsTheExpectedNumberOfEmployments() {
 
         // Note that that parentships with additional children will be counted a number of times equal to the number of children
         try (GraknClient.Session session = graknClient.session(KEYSPACE)) {
             try (GraknClient.Transaction tx = session.transaction().write()) {
-                GraqlGet.Aggregate parentshipsCountQuery = Graql.match(
+                GraqlGet.Aggregate countQuery = Graql.match(
                         Graql.var("emp").isa("employment")
                                 .rel("employment_employee", Graql.var("p"))
                                 .rel("employment_employer", Graql.var("company"))
@@ -40,7 +40,7 @@ public class EmploymentAgentE2E {
                                 .has("annual-wage", Graql.var("annual-wage"))
                 ).get().count();
 
-                List<Numeric> answer = tx.execute(parentshipsCountQuery);
+                List<Numeric> answer = tx.execute(countQuery);
                 int numAnswers = answer.get(0).number().intValue();
                 int expectedNumAnswers = 200;
                 assertThat(numAnswers, equalTo(expectedNumAnswers));
