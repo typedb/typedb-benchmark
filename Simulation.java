@@ -159,7 +159,7 @@ public class Simulation implements AgentContext, AutoCloseable {
             GrablTracing tracing = null;
             try {
                 if (disableTracing) {
-                    tracing = withLogging(noOpTracing());
+                    tracing = withLogging(tracingNoOp());
                 } else {
                     tracing = withLogging(tracing(grablTracingUri, grablTracingUsername, grablTracingToken));
                 }
