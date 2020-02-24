@@ -72,7 +72,7 @@ public class QueryCountE2E {
                         .rel("marriage_husband", "husband")
                         .rel("marriage_wife", "wife")
         ).get().count();
-        assertQueryCount(countQuery, 129);
+        assertQueryCount(countQuery, 116);
     }
 
     @Test
@@ -84,10 +84,10 @@ public class QueryCountE2E {
                         .rel("parentship_parent", "p2")
                         .rel("parentship_child", "ch")
         ).get().count();
-        assertQueryCount(countQuery, 540);
+        assertQueryCount(countQuery, 530);
     }
     @Test
-    public void testProductpAgentInsertsTheExpectedNumberOfProducts() {
+    public void testProductAgentInsertsTheExpectedNumberOfProducts() {
         GraqlGet.Aggregate countQuery = Graql.match(
                 Graql.var("continent")
                         .isa("continent")
@@ -116,6 +116,29 @@ public class QueryCountE2E {
                         .has("relocation-date", Graql.var("d"))
         ).get().count();
         assertQueryCount(countQuery, 80);
+    }
+
+    @Test
+    public void testTransactionAgentInsertsTheExpectedNumberOfTransactions() {
+        GraqlGet.Aggregate countQuery = Graql.match(
+                Graql.var("product")
+                        .isa("product")
+                        .has("product-barcode", Graql.var("product-barcode")),
+                Graql.var("c-buyer").isa("company")
+                        .has("company-number", Graql.var("buyer-company-number")),
+                Graql.var("c-seller").isa("company")
+                        .has("company-number", Graql.var("seller-company-number")),
+                        Graql.var("transaction")
+                                .isa("transaction")
+                                .rel("transaction_vendor", Graql.var("c-seller"))
+                                .rel("transaction_buyer", Graql.var("c-buyer"))
+                                .rel("transaction_merchandise", Graql.var("product"))
+//                                .has("currency")  // TODO Add currency
+                                .has("value", Graql.var("value"))
+                                .has("product-quantity", Graql.var("quantity"))
+//                        Graql.var("locates").isa("locates") // TODO Necessary?
+                ).get().count();
+        assertQueryCount(countQuery, 9625);
     }
 
     @After

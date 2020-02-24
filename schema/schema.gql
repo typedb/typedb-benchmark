@@ -97,6 +97,9 @@ description sub attribute,
 
 product-description sub description;
 
+product-quantity sub attribute,
+    datatype long;
+
 service-description sub description;
 
 person sub entity,
@@ -288,6 +291,7 @@ transaction sub relation,
     relates transaction_merchandise,
     has currency,
     has value,
+    has product-quantity,
     plays locates_located;
 
 product sub entity,

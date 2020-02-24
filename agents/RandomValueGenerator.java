@@ -18,12 +18,12 @@ public class RandomValueGenerator {
         return (in * (max - min)) + min;
     }
 
-    static int boundRandomInt(Random random, int min, int max) {
+    int boundRandomInt(int min, int max) {
         return random.nextInt(max - min) + min;
     }
 
     String boundRandomLengthRandomString(int minLength, int maxLength) {
-        return RandomStringUtils.random(boundRandomInt(random, minLength, maxLength), 0, 0, true, true, null, random);
+        return RandomStringUtils.random(boundRandomInt(minLength, maxLength), 0, 0, true, true, null, random);
     }
 
     double boundRandomDouble(Double min, Double max) {

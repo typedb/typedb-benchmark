@@ -1,24 +1,23 @@
 package grakn.simulation.agents;
 
-import grakn.client.exception.GraknClientException;
 import grakn.simulation.agents.common.ContinentAgent;
 import graql.lang.Graql;
+import graql.lang.query.GraqlGet;
 import graql.lang.query.GraqlInsert;
 
 public class ProductAgent extends ContinentAgent {
 
     private static int NUM_PRODUCTS = 5;
-    private static int NUM_INSERTION_ATTEMPTS = 5;
 
     @Override
     public void iterate() {
         for (int i = 0; i < NUM_PRODUCTS; i++) {
-            insertProduct();
+            insertProduct(i);
         }
         tx().commit();
     }
 
-    private void insertProduct() {
+    private void insertProduct(int iterationScopeId) {
         GraqlInsert insertProductQuery = Graql.match(
                 Graql.var("continent")
                         .isa("continent")
@@ -26,7 +25,7 @@ public class ProductAgent extends ContinentAgent {
         ).insert(
                 Graql.var("product")
                         .isa("product")
-                        .has("product-barcode", randomAttributeGenerator().boundRandomDouble(0.0, 10000.0)) // TODO Handle key clashes
+                        .has("product-barcode", Double.valueOf(hashcode(iterationScopeId)))
                         .has("product-name", randomAttributeGenerator().boundRandomLengthRandomString(5, 20))
                         .has("product-description", randomAttributeGenerator().boundRandomLengthRandomString(75, 100)),
                 Graql.var("prod")
@@ -36,5 +35,21 @@ public class ProductAgent extends ContinentAgent {
                 );
         log().query("insertProduct", insertProductQuery);
         tx().execute(insertProductQuery);
+    }
+
+    static GraqlGet.Unfiltered getProductsInContinentQuery(World.Continent continent) {
+        return Graql.match(
+                Graql.var("continent")
+                        .isa("continent")
+                        .has("location-name", continent.name()),
+                Graql.var("product")
+                        .isa("product")
+                        .has("product-barcode", Graql.var("product-barcode")),
+                Graql.var("prod")
+                        .isa("produced-in")
+                        .rel("produced-in_product", Graql.var("product"))
+                        .rel("produced-in_continent", Graql.var("continent"))
+
+        ).get();
     }
 }
