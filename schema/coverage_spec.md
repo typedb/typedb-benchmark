@@ -28,18 +28,26 @@ Following are schema/data patterns that are cases that we would like to ensure w
 - [ ] `Necessary?` Multiple abstract types in an inheritance
 ### Keys 
 - [x] `Implemented` Different types using the same attribute as their key (`location-name`, although `continent`, `country`, `city` are all within the `location` hierarchy)
+
 - [ ] Different types owning the same attribute, one as its key, the other not keyed
+
 - [x] `Only product-barcode implemented` Types using attributes as keys where the attribute types form a hierarchy (`identifier-double`)
+
 - Keying with each datatype:
 	- [x] `Implemented` long (`marriage-id`, `company-number`)
 	- [x] `Implemented` double (`product-barcode`)
 	- [x] `Implemented` string (`email`, `location-name`)
 	- [ ] boolean
 	- [ ] date
+	
 - [ ] Multiple keys for one thing type
-- [ ] Multiple keys for one thing type, with different datatypes
+
+- [x] `Implemented` Multiple keys for one thing type, with different datatypes (`company key company-name, key company-number`)
+
 - [x] `Disallowed` ~~An attribute owned by the parent but used as key by the child~~
+
 - [ ] `Possible? Necessary?` Keying on both of two attributes that are in a hierarchy together
+
 - [ ] `Possible?` Can a subtype of a key be used to key the thing keyed by its super type (at insertion time)?
 
 ### Attributes
@@ -72,7 +80,7 @@ Ternary and N-ary relations, with interesting numbers of roleplayers per role
 - [ ] Unary relation, where a thing instance plays one role once and there are no other roleplayers
 - [x] Symmetric relation (`friendship`, idea: `project-collaboration`)
 - [x] `Implemented` Antisymmetric relation (`employment`, `location-hierarchy`, `marriage`, `transaction`...)
-- [x] Transitive relation
+- [x] `Implemented` Transitive relation (`location-hierarchy`)
 - Reflexive relation (`data-sourcing` as an example relation, or a court ruling, which could be on another ruling). There are two senses here:
 	- [ ] A relation that plays a role in itself
 	- [ ] A thing instance that plays two roles in the same relation instance

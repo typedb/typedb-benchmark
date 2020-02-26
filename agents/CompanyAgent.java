@@ -22,13 +22,8 @@ public class CompanyAgent extends CountryAgent {
         String adjective = pickOne(world().getAdjectives());
         String noun = pickOne(world().getNouns());
 
-        String companyName = StringUtils.capitalize(adjective) + StringUtils.capitalize(noun);
-
-        String companyNumberString = companyName
-                + i
-                + simulationStep() + "_"
-                + country().name();
-        int companyNumber = companyNumberString.hashCode();
+        int companyNumber = uniqueID(i);
+        String companyName = StringUtils.capitalize(adjective) + StringUtils.capitalize(noun) + "-" + companyNumber;
 
         GraqlInsert query =
                 Graql.match(

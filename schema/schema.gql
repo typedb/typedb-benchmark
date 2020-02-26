@@ -293,7 +293,7 @@ organisation sub entity;
 
 company sub organisation,
     # We may want to say `has company-name as organisation-name;`
-    has company-name,
+    key company-name,
     key company-number,
     plays employment_employer,
     plays transaction_vendor,
