@@ -115,3 +115,7 @@ Ternary and N-ary relations, with interesting numbers of roleplayers per role
 - [ ] (Future) see how quickly an indexed schema pattern comes into effect and the speed improvement
 - Matching across data and schema in single queries, e.g.:
   - [ ] `match $d type my-attribute; $d datatype string; get;`
+- Supernodes
+  - [ ] Entities
+  - [ ] Attributes
+  - [ ] Relations

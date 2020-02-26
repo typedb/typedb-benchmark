@@ -107,8 +107,58 @@ product-quantity sub attribute,
 service-description sub description;
 
 #######################################################################
-# Entities and Relations
+# Entities and Relations, by approximate category
 #######################################################################
+
+# ----------------------------
+# Geography
+# ----------------------------
+
+location sub entity,
+    abstract,
+    key location-name,
+    plays location-hierarchy_superior,
+    plays location-hierarchy_subordinate,
+    plays relocation_previous-location,
+    plays relocation_new-location,
+    plays locates_location,
+    plays born-in_place-of-birth;  # TODO Can we avoid using this but also avoid validation errors?
+
+city sub location,
+    plays residency_location;
+
+country sub location,
+    plays currency-adoption_adopting-country,
+    plays incorporation_incorporating;
+
+continent sub location,
+    plays produced-in_continent;
+
+location-hierarchy sub relation,
+    relates location-hierarchy_superior,
+    relates location-hierarchy_subordinate;
+
+locates sub relation,
+    relates locates_location,
+    relates locates_located;
+
+# ----------------------------
+# Currency
+# ----------------------------
+
+currency-adoption sub relation,
+    has start-date,
+    has end-date,
+    relates currency-adoption_adopting-country,
+    relates currency-adoption_currency-adopted;
+
+current-currency sub currency-adoption,
+    relates currency-adoption_adopting-country,
+    relates currency-adoption_currency-adopted;
+
+# ----------------------------
+# Friends and Family
+# ----------------------------
 
 person sub entity,
     key email,
@@ -143,6 +193,58 @@ marriage sub relation,
     relates marriage_husband,
     relates marriage_wife,
     plays locates_located;
+
+# ----------------------------
+# Individuals
+# ----------------------------
+
+residency sub relation,
+    has start-date,
+    has end-date,
+    relates residency_resident,
+    relates residency_location;
+
+relocation sub relation,
+    has relocation-date,
+    relates relocation_previous-location,
+    relates relocation_new-location,
+    relates relocation_relocated-person;
+
+born-in sub locates,
+    relates born-in_place-of-birth as locates_location,
+    relates born-in_child as locates_located;
+
+# ----------------------------
+# Organisational Structure
+# ----------------------------
+
+organisation sub entity;
+
+company sub organisation,
+    # We may want to say `has company-name as organisation-name;`
+    has company-name,
+    key company-number,
+    plays employment_employer,
+    plays transaction_vendor,
+    plays transaction_buyer,
+    plays incorporation_incorporated;
+
+incorporation sub relation,
+    has date-of-incorporation,
+    relates incorporation_incorporated,
+    relates incorporation_incorporating;
+
+university sub organisation,
+    has university-name,
+    plays employment_employer,
+    plays studentship_school,
+    plays transaction_vendor,
+    plays transaction_buyer;
+
+charity sub organisation,
+    has charity-name,
+    plays volunteering_cause,
+    plays transaction_buyer;
 
 membership sub relation,
 #    key identifier,
@@ -183,61 +285,6 @@ occupation sub entity,
     key name;
 #    plays employment_profession;
 
-organisation sub entity;
-
-company sub organisation,
-    # We may want to say `has company-name as organisation-name;`
-    has company-name,
-    key company-number,
-    plays employment_employer,
-    plays transaction_vendor,
-    plays transaction_buyer,
-    plays incorporation_incorporated;
-
-university sub organisation,
-    has university-name,
-    plays employment_employer,
-    plays studentship_school,
-    plays transaction_vendor,
-    plays transaction_buyer;
-
-charity sub organisation,
-    has charity-name,
-    plays volunteering_cause,
-    plays transaction_buyer;
-
-location sub entity,
-    abstract,
-    key location-name,
-    plays location-hierarchy_superior,
-    plays location-hierarchy_subordinate,
-    plays relocation_previous-location,
-    plays relocation_new-location,
-    plays locates_location,
-    plays born-in_place-of-birth;  # TODO Can we avoid using this but also avoid validation errors?
-
-city sub location,
-    plays residency_location;
-
-country sub location,
-    plays currency-adoption_adopting-country,
-    plays incorporation_incorporating;
-
-continent sub location,
-    plays produced-in_continent;
-
-location-hierarchy sub relation,
-    relates location-hierarchy_superior,
-    relates location-hierarchy_subordinate;
-
-locates sub relation,
-    relates locates_location,
-    relates locates_located;
-
-born-in sub locates,
-    relates born-in_place-of-birth as locates_location,
-    relates born-in_child as locates_located;
-
 legal-document sub entity,
     has date-signed,
     has text-content;
@@ -249,15 +296,9 @@ employment-contract sub legal-contract,
     has contract-content,
     has contracted-hours;
 
-currency-adoption sub relation,
-    has start-date,
-    has end-date,
-    relates currency-adoption_adopting-country,
-    relates currency-adoption_currency-adopted;
-
-current-currency sub currency-adoption,
-    relates currency-adoption_adopting-country,
-    relates currency-adoption_currency-adopted;
+# ----------------------------
+# Organisational Trade
+# ----------------------------
 
 transaction sub relation,
     relates transaction_buyer,
@@ -284,23 +325,6 @@ service sub entity,
     has service-name,
     has service-description,
     plays transaction_merchandise;
-
-residency sub relation,
-    has start-date,
-    has end-date,
-    relates residency_resident,
-    relates residency_location;
-
-relocation sub relation,
-    has relocation-date,
-    relates relocation_previous-location,
-    relates relocation_new-location,
-    relates relocation_relocated-person;
-
-incorporation sub relation,
-    has date-of-incorporation,
-    relates incorporation_incorporated,
-    relates incorporation_incorporating;
 
 #######################################################################
 # Rules
