@@ -3,6 +3,7 @@ package grakn.simulation;
 import grakn.simulation.agents.*;
 import grakn.simulation.agents.base.AgentRunner;
 import grakn.simulation.agents.common.CityAgentRunner;
+import grakn.simulation.agents.common.ContinentAgentRunner;
 import grakn.simulation.agents.common.CountryAgentRunner;
 
 public class AgentRunnerList {
@@ -12,6 +13,8 @@ public class AgentRunnerList {
             new CityAgentRunner(ParentshipAgent.class),
             new CityAgentRunner(RelocationAgent.class),
             new CountryAgentRunner(CompanyAgent.class),
-            new CityAgentRunner(EmploymentAgent.class)
+            new CityAgentRunner(EmploymentAgent.class),
+            new ContinentAgentRunner(ProductAgent.class),
+            new CountryAgentRunner(TransactionAgent.class)
     };
 }

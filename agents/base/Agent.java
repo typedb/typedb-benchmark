@@ -127,6 +127,16 @@ public abstract class Agent<T> implements AutoCloseable {
         context.close();
     }
 
+    /**
+     * Create a unique identifier, useful for creating keys without risk of collision
+     * @param iterationScopeId An id that uniquely identifies a concept within the scope of the agent at a particular iteration
+     * @return
+     */
+    protected int hashcode(int iterationScopeId) {
+        String id = simulationStep() + tracker() + iterationScopeId;
+        return id.hashCode();
+    }
+
     public abstract void iterate();
 
     public class LogWrapper {

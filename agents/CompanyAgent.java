@@ -33,7 +33,7 @@ public class CompanyAgent extends CountryAgent {
         GraqlInsert query =
                 Graql.match(
                         Graql.var("country").isa("country")
-                                .has("name", country().name()))
+                                .has("location-name", country().name()))
                         .insert(Graql.var("company").isa("company")
                                         .has("company-name", companyName)
                                         .has("company-number", companyNumber),
@@ -49,7 +49,7 @@ public class CompanyAgent extends CountryAgent {
     static GraqlGet getCompanyNumbersInCountryQuery(World.Country country) {
         return Graql.match(
                 Graql.var("country").isa("country")
-                        .has("name", country.name()),
+                        .has("location-name", country.name()),
                 Graql.var("company").isa("company")
                         .has("company-number", Graql.var("company-number")),
                 Graql.var("reg").isa("incorporation")

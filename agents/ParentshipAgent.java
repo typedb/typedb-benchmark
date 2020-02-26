@@ -52,7 +52,7 @@ public class ParentshipAgent extends CityAgent {
     private List<HashMap<String, String>> getMarriageEmails() {
         GraqlGet.Sorted marriageQuery = Graql.match(
                 Graql.var("city").isa("city")
-                        .has("name", city().name()),
+                        .has("location-name", city().name()),
                 Graql.var("m").isa("marriage")
                         .rel("marriage_husband", Graql.var("husband"))
                         .rel("marriage_wife", Graql.var("wife"))
@@ -87,7 +87,7 @@ public class ParentshipAgent extends CityAgent {
 
         GraqlGet.Unfiltered childrenQuery = Graql.match(
                 Graql.var("c").isa("city")
-                        .has("name", city().name()),
+                        .has("location-name", city().name()),
                 Graql.var("child").isa("person")
                         .has("email", Graql.var("email"))
                         .has("date-of-birth", dateToday),
