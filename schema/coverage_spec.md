@@ -27,7 +27,7 @@ Following are schema/data patterns that are cases that we would like to ensure w
   - [x] `Implemented` Attributes (`name`)
 - [ ] `Necessary?` Multiple abstract types in an inheritance
 ### Keys 
-- [ ] Different types using the same attribute as their key
+- [x] `Implemented` Different types using the same attribute as their key (`location-name`, although `continent`, `country`, `city` are all within the `location` hierarchy)
 - [ ] Different types owning the same attribute, one as its key, the other not keyed
 - [x] `Only product-barcode implemented` Types using attributes as keys where the attribute types form a hierarchy (`identifier-double`)
 - Keying with each datatype:
@@ -44,7 +44,7 @@ Following are schema/data patterns that are cases that we would like to ensure w
 
 ### Attributes
 
-- [x] Attribute playing a (non-implicit) role in a relation (`currency plays plays currency-adoption_currency-adopted`)
+- [ ] Attribute playing a (non-implicit) role in a relation
 - [x] `Easy to implement language on text-content of employment-contract` Attribute of attribute (`language`)
 - [ ] `Deemed unnecessary for now` ~~Attribute of attribute of attribute~~
 - [x] `Implemented` Attribute hierarchies (`sub date-of-event`)
@@ -57,7 +57,7 @@ Following are schema/data patterns that are cases that we would like to ensure w
 - Implicit relations:
   - [ ] adding new roleplayers to them
   - [x] `Easy to implement currency on annual-wage` adding attributes to them
-- [x] Regex for strings
+- [x] `Only implemented for initialisation data` Regex for strings (`currency`, `currency-code`)
 - [ ] `Implement as an update of people's age based on DoB` Attribute value updates (deletion of implicit relations with via and adding new attribute)
 - [ ] Box shape where two things are in a hierarchy each owning an attribute, where the attributes are also in a hierarchy
 
@@ -88,9 +88,9 @@ Ternary and N-ary relations, with interesting numbers of roleplayers per role
 - [x] `Implemented` Rules for relations that also have materialised instances (`born-in-transitivity`, `location-hierarchy-transitivity`)
 - [x] `Implemented` Inferred attribute (`born-in-location-implies-residency-date`, `person-relocating-ends-old-residency`, `person-membership-of-organisation-means-relocation-date`)
 - Inferred attribute using value from the `when`
-	- [ ] as the same type in the `then`
+	- [x] `Implemented` as the same type in the `then` (`transaction-currency-is-that-of-the-country`)
 	- [x] `Implemented` transposing to a different type in the `then` (`person-relocating-ends-old-residency`, `born-in-location-implies-residency-date`)
-- [x] Inferred complex type (`country-currently-uses-currency`)
+- [ ] Inferred complex type
 - [ ] `Necessary?` Inferred entity
 - [x] `Implemented` Successive/compound/recursive rules (those regarding `born-in` and `residency`)
 - [x] `Implemented` `when` bodies with a relation(s) where the relation(s) don't have a variable ascribed to them (`person-membership-of-organisation-means-relocation`)

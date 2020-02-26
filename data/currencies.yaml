@@ -1,8 +1,9 @@
 template: insert $x <0> isa currency, has currency-code <1>;
 data: |
+  American Dollar,USD
   Great British Pound,GBP
   Euro,EUR
-  American Dollar,USD
-  Indian Rupee,INR
-  Malaysian Ringgit,MYR
-  Indonesian Rupiah,IDR
+  Brazilian Real,BRL
+  South African Rand,ZAR
+  Renminbi,RMB
+  Australian Dollar,AUD

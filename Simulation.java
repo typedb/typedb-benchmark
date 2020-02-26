@@ -179,7 +179,8 @@ public class Simulation implements AgentContext, AutoCloseable {
                     try (GrablTracingThreadStatic.ThreadContext context = GrablTracingThreadStatic.contextOnThread("data", 0)) {
                         loadData(session,
                                 files.get("data.yaml"),
-                                files.get("currencies.yaml"));
+                                files.get("currencies.yaml"),
+                                files.get("country_currencies.yaml"));
                     }
                 }
 

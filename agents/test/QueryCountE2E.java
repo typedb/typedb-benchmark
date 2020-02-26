@@ -128,15 +128,20 @@ public class QueryCountE2E {
                         .has("company-number", Graql.var("buyer-company-number")),
                 Graql.var("c-seller").isa("company")
                         .has("company-number", Graql.var("seller-company-number")),
-                        Graql.var("transaction")
-                                .isa("transaction")
-                                .rel("transaction_vendor", Graql.var("c-seller"))
-                                .rel("transaction_buyer", Graql.var("c-buyer"))
-                                .rel("transaction_merchandise", Graql.var("product"))
-//                                .has("currency")  // TODO Add currency
-                                .has("value", Graql.var("value"))
-                                .has("product-quantity", Graql.var("quantity"))
-//                        Graql.var("locates").isa("locates") // TODO Necessary?
+                Graql.var("country").isa("country")
+                        .has("location-name", Graql.var("country-name")),
+                Graql.var("transaction")
+                        .isa("transaction")
+                        .rel("transaction_vendor", Graql.var("c-seller"))
+                        .rel("transaction_buyer", Graql.var("c-buyer"))
+                        .rel("transaction_merchandise", Graql.var("product"))
+//                        .has("currency", Graql.var("currency-name")) // Requires reasoning over lots of results, test times out
+                        .has("value", Graql.var("value"))
+                        .has("product-quantity", Graql.var("quantity")),
+                Graql.var("locates")
+                        .isa("locates")
+                        .rel("locates_location", Graql.var("country"))
+                        .rel("locates_located", Graql.var("transaction"))
                 ).get().count();
         assertQueryCount(countQuery, 9625);
     }

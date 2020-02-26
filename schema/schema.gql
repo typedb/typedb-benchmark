@@ -67,13 +67,12 @@ annual-wage sub attribute,
 
 currency-code sub attribute,
     datatype string,
-    regex "^(GBP|EUR|USD|INR|MYR|IDR)$";
+    regex "^(USD|GBP|EUR|BRL|ZAR|RMB|AUD)$";
 
 currency sub attribute, 
     datatype string,
-    regex "^(Great British Pound|Euro|American Dollar|Indian Rupee|Malaysian Ringgit|Indonesian Rupiah)$",
-    has currency-code,
-    plays currency-adoption_currency-adopted;
+    regex "^(American Dollar|Great British Pound|Euro|Brazilian Real|South African Rand|Renminbi|Australian Dollar)$",
+    has currency-code;
 
 value sub attribute,
     datatype double;
@@ -111,7 +110,7 @@ service-description sub description;
 #######################################################################
 
 # --------------------------------------------------------
-# Regions
+# Locations
 # --------------------------------------------------------
 
 location sub entity,
@@ -128,7 +127,7 @@ city sub location,
     plays residency_location;
 
 country sub location,
-    plays currency-adoption_adopting-country,
+    has currency,
     plays incorporation_incorporating;
 
 continent sub location,
@@ -154,42 +153,11 @@ when {
 # Currency
 # --------------------------------------------------------
 
-currency-adoption sub relation,
-    has start-date,
-    has end-date,
-    relates currency-adoption_adopting-country,
-    relates currency-adoption_currency-adopted;
-
-current-currency sub currency-adoption,
-    relates currency-adoption_adopting-country,
-    relates currency-adoption_currency-adopted;
-
-country-currently-uses-currency sub rule,
-when {
-    $ca isa currency-adoption;
-    not {$ca has end-date $ed;};
-}, then {
-    $ca isa current-currency;
-};
-
-transaction-currency-is-that-of-the-location sub rule,
-when {
-    $transaction isa transaction;
-    $l(locates_located: $transaction, locates_location: $transaction-location) isa locates;
-    $lh(location-hierarchy_subordinate: $transaction-location, location-hierarchy_superior: $loc-country) isa location-hierarchy;
-    $loc-country isa country;
-    $cc(currency-adoption_adopting-country: $loc-country, currency-adoption_currency-adopted: $currency) isa current-currency;
-}, then {
-    $transaction has currency $currency;
-};
-
-# This rule could be avoided by a disjunction in the rule body of `transaction-currency-is-that-of-the-location`
 transaction-currency-is-that-of-the-country sub rule,
 when {
     $transaction isa transaction;
     $l(locates_located: $t, locates_location: $transaction-location) isa locates;
-    $transaction-country isa country;
-    $cc(currency-adoption_adopting-country: $transaction-country, currency-adoption_currency-adopted: $currency) isa current-currency;
+    $transaction-country isa country, has currency $currency;
 }, then {
     $transaction has currency $currency;
 };
