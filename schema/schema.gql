@@ -74,7 +74,7 @@ currency sub attribute,
 value sub attribute,
     datatype double;
 
-data-signed sub attribute,
+date-signed sub attribute,
     datatype date;
 
 email sub attribute,
@@ -109,8 +109,6 @@ person sub entity,
     has gender,
     has date-of-birth,
     plays employment_employee,
-    plays employment_full-time-employee,
-    plays employment_part-time-employee,
     plays volunteering_volunteer,
     plays studentship_student,
     plays parentship_parent,
@@ -139,7 +137,6 @@ marriage sub relation,
     plays locates_located;
 
 membership sub relation,
-    abstract,
 #    key identifier,
     has start-date,
     has end-date,
@@ -149,8 +146,6 @@ membership sub relation,
 employment sub membership,
     # key employment-id as membership-id, # We might want to say this?
     relates employment_employee as membership_member,
-    relates employment_part-time-employee as employment_employee,
-    relates employment_full-time-employee as employment_employee,
     relates employment_employer as membership_group,
     # relates employment_contract,
     # relates employment_profession,  # https://github.com/graknlabs/grakn/issues/5553
@@ -180,8 +175,7 @@ occupation sub entity,
     key name;
 #    plays employment_profession;
 
-organisation sub entity,
-    abstract;
+organisation sub entity;
 
 company sub organisation,
     # We may want to say `has company-name as organisation-name;`
@@ -205,6 +199,7 @@ charity sub organisation,
     plays transaction_buyer;
 
 location sub entity,
+    abstract,
     key location-name,
     plays location-hierarchy_superior,
     plays location-hierarchy_subordinate,
@@ -213,21 +208,12 @@ location sub entity,
     plays locates_location,
     plays born-in_place-of-birth;  # TODO Can we avoid using this but also avoid validation errors?
 
-area sub location,
-    plays born-in_place-of-birth,
-    plays residency_location;
-
 city sub location,
-    plays born-in_place-of-birth,
     plays residency_location;
-
-county sub location;
 
 country sub location,
     plays currency-adoption_adopting-country,
     plays incorporation_incorporating;
-
-state sub location;
 
 continent sub location,
     plays produced-in_continent;
@@ -265,7 +251,7 @@ when {
 };
 
 legal-document sub entity,
-    has data-signed,
+    has date-signed,
     has text-content;
 
 legal-contract sub legal-document;
@@ -307,7 +293,7 @@ produced-in sub relation,
 
 service sub entity,
     key service-id,
-    key service-name,
+    has service-name,
     has service-description,
     plays transaction_merchandise;
 
