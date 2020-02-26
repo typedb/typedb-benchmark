@@ -107,11 +107,11 @@ product-quantity sub attribute,
 service-description sub description;
 
 #######################################################################
-# Entities and Relations, by approximate category
+# Entities, Relations and Rules, by approximate category
 #######################################################################
 
 # ----------------------------
-# Geography
+# Regions
 # ----------------------------
 
 location sub entity,
@@ -142,6 +142,14 @@ locates sub relation,
     relates locates_location,
     relates locates_located;
 
+location-hierarchy-transitivity sub rule,
+when {
+    $lh1(location-hierarchy_superior: $a, location-hierarchy_subordinate: $b) isa location-hierarchy;
+    $lh2(location-hierarchy_superior: $b, location-hierarchy_subordinate: $c) isa location-hierarchy;
+}, then {
+    (location-hierarchy_superior: $a, location-hierarchy_subordinate: $c) isa location-hierarchy;
+};
+
 # ----------------------------
 # Currency
 # ----------------------------
@@ -155,6 +163,36 @@ currency-adoption sub relation,
 current-currency sub currency-adoption,
     relates currency-adoption_adopting-country,
     relates currency-adoption_currency-adopted;
+
+country-currently-uses-currency sub rule,
+when {
+    $ca isa currency-adoption;
+    not {$ca has end-date $ed;};
+}, then {
+    $ca isa current-currency;
+};
+
+transaction-currency-is-that-of-the-location sub rule,
+when {
+    $transaction isa transaction;
+    $l(locates_located: $transaction, locates_location: $transaction-location) isa locates;
+    $lh(location-hierarchy_subordinate: $transaction-location, location-hierarchy_superior: $loc-country) isa location-hierarchy;
+    $loc-country isa country;
+    $cc(currency-adoption_adopting-country: $loc-country, currency-adoption_currency-adopted: $currency) isa current-currency;
+}, then {
+    $transaction has currency $currency;
+};
+
+# This rule could be avoided by a disjunction in the rule body of `transaction-currency-is-that-of-the-location`
+transaction-currency-is-that-of-the-country sub rule,
+when {
+    $transaction isa transaction;
+    $l(locates_located: $t, locates_location: $transaction-location) isa locates;
+    $transaction-country isa country;
+    $cc(currency-adoption_adopting-country: $transaction-country, currency-adoption_currency-adopted: $currency) isa current-currency;
+}, then {
+    $transaction has currency $currency;
+};
 
 # ----------------------------
 # Friends and Family
@@ -198,6 +236,21 @@ marriage sub relation,
 # Individuals
 # ----------------------------
 
+born-in sub locates,
+    relates born-in_place-of-birth as locates_location,
+    relates born-in_child as locates_located;
+
+# Transitive group membership
+# Here we realise that it's common to say that when something takes place in a location it also takes place in the superior places.
+# This will lead to many rules of this kind. Can this be generified, and should it be?
+born-in-transitivity sub rule,
+when {
+    $lh1(location-hierarchy_superior: $a, location-hierarchy_subordinate: $b) isa location-hierarchy;
+    $bi(born-in_child: $p, born-in_place-of-birth: $b) isa born-in;
+}, then {
+    (born-in_child: $p, born-in_place-of-birth: $a) isa born-in;
+};
+
 residency sub relation,
     has start-date,
     has end-date,
@@ -210,9 +263,59 @@ relocation sub relation,
     relates relocation_new-location,
     relates relocation_relocated-person;
 
-born-in sub locates,
-    relates born-in_place-of-birth as locates_location,
-    relates born-in_child as locates_located;
+# Causes of residency
+# - born in a location
+# - move to a location
+# - can be inferred from where someone works or studies at school or university
+
+born-in-location-implies-residency sub rule,
+when {
+    $bi(born-in_place-of-birth: $location, born-in_child: $person) isa born-in;
+}, then {
+    (residency_resident: $person, residency_location: $location) isa residency;
+};
+
+# This rule can be triggered by a person moving back to their hometown having moved away, and add an incorrect start-date
+born-in-location-implies-residency-date sub rule,
+when {
+    $bi(born-in_place-of-birth: $location, born-in_child: $person) isa born-in;
+    $person isa person, has date-of-birth $dob;
+    $r(residency_resident: $person, residency_location: $location) isa residency;
+}, then {
+    $r has start-date $dob;
+};
+
+person-relocating-adds-new-residency sub rule,
+when {
+    $rel(relocation_relocated-person: $person, relocation_new-location: $location) isa relocation;
+}, then {
+    (residency_resident: $person, residency_location: $location) isa residency;
+};
+
+person-relocating-ends-old-residency sub rule,
+when {
+    $rel(relocation_relocated-person: $person, relocation_previous-location: $location) isa relocation, has relocation-date $rel-date;
+    $old-residency(residency_resident: $person, residency_location: $location) isa residency;
+}, then {
+    $old-residency has end-date $rel-date;
+};
+
+person-membership-of-organisation-means-relocation sub rule,
+when {
+    (membership_member: $person, membership_group: $group) isa membership;
+    (locates_located: $group, locates_location: $location) isa locates;
+}, then {
+    (relocation_relocated-person: $person, relocation_previous-location: $location) isa relocation;
+};
+
+person-membership-of-organisation-means-relocation-date sub rule,
+when {
+    (membership_member: $person, membership_group: $group) isa membership, has start-date $membership-start-date;
+    (locates_located: $group, locates_location: $location) isa locates;
+    $rel(relocation_relocated-person: $person, relocation_previous-location: $location) isa relocation;
+}, then {
+    $rel has relocation-date $membership-start-date;
+};
 
 # ----------------------------
 # Organisational Structure
@@ -325,111 +428,3 @@ service sub entity,
     has service-name,
     has service-description,
     plays transaction_merchandise;
-
-#######################################################################
-# Rules
-#######################################################################
-
-# Transitive hierarchy
-location-hierarchy-transitivity sub rule,
-when {
-    $lh1(location-hierarchy_superior: $a, location-hierarchy_subordinate: $b) isa location-hierarchy;
-    $lh2(location-hierarchy_superior: $b, location-hierarchy_subordinate: $c) isa location-hierarchy;
-}, then {
-    (location-hierarchy_superior: $a, location-hierarchy_subordinate: $c) isa location-hierarchy;
-};
-
-# Transitive group membership
-# Here we realise that it's common to say that when something takes place in a location it also takes place in the superior places.
-# This will lead to many rules of this kind. Can this be generified, and should it be?
-born-in-transitivity sub rule,
-when {
-    $lh1(location-hierarchy_superior: $a, location-hierarchy_subordinate: $b) isa location-hierarchy;
-    $bi(born-in_child: $p, born-in_place-of-birth: $b) isa born-in;
-}, then {
-    (born-in_child: $p, born-in_place-of-birth: $a) isa born-in;
-};
-
-country-currently-uses-currency sub rule,
-when {
-    $ca isa currency-adoption;
-    not {$ca has end-date $ed;};
-}, then {
-    $ca isa current-currency;
-};
-
-transaction-currency-is-that-of-the-location sub rule,
-when {
-    $transaction isa transaction;
-    $l(locates_located: $transaction, locates_location: $transaction-location) isa locates;
-    $lh(location-hierarchy_subordinate: $transaction-location, location-hierarchy_superior: $loc-country) isa location-hierarchy;
-    $loc-country isa country;
-    $cc(currency-adoption_adopting-country: $loc-country, currency-adoption_currency-adopted: $currency) isa current-currency;
-}, then {
-    $transaction has currency $currency;
-};
-
-# This rule could be avoided by a disjunction in the rule body of `transaction-currency-is-that-of-the-location`
-transaction-currency-is-that-of-the-country sub rule,
-when {
-    $transaction isa transaction;
-    $l(locates_located: $t, locates_location: $transaction-location) isa locates;
-    $transaction-country isa country;
-    $cc(currency-adoption_adopting-country: $transaction-country, currency-adoption_currency-adopted: $currency) isa current-currency;
-}, then {
-    $transaction has currency $currency;
-};
-
-# Causes of residency 
-# - born in a location
-# - move to a location
-# - can be inferred from where someone works or studies at school or university
-
-born-in-location-implies-residency sub rule,
-when {
-    $bi(born-in_place-of-birth: $location, born-in_child: $person) isa born-in;
-}, then {
-    (residency_resident: $person, residency_location: $location) isa residency;
-};
-
-# This rule can be triggered by a person moving back to their hometown having moved away, and add an incorrect start-date
-born-in-location-implies-residency-date sub rule,
-when {
-    $bi(born-in_place-of-birth: $location, born-in_child: $person) isa born-in;
-    $person isa person, has date-of-birth $dob;
-    $r(residency_resident: $person, residency_location: $location) isa residency;
-}, then {
-    $r has start-date $dob;
-};
-
-person-relocating-adds-new-residency sub rule,
-when {
-    $rel(relocation_relocated-person: $person, relocation_new-location: $location) isa relocation;
-}, then {
-    (residency_resident: $person, residency_location: $location) isa residency;
-};
-
-person-relocating-ends-old-residency sub rule,
-when {
-    $rel(relocation_relocated-person: $person, relocation_previous-location: $location) isa relocation, has relocation-date $rel-date;
-    $old-residency(residency_resident: $person, residency_location: $location) isa residency;
-}, then {
-    $old-residency has end-date $rel-date;
-};
-
-person-membership-of-organisation-means-relocation sub rule,
-when {
-    (membership_member: $person, membership_group: $group) isa membership;
-    (locates_located: $group, locates_location: $location) isa locates;
-}, then {
-    (relocation_relocated-person: $person, relocation_previous-location: $location) isa relocation;
-};
-
-person-membership-of-organisation-means-relocation-date sub rule,
-when {
-    (membership_member: $person, membership_group: $group) isa membership, has start-date $membership-start-date;
-    (locates_located: $group, locates_location: $location) isa locates;
-    $rel(relocation_relocated-person: $person, relocation_previous-location: $location) isa relocation;
-}, then {
-    $rel has relocation-date $membership-start-date;
-};
