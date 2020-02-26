@@ -1,5 +1,9 @@
 define
 
+#######################################################################
+# Attributes
+#######################################################################
+
 name sub attribute,
     datatype string;
 
@@ -101,6 +105,10 @@ product-quantity sub attribute,
     datatype long;
 
 service-description sub description;
+
+#######################################################################
+# Entities and Relations
+#######################################################################
 
 person sub entity,
     key email,
@@ -226,29 +234,9 @@ locates sub relation,
     relates locates_location,
     relates locates_located;
 
-# Transitive hierarchy
-location-hierarchy-transitivity sub rule,
-when {
-    $lh1(location-hierarchy_superior: $a, location-hierarchy_subordinate: $b) isa location-hierarchy;
-    $lh2(location-hierarchy_superior: $b, location-hierarchy_subordinate: $c) isa location-hierarchy;
-}, then {
-    (location-hierarchy_superior: $a, location-hierarchy_subordinate: $c) isa location-hierarchy;
-};
-
 born-in sub locates,
     relates born-in_place-of-birth as locates_location,
     relates born-in_child as locates_located;
-
-# Transitive group membership
-# Here we realise that it's common to say that when something takes place in a location it also takes place in the superior places. 
-# This will lead to many rules of this kind. Can this be generified, and should it be?
-born-in-transitivity sub rule,
-when {
-    $lh1(location-hierarchy_superior: $a, location-hierarchy_subordinate: $b) isa location-hierarchy;
-    $bi(born-in_child: $p, born-in_place-of-birth: $b) isa born-in;
-}, then {
-    (born-in_child: $p, born-in_place-of-birth: $a) isa born-in;
-};
 
 legal-document sub entity,
     has date-signed,
@@ -297,6 +285,47 @@ service sub entity,
     has service-description,
     plays transaction_merchandise;
 
+residency sub relation,
+    has start-date,
+    has end-date,
+    relates residency_resident,
+    relates residency_location;
+
+relocation sub relation,
+    has relocation-date,
+    relates relocation_previous-location,
+    relates relocation_new-location,
+    relates relocation_relocated-person;
+
+incorporation sub relation,
+    has date-of-incorporation,
+    relates incorporation_incorporated,
+    relates incorporation_incorporating;
+
+#######################################################################
+# Rules
+#######################################################################
+
+# Transitive hierarchy
+location-hierarchy-transitivity sub rule,
+when {
+    $lh1(location-hierarchy_superior: $a, location-hierarchy_subordinate: $b) isa location-hierarchy;
+    $lh2(location-hierarchy_superior: $b, location-hierarchy_subordinate: $c) isa location-hierarchy;
+}, then {
+    (location-hierarchy_superior: $a, location-hierarchy_subordinate: $c) isa location-hierarchy;
+};
+
+# Transitive group membership
+# Here we realise that it's common to say that when something takes place in a location it also takes place in the superior places.
+# This will lead to many rules of this kind. Can this be generified, and should it be?
+born-in-transitivity sub rule,
+when {
+    $lh1(location-hierarchy_superior: $a, location-hierarchy_subordinate: $b) isa location-hierarchy;
+    $bi(born-in_child: $p, born-in_place-of-birth: $b) isa born-in;
+}, then {
+    (born-in_child: $p, born-in_place-of-birth: $a) isa born-in;
+};
+
 country-currently-uses-currency sub rule,
 when {
     $ca isa currency-adoption;
@@ -326,18 +355,6 @@ when {
 }, then {
     $transaction has currency $currency;
 };
-
-residency sub relation,
-    has start-date,
-    has end-date,
-    relates residency_resident,
-    relates residency_location;
-
-relocation sub relation,
-    has relocation-date,
-    relates relocation_previous-location,
-    relates relocation_new-location,
-    relates relocation_relocated-person;
 
 # Causes of residency 
 # - born in a location
@@ -392,8 +409,3 @@ when {
 }, then {
     $rel has relocation-date $membership-start-date;
 };
-
-incorporation sub relation,
-    has date-of-incorporation,
-    relates incorporation_incorporated,
-    relates incorporation_incorporating;
