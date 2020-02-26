@@ -110,9 +110,9 @@ service-description sub description;
 # Entities, Relations and Rules, by approximate category
 #######################################################################
 
-# ----------------------------
+# --------------------------------------------------------
 # Regions
-# ----------------------------
+# --------------------------------------------------------
 
 location sub entity,
     abstract,
@@ -150,9 +150,9 @@ when {
     (location-hierarchy_superior: $a, location-hierarchy_subordinate: $c) isa location-hierarchy;
 };
 
-# ----------------------------
+# --------------------------------------------------------
 # Currency
-# ----------------------------
+# --------------------------------------------------------
 
 currency-adoption sub relation,
     has start-date,
@@ -194,9 +194,9 @@ when {
     $transaction has currency $currency;
 };
 
-# ----------------------------
+# --------------------------------------------------------
 # Friends and Family
-# ----------------------------
+# --------------------------------------------------------
 
 person sub entity,
     key email,
@@ -232,9 +232,9 @@ marriage sub relation,
     relates marriage_wife,
     plays locates_located;
 
-# ----------------------------
+# --------------------------------------------------------
 # Individuals
-# ----------------------------
+# --------------------------------------------------------
 
 born-in sub locates,
     relates born-in_place-of-birth as locates_location,
@@ -317,9 +317,9 @@ when {
     $rel has relocation-date $membership-start-date;
 };
 
-# ----------------------------
+# --------------------------------------------------------
 # Organisational Structure
-# ----------------------------
+# --------------------------------------------------------
 
 organisation sub entity;
 
@@ -399,9 +399,9 @@ employment-contract sub legal-contract,
     has contract-content,
     has contracted-hours;
 
-# ----------------------------
+# --------------------------------------------------------
 # Organisational Trade
-# ----------------------------
+# --------------------------------------------------------
 
 transaction sub relation,
     relates transaction_buyer,
