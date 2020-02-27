@@ -25,7 +25,7 @@ public class ProductAgent extends ContinentAgent {
         ).insert(
                 Graql.var("product")
                         .isa("product")
-                        .has("product-barcode", Double.valueOf(hashcode(iterationScopeId)))
+                        .has("product-barcode", Double.valueOf(uniqueId(iterationScopeId)))
                         .has("product-name", randomAttributeGenerator().boundRandomLengthRandomString(5, 20))
                         .has("product-description", randomAttributeGenerator().boundRandomLengthRandomString(75, 100)),
                 Graql.var("prod")
