@@ -132,7 +132,7 @@ public abstract class Agent<T> implements AutoCloseable {
      * @param iterationScopeId An id that uniquely identifies a concept within the scope of the agent at a particular iteration
      * @return
      */
-    protected int uniqueID(int iterationScopeId) {
+    protected int uniqueId(int iterationScopeId) {
         String id = simulationStep() + tracker() + iterationScopeId;
         return id.hashCode();
     }

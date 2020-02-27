@@ -22,7 +22,7 @@ public class CompanyAgent extends CountryAgent {
         String adjective = pickOne(world().getAdjectives());
         String noun = pickOne(world().getNouns());
 
-        int companyNumber = uniqueID(i);
+        int companyNumber = uniqueId(i);
         String companyName = StringUtils.capitalize(adjective) + StringUtils.capitalize(noun) + "-" + companyNumber;
 
         GraqlInsert query =
