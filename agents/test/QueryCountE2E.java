@@ -61,8 +61,8 @@ public class QueryCountE2E {
                         .rel("employment_contract", Graql.var("contract"))
                         .has("start-date", Graql.var("employment-date"))
                         .has("annual-wage", Graql.var("annual-wage"), Graql.var("r")),
-//                        Test times out when querying for currency too
-//                Graql.var("r").has("currency", Graql.var("currency")), // TODO Should this be inferred rather than inserted?
+//                TODO Test times out when querying for currency https://github.com/graknlabs/simulation/issues/41
+//                Graql.var("r").has("currency", Graql.var("currency")),
                 Graql.var("locates").isa("locates")
                         .rel("locates_located", Graql.var("emp"))
                         .rel("locates_location", Graql.var("city")),
