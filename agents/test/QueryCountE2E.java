@@ -135,7 +135,7 @@ public class QueryCountE2E {
                         .rel("transaction_vendor", Graql.var("c-seller"))
                         .rel("transaction_buyer", Graql.var("c-buyer"))
                         .rel("transaction_merchandise", Graql.var("product"))
-//                        .has("currency", Graql.var("currency-name")) // Requires reasoning over lots of results, test times out
+//                        .has("currency", Graql.var("currency-name")) // TODO Requires reasoning over lots of results, test times out. Issue https://github.com/graknlabs/simulation/issues/40
                         .has("value", Graql.var("value"))
                         .has("product-quantity", Graql.var("quantity")),
                 Graql.var("locates")
