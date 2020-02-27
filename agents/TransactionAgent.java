@@ -63,17 +63,23 @@ public class TransactionAgent extends CountryAgent {
                 Graql.var("c-buyer").isa("company")
                         .has("company-number", transaction.getFirst()),
                 Graql.var("c-seller").isa("company")
-                        .has("company-number", sellerCompanyNumber))
+                        .has("company-number", sellerCompanyNumber),
+                Graql.var("country").isa("country")
+                        .has("location-name", country().name()))
                 .insert(
                         Graql.var("transaction")
                                 .isa("transaction")
                                 .rel("transaction_vendor", Graql.var("c-seller"))
                                 .rel("transaction_buyer", Graql.var("c-buyer"))
                                 .rel("transaction_merchandise", Graql.var("product"))
-//                                .has("currency")  // TODO Add currency
+//                                .has("currency")  // TODO Add currency https://github.com/graknlabs/simulation/issues/31
                                 .has("value", randomAttributeGenerator().boundRandomDouble(0.01, 10000.00))
-                                .has("product-quantity", randomAttributeGenerator().boundRandomInt(1, 1000))
-//                        Graql.var("locates").isa("locates") // TODO Necessary?
+                                .has("product-quantity", randomAttributeGenerator().boundRandomInt(1, 1000)),
+                        Graql.var("locates")
+                                .isa("locates")
+                                .rel("locates_location", Graql.var("country"))
+                                .rel("locates_located", Graql.var("transaction"))
+
                 );
         log().query("insertTransaction", insertTransactionQuery);
         tx().execute(insertTransactionQuery);

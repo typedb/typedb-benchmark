@@ -1,5 +1,9 @@
 define
 
+#######################################################################
+# Attributes
+#######################################################################
+
 name sub attribute,
     datatype string;
 
@@ -63,18 +67,17 @@ annual-wage sub attribute,
 
 currency-code sub attribute,
     datatype string,
-    regex "^(GBP|EUR|USD|INR|MYR|IDR)$";
+    regex "^(USD|GBP|EUR|BRL|ZAR|RMB|AUD)$";
 
 currency sub attribute, 
     datatype string,
-    regex "^(Great British Pound|Euro|American Dollar|Indian Rupee|Malaysian Ringgit|Indonesian Rupiah)$",
-    has currency-code,
-    plays currency-adoption_currency-adopted;
+    regex "^(American Dollar|Great British Pound|Euro|Brazilian Real|South African Rand|Renminbi|Australian Dollar)$",
+    has currency-code;
 
 value sub attribute,
     datatype double;
 
-data-signed sub attribute,
+date-signed sub attribute,
     datatype date;
 
 email sub attribute,
@@ -102,6 +105,67 @@ product-quantity sub attribute,
 
 service-description sub description;
 
+#######################################################################
+# Entities, Relations and Rules, by approximate category
+#######################################################################
+
+# --------------------------------------------------------
+# Locations
+# --------------------------------------------------------
+
+location sub entity,
+    abstract,
+    key location-name,
+    plays location-hierarchy_superior,
+    plays location-hierarchy_subordinate,
+    plays relocation_previous-location,
+    plays relocation_new-location,
+    plays locates_location,
+    plays born-in_place-of-birth;  # TODO Can we avoid using this but also avoid validation errors?
+
+city sub location,
+    plays residency_location;
+
+country sub location,
+    has currency,
+    plays incorporation_incorporating;
+
+continent sub location,
+    plays produced-in_continent;
+
+location-hierarchy sub relation,
+    relates location-hierarchy_superior,
+    relates location-hierarchy_subordinate;
+
+locates sub relation,
+    relates locates_location,
+    relates locates_located;
+
+location-hierarchy-transitivity sub rule,
+when {
+    $lh1(location-hierarchy_superior: $a, location-hierarchy_subordinate: $b) isa location-hierarchy;
+    $lh2(location-hierarchy_superior: $b, location-hierarchy_subordinate: $c) isa location-hierarchy;
+}, then {
+    (location-hierarchy_superior: $a, location-hierarchy_subordinate: $c) isa location-hierarchy;
+};
+
+# --------------------------------------------------------
+# Currency
+# --------------------------------------------------------
+
+transaction-currency-is-that-of-the-country sub rule,
+when {
+    $transaction isa transaction;
+    $l(locates_located: $t, locates_location: $transaction-location) isa locates;
+    $transaction-country isa country, has currency $currency;
+}, then {
+    $transaction has currency $currency;
+};
+
+# --------------------------------------------------------
+# Friends and Family
+# --------------------------------------------------------
+
 person sub entity,
     key email,
     has forename,
@@ -109,8 +173,6 @@ person sub entity,
     has gender,
     has date-of-birth,
     plays employment_employee,
-    plays employment_full-time-employee,
-    plays employment_part-time-employee,
     plays volunteering_volunteer,
     plays studentship_student,
     plays parentship_parent,
@@ -138,123 +200,16 @@ marriage sub relation,
     relates marriage_wife,
     plays locates_located;
 
-membership sub relation,
-    abstract,
-#    key identifier,
-    has start-date,
-    has end-date,
-    relates membership_member,
-    relates membership_group;
-
-employment sub membership,
-    # key employment-id as membership-id, # We might want to say this?
-    relates employment_employee as membership_member,
-    relates employment_part-time-employee as employment_employee,
-    relates employment_full-time-employee as employment_employee,
-    relates employment_employer as membership_group,
-    # relates employment_contract,
-    # relates employment_profession,  # https://github.com/graknlabs/grakn/issues/5553
-    
-    # For wages in different currencies, either:
-    # - subtype for the different currencies,
-    # - add currency as attribute to implicit relation,
-    # - model the wage as an entity,
-    # The attribute on an implicit relation is a pattern we would like to stress-test
-    has annual-wage, 
-    has contracted-hours,
-    # Nested relation
-    plays locates_located;
-
-# @has-annual-wage sub @has-attribute,
-#     has currency;
-
-studentship sub membership,
-    relates studentship_student as membership_member,
-    relates studentship_school as membership_group;
-
-volunteering sub membership,
-    relates volunteering_volunteer as membership_member,
-    relates volunteering_cause as membership_group;
-
-occupation sub entity,
-    key name;
-#    plays employment_profession;
-
-organisation sub entity,
-    abstract;
-
-company sub organisation,
-    # We may want to say `has company-name as organisation-name;`
-    has company-name,
-    key company-number,
-    plays employment_employer,
-    plays transaction_vendor,
-    plays transaction_buyer,
-    plays incorporation_incorporated;
-
-university sub organisation,
-    has university-name,
-    plays employment_employer,
-    plays studentship_school,
-    plays transaction_vendor,
-    plays transaction_buyer;
-
-charity sub organisation,
-    has charity-name,
-    plays volunteering_cause,
-    plays transaction_buyer;
-
-location sub entity,
-    key location-name,
-    plays location-hierarchy_superior,
-    plays location-hierarchy_subordinate,
-    plays relocation_previous-location,
-    plays relocation_new-location,
-    plays locates_location,
-    plays born-in_place-of-birth;  # TODO Can we avoid using this but also avoid validation errors?
-
-area sub location,
-    plays born-in_place-of-birth,
-    plays residency_location;
-
-city sub location,
-    plays born-in_place-of-birth,
-    plays residency_location;
-
-county sub location;
-
-country sub location,
-    plays currency-adoption_adopting-country,
-    plays incorporation_incorporating;
-
-state sub location;
-
-continent sub location,
-    plays produced-in_continent;
-
-location-hierarchy sub relation,
-    relates location-hierarchy_superior,
-    relates location-hierarchy_subordinate;
-
-locates sub relation,
-    relates locates_location,
-    relates locates_located;
-
-# Transitive hierarchy
-location-hierarchy-transitivity sub rule,
-when {
-    $lh1(location-hierarchy_superior: $a, location-hierarchy_subordinate: $b) isa location-hierarchy;
-    $lh2(location-hierarchy_superior: $b, location-hierarchy_subordinate: $c) isa location-hierarchy;
-}, then {
-    (location-hierarchy_superior: $a, location-hierarchy_subordinate: $c) isa location-hierarchy;
-};
+# --------------------------------------------------------
+# Individuals
+# --------------------------------------------------------
 
 born-in sub locates,
     relates born-in_place-of-birth as locates_location,
     relates born-in_child as locates_located;
 
 # Transitive group membership
-# Here we realise that it's common to say that when something takes place in a location it also takes place in the superior places. 
+# Here we realise that it's common to say that when something takes place in a location it also takes place in the superior places.
 # This will lead to many rules of this kind. Can this be generified, and should it be?
 born-in-transitivity sub rule,
 when {
@@ -262,83 +217,6 @@ when {
     $bi(born-in_child: $p, born-in_place-of-birth: $b) isa born-in;
 }, then {
     (born-in_child: $p, born-in_place-of-birth: $a) isa born-in;
-};
-
-legal-document sub entity,
-    has data-signed,
-    has text-content;
-
-legal-contract sub legal-document;
-
-employment-contract sub legal-contract,
-    # plays employment_contract,
-    has contract-content,
-    has contracted-hours;
-
-currency-adoption sub relation,
-    has start-date,
-    has end-date,
-    relates currency-adoption_adopting-country,
-    relates currency-adoption_currency-adopted;
-
-current-currency sub currency-adoption,
-    relates currency-adoption_adopting-country,
-    relates currency-adoption_currency-adopted;
-
-transaction sub relation,
-    relates transaction_buyer,
-    relates transaction_vendor,
-    relates transaction_merchandise,
-    has currency,
-    has value,
-    has product-quantity,
-    plays locates_located;
-
-product sub entity,
-    key product-barcode,
-    has product-name,
-    has product-description,
-    plays transaction_merchandise,
-    plays produced-in_product;
-
-produced-in sub relation,
-    relates produced-in_product,
-    relates produced-in_continent;
-
-service sub entity,
-    key service-id,
-    key service-name,
-    has service-description,
-    plays transaction_merchandise;
-
-country-currently-uses-currency sub rule,
-when {
-    $ca isa currency-adoption;
-    not {$ca has end-date $ed;};
-}, then {
-    $ca isa current-currency;
-};
-
-transaction-currency-is-that-of-the-location sub rule,
-when {
-    $transaction isa transaction;
-    $l(locates_located: $transaction, locates_location: $transaction-location) isa locates;
-    $lh(location-hierarchy_subordinate: $transaction-location, location-hierarchy_superior: $loc-country) isa location-hierarchy;
-    $loc-country isa country;
-    $cc(currency-adoption_adopting-country: $loc-country, currency-adoption_currency-adopted: $currency) isa current-currency;
-}, then {
-    $transaction has currency $currency;
-};
-
-# This rule could be avoided by a disjunction in the rule body of `transaction-currency-is-that-of-the-location`
-transaction-currency-is-that-of-the-country sub rule,
-when {
-    $transaction isa transaction;
-    $l(locates_located: $t, locates_location: $transaction-location) isa locates;
-    $transaction-country isa country;
-    $cc(currency-adoption_adopting-country: $transaction-country, currency-adoption_currency-adopted: $currency) isa current-currency;
-}, then {
-    $transaction has currency $currency;
 };
 
 residency sub relation,
@@ -353,7 +231,7 @@ relocation sub relation,
     relates relocation_new-location,
     relates relocation_relocated-person;
 
-# Causes of residency 
+# Causes of residency
 # - born in a location
 # - move to a location
 # - can be inferred from where someone works or studies at school or university
@@ -407,7 +285,114 @@ when {
     $rel has relocation-date $membership-start-date;
 };
 
+# --------------------------------------------------------
+# Organisational Structure
+# --------------------------------------------------------
+
+organisation sub entity;
+
+company sub organisation,
+    # We may want to say `has company-name as organisation-name;`
+    has company-name,
+    key company-number,
+    plays employment_employer,
+    plays transaction_vendor,
+    plays transaction_buyer,
+    plays incorporation_incorporated;
+
 incorporation sub relation,
     has date-of-incorporation,
     relates incorporation_incorporated,
     relates incorporation_incorporating;
+
+university sub organisation,
+    has university-name,
+    plays employment_employer,
+    plays studentship_school,
+    plays transaction_vendor,
+    plays transaction_buyer;
+
+charity sub organisation,
+    has charity-name,
+    plays volunteering_cause,
+    plays transaction_buyer;
+
+membership sub relation,
+#    key identifier,
+    has start-date,
+    has end-date,
+    relates membership_member,
+    relates membership_group;
+
+employment sub membership,
+    # key employment-id as membership-id, # We might want to say this?
+    relates employment_employee as membership_member,
+    relates employment_employer as membership_group,
+    # relates employment_contract,
+    # relates employment_profession,  # https://github.com/graknlabs/grakn/issues/5553
+    
+    # For wages in different currencies, either:
+    # - subtype for the different currencies,
+    # - add currency as attribute to implicit relation,
+    # - model the wage as an entity,
+    # The attribute on an implicit relation is a pattern we would like to stress-test
+    has annual-wage, 
+    has contracted-hours,
+    # Nested relation
+    plays locates_located;
+
+# @has-annual-wage sub @has-attribute,
+#     has currency;
+
+studentship sub membership,
+    relates studentship_student as membership_member,
+    relates studentship_school as membership_group;
+
+volunteering sub membership,
+    relates volunteering_volunteer as membership_member,
+    relates volunteering_cause as membership_group;
+
+occupation sub entity,
+    key name;
+#    plays employment_profession;
+
+legal-document sub entity,
+    has date-signed,
+    has text-content;
+
+legal-contract sub legal-document;
+
+employment-contract sub legal-contract,
+    # plays employment_contract,
+    has contract-content,
+    has contracted-hours;
+
+# --------------------------------------------------------
+# Organisational Trade
+# --------------------------------------------------------
+
+transaction sub relation,
+    relates transaction_buyer,
+    relates transaction_vendor,
+    relates transaction_merchandise,
+    has currency,
+    has value,
+    has product-quantity,
+    plays locates_located;
+
+product sub entity,
+    key product-barcode,
+    has product-name,
+    has product-description,
+    plays transaction_merchandise,
+    plays produced-in_product;
+
+produced-in sub relation,
+    relates produced-in_product,
+    relates produced-in_continent;
+
+service sub entity,
+    key service-id,
+    has service-name,
+    has service-description,
+    plays transaction_merchandise;
