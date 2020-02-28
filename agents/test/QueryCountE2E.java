@@ -131,6 +131,18 @@ public class QueryCountE2E {
     }
 
     @Test
+    public void testTheCorrectNumberOfResidenciesAreInferred() {
+        GraqlGet.Aggregate countQuery = Graql.match(
+                var("r").isa("residency")
+                        .rel("residency_resident", "p")
+                        .rel("residency_location", "l")
+                        .has("is-current", Graql.var("is-current"))
+                        .has("start-date", Graql.var("start-date"))
+        ).get().count();
+        assertQueryCount(countQuery, 350);
+    }
+
+    @Test
     public void testTransactionAgentInsertsTheExpectedNumberOfTransactions() {
         GraqlGet.Aggregate countQuery = Graql.match(
                 Graql.var("product")
@@ -149,7 +161,8 @@ public class QueryCountE2E {
                         .rel("transaction_merchandise", Graql.var("product"))
 //                        .has("currency", Graql.var("currency-name")) // TODO Requires reasoning over lots of results, test times out. Issue https://github.com/graknlabs/simulation/issues/40
                         .has("value", Graql.var("value"))
-                        .has("product-quantity", Graql.var("quantity")),
+                        .has("product-quantity", Graql.var("quantity"))
+                        .has("is-taxable", Graql.var("is-taxable")),
                 Graql.var("locates")
                         .isa("locates")
                         .rel("locates_location", Graql.var("country"))

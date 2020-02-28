@@ -107,6 +107,12 @@ product-quantity sub attribute,
 
 service-description sub description;
 
+is-taxable sub attribute,
+    datatype boolean;
+
+is-current sub attribute,
+    datatype boolean;
+
 #######################################################################
 # Entities, Relations and Rules, by approximate category
 #######################################################################
@@ -225,6 +231,7 @@ born-in sub locates,
 residency sub relation,
     has start-date,
     has end-date,
+    has is-current,
     relates residency_resident,
     relates residency_location;
 
@@ -286,6 +293,23 @@ when {
     $rel(relocation_relocated-person: $person, relocation_previous-location: $location) isa relocation;
 }, then {
     $rel has relocation-date $membership-start-date;
+};
+
+residency-without-end-date-is-current sub rule,
+when {
+    $res(residency_resident: $person, residency_location: $location) isa residency;
+    not {
+        $res has end-date $rel-date;
+    };
+}, then {
+    $res has is-current true;
+};
+
+label-non-current-residency sub rule,
+when {
+    $res isa residency, has end-date $end-date;
+}, then {
+    $res has is-current false;
 };
 
 # --------------------------------------------------------
@@ -368,6 +392,18 @@ employment-contract sub legal-document,
     has contract-content,
     has contracted-hours;
 
+unemployed-person sub person;
+
+person-with-no-active-employment-is-unemployed sub rule,
+when {
+    $p isa person;
+    not {
+        $e(employment_employee: $p) isa employment;
+    };
+}, then {
+    $p isa unemployed-person;
+};
+
 # --------------------------------------------------------
 # Organisational Trade
 # --------------------------------------------------------
@@ -379,6 +415,7 @@ transaction sub relation,
     has currency,
     has value,
     has product-quantity,
+    has is-taxable,
     plays locates_located;
 
 product sub entity,
