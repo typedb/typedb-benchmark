@@ -180,7 +180,8 @@ public class Simulation implements AgentContext, AutoCloseable {
                         loadData(session,
                                 files.get("data.yaml"),
                                 files.get("currencies.yaml"),
-                                files.get("country_currencies.yaml"));
+                                files.get("country_currencies.yaml"),
+                                files.get("country_languages.yaml"));
                     }
                 }
 

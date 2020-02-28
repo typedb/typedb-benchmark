@@ -55,6 +55,7 @@ public class QueryCountE2E {
     @Test
     public void testEmploymentAgentInsertsTheExpectedNumberOfEmployments() {
         GraqlGet.Aggregate countQuery = Graql.match(
+                Graql.var("city").isa("city"),
                 Graql.var("emp").isa("employment")
                         .rel("employment_employee", Graql.var("p"))
                         .rel("employment_employer", Graql.var("company"))
@@ -69,6 +70,7 @@ public class QueryCountE2E {
                 Graql.var("contract").isa("employment-contract")
                         .has("contract-content", Graql.var("contract-content"))
                         .has("contracted-hours", Graql.var("contracted-hours"))
+//                Graql.var("contract-content").has("content-language", Graql.var("lang"))  // TODO causes test to time out https://github.com/graknlabs/simulation/issues/42
         ).get().count();
         assertQueryCount(countQuery, 200);
     }
