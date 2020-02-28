@@ -363,9 +363,7 @@ legal-document sub entity,
     has date-signed,
     has text-content;
 
-legal-contract sub legal-document;
-
-employment-contract sub legal-contract,
+employment-contract sub legal-document,
     # plays employment_contract,
     has contract-content,
     has contracted-hours;
