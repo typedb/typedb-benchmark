@@ -5,6 +5,7 @@ import grakn.client.GraknClient;
 import grakn.client.answer.Numeric;
 import graql.lang.Graql;
 import graql.lang.query.GraqlGet;
+import graql.lang.query.GraqlInsert;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -82,7 +83,7 @@ public class QueryCountE2E {
                         .rel("marriage_husband", "husband")
                         .rel("marriage_wife", "wife")
         ).get().count();
-        assertQueryCount(countQuery, 116);
+        assertQueryCount(countQuery, 125);
     }
 
     @Test
@@ -94,8 +95,9 @@ public class QueryCountE2E {
                         .rel("parentship_parent", "p2")
                         .rel("parentship_child", "ch")
         ).get().count();
-        assertQueryCount(countQuery, 530);
+        assertQueryCount(countQuery, 540);
     }
+
     @Test
     public void testProductAgentInsertsTheExpectedNumberOfProducts() {
         GraqlGet.Aggregate countQuery = Graql.match(
@@ -154,6 +156,20 @@ public class QueryCountE2E {
                         .rel("locates_located", Graql.var("transaction"))
                 ).get().count();
         assertQueryCount(countQuery, 9625);
+    }
+
+    @Test
+    public void testFriendshipAgentInsertsTheExpectedNumberOfFriendships() {
+        GraqlGet.Aggregate countQuery = Graql.match(
+                Graql.var("p1").isa("person").has("email", Graql.var("email-1")),
+                Graql.var("p2").isa("person").has("email", Graql.var("email-2")),
+                Graql.var("friendship")
+                        .isa("friendship")
+                        .rel("friendship_friend", Graql.var("p1"))
+                        .rel("friendship_friend", Graql.var("p2"))
+                        .has("start-date", Graql.var("start-date"))
+        ).get().count();
+        assertQueryCount(countQuery, 590);
     }
 
     @After

@@ -15,6 +15,7 @@ public class AgentRunnerList {
             new CountryAgentRunner(CompanyAgent.class),
             new CityAgentRunner(EmploymentAgent.class),
             new ContinentAgentRunner(ProductAgent.class),
-            new CountryAgentRunner(TransactionAgent.class)
+            new CountryAgentRunner(TransactionAgent.class),
+            new CityAgentRunner(FriendshipAgent.class)
     };
 }

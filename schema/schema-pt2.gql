@@ -7,7 +7,7 @@ employment sub membership,
 occupation sub entity,
    plays employment_profession;
 
-employment-contract sub legal-contract,
+employment-contract sub legal-document,
     plays employment_contract;
 
 contract-has-language-of-location-is-there-is-only-one-language sub rule,
