@@ -42,7 +42,7 @@ jobs:
       - checkout
       - run-grakn-server
       - run: bazel run //:simulation -- -d -k world
-      - run: bazel test //agents/test/... --test_arg=localhost:48555
+      - run: bazel test //agents/test/... --test_arg=localhost:48555 --test_output=all
 
 workflows:
   version: 2
