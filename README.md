@@ -10,13 +10,18 @@ Logsplit is a simple Python 3 script designed to split the logs of simulation ba
 
 Ensure the `logs/` directory exists.
 ```shell script
-mkdir logs
+mkdir logs1
 ```
 Pipe the output of simulation to logsplit:
 ```shell script
 bazel run //:simulation -- -d -k world | python3 logsplit.py
 ```
 The separated logs can then be found in the `logs/` directory.
+
+By running the simulation twice and recording the logs in separate directories, we can look at the diff of the directories to check for determinism. This command is useful:
+```shell script
+diff -bur logs/ logs1/
+```
 
 ## CLI options
 
