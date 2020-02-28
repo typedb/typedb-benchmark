@@ -54,16 +54,30 @@ public class EmploymentAgent extends CityAgent {
 
     private void insertEmployment(String employeeEmail, Long companyNumber){
         GraqlInsert insertEmploymentQuery = Graql.match(
-                Graql.var("city").isa("city").has("location-name", city().name()),
-                Graql.var("p").isa("person").has("email", employeeEmail),
-                Graql.var("company").isa("company").has("company-number", companyNumber)
+                Graql.var("city")
+                        .isa("city")
+                        .has("location-name", city().name()),
+                Graql.var("p")
+                        .isa("person")
+                        .has("email", employeeEmail),
+                Graql.var("company")
+                        .isa("company")
+                        .has("company-number", companyNumber),
+                Graql.var("country")
+                        .isa("country")
+                        .has("currency", Graql.var("currency")),
+                Graql.var("lh")
+                        .isa("location-hierarchy")
+                        .rel(Graql.var("city"))
+                        .rel(Graql.var("country"))
         ).insert(
                 Graql.var("emp").isa("employment")
                         .rel("employment_employee", Graql.var("p"))
                         .rel("employment_employer", Graql.var("company"))
                         .rel("employment_contract", Graql.var("contract"))
                         .has("start-date", employmentDate)
-                        .has("annual-wage", randomAttributeGenerator().boundRandomDouble(MIN_ANNUAL_WAGE, MAX_ANNUAL_WAGE)),
+                        .has("annual-wage", randomAttributeGenerator().boundRandomDouble(MIN_ANNUAL_WAGE, MAX_ANNUAL_WAGE), Graql.var("r")),
+                Graql.var("r").has("currency", Graql.var("currency")), //TODO Should this be inferred rather than inserted?
                 Graql.var("locates").isa("locates")
                         .rel("locates_located", Graql.var("emp"))
                         .rel("locates_location", Graql.var("city")),

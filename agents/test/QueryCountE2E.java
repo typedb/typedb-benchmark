@@ -60,7 +60,15 @@ public class QueryCountE2E {
                         .rel("employment_employer", Graql.var("company"))
                         .rel("employment_contract", Graql.var("contract"))
                         .has("start-date", Graql.var("employment-date"))
-                        .has("annual-wage", Graql.var("annual-wage"))
+                        .has("annual-wage", Graql.var("annual-wage"), Graql.var("r")),
+//                TODO Test times out when querying for currency https://github.com/graknlabs/simulation/issues/41
+//                Graql.var("r").has("currency", Graql.var("currency")),
+                Graql.var("locates").isa("locates")
+                        .rel("locates_located", Graql.var("emp"))
+                        .rel("locates_location", Graql.var("city")),
+                Graql.var("contract").isa("employment-contract")
+                        .has("contract-content", Graql.var("contract-content"))
+                        .has("contracted-hours", Graql.var("contracted-hours"))
         ).get().count();
         assertQueryCount(countQuery, 200);
     }
