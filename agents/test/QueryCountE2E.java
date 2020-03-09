@@ -54,6 +54,15 @@ public class QueryCountE2E {
     }
 
     @Test
+    public void testAgeUpdateMaintainsTheExpectedNumberOfAges() {
+        GraqlGet.Aggregate countQuery = Graql.match(
+                Graql.var("p").isa("person")
+                        .has("age", Graql.var("age"))
+        ).get().count();
+        assertQueryCount(countQuery, 350);
+    }
+
+    @Test
     public void testEmploymentAgentInsertsTheExpectedNumberOfEmployments() {
         GraqlGet.Aggregate countQuery = Graql.match(
                 Graql.var("city").isa("city"),
