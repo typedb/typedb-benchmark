@@ -10,7 +10,7 @@ Logsplit is a simple Python 3 script designed to split the logs of simulation ba
 
 Ensure the `logs/` directory exists.
 ```shell script
-mkdir logs1
+mkdir logs
 ```
 Pipe the output of simulation to logsplit:
 ```shell script
