@@ -163,8 +163,8 @@ public class Simulation implements AgentContext, AutoCloseable {
                 } else {
                     tracing = withLogging(tracing(grablTracingUri, grablTracingUsername, grablTracingToken));
                 }
-                GrablTracing.Analysis analysis = tracing.analysis(grablTracingOrganisation, grablTracingRepository, grablTracingCommit);
-                GrablTracingThreadStatic.setAnalysis(analysis);
+                GrablTracingThreadStatic.setGlobalTracingClient(tracing);
+                GrablTracingThreadStatic.openGlobalAnalysis(grablTracingOrganisation, grablTracingRepository, grablTracingCommit);
 
                 grakn = new GraknClient(graknHostUri);
 
