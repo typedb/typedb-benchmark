@@ -44,6 +44,9 @@ relocation-date sub date-of-event;
 gender sub attribute,
     datatype string;
 
+age sub attribute,
+    datatype long;
+
 language sub attribute,
     datatype string,
     regex "^(English|German|Portugese|Afrikaans|Mandarin)$";
@@ -192,6 +195,7 @@ person sub entity,
     has surname,
     has gender,
     has date-of-birth,
+    has age,
     plays employment_employee,
     plays volunteering_volunteer,
     plays studentship_student,
