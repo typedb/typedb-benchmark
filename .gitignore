@@ -1,6 +1,6 @@
 # Misc
 .DS_Store
-logs1/
+*.log
 
 # Temporary source files
 tmp/
