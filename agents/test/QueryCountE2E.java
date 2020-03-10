@@ -92,7 +92,7 @@ public class QueryCountE2E {
                         .rel("marriage_husband", "husband")
                         .rel("marriage_wife", "wife")
         ).get().count();
-        assertQueryCount(countQuery, 125);
+        assertQueryCount(countQuery, 127);
     }
 
     @Test
@@ -104,7 +104,7 @@ public class QueryCountE2E {
                         .rel("parentship_parent", "p2")
                         .rel("parentship_child", "ch")
         ).get().count();
-        assertQueryCount(countQuery, 540);
+        assertQueryCount(countQuery, 550);
     }
 
     @Test
