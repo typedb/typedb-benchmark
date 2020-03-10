@@ -13,5 +13,5 @@ java_test(
         # External dependencies from Maven
         "//dependencies/maven/artifacts/org/hamcrest:hamcrest",
     ],
-    size="large"
+    size="enormous"
 )
