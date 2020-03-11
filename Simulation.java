@@ -37,7 +37,9 @@ import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import static grabl.tracing.client.GrablTracing.*;
+import static grabl.tracing.client.GrablTracing.tracing;
+import static grabl.tracing.client.GrablTracing.tracingNoOp;
+import static grabl.tracing.client.GrablTracing.withLogging;
 
 public class Simulation implements AgentContext, AutoCloseable {
 
@@ -160,6 +162,8 @@ public class Simulation implements AgentContext, AutoCloseable {
             try {
                 if (disableTracing) {
                     tracing = withLogging(tracingNoOp());
+                } else if (grablTracingUsername == null) {
+                    tracing = withLogging(tracing(grablTracingUri));
                 } else {
                     tracing = withLogging(tracing(grablTracingUri, grablTracingUsername, grablTracingToken));
                 }
