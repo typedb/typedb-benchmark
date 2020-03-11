@@ -5,6 +5,7 @@ import grakn.client.GraknClient;
 import grakn.client.answer.Numeric;
 import graql.lang.Graql;
 import graql.lang.query.GraqlGet;
+import graql.lang.query.GraqlInsert;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -53,6 +54,15 @@ public class QueryCountE2E {
     }
 
     @Test
+    public void testAgeUpdateMaintainsTheExpectedNumberOfAges() {
+        GraqlGet.Aggregate countQuery = Graql.match(
+                Graql.var("p").isa("person")
+                        .has("age", Graql.var("age"))
+        ).get().count();
+        assertQueryCount(countQuery, 350);
+    }
+
+    @Test
     public void testEmploymentAgentInsertsTheExpectedNumberOfEmployments() {
         GraqlGet.Aggregate countQuery = Graql.match(
                 Graql.var("city").isa("city"),
@@ -82,7 +92,7 @@ public class QueryCountE2E {
                         .rel("marriage_husband", "husband")
                         .rel("marriage_wife", "wife")
         ).get().count();
-        assertQueryCount(countQuery, 116);
+        assertQueryCount(countQuery, 127);
     }
 
     @Test
@@ -94,8 +104,9 @@ public class QueryCountE2E {
                         .rel("parentship_parent", "p2")
                         .rel("parentship_child", "ch")
         ).get().count();
-        assertQueryCount(countQuery, 530);
+        assertQueryCount(countQuery, 550);
     }
+
     @Test
     public void testProductAgentInsertsTheExpectedNumberOfProducts() {
         GraqlGet.Aggregate countQuery = Graql.match(
@@ -129,6 +140,18 @@ public class QueryCountE2E {
     }
 
     @Test
+    public void testTheCorrectNumberOfResidenciesAreInferred() {
+        GraqlGet.Aggregate countQuery = Graql.match(
+                var("r").isa("residency")
+                        .rel("residency_resident", "p")
+                        .rel("residency_location", "l")
+                        .has("is-current", Graql.var("is-current"))
+                        .has("start-date", Graql.var("start-date"))
+        ).get().count();
+        assertQueryCount(countQuery, 350);
+    }
+
+    @Test
     public void testTransactionAgentInsertsTheExpectedNumberOfTransactions() {
         GraqlGet.Aggregate countQuery = Graql.match(
                 Graql.var("product")
@@ -147,13 +170,28 @@ public class QueryCountE2E {
                         .rel("transaction_merchandise", Graql.var("product"))
 //                        .has("currency", Graql.var("currency-name")) // TODO Requires reasoning over lots of results, test times out. Issue https://github.com/graknlabs/simulation/issues/40
                         .has("value", Graql.var("value"))
-                        .has("product-quantity", Graql.var("quantity")),
+                        .has("product-quantity", Graql.var("quantity"))
+                        .has("is-taxable", Graql.var("is-taxable")),
                 Graql.var("locates")
                         .isa("locates")
                         .rel("locates_location", Graql.var("country"))
                         .rel("locates_located", Graql.var("transaction"))
                 ).get().count();
         assertQueryCount(countQuery, 9625);
+    }
+
+    @Test
+    public void testFriendshipAgentInsertsTheExpectedNumberOfFriendships() {
+        GraqlGet.Aggregate countQuery = Graql.match(
+                Graql.var("p1").isa("person").has("email", Graql.var("email-1")),
+                Graql.var("p2").isa("person").has("email", Graql.var("email-2")),
+                Graql.var("friendship")
+                        .isa("friendship")
+                        .rel("friendship_friend", Graql.var("p1"))
+                        .rel("friendship_friend", Graql.var("p2"))
+                        .has("start-date", Graql.var("start-date"))
+        ).get().count();
+        assertQueryCount(countQuery, 590);
     }
 
     @After

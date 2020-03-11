@@ -74,7 +74,8 @@ public class TransactionAgent extends CountryAgent {
                                 .rel("transaction_merchandise", Graql.var("product"))
 //                                .has("currency")  // TODO Add currency https://github.com/graknlabs/simulation/issues/31
                                 .has("value", randomAttributeGenerator().boundRandomDouble(0.01, 10000.00))
-                                .has("product-quantity", randomAttributeGenerator().boundRandomInt(1, 1000)),
+                                .has("product-quantity", randomAttributeGenerator().boundRandomInt(1, 1000))
+                                .has("is-taxable", randomAttributeGenerator().bool()),
                         Graql.var("locates")
                                 .isa("locates")
                                 .rel("locates_location", Graql.var("country"))

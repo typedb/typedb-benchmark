@@ -18,6 +18,11 @@ bazel run //:simulation -- -d -k world | python3 logsplit.py
 ```
 The separated logs can then be found in the `logs/` directory.
 
+By running the simulation twice and recording the logs in separate directories, we can look at the diff of the directories to check for determinism. This command is useful:
+```shell script
+diff -bur logs/ logs1/
+```
+
 ## CLI options
 
 ### Standard Options

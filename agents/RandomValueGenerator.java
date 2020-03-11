@@ -29,4 +29,8 @@ public class RandomValueGenerator {
     double boundRandomDouble(Double min, Double max) {
         return doubleInterpolate(random.nextDouble(), min, max);
     }
+
+    boolean bool() {
+        return random.nextBoolean();
+    }
 }
