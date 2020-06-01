@@ -56,7 +56,7 @@ public class Simulation implements AgentContext, AutoCloseable {
     }
 
     public static void main(String[] args) {
-        System.setProperty("javax.net.ssl.trustStore", "/tmp/0.tcp.ngrok.io.jks");
+        System.setProperty("javax.net.ssl.trustStore", "/tmp/rootCA.jks");
         System.setProperty("javax.net.ssl.trustStorePassword","changeit");
         //////////////////////////
         // COMMAND LINE OPTIONS //
