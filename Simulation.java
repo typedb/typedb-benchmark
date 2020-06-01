@@ -11,8 +11,7 @@ import grakn.simulation.agents.World;
 import grakn.simulation.common.RandomSource;
 import grakn.simulation.yaml_tool.GraknYAMLException;
 import grakn.simulation.yaml_tool.GraknYAMLLoader;
-import graql.lang.Graql;
-import graql.lang.query.GraqlDefine;
+import graql.lang.Graql; import graql.lang.query.GraqlDefine;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
@@ -57,7 +56,8 @@ public class Simulation implements AgentContext, AutoCloseable {
     }
 
     public static void main(String[] args) {
-
+        System.setProperty("javax.net.ssl.trustStore", "/tmp/0.tcp.ngrok.io.jks");
+        System.setProperty("javax.net.ssl.trustStorePassword","changeit");
         //////////////////////////
         // COMMAND LINE OPTIONS //
         //////////////////////////
