@@ -229,14 +229,18 @@ public class Simulation implements AgentContext, AutoCloseable {
     }
 
     private static void loadSchema(Session session, Path... schemaPath) throws IOException {
+        System.out.println(">>>> trace: loadSchema: start");
         for (Path path : schemaPath) {
             String schemaQuery = new String(Files.readAllBytes(path), StandardCharsets.UTF_8);
 
+            System.out.println(">>>> trace: loadSchema - session.tx.write: start");
             try (Transaction tx = session.transaction().write()) {
+                System.out.println(">>>> trace: loadSchema - session.tx.write: end");
                 tx.execute((GraqlDefine) Graql.parse(schemaQuery));
                 tx.commit();
             }
         }
+        System.out.println(">>>> trace: loadSchema: end");
     }
 
     private static void loadData(Session session, Path... dataPath) throws IOException, GraknYAMLException {
