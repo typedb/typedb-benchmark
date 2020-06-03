@@ -53,7 +53,7 @@ public class AgeUpdateAgent extends CityAgent {
     private Stream<ConceptMap> getPeopleBornInCity() {
         GraqlGet.Sorted peopleQuery = getPeopleBornInCityQuery();
         log().query("getPeopleBornInCity", peopleQuery);
-        return tx().stream(peopleQuery);
+        return tx().stream(peopleQuery).get();
     }
 
     private GraqlGet.Sorted getPeopleBornInCityQuery() {

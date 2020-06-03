@@ -30,7 +30,7 @@ public class QueryCountE2E {
     private void assertQueryCount(GraqlGet.Aggregate countQuery, int expectedCount) {
         try (GraknClient.Session session = graknClient.session(KEYSPACE)) {
             try (GraknClient.Transaction tx = session.transaction().write()) {
-                List<Numeric> answer = tx.execute(countQuery);
+                List<Numeric> answer = tx.execute(countQuery).get();
                 int numAnswers = answer.get(0).number().intValue();
                 assertThat(numAnswers, equalTo(expectedCount));
             }

@@ -44,7 +44,7 @@ public class FriendshipAgent extends CityAgent {
                         .rel("friendship_friend", Graql.var("p1"))
                         .rel("friendship_friend", Graql.var("p2"))).get().count();
         log().query("checkIfFriendshipExists", friendshipExistsQuery);
-        List<Numeric> answer = tx().execute(friendshipExistsQuery);
+        List<Numeric> answer = tx().execute(friendshipExistsQuery).get();
         int numAnswers = answer.get(0).number().intValue();
         return numAnswers > 0;
     }

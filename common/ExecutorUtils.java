@@ -13,8 +13,7 @@ public class ExecutorUtils {
 
     @SuppressWarnings("unchecked")
     public static <T> List<T> getOrderedAttribute(GraknClient.Transaction tx, GraqlGet query, String attributeName, Integer limit){
-        return tx.execute(query)
-                .stream()
+        return tx.stream(query).get()
                 .map(conceptMap -> (T) conceptMap.get(attributeName).asAttribute().value())
                 .sorted()
                 .limit(limit)
@@ -23,8 +22,7 @@ public class ExecutorUtils {
 
     @SuppressWarnings("unchecked")
     public static <T> List<T> getOrderedAttribute(GraknClient.Transaction tx, GraqlGet query, String attributeName){
-        return tx.execute(query)
-                .stream()
+        return tx.stream(query).get()
                 .map(conceptMap -> (T) conceptMap.get(attributeName).asAttribute().value())
                 .sorted()
                 .collect(Collectors.toList());
