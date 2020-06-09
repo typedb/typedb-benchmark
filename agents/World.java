@@ -19,6 +19,7 @@ import java.util.stream.Stream;
 public class World {
 
     static final int AGE_OF_ADULTHOOD = 2;
+    private final int scaleFactor;
     private Path logDirPath;
 
     private List<Continent> continents = new ArrayList<>();
@@ -33,7 +34,10 @@ public class World {
     private final List<String> adjectives;
     private final List<String> nouns;
 
-    public World(Path continentsPath, Path countriesPath, Path citiesPath, Path femaleForenamesPath, Path maleForenamesPath, Path surnamesPath, Path adjectivesPath, Path nounsPath) throws IOException {
+    public World(int scaleFactor, Path continentsPath, Path countriesPath, Path citiesPath, Path femaleForenamesPath, Path maleForenamesPath, Path surnamesPath, Path adjectivesPath, Path nounsPath) throws IOException {
+
+        this.scaleFactor = scaleFactor;
+
         try {
             this.logDirPath = Paths.get(System.getenv("LOG_DIR_PATH"));
         } catch (NullPointerException n){
@@ -99,6 +103,10 @@ public class World {
 
     public List<String> getNouns() {
         return nouns;
+    }
+
+    public int getScaleFactor() {
+        return scaleFactor;
     }
 
     public class Continent {

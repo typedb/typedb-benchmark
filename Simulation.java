@@ -44,7 +44,8 @@ import static grabl.tracing.client.GrablTracing.withLogging;
 public class Simulation implements AgentContext, AutoCloseable {
 
     private final static long RANDOM_SEED = 1;
-    private final static int NUM_ITERATIONS = 10;
+    private final static int DEFAULT_NUM_ITERATIONS = 10;
+    private final static int DEFAULT_SCALE_FACTOR = 5;
     private final static Logger LOG = LoggerFactory.getLogger(Simulation.class);
 
     private static Optional<String> getOption(CommandLine commandLine, String option) {
@@ -89,11 +90,15 @@ public class Simulation implements AgentContext, AutoCloseable {
         options.addOption(Option.builder("i")
                 .longOpt("iterations").desc("Number of simulation iterations").hasArg().argName("iterations")
                 .build());
+        options.addOption(Option.builder("f")
+                .longOpt("scale-factor").desc("Scale factor of iteration data").hasArg().argName("scale-factor")
+                .build());
         options.addOption(Option.builder("k")
                 .longOpt("keyspace").desc("Grakn keyspace").hasArg().required().argName("keyspace")
                 .build());
         options.addOption(Option.builder("d")
-                .longOpt("disable-tracing").desc("Disable grabl tracing").build());
+                .longOpt("disable-tracing").desc("Disable grabl tracing")
+                .build());
 
         CommandLineParser parser = new DefaultParser();
         CommandLine commandLine;
@@ -120,7 +125,8 @@ public class Simulation implements AgentContext, AutoCloseable {
 
         boolean disableTracing = commandLine.hasOption("d");
 
-        int iterations = getOption(commandLine, "i").map(Integer::parseInt).orElse(NUM_ITERATIONS);
+        int iterations = getOption(commandLine, "i").map(Integer::parseInt).orElse(DEFAULT_NUM_ITERATIONS);
+        int scaleFactor = getOption(commandLine, "f").map(Integer::parseInt).orElse(DEFAULT_SCALE_FACTOR);
         String graknKeyspace = commandLine.getOptionValue("k");
 
         Map<String, Path> files = new HashMap<>();
@@ -139,6 +145,7 @@ public class Simulation implements AgentContext, AutoCloseable {
         World world;
         try {
             world = new World(
+                    scaleFactor,
                     files.get("continents.csv"),
                     files.get("countries.csv"),
                     files.get("cities.csv"),
