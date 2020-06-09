@@ -14,8 +14,6 @@ import static grakn.simulation.agents.RelocationAgent.cityResidentsQuery;
 
 public class FriendshipAgent extends CityAgent {
 
-    private static int NUM_FRIENDSHIPS = 5;
-
     @Override
     public void iterate() {
 
@@ -23,7 +21,8 @@ public class FriendshipAgent extends CityAgent {
         closeTx();  // TODO Closing and reopening the transaction here is a workaround for https://github.com/graknlabs/grakn/issues/5585
         if (residentEmails.size() > 0) {
             shuffle(residentEmails);
-            for (int i = 0; i < NUM_FRIENDSHIPS; i++) {
+            int numFriendships = world().getScaleFactor();
+            for (int i = 0; i < numFriendships; i++) {
 
                 String friend1 = pickOne(residentEmails);
                 String friend2 = pickOne(residentEmails);

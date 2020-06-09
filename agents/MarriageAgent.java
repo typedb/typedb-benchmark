@@ -13,8 +13,6 @@ import static grakn.simulation.common.ExecutorUtils.getOrderedAttribute;
 
 public class MarriageAgent extends CityAgent {
 
-    private static final int NUM_MARRIAGES = 5;
-
     @Override
     public void iterate() {
         // Find bachelors and bachelorettes who are considered adults and who are not in a marriage and pair them off randomly
@@ -24,7 +22,9 @@ public class MarriageAgent extends CityAgent {
         List<String> menEmails = getSingleMen();
         shuffle(menEmails);
 
-        int numMarriagesPossible = Math.min(NUM_MARRIAGES, Math.min(womenEmails.size(), menEmails.size()));
+        int numMarriages = world().getScaleFactor();
+
+        int numMarriagesPossible = Math.min(numMarriages, Math.min(womenEmails.size(), menEmails.size()));
 
         if (numMarriagesPossible > 0) {
 

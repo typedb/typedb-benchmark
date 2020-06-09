@@ -7,11 +7,10 @@ import graql.lang.query.GraqlInsert;
 
 public class ProductAgent extends ContinentAgent {
 
-    private static int NUM_PRODUCTS = 5;
-
     @Override
     public void iterate() {
-        for (int i = 0; i < NUM_PRODUCTS; i++) {
+        int numProducts = world().getScaleFactor();
+        for (int i = 0; i < numProducts; i++) {
             insertProduct(i);
         }
         tx().commit();

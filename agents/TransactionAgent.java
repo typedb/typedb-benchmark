@@ -16,7 +16,7 @@ import static grakn.simulation.common.ExecutorUtils.getOrderedAttribute;
 
 public class TransactionAgent extends CountryAgent {
 
-    private int NUM_TRANSACTIONS_PER_COMPANY_ON_AVERAGE = 5;
+    private int NUM_TRANSACTIONS_PER_COMPANY_ON_AVERAGE = 1;
 
     @Override
     public void iterate() {
@@ -24,7 +24,7 @@ public class TransactionAgent extends CountryAgent {
         List<Double> productBarcodes = getProductBarcodesInContinent();
         shuffle(companyNumbers);
 
-        int numTransactions = NUM_TRANSACTIONS_PER_COMPANY_ON_AVERAGE * companyNumbers.size();
+        int numTransactions = NUM_TRANSACTIONS_PER_COMPANY_ON_AVERAGE * world().getScaleFactor() * companyNumbers.size();
 
         // Company numbers is the list of sellers
         // Company numbers picked randomly is the list of buyers

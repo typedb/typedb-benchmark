@@ -16,8 +16,6 @@ import static grakn.simulation.common.ExecutorUtils.getOrderedAttribute;
 
 public class RelocationAgent extends CityAgent {
 
-    private static final int NUM_RELOCATIONS = 5;
-
     @Override
     public void iterate() {
         /*
@@ -62,7 +60,8 @@ public class RelocationAgent extends CityAgent {
     private List<String> getResidentEmails(LocalDateTime earliestDate) {
         GraqlGet.Unfiltered cityResidentsQuery = cityResidentsQuery(city(), earliestDate);
         log().query("getResidentEmails", cityResidentsQuery);
-        return ExecutorUtils.getOrderedAttribute(tx(), cityResidentsQuery, "email", NUM_RELOCATIONS);
+        int numRelocations = world().getScaleFactor();
+        return ExecutorUtils.getOrderedAttribute(tx(), cityResidentsQuery, "email", numRelocations);
     }
 
     private List<String> getRelocationCityNames() {
