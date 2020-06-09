@@ -57,7 +57,7 @@ content-language sub attribute,
 num-characters sub attribute,
     datatype long;
 
-text-content sub attribute, 
+text-content sub attribute,
     datatype string,
     has content-language,
     has num-characters;
