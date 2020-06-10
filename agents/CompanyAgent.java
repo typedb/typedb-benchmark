@@ -8,11 +8,12 @@ import org.apache.commons.lang3.StringUtils;
 
 public class CompanyAgent extends CountryAgent {
 
-    private static final int NUM_COMPANIES = 5;
-
     @Override
     public void iterate() {
-        for (int i = 0; i < NUM_COMPANIES; i++) {
+
+        int numCompanies = world().getScaleFactor();
+
+        for (int i = 0; i < numCompanies; i++) {
             insertCompany(i);
         }
         tx().commit();

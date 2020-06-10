@@ -6,12 +6,11 @@ import graql.lang.query.GraqlInsert;
 
 public class PersonBirthAgent extends CityAgent {
 
-    private static final int NUM_BIRTHS = 5;
-
     @Override
     public void iterate() {
         // Find bachelors and bachelorettes who are considered adults and who are not in a marriage and pair them off randomly
-        for (int i = 0; i < NUM_BIRTHS; i++) {
+        int numBirths = world().getScaleFactor();
+        for (int i = 0; i < numBirths; i++) {
             insertPerson(i);
         }
         tx().commit();
