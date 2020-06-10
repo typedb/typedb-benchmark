@@ -139,3 +139,7 @@ graknlabs_graql_maven_dependencies()
 
 load("//dependencies/graknlabs:dependencies.bzl", "graknlabs_grabl_tracing")
 graknlabs_grabl_tracing()
+
+load("@graknlabs_grabl_tracing//dependencies/maven:dependencies.bzl",
+graknlabs_grabl_tracing_maven_dependencies = "maven_dependencies")
+graknlabs_grabl_tracing_maven_dependencies()
