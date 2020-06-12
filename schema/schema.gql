@@ -27,7 +27,7 @@ service-name sub name;
 
 date-of-event sub attribute,
     abstract,
-    value date;
+    value datetime;
 
 date-of-incorporation sub date-of-event;
 
@@ -83,7 +83,7 @@ value sub attribute,
     value double;
 
 date-signed sub attribute,
-    value date;
+    value datetime;
 
 email sub attribute,
     value string;
