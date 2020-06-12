@@ -67,7 +67,7 @@ contract-content sub text-content;
 contracted-hours sub attribute,
     datatype double;
 
-annual-wage sub attribute,
+wage-value sub attribute,
     datatype double;
 
 currency-code sub attribute,
@@ -367,13 +367,15 @@ employment sub membership,
     # - add currency as attribute to implicit relation,
     # - model the wage as an entity,
     # The attribute on an implicit relation is a pattern we would like to stress-test
-    has annual-wage, 
+    relates employment_wage,
     has contracted-hours,
     # Nested relation
     plays locates_located;
 
-# @has-annual-wage sub @has-attribute,
-#     has currency;
+wage sub entity,
+    plays employment_wage
+    has wage-value,
+    has currency;
 
 studentship sub membership,
     relates studentship_student as membership_member,

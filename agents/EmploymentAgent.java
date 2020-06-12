@@ -46,7 +46,7 @@ public class EmploymentAgent extends CityAgent {
     }
 
     private List<String> getEmployeeEmails(LocalDateTime earliestDate) {
-        GraqlGet.Unfiltered getEmployeeEmailsQuery = cityResidentsQuery(city(), earliestDate);
+        GraqlGet getEmployeeEmailsQuery = cityResidentsQuery(city(), earliestDate);
         log().query("getEmployeeEmails", getEmployeeEmailsQuery);
         int numEmployments = world().getScaleFactor();
         return ExecutorUtils.getOrderedAttribute(tx(), getEmployeeEmailsQuery, "email", numEmployments);
@@ -75,9 +75,11 @@ public class EmploymentAgent extends CityAgent {
                         .rel("employment_employee", Graql.var("p"))
                         .rel("employment_employer", Graql.var("company"))
                         .rel("employment_contract", Graql.var("contract"))
-                        .has("start-date", employmentDate)
-                        .has("annual-wage", randomAttributeGenerator().boundRandomDouble(MIN_ANNUAL_WAGE, MAX_ANNUAL_WAGE), Graql.var("r")),
-                Graql.var("r").has("currency", Graql.var("currency")), //TODO Should this be inferred rather than inserted?
+                        .rel("employment_wage", Graql.var("wage"))
+                        .has("start-date", employmentDate),
+                Graql.var("wage").isa("wage")
+                        .has("wage-value", randomAttributeGenerator().boundRandomDouble(MIN_ANNUAL_WAGE, MAX_ANNUAL_WAGE))
+                        .has("currency", Graql.var("currency")), //TODO Should this be inferred rather than inserted?
                 Graql.var("locates").isa("locates")
                         .rel("locates_located", Graql.var("emp"))
                         .rel("locates_location", Graql.var("city")),
