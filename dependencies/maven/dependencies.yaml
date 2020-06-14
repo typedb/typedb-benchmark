@@ -37,7 +37,7 @@ dependencies:
 
   io.netty:
     netty-tcnative-boringssl-static:
-      version: "2.0.25.Final"
+      version: "2.0.30.Final"
       lang: java
 
   org.hamcrest:
