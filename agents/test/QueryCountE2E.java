@@ -196,6 +196,49 @@ public class QueryCountE2E {
         assertQueryCount(countQuery, 590);
     }
 
+    private void checkNonDeterminism(GraqlGet.Aggregate countQuery, int expectedCount) {
+        ArrayList<Integer> expectedCounts = new ArrayList<>();
+        ArrayList<Integer> actualCounts = new ArrayList<>();
+
+        for (int i = 0; i <= 2; i++) {
+            expectedCounts.add(expectedCount);
+            try (GraknClient.Session session = graknClient.session(KEYSPACE)) {
+                try (GraknClient.Transaction tx = session.transaction().write()) {
+                    List<Numeric> answer = tx.execute(countQuery).get();
+                    int numAnswers = answer.get(0).number().intValue();
+                    actualCounts.add(numAnswers);
+                }
+            }
+        }
+        assertThat(actualCounts, equalTo(expectedCounts));
+    }
+
+    @Test
+    public void testFriendshipAgentInsertsTheExpectedNumberOfFriendshipsIsDeterministic() {
+        GraqlGet.Aggregate countQuery = Graql.match(
+                Graql.var("p1").isa("person").has("email", Graql.var("email-1")),
+                Graql.var("p2").isa("person").has("email", Graql.var("email-2")),
+                Graql.var("friendship")
+                        .isa("friendship")
+                        .rel("friendship_friend", Graql.var("p1"))
+                        .rel("friendship_friend", Graql.var("p2"))
+                        .has("start-date", Graql.var("start-date"))
+        ).get().count();
+        checkNonDeterminism(countQuery, 590);
+    }
+
+    @Test
+    public void testTheCorrectNumberOfResidenciesAreInferredIsDeterministic() {
+        GraqlGet.Aggregate countQuery = Graql.match(
+                var("r").isa("residency")
+                        .rel("residency_resident", "p")
+                        .rel("residency_location", "l")
+                        .has("is-current", Graql.var("is-current"))
+                        .has("start-date", Graql.var("start-date"))
+        ).get().count();
+        checkNonDeterminism(countQuery, 350);
+    }
+
     @After
     public void closeClient() {
         graknClient.close();
