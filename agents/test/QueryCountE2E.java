@@ -150,7 +150,7 @@ public class QueryCountE2E {
                         .has("is-current", Graql.var("is-current"))
                         .has("start-date", Graql.var("start-date"))
         ).get().count();
-        assertQueryCount(countQuery, 630);
+        assertQueryCount(countQuery, 350);
     }
 
     @Test
@@ -193,7 +193,7 @@ public class QueryCountE2E {
                         .rel("friendship_friend", Graql.var("p2"))
                         .has("start-date", Graql.var("start-date"))
         ).get().count();
-        assertQueryCount(countQuery, 607);
+        assertQueryCount(countQuery, 590);
     }
 
     @After
