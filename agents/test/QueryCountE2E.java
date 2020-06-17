@@ -5,9 +5,8 @@ import grakn.client.GraknClient;
 import grakn.client.answer.Numeric;
 import graql.lang.Graql;
 import graql.lang.query.GraqlGet;
-import graql.lang.query.GraqlInsert;
-import org.junit.After;
-import org.junit.Before;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -19,22 +18,22 @@ import static org.hamcrest.Matchers.equalTo;
 
 public class QueryCountE2E {
 
-    private GraknClient graknClient;
-    private final String KEYSPACE = "world";
+    private static GraknClient graknClient;
+    private static final String KEYSPACE = "world";
+    private static GraknClient.Session session;
 
-    @Before
-    public void createClient() {
+    @BeforeClass
+    public static void createClient() {
         TestArgsInterpreter testArgsInterpreter = new TestArgsInterpreter();
         graknClient = new GraknClient(testArgsInterpreter.getHost());
+        session = graknClient.session(KEYSPACE);
     }
 
     private void assertQueryCount(GraqlGet.Aggregate countQuery, int expectedCount) {
-        try (GraknClient.Session session = graknClient.session(KEYSPACE)) {
-            try (GraknClient.Transaction tx = session.transaction().write()) {
-                List<Numeric> answer = tx.execute(countQuery).get();
-                int numAnswers = answer.get(0).number().intValue();
-                assertThat(numAnswers, equalTo(expectedCount));
-            }
+        try (GraknClient.Transaction tx = session.transaction().read()) {
+            List<Numeric> answer = tx.execute(countQuery).get();
+            int numAnswers = answer.get(0).number().intValue();
+            assertThat(numAnswers, equalTo(expectedCount));
         }
     }
 
@@ -201,14 +200,12 @@ public class QueryCountE2E {
         ArrayList<Integer> expectedCounts = new ArrayList<>();
         ArrayList<Integer> actualCounts = new ArrayList<>();
 
-        for (int i = 0; i <= 2; i++) {
+        for (int i = 0; i <= 5; i++) {
             expectedCounts.add(expectedCount);
-            try (GraknClient.Session session = graknClient.session(KEYSPACE)) {
-                try (GraknClient.Transaction tx = session.transaction().write()) {
-                    List<Numeric> answer = tx.execute(countQuery).get();
-                    int numAnswers = answer.get(0).number().intValue();
-                    actualCounts.add(numAnswers);
-                }
+            try (GraknClient.Transaction tx = session.transaction().write()) {
+                List<Numeric> answer = tx.execute(countQuery).get();
+                int numAnswers = answer.get(0).number().intValue();
+                actualCounts.add(numAnswers);
             }
         }
         assertThat(actualCounts, equalTo(expectedCounts));
@@ -240,8 +237,9 @@ public class QueryCountE2E {
         checkNonDeterminism(countQuery, 350);
     }
 
-    @After
-    public void closeClient() {
+    @AfterClass
+    public static void closeClient() {
+        session.close();
         graknClient.close();
     }
 }
