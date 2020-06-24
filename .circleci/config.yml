@@ -19,6 +19,13 @@ commands:
     steps:
       - run: bazel run @graknlabs_dependencies//tool/bazelrun:rbe -- << parameters.command >>
 
+  run-grakn:
+    steps:
+      - run-bazel:
+          command: bazel build @graknlabs_grakn_core//:assemble-linux-targz
+      - run: mkdir dist && tar -xvzf bazel-bin/external/graknlabs_grakn_core/grakn-core-all-linux.tar.gz -C ./dist/
+      - run: nohup ./dist/grakn-core-all-linux/grakn server start
+
 jobs:
   build:
     machine: 
@@ -38,7 +45,7 @@ jobs:
     steps:
       - install-bazel
       - checkout
-      - run-grakn-server
+      - run-grakn
       - run: bazel run //:simulation -- -d -k world
       - run: bazel test //agents/test/... --test_arg=localhost:48555 --test_output=all
 
