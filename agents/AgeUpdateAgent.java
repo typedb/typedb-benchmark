@@ -29,11 +29,11 @@ public class AgeUpdateAgent extends CityAgent {
     }
 
     private void updatePersonAge(String personEmail, long newAge) {
-        GraqlDelete.Unfiltered deleteImplicitQuery = Graql.match(
+        GraqlDelete deleteImplicitQuery = Graql.match(
                 Graql.var("p").isa("person")
                         .has("email", personEmail)
-                        .has("age", Graql.var("age"), Graql.var("r"))
-        ).delete("r");
+                        .has("age", Graql.var("age"))
+        ).delete(Graql.var("p").has("age", Graql.var("age")));
 
         log().query("deleteImplicitQuery", deleteImplicitQuery);
         tx().execute(deleteImplicitQuery);
@@ -53,7 +53,7 @@ public class AgeUpdateAgent extends CityAgent {
     private Stream<ConceptMap> getPeopleBornInCity() {
         GraqlGet.Sorted peopleQuery = getPeopleBornInCityQuery();
         log().query("getPeopleBornInCity", peopleQuery);
-        return tx().stream(peopleQuery);
+        return tx().stream(peopleQuery).get();
     }
 
     private GraqlGet.Sorted getPeopleBornInCityQuery() {

@@ -5,11 +5,11 @@ import grakn.client.GraknClient;
 import grakn.client.answer.Numeric;
 import graql.lang.Graql;
 import graql.lang.query.GraqlGet;
-import graql.lang.query.GraqlInsert;
-import org.junit.After;
-import org.junit.Before;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static graql.lang.Graql.var;
@@ -18,22 +18,22 @@ import static org.hamcrest.Matchers.equalTo;
 
 public class QueryCountE2E {
 
-    private GraknClient graknClient;
-    private final String KEYSPACE = "world";
+    private static GraknClient graknClient;
+    private static final String KEYSPACE = "world";
+    private static GraknClient.Session session;
 
-    @Before
-    public void createClient() {
+    @BeforeClass
+    public static void createClient() {
         TestArgsInterpreter testArgsInterpreter = new TestArgsInterpreter();
         graknClient = new GraknClient(testArgsInterpreter.getHost());
+        session = graknClient.session(KEYSPACE);
     }
 
     private void assertQueryCount(GraqlGet.Aggregate countQuery, int expectedCount) {
-        try (GraknClient.Session session = graknClient.session(KEYSPACE)) {
-            try (GraknClient.Transaction tx = session.transaction().write()) {
-                List<Numeric> answer = tx.execute(countQuery);
-                int numAnswers = answer.get(0).number().intValue();
-                assertThat(numAnswers, equalTo(expectedCount));
-            }
+        try (GraknClient.Transaction tx = session.transaction().read()) {
+            List<Numeric> answer = tx.execute(countQuery).get();
+            int numAnswers = answer.get(0).number().intValue();
+            assertThat(numAnswers, equalTo(expectedCount));
         }
     }
 
@@ -70,10 +70,12 @@ public class QueryCountE2E {
                         .rel("employment_employee", Graql.var("p"))
                         .rel("employment_employer", Graql.var("company"))
                         .rel("employment_contract", Graql.var("contract"))
-                        .has("start-date", Graql.var("employment-date"))
-                        .has("annual-wage", Graql.var("annual-wage"), Graql.var("r")),
+                        .rel("employment_wage", Graql.var("wage"))
+                        .has("start-date", Graql.var("employment-date")),
+                Graql.var("wage").isa("wage")
+                        .has("wage-value", Graql.var("wage-value"))
+                        .has("currency", Graql.var("currency")),
 //                TODO Test times out when querying for currency https://github.com/graknlabs/simulation/issues/41
-//                Graql.var("r").has("currency", Graql.var("currency")),
                 Graql.var("locates").isa("locates")
                         .rel("locates_located", Graql.var("emp"))
                         .rel("locates_location", Graql.var("city")),
@@ -194,8 +196,50 @@ public class QueryCountE2E {
         assertQueryCount(countQuery, 590);
     }
 
-    @After
-    public void closeClient() {
+    private void checkNonDeterminism(GraqlGet.Aggregate countQuery, int expectedCount) {
+        ArrayList<Integer> expectedCounts = new ArrayList<>();
+        ArrayList<Integer> actualCounts = new ArrayList<>();
+
+        for (int i = 0; i <= 5; i++) {
+            expectedCounts.add(expectedCount);
+            try (GraknClient.Transaction tx = session.transaction().write()) {
+                List<Numeric> answer = tx.execute(countQuery).get();
+                int numAnswers = answer.get(0).number().intValue();
+                actualCounts.add(numAnswers);
+            }
+        }
+        assertThat(actualCounts, equalTo(expectedCounts));
+    }
+
+    @Test
+    public void testFriendshipAgentInsertsTheExpectedNumberOfFriendshipsIsDeterministic() {
+        GraqlGet.Aggregate countQuery = Graql.match(
+                Graql.var("p1").isa("person").has("email", Graql.var("email-1")),
+                Graql.var("p2").isa("person").has("email", Graql.var("email-2")),
+                Graql.var("friendship")
+                        .isa("friendship")
+                        .rel("friendship_friend", Graql.var("p1"))
+                        .rel("friendship_friend", Graql.var("p2"))
+                        .has("start-date", Graql.var("start-date"))
+        ).get().count();
+        checkNonDeterminism(countQuery, 590);
+    }
+
+    @Test
+    public void testTheCorrectNumberOfResidenciesAreInferredIsDeterministic() {
+        GraqlGet.Aggregate countQuery = Graql.match(
+                var("r").isa("residency")
+                        .rel("residency_resident", "p")
+                        .rel("residency_location", "l")
+                        .has("is-current", Graql.var("is-current"))
+                        .has("start-date", Graql.var("start-date"))
+        ).get().count();
+        checkNonDeterminism(countQuery, 350);
+    }
+
+    @AfterClass
+    public static void closeClient() {
+        session.close();
         graknClient.close();
     }
 }

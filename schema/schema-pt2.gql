@@ -2,13 +2,17 @@ define
 
 employment sub membership,
     relates employment_contract,
-    relates employment_profession;
+    relates employment_profession,
+    relates employment_wage;
 
 occupation sub entity,
    plays employment_profession;
 
 employment-contract sub legal-document,
     plays employment_contract;
+
+wage sub entity,
+    plays employment_wage;
 
 contract-has-language-of-location-is-there-is-only-one-language sub rule,
 when {
@@ -32,6 +36,3 @@ when {
 }, then {
     $emp has contracted-hours $hours;
 };
-
-@has-annual-wage sub @has-attribute,
-    has currency;

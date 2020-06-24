@@ -72,7 +72,7 @@ public class ParentshipAgent extends CityAgent {
         ).get().sort("marriage-id");
 
         log().query("getMarriageEmails", marriageQuery);
-        List<ConceptMap> marriageAnswers = tx().execute(marriageQuery);
+        List<ConceptMap> marriageAnswers = tx().execute(marriageQuery).get();
 
         return marriageAnswers
                 .stream()
