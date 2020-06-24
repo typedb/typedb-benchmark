@@ -5,7 +5,7 @@ define
 #######################################################################
 
 name sub attribute,
-    datatype string;
+    value string;
 
 location-name sub name;
 
@@ -15,7 +15,7 @@ university-name sub organisation-name;
 charity-name sub organisation-name;
 
 company-number sub attribute,
-    datatype long;
+    value long;
 
 forename sub name;
 
@@ -27,7 +27,7 @@ service-name sub name;
 
 date-of-event sub attribute,
     abstract,
-    datatype date;
+    value datetime;
 
 date-of-incorporation sub date-of-event;
 
@@ -42,79 +42,79 @@ date-of-marriage sub date-of-event;
 relocation-date sub date-of-event;
 
 gender sub attribute,
-    datatype string;
+    value string;
 
 age sub attribute,
-    datatype long;
+    value long;
 
 language sub attribute,
-    datatype string,
+    value string,
     regex "^(English|German|Portugese|Afrikaans|Mandarin)$";
 
 content-language sub attribute,
-    datatype string;
+    value string;
 
 num-characters sub attribute,
-    datatype long;
+    value long;
 
-text-content sub attribute, 
-    datatype string,
+text-content sub attribute,
+    value string,
     has content-language,
     has num-characters;
 
 contract-content sub text-content;
 
 contracted-hours sub attribute,
-    datatype double;
+    value double;
 
-annual-wage sub attribute,
-    datatype double;
+wage-value sub attribute,
+    value double;
 
 currency-code sub attribute,
-    datatype string,
+    value string,
     regex "^(USD|GBP|EUR|BRL|ZAR|RMB|AUD)$";
 
 currency sub attribute,
-    datatype string,
+    value string,
     regex "^(American Dollar|Great British Pound|Euro|Brazilian Real|South African Rand|Renminbi|Australian Dollar)$",
     has currency-code;
 
 value sub attribute,
-    datatype double;
+    value double;
 
 date-signed sub attribute,
-    datatype date;
+    value datetime;
 
 email sub attribute,
-    datatype string;
+    value string;
 
 identifier sub attribute,
-    datatype long;
+    value long;
 
 marriage-id sub identifier;
 
 identifier-double sub attribute, 
-    datatype double;
+    value double;
 
 service-id sub identifier-double;
 
 product-barcode sub identifier-double;
 
 description sub attribute,
-    datatype string;
+    value string;
 
 product-description sub description;
 
 product-quantity sub attribute,
-    datatype long;
+    value long;
 
 service-description sub description;
 
 is-taxable sub attribute,
-    datatype boolean;
+    value boolean;
 
 is-current sub attribute,
-    datatype boolean;
+    value boolean;
 
 #######################################################################
 # Entities, Relations and Rules, by approximate category
@@ -360,20 +360,22 @@ employment sub membership,
     relates employment_employee as membership_member,
     relates employment_employer as membership_group,
     # relates employment_contract,
-    # relates employment_profession,  # https://github.com/graknlabs/grakn/issues/5553
-    
+    # relates employment_profession,
+    # relates employment_wage,  # https://github.com/graknlabs/grakn/issues/5553
     # For wages in different currencies, either:
     # - subtype for the different currencies,
     # - add currency as attribute to implicit relation,
     # - model the wage as an entity,
     # The attribute on an implicit relation is a pattern we would like to stress-test
-    has annual-wage, 
+
     has contracted-hours,
     # Nested relation
     plays locates_located;
 
-# @has-annual-wage sub @has-attribute,
-#     has currency;
+wage sub entity,
+#    plays employment_wage,
+    has wage-value,
+    has currency;
 
 studentship sub membership,
     relates studentship_student as membership_member,
