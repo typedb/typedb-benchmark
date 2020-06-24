@@ -173,6 +173,14 @@ graknlabs_protocol()
 
 load("@graknlabs_protocol//dependencies/maven:artifacts.bzl", graknlabs_protocol_artifacts = "artifacts")
 
+########################################################
+# Load @graknlabs_console (from @graknlabs_grakn_core) #
+########################################################
+load("@graknlabs_grakn_core//dependencies/graknlabs:dependencies.bzl", "graknlabs_console")
+graknlabs_console()
+
+load("@graknlabs_graql//dependencies/maven:artifacts.bzl", graknlabs_graql_artifacts = "artifacts")
+
 ###############
 # Load @maven #
 ###############
