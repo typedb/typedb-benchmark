@@ -29,14 +29,14 @@ def graknlabs_grakn_core():
     git_repository(
         name = "graknlabs_grakn_core",
         remote = "https://github.com/graknlabs/grakn",
-        commit = "d7417991d97fa374172f97c96f028cef2c426f15" # sync-marker: do not remove this comment, this is used for sync-dependencies by @graknlabs_grakn_core
+        commit = "553cde5dda0d714a86c07b55c5c801a3d315838a" # sync-marker: do not remove this comment, this is used for sync-dependencies by @graknlabs_grakn_core
     )
 
 def graknlabs_client_java():
     git_repository(
         name = "graknlabs_client_java",
         remote = "https://github.com/graknlabs/client-java",
-        commit = "553cde5dda0d714a86c07b55c5c801a3d315838a",
+        commit = "0fa3309739c56dfe35cd513c889a6c611c32894a",
     )
 
 def graknlabs_grabl_tracing():
