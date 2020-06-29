@@ -4,9 +4,9 @@ java_library(
     deps = [
         "@graknlabs_client_java//:client-java",
         "@graknlabs_graql//java:graql",
-        "//dependencies/maven/artifacts/org/yaml:snakeyaml",
-        "//dependencies/maven/artifacts/org/apache/commons:commons-csv",
-        "//dependencies/maven/artifacts/org/apache/commons:commons-lang3",
+        "@maven//:org_yaml_snakeyaml",
+        "@maven//:org_apache_commons_commons_csv",
+        "@maven//:org_apache_commons_commons_lang3",
     ],
     visibility = ["//visibility:public"],
 )

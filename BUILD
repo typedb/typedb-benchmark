@@ -9,9 +9,9 @@ java_library(
     deps = [
         "//agents",
         "//common",
-        "//dependencies/maven/artifacts/ch/qos/logback:logback-classic",
-        "//dependencies/maven/artifacts/commons-cli",
-        "//dependencies/maven/artifacts/org/slf4j:slf4j-api",
+        "@maven//:ch_qos_logback_logback_classic",
+        "@maven//:commons_cli_commons_cli",
+        "@maven//:org_slf4j_slf4j_api",
         "//yaml_tool",
         "@graknlabs_client_java//:client-java",
         "@graknlabs_grabl_tracing//client",

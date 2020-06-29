@@ -2,7 +2,7 @@ java_library(
     name = "common",
     srcs = glob(["*.java"]),
     deps = [
-        "//dependencies/maven/artifacts/org/slf4j:slf4j-api",
+        "@maven//:org_slf4j_slf4j_api",
         "@graknlabs_client_java//:client-java",
         "@graknlabs_graql//java:graql",
     ],
