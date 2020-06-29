@@ -11,7 +11,7 @@ java_test(
         "@graknlabs_graql//java:graql",
 
         # External dependencies from Maven
-        "//dependencies/maven/artifacts/org/hamcrest:hamcrest",
+        "@maven//:org_hamcrest_hamcrest",
     ],
     size="enormous"
 )
