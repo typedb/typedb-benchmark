@@ -233,7 +233,7 @@ public class Simulation implements AgentContext, AutoCloseable {
                     ///////////////
 
                     for (int i = 0; i < iterations; ++i) {
-                        simulation.iterate();
+                        simulation.iterate(true);
                     }
                 }
             } finally {
@@ -316,12 +316,12 @@ public class Simulation implements AgentContext, AutoCloseable {
         this.world = world;
     }
 
-    private void iterate() {
+    private void iterate(Boolean traceIteration) {
 
         LOG.info("Simulation step: {}", simulationStep);
 
         for (AgentRunner agentRunner : agentRunners) {
-            agentRunner.iterate(this, RandomSource.nextSource(random));
+            agentRunner.iterate(this, RandomSource.nextSource(random), traceIteration);
         }
 
         closeAllSessionsInMap(); // We want to test opening new sessions each iteration.

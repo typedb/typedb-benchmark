@@ -23,10 +23,10 @@ public abstract class AgentRunner<T> {
 
     private Constructor<? extends Agent<T>> agentConstructor;
     private Logger logger;
-    private Boolean sample;
+    private Boolean traceAgent;
 
-    protected AgentRunner(Class<? extends Agent<T>> agentClass, Boolean sample) {
-        this.sample = sample;
+    protected AgentRunner(Class<? extends Agent<T>> agentClass, Boolean traceAgent) {
+        this.traceAgent = traceAgent;
         try {
             agentConstructor = agentClass.getDeclaredConstructor();
             agentConstructor.setAccessible(true);
@@ -43,16 +43,16 @@ public abstract class AgentRunner<T> {
 
     abstract protected String getTracker(AgentContext agentContext, RandomSource randomSource, T item);
 
-    public void iterate(AgentContext agentContext, RandomSource randomSource) {
+    public void iterate(AgentContext agentContext, RandomSource randomSource, Boolean traceIteration) {
         List<T> items = getParallelItems(agentContext, randomSource);
         List<RandomSource> sources = randomSource.split(items.size());
 
         Pair.zip(sources, items).parallelStream().forEach(
-                pair -> runAgent(agentContext, pair.getFirst(), pair.getSecond())
+                pair -> runAgent(agentContext, pair.getFirst(), pair.getSecond(), traceIteration)
         );
     }
 
-    private void runAgent(AgentContext agentContext, RandomSource source, T item) {
+    private void runAgent(AgentContext agentContext, RandomSource source, T item, Boolean traceIteration) {
         Random random = source.startNewRandom();
         Random agentRandom = RandomSource.nextSource(random).startNewRandom();
         String sessionKey = getSessionKey(agentContext, RandomSource.nextSource(random), item);
@@ -60,7 +60,7 @@ public abstract class AgentRunner<T> {
 
         try (Agent<T> agent = agentConstructor.newInstance()) {
 
-            agent.init(agentContext, agentRandom, item, sessionKey, tracker, logger, sample);
+            agent.init(agentContext, agentRandom, item, sessionKey, tracker, logger, traceAgent && traceIteration);
             agent.iterate();
 
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {

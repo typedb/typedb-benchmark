@@ -33,7 +33,7 @@ public abstract class Agent<T> implements AutoCloseable {
     private LogWrapper logWrapper;
     private ThreadContext context;
 
-    void init(AgentContext agentContext, Random random, T item, String sessionKey, String tracker, Logger logger, Boolean sample) {
+    void init(AgentContext agentContext, Random random, T item, String sessionKey, String tracker, Logger logger, Boolean trace) {
         this.agentContext = agentContext;
         this.random = random;
         this.item = item;
@@ -41,7 +41,7 @@ public abstract class Agent<T> implements AutoCloseable {
         this.tracker = tracker;
 
         this.logWrapper = new LogWrapper(logger);
-        if (sample) {
+        if (trace) {
             context = contextOnThread(tracker(), simulationStep());
         }
     }
