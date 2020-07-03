@@ -1,5 +1,6 @@
-package grakn.simulation.yaml_tool;
+package grakn.simulation.config;
 
+import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
 import org.yaml.snakeyaml.error.YAMLException;
 
@@ -7,7 +8,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
-import org.yaml.snakeyaml.Yaml;
 
 public class ConfigLoader {
 

@@ -6,7 +6,6 @@ import grakn.client.GraknClient;
 import grakn.client.GraknClient.Session;
 import grakn.client.GraknClient.Transaction;
 import grakn.simulation.agents.World;
-import grakn.simulation.agents.base.Agent;
 import grakn.simulation.agents.base.AgentContext;
 import grakn.simulation.agents.base.AgentRunner;
 import grakn.simulation.agents.common.CityAgent;
@@ -16,9 +15,8 @@ import grakn.simulation.agents.common.ContinentAgentRunner;
 import grakn.simulation.agents.common.CountryAgent;
 import grakn.simulation.agents.common.CountryAgentRunner;
 import grakn.simulation.common.RandomSource;
-import grakn.simulation.yaml_tool.AgentConfig;
-import grakn.simulation.yaml_tool.Config;
-import grakn.simulation.yaml_tool.ConfigLoader;
+import grakn.simulation.config.Config;
+import grakn.simulation.config.ConfigLoader;
 import grakn.simulation.yaml_tool.GraknYAMLException;
 import grakn.simulation.yaml_tool.GraknYAMLLoader;
 import graql.lang.Graql;
@@ -59,7 +57,7 @@ public class Simulation implements AgentContext, AutoCloseable {
     private final static long RANDOM_SEED = 1;
     private final static int DEFAULT_NUM_ITERATIONS = 10;
     private final static int DEFAULT_SCALE_FACTOR = 5;
-    private final static String DEFAULT_CONFIG_YAML = "config.yaml";
+    private final static String DEFAULT_CONFIG_YAML = "config/config.yaml";
     private final static Logger LOG = LoggerFactory.getLogger(Simulation.class);
 
     private static Optional<String> getOption(CommandLine commandLine, String option) {
@@ -160,9 +158,9 @@ public class Simulation implements AgentContext, AutoCloseable {
         ////////////////////////////////////
 
         List<AgentRunner> agentRunners = new ArrayList<>();
-        for (AgentConfig agentConfig : config.getAgents()) {
-            if (agentConfig.getRun()) {
-                AgentRunner<?> runner = buildAgentRunner(agentConfig.getName(), agentConfig.getSample());
+        for (Config.Agent agent : config.getAgents()) {
+            if (agent.getRun()) {
+                AgentRunner<?> runner = buildAgentRunner(agent.getName(), agent.getTrace());
                 agentRunners.add(runner);
             }
         }
@@ -257,7 +255,7 @@ public class Simulation implements AgentContext, AutoCloseable {
 
     private static AgentRunner<?> buildAgentRunner(String agentClassName, Boolean sample) {
         try {
-            Class<? extends Agent<?>> agentClass = (Class<? extends Agent<?>>) Class.forName("grakn.simulation.agents." + agentClassName);
+            Class<? extends grakn.simulation.agents.base.Agent> agentClass = (Class<? extends grakn.simulation.agents.base.Agent>) Class.forName("grakn.simulation.agents." + agentClassName);
             Class<? extends AgentRunner<?>> agentRunnerClass;
             if (agentClass.getSuperclass().isAssignableFrom(CityAgent.class)) {
                 agentRunnerClass = CityAgentRunner.class;
