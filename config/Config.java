@@ -27,7 +27,6 @@ public class Config {
         private Boolean run;
         private Boolean trace;
 
-
         public String getName() {
             return name;
         }
@@ -40,16 +39,21 @@ public class Config {
             return trace;
         }
 
-        public void setTrace(Boolean trace) {
-            this.trace = trace;
-        }
-
         public Boolean getRun() {
             return run;
         }
 
-        public void setRun(Boolean run) {
-            this.run = run;
+        public void setMode(String mode) {
+            if (mode.equals("trace")) {
+                run = true;
+                trace = true;
+            } else if (mode.equals("run")) {
+                run = true;
+                trace = false;
+            } else {
+                run = false;
+                trace = false;
+            }
         }
     }
 }

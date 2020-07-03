@@ -126,7 +126,9 @@ public abstract class Agent<T> implements AutoCloseable {
     @Override
     public void close() {
         closeTx();
-        context.close();
+        if (context != null) {
+            context.close();
+        }
     }
 
     /**
