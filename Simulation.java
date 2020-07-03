@@ -8,12 +8,6 @@ import grakn.client.GraknClient.Transaction;
 import grakn.simulation.agents.World;
 import grakn.simulation.agents.base.AgentContext;
 import grakn.simulation.agents.base.AgentRunner;
-import grakn.simulation.agents.common.CityAgent;
-import grakn.simulation.agents.common.CityAgentRunner;
-import grakn.simulation.agents.common.ContinentAgent;
-import grakn.simulation.agents.common.ContinentAgentRunner;
-import grakn.simulation.agents.common.CountryAgent;
-import grakn.simulation.agents.common.CountryAgentRunner;
 import grakn.simulation.common.RandomSource;
 import grakn.simulation.config.Config;
 import grakn.simulation.config.ConfigLoader;
@@ -31,7 +25,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -160,7 +153,8 @@ public class Simulation implements AgentContext, AutoCloseable {
         List<AgentRunner> agentRunners = new ArrayList<>();
         for (Config.Agent agent : config.getAgents()) {
             if (agent.getRun()) {
-                AgentRunner<?> runner = buildAgentRunner(agent.getName(), agent.getTrace());
+                AgentRunner<?> runner = AgentRunners.AGENTS.get(agent.getName());
+                runner.setTrace(agent.getTrace());
                 agentRunners.add(runner);
             }
         }
@@ -251,26 +245,6 @@ public class Simulation implements AgentContext, AutoCloseable {
         }
 
         LOG.info("Simulation complete");
-    }
-
-    private static AgentRunner<?> buildAgentRunner(String agentClassName, Boolean sample) {
-        try {
-            Class<? extends grakn.simulation.agents.base.Agent> agentClass = (Class<? extends grakn.simulation.agents.base.Agent>) Class.forName("grakn.simulation.agents." + agentClassName);
-            Class<? extends AgentRunner<?>> agentRunnerClass;
-            if (agentClass.getSuperclass().isAssignableFrom(CityAgent.class)) {
-                agentRunnerClass = CityAgentRunner.class;
-            } else if (agentClass.getSuperclass().isAssignableFrom(CountryAgent.class)) {
-                agentRunnerClass = CountryAgentRunner.class;
-            } else if (agentClass.getSuperclass().isAssignableFrom(ContinentAgent.class)) {
-                agentRunnerClass = ContinentAgentRunner.class;
-            } else {
-                throw new RuntimeException(String.format("Encountered something unexpected in the agent class hierarchy, could not build an agent runner for agent class %s", agentClassName));
-            }
-            return agentRunnerClass.getDeclaredConstructor(Class.class, Boolean.class).newInstance(agentClass, sample);
-        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-            e.printStackTrace();
-            throw new RuntimeException(String.format("Could not build an agent runner for agent class %s", agentClassName), e);
-        }
     }
 
     private static void loadSchema(Session session, Path... schemaPath) throws IOException {

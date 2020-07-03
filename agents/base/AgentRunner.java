@@ -23,10 +23,9 @@ public abstract class AgentRunner<T> {
 
     private Constructor<? extends Agent<T>> agentConstructor;
     private Logger logger;
-    private Boolean traceAgent;
+    private Boolean traceAgent = true;
 
-    protected AgentRunner(Class<? extends Agent<T>> agentClass, Boolean traceAgent) {
-        this.traceAgent = traceAgent;
+    protected AgentRunner(Class<? extends Agent<T>> agentClass) {
         try {
             agentConstructor = agentClass.getDeclaredConstructor();
             agentConstructor.setAccessible(true);
@@ -35,6 +34,10 @@ public abstract class AgentRunner<T> {
         }
 
         logger = LoggerFactory.getLogger(agentClass);
+    }
+
+    public void setTrace(Boolean trace) {
+        traceAgent = trace;
     }
 
     abstract protected List<T> getParallelItems(AgentContext agentContext, RandomSource randomSource);

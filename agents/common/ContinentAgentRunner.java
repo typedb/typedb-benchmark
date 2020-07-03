@@ -13,8 +13,8 @@ import static java.util.stream.Collectors.toList;
 
 public class ContinentAgentRunner extends AgentRunner<World.Continent> {
 
-    public ContinentAgentRunner(Class<? extends Agent<World.Continent>> agentClass, Boolean trace) {
-        super(agentClass, trace);
+    public ContinentAgentRunner(Class<? extends Agent<World.Continent>> agentClass) {
+        super(agentClass);
     }
 
     @Override
