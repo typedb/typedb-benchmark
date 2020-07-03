@@ -9,8 +9,4 @@ public abstract class ContinentAgent extends Agent<World.Continent> {
     protected World.Continent continent() {
         return item();
     }
-    @Override
-    public Class<? extends AgentRunner<?>> runnerType() {
-        return ContinentAgentRunner.class;
-    }
 }

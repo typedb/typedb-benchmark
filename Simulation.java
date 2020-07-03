@@ -9,6 +9,12 @@ import grakn.simulation.agents.World;
 import grakn.simulation.agents.base.Agent;
 import grakn.simulation.agents.base.AgentContext;
 import grakn.simulation.agents.base.AgentRunner;
+import grakn.simulation.agents.common.CityAgent;
+import grakn.simulation.agents.common.CityAgentRunner;
+import grakn.simulation.agents.common.ContinentAgent;
+import grakn.simulation.agents.common.ContinentAgentRunner;
+import grakn.simulation.agents.common.CountryAgent;
+import grakn.simulation.agents.common.CountryAgentRunner;
 import grakn.simulation.common.RandomSource;
 import grakn.simulation.yaml_tool.AgentConfig;
 import grakn.simulation.yaml_tool.Config;
@@ -103,11 +109,11 @@ public class Simulation implements AgentContext, AutoCloseable {
         options.addOption(Option.builder("k")
                 .longOpt("keyspace").desc("Grakn keyspace").hasArg().required().argName("keyspace")
                 .build());
+        options.addOption(Option.builder("b")
+                .longOpt("config-file").desc("Configuration file").hasArg().argName("config-file")
+                .build());
         options.addOption(Option.builder("d")
                 .longOpt("disable-tracing").desc("Disable grabl tracing")
-                .build());
-        options.addOption(Option.builder("b")
-                .longOpt("config-file").desc("Configuration file")
                 .build());
 
         CommandLineParser parser = new DefaultParser();
@@ -252,12 +258,20 @@ public class Simulation implements AgentContext, AutoCloseable {
     private static AgentRunner<?> buildAgentRunner(String agentClassName, Boolean sample) {
         try {
             Class<? extends Agent<?>> agentClass = (Class<? extends Agent<?>>) Class.forName("grakn.simulation.agents." + agentClassName);
-            Agent<?> agent = agentClass.newInstance();
-            AgentRunner<?> agentRunner = agent.runnerType().getDeclaredConstructor(Class.class, Boolean.class).newInstance(agentClass, sample);
-            return agentRunner;
+            Class<? extends AgentRunner<?>> agentRunnerClass;
+            if (agentClass.getSuperclass().isAssignableFrom(CityAgent.class)) {
+                agentRunnerClass = CityAgentRunner.class;
+            } else if (agentClass.getSuperclass().isAssignableFrom(CountryAgent.class)) {
+                agentRunnerClass = CountryAgentRunner.class;
+            } else if (agentClass.getSuperclass().isAssignableFrom(ContinentAgent.class)) {
+                agentRunnerClass = ContinentAgentRunner.class;
+            } else {
+                throw new RuntimeException(String.format("Encountered something unexpected in the agent class hierarchy, could not build an agent runner for agent class %s", agentClassName));
+            }
+            return agentRunnerClass.getDeclaredConstructor(Class.class, Boolean.class).newInstance(agentClass, sample);
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
             e.printStackTrace();
-            throw new RuntimeException(e);
+            throw new RuntimeException(String.format("Could not build an agent runner for agent class %s", agentClassName), e);
         }
     }
 

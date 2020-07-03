@@ -49,8 +49,6 @@ public abstract class Agent<T> implements AutoCloseable {
     private GraknClient.Transaction tx;
     private LocalDateTime today;
 
-    public abstract Class<? extends AgentRunner<?>> runnerType();
-
     protected LogWrapper log() {
         return logWrapper;
     }
