@@ -1,3 +1,7 @@
+exports_files([
+    "config.yaml",
+])
+
 java_library(
     name = "simulation-lib",
     srcs = glob(["*.java"]),
@@ -28,6 +32,7 @@ java_binary(
     data = [
         "//data",
         "//schema",
+        "//:config.yaml",
     ],
     main_class = "grakn.simulation.Simulation",
     runtime_deps = [":simulation-lib"],

@@ -23,8 +23,10 @@ public abstract class AgentRunner<T> {
 
     private Constructor<? extends Agent<T>> agentConstructor;
     private Logger logger;
+    private Boolean sample;
 
-    protected AgentRunner(Class<? extends Agent<T>> agentClass) {
+    protected AgentRunner(Class<? extends Agent<T>> agentClass, Boolean sample) {
+        this.sample = sample;
         try {
             agentConstructor = agentClass.getDeclaredConstructor();
             agentConstructor.setAccessible(true);
@@ -58,7 +60,7 @@ public abstract class AgentRunner<T> {
 
         try (Agent<T> agent = agentConstructor.newInstance()) {
 
-            agent.init(agentContext, agentRandom, item, sessionKey, tracker, logger);
+            agent.init(agentContext, agentRandom, item, sessionKey, tracker, logger, sample);
             agent.iterate();
 
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {

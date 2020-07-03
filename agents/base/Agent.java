@@ -19,7 +19,7 @@ import static grabl.tracing.client.GrablTracingThreadStatic.contextOnThread;
  * this class.
  *
  * This class is instantiated via reflection by {@link AgentRunner} and initialized using
- * {@link #init(AgentContext, Random, Object, String, String, Logger)}.
+ * {@link #init(AgentContext, Random, Object, String, String, Logger, Boolean)}.
  *
  * The protected methods of this class provide useful simple methods for writing Agents as concisely as possible.
  */
@@ -33,7 +33,7 @@ public abstract class Agent<T> implements AutoCloseable {
     private LogWrapper logWrapper;
     private ThreadContext context;
 
-    void init(AgentContext agentContext, Random random, T item, String sessionKey, String tracker, Logger logger) {
+    void init(AgentContext agentContext, Random random, T item, String sessionKey, String tracker, Logger logger, Boolean sample) {
         this.agentContext = agentContext;
         this.random = random;
         this.item = item;
@@ -41,11 +41,15 @@ public abstract class Agent<T> implements AutoCloseable {
         this.tracker = tracker;
 
         this.logWrapper = new LogWrapper(logger);
-        context = contextOnThread(tracker(), simulationStep());
+        if (sample) {
+            context = contextOnThread(tracker(), simulationStep());
+        }
     }
 
     private GraknClient.Transaction tx;
     private LocalDateTime today;
+
+    public abstract Class<? extends AgentRunner<?>> runnerType();
 
     protected LogWrapper log() {
         return logWrapper;

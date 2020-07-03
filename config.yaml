@@ -1,0 +1,32 @@
+agents:
+  - name: "MarriageAgent"
+    run: true
+    sample: true
+  - name: "PersonBirthAgent"
+    run: true
+    sample: true
+  - name: "AgeUpdateAgent"
+    run: true
+    sample: true
+  - name: "ParentshipAgent"
+    run: true
+    sample: true
+  - name: "RelocationAgent"
+    run: true
+    sample: true
+  - name: "CompanyAgent"
+    run: true
+    sample: true
+  - name: "EmploymentAgent"
+    run: true
+    sample: true
+  - name: "ProductAgent"
+    run: true
+    sample: true
+  - name: "TransactionAgent"
+    run: true
+    sample: true
+  - name: "FriendshipAgent"
+    run: true
+    sample: true
+sampling: logarithmic_iterations_base_10

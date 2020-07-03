@@ -5,10 +5,14 @@ import grabl.tracing.client.GrablTracingThreadStatic;
 import grakn.client.GraknClient;
 import grakn.client.GraknClient.Session;
 import grakn.client.GraknClient.Transaction;
+import grakn.simulation.agents.World;
+import grakn.simulation.agents.base.Agent;
 import grakn.simulation.agents.base.AgentContext;
 import grakn.simulation.agents.base.AgentRunner;
-import grakn.simulation.agents.World;
 import grakn.simulation.common.RandomSource;
+import grakn.simulation.yaml_tool.AgentConfig;
+import grakn.simulation.yaml_tool.Config;
+import grakn.simulation.yaml_tool.ConfigLoader;
 import grakn.simulation.yaml_tool.GraknYAMLException;
 import grakn.simulation.yaml_tool.GraknYAMLLoader;
 import graql.lang.Graql;
@@ -23,6 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -30,7 +35,9 @@ import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
@@ -46,6 +53,7 @@ public class Simulation implements AgentContext, AutoCloseable {
     private final static long RANDOM_SEED = 1;
     private final static int DEFAULT_NUM_ITERATIONS = 10;
     private final static int DEFAULT_SCALE_FACTOR = 5;
+    private final static String DEFAULT_CONFIG_YAML = "config.yaml";
     private final static Logger LOG = LoggerFactory.getLogger(Simulation.class);
 
     private static Optional<String> getOption(CommandLine commandLine, String option) {
@@ -98,6 +106,9 @@ public class Simulation implements AgentContext, AutoCloseable {
         options.addOption(Option.builder("d")
                 .longOpt("disable-tracing").desc("Disable grabl tracing")
                 .build());
+        options.addOption(Option.builder("b")
+                .longOpt("config-file").desc("Configuration file")
+                .build());
 
         CommandLineParser parser = new DefaultParser();
         CommandLine commandLine;
@@ -135,9 +146,20 @@ public class Simulation implements AgentContext, AutoCloseable {
             files.put(filename, path);
         }
 
+        Path configPath = Paths.get(getOption(commandLine, "b").orElse(DEFAULT_CONFIG_YAML));
+        Config config = ConfigLoader.loadConfigFromYaml(configPath.toFile());
+
         ////////////////////
         // INITIALIZATION //
-        ////////////////////
+        ////////////////////////////////////
+
+        List<AgentRunner> agentRunners = new ArrayList<>();
+        for (AgentConfig agentConfig : config.getAgents()) {
+            if (agentConfig.getRun()) {
+                AgentRunner<?> runner = buildAgentRunner(agentConfig.getName(), agentConfig.getSample());
+                agentRunners.add(runner);
+            }
+        }
 
         LOG.info("Welcome to the Simulation!");
         LOG.info("Parsing world data...");
@@ -198,7 +220,7 @@ public class Simulation implements AgentContext, AutoCloseable {
                 try (Simulation simulation = new Simulation(
                         grakn,
                         graknKeyspace,
-                        AgentRunnerList.AGENTS,
+                        agentRunners,
                         new RandomSource(seed),
                         world
                 )) {
@@ -227,6 +249,18 @@ public class Simulation implements AgentContext, AutoCloseable {
         LOG.info("Simulation complete");
     }
 
+    private static AgentRunner<?> buildAgentRunner(String agentClassName, Boolean sample) {
+        try {
+            Class<? extends Agent<?>> agentClass = (Class<? extends Agent<?>>) Class.forName("grakn.simulation.agents." + agentClassName);
+            Agent<?> agent = agentClass.newInstance();
+            AgentRunner<?> agentRunner = agent.runnerType().getDeclaredConstructor(Class.class, Boolean.class).newInstance(agentClass, sample);
+            return agentRunner;
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+    }
+
     private static void loadSchema(Session session, Path... schemaPath) throws IOException {
         System.out.println(">>>> trace: loadSchema: start");
         for (Path path : schemaPath) {
@@ -252,7 +286,7 @@ public class Simulation implements AgentContext, AutoCloseable {
     private final GraknClient client;
     private final String keyspace;
     private final Session defaultSession;
-    private final AgentRunner[] agents;
+    private final List<AgentRunner> agentRunners;
     private final Random random;
     private final World world;
 
@@ -260,11 +294,11 @@ public class Simulation implements AgentContext, AutoCloseable {
 
     private final ConcurrentMap<String, Session> sessionMap;
 
-    private Simulation(GraknClient grakn, String keyspace, AgentRunner[] agents, RandomSource randomSource, World world) {
+    private Simulation(GraknClient grakn, String keyspace, List<AgentRunner> agentRunners, RandomSource randomSource, World world) {
         client = grakn;
         this.keyspace = keyspace;
         defaultSession = client.session(keyspace);
-        this.agents = agents;
+        this.agentRunners = agentRunners;
         random = randomSource.startNewRandom();
         sessionMap = new ConcurrentHashMap<>();
         this.world = world;
@@ -274,7 +308,7 @@ public class Simulation implements AgentContext, AutoCloseable {
 
         LOG.info("Simulation step: {}", simulationStep);
 
-        for (AgentRunner agentRunner : agents) {
+        for (AgentRunner agentRunner : agentRunners) {
             agentRunner.iterate(this, RandomSource.nextSource(random));
         }
 
