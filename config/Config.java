@@ -4,7 +4,7 @@ import java.util.List;
 
 public class Config {
     private List<Agent> agents;
-    private String iterationTraceSampling;
+    private TraceSampling traceSampling;
 
     public List<Agent> getAgents() {
         return agents;
@@ -14,12 +14,33 @@ public class Config {
         this.agents = agents;
     }
 
-    public String getIterationTraceSampling() {
-        return iterationTraceSampling;
+    public TraceSampling getTraceSampling() {
+        return traceSampling;
     }
 
-    public void setIterationTraceSampling(String iterationTraceSampling) {
-        this.iterationTraceSampling = iterationTraceSampling;
+    public void setTraceSampling(TraceSampling traceSampling) {
+        this.traceSampling = traceSampling;
+    }
+
+    public static class TraceSampling {
+        private String functionName;
+        private Integer arg;
+
+        public String getFunctionName() {
+            return functionName;
+        }
+
+        public void setFunctionName(String functionName) {
+            this.functionName = functionName;
+        }
+
+        public Integer getArg() {
+            return arg;
+        }
+
+        public void setArg(Integer arg) {
+            this.arg = arg;
+        }
     }
 
     public static class Agent {

@@ -21,7 +21,8 @@ agents:
     mode: "trace"
   - name: "FriendshipAgent"
     mode: "trace"
-#samplingFunction:
-#  name: "every"
-#  arg: 5
-iterationTraceSampling: "logarithmic_iterations_base_10"
+
+traceSampling:
+  # Options: `"every"` for every K traces; `"log"` for logarithm with base N
+  functionName: "every"
+  arg: 5

@@ -33,6 +33,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,6 +41,7 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.function.Function;
 
 import static grabl.tracing.client.GrablTracing.tracing;
 import static grabl.tracing.client.GrablTracing.tracingNoOp;
@@ -51,7 +53,43 @@ public class Simulation implements AgentContext, AutoCloseable {
     private final static int DEFAULT_NUM_ITERATIONS = 10;
     private final static int DEFAULT_SCALE_FACTOR = 5;
     private final static String DEFAULT_CONFIG_YAML = "config/config.yaml";
-    private final static Logger LOG = LoggerFactory.getLogger(Simulation.class);
+    private final static Logger LOGGER = LoggerFactory.getLogger(Simulation.class);
+
+    private enum SamplingFunction {
+
+        EVERY("every", new int[0]),
+        LOG("log", new int[0]);
+
+        private final String name;
+        private final int[] acceptedArgs;
+
+        SamplingFunction(String name, int[] acceptedArgs) {
+            this.name = name;
+            this.acceptedArgs = acceptedArgs;
+        }
+
+        public static SamplingFunction validate(Config.TraceSampling func) {
+            for (SamplingFunction samplingFunction : SamplingFunction.values()) {
+                if (samplingFunction.getName().equals(func.getFunctionName())) {
+                    if (samplingFunction.getAcceptedArgs().length == 0
+                            || Arrays.stream(samplingFunction.getAcceptedArgs()).anyMatch(func.getArg()::equals)) {
+                        return samplingFunction;
+                    } else {
+                        throw new IllegalArgumentException("Function argument not permitted");
+                    }
+                }
+            }
+            throw new IllegalArgumentException("Function name not recognised");
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public int[] getAcceptedArgs() {
+            return acceptedArgs;
+        }
+    }
 
     private static Optional<String> getOption(CommandLine commandLine, String option) {
         if (commandLine.hasOption(option)) {
@@ -159,8 +197,23 @@ public class Simulation implements AgentContext, AutoCloseable {
             }
         }
 
-        LOG.info("Welcome to the Simulation!");
-        LOG.info("Parsing world data...");
+        Function<Integer, Boolean> iterationSamplingFunc;
+
+        SamplingFunction samplingFunction = SamplingFunction.validate(config.getTraceSampling());
+
+        if(samplingFunction.equals(SamplingFunction.EVERY)){
+            iterationSamplingFunc = i -> i % config.getTraceSampling().getArg() == 0;
+        } else if (samplingFunction.equals(SamplingFunction.LOG)) {
+            iterationSamplingFunc = i -> {
+                int base = config.getTraceSampling().getArg();
+                return i == (int) Math.log(i) / Math.log(base);
+            };
+        } else {
+            throw new RuntimeException("Function validation failed");
+        }
+
+        LOGGER.info("Welcome to the Simulation!");
+        LOGGER.info("Parsing world data...");
         World world;
         try {
             world = new World(
@@ -180,7 +233,7 @@ public class Simulation implements AgentContext, AutoCloseable {
             return;
         }
 
-        LOG.info("Connecting to Grakn...");
+        LOGGER.info("Connecting to Grakn...");
 
         try {
             GraknClient grakn = null;
@@ -227,7 +280,7 @@ public class Simulation implements AgentContext, AutoCloseable {
                     ///////////////
 
                     for (int i = 0; i < iterations; ++i) {
-                        simulation.iterate(true);
+                        simulation.iterate(iterationSamplingFunc.apply(i));
                     }
                 }
             } finally {
@@ -244,7 +297,7 @@ public class Simulation implements AgentContext, AutoCloseable {
             System.exit(1);
         }
 
-        LOG.info("Simulation complete");
+        LOGGER.info("Simulation complete");
     }
 
     private static void loadSchema(Session session, Path... schemaPath) throws IOException {
@@ -292,7 +345,7 @@ public class Simulation implements AgentContext, AutoCloseable {
 
     private void iterate(Boolean traceIteration) {
 
-        LOG.info("Simulation step: {}", simulationStep);
+        LOGGER.info("Simulation step: {}", simulationStep);
 
         for (AgentRunner agentRunner : agentRunners) {
             agentRunner.iterate(this, RandomSource.nextSource(random), traceIteration);
