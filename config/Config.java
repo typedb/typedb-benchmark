@@ -1,6 +1,9 @@
 package grakn.simulation.config;
 
+import grakn.simulation.agents.base.AgentRunner;
+
 import java.util.List;
+import java.util.function.Function;
 
 public class Config {
     private List<Agent> agents;
@@ -23,15 +26,15 @@ public class Config {
     }
 
     public static class TraceSampling {
-        private String functionName;
+        private Schema.SamplingFunction function;
         private Integer arg;
 
-        public String getFunctionName() {
-            return functionName;
+        public Function<Integer, Boolean> getSamplingFunction() {
+            return Schema.SamplingFunction.applyArg(function, arg);
         }
 
-        public void setFunctionName(String functionName) {
-            this.functionName = functionName;
+        public void setFunction(String function) {
+            this.function = Schema.SamplingFunction.getByName(function);
         }
 
         public Integer getArg() {
@@ -44,37 +47,35 @@ public class Config {
     }
 
     public static class Agent {
-        private String name;
-        private Boolean run;
-        private Boolean trace;
-
-        public String getName() {
-            return name;
-        }
+        private Schema.AgentMode agentMode;
+        private AgentRunner<?> runner;
 
         public void setName(String name) {
-            this.name = name;
-        }
-
-        public Boolean getTrace() {
-            return trace;
-        }
-
-        public Boolean getRun() {
-            return run;
+            this.runner = Schema.AGENTS.get(name);
         }
 
         public void setMode(String mode) {
-            if (mode.equals("trace")) {
-                run = true;
-                trace = true;
-            } else if (mode.equals("run")) {
-                run = true;
-                trace = false;
-            } else {
-                run = false;
-                trace = false;
+            switch (mode) {
+                case "trace":
+                    this.agentMode = Schema.AgentMode.TRACE;
+                    break;
+                case "run":
+                    this.agentMode = Schema.AgentMode.RUN;
+                    break;
+                case "off":
+                    this.agentMode = Schema.AgentMode.OFF;
+                    break;
+                default:
+                    throw new IllegalArgumentException(String.format("Unrecognised agent mode %s", mode));
             }
+        }
+
+        public Schema.AgentMode getAgentMode() {
+            return agentMode;
+        }
+
+        public AgentRunner<?> getRunner() {
+            return runner;
         }
     }
 }
