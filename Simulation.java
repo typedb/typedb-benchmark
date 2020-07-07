@@ -61,11 +61,7 @@ public class Simulation implements AgentContext, AutoCloseable {
         }
     }
 
-    public static void main(String[] args) {
-        //////////////////////////
-        // COMMAND LINE OPTIONS //
-        //////////////////////////
-
+    private static Options buildOptions() {
         Options options = new Options();
         options.addOption(Option.builder("g")
                 .longOpt("grakn-uri").desc("Grakn server URI").hasArg().argName("uri")
@@ -106,6 +102,12 @@ public class Simulation implements AgentContext, AutoCloseable {
         options.addOption(Option.builder("d")
                 .longOpt("disable-tracing").desc("Disable grabl tracing")
                 .build());
+        return options;
+    }
+
+    public static void main(String[] args) {
+
+        Options options = buildOptions();
 
         CommandLineParser parser = new DefaultParser();
         CommandLine commandLine;
