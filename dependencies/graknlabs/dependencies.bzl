@@ -42,6 +42,6 @@ def graknlabs_client_java():
 def graknlabs_grabl_tracing():
     git_repository(
         name = "graknlabs_grabl_tracing",
-        remote = "https://github.com/jmsfltchr/grabl-tracing",
-        commit = "e2d2b4319acc5bcca71c95a104176252ea8c8f83"  # sync-marker: do not remove this comment, this is used for sync-dependencies by @graknlabs_grabl_tracing
+        remote = "https://github.com/graknlabs/grabl-tracing",
+        commit = "ef402d500034ad2d5c9106c95d15804f29f1334c"  # sync-marker: do not remove this comment, this is used for sync-dependencies by @graknlabs_grabl_tracing
     )
