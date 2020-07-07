@@ -51,7 +51,7 @@ jobs:
             git diff --exit-code dependencies/maven/artifacts.snapshot
       - run: bazel run @graknlabs_dependencies//tool/unuseddeps:unused-deps -- list
 
-  test-end-to-end:
+  test-end-to-end-neo4j:
     machine: 
       image: ubuntu-1604:201903-01
     working_directory: ~/simulation
@@ -59,6 +59,14 @@ jobs:
       - install-bazel
       - checkout
       - run-neo4j
+
+  test-end-to-end-grakn:
+    machine:
+      image: ubuntu-1604:201903-01
+    working_directory: ~/simulation
+    steps:
+      - install-bazel
+      - checkout
       - run-grakn
       - run: bazel run //:simulation -- -d -k world
       - run: bazel test //agents/test/... --test_arg=localhost:48555 --test_output=all
@@ -68,6 +76,9 @@ workflows:
   simulation:
     jobs:
       - build
-      - test-end-to-end:
+      - test-end-to-end-neo4j:
           requires:
             - build
+#      - test-end-to-end-grakn:
+#          requires:
+#            - build
