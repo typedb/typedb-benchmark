@@ -39,7 +39,7 @@ public class Schema {
 
     public enum AgentMode {
         TRACE(true, true),
-        RUN(true, false),
+        RUN(false, true),
         OFF(false, false);
 
         private final Boolean trace;
