@@ -1,6 +1,8 @@
 java_library(
     name = "simulation-lib",
-    srcs = glob(["*.java"]),
+    srcs = [
+        "Simulation.java"
+    ],
     resource_strip_prefix = "conf/",
     resources = [
         "conf/logback.xml",
