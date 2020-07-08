@@ -40,30 +40,30 @@ public abstract class AgentRunner<T> {
         traceAgent = trace;
     }
 
-    abstract protected List<T> getParallelItems(AgentContext agentContext, RandomSource randomSource);
+    abstract protected List<T> getParallelItems(IterationContext iterationContext, RandomSource randomSource);
 
-    abstract protected String getSessionKey(AgentContext agentContext, RandomSource randomSource, T item);
+    abstract protected String getSessionKey(IterationContext iterationContext, RandomSource randomSource, T item);
 
-    abstract protected String getTracker(AgentContext agentContext, RandomSource randomSource, T item);
+    abstract protected String getTracker(IterationContext iterationContext, RandomSource randomSource, T item);
 
-    public void iterate(AgentContext agentContext, RandomSource randomSource, Boolean traceIteration) {
-        List<T> items = getParallelItems(agentContext, randomSource);
+    public void iterate(IterationContext iterationContext, RandomSource randomSource) {
+        List<T> items = getParallelItems(iterationContext, randomSource);
         List<RandomSource> sources = randomSource.split(items.size());
 
         Pair.zip(sources, items).parallelStream().forEach(
-                pair -> runAgent(agentContext, pair.getFirst(), pair.getSecond(), traceIteration)
+                pair -> runAgent(iterationContext, pair.getFirst(), pair.getSecond())
         );
     }
 
-    private void runAgent(AgentContext agentContext, RandomSource source, T item, Boolean traceIteration) {
+    private void runAgent(IterationContext iterationContext, RandomSource source, T item) {
         Random random = source.startNewRandom();
         Random agentRandom = RandomSource.nextSource(random).startNewRandom();
-        String sessionKey = getSessionKey(agentContext, RandomSource.nextSource(random), item);
-        String tracker = getTracker(agentContext, RandomSource.nextSource(random), item);
+        String sessionKey = getSessionKey(iterationContext, RandomSource.nextSource(random), item);
+        String tracker = getTracker(iterationContext, RandomSource.nextSource(random), item);
 
         try (Agent<T> agent = agentConstructor.newInstance()) {
 
-            agent.init(agentContext, agentRandom, item, sessionKey, tracker, logger, traceAgent && traceIteration);
+            agent.init(iterationContext, agentRandom, item, sessionKey, tracker, logger, traceAgent && iterationContext.shouldTrace());
             agent.iterate();
 
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {

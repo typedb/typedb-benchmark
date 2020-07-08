@@ -19,13 +19,13 @@ import static grabl.tracing.client.GrablTracingThreadStatic.contextOnThread;
  * this class.
  *
  * This class is instantiated via reflection by {@link AgentRunner} and initialized using
- * {@link #init(AgentContext, Random, Object, String, String, Logger, Boolean)}.
+ * {@link #init(IterationContext, Random, Object, String, String, Logger, Boolean)}.
  *
  * The protected methods of this class provide useful simple methods for writing Agents as concisely as possible.
  */
 public abstract class Agent<T> implements AutoCloseable {
 
-    private AgentContext agentContext;
+    private IterationContext iterationContext;
     private Random random;
     private T item;
     private String sessionKey;
@@ -33,8 +33,8 @@ public abstract class Agent<T> implements AutoCloseable {
     private LogWrapper logWrapper;
     private ThreadContext context;
 
-    void init(AgentContext agentContext, Random random, T item, String sessionKey, String tracker, Logger logger, Boolean trace) {
-        this.agentContext = agentContext;
+    void init(IterationContext iterationContext, Random random, T item, String sessionKey, String tracker, Logger logger, Boolean trace) {
+        this.iterationContext = iterationContext;
         this.random = random;
         this.item = item;
         this.sessionKey = sessionKey;
@@ -70,11 +70,11 @@ public abstract class Agent<T> implements AutoCloseable {
     }
 
     protected GraknClient.Session session() {
-        return agentContext.getIterationGraknSessionFor(getSessionKey());
+        return iterationContext.getIterationGraknSessionFor(getSessionKey());
     }
 
     protected GraknClient.Transaction.Builder transaction() {
-        return agentContext.getIterationGraknSessionFor(getSessionKey()).transaction();
+        return iterationContext.getIterationGraknSessionFor(getSessionKey()).transaction();
     }
 
     protected String getSessionKey() {
@@ -101,18 +101,18 @@ public abstract class Agent<T> implements AutoCloseable {
     }
 
     protected World world() {
-        return agentContext.getWorld();
+        return iterationContext.getWorld();
     }
 
     protected LocalDateTime today() {
         if (today == null) {
-            today = agentContext.getLocalDateTime();
+            today = iterationContext.getLocalDateTime();
         }
         return today;
     }
 
     protected int simulationStep() {
-        return agentContext.getSimulationStep();
+        return iterationContext.getSimulationStep();
     }
 
     protected void shuffle(List<?> list) {

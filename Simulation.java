@@ -6,7 +6,7 @@ import grakn.client.GraknClient;
 import grakn.client.GraknClient.Session;
 import grakn.client.GraknClient.Transaction;
 import grakn.simulation.agents.World;
-import grakn.simulation.agents.base.AgentContext;
+import grakn.simulation.agents.base.IterationContext;
 import grakn.simulation.agents.base.AgentRunner;
 import grakn.simulation.common.RandomSource;
 import grakn.simulation.config.Config;
@@ -40,18 +40,19 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.function.Function;
 
 import static grabl.tracing.client.GrablTracing.tracing;
 import static grabl.tracing.client.GrablTracing.tracingNoOp;
 import static grabl.tracing.client.GrablTracing.withLogging;
 
-public class Simulation implements AgentContext, AutoCloseable {
+public class Simulation implements IterationContext, AutoCloseable {
 
     private final static long RANDOM_SEED = 1;
     private final static int DEFAULT_NUM_ITERATIONS = 10;
     private final static int DEFAULT_SCALE_FACTOR = 5;
     private final static String DEFAULT_CONFIG_YAML = "config/config.yaml";
-    private final static Logger LOGGER = LoggerFactory.getLogger(Simulation.class);
+    private final static Logger LOG = LoggerFactory.getLogger(Simulation.class);
 
     private static Optional<String> getOption(CommandLine commandLine, String option) {
         if (commandLine.hasOption(option)) {
@@ -150,7 +151,7 @@ public class Simulation implements AgentContext, AutoCloseable {
 
         ////////////////////
         // INITIALIZATION //
-        ////////////////////////////////////
+        ////////////////////
 
         List<AgentRunner> agentRunners = new ArrayList<>();
         for (Config.Agent agent : config.getAgents()) {
@@ -161,8 +162,8 @@ public class Simulation implements AgentContext, AutoCloseable {
             }
         }
 
-        LOGGER.info("Welcome to the Simulation!");
-        LOGGER.info("Parsing world data...");
+        LOG.info("Welcome to the Simulation!");
+        LOG.info("Parsing world data...");
         World world;
         try {
             world = new World(
@@ -182,7 +183,7 @@ public class Simulation implements AgentContext, AutoCloseable {
             return;
         }
 
-        LOGGER.info("Connecting to Grakn...");
+        LOG.info("Connecting to Grakn...");
 
         try {
             GraknClient grakn = null;
@@ -222,14 +223,15 @@ public class Simulation implements AgentContext, AutoCloseable {
                         graknKeyspace,
                         agentRunners,
                         new RandomSource(seed),
-                        world
+                        world,
+                        config.getTraceSampling().getSamplingFunction()
                 )) {
                     ///////////////
                     // MAIN LOOP //
                     ///////////////
 
                     for (int i = 0; i < iterations; ++i) {
-                        simulation.iterate(config.getTraceSampling().getSamplingFunction().apply(i));
+                        simulation.iterate();
                     }
                 }
             } finally {
@@ -246,7 +248,7 @@ public class Simulation implements AgentContext, AutoCloseable {
             System.exit(1);
         }
 
-        LOGGER.info("Simulation complete");
+        LOG.info("Simulation complete");
     }
 
     private static void loadSchema(Session session, Path... schemaPath) throws IOException {
@@ -276,28 +278,30 @@ public class Simulation implements AgentContext, AutoCloseable {
     private final Session defaultSession;
     private final List<AgentRunner> agentRunners;
     private final Random random;
+    private Function<Integer, Boolean> iterationSamplingFunction;
     private final World world;
 
     private int simulationStep = 1;
 
     private final ConcurrentMap<String, Session> sessionMap;
 
-    private Simulation(GraknClient grakn, String keyspace, List<AgentRunner> agentRunners, RandomSource randomSource, World world) {
+    private Simulation(GraknClient grakn, String keyspace, List<AgentRunner> agentRunners, RandomSource randomSource, World world, Function<Integer, Boolean> iterationSamplingFunction) {
         client = grakn;
         this.keyspace = keyspace;
         defaultSession = client.session(keyspace);
         this.agentRunners = agentRunners;
         random = randomSource.startNewRandom();
+        this.iterationSamplingFunction = iterationSamplingFunction;
         sessionMap = new ConcurrentHashMap<>();
         this.world = world;
     }
 
-    private void iterate(Boolean traceIteration) {
+    private void iterate() {
 
-        LOGGER.info("Simulation step: {}", simulationStep);
+        LOG.info("Simulation step: {}", simulationStep);
 
         for (AgentRunner agentRunner : agentRunners) {
-            agentRunner.iterate(this, RandomSource.nextSource(random), traceIteration);
+            agentRunner.iterate(this, RandomSource.nextSource(random));
         }
 
         closeAllSessionsInMap(); // We want to test opening new sessions each iteration.
@@ -330,6 +334,11 @@ public class Simulation implements AgentContext, AutoCloseable {
     @Override
     public World getWorld() {
         return world;
+    }
+
+    @Override
+    public boolean shouldTrace() {
+        return iterationSamplingFunction.apply(getSimulationStep());
     }
 
     @Override
