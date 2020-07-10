@@ -46,13 +46,13 @@ public class TransactionAgent extends CountryAgent {
     private List<Long> getCompanyNumbersInCountry(){
         GraqlGet companiesQuery = getCompanyNumbersInCountryQuery(country());
         log().query("getCompanyNumbersInCountry", companiesQuery);
-        return getOrderedAttribute(tx(), companiesQuery, "company-number");
+        return getOrderedAttribute(tx().forGrakn(), companiesQuery, "company-number");
     }
 
     private List<Double> getProductBarcodesInContinent() {
         GraqlGet.Unfiltered productsQuery = getProductsInContinentQuery(country().continent());
         log().query("getProductBarcodesInContinent", productsQuery);
-        return getOrderedAttribute(tx(), productsQuery, "product-barcode");
+        return getOrderedAttribute(tx().forGrakn(), productsQuery, "product-barcode");
     }
 
     private void insertTransaction(Pair<Long, Double> transaction, Long sellerCompanyNumber){
@@ -83,6 +83,6 @@ public class TransactionAgent extends CountryAgent {
 
                 );
         log().query("insertTransaction", insertTransactionQuery);
-        tx().execute(insertTransactionQuery);
+        tx().forGrakn().execute(insertTransactionQuery);
     }
 }

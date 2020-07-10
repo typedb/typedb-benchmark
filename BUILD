@@ -12,6 +12,7 @@ java_library(
         "//agents",
         "//common",
         "//config",
+        "//driver",
         "//yaml_tool",
         "@maven//:ch_qos_logback_logback_classic",
         "@maven//:commons_cli_commons_cli",

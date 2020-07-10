@@ -61,7 +61,7 @@ public class RelocationAgent extends CityAgent {
         GraqlGet.Unfiltered cityResidentsQuery = cityResidentsQuery(city(), earliestDate);
         log().query("getResidentEmails", cityResidentsQuery);
         int numRelocations = world().getScaleFactor();
-        return ExecutorUtils.getOrderedAttribute(tx(), cityResidentsQuery, "email", numRelocations);
+        return ExecutorUtils.getOrderedAttribute(tx().forGrakn(), cityResidentsQuery, "email", numRelocations);
     }
 
     private List<String> getRelocationCityNames() {
@@ -74,7 +74,7 @@ public class RelocationAgent extends CityAgent {
         ).get();
 
         log().query("getRelocationCityNames", relocationCitiesQuery);
-        return getOrderedAttribute(tx(), relocationCitiesQuery, "city-name");
+        return getOrderedAttribute(tx().forGrakn(), relocationCitiesQuery, "city-name");
     }
 
     private void insertRelocation(String email, String newCityName) {
@@ -91,6 +91,6 @@ public class RelocationAgent extends CityAgent {
         );
 
         log().query("insertRelocation", relocatePersonQuery);
-        tx().execute(relocatePersonQuery);
+        tx().forGrakn().execute(relocatePersonQuery);
     }
 }

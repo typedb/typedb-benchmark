@@ -42,13 +42,13 @@ public class MarriageAgent extends CityAgent {
     private List<String> getSingleWomen() {
         GraqlGet.Unfiltered singleWomenQuery = getSinglePeopleOfGenderQuery("female", "marriage_wife");
         log().query("getSingleWomen", singleWomenQuery);
-        return getOrderedAttribute(tx(), singleWomenQuery, "email");
+        return getOrderedAttribute(tx().forGrakn(), singleWomenQuery, "email");
     }
 
     private List<String> getSingleMen() {
         GraqlGet.Unfiltered singleMenQuery = getSinglePeopleOfGenderQuery("male", "marriage_husband");
         log().query("getSingleMen", singleMenQuery);
-        return getOrderedAttribute(tx(), singleMenQuery, "email");
+        return getOrderedAttribute(tx().forGrakn(), singleMenQuery, "email");
     }
 
     private GraqlGet.Unfiltered getSinglePeopleOfGenderQuery(String gender, String marriageRole) {
@@ -80,6 +80,6 @@ public class MarriageAgent extends CityAgent {
                 Graql.var().isa("locates").rel("locates_located", Graql.var("m")).rel("locates_location", Graql.var("city"))
         );
         log().query("insertMarriage", marriageQuery);
-        tx().execute(marriageQuery);
+        tx().forGrakn().execute(marriageQuery);
     }
 }

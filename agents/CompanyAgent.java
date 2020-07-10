@@ -39,7 +39,7 @@ public class CompanyAgent extends CountryAgent {
                                         .has("date-of-incorporation", today())
                         );
         log().query("insertCompany", query);
-        tx().execute(query);
+        tx().forGrakn().execute(query);
     }
 
     static GraqlGet getCompanyNumbersInCountryQuery(World.Country country) {

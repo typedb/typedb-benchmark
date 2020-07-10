@@ -33,7 +33,7 @@ public class ProductAgent extends ContinentAgent {
                         .rel("produced-in_continent", Graql.var("continent"))
                 );
         log().query("insertProduct", insertProductQuery);
-        tx().execute(insertProductQuery);
+        tx().forGrakn().execute(insertProductQuery);
     }
 
     static GraqlGet.Unfiltered getProductsInContinentQuery(World.Continent continent) {

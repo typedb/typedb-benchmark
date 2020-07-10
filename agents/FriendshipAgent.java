@@ -43,7 +43,7 @@ public class FriendshipAgent extends CityAgent {
                         .rel("friendship_friend", Graql.var("p1"))
                         .rel("friendship_friend", Graql.var("p2"))).get().count();
         log().query("checkIfFriendshipExists", friendshipExistsQuery);
-        List<Numeric> answer = tx().execute(friendshipExistsQuery).get();
+        List<Numeric> answer = tx().forGrakn().execute(friendshipExistsQuery).get();
         int numAnswers = answer.get(0).number().intValue();
         return numAnswers > 0;
     }
@@ -51,7 +51,7 @@ public class FriendshipAgent extends CityAgent {
     private List<String> getResidentEmails(LocalDateTime earliestDate) {
         GraqlGet.Unfiltered cityResidentsQuery = cityResidentsQuery(city(), earliestDate);
         log().query("getResidentEmails", cityResidentsQuery);
-        return ExecutorUtils.getOrderedAttribute(tx(), cityResidentsQuery, "email");
+        return ExecutorUtils.getOrderedAttribute(tx().forGrakn(), cityResidentsQuery, "email");
     }
 
     private void insertFriendship(String friend1Email, String friend2Email) {
@@ -66,6 +66,6 @@ public class FriendshipAgent extends CityAgent {
                         .has("start-date", today())
         );
         log().query("insertFriendship", insertFriendshipQuery);
-        tx().execute(insertFriendshipQuery);
+        tx().forGrakn().execute(insertFriendshipQuery);
     }
 }

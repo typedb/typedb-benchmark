@@ -8,9 +8,12 @@ import grakn.client.GraknClient.Transaction;
 import grakn.simulation.agents.World;
 import grakn.simulation.agents.base.IterationContext;
 import grakn.simulation.agents.base.AgentRunner;
+import grakn.simulation.driver.DbDriverWrapper;
+import grakn.simulation.driver.GraknClientWrapper;
 import grakn.simulation.common.RandomSource;
 import grakn.simulation.config.Config;
 import grakn.simulation.config.ConfigLoader;
+import grakn.simulation.config.Schema;
 import grakn.simulation.yaml_tool.GraknYAMLException;
 import grakn.simulation.yaml_tool.GraknYAMLLoader;
 import graql.lang.Graql;
@@ -64,8 +67,11 @@ public class Simulation implements IterationContext, AutoCloseable {
 
     private static Options buildOptions() {
         Options options = new Options();
-        options.addOption(Option.builder("g")
-                .longOpt("grakn-uri").desc("Grakn server URI").hasArg().argName("uri")
+        options.addOption(Option.builder("d")
+                .longOpt("database").desc("Database under test").hasArg().required().argName("database")
+                .build());
+        options.addOption(Option.builder("u")
+                .longOpt("database-uri").desc("Database server URI").hasArg().argName("uri")
                 .build());
         options.addOption(Option.builder("t")
                 .longOpt("tracing-uri").desc("Grabl tracing server URI").hasArg().argName("uri")
@@ -95,12 +101,12 @@ public class Simulation implements IterationContext, AutoCloseable {
                 .longOpt("scale-factor").desc("Scale factor of iteration data").hasArg().argName("scale-factor")
                 .build());
         options.addOption(Option.builder("k")
-                .longOpt("keyspace").desc("Grakn keyspace").hasArg().required().argName("keyspace")
+                .longOpt("keyspace").desc("keyspace name").hasArg().required().argName("name")
                 .build());
         options.addOption(Option.builder("b")
-                .longOpt("config-file").desc("Configuration file").hasArg().argName("config-file")
+                .longOpt("config-file").desc("Configuration file").hasArg().argName("config-file-path")
                 .build());
-        options.addOption(Option.builder("d")
+        options.addOption(Option.builder("z")
                 .longOpt("disable-tracing").desc("Disable grabl tracing")
                 .build());
         return options;
@@ -120,7 +126,7 @@ public class Simulation implements IterationContext, AutoCloseable {
             return;
         }
 
-        String graknHostUri = getOption(commandLine, "g").orElse(GraknClient.DEFAULT_URI);
+        String graknHostUri = getOption(commandLine, "u").orElse(GraknClient.DEFAULT_URI);
         String grablTracingUri = getOption(commandLine, "t").orElse("localhost:7979");
         String grablTracingOrganisation = commandLine.getOptionValue("o");
         String grablTracingRepository = commandLine.getOptionValue("r");
@@ -128,16 +134,30 @@ public class Simulation implements IterationContext, AutoCloseable {
         String grablTracingUsername = commandLine.getOptionValue("u");
         String grablTracingToken = commandLine.getOptionValue("a");
 
+        String dbName = getOption(commandLine, "d").orElse("grakn");
+
+        Schema.Database db;
+        switch (dbName) {
+            case "grakn":
+                db = Schema.Database.GRAKN;
+                break;
+            case "neo4j":
+                db = Schema.Database.NEO4J;
+                break;
+            default:
+                throw new IllegalStateException("Unexpected value: " + dbName);
+        }
+
         long seed = getOption(commandLine, "s").map(Long::parseLong).orElseGet(() -> {
             System.out.println("No seed supplied, using random seed: " + RANDOM_SEED);
             return RANDOM_SEED;
         });
 
-        boolean disableTracing = commandLine.hasOption("d");
+        boolean disableTracing = commandLine.hasOption("z");
 
         int iterations = getOption(commandLine, "i").map(Integer::parseInt).orElse(DEFAULT_NUM_ITERATIONS);
         int scaleFactor = getOption(commandLine, "f").map(Integer::parseInt).orElse(DEFAULT_SCALE_FACTOR);
-        String graknKeyspace = commandLine.getOptionValue("k");
+        String databaseName = commandLine.getOptionValue("k");
 
         Map<String, Path> files = new HashMap<>();
         for (String filepath : commandLine.getArgList()) {
@@ -158,11 +178,63 @@ public class Simulation implements IterationContext, AutoCloseable {
             if (agent.getAgentMode().getRun()) {
                 AgentRunner<?> runner = agent.getRunner();
                 runner.setTrace(agent.getAgentMode().getTrace());
+//                runner.setDb(db);// TODO Set the DB so that agent implementations are picked based on this
                 agentRunners.add(runner);
             }
         }
 
         LOG.info("Welcome to the Simulation!");
+
+        World world = initialiseWorld(scaleFactor, files);
+        if (world == null) return;
+
+        LOG.info(String.format("Connecting to %s...", db.toString()));
+
+        try {
+            GraknClientWrapper driverWrapper = null; // TODO inject this
+            GrablTracing tracing = null;
+            try {
+                tracing = initialiseGrablTracing(grablTracingUri, grablTracingOrganisation, grablTracingRepository, grablTracingCommit, grablTracingUsername, grablTracingToken, disableTracing);
+
+                driverWrapper = new GraknClientWrapper();
+                driverWrapper.open(graknHostUri);
+
+                initialiseForGrakn(databaseName, files, driverWrapper);
+
+                try (Simulation simulation = new Simulation(
+                        driverWrapper,
+                        databaseName,
+                        agentRunners,
+                        new RandomSource(seed),
+                        world,
+                        config.getTraceSampling().getSamplingFunction()
+                )) {
+                    ///////////////
+                    // MAIN LOOP //
+                    ///////////////
+
+                    for (int i = 0; i < iterations; ++i) {
+                        simulation.iterate();
+                    }
+                }
+            } finally {
+                if (driverWrapper != null) {
+                    driverWrapper.close();
+                }
+
+                if (tracing != null) {
+                    tracing.close();
+                }
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            System.exit(1);
+        }
+
+        LOG.info("Simulation complete");
+    }
+
+    private static World initialiseWorld(int scaleFactor, Map<String, Path> files) {
         LOG.info("Parsing world data...");
         World world;
         try {
@@ -180,78 +252,45 @@ public class Simulation implements IterationContext, AutoCloseable {
         } catch (IOException e) {
             e.printStackTrace();
             System.exit(1);
-            return;
+            return null;
         }
-
-        LOG.info("Connecting to Grakn...");
-
-        try {
-            GraknClient grakn = null;
-            GrablTracing tracing = null;
-            try {
-                if (disableTracing) {
-                    tracing = withLogging(tracingNoOp());
-                } else if (grablTracingUsername == null) {
-                    tracing = withLogging(tracing(grablTracingUri));
-                } else {
-                    tracing = withLogging(tracing(grablTracingUri, grablTracingUsername, grablTracingToken));
-                }
-                GrablTracingThreadStatic.setGlobalTracingClient(tracing);
-                GrablTracingThreadStatic.openGlobalAnalysis(grablTracingOrganisation, grablTracingRepository, grablTracingCommit);
-
-                grakn = new GraknClient(graknHostUri);
-
-                try (Session session = grakn.session(graknKeyspace)) {
-                    // TODO: merge these two schema files once this issue is fixed
-                    // https://github.com/graknlabs/grakn/issues/5553
-                    try (GrablTracingThreadStatic.ThreadContext context = GrablTracingThreadStatic.contextOnThread("schema", 0)) {
-                        loadSchema(session,
-                                files.get("schema.gql"),
-                                files.get("schema-pt2.gql"));
-                    }
-                    try (GrablTracingThreadStatic.ThreadContext context = GrablTracingThreadStatic.contextOnThread("data", 0)) {
-                        loadData(session,
-                                files.get("data.yaml"),
-                                files.get("currencies.yaml"),
-                                files.get("country_currencies.yaml"),
-                                files.get("country_languages.yaml"));
-                    }
-                }
-
-                try (Simulation simulation = new Simulation(
-                        grakn,
-                        graknKeyspace,
-                        agentRunners,
-                        new RandomSource(seed),
-                        world,
-                        config.getTraceSampling().getSamplingFunction()
-                )) {
-                    ///////////////
-                    // MAIN LOOP //
-                    ///////////////
-
-                    for (int i = 0; i < iterations; ++i) {
-                        simulation.iterate();
-                    }
-                }
-            } finally {
-                if (grakn != null) {
-                    grakn.close();
-                }
-
-                if (tracing != null) {
-                    tracing.close();
-                }
-            }
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            System.exit(1);
-        }
-
-        LOG.info("Simulation complete");
+        return world;
     }
 
-    private static void loadSchema(Session session, Path... schemaPath) throws IOException {
+    private static GrablTracing initialiseGrablTracing(String grablTracingUri, String grablTracingOrganisation, String grablTracingRepository, String grablTracingCommit, String grablTracingUsername, String grablTracingToken, boolean disableTracing) {
+        GrablTracing tracing;
+        if (disableTracing) {
+            tracing = withLogging(tracingNoOp());
+        } else if (grablTracingUsername == null) {
+            tracing = withLogging(tracing(grablTracingUri));
+        } else {
+            tracing = withLogging(tracing(grablTracingUri, grablTracingUsername, grablTracingToken));
+        }
+        GrablTracingThreadStatic.setGlobalTracingClient(tracing);
+        GrablTracingThreadStatic.openGlobalAnalysis(grablTracingOrganisation, grablTracingRepository, grablTracingCommit);
+        return tracing;
+    }
+
+    private static void initialiseForGrakn(String graknKeyspace, Map<String, Path> files, GraknClientWrapper driver) throws IOException, GraknYAMLException {
+        try (Session session = driver.getClient().session(graknKeyspace)) {
+            // TODO: merge these two schema files once this issue is fixed
+            // https://github.com/graknlabs/grakn/issues/5553
+            try (GrablTracingThreadStatic.ThreadContext context = GrablTracingThreadStatic.contextOnThread("schema", 0)) {
+                loadGraknSchema(session,
+                        files.get("schema.gql"),
+                        files.get("schema-pt2.gql"));
+            }
+            try (GrablTracingThreadStatic.ThreadContext context = GrablTracingThreadStatic.contextOnThread("data", 0)) {
+                loadGraknData(session,
+                        files.get("data.yaml"),
+                        files.get("currencies.yaml"),
+                        files.get("country_currencies.yaml"),
+                        files.get("country_languages.yaml"));
+            }
+        }
+    }
+
+    private static void loadGraknSchema(Session session, Path... schemaPath) throws IOException {
         System.out.println(">>>> trace: loadSchema: start");
         for (Path path : schemaPath) {
             String schemaQuery = new String(Files.readAllBytes(path), StandardCharsets.UTF_8);
@@ -266,16 +305,16 @@ public class Simulation implements IterationContext, AutoCloseable {
         System.out.println(">>>> trace: loadSchema: end");
     }
 
-    private static void loadData(Session session, Path... dataPath) throws IOException, GraknYAMLException {
+    private static void loadGraknData(Session session, Path... dataPath) throws IOException, GraknYAMLException {
         GraknYAMLLoader loader = new GraknYAMLLoader(session);
         for (Path path : dataPath) {
             loader.loadFile(path.toFile());
         }
     }
 
-    private final GraknClient client;
+    private final DbDriverWrapper dbDriver;
     private final String keyspace;
-    private final Session defaultSession;
+    private final DbDriverWrapper.Session defaultSession;
     private final List<AgentRunner> agentRunners;
     private final Random random;
     private Function<Integer, Boolean> iterationSamplingFunction;
@@ -283,12 +322,12 @@ public class Simulation implements IterationContext, AutoCloseable {
 
     private int simulationStep = 1;
 
-    private final ConcurrentMap<String, Session> sessionMap;
+    private final ConcurrentMap<String, DbDriverWrapper.Session> sessionMap;
 
-    private Simulation(GraknClient grakn, String keyspace, List<AgentRunner> agentRunners, RandomSource randomSource, World world, Function<Integer, Boolean> iterationSamplingFunction) {
-        client = grakn;
+    private Simulation(DbDriverWrapper dbDriver, String keyspace, List<AgentRunner> agentRunners, RandomSource randomSource, World world, Function<Integer, Boolean> iterationSamplingFunction) {
+        this.dbDriver = dbDriver;
         this.keyspace = keyspace;
-        defaultSession = client.session(keyspace);
+        defaultSession = this.dbDriver.session(keyspace);
         this.agentRunners = agentRunners;
         random = randomSource.startNewRandom();
         this.iterationSamplingFunction = iterationSamplingFunction;
@@ -310,15 +349,15 @@ public class Simulation implements IterationContext, AutoCloseable {
     }
 
     private void closeAllSessionsInMap() {
-        for (Session session : sessionMap.values()) {
+        for (DbDriverWrapper.Session session : sessionMap.values()) {
             session.close();
         }
         sessionMap.clear();
     }
     
     @Override
-    public Session getIterationGraknSessionFor(String key) {
-        return sessionMap.computeIfAbsent(key, k -> client.session(keyspace)); // Open sessions for new keys
+    public DbDriverWrapper.Session getIterationSessionFor(String key) {
+        return sessionMap.computeIfAbsent(key, k -> dbDriver.session(keyspace)); // Open sessions for new keys
     }
 
     @Override
@@ -347,8 +386,8 @@ public class Simulation implements IterationContext, AutoCloseable {
 
         defaultSession.close();
 
-        if (client != null) {
-            client.close();
+        if (dbDriver != null) {
+            dbDriver.close();
         }
     }
 }

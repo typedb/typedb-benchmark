@@ -36,7 +36,7 @@ public class AgeUpdateAgent extends CityAgent {
         ).delete(Graql.var("p").has("age", Graql.var("age")));
 
         log().query("deleteImplicitQuery", deleteImplicitQuery);
-        tx().execute(deleteImplicitQuery);
+        tx().forGrakn().execute(deleteImplicitQuery);
 
         GraqlInsert insertNewAgeQuery = Graql.match(
                 Graql.var("p").isa("person")
@@ -47,13 +47,13 @@ public class AgeUpdateAgent extends CityAgent {
         );
 
         log().query("insertNewAgeQuery", insertNewAgeQuery);
-        tx().execute(insertNewAgeQuery);
+        tx().forGrakn().execute(insertNewAgeQuery);
     }
 
     private Stream<ConceptMap> getPeopleBornInCity() {
         GraqlGet.Sorted peopleQuery = getPeopleBornInCityQuery();
         log().query("getPeopleBornInCity", peopleQuery);
-        return tx().stream(peopleQuery).get();
+        return tx().forGrakn().stream(peopleQuery).get();
     }
 
     private GraqlGet.Sorted getPeopleBornInCityQuery() {

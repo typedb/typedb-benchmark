@@ -42,14 +42,14 @@ public class EmploymentAgent extends CityAgent {
         GraqlGet companyNumbersQuery = CompanyAgent.getCompanyNumbersInCountryQuery(city().country());
         log().query("getEmployeeEmails", companyNumbersQuery);
         int numCompanies = world().getScaleFactor();
-        return ExecutorUtils.getOrderedAttribute(tx(), companyNumbersQuery, "company-number", numCompanies);
+        return ExecutorUtils.getOrderedAttribute(tx().forGrakn(), companyNumbersQuery, "company-number", numCompanies);
     }
 
     private List<String> getEmployeeEmails(LocalDateTime earliestDate) {
         GraqlGet getEmployeeEmailsQuery = cityResidentsQuery(city(), earliestDate);
         log().query("getEmployeeEmails", getEmployeeEmailsQuery);
         int numEmployments = world().getScaleFactor();
-        return ExecutorUtils.getOrderedAttribute(tx(), getEmployeeEmailsQuery, "email", numEmployments);
+        return ExecutorUtils.getOrderedAttribute(tx().forGrakn(), getEmployeeEmailsQuery, "email", numEmployments);
     }
 
     private void insertEmployment(String employeeEmail, Long companyNumber){
@@ -88,6 +88,6 @@ public class EmploymentAgent extends CityAgent {
                         .has("contracted-hours", randomAttributeGenerator().boundRandomDouble(MIN_CONTRACTED_HOURS, MAX_CONTRACTED_HOURS))
         );
         log().query("insertEmployment", insertEmploymentQuery);
-        tx().execute(insertEmploymentQuery);
+        tx().forGrakn().execute(insertEmploymentQuery);
     }
 }

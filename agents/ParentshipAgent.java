@@ -72,7 +72,7 @@ public class ParentshipAgent extends CityAgent {
         ).get().sort("marriage-id");
 
         log().query("getMarriageEmails", marriageQuery);
-        List<ConceptMap> marriageAnswers = tx().execute(marriageQuery).get();
+        List<ConceptMap> marriageAnswers = tx().forGrakn().execute(marriageQuery).get();
 
         return marriageAnswers
                 .stream()
@@ -97,7 +97,7 @@ public class ParentshipAgent extends CityAgent {
         ).get();
 
         log().query("getChildrenEmails", childrenQuery);
-        return getOrderedAttribute(tx(), childrenQuery, "email");
+        return getOrderedAttribute(tx().forGrakn(), childrenQuery, "email");
     }
 
     private void insertParentShip(HashMap<String, String> marriage, List<String> childEmails) {
@@ -128,6 +128,6 @@ public class ParentshipAgent extends CityAgent {
         );
 
         log().query("insertParentShip", parentshipQuery);
-        tx().execute(parentshipQuery);
+        tx().forGrakn().execute(parentshipQuery);
     }
 }

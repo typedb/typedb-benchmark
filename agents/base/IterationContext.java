@@ -1,12 +1,12 @@
 package grakn.simulation.agents.base;
 
-import grakn.client.GraknClient.Session;
 import grakn.simulation.agents.World;
+import grakn.simulation.driver.DbDriverWrapper;
 
 import java.time.LocalDateTime;
 
 public interface IterationContext {
-    Session getIterationGraknSessionFor(String sessionKey);
+    DbDriverWrapper.Session getIterationSessionFor(String sessionKey);
     int getSimulationStep();
     LocalDateTime getLocalDateTime();
     World getWorld();

@@ -4,9 +4,9 @@ import grakn.simulation.agents.AgeUpdateAgent;
 import grakn.simulation.agents.CompanyAgent;
 import grakn.simulation.agents.EmploymentAgent;
 import grakn.simulation.agents.FriendshipAgent;
+import grakn.simulation.agents.PersonBirthAgent;
 import grakn.simulation.agents.MarriageAgent;
 import grakn.simulation.agents.ParentshipAgent;
-import grakn.simulation.agents.PersonBirthAgent;
 import grakn.simulation.agents.ProductAgent;
 import grakn.simulation.agents.RelocationAgent;
 import grakn.simulation.agents.TransactionAgent;
@@ -35,6 +35,19 @@ public class Schema {
         AGENTS.put("ProductAgent", new ContinentAgentRunner(ProductAgent.class));
         AGENTS.put("TransactionAgent", new CountryAgentRunner(TransactionAgent.class));
         AGENTS.put("FriendshipAgent", new CityAgentRunner(FriendshipAgent.class));
+    }
+
+    public enum Database {
+        GRAKN {
+            public String toString() {
+                return "Grakn";
+            }
+        },
+        NEO4J {
+            public String toString() {
+                return "Neo4j";
+            }
+        },
     }
 
     public enum AgentMode {
