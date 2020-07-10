@@ -9,10 +9,11 @@ java_library(
     deps = [
         "//agents",
         "//common",
+        "//config",
+        "//yaml_tool",
         "@maven//:ch_qos_logback_logback_classic",
         "@maven//:commons_cli_commons_cli",
         "@maven//:org_slf4j_slf4j_api",
-        "//yaml_tool",
         "@graknlabs_client_java//:client-java",
         "@graknlabs_grabl_tracing//client",
         "@graknlabs_graql//java:graql",
@@ -28,6 +29,7 @@ java_binary(
     data = [
         "//data",
         "//schema",
+        "//config:config.yaml",
     ],
     main_class = "grakn.simulation.Simulation",
     runtime_deps = [":simulation-lib"],
