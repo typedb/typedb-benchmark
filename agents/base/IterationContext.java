@@ -1,6 +1,6 @@
 package grakn.simulation.agents.base;
 
-import grakn.simulation.agents.World;
+import grakn.simulation.world.World;
 import grakn.simulation.driver.DbDriverWrapper;
 
 import java.time.LocalDateTime;

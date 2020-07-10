@@ -1,7 +1,8 @@
 java_library(
     name = "simulation-lib",
     srcs = [
-        "Simulation.java"
+        "RunSimulation.java",
+        "Simulation.java",
     ],
     resource_strip_prefix = "conf/",
     resources = [
@@ -13,20 +14,20 @@ java_library(
         "//common",
         "//config",
         "//driver",
-        "//yaml_tool",
+        "//initialise",
+        "//world",
+        "@graknlabs_client_java//:client-java",
+        "@graknlabs_grabl_tracing//client",
         "@maven//:ch_qos_logback_logback_classic",
         "@maven//:commons_cli_commons_cli",
         "@maven//:org_slf4j_slf4j_api",
-        "@graknlabs_client_java//:client-java",
-        "@graknlabs_grabl_tracing//client",
-        "@graknlabs_graql//java:graql",
     ],
 )
 
 java_library(
     name = "hello-world-example",
     srcs = [
-        "HelloWorldExample.java"
+        "HelloWorldExample.java",
     ],
     resource_strip_prefix = "conf/",
     resources = [
@@ -45,11 +46,11 @@ java_binary(
         "$(locations //schema)",
     ],
     data = [
+        "//config:config.yaml",
         "//data",
         "//schema",
-        "//config:config.yaml",
     ],
-    main_class = "grakn.simulation.Simulation",
+    main_class = "grakn.simulation.RunSimulation",
     runtime_deps = [":simulation-lib"],
 )
 
@@ -65,6 +66,6 @@ java_binary(
         "-Xdebug",
         "-Xrunjdwp:transport=dt_socket,server=y,address=5005",
     ],
-    main_class = "grakn.simulation.Simulation",
+    main_class = "grakn.simulation.RunSimulation",
     runtime_deps = [":simulation-lib"],
 )

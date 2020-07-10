@@ -3,6 +3,7 @@ package grakn.simulation.agents;
 import grakn.simulation.agents.common.CityAgent;
 import grakn.simulation.common.Allocation;
 import grakn.simulation.common.ExecutorUtils;
+import grakn.simulation.world.World;
 import graql.lang.Graql;
 import graql.lang.query.GraqlGet;
 import graql.lang.query.GraqlInsert;

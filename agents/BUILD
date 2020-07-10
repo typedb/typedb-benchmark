@@ -9,6 +9,7 @@ java_library(
     deps = [
         "//common",
         "//driver",
+        "//world",
         "@maven//:commons_cli_commons_cli",
         "@maven//:org_apache_commons_commons_csv",
         "@maven//:org_slf4j_slf4j_api",

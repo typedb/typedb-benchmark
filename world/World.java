@@ -1,4 +1,4 @@
-package grakn.simulation.agents;
+package grakn.simulation.world;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
@@ -18,7 +18,7 @@ import java.util.stream.Stream;
 
 public class World {
 
-    static final int AGE_OF_ADULTHOOD = 2;
+    public final int AGE_OF_ADULTHOOD = 2;
     private final int scaleFactor;
     private Path logDirPath;
 

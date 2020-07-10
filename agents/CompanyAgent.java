@@ -1,6 +1,7 @@
 package grakn.simulation.agents;
 
 import grakn.simulation.agents.common.CountryAgent;
+import grakn.simulation.world.World;
 import graql.lang.Graql;
 import graql.lang.query.GraqlGet;
 import graql.lang.query.GraqlInsert;

@@ -1,6 +1,7 @@
 package grakn.simulation.agents;
 
 import grakn.simulation.agents.common.CityAgent;
+import grakn.simulation.world.World;
 import graql.lang.Graql;
 import graql.lang.query.GraqlGet;
 import graql.lang.query.GraqlInsert;
@@ -36,7 +37,7 @@ public class MarriageAgent extends CityAgent {
     }
 
     private LocalDateTime dobOfAdults() {
-        return today().minusYears(World.AGE_OF_ADULTHOOD);
+        return today().minusYears(world().AGE_OF_ADULTHOOD);
     }
 
     private List<String> getSingleWomen() {

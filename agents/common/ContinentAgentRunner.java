@@ -1,6 +1,6 @@
 package grakn.simulation.agents.common;
 
-import grakn.simulation.agents.World;
+import grakn.simulation.world.World;
 import grakn.simulation.agents.base.Agent;
 import grakn.simulation.agents.base.IterationContext;
 import grakn.simulation.agents.base.AgentRunner;
