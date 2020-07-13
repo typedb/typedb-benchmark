@@ -1,13 +1,15 @@
 java_library(
-    name = "initialise",
-    srcs = glob(["*.java"]),
+    name = "grakn",
+    srcs = glob([
+        "*.java",
+    ]),
     visibility = ["//visibility:public"],
     deps = [
+        "//agents",
+        "//common",
         "//world",
-        "//yaml_tool",
         "@graknlabs_client_java//:client-java",
-        "@graknlabs_grabl_tracing//client",
         "@graknlabs_graql//java:graql",
-        "@neo4j//:org_neo4j_driver_neo4j_java_driver",
+        "@maven//:org_apache_commons_commons_lang3",
     ],
 )

@@ -1,19 +1,19 @@
 package grakn.simulation.config;
 
-import grakn.simulation.agents.interaction.AgeUpdateAgent;
-import grakn.simulation.agents.interaction.CompanyAgent;
-import grakn.simulation.agents.interaction.EmploymentAgent;
-import grakn.simulation.agents.interaction.FriendshipAgent;
-import grakn.simulation.agents.interaction.PersonBirthAgent;
-import grakn.simulation.agents.interaction.MarriageAgent;
-import grakn.simulation.agents.interaction.ParentshipAgent;
-import grakn.simulation.agents.interaction.ProductAgent;
-import grakn.simulation.agents.interaction.RelocationAgent;
-import grakn.simulation.agents.interaction.TransactionAgent;
 import grakn.simulation.agents.base.AgentRunner;
 import grakn.simulation.agents.world.CityAgentRunner;
 import grakn.simulation.agents.world.ContinentAgentRunner;
 import grakn.simulation.agents.world.CountryAgentRunner;
+import grakn.simulation.grakn.AgeUpdateAgent;
+import grakn.simulation.grakn.CompanyAgent;
+import grakn.simulation.grakn.EmploymentAgent;
+import grakn.simulation.grakn.FriendshipAgent;
+import grakn.simulation.grakn.MarriageAgent;
+import grakn.simulation.grakn.ParentshipAgent;
+import grakn.simulation.grakn.PersonBirthAgent;
+import grakn.simulation.grakn.ProductAgent;
+import grakn.simulation.grakn.RelocationAgent;
+import grakn.simulation.grakn.TransactionAgent;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -27,7 +27,7 @@ public class Schema {
         AGENTS = new HashMap<>();
         AGENTS.put("MarriageAgent", new CityAgentRunner(MarriageAgent.class));
         AGENTS.put("PersonBirthAgent", new CityAgentRunner(PersonBirthAgent.class));
-        AGENTS.put("GraknAgeUpdateAgent", new CityAgentRunner(AgeUpdateAgent.class));
+        AGENTS.put("AgeUpdateAgent", new CityAgentRunner(AgeUpdateAgent.class));
         AGENTS.put("ParentshipAgent", new CityAgentRunner(ParentshipAgent.class));
         AGENTS.put("RelocationAgent", new CityAgentRunner(RelocationAgent.class));
         AGENTS.put("CompanyAgent", new CountryAgentRunner(CompanyAgent.class));

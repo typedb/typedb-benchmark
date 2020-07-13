@@ -2,18 +2,11 @@ package grakn.simulation.agents.interaction;
 
 import grakn.simulation.agents.world.CityAgent;
 import grakn.simulation.common.Allocation;
-import grakn.simulation.common.ExecutorUtils;
-import grakn.simulation.world.World;
-import graql.lang.Graql;
-import graql.lang.query.GraqlGet;
-import graql.lang.query.GraqlInsert;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
-
-import static grakn.simulation.common.ExecutorUtils.getOrderedAttribute;
 
 public abstract class RelocationAgent extends CityAgent {
 

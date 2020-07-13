@@ -1,7 +1,6 @@
 package grakn.simulation.grakn;
 
 import grakn.client.answer.ConceptMap;
-import grakn.simulation.common.Allocation;
 import graql.lang.Graql;
 import graql.lang.query.GraqlGet;
 import graql.lang.query.GraqlInsert;
@@ -11,11 +10,9 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
-import static grakn.simulation.common.ExecutorUtils.getOrderedAttribute;
+import static grakn.simulation.grakn.ExecutorUtils.getOrderedAttribute;
 import static java.util.stream.Collectors.toList;
 
 public class ParentshipAgent extends grakn.simulation.agents.interaction.ParentshipAgent {

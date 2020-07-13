@@ -3,7 +3,8 @@ java_library(
     srcs = glob([
         "*.java",
         "base/*.java",
-        "common/*.java",
+        "interaction/*.java",
+        "world/*.java",
     ]),
     visibility = ["//visibility:public"],
     deps = [

@@ -7,6 +7,7 @@ java_library(
     srcs = glob(["*.java"]),
     deps = [
         "//agents",
+        "//grakn",
         "@maven//:org_yaml_snakeyaml",
     ],
     visibility = ["//visibility:public"],

@@ -1,6 +1,5 @@
 package grakn.simulation.grakn;
 
-import grakn.simulation.common.ExecutorUtils;
 import graql.lang.Graql;
 import graql.lang.query.GraqlGet;
 import graql.lang.query.GraqlInsert;

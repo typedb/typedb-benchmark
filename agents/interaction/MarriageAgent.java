@@ -1,15 +1,9 @@
 package grakn.simulation.agents.interaction;
 
 import grakn.simulation.agents.world.CityAgent;
-import graql.lang.Graql;
-import graql.lang.query.GraqlGet;
-import graql.lang.query.GraqlInsert;
-import graql.lang.statement.Statement;
 
 import java.time.LocalDateTime;
 import java.util.List;
-
-import static grakn.simulation.common.ExecutorUtils.getOrderedAttribute;
 
 public abstract class MarriageAgent extends CityAgent {
 

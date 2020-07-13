@@ -7,7 +7,7 @@ import graql.lang.query.GraqlInsert;
 
 import java.util.List;
 
-import static grakn.simulation.common.ExecutorUtils.getOrderedAttribute;
+import static grakn.simulation.grakn.ExecutorUtils.getOrderedAttribute;
 import static grakn.simulation.grakn.CompanyAgent.getCompanyNumbersInCountryQuery;
 import static grakn.simulation.grakn.ProductAgent.getProductsInContinentQuery;
 

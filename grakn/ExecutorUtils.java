@@ -1,4 +1,4 @@
-package grakn.simulation.common;
+package grakn.simulation.grakn;
 
 import grakn.client.GraknClient;
 import graql.lang.query.GraqlGet;
