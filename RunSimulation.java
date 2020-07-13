@@ -2,6 +2,7 @@ package grakn.simulation;
 
 import grabl.tracing.client.GrablTracing;
 import grakn.client.GraknClient;
+import grakn.simulation.initialise.Initialise;
 import grakn.simulation.world.World;
 import grakn.simulation.agents.base.AgentRunner;
 import grakn.simulation.common.RandomSource;
@@ -9,7 +10,6 @@ import grakn.simulation.config.Config;
 import grakn.simulation.config.ConfigLoader;
 import grakn.simulation.config.Schema;
 import grakn.simulation.driver.GraknClientWrapper;
-import grakn.simulation.initialise.InitialiseGrakn;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
@@ -27,8 +27,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import static grakn.simulation.initialise.Initialise.initialiseGrablTracing;
-import static grakn.simulation.initialise.Initialise.initialiseWorld;
+import static grakn.simulation.initialise.Initialise.grablTracing;
+import static grakn.simulation.initialise.Initialise.world;
+
 
 public class RunSimulation {
 
@@ -40,7 +41,7 @@ public class RunSimulation {
 
     public static void main(String[] args) {
 
-        Options options = buildOptions();
+        Options options = cliOptions();
 
         CommandLineParser parser = new DefaultParser();
         CommandLine commandLine;
@@ -52,27 +53,29 @@ public class RunSimulation {
             return;
         }
 
-        String graknHostUri = getOption(commandLine, "u").orElse(GraknClient.DEFAULT_URI);
+        String dbName = getOption(commandLine, "d").orElse("grakn");
+        Schema.Database db;
+        String defaultUri;
+        switch (dbName) {
+            case "grakn":
+                db = Schema.Database.GRAKN;
+                defaultUri = GraknClient.DEFAULT_URI;
+                break;
+            case "neo4j":
+                db = Schema.Database.NEO4J;
+                defaultUri = "localhost:7474"; // TODO Check this
+                break;
+            default:
+                throw new IllegalStateException("Unexpected value: " + dbName);
+        }
+
+        String hostUri = getOption(commandLine, "u").orElse(defaultUri);
         String grablTracingUri = getOption(commandLine, "t").orElse("localhost:7979");
         String grablTracingOrganisation = commandLine.getOptionValue("o");
         String grablTracingRepository = commandLine.getOptionValue("r");
         String grablTracingCommit = commandLine.getOptionValue("c");
         String grablTracingUsername = commandLine.getOptionValue("u");
         String grablTracingToken = commandLine.getOptionValue("a");
-
-        String dbName = getOption(commandLine, "d").orElse("grakn");
-
-        Schema.Database db;
-        switch (dbName) {
-            case "grakn":
-                db = Schema.Database.GRAKN;
-                break;
-            case "neo4j":
-                db = Schema.Database.NEO4J;
-                break;
-            default:
-                throw new IllegalStateException("Unexpected value: " + dbName);
-        }
 
         long seed = getOption(commandLine, "s").map(Long::parseLong).orElseGet(() -> {
             System.out.println("No seed supplied, using random seed: " + RANDOM_SEED);
@@ -111,7 +114,7 @@ public class RunSimulation {
 
         LOG.info("Welcome to the Simulation!");
         LOG.info("Parsing world data...");
-        World world = initialiseWorld(scaleFactor, files);
+        World world = world(scaleFactor, files);
         if (world == null) return;
 
         LOG.info(String.format("Connecting to %s...", db.toString()));
@@ -120,12 +123,14 @@ public class RunSimulation {
             GraknClientWrapper driverWrapper = null; // TODO inject this
             GrablTracing tracing = null;
             try {
-                tracing = initialiseGrablTracing(grablTracingUri, grablTracingOrganisation, grablTracingRepository, grablTracingCommit, grablTracingUsername, grablTracingToken, disableTracing);
+                tracing = grablTracing(grablTracingUri, grablTracingOrganisation, grablTracingRepository, grablTracingCommit, grablTracingUsername, grablTracingToken, disableTracing);
 
                 driverWrapper = new GraknClientWrapper();
-                driverWrapper.open(graknHostUri);
+                driverWrapper.open(hostUri);
 
-                InitialiseGrakn.initialise(databaseName, files, driverWrapper);
+                GraknClient.Session session = driverWrapper.getClient().session(databaseName);
+                Initialise.Grakn.schema(session, files);
+                Initialise.Grakn.data(session, files);
 
                 try (Simulation simulation = new Simulation(
                         driverWrapper,
@@ -168,7 +173,7 @@ public class RunSimulation {
         }
     }
 
-    private static Options buildOptions() {
+    private static Options cliOptions() {
         Options options = new Options();
         options.addOption(Option.builder("d")
                 .longOpt("database").desc("Database under test").hasArg().required().argName("database")

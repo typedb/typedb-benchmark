@@ -1,10 +1,10 @@
 package grakn.simulation;
 
-import grakn.simulation.world.World;
-import grakn.simulation.agents.base.IterationContext;
 import grakn.simulation.agents.base.AgentRunner;
-import grakn.simulation.driver.DbDriverWrapper;
+import grakn.simulation.agents.base.IterationContext;
 import grakn.simulation.common.RandomSource;
+import grakn.simulation.driver.DbDriverWrapper;
+import grakn.simulation.world.World;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -14,8 +14,6 @@ import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.Function;
-
-import static grabl.tracing.client.GrablTracing.tracing;
 
 public class Simulation implements IterationContext, AutoCloseable {
 
