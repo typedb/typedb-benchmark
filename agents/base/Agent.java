@@ -1,7 +1,7 @@
 package grakn.simulation.agents.base;
 
 import grabl.tracing.client.GrablTracingThreadStatic.ThreadContext;
-import grakn.simulation.agents.RandomValueGenerator;
+import grakn.simulation.agents.interaction.RandomValueGenerator;
 import grakn.simulation.world.World;
 import grakn.simulation.driver.DbDriverWrapper;
 import graql.lang.query.GraqlQuery;

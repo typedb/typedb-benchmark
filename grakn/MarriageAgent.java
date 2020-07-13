@@ -1,52 +1,25 @@
-package grakn.simulation.agents;
+package grakn.simulation.grakn;
 
-import grakn.simulation.agents.common.CityAgent;
-import grakn.simulation.world.World;
 import graql.lang.Graql;
 import graql.lang.query.GraqlGet;
 import graql.lang.query.GraqlInsert;
 import graql.lang.statement.Statement;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 import static grakn.simulation.common.ExecutorUtils.getOrderedAttribute;
 
-public class MarriageAgent extends CityAgent {
+public class MarriageAgent extends grakn.simulation.agents.interaction.MarriageAgent {
 
     @Override
-    public void iterate() {
-        // Find bachelors and bachelorettes who are considered adults and who are not in a marriage and pair them off randomly
-        List<String> womenEmails = getSingleWomen();
-        shuffle(womenEmails);
-
-        List<String> menEmails = getSingleMen();
-        shuffle(menEmails);
-
-        int numMarriages = world().getScaleFactor();
-
-        int numMarriagesPossible = Math.min(numMarriages, Math.min(womenEmails.size(), menEmails.size()));
-
-        if (numMarriagesPossible > 0) {
-
-            for (int i = 0; i < numMarriagesPossible; i++) {
-                insertMarriage(womenEmails.get(i), menEmails.get(i));
-            }
-            tx().commit();
-        }
-    }
-
-    private LocalDateTime dobOfAdults() {
-        return today().minusYears(world().AGE_OF_ADULTHOOD);
-    }
-
-    private List<String> getSingleWomen() {
+    protected List<String> getSingleWomen() {
         GraqlGet.Unfiltered singleWomenQuery = getSinglePeopleOfGenderQuery("female", "marriage_wife");
         log().query("getSingleWomen", singleWomenQuery);
         return getOrderedAttribute(tx().forGrakn(), singleWomenQuery, "email");
     }
 
-    private List<String> getSingleMen() {
+    @Override
+    protected List<String> getSingleMen() {
         GraqlGet.Unfiltered singleMenQuery = getSinglePeopleOfGenderQuery("male", "marriage_husband");
         log().query("getSingleMen", singleMenQuery);
         return getOrderedAttribute(tx().forGrakn(), singleMenQuery, "email");
@@ -66,7 +39,8 @@ public class MarriageAgent extends CityAgent {
         ).get("email");
     }
 
-    private void insertMarriage(String wifeEmail, String husbandEmail) {
+    @Override
+    protected void insertMarriage(String wifeEmail, String husbandEmail) {
         int marriageIdentifier = (wifeEmail + husbandEmail).hashCode();
 
         GraqlInsert marriageQuery = Graql.match(

@@ -1,6 +1,6 @@
-package grakn.simulation.agents;
+package grakn.simulation.grakn;
 
-import grakn.simulation.agents.common.CityAgent;
+import grakn.simulation.agents.world.CityAgent;
 import grakn.simulation.common.Allocation;
 import grakn.simulation.common.ExecutorUtils;
 import grakn.simulation.world.World;
@@ -15,35 +15,7 @@ import java.util.List;
 
 import static grakn.simulation.common.ExecutorUtils.getOrderedAttribute;
 
-public class RelocationAgent extends CityAgent {
-
-    @Override
-    public void iterate() {
-        /*
-        Find people currently resident the city
-        Find other cities in the continent
-        Distribute the people among those cities via a relocation
-         */
-
-        LocalDateTime earliestDate;
-        if (today().minusYears(2).isBefore(LocalDateTime.of(LocalDate.ofYearDay(0, 1), LocalTime.of(0, 0, 0))))
-            earliestDate = today();
-        else {
-            earliestDate = today().minusYears(2);
-        }
-
-        List<String> residentEmails;
-        List<String> relocationCityNames;
-
-        residentEmails = getResidentEmails(earliestDate);
-        shuffle(residentEmails);
-
-        relocationCityNames = getRelocationCityNames();
-
-        Allocation.allocate(residentEmails, relocationCityNames, this::insertRelocation);
-
-        tx().commit();
-    }
+public class RelocationAgent extends grakn.simulation.agents.interaction.RelocationAgent {
 
     static GraqlGet.Unfiltered cityResidentsQuery(World.City city, LocalDateTime earliestDate) {
         return Graql.match(
@@ -58,14 +30,16 @@ public class RelocationAgent extends CityAgent {
         ).get();
     }
 
-    private List<String> getResidentEmails(LocalDateTime earliestDate) {
+    @Override
+    protected List<String> getResidentEmails(LocalDateTime earliestDate) {
         GraqlGet.Unfiltered cityResidentsQuery = cityResidentsQuery(city(), earliestDate);
         log().query("getResidentEmails", cityResidentsQuery);
         int numRelocations = world().getScaleFactor();
         return ExecutorUtils.getOrderedAttribute(tx().forGrakn(), cityResidentsQuery, "email", numRelocations);
     }
 
-    private List<String> getRelocationCityNames() {
+    @Override
+    protected List<String> getRelocationCityNames() {
 
         GraqlGet.Unfiltered relocationCitiesQuery = Graql.match(
                 Graql.var("city").isa("city").has("location-name", Graql.var("city-name")),
@@ -78,7 +52,8 @@ public class RelocationAgent extends CityAgent {
         return getOrderedAttribute(tx().forGrakn(), relocationCitiesQuery, "city-name");
     }
 
-    private void insertRelocation(String email, String newCityName) {
+    @Override
+    protected void insertRelocation(String email, String newCityName) {
         GraqlInsert relocatePersonQuery = Graql.match(
                 Graql.var("p").isa("person").has("email", email),
                 Graql.var("new-city").isa("city").has("location-name", newCityName),

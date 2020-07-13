@@ -1,7 +1,6 @@
-package grakn.simulation.agents;
+package grakn.simulation.grakn;
 
 import grakn.client.answer.Numeric;
-import grakn.simulation.agents.common.CityAgent;
 import grakn.simulation.common.ExecutorUtils;
 import graql.lang.Graql;
 import graql.lang.query.GraqlGet;
@@ -10,32 +9,9 @@ import graql.lang.query.GraqlInsert;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static grakn.simulation.agents.RelocationAgent.cityResidentsQuery;
+public class FriendshipAgent extends grakn.simulation.agents.interaction.FriendshipAgent {
 
-public class FriendshipAgent extends CityAgent {
-
-    @Override
-    public void iterate() {
-
-        List<String> residentEmails = getResidentEmails(today());
-        closeTx();  // TODO Closing and reopening the transaction here is a workaround for https://github.com/graknlabs/grakn/issues/5585
-        if (residentEmails.size() > 0) {
-            shuffle(residentEmails);
-            int numFriendships = world().getScaleFactor();
-            for (int i = 0; i < numFriendships; i++) {
-
-                String friend1 = pickOne(residentEmails);
-                String friend2 = pickOne(residentEmails);
-
-                if (!checkIfFriendshipExists(friend1, friend2)) {
-                    insertFriendship(friend1, friend2);
-                }
-            }
-            tx().commit();
-        }
-    }
-
-    private boolean checkIfFriendshipExists(String friend1Email, String friend2Email) {
+    protected boolean checkIfFriendshipExists(String friend1Email, String friend2Email) {
         GraqlGet.Aggregate friendshipExistsQuery = Graql.match(
                 Graql.var("p1").isa("person").has("email", friend1Email),
                 Graql.var("p2").isa("person").has("email", friend2Email),
@@ -48,13 +24,13 @@ public class FriendshipAgent extends CityAgent {
         return numAnswers > 0;
     }
 
-    private List<String> getResidentEmails(LocalDateTime earliestDate) {
+    protected List<String> getResidentEmails(LocalDateTime earliestDate) {
         GraqlGet.Unfiltered cityResidentsQuery = cityResidentsQuery(city(), earliestDate);
         log().query("getResidentEmails", cityResidentsQuery);
         return ExecutorUtils.getOrderedAttribute(tx().forGrakn(), cityResidentsQuery, "email");
     }
 
-    private void insertFriendship(String friend1Email, String friend2Email) {
+    protected void insertFriendship(String friend1Email, String friend2Email) {
         GraqlInsert insertFriendshipQuery = Graql.match(
                 Graql.var("p1").isa("person").has("email", friend1Email),
                 Graql.var("p2").isa("person").has("email", friend2Email)

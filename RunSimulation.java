@@ -103,9 +103,10 @@ public class RunSimulation {
         ////////////////////
 
         List<AgentRunner> agentRunners = new ArrayList<>();
+
         for (Config.Agent agent : config.getAgents()) {
             if (agent.getAgentMode().getRun()) {
-                AgentRunner<?> runner = agent.getRunner();
+                AgentRunner<?> runner = Schema.AGENTS.get(agent.getName());
                 runner.setTrace(agent.getAgentMode().getTrace());
 //                runner.setDb(db);// TODO Set the DB so that agent implementations are picked based on this
                 agentRunners.add(runner);

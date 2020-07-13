@@ -1,26 +1,15 @@
-package grakn.simulation.agents;
+package grakn.simulation.grakn;
 
-import grakn.simulation.agents.common.CountryAgent;
 import grakn.simulation.world.World;
 import graql.lang.Graql;
 import graql.lang.query.GraqlGet;
 import graql.lang.query.GraqlInsert;
 import org.apache.commons.lang3.StringUtils;
 
-public class CompanyAgent extends CountryAgent {
+public class CompanyAgent extends grakn.simulation.agents.interaction.CompanyAgent {
 
     @Override
-    public void iterate() {
-
-        int numCompanies = world().getScaleFactor();
-
-        for (int i = 0; i < numCompanies; i++) {
-            insertCompany(i);
-        }
-        tx().commit();
-    }
-
-    private void insertCompany(int i) {
+    protected void insertCompany(int i) {
         String adjective = pickOne(world().getAdjectives());
         String noun = pickOne(world().getNouns());
 

@@ -1,19 +1,19 @@
 package grakn.simulation.config;
 
-import grakn.simulation.agents.AgeUpdateAgent;
-import grakn.simulation.agents.CompanyAgent;
-import grakn.simulation.agents.EmploymentAgent;
-import grakn.simulation.agents.FriendshipAgent;
-import grakn.simulation.agents.PersonBirthAgent;
-import grakn.simulation.agents.MarriageAgent;
-import grakn.simulation.agents.ParentshipAgent;
-import grakn.simulation.agents.ProductAgent;
-import grakn.simulation.agents.RelocationAgent;
-import grakn.simulation.agents.TransactionAgent;
+import grakn.simulation.agents.interaction.AgeUpdateAgent;
+import grakn.simulation.agents.interaction.CompanyAgent;
+import grakn.simulation.agents.interaction.EmploymentAgent;
+import grakn.simulation.agents.interaction.FriendshipAgent;
+import grakn.simulation.agents.interaction.PersonBirthAgent;
+import grakn.simulation.agents.interaction.MarriageAgent;
+import grakn.simulation.agents.interaction.ParentshipAgent;
+import grakn.simulation.agents.interaction.ProductAgent;
+import grakn.simulation.agents.interaction.RelocationAgent;
+import grakn.simulation.agents.interaction.TransactionAgent;
 import grakn.simulation.agents.base.AgentRunner;
-import grakn.simulation.agents.common.CityAgentRunner;
-import grakn.simulation.agents.common.ContinentAgentRunner;
-import grakn.simulation.agents.common.CountryAgentRunner;
+import grakn.simulation.agents.world.CityAgentRunner;
+import grakn.simulation.agents.world.ContinentAgentRunner;
+import grakn.simulation.agents.world.CountryAgentRunner;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -22,12 +22,12 @@ import java.util.stream.Collectors;
 
 public class Schema {
 
-    static HashMap<String, AgentRunner<?>> AGENTS;
+    public static HashMap<String, AgentRunner<?>> AGENTS;
     static {
         AGENTS = new HashMap<>();
         AGENTS.put("MarriageAgent", new CityAgentRunner(MarriageAgent.class));
         AGENTS.put("PersonBirthAgent", new CityAgentRunner(PersonBirthAgent.class));
-        AGENTS.put("AgeUpdateAgent", new CityAgentRunner(AgeUpdateAgent.class));
+        AGENTS.put("GraknAgeUpdateAgent", new CityAgentRunner(AgeUpdateAgent.class));
         AGENTS.put("ParentshipAgent", new CityAgentRunner(ParentshipAgent.class));
         AGENTS.put("RelocationAgent", new CityAgentRunner(RelocationAgent.class));
         AGENTS.put("CompanyAgent", new CountryAgentRunner(CompanyAgent.class));

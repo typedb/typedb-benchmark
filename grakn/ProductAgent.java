@@ -1,23 +1,14 @@
-package grakn.simulation.agents;
+package grakn.simulation.grakn;
 
-import grakn.simulation.agents.common.ContinentAgent;
 import grakn.simulation.world.World;
 import graql.lang.Graql;
 import graql.lang.query.GraqlGet;
 import graql.lang.query.GraqlInsert;
 
-public class ProductAgent extends ContinentAgent {
+public class ProductAgent extends grakn.simulation.agents.interaction.ProductAgent {
 
     @Override
-    public void iterate() {
-        int numProducts = world().getScaleFactor();
-        for (int i = 0; i < numProducts; i++) {
-            insertProduct(i);
-        }
-        tx().commit();
-    }
-
-    private void insertProduct(int iterationScopeId) {
+    protected void insertProduct(int iterationScopeId) {
         GraqlInsert insertProductQuery = Graql.match(
                 Graql.var("continent")
                         .isa("continent")

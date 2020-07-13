@@ -1,61 +1,34 @@
-package grakn.simulation.agents;
+package grakn.simulation.grakn;
 
-import grakn.simulation.agents.common.CountryAgent;
-import grakn.simulation.common.Allocation;
 import grakn.simulation.common.Pair;
 import graql.lang.Graql;
 import graql.lang.query.GraqlGet;
 import graql.lang.query.GraqlInsert;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import static grakn.simulation.agents.CompanyAgent.getCompanyNumbersInCountryQuery;
-import static grakn.simulation.agents.ProductAgent.getProductsInContinentQuery;
+import static grakn.simulation.agents.interaction.CompanyAgent.getCompanyNumbersInCountryQuery;
+import static grakn.simulation.agents.interaction.ProductAgent.getProductsInContinentQuery;
 import static grakn.simulation.common.ExecutorUtils.getOrderedAttribute;
 
-public class TransactionAgent extends CountryAgent {
-
-    private int NUM_TRANSACTIONS_PER_COMPANY_ON_AVERAGE = 1;
+public class TransactionAgent extends grakn.simulation.agents.interaction.TransactionAgent {
 
     @Override
-    public void iterate() {
-        List<Long> companyNumbers = getCompanyNumbersInCountry();
-        List<Double> productBarcodes = getProductBarcodesInContinent();
-        shuffle(companyNumbers);
-
-        int numTransactions = NUM_TRANSACTIONS_PER_COMPANY_ON_AVERAGE * world().getScaleFactor() * companyNumbers.size();
-
-        // Company numbers is the list of sellers
-        // Company numbers picked randomly is the list of buyers
-        // Products randomly picked
-
-        // See if we can allocate with a Pair, which is the buyer and the product id
-        List<Pair<Long, Double>> transactions = new ArrayList<>();
-
-        for (int i = 0; i < numTransactions; i++) {
-            Long companyNumber = pickOne(companyNumbers);
-            Double productBarcode = pickOne(productBarcodes);
-            Pair<Long, Double> buyerAndProduct = new Pair(companyNumber, productBarcode);
-            transactions.add(buyerAndProduct);
-        }
-        Allocation.allocate(transactions, companyNumbers, this::insertTransaction);
-        tx().commit();
-    }
-
-    private List<Long> getCompanyNumbersInCountry(){
+    protected List<Long> getCompanyNumbersInCountry(){
         GraqlGet companiesQuery = getCompanyNumbersInCountryQuery(country());
         log().query("getCompanyNumbersInCountry", companiesQuery);
         return getOrderedAttribute(tx().forGrakn(), companiesQuery, "company-number");
     }
 
-    private List<Double> getProductBarcodesInContinent() {
+    @Override
+    protected List<Double> getProductBarcodesInContinent() {
         GraqlGet.Unfiltered productsQuery = getProductsInContinentQuery(country().continent());
         log().query("getProductBarcodesInContinent", productsQuery);
         return getOrderedAttribute(tx().forGrakn(), productsQuery, "product-barcode");
     }
 
-    private void insertTransaction(Pair<Long, Double> transaction, Long sellerCompanyNumber){
+    @Override
+    protected void insertTransaction(Pair<Long, Double> transaction, Long sellerCompanyNumber){
         GraqlInsert insertTransactionQuery = Graql.match(
                 Graql.var("product")
                         .isa("product")

@@ -1,34 +1,17 @@
-package grakn.simulation.agents;
+package grakn.simulation.grakn;
 
 import grakn.client.answer.ConceptMap;
-import grakn.simulation.agents.common.CityAgent;
 import graql.lang.Graql;
 import graql.lang.query.GraqlDelete;
 import graql.lang.query.GraqlGet;
 import graql.lang.query.GraqlInsert;
 
-import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.stream.Stream;
 
-public class AgeUpdateAgent extends CityAgent {
+public class AgeUpdateAgent extends grakn.simulation.agents.interaction.AgeUpdateAgent {
 
     @Override
-    public void iterate() {
-//        Get all people born in a city
-        Stream<ConceptMap> peopleAnswers = getPeopleBornInCity();
-//        Update their ages
-        peopleAnswers.forEach(personAnswer -> {
-                    LocalDateTime dob = (LocalDateTime) personAnswer.get("dob").asAttribute().value();
-                    long age = ChronoUnit.YEARS.between(dob, today());
-                    updatePersonAge(personAnswer.get("email").asAttribute().value().toString(), age);
-                }
-        );
-
-        tx().commit();
-    }
-
-    private void updatePersonAge(String personEmail, long newAge) {
+    protected void updatePersonAge(String personEmail, long newAge) {
         GraqlDelete deleteImplicitQuery = Graql.match(
                 Graql.var("p").isa("person")
                         .has("email", personEmail)
@@ -50,13 +33,15 @@ public class AgeUpdateAgent extends CityAgent {
         tx().forGrakn().execute(insertNewAgeQuery);
     }
 
-    private Stream<ConceptMap> getPeopleBornInCity() {
+    @Override
+    protected Stream<ConceptMap> getPeopleBornInCity() {
         GraqlGet.Sorted peopleQuery = getPeopleBornInCityQuery();
         log().query("getPeopleBornInCity", peopleQuery);
         return tx().forGrakn().stream(peopleQuery).get();
     }
 
-    private GraqlGet.Sorted getPeopleBornInCityQuery() {
+    @Override
+    protected GraqlGet.Sorted getPeopleBornInCityQuery() {
         return Graql.match(
                 Graql.var("c").isa("city")
                         .has("location-name", city().toString()),

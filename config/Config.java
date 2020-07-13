@@ -48,10 +48,14 @@ public class Config {
 
     public static class Agent {
         private Schema.AgentMode agentMode;
-        private AgentRunner<?> runner;
+        private String name;
 
         public void setName(String name) {
-            this.runner = Schema.AGENTS.get(name);
+            this.name = name;
+        }
+
+        public String getName() {
+            return name;
         }
 
         public void setMode(String mode) {
@@ -72,10 +76,6 @@ public class Config {
 
         public Schema.AgentMode getAgentMode() {
             return agentMode;
-        }
-
-        public AgentRunner<?> getRunner() {
-            return runner;
         }
     }
 }
