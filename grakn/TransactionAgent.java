@@ -7,9 +7,9 @@ import graql.lang.query.GraqlInsert;
 
 import java.util.List;
 
-import static grakn.simulation.agents.interaction.CompanyAgent.getCompanyNumbersInCountryQuery;
-import static grakn.simulation.agents.interaction.ProductAgent.getProductsInContinentQuery;
 import static grakn.simulation.common.ExecutorUtils.getOrderedAttribute;
+import static grakn.simulation.grakn.CompanyAgent.getCompanyNumbersInCountryQuery;
+import static grakn.simulation.grakn.ProductAgent.getProductsInContinentQuery;
 
 public class TransactionAgent extends grakn.simulation.agents.interaction.TransactionAgent {
 
@@ -28,7 +28,7 @@ public class TransactionAgent extends grakn.simulation.agents.interaction.Transa
     }
 
     @Override
-    protected void insertTransaction(Pair<Long, Double> transaction, Long sellerCompanyNumber){
+    protected void insertTransaction(Pair<Long, Double> transaction, long sellerCompanyNumber, double value, int productQuantity, boolean isTaxable){
         GraqlInsert insertTransactionQuery = Graql.match(
                 Graql.var("product")
                         .isa("product")
@@ -46,9 +46,9 @@ public class TransactionAgent extends grakn.simulation.agents.interaction.Transa
                                 .rel("transaction_buyer", Graql.var("c-buyer"))
                                 .rel("transaction_merchandise", Graql.var("product"))
 //                                .has("currency")  // TODO Add currency https://github.com/graknlabs/simulation/issues/31
-                                .has("value", randomAttributeGenerator().boundRandomDouble(0.01, 10000.00))
-                                .has("product-quantity", randomAttributeGenerator().boundRandomInt(1, 1000))
-                                .has("is-taxable", randomAttributeGenerator().bool()),
+                                .has("value", value)
+                                .has("product-quantity", productQuantity)
+                                .has("is-taxable", isTaxable),
                         Graql.var("locates")
                                 .isa("locates")
                                 .rel("locates_location", Graql.var("country"))

@@ -32,7 +32,12 @@ public abstract class TransactionAgent extends CountryAgent {
             Pair<Long, Double> buyerAndProduct = new Pair(companyNumber, productBarcode);
             transactions.add(buyerAndProduct);
         }
-        Allocation.allocate(transactions, companyNumbers, this::insertTransaction);
+        Allocation.allocate(transactions, companyNumbers, (transaction, sellerCompanyNumber) -> {
+            Double value = randomAttributeGenerator().boundRandomDouble(0.01, 10000.00);
+            Integer productQuantity = randomAttributeGenerator().boundRandomInt(1, 1000);
+            Boolean isTaxable = randomAttributeGenerator().bool();
+            insertTransaction(transaction, sellerCompanyNumber, value, productQuantity, isTaxable);
+        });
         tx().commit();
     }
 
@@ -40,5 +45,5 @@ public abstract class TransactionAgent extends CountryAgent {
 
     abstract protected List<Double> getProductBarcodesInContinent();
 
-    abstract protected void insertTransaction(Pair<Long, Double> transaction, Long sellerCompanyNumber);
+    abstract protected void insertTransaction(Pair<Long, Double> transaction, long sellerCompanyNumber, double value, int productQuantity, boolean isTaxable);
 }

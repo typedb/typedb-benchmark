@@ -8,6 +8,8 @@ import graql.lang.query.GraqlInsert;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static grakn.simulation.grakn.RelocationAgent.cityResidentsQuery;
+
 public class EmploymentAgent extends grakn.simulation.agents.interaction.EmploymentAgent {
 
     @Override
@@ -27,7 +29,7 @@ public class EmploymentAgent extends grakn.simulation.agents.interaction.Employm
     }
 
     @Override
-    protected void insertEmployment(String employeeEmail, Long companyNumber){
+    protected void insertEmployment(String employeeEmail, long companyNumber, LocalDateTime employmentDate, double wageValue, String contractContent, double contractedHours){
         GraqlInsert insertEmploymentQuery = Graql.match(
                 Graql.var("city")
                         .isa("city")
@@ -53,14 +55,14 @@ public class EmploymentAgent extends grakn.simulation.agents.interaction.Employm
                         .rel("employment_wage", Graql.var("wage"))
                         .has("start-date", employmentDate),
                 Graql.var("wage").isa("wage")
-                        .has("wage-value", randomAttributeGenerator().boundRandomDouble(MIN_ANNUAL_WAGE, MAX_ANNUAL_WAGE))
+                        .has("wage-value", wageValue)
                         .has("currency", Graql.var("currency")), //TODO Should this be inferred rather than inserted?
                 Graql.var("locates").isa("locates")
                         .rel("locates_located", Graql.var("emp"))
                         .rel("locates_location", Graql.var("city")),
                 Graql.var("contract").isa("employment-contract")
-                        .has("contract-content", randomAttributeGenerator().boundRandomLengthRandomString(MIN_CONTRACT_CHARACTER_LENGTH, MAX_CONTRACT_CHARACTER_LENGTH))
-                        .has("contracted-hours", randomAttributeGenerator().boundRandomDouble(MIN_CONTRACTED_HOURS, MAX_CONTRACTED_HOURS))
+                        .has("contract-content", contractContent)
+                        .has("contracted-hours", contractedHours)
         );
         log().query("insertEmployment", insertEmploymentQuery);
         tx().forGrakn().execute(insertEmploymentQuery);

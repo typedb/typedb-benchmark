@@ -8,7 +8,7 @@ import graql.lang.query.GraqlInsert;
 public class ProductAgent extends grakn.simulation.agents.interaction.ProductAgent {
 
     @Override
-    protected void insertProduct(int iterationScopeId) {
+    protected void insertProduct(int iterationScopeId, String productName, String productDescription) {
         GraqlInsert insertProductQuery = Graql.match(
                 Graql.var("continent")
                         .isa("continent")
@@ -17,8 +17,8 @@ public class ProductAgent extends grakn.simulation.agents.interaction.ProductAge
                 Graql.var("product")
                         .isa("product")
                         .has("product-barcode", Double.valueOf(uniqueId(iterationScopeId)))
-                        .has("product-name", randomAttributeGenerator().boundRandomLengthRandomString(5, 20))
-                        .has("product-description", randomAttributeGenerator().boundRandomLengthRandomString(75, 100)),
+                        .has("product-name", productName)
+                        .has("product-description", productDescription),
                 Graql.var("prod")
                         .isa("produced-in")
                         .rel("produced-in_product", Graql.var("product"))

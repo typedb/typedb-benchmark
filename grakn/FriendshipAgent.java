@@ -9,6 +9,8 @@ import graql.lang.query.GraqlInsert;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static grakn.simulation.grakn.RelocationAgent.cityResidentsQuery;
+
 public class FriendshipAgent extends grakn.simulation.agents.interaction.FriendshipAgent {
 
     protected boolean checkIfFriendshipExists(String friend1Email, String friend2Email) {
