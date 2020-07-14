@@ -5,10 +5,6 @@ exports_files([
 java_library(
     name = "config",
     srcs = glob(["*.java"]),
-    deps = [
-        "//db/common/agents",
-        "//db/grakn",
-        "@maven//:org_yaml_snakeyaml",
-    ],
     visibility = ["//visibility:public"],
+    deps = ["@maven//:org_yaml_snakeyaml"],
 )
