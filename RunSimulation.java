@@ -2,18 +2,18 @@ package grakn.simulation;
 
 import grabl.tracing.client.GrablTracing;
 import grakn.client.GraknClient;
-import grakn.simulation.initialise.AgentPicker;
-import grakn.simulation.driver.DriverWrapper;
-import grakn.simulation.grakn.initialise.GraknAgentPicker;
-import grakn.simulation.grakn.initialise.GraknInitialiser;
-import grakn.simulation.initialise.Initialiser;
-import grakn.simulation.world.World;
-import grakn.simulation.agents.base.AgentRunner;
+import grakn.simulation.db.common.initialise.AgentPicker;
+import grakn.simulation.db.common.driver.DriverWrapper;
+import grakn.simulation.db.grakn.initialise.GraknAgentPicker;
+import grakn.simulation.db.grakn.initialise.GraknInitialiser;
+import grakn.simulation.db.common.initialise.Initialiser;
+import grakn.simulation.db.common.world.World;
+import grakn.simulation.db.common.agents.base.AgentRunner;
 import grakn.simulation.utils.RandomSource;
 import grakn.simulation.config.Config;
 import grakn.simulation.config.ConfigLoader;
 import grakn.simulation.config.Schema;
-import grakn.simulation.grakn.driver.GraknClientWrapper;
+import grakn.simulation.db.grakn.driver.GraknClientWrapper;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
@@ -31,8 +31,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import static grakn.simulation.initialise.Initialiser.grablTracing;
-import static grakn.simulation.initialise.Initialiser.world;
+import static grakn.simulation.db.common.initialise.Initialiser.grablTracing;
+import static grakn.simulation.db.common.initialise.Initialiser.world;
 
 
 public class RunSimulation {
