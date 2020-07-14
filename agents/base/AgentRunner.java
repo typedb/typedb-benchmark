@@ -1,7 +1,7 @@
 package grakn.simulation.agents.base;
 
-import grakn.simulation.common.Pair;
-import grakn.simulation.common.RandomSource;
+import grakn.simulation.agents.utils.Pair;
+import grakn.simulation.utils.RandomSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

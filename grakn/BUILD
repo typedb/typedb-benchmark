@@ -9,7 +9,7 @@ java_library(
     visibility = ["//visibility:public"],
     deps = [
         "//agents",
-        "//common",
+        "//utils",
         "//driver",
         "//yaml_tool",
         "//initialise",

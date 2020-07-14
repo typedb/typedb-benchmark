@@ -11,7 +11,7 @@ java_library(
     visibility = ["//visibility:public"],
     deps = [
         "//agents",
-        "//common",
+        "//utils",
         "//config",
         "//driver",
         "//initialise",

@@ -1,4 +1,4 @@
-package grakn.simulation.common;
+package grakn.simulation.utils;
 
 import java.util.ArrayList;
 import java.util.List;

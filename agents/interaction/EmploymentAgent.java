@@ -5,7 +5,7 @@ import grakn.simulation.agents.world.CityAgent;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static grakn.simulation.common.Allocation.allocate;
+import static grakn.simulation.agents.utils.Allocation.allocate;
 
 public abstract class EmploymentAgent extends CityAgent {
 

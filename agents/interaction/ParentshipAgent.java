@@ -1,7 +1,7 @@
 package grakn.simulation.agents.interaction;
 
 import grakn.simulation.agents.world.CityAgent;
-import grakn.simulation.common.Allocation;
+import grakn.simulation.agents.utils.Allocation;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;

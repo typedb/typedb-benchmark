@@ -1,8 +1,8 @@
 package grakn.simulation.agents.interaction;
 
 import grakn.simulation.agents.world.CountryAgent;
-import grakn.simulation.common.Allocation;
-import grakn.simulation.common.Pair;
+import grakn.simulation.agents.utils.Allocation;
+import grakn.simulation.agents.utils.Pair;
 
 import java.util.ArrayList;
 import java.util.List;

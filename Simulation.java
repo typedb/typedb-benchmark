@@ -2,7 +2,7 @@ package grakn.simulation;
 
 import grakn.simulation.agents.base.AgentRunner;
 import grakn.simulation.agents.base.IterationContext;
-import grakn.simulation.common.RandomSource;
+import grakn.simulation.utils.RandomSource;
 import grakn.simulation.driver.DriverWrapper;
 import grakn.simulation.world.World;
 

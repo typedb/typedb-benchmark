@@ -5,10 +5,11 @@ java_library(
         "base/*.java",
         "interaction/*.java",
         "world/*.java",
+        "utils/*.java",
     ]),
     visibility = ["//visibility:public"],
     deps = [
-        "//common",
+        "//utils",
         "//driver",
         "//world",
         "@maven//:commons_cli_commons_cli",

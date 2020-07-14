@@ -9,7 +9,7 @@ import grakn.simulation.grakn.initialise.GraknInitialiser;
 import grakn.simulation.initialise.Initialiser;
 import grakn.simulation.world.World;
 import grakn.simulation.agents.base.AgentRunner;
-import grakn.simulation.common.RandomSource;
+import grakn.simulation.utils.RandomSource;
 import grakn.simulation.config.Config;
 import grakn.simulation.config.ConfigLoader;
 import grakn.simulation.config.Schema;
