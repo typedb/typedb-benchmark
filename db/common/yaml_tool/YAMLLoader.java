@@ -74,17 +74,6 @@ public abstract class YAMLLoader {
                 throw new YAMLException("Could not parse CSV data.", e);
             }
         }
-
-        // Try data attrib
-        String data = getString(documentMap, "db/common/data");
-        if (data != null) {
-            try {
-                CSVParser parser = CSVParser.parse(data, CSVFormat.DEFAULT);
-                parseCSV(tx, template, parser);
-            } catch (IOException e) {
-                throw new YAMLException("Could not parse CSV data.", e);
-            }
-        }
     }
 
     protected abstract void parseCSV(DriverWrapper.Session.Transaction tx, QueryTemplate template, CSVParser parser) throws IOException;
