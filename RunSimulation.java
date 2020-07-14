@@ -37,11 +37,8 @@ import static grakn.simulation.db.common.initialise.Initialiser.world;
 
 public class RunSimulation {
 
-    private final static long RANDOM_SEED = 1;
-    private final static int DEFAULT_NUM_ITERATIONS = 10;
-    private final static int DEFAULT_SCALE_FACTOR = 5;
     private final static String DEFAULT_CONFIG_YAML = "config/config.yaml";
-    public final static Logger LOG = LoggerFactory.getLogger(Simulation.class);
+    final static Logger LOG = LoggerFactory.getLogger(Simulation.class);
 
     public static void main(String[] args) {
 
@@ -66,16 +63,7 @@ public class RunSimulation {
         String grablTracingUsername = commandLine.getOptionValue("u");
         String grablTracingToken = commandLine.getOptionValue("a");
 
-        long seed = getOption(commandLine, "s").map(Long::parseLong).orElseGet(() -> {
-            System.out.println("No seed supplied, using random seed: " + RANDOM_SEED);
-            return RANDOM_SEED;
-        });
-
-        boolean disableTracing = commandLine.hasOption("z");
-
-        int iterations = getOption(commandLine, "i").map(Integer::parseInt).orElse(DEFAULT_NUM_ITERATIONS);
-        int scaleFactor = getOption(commandLine, "f").map(Integer::parseInt).orElse(DEFAULT_SCALE_FACTOR);
-        String databaseName = commandLine.getOptionValue("k");
+        boolean disableTracing = commandLine.hasOption("n");
 
         Map<String, Path> files = new HashMap<>();
         for (String filepath : commandLine.getArgList()) {
@@ -123,14 +111,13 @@ public class RunSimulation {
             if (agent.getAgentMode().getRun()) {
                 AgentRunner<?> runner = agentPicker.get(agent.getName());
                 runner.setTrace(agent.getAgentMode().getTrace());
-//                runner.setDb(db);// TODO Set the DB so that agent implementations are picked based on this
                 agentRunners.add(runner);
             }
         }
 
         LOG.info("Welcome to the Simulation!");
         LOG.info("Parsing world data...");
-        World world = world(scaleFactor, files);
+        World world = world(config.getScaleFactor(), files);
         if (world == null) return;
 
         LOG.info(String.format("Connecting to %s...", db.toString()));
@@ -143,13 +130,13 @@ public class RunSimulation {
                 driverWrapper = new GraknClientWrapper();
                 driverWrapper.open(hostUri);
 
-                initialiser.initialise(driverWrapper, databaseName, files);
+                initialiser.initialise(driverWrapper, config.getDatabaseName(), files);
 
                 try (Simulation simulation = new Simulation(
                         driverWrapper,
-                        databaseName,
+                        config.getDatabaseName(),
                         agentRunners,
-                        new RandomSource(seed),
+                        new RandomSource(config.getRandomSeed()),
                         world,
                         config.getTraceSampling().getSamplingFunction()
                 )) {
@@ -157,7 +144,7 @@ public class RunSimulation {
                     // MAIN LOOP //
                     ///////////////
 
-                    for (int i = 0; i < iterations; ++i) {
+                    for (int i = 0; i < config.getIterations(); ++i) {
                         simulation.iterate();
                     }
                 }
@@ -210,22 +197,10 @@ public class RunSimulation {
         options.addOption(Option.builder("a")
                 .longOpt("api-token").desc("Grabl tracing API token").hasArg().argName("token")
                 .build());
-        options.addOption(Option.builder("s")
-                .longOpt("seed").desc("Simulation randomization seed").hasArg().argName("seed")
-                .build());
-        options.addOption(Option.builder("i")
-                .longOpt("iterations").desc("Number of simulation iterations").hasArg().argName("iterations")
-                .build());
-        options.addOption(Option.builder("f")
-                .longOpt("scale-factor").desc("Scale factor of iteration data").hasArg().argName("scale-factor")
-                .build());
-        options.addOption(Option.builder("k")
-                .longOpt("keyspace").desc("keyspace name").hasArg().required().argName("name")
-                .build());
         options.addOption(Option.builder("b")
                 .longOpt("config-file").desc("Configuration file").hasArg().argName("config-file-path")
                 .build());
-        options.addOption(Option.builder("z")
+        options.addOption(Option.builder("n")
                 .longOpt("disable-tracing").desc("Disable grabl tracing")
                 .build());
         return options;
