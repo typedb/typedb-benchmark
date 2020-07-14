@@ -15,6 +15,13 @@ import static grabl.tracing.client.GrablTracing.tracingNoOp;
 import static grabl.tracing.client.GrablTracing.withLogging;
 
 public abstract class Initialiser {
+
+    protected final Map<String, Path> files;
+
+    public Initialiser(Map<String, Path> files) {
+        this.files = files;
+    }
+
     public static World world(int scaleFactor, Map<String, Path> files) {
         World world;
         try {
@@ -51,6 +58,6 @@ public abstract class Initialiser {
         return tracing;
     }
 
-    public abstract void initialise(DriverWrapper driverWrapper, String databaseName, Map<String, Path> files) throws IOException, YAMLException;
+    public abstract void initialise(DriverWrapper driverWrapper, String databaseName) throws IOException, YAMLException;
 
 }

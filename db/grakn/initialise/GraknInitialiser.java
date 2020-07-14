@@ -18,7 +18,11 @@ import java.util.Map;
 
 public class GraknInitialiser extends Initialiser {
 
-    public static void schema(DriverWrapper.Session session, Map<String, Path> files) throws IOException {
+    public GraknInitialiser(Map<String, Path> files) {
+        super(files);
+    }
+
+    private void initialiseSchema(DriverWrapper.Session session) throws IOException {
         try (GrablTracingThreadStatic.ThreadContext context = GrablTracingThreadStatic.contextOnThread("db/grakn/schema", 0)) {
             // TODO: merge these two schema files once this issue is fixed
             // https://github.com/graknlabs/grakn/issues/5553
@@ -43,27 +47,21 @@ public class GraknInitialiser extends Initialiser {
         System.out.println(">>>> trace: loadSchema: end");
     }
 
-    public static void data(DriverWrapper.Session session, Map<String, Path> files) throws IOException, YAMLException {
+    private void initialiseData(DriverWrapper.Session session) throws IOException, YAMLException {
         try (GrablTracingThreadStatic.ThreadContext context = GrablTracingThreadStatic.contextOnThread("db/common/data", 0)) {
-            dataFile(session,
-                    files.get("data.yaml"),
-                    files.get("currencies.yaml"),
-                    files.get("country_currencies.yaml"),
-                    files.get("country_languages.yaml"));
+            dataFile(session, files.get("data.yaml"));
         }
     }
 
-    private static void dataFile(DriverWrapper.Session session, Path... dataPath) throws IOException, YAMLException {
-        YAMLLoader loader = new GraknYAMLLoader(session);
-        for (Path path : dataPath) {
-            loader.loadFile(path.toFile());
-        }
+    private void dataFile(DriverWrapper.Session session, Path dataPath) throws IOException, YAMLException {
+        YAMLLoader loader = new GraknYAMLLoader(session, files);
+        loader.loadFile(dataPath.toFile());
     }
 
     @Override
-    public void initialise(DriverWrapper driverWrapper, String databaseName, Map<String, Path> files) throws IOException, YAMLException {
+    public void initialise(DriverWrapper driverWrapper, String databaseName) throws IOException, YAMLException {
         DriverWrapper.Session session = driverWrapper.session(databaseName);
-        GraknInitialiser.schema(session, files);
-        GraknInitialiser.data(session, files);
+        initialiseSchema(session);
+        initialiseData(session);
     }
 }

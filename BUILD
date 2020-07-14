@@ -44,11 +44,13 @@ java_binary(
     args = [
         "$(locations //db/common/data)",
         "$(locations //db/grakn/schema)",
+        "$(locations //db/grakn/data)",
     ],
     data = [
         "//config:config.yaml",
         "//db/common/data",
         "//db/grakn/schema",
+        "//db/grakn/data",
     ],
     main_class = "grakn.simulation.Simulation",
     runtime_deps = [":simulation-lib"],

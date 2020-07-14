@@ -9,10 +9,14 @@ import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 
 import java.io.IOException;
+import java.nio.file.Path;
+import java.util.Map;
 
 public class GraknYAMLLoader extends YAMLLoader {
-    public GraknYAMLLoader(DriverWrapper.Session session) {
-        super(session);
+
+
+    public GraknYAMLLoader(DriverWrapper.Session session, Map<String, Path> accessibleFiles) {
+        super(session, accessibleFiles);
     }
 
     protected void parseCSV(DriverWrapper.Session.Transaction tx, QueryTemplate template, CSVParser parser) throws IOException {

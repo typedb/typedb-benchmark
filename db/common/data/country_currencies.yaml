@@ -1,9 +1,0 @@
-template: match $country isa country, has location-name <0>; insert $country has currency <1>;
-data: |
-  USA,American Dollar
-  United Kingdom,Great British Pound
-  Germany,Euro
-  Brazil,Brazilian Real
-  South Africa,South African Rand
-  China,Renminbi
-  Australia,Australian Dollar

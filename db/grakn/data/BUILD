@@ -1,7 +1,7 @@
 filegroup(
     name = "data",
     srcs = glob([
-        "csv/*.csv",
+        "*.yaml",
     ]),
     visibility = ["//visibility:public"],
 )

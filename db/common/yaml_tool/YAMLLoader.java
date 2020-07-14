@@ -28,26 +28,28 @@ public abstract class YAMLLoader {
     // Instances of YAML should not be shared across threads but are okay to be re-used within a thread.
     protected static final ThreadLocal<Yaml> THREAD_YAML = ThreadLocal.withInitial(Yaml::new);
     protected DriverWrapper.Session session;
+    private Map<String, Path> accessibleFiles;
 
-    public YAMLLoader(DriverWrapper.Session session) {
+    public YAMLLoader(DriverWrapper.Session session, Map<String, Path> accessibleFiles) {
         this.session = session;
+        this.accessibleFiles = accessibleFiles;
     }
 
-    public void loadFile(File file) throws YAMLException, FileNotFoundException {
-        loadInputStream(new FileInputStream(file), file.toPath().getParent());
+    public void loadFile(File loadFile) throws YAMLException, FileNotFoundException {
+        loadInputStream(new FileInputStream(loadFile));
     }
 
-    public void loadInputStream(InputStream inputStream, Path workingDir) throws YAMLException {
+    public void loadInputStream(InputStream inputStream) throws YAMLException {
         try (DriverWrapper.Session.Transaction tx = session.transaction()) {
             for (Object document : THREAD_YAML.get().loadAll(inputStream)) {
-                loadDocument(tx, document, workingDir);
+                loadDocument(tx, document);
             }
 
             tx.commit();
         }
     }
 
-    protected void loadDocument(DriverWrapper.Session.Transaction tx, Object document, Path workingDir) throws YAMLException {
+    protected void loadDocument(DriverWrapper.Session.Transaction tx, Object document) throws YAMLException {
         Map documentMap;
         try {
             documentMap = (Map) document;
@@ -66,7 +68,7 @@ public abstract class YAMLLoader {
         String dataFile = getString(documentMap, "data_file");
         if (dataFile != null) {
             try {
-                CSVParser parser = CSVParser.parse(workingDir.resolve(dataFile), StandardCharsets.UTF_8, CSVFormat.DEFAULT);
+                CSVParser parser = CSVParser.parse(accessibleFiles.get(dataFile), StandardCharsets.UTF_8, CSVFormat.DEFAULT);
                 parseCSV(tx, template, parser);
             } catch (IOException e) {
                 throw new YAMLException("Could not parse CSV data.", e);

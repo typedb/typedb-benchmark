@@ -100,7 +100,7 @@ public class Simulation implements IterationContext, AutoCloseable {
                 db = Schema.Database.GRAKN;
                 defaultUri = GraknClient.DEFAULT_URI;
                 agentPicker = new GraknAgentPicker();
-                initialiser = new GraknInitialiser();
+                initialiser = new GraknInitialiser(files);
                 driverWrapper = new GraknClientWrapper();
                 break;
 //            case "neo4j":
@@ -137,7 +137,7 @@ public class Simulation implements IterationContext, AutoCloseable {
 
                 try (DriverWrapper driverWrapperIgnored = driverWrapper.open(hostUri)) {
 
-                    initialiser.initialise(driverWrapper, config.getDatabaseName(), files);
+                    initialiser.initialise(driverWrapper, config.getDatabaseName());
 
                     try (Simulation simulation = new Simulation(
                             driverWrapper,
