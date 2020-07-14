@@ -1,4 +1,4 @@
-package grakn.simulation.agents.base;
+package grakn.simulation.initialise;
 
 import grakn.simulation.agents.base.AgentRunner;
 import grakn.simulation.agents.world.CityAgentRunner;

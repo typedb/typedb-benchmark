@@ -1,11 +1,11 @@
 package grakn.simulation.yaml_tool;
 
-public class GraknYAMLException extends Exception {
-    public GraknYAMLException(String message) {
+public class YAMLException extends Exception {
+    public YAMLException(String message) {
         super(generateMessage(message));
     }
 
-    public GraknYAMLException(String message, Throwable cause) {
+    public YAMLException(String message, Throwable cause) {
         super(generateMessage(message), cause);
     }
 

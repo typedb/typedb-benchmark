@@ -3,7 +3,7 @@ package grakn.simulation;
 import grakn.simulation.agents.base.AgentRunner;
 import grakn.simulation.agents.base.IterationContext;
 import grakn.simulation.common.RandomSource;
-import grakn.simulation.driver.DbDriverWrapper;
+import grakn.simulation.driver.DriverWrapper;
 import grakn.simulation.world.World;
 
 import java.time.LocalDate;
@@ -17,9 +17,9 @@ import java.util.function.Function;
 
 public class Simulation implements IterationContext, AutoCloseable {
 
-    private final DbDriverWrapper dbDriver;
+    private final DriverWrapper dbDriver;
     private final String keyspace;
-    private final DbDriverWrapper.Session defaultSession;
+    private final DriverWrapper.Session defaultSession;
     private final List<AgentRunner> agentRunners;
     private final Random random;
     private Function<Integer, Boolean> iterationSamplingFunction;
@@ -27,9 +27,9 @@ public class Simulation implements IterationContext, AutoCloseable {
 
     private int simulationStep = 1;
 
-    private final ConcurrentMap<String, DbDriverWrapper.Session> sessionMap;
+    private final ConcurrentMap<String, DriverWrapper.Session> sessionMap;
 
-    Simulation(DbDriverWrapper dbDriver, String keyspace, List<AgentRunner> agentRunners, RandomSource randomSource, World world, Function<Integer, Boolean> iterationSamplingFunction) {
+    Simulation(DriverWrapper dbDriver, String keyspace, List<AgentRunner> agentRunners, RandomSource randomSource, World world, Function<Integer, Boolean> iterationSamplingFunction) {
         this.dbDriver = dbDriver;
         this.keyspace = keyspace;
         defaultSession = this.dbDriver.session(keyspace);
@@ -54,14 +54,14 @@ public class Simulation implements IterationContext, AutoCloseable {
     }
 
     private void closeAllSessionsInMap() {
-        for (DbDriverWrapper.Session session : sessionMap.values()) {
+        for (DriverWrapper.Session session : sessionMap.values()) {
             session.close();
         }
         sessionMap.clear();
     }
     
     @Override
-    public DbDriverWrapper.Session getIterationSessionFor(String key) {
+    public DriverWrapper.Session getIterationSessionFor(String key) {
         return sessionMap.computeIfAbsent(key, k -> dbDriver.session(keyspace)); // Open sessions for new keys
     }
 

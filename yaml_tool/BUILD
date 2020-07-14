@@ -2,6 +2,7 @@ java_library(
     name = "yaml_tool",
     srcs = glob(["*.java"]),
     deps = [
+        "//driver",
         "@graknlabs_client_java//:client-java",
         "@graknlabs_graql//java:graql",
         "@maven//:org_yaml_snakeyaml",

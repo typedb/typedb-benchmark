@@ -3,7 +3,7 @@ package grakn.simulation.agents.base;
 import grabl.tracing.client.GrablTracingThreadStatic.ThreadContext;
 import grakn.simulation.agents.interaction.RandomValueGenerator;
 import grakn.simulation.world.World;
-import grakn.simulation.driver.DbDriverWrapper;
+import grakn.simulation.driver.DriverWrapper;
 import graql.lang.query.GraqlQuery;
 import org.slf4j.Logger;
 
@@ -46,7 +46,7 @@ public abstract class Agent<T> implements AutoCloseable {
         }
     }
 
-    private DbDriverWrapper.Session.Transaction tx;
+    private DriverWrapper.Session.Transaction tx;
     private LocalDateTime today;
 
     protected LogWrapper log() {
@@ -69,11 +69,11 @@ public abstract class Agent<T> implements AutoCloseable {
         return tracker;
     }
 
-    protected DbDriverWrapper.Session session() {
+    protected DriverWrapper.Session session() {
         return iterationContext.getIterationSessionFor(getSessionKey());
     }
 
-    protected DbDriverWrapper.Session.Transaction transaction() {
+    protected DriverWrapper.Session.Transaction transaction() {
         return iterationContext.getIterationSessionFor(getSessionKey()).transaction();
     }
 
@@ -81,7 +81,7 @@ public abstract class Agent<T> implements AutoCloseable {
         return sessionKey;
     }
 
-    protected DbDriverWrapper.Session.Transaction tx() {
+    protected DriverWrapper.Session.Transaction tx() {
         if (tx == null) {
             tx = transaction();
         }
@@ -95,7 +95,7 @@ public abstract class Agent<T> implements AutoCloseable {
         }
     }
 
-    protected void setTx(DbDriverWrapper.Session.Transaction tx) {
+    protected void setTx(DriverWrapper.Session.Transaction tx) {
         closeTx();
         this.tx = tx;
     }

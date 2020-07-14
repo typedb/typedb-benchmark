@@ -1,7 +1,5 @@
 package grakn.simulation.config;
 
-import grakn.simulation.agents.base.AgentRunner;
-
 import java.util.List;
 import java.util.function.Function;
 

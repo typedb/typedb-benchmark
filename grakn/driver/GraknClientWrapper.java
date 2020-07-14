@@ -1,8 +1,9 @@
-package grakn.simulation.driver;
+package grakn.simulation.grakn.driver;
 
 import grakn.client.GraknClient;
+import grakn.simulation.driver.DriverWrapper;
 
-public class GraknClientWrapper implements DbDriverWrapper {
+public class GraknClientWrapper implements DriverWrapper {
 
     private GraknClient client = null;
 
@@ -20,16 +21,12 @@ public class GraknClientWrapper implements DbDriverWrapper {
         client.close();
     }
 
-//    GraknClientWrapper(String uri) {
-//        client = new GraknClient(uri);
-//    }
-
     @Override
-    public Session session(String keyspace) {
-        return new Session(client.session(keyspace));
+    public Session session(String database) {
+        return new Session(client.session(database));
     }
 
-    class Session implements DbDriverWrapper.Session {
+    class Session extends DriverWrapper.Session {
 
         private GraknClient.Session session;
 
@@ -47,7 +44,7 @@ public class GraknClientWrapper implements DbDriverWrapper {
             return new Transaction(session.transaction(GraknClient.Transaction.Type.WRITE));
         }
 
-        class Transaction implements DbDriverWrapper.Session.Transaction {
+        class Transaction extends DriverWrapper.Session.Transaction {
 
             private GraknClient.Transaction transaction;
 
@@ -68,11 +65,6 @@ public class GraknClientWrapper implements DbDriverWrapper {
             @Override
             public GraknClient.Transaction forGrakn() {
                 return transaction;
-            }
-
-            @Override
-            public org.neo4j.driver.Transaction forNeo4j() {
-                throw new ClassCastException("Can't cast a Grakn transation into a Neo4j transaction");
             }
         }
     }

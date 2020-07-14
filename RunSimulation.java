@@ -2,15 +2,18 @@ package grakn.simulation;
 
 import grabl.tracing.client.GrablTracing;
 import grakn.client.GraknClient;
-import grakn.simulation.grakn.GraknAgentPicker;
-import grakn.simulation.initialise.Initialise;
+import grakn.simulation.initialise.AgentPicker;
+import grakn.simulation.driver.DriverWrapper;
+import grakn.simulation.grakn.initialise.GraknAgentPicker;
+import grakn.simulation.grakn.initialise.GraknInitialiser;
+import grakn.simulation.initialise.Initialiser;
 import grakn.simulation.world.World;
 import grakn.simulation.agents.base.AgentRunner;
 import grakn.simulation.common.RandomSource;
 import grakn.simulation.config.Config;
 import grakn.simulation.config.ConfigLoader;
 import grakn.simulation.config.Schema;
-import grakn.simulation.driver.GraknClientWrapper;
+import grakn.simulation.grakn.driver.GraknClientWrapper;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
@@ -28,8 +31,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import static grakn.simulation.initialise.Initialise.grablTracing;
-import static grakn.simulation.initialise.Initialise.world;
+import static grakn.simulation.initialise.Initialiser.grablTracing;
+import static grakn.simulation.initialise.Initialiser.world;
 
 
 public class RunSimulation {
@@ -55,22 +58,7 @@ public class RunSimulation {
         }
 
         String dbName = getOption(commandLine, "d").orElse("grakn");
-        Schema.Database db;
-        String defaultUri;
-        switch (dbName) {
-            case "grakn":
-                db = Schema.Database.GRAKN;
-                defaultUri = GraknClient.DEFAULT_URI;
-                break;
-            case "neo4j":
-                db = Schema.Database.NEO4J;
-                defaultUri = "localhost:7474"; // TODO Check this
-                break;
-            default:
-                throw new IllegalArgumentException("Unexpected value: " + dbName);
-        }
-
-        String hostUri = getOption(commandLine, "u").orElse(defaultUri);
+        String hostUri = getOption(commandLine, "u").orElse(null);
         String grablTracingUri = getOption(commandLine, "t").orElse("localhost:7979");
         String grablTracingOrganisation = commandLine.getOptionValue("o");
         String grablTracingRepository = commandLine.getOptionValue("r");
@@ -103,11 +91,37 @@ public class RunSimulation {
         // INITIALIZATION //
         ////////////////////
 
-        List<AgentRunner> agentRunners = new ArrayList<>();
+        // Components customised based on the DB
+        Schema.Database db;
+        String defaultUri;
+        AgentPicker agentPicker;
+        Initialiser initialiser;
+        DriverWrapper driverWrapper;
+        switch (dbName) {
+            case "grakn":
+                db = Schema.Database.GRAKN;
+                defaultUri = GraknClient.DEFAULT_URI;
+                agentPicker = new GraknAgentPicker();
+                initialiser = new GraknInitialiser();
+                driverWrapper = new GraknClientWrapper();
+                break;
+//            case "neo4j":
+//                db = Schema.Database.NEO4J;
+//                defaultUri = "localhost:7474"; // TODO Check this
+//                agentPicker = new Neo4jAgentPicker();
+//                break;
+            default:
+                throw new IllegalArgumentException("Unexpected value: " + dbName);
+        }
 
+        if (hostUri == null) hostUri = defaultUri;
+
+
+        // Get the agents with their runners
+        List<AgentRunner> agentRunners = new ArrayList<>();
         for (Config.Agent agent : config.getAgents()) {
             if (agent.getAgentMode().getRun()) {
-                AgentRunner<?> runner = new GraknAgentPicker().get(agent.getName());
+                AgentRunner<?> runner = agentPicker.get(agent.getName());
                 runner.setTrace(agent.getAgentMode().getTrace());
 //                runner.setDb(db);// TODO Set the DB so that agent implementations are picked based on this
                 agentRunners.add(runner);
@@ -122,7 +136,6 @@ public class RunSimulation {
         LOG.info(String.format("Connecting to %s...", db.toString()));
 
         try {
-            GraknClientWrapper driverWrapper = null; // TODO inject this
             GrablTracing tracing = null;
             try {
                 tracing = grablTracing(grablTracingUri, grablTracingOrganisation, grablTracingRepository, grablTracingCommit, grablTracingUsername, grablTracingToken, disableTracing);
@@ -130,9 +143,7 @@ public class RunSimulation {
                 driverWrapper = new GraknClientWrapper();
                 driverWrapper.open(hostUri);
 
-                GraknClient.Session session = driverWrapper.getClient().session(databaseName);
-                Initialise.Grakn.schema(session, files);
-                Initialise.Grakn.data(session, files);
+                initialiser.initialise(driverWrapper, databaseName, files);
 
                 try (Simulation simulation = new Simulation(
                         driverWrapper,
@@ -151,9 +162,7 @@ public class RunSimulation {
                     }
                 }
             } finally {
-                if (driverWrapper != null) {
-                    driverWrapper.close();
-                }
+                driverWrapper.close();
 
                 if (tracing != null) {
                     tracing.close();

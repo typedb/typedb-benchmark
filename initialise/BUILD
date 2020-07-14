@@ -4,7 +4,9 @@ java_library(
     visibility = ["//visibility:public"],
     deps = [
         "//world",
+        "//agents",
         "//yaml_tool",
+        "//driver",
         "@graknlabs_client_java//:client-java",
         "@graknlabs_grabl_tracing//client",
         "@graknlabs_graql//java:graql",

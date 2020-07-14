@@ -11,14 +11,14 @@ import java.util.regex.Pattern;
 /**
  * A class to perform simple Graql query templating.
  */
-public class GraqlQueryTemplate {
+public class QueryTemplate {
     private static final Pattern TEMPLATE_VAR_PATTERN = Pattern.compile("<(\\d+)>");
 
     private String[] templateComponents;
     private List<Integer> vars;
     private Set<Integer> columns;
 
-    public GraqlQueryTemplate(String template) {
+    public QueryTemplate(String template) {
         Matcher matcher = TEMPLATE_VAR_PATTERN.matcher(template);
 
         columns = new HashSet<>();

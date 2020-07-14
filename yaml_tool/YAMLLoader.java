@@ -1,19 +1,18 @@
 package grakn.simulation.yaml_tool;
 
-import grakn.client.GraknClient.Transaction;
-import graql.lang.Graql;
-import graql.lang.query.GraqlInsert;
+import grakn.simulation.driver.DriverWrapper;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
-import org.apache.commons.csv.CSVRecord;
 import org.yaml.snakeyaml.Yaml;
-import grakn.client.GraknClient.Session;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.*;
+import java.util.Map;
 
 /**
  * A class to automate loading data into Grakn simply using YAML files with embedded Graql and CSV.
@@ -24,22 +23,22 @@ import java.util.*;
  * angle brackets with numbers to indicate the column index (beginning with 0) of the variable in the CSV "data"
  * section.
  */
-public class GraknYAMLLoader {
+public abstract class YAMLLoader {
 
     // Instances of YAML should not be shared across threads but are okay to be re-used within a thread.
-    private static final ThreadLocal<Yaml> THREAD_YAML = ThreadLocal.withInitial(Yaml::new);
-    private Session session;
+    protected static final ThreadLocal<Yaml> THREAD_YAML = ThreadLocal.withInitial(Yaml::new);
+    protected DriverWrapper.Session session;
 
-    public GraknYAMLLoader(Session session) {
+    public YAMLLoader(DriverWrapper.Session session) {
         this.session = session;
     }
 
-    public void loadFile(File file) throws GraknYAMLException, FileNotFoundException {
+    public void loadFile(File file) throws YAMLException, FileNotFoundException {
         loadInputStream(new FileInputStream(file), file.toPath().getParent());
     }
 
-    public void loadInputStream(InputStream inputStream, Path workingDir) throws GraknYAMLException {
-        try (Transaction tx = session.transaction().write()) {
+    public void loadInputStream(InputStream inputStream, Path workingDir) throws YAMLException {
+        try (DriverWrapper.Session.Transaction tx = session.transaction()) {
             for (Object document : THREAD_YAML.get().loadAll(inputStream)) {
                 loadDocument(tx, document, workingDir);
             }
@@ -48,20 +47,20 @@ public class GraknYAMLLoader {
         }
     }
 
-    private void loadDocument(Transaction tx, Object document, Path workingDir) throws GraknYAMLException {
+    protected void loadDocument(DriverWrapper.Session.Transaction tx, Object document, Path workingDir) throws YAMLException {
         Map documentMap;
         try {
             documentMap = (Map) document;
         } catch (ClassCastException e) {
-            throw new GraknYAMLException("Document was not a Map.");
+            throw new YAMLException("Document was not a Map.");
         }
 
         // Get template
         String templateString = getString(documentMap, "template");
         if (templateString == null) {
-            throw new GraknYAMLException("No template was supplied.");
+            throw new YAMLException("No template was supplied.");
         }
-        GraqlQueryTemplate template = new GraqlQueryTemplate(templateString);
+        QueryTemplate template = new QueryTemplate(templateString);
 
         // Try data_file
         String dataFile = getString(documentMap, "data_file");
@@ -70,7 +69,7 @@ public class GraknYAMLLoader {
                 CSVParser parser = CSVParser.parse(workingDir.resolve(dataFile), StandardCharsets.UTF_8, CSVFormat.DEFAULT);
                 parseCSV(tx, template, parser);
             } catch (IOException e) {
-                throw new GraknYAMLException("Could not parse CSV data.", e);
+                throw new YAMLException("Could not parse CSV data.", e);
             }
         }
 
@@ -81,18 +80,12 @@ public class GraknYAMLLoader {
                 CSVParser parser = CSVParser.parse(data, CSVFormat.DEFAULT);
                 parseCSV(tx, template, parser);
             } catch (IOException e) {
-                throw new GraknYAMLException("Could not parse CSV data.", e);
+                throw new YAMLException("Could not parse CSV data.", e);
             }
         }
     }
 
-    private void parseCSV(Transaction tx, GraqlQueryTemplate template, CSVParser parser) throws IOException {
-        for (CSVRecord record : parser.getRecords()) {
-            String interpolatedQuery = template.interpolate(record::get);
-            GraqlInsert insert = Graql.parse(interpolatedQuery);
-            tx.execute(insert);
-        }
-    }
+    protected abstract void parseCSV(DriverWrapper.Session.Transaction tx, QueryTemplate template, CSVParser parser) throws IOException;
 
     /**
      * Helper method to avoid repeating nasty type checking code.
@@ -100,15 +93,15 @@ public class GraknYAMLLoader {
      * @param object The document object Map.
      * @param key A String key to lookup in the Map.
      * @return The String found.
-     * @throws GraknYAMLException when something other than a String is found.
+     * @throws YAMLException when something other than a String is found.
      */
-    private static String getString(Map object, String key) throws GraknYAMLException {
+    private static String getString(Map object, String key) throws YAMLException {
         Object result = object.get(key);
         if (result == null) {
             return null;
         }
         if (!(result instanceof String)) {
-            throw new GraknYAMLException("Did not find a String for '" + key + "'");
+            throw new YAMLException("Did not find a String for '" + key + "'");
         }
         return (String) result;
     }

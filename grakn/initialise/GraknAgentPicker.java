@@ -1,6 +1,6 @@
-package grakn.simulation.grakn;
+package grakn.simulation.grakn.initialise;
 
-import grakn.simulation.agents.base.AgentPicker;
+import grakn.simulation.initialise.AgentPicker;
 import grakn.simulation.agents.world.CityAgentRunner;
 import grakn.simulation.agents.world.ContinentAgentRunner;
 import grakn.simulation.agents.world.CountryAgentRunner;
