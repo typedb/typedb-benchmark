@@ -1,6 +1,7 @@
 java_library(
     name = "grakn",
     srcs = glob([
+        "agents/*.java",
         "*.java",
     ]),
     visibility = ["//visibility:public"],

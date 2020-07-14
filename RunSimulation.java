@@ -2,6 +2,7 @@ package grakn.simulation;
 
 import grabl.tracing.client.GrablTracing;
 import grakn.client.GraknClient;
+import grakn.simulation.grakn.GraknAgentPicker;
 import grakn.simulation.initialise.Initialise;
 import grakn.simulation.world.World;
 import grakn.simulation.agents.base.AgentRunner;
@@ -66,7 +67,7 @@ public class RunSimulation {
                 defaultUri = "localhost:7474"; // TODO Check this
                 break;
             default:
-                throw new IllegalStateException("Unexpected value: " + dbName);
+                throw new IllegalArgumentException("Unexpected value: " + dbName);
         }
 
         String hostUri = getOption(commandLine, "u").orElse(defaultUri);
@@ -106,7 +107,7 @@ public class RunSimulation {
 
         for (Config.Agent agent : config.getAgents()) {
             if (agent.getAgentMode().getRun()) {
-                AgentRunner<?> runner = Schema.AGENTS.get(agent.getName());
+                AgentRunner<?> runner = new GraknAgentPicker().get(agent.getName());
                 runner.setTrace(agent.getAgentMode().getTrace());
 //                runner.setDb(db);// TODO Set the DB so that agent implementations are picked based on this
                 agentRunners.add(runner);

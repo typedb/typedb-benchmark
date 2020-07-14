@@ -16,6 +16,7 @@ java_library(
         "//driver",
         "//initialise",
         "//world",
+        "//grakn",
         "@graknlabs_client_java//:client-java",
         "@graknlabs_grabl_tracing//client",
         "@maven//:ch_qos_logback_logback_classic",

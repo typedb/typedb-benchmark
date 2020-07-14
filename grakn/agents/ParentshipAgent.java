@@ -1,4 +1,4 @@
-package grakn.simulation.grakn;
+package grakn.simulation.grakn.agents;
 
 import grakn.client.answer.ConceptMap;
 import graql.lang.Graql;
@@ -12,7 +12,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
-import static grakn.simulation.grakn.ExecutorUtils.getOrderedAttribute;
+import static grakn.simulation.grakn.agents.ExecutorUtils.getOrderedAttribute;
 import static java.util.stream.Collectors.toList;
 
 public class ParentshipAgent extends grakn.simulation.agents.interaction.ParentshipAgent {

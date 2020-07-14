@@ -1,41 +1,10 @@
 package grakn.simulation.config;
 
-import grakn.simulation.agents.base.AgentRunner;
-import grakn.simulation.agents.world.CityAgentRunner;
-import grakn.simulation.agents.world.ContinentAgentRunner;
-import grakn.simulation.agents.world.CountryAgentRunner;
-import grakn.simulation.grakn.AgeUpdateAgent;
-import grakn.simulation.grakn.CompanyAgent;
-import grakn.simulation.grakn.EmploymentAgent;
-import grakn.simulation.grakn.FriendshipAgent;
-import grakn.simulation.grakn.MarriageAgent;
-import grakn.simulation.grakn.ParentshipAgent;
-import grakn.simulation.grakn.PersonBirthAgent;
-import grakn.simulation.grakn.ProductAgent;
-import grakn.simulation.grakn.RelocationAgent;
-import grakn.simulation.grakn.TransactionAgent;
-
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class Schema {
-
-    public static HashMap<String, AgentRunner<?>> AGENTS;
-    static {
-        AGENTS = new HashMap<>();
-        AGENTS.put("MarriageAgent", new CityAgentRunner(MarriageAgent.class));
-        AGENTS.put("PersonBirthAgent", new CityAgentRunner(PersonBirthAgent.class));
-        AGENTS.put("AgeUpdateAgent", new CityAgentRunner(AgeUpdateAgent.class));
-        AGENTS.put("ParentshipAgent", new CityAgentRunner(ParentshipAgent.class));
-        AGENTS.put("RelocationAgent", new CityAgentRunner(RelocationAgent.class));
-        AGENTS.put("CompanyAgent", new CountryAgentRunner(CompanyAgent.class));
-        AGENTS.put("EmploymentAgent", new CityAgentRunner(EmploymentAgent.class));
-        AGENTS.put("ProductAgent", new ContinentAgentRunner(ProductAgent.class));
-        AGENTS.put("TransactionAgent", new CountryAgentRunner(TransactionAgent.class));
-        AGENTS.put("FriendshipAgent", new CityAgentRunner(FriendshipAgent.class));
-    }
 
     public enum Database {
         GRAKN {

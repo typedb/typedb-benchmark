@@ -1,4 +1,4 @@
-package grakn.simulation.grakn;
+package grakn.simulation.grakn.agents;
 
 import grakn.client.answer.Numeric;
 import graql.lang.Graql;
@@ -8,7 +8,7 @@ import graql.lang.query.GraqlInsert;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static grakn.simulation.grakn.RelocationAgent.cityResidentsQuery;
+import static grakn.simulation.grakn.agents.RelocationAgent.cityResidentsQuery;
 
 public class FriendshipAgent extends grakn.simulation.agents.interaction.FriendshipAgent {
 

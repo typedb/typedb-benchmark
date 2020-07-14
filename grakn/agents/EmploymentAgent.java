@@ -1,4 +1,4 @@
-package grakn.simulation.grakn;
+package grakn.simulation.grakn.agents;
 
 import graql.lang.Graql;
 import graql.lang.query.GraqlGet;
@@ -7,7 +7,7 @@ import graql.lang.query.GraqlInsert;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static grakn.simulation.grakn.RelocationAgent.cityResidentsQuery;
+import static grakn.simulation.grakn.agents.RelocationAgent.cityResidentsQuery;
 
 public class EmploymentAgent extends grakn.simulation.agents.interaction.EmploymentAgent {
 

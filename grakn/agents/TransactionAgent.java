@@ -1,4 +1,4 @@
-package grakn.simulation.grakn;
+package grakn.simulation.grakn.agents;
 
 import grakn.simulation.common.Pair;
 import graql.lang.Graql;
@@ -7,9 +7,9 @@ import graql.lang.query.GraqlInsert;
 
 import java.util.List;
 
-import static grakn.simulation.grakn.ExecutorUtils.getOrderedAttribute;
-import static grakn.simulation.grakn.CompanyAgent.getCompanyNumbersInCountryQuery;
-import static grakn.simulation.grakn.ProductAgent.getProductsInContinentQuery;
+import static grakn.simulation.grakn.agents.ExecutorUtils.getOrderedAttribute;
+import static grakn.simulation.grakn.agents.CompanyAgent.getCompanyNumbersInCountryQuery;
+import static grakn.simulation.grakn.agents.ProductAgent.getProductsInContinentQuery;
 
 public class TransactionAgent extends grakn.simulation.agents.interaction.TransactionAgent {
 

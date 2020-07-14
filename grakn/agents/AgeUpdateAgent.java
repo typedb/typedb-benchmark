@@ -1,4 +1,4 @@
-package grakn.simulation.grakn;
+package grakn.simulation.grakn.agents;
 
 import grakn.client.answer.ConceptMap;
 import graql.lang.Graql;
