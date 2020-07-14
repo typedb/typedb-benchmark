@@ -1,7 +1,6 @@
 java_library(
     name = "simulation-lib",
     srcs = [
-        "RunSimulation.java",
         "Simulation.java",
     ],
     resource_strip_prefix = "conf/",
@@ -51,7 +50,7 @@ java_binary(
         "//db/common/data",
         "//db/grakn/schema",
     ],
-    main_class = "grakn.simulation.RunSimulation",
+    main_class = "grakn.simulation.Simulation",
     runtime_deps = [":simulation-lib"],
 )
 
@@ -67,6 +66,6 @@ java_binary(
         "-Xdebug",
         "-Xrunjdwp:transport=dt_socket,server=y,address=5005",
     ],
-    main_class = "grakn.simulation.RunSimulation",
+    main_class = "grakn.simulation.Simulation",
     runtime_deps = [":simulation-lib"],
 )
