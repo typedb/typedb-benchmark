@@ -2,9 +2,9 @@ package grakn.simulation.db.common.driver;
 
 import grakn.client.GraknClient;
 
-public interface DriverWrapper {
+public interface DriverWrapper extends AutoCloseable {
 
-    void open(String uri);
+    DriverWrapper open(String uri);
     void close();
     Session session(String database);
 

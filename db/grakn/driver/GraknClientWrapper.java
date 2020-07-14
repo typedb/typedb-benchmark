@@ -12,8 +12,9 @@ public class GraknClientWrapper implements DriverWrapper {
     }
 
     @Override
-    public void open(String uri) {
+    public GraknClientWrapper open(String uri) {
         client = new GraknClient(uri);
+        return this;
     }
 
     @Override

@@ -133,36 +133,28 @@ public class Simulation implements IterationContext, AutoCloseable {
         LOG.info(String.format("Connecting to %s...", db.toString()));
 
         try {
-            GrablTracing tracing = null;
-            try {
-                tracing = grablTracing(grablTracingUri, grablTracingOrganisation, grablTracingRepository, grablTracingCommit, grablTracingUsername, grablTracingToken, disableTracing);
+            try (GrablTracing tracingIgnored = grablTracing(grablTracingUri, grablTracingOrganisation, grablTracingRepository, grablTracingCommit, grablTracingUsername, grablTracingToken, disableTracing)) {
 
-                driverWrapper = new GraknClientWrapper();
-                driverWrapper.open(hostUri);
+                try (DriverWrapper driverWrapperIgnored = driverWrapper.open(hostUri)) {
 
-                initialiser.initialise(driverWrapper, config.getDatabaseName(), files);
+                    initialiser.initialise(driverWrapper, config.getDatabaseName(), files);
 
-                try (Simulation simulation = new Simulation(
-                        driverWrapper,
-                        config.getDatabaseName(),
-                        agentRunners,
-                        new RandomSource(config.getRandomSeed()),
-                        world,
-                        config.getTraceSampling().getSamplingFunction()
-                )) {
-                    ///////////////
-                    // MAIN LOOP //
-                    ///////////////
+                    try (Simulation simulation = new Simulation(
+                            driverWrapper,
+                            config.getDatabaseName(),
+                            agentRunners,
+                            new RandomSource(config.getRandomSeed()),
+                            world,
+                            config.getTraceSampling().getSamplingFunction()
+                    )) {
+                        ///////////////
+                        // MAIN LOOP //
+                        ///////////////
 
-                    for (int i = 0; i < config.getIterations(); ++i) {
-                        simulation.iterate();
+                        for (int i = 0; i < config.getIterations(); ++i) {
+                            simulation.iterate();
+                        }
                     }
-                }
-            } finally {
-                driverWrapper.close();
-
-                if (tracing != null) {
-                    tracing.close();
                 }
             }
         } catch (Exception ex) {
