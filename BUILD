@@ -24,21 +24,6 @@ java_library(
     ],
 )
 
-java_library(
-    name = "hello-world-example",
-    srcs = [
-        "HelloWorldExample.java",
-    ],
-    resource_strip_prefix = "conf/",
-    resources = [
-        "conf/logback.xml",
-    ],
-    visibility = ["//visibility:public"],
-    deps = [
-        "@neo4j//:org_neo4j_driver_neo4j_java_driver",
-    ],
-)
-
 java_binary(
     name = "simulation",
     args = [
@@ -54,12 +39,6 @@ java_binary(
     ],
     main_class = "grakn.simulation.Simulation",
     runtime_deps = [":simulation-lib"],
-)
-
-java_binary(
-    name = "hello-world",
-    main_class = "grakn.simulation.HelloWorldExample",
-    runtime_deps = [":hello-world-example"],
 )
 
 java_binary(
