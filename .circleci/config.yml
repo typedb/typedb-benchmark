@@ -79,6 +79,6 @@ workflows:
       - test-end-to-end-neo4j:
           requires:
             - build
-#      - test-end-to-end-grakn:
-#          requires:
-#            - build
+      - test-end-to-end-grakn:
+          requires:
+            - build
