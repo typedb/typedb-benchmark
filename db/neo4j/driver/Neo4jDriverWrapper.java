@@ -1,37 +1,39 @@
-package grakn.simulation.db.grakn.driver;
+package grakn.simulation.db.neo4j.driver;
 
-import grakn.client.GraknClient;
 import grakn.simulation.db.common.driver.DriverWrapper;
+import org.neo4j.driver.AuthTokens;
+import org.neo4j.driver.Driver;
+import org.neo4j.driver.GraphDatabase;
 
-public class GraknClientWrapper implements DriverWrapper {
+public class Neo4jDriverWrapper implements DriverWrapper {
 
-    private GraknClient client = null;
+    private Driver driver = null;
 
-    public GraknClient getClient() {
-        return client;
+    public Driver getClient() {
+        return driver;
     }
 
     @Override
-    public GraknClientWrapper open(String uri) {
-        client = new GraknClient(uri);
+    public Neo4jDriverWrapper open(String uri) {
+        driver = GraphDatabase.driver( uri, AuthTokens.basic( "neo4j", "admin" ) );;
         return this;
     }
 
     @Override
     public void close() {
-        client.close();
+        driver.close();
     }
 
     @Override
     public Session session(String database) {
-        return new Session(client.session(database));
+        return new Session(driver.session());
     }
 
     static class Session extends DriverWrapper.Session {
 
-        private GraknClient.Session session;
+        private org.neo4j.driver.Session session;
 
-        Session(GraknClient.Session session) {
+        Session(org.neo4j.driver.Session session) {
             this.session = session;
         }
 
@@ -42,14 +44,14 @@ public class GraknClientWrapper implements DriverWrapper {
 
         @Override
         public Transaction transaction() {
-            return new Transaction(session.transaction(GraknClient.Transaction.Type.WRITE));
+            return new Transaction(session.beginTransaction());
         }
 
         class Transaction extends DriverWrapper.Session.Transaction {
 
-            private GraknClient.Transaction transaction;
+            private org.neo4j.driver.Transaction transaction;
 
-            Transaction(GraknClient.Transaction transaction) {
+            Transaction(org.neo4j.driver.Transaction transaction) {
                 this.transaction = transaction;
             }
 
@@ -64,7 +66,7 @@ public class GraknClientWrapper implements DriverWrapper {
             }
 
             @Override
-            public GraknClient.Transaction forGrakn() {
+            public org.neo4j.driver.Transaction forNeo4j() {
                 return transaction;
             }
         }
