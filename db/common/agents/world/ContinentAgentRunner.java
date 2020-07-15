@@ -1,11 +1,11 @@
 package grakn.simulation.db.common.agents.world;
 
 import grakn.simulation.db.common.agents.base.Agent;
-import grakn.simulation.db.common.agents.base.IterationContext;
 import grakn.simulation.db.common.agents.base.AgentRunner;
-import grakn.simulation.utils.RandomSource;
+import grakn.simulation.db.common.agents.base.IterationContext;
 import grakn.simulation.db.common.agents.utils.Tracker;
 import grakn.simulation.db.common.world.World;
+import grakn.simulation.utils.RandomSource;
 
 import java.util.List;
 

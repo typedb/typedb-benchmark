@@ -12,6 +12,9 @@ import grakn.simulation.db.common.initialise.Initialiser;
 import grakn.simulation.db.grakn.driver.GraknClientWrapper;
 import grakn.simulation.db.grakn.initialise.GraknAgentPicker;
 import grakn.simulation.db.grakn.initialise.GraknInitialiser;
+import grakn.simulation.db.neo4j.driver.Neo4jDriverWrapper;
+import grakn.simulation.db.neo4j.initialise.Neo4jAgentPicker;
+import grakn.simulation.db.neo4j.initialise.Neo4jInitialiser;
 import grakn.simulation.utils.RandomSource;
 import grakn.simulation.db.common.driver.DriverWrapper;
 import grakn.simulation.db.common.world.World;
@@ -103,11 +106,13 @@ public class Simulation implements IterationContext, AutoCloseable {
                 initialiser = new GraknInitialiser(files);
                 driverWrapper = new GraknClientWrapper();
                 break;
-//            case "neo4j":
-//                db = Schema.Database.NEO4J;
-//                defaultUri = "localhost:7474"; // TODO Check this
-//                agentPicker = new Neo4jAgentPicker();
-//                break;
+            case "neo4j":
+                db = Schema.Database.NEO4J;
+                defaultUri = "bolt://localhost:7687"; // TODO Check this
+                agentPicker = new Neo4jAgentPicker();
+                initialiser = new Neo4jInitialiser(files);
+                driverWrapper = new Neo4jDriverWrapper();
+                break;
             default:
                 throw new IllegalArgumentException("Unexpected value: " + dbName);
         }

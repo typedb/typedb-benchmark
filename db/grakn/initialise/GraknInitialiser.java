@@ -51,7 +51,7 @@ public class GraknInitialiser extends Initialiser {
     protected void initialiseData(DriverWrapper.Session session) throws IOException, YAMLException {
         try (GrablTracingThreadStatic.ThreadContext context = GrablTracingThreadStatic.contextOnThread("db/common/data", 0)) {
             YAMLLoader loader = new GraknYAMLLoader(session, files);
-            loader.loadFile(files.get("data.yaml").toFile());
+            loader.loadFile(files.get("grakn_data.yaml").toFile());
         }
     }
 

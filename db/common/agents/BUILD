@@ -9,6 +9,7 @@ java_library(
     visibility = ["//visibility:public"],
     deps = [
         "//utils",
+        "//config",
         "//db/common/driver",
         "//db/common/world",
         "@maven//:commons_cli_commons_cli",
