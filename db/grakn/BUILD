@@ -1,7 +1,7 @@
 java_library(
     name = "grakn",
     srcs = glob([
-        "agents/*.java",
+        "agents/interaction/*.java",
         "initialise/*.java",
         "yaml_tool/*.java",
         "driver/*.java",

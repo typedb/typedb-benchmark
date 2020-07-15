@@ -1,4 +1,4 @@
-package grakn.simulation.db.grakn.agents;
+package grakn.simulation.db.grakn.agents.interaction;
 
 import graql.lang.Graql;
 import graql.lang.query.GraqlInsert;

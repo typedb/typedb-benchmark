@@ -1,4 +1,4 @@
-package grakn.simulation.db.grakn.agents;
+package grakn.simulation.db.grakn.agents.interaction;
 
 import grakn.simulation.db.common.world.World;
 import graql.lang.Graql;
@@ -8,7 +8,7 @@ import graql.lang.query.GraqlInsert;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static grakn.simulation.db.grakn.agents.ExecutorUtils.getOrderedAttribute;
+import static grakn.simulation.db.grakn.agents.interaction.ExecutorUtils.getOrderedAttribute;
 
 public class RelocationAgent extends grakn.simulation.db.common.agents.interaction.RelocationAgent {
 

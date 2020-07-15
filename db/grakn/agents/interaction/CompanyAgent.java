@@ -1,4 +1,4 @@
-package grakn.simulation.db.grakn.agents;
+package grakn.simulation.db.grakn.agents.interaction;
 
 import grakn.simulation.db.common.world.World;
 import graql.lang.Graql;

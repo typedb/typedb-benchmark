@@ -1,4 +1,4 @@
-package grakn.simulation.db.grakn.agents;
+package grakn.simulation.db.grakn.agents.interaction;
 
 import graql.lang.Graql;
 import graql.lang.query.GraqlGet;
@@ -7,7 +7,7 @@ import graql.lang.statement.Statement;
 
 import java.util.List;
 
-import static grakn.simulation.db.grakn.agents.ExecutorUtils.getOrderedAttribute;
+import static grakn.simulation.db.grakn.agents.interaction.ExecutorUtils.getOrderedAttribute;
 
 public class MarriageAgent extends grakn.simulation.db.common.agents.interaction.MarriageAgent {
 
