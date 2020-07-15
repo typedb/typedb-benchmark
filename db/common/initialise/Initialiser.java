@@ -58,6 +58,8 @@ public abstract class Initialiser {
         return tracing;
     }
 
+    protected abstract void initialiseData(DriverWrapper.Session session) throws IOException, YAMLException;
+
     public abstract void initialise(DriverWrapper driverWrapper, String databaseName) throws IOException, YAMLException;
 
 }

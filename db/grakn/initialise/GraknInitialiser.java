@@ -47,15 +47,12 @@ public class GraknInitialiser extends Initialiser {
         System.out.println(">>>> trace: loadSchema: end");
     }
 
-    private void initialiseData(DriverWrapper.Session session) throws IOException, YAMLException {
+    @Override
+    protected void initialiseData(DriverWrapper.Session session) throws IOException, YAMLException {
         try (GrablTracingThreadStatic.ThreadContext context = GrablTracingThreadStatic.contextOnThread("db/common/data", 0)) {
-            dataFile(session, files.get("data.yaml"));
+            YAMLLoader loader = new GraknYAMLLoader(session, files);
+            loader.loadFile(files.get("data.yaml").toFile());
         }
-    }
-
-    private void dataFile(DriverWrapper.Session session, Path dataPath) throws IOException, YAMLException {
-        YAMLLoader loader = new GraknYAMLLoader(session, files);
-        loader.loadFile(dataPath.toFile());
     }
 
     @Override

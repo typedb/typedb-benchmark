@@ -21,9 +21,13 @@ data_file: cities.csv
 template: insert $x <0> isa currency, has currency-code <1>;
 data_file: currencies.csv
 ---
-template: match $country isa country, has location-name <0>; insert $country has currency <1>;
+template: |
+  match $country isa country, has location-name <0>;
+  insert $country has currency <1>;
 data_file: country_currencies.csv
 ---
-template: match $country isa country, has location-name <0>; insert $country has language <1>;
+template: |
+  match $country isa country, has location-name <0>;
+  insert $country has language <1>;
 data_file: country_languages.csv
 ...
