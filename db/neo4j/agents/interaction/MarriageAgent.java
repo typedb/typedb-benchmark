@@ -8,15 +8,15 @@ public class MarriageAgent extends grakn.simulation.db.common.agents.interaction
 
     @Override
     protected List<String> getSingleWomen() {
-        return getSinglePeopleOfGenderQuery("female");
+        return getSinglePeopleOfGenderQuery("getSingleWomen", "female");
     }
 
     @Override
     protected List<String> getSingleMen() {
-        return getSinglePeopleOfGenderQuery("male");
+        return getSinglePeopleOfGenderQuery("getSingleMen", "male");
     }
 
-    private List<String> getSinglePeopleOfGenderQuery(String gender) {
+    private List<String> getSinglePeopleOfGenderQuery(String scope, String gender) {
         String queryString = "" +
                 "MATCH (person:Person {gender: $gender})-[residency:RESIDENT_OF]->(city:City {location_name: $location_name})\n" +
                 "WHERE datetime(\"" + dobOfAdults() + "\") < datetime(person.date_of_birth)\n" +
@@ -31,8 +31,8 @@ public class MarriageAgent extends grakn.simulation.db.common.agents.interaction
 
         Neo4jQuery query = new Neo4jQuery(queryString, parameters);
 
-        log().query("insertMarriage", query);
-        return getOrderedAttribute(tx().forNeo4j(), query, "email");
+        log().query(scope, query);
+        return getOrderedAttribute(tx().forNeo4j(), query, "person.email");
     }
 
     @Override
