@@ -4,6 +4,7 @@ import grakn.simulation.db.common.agents.world.CityAgentRunner;
 import grakn.simulation.db.common.agents.world.ContinentAgentRunner;
 import grakn.simulation.db.common.agents.world.CountryAgentRunner;
 import grakn.simulation.db.common.initialise.AgentPicker;
+import grakn.simulation.db.neo4j.agents.interaction.AgeUpdateAgent;
 import grakn.simulation.db.neo4j.agents.interaction.MarriageAgent;
 import grakn.simulation.db.neo4j.agents.interaction.PersonBirthAgent;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
@@ -23,7 +24,7 @@ public class Neo4jAgentPicker extends AgentPicker {
 
     @Override
     protected CityAgentRunner ageUpdate() {
-        throw new NotImplementedException();
+        return new CityAgentRunner(AgeUpdateAgent.class, COUNTRY);
     }
 
     @Override

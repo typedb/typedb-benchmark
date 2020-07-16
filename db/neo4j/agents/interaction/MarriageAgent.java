@@ -40,7 +40,7 @@ public class MarriageAgent extends grakn.simulation.db.common.agents.interaction
     protected void insertMarriage(int marriageIdentifier, String wifeEmail, String husbandEmail) {
         String template = "" +
                 "MATCH (wife:Person {email: $wifeEmail}), (husband:Person {email: $husbandEmail}), (city:City {locationName: $cityName})\n" +
-                "CREATE (husband)-[:MARRIED_TO {id: $marriageIdentifier, locationName: $cityName}]->(wife)";
+                "CREATE (husband)-[:MARRIED_TO {id: $marriageIdentifier, locationName: city.locationName}]->(wife)";
 
         Object[] parameters = new Object[]{
                 "marriageIdentifier", marriageIdentifier,

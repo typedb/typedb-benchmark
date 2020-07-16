@@ -6,12 +6,26 @@ import graql.lang.query.GraqlDelete;
 import graql.lang.query.GraqlGet;
 import graql.lang.query.GraqlInsert;
 
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.stream.Stream;
 
 public class AgeUpdateAgent extends grakn.simulation.db.common.agents.interaction.AgeUpdateAgent {
 
     @Override
-    protected void updatePersonAge(String personEmail, long newAge) {
+    protected void updateAgesOfAllPeople() {
+        // Get all people born in a city
+        Stream<ConceptMap> peopleAnswers = getPeopleBornInCity();
+        // Update their ages
+        peopleAnswers.forEach(personAnswer -> {
+                    LocalDateTime dob = (LocalDateTime) personAnswer.get("dob").asAttribute().value();
+                    long age = ChronoUnit.YEARS.between(dob, today());
+                    updatePersonAge(personAnswer.get("email").asAttribute().value().toString(), age);
+                }
+        );
+    }
+
+    private void updatePersonAge(String personEmail, long newAge) {
         GraqlDelete deleteImplicitQuery = Graql.match(
                 Graql.var("p").isa("person")
                         .has("email", personEmail)
@@ -33,16 +47,8 @@ public class AgeUpdateAgent extends grakn.simulation.db.common.agents.interactio
         tx().forGrakn().execute(insertNewAgeQuery);
     }
 
-    @Override
-    protected Stream<ConceptMap> getPeopleBornInCity() {
-        GraqlGet.Sorted peopleQuery = getPeopleBornInCityQuery();
-        log().query("getPeopleBornInCity", peopleQuery);
-        return tx().forGrakn().stream(peopleQuery).get();
-    }
-
-    @Override
-    protected GraqlGet.Sorted getPeopleBornInCityQuery() {
-        return Graql.match(
+    private Stream<ConceptMap> getPeopleBornInCity() {
+        GraqlGet.Sorted peopleQuery = Graql.match(
                 Graql.var("c").isa("city")
                         .has("location-name", city().toString()),
                 Graql.var("p").isa("person")
@@ -52,5 +58,7 @@ public class AgeUpdateAgent extends grakn.simulation.db.common.agents.interactio
                         .rel("born-in_child", "p")
                         .rel("born-in_place-of-birth", "c")
         ).get().sort("email");
+        log().query("getPeopleBornInCity", peopleQuery);
+        return tx().forGrakn().stream(peopleQuery).get();
     }
 }
