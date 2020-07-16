@@ -6,10 +6,10 @@ public class PersonBirthAgent extends grakn.simulation.db.common.agents.interact
 
     @Override
     protected void insertPerson(String email, String gender, String forename, String surname) {
-        String template = "MATCH (c:City {location_name: $location_name})" +
+        String template = "MATCH (c:City {locationName: $locationName})" +
                 "CREATE (p:Person {" +
                 "email: $email, " +
-                "date_of_birth: $date, " +
+                "dateOfBirth: $date, " +
                 "gender: $gender, " +
                 "forename: $forename, " +
                 "surname: $surname" +
@@ -17,7 +17,7 @@ public class PersonBirthAgent extends grakn.simulation.db.common.agents.interact
                 "(p)-[:RESIDENT_OF {start_date: $date, is_current: $current}]->(c)";
 
         Object[] parameters = new Object[]{
-                "location_name", city().toString(),
+                "locationName", city().toString(),
                 "email", email,
                 "date", today(),
                 "gender", gender,

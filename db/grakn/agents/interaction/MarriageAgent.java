@@ -39,8 +39,7 @@ public class MarriageAgent extends grakn.simulation.db.common.agents.interaction
     }
 
     @Override
-    protected void insertMarriage(String wifeEmail, String husbandEmail) {
-        int marriageIdentifier = (wifeEmail + husbandEmail).hashCode();
+    protected void insertMarriage(int marriageIdentifier, String wifeEmail, String husbandEmail) {
 
         GraqlInsert marriageQuery = Graql.match(
                 Graql.var("husband").isa("person").has("email", husbandEmail),
