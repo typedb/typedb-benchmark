@@ -1,5 +1,7 @@
 package grakn.simulation.db.neo4j.agents.interaction;
 
+import static grakn.simulation.db.neo4j.driver.Neo4jDriverWrapper.run;
+
 public class PersonBirthAgent extends grakn.simulation.db.common.agents.interaction.PersonBirthAgent {
 
     @Override
@@ -27,8 +29,7 @@ public class PersonBirthAgent extends grakn.simulation.db.common.agents.interact
         Neo4jQuery query = new Neo4jQuery(template, parameters);
 
         log().query("insertPerson", query); //TODO Figure out to log Neo4j's pre-prepared queries
-//        Result result = tx().forNeo4j().run(query.template(), parameters(query.parameters()));
-        tx().forNeo4j().run(query);
+        run(tx().forNeo4j(), query);
 
 //        Key constraints are possible with Neo4j Enterprise
 //        https://neo4j.com/developer/kb/how-to-implement-a-primary-key-property-for-a-label/

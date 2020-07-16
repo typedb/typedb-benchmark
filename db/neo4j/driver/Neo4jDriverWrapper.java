@@ -69,14 +69,14 @@ public class Neo4jDriverWrapper implements DriverWrapper {
                 transaction.commit();
             }
 
-            public Result run(Neo4jQuery query) {
-                return transaction.run(query.template(), parameters(query.parameters()));
-            }
-
             @Override
-            public Transaction forNeo4j() {
-                return this;
+            public org.neo4j.driver.Transaction forNeo4j() {
+                return transaction;
             }
         }
+    }
+
+    public static Result run(org.neo4j.driver.Transaction transaction, Neo4jQuery query) {
+        return transaction.run(query.template(), parameters(query.parameters()));
     }
 }
