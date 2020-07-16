@@ -13,23 +13,19 @@ public class MarriageAgent extends grakn.simulation.db.common.agents.interaction
 
     @Override
     protected List<String> getSingleWomen() {
-        GraqlGet.Unfiltered singleWomenQuery = getSinglePeopleOfGenderQuery("female", "marriage_wife");
-        log().query("getSingleWomen", singleWomenQuery);
-        return getOrderedAttribute(tx().forGrakn(), singleWomenQuery, "email");
+        return getSinglePeopleOfGenderQuery("getSingleWomen", "female", "marriage_wife");
     }
 
     @Override
     protected List<String> getSingleMen() {
-        GraqlGet.Unfiltered singleMenQuery = getSinglePeopleOfGenderQuery("male", "marriage_husband");
-        log().query("getSingleMen", singleMenQuery);
-        return getOrderedAttribute(tx().forGrakn(), singleMenQuery, "email");
+        return getSinglePeopleOfGenderQuery("getSingleMen", "male", "marriage_husband");
     }
 
-    private GraqlGet.Unfiltered getSinglePeopleOfGenderQuery(String gender, String marriageRole) {
+    private List<String> getSinglePeopleOfGenderQuery(String scope, String gender, String marriageRole) {
         Statement personVar = Graql.var("p");
         Statement cityVar = Graql.var("city");
 
-        return Graql.match(
+        GraqlGet query = Graql.match(
                 personVar.isa("person").has("gender", gender).has("email", Graql.var("email")).has("date-of-birth", Graql.var("dob")),
                 Graql.var("dob").lte(dobOfAdults()),
                 Graql.not(Graql.var("m").isa("marriage").rel(marriageRole, personVar)),
@@ -37,6 +33,9 @@ public class MarriageAgent extends grakn.simulation.db.common.agents.interaction
                 Graql.not(Graql.var("r").has("end-date", Graql.var("ed"))),
                 cityVar.isa("city").has("location-name", city().name())
         ).get("email");
+
+        log().query(scope, query);
+        return getOrderedAttribute(tx().forGrakn(), query, "email");
     }
 
     @Override

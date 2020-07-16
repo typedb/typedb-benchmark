@@ -1,6 +1,7 @@
 package grakn.simulation.db.common.driver;
 
 import grakn.client.GraknClient;
+import grakn.simulation.db.neo4j.driver.Neo4jDriverWrapper;
 
 public interface DriverWrapper extends AutoCloseable {
 
@@ -18,7 +19,7 @@ public interface DriverWrapper extends AutoCloseable {
             public GraknClient.Transaction forGrakn() {
                 throw new ClassCastException("Can't cast transaction into a Grakn transaction");
             }
-            public org.neo4j.driver.Transaction forNeo4j() {
+            public Neo4jDriverWrapper.Session.Transaction forNeo4j() {
                 throw new ClassCastException("Can't cast transaction into a Neo4j transaction");
             }
         }

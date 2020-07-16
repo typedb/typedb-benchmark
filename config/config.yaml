@@ -1,8 +1,8 @@
 agents:
   # For each agent select a `mode`, `"run"` to run without tracing, `"trace"` to run with tracing, any other input to
   # not run or trace
-#  - name: "marriage"
-#    mode: "trace"
+  - name: "marriage"
+    mode: "trace"
   - name: "personBirth"
     mode: "trace"
 #  - name: "ageUpdate"

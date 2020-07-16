@@ -4,14 +4,16 @@ import grakn.simulation.db.common.agents.world.CityAgentRunner;
 import grakn.simulation.db.common.agents.world.ContinentAgentRunner;
 import grakn.simulation.db.common.agents.world.CountryAgentRunner;
 import grakn.simulation.db.common.initialise.AgentPicker;
+import grakn.simulation.db.neo4j.agents.interaction.MarriageAgent;
 import grakn.simulation.db.neo4j.agents.interaction.PersonBirthAgent;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import static grakn.simulation.db.common.agents.world.CityAgentRunner.SessionStrategy.COUNTRY;
 
 public class Neo4jAgentPicker extends AgentPicker {
     @Override
     protected CityAgentRunner marriage() {
-        return null;
+        return new CityAgentRunner(MarriageAgent.class, COUNTRY);
     }
 
     @Override
@@ -21,41 +23,41 @@ public class Neo4jAgentPicker extends AgentPicker {
 
     @Override
     protected CityAgentRunner ageUpdate() {
-        return null;
+        throw new NotImplementedException();
     }
 
     @Override
     protected CityAgentRunner parentship() {
-        return null;
+        throw new NotImplementedException();
     }
 
     @Override
     protected CityAgentRunner relocation() {
-        return null;
+        throw new NotImplementedException();
     }
 
     @Override
     protected CountryAgentRunner company() {
-        return null;
+        throw new NotImplementedException();
     }
 
     @Override
     protected CityAgentRunner employment() {
-        return null;
+        throw new NotImplementedException();
     }
 
     @Override
     protected ContinentAgentRunner product() {
-        return null;
+        throw new NotImplementedException();
     }
 
     @Override
     protected CountryAgentRunner transaction() {
-        return null;
+        throw new NotImplementedException();
     }
 
     @Override
     protected CityAgentRunner friendship() {
-        return null;
+        throw new NotImplementedException();
     }
 }

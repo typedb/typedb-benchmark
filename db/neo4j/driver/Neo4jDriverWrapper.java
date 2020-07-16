@@ -1,9 +1,13 @@
 package grakn.simulation.db.neo4j.driver;
 
 import grakn.simulation.db.common.driver.DriverWrapper;
+import grakn.simulation.db.neo4j.agents.interaction.Neo4jQuery;
 import org.neo4j.driver.AuthTokens;
 import org.neo4j.driver.Driver;
 import org.neo4j.driver.GraphDatabase;
+import org.neo4j.driver.Result;
+
+import static org.neo4j.driver.Values.parameters;
 
 public class Neo4jDriverWrapper implements DriverWrapper {
 
@@ -29,7 +33,7 @@ public class Neo4jDriverWrapper implements DriverWrapper {
         return new Session(driver.session());
     }
 
-    static class Session extends DriverWrapper.Session {
+    public static class Session extends DriverWrapper.Session {
 
         private org.neo4j.driver.Session session;
 
@@ -47,7 +51,7 @@ public class Neo4jDriverWrapper implements DriverWrapper {
             return new Transaction(session.beginTransaction());
         }
 
-        class Transaction extends DriverWrapper.Session.Transaction {
+        public class Transaction extends DriverWrapper.Session.Transaction {
 
             private org.neo4j.driver.Transaction transaction;
 
@@ -65,9 +69,13 @@ public class Neo4jDriverWrapper implements DriverWrapper {
                 transaction.commit();
             }
 
+            public Result run(Neo4jQuery query) {
+                return transaction.run(query.template(), parameters(query.parameters()));
+            }
+
             @Override
-            public org.neo4j.driver.Transaction forNeo4j() {
-                return transaction;
+            public Transaction forNeo4j() {
+                return this;
             }
         }
     }
