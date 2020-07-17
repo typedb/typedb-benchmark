@@ -17,7 +17,7 @@ commands:
   run-grakn:
     steps:
       - run-bazel:
-          command: bazel run //test:grakn-extractor -- dist/grakn-core-all-linux
+          command: bazel run //agents/test/common:grakn-extractor -- dist/grakn-core-all-linux
       - run: nohup ./dist/grakn-core-all-linux/grakn server start
 
 jobs:
