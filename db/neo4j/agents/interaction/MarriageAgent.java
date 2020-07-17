@@ -22,11 +22,11 @@ public class MarriageAgent extends grakn.simulation.db.common.agents.interaction
                 "MATCH (person:Person {gender: $gender})-[residency:RESIDENT_OF]->(city:City {locationName: $locationName})\n" +
                 "WHERE datetime(\"" + dobOfAdults() + "\") < datetime(person.dateOfBirth)\n" +
                 "AND NOT (person)-[:MARRIED_TO]-()\n" +
-                "AND NOT EXISTS (residency.end_date)\n" +
+                "AND NOT EXISTS (residency.endDate)\n" +
                 "RETURN person.email";
 
         Object[] parameters = new Object[]{
-                "locationName", city().toString(),
+                "locationName", city().name(),
                 "gender", gender
         };
 

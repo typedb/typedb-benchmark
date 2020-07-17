@@ -14,7 +14,7 @@ public class PersonBirthAgent extends grakn.simulation.db.common.agents.interact
                 "forename: $forename, " +
                 "surname: $surname" +
                 "})-[:BORN_IN]->(c)," +
-                "(p)-[:RESIDENT_OF {start_date: $date, is_current: $current}]->(c)";
+                "(p)-[:RESIDENT_OF {startDate: $date, isCurrent: $current}]->(c)";
 
         Object[] parameters = new Object[]{
                 "locationName", city().toString(),
