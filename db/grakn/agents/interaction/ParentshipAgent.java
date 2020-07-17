@@ -18,7 +18,7 @@ import static java.util.stream.Collectors.toList;
 public class ParentshipAgent extends grakn.simulation.db.common.agents.interaction.ParentshipAgent {
 
     @Override
-    protected List<HashMap<String, String>> getMarriageEmails() {
+    protected List<HashMap<Email, String>> getMarriageEmails() {
         GraqlGet.Sorted marriageQuery = Graql.match(
                 Graql.var("city").isa("city")
                         .has("location-name", city().name()),
@@ -45,9 +45,9 @@ public class ParentshipAgent extends grakn.simulation.db.common.agents.interacti
 
         return marriageAnswers
                 .stream()
-                .map(a -> new HashMap<String, String>() {{
-                    put("wife-email", a.get("wife-email").asAttribute().value().toString());
-                    put("husband-email", a.get("husband-email").asAttribute().value().toString());
+                .map(a -> new HashMap<Email, String>() {{
+                    put(Email.WIFE, a.get("wife-email").asAttribute().value().toString());
+                    put(Email.HUSBAND, a.get("husband-email").asAttribute().value().toString());
                 }})
                 .collect(toList());
     }
@@ -71,10 +71,10 @@ public class ParentshipAgent extends grakn.simulation.db.common.agents.interacti
     }
 
     @Override
-    protected void insertParentShip(HashMap<String, String> marriage, List<String> childEmails) {
+    protected void insertParentShip(HashMap<Email, String> marriage, List<String> childEmails) {
         ArrayList<Statement> matchStatements = new ArrayList<>(Arrays.asList(
-                Graql.var("mother").isa("person").has("email", marriage.get("wife-email")),
-                Graql.var("father").isa("person").has("email", marriage.get("husband-email"))
+                Graql.var("mother").isa("person").has("email", marriage.get(Email.WIFE)),
+                Graql.var("father").isa("person").has("email", marriage.get(Email.HUSBAND))
         ));
 
         Statement parentship = Graql.var("par");
@@ -85,6 +85,9 @@ public class ParentshipAgent extends grakn.simulation.db.common.agents.interacti
                         .rel("parentship_parent", "mother")
         ));
 
+        // This model currently inserts a single relation that combines both parents and all of the children they had.
+        // They these children at the same time, and will not have any subsequently. This could be represented as
+        // multiple ternary relations instead, each with both parents and one child.
         for (int i = 0; i < childEmails.size(); i++) {
             String childEmail = childEmails.get(i);
             Statement childVar = Graql.var("child-" + i);

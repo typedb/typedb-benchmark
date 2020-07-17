@@ -12,13 +12,17 @@ import java.util.Map;
 
 public abstract class ParentshipAgent extends CityAgent {
 
+    protected enum Email {
+        WIFE, HUSBAND
+    }
+
     @Override
     public final void iterate() {
         // Query for married couples in the city who are not already in a parentship relation together
 
         List<String> childrenEmails = getChildrenEmailsBorn(today());
 
-        List<HashMap<String, String>> marriageEmails = getMarriageEmails();
+        List<HashMap<Email, String>> marriageEmails = getMarriageEmails();
 
         if (marriageEmails.size() > 0 && childrenEmails.size() > 0) {
             LinkedHashMap<Integer, List<Integer>> childrenPerMarriage = Allocation.allocateEvenlyToMap(childrenEmails.size(), marriageEmails.size());
@@ -27,7 +31,7 @@ public abstract class ParentshipAgent extends CityAgent {
                 Integer marriageIndex = childrenForMarriage.getKey();
                 List<Integer> children = childrenForMarriage.getValue();
 
-                HashMap<String, String> marriage = marriageEmails.get(marriageIndex);
+                HashMap<Email, String> marriage = marriageEmails.get(marriageIndex);
 
                 List<String> childEmails = new ArrayList<>();
                 for (Integer childIndex : children) {
@@ -40,9 +44,9 @@ public abstract class ParentshipAgent extends CityAgent {
         }
     }
 
-    abstract protected List<HashMap<String, String>> getMarriageEmails();
+    abstract protected List<HashMap<Email, String>> getMarriageEmails();
 
     abstract protected List<String> getChildrenEmailsBorn(LocalDateTime dateToday);
 
-    abstract protected void insertParentShip(HashMap<String, String> marriage, List<String> childEmails);
+    abstract protected void insertParentShip(HashMap<Email, String> marriage, List<String> childEmails);
 }

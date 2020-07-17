@@ -17,7 +17,7 @@ public class AgeUpdateAgent extends grakn.simulation.db.common.agents.interactio
 
         Neo4jQuery query = new Neo4jQuery(template, parameters);
 
-        log().query("insertMarriage", query);
+        log().query("updateAgesOfAllPeople", query);
         run(tx().forNeo4j(), query);
     }
 }

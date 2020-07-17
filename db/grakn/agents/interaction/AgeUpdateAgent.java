@@ -17,6 +17,7 @@ public class AgeUpdateAgent extends grakn.simulation.db.common.agents.interactio
         // Get all people born in a city
         Stream<ConceptMap> peopleAnswers = getPeopleBornInCity();
         // Update their ages
+        log().message("updateAgesOfAllPeople");
         peopleAnswers.forEach(personAnswer -> {
                     LocalDateTime dob = (LocalDateTime) personAnswer.get("dob").asAttribute().value();
                     long age = ChronoUnit.YEARS.between(dob, today());
