@@ -22,7 +22,7 @@ public class TransactionAgent extends grakn.simulation.db.common.agents.interact
 
     @Override
     protected List<Double> getProductBarcodesInContinent() {
-        GraqlGet.Unfiltered productsQuery = getProductsInContinentQuery(country().continent());
+        GraqlGet productsQuery = getProductsInContinentQuery(country().continent());
         log().query("getProductBarcodesInContinent", productsQuery);
         return getOrderedAttribute(tx().forGrakn(), productsQuery, "product-barcode");
     }

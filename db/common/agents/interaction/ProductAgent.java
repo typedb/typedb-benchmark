@@ -10,12 +10,13 @@ public abstract class ProductAgent extends ContinentAgent {
         for (int i = 0; i < numProducts; i++) {
             String productName = randomAttributeGenerator().boundRandomLengthRandomString(5, 20);
             String productDescription = randomAttributeGenerator().boundRandomLengthRandomString(75, 100);
-            insertProduct(i, productName, productDescription);
+            Double barcode = (double) uniqueId(i);
+            insertProduct(barcode, productName, productDescription);
         }
         tx().commit();
     }
 
-    abstract protected void insertProduct(int iterationScopeId, String productName, String productDescription);
+    abstract protected void insertProduct(Double barcode, String productName, String productDescription);
 
 //    TODO Should this be abstracted?
 //    static GraqlGet.Unfiltered getProductsInContinentQuery(World.Continent continent);

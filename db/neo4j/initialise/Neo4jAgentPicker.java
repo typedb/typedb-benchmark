@@ -10,6 +10,7 @@ import grakn.simulation.db.neo4j.agents.interaction.EmploymentAgent;
 import grakn.simulation.db.neo4j.agents.interaction.MarriageAgent;
 import grakn.simulation.db.neo4j.agents.interaction.ParentshipAgent;
 import grakn.simulation.db.neo4j.agents.interaction.PersonBirthAgent;
+import grakn.simulation.db.neo4j.agents.interaction.ProductAgent;
 import grakn.simulation.db.neo4j.agents.interaction.RelocationAgent;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
@@ -54,7 +55,7 @@ public class Neo4jAgentPicker extends AgentPicker {
 
     @Override
     protected ContinentAgentRunner product() {
-        throw new NotImplementedException();
+        return new ContinentAgentRunner(ProductAgent.class);
     }
 
     @Override
