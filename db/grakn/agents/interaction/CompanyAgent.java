@@ -9,12 +9,7 @@ import org.apache.commons.lang3.StringUtils;
 public class CompanyAgent extends grakn.simulation.db.common.agents.interaction.CompanyAgent {
 
     @Override
-    protected void insertCompany(int i) {
-        String adjective = pickOne(world().getAdjectives());
-        String noun = pickOne(world().getNouns());
-
-        int companyNumber = uniqueId(i);
-        String companyName = StringUtils.capitalize(adjective) + StringUtils.capitalize(noun) + "-" + companyNumber;
+    protected void insertCompany(int companyNumber, String companyName) {
 
         GraqlInsert query =
                 Graql.match(
