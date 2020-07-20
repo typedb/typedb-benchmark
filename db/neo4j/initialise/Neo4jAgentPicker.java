@@ -7,13 +7,13 @@ import grakn.simulation.db.common.initialise.AgentPicker;
 import grakn.simulation.db.neo4j.agents.interaction.AgeUpdateAgent;
 import grakn.simulation.db.neo4j.agents.interaction.CompanyAgent;
 import grakn.simulation.db.neo4j.agents.interaction.EmploymentAgent;
+import grakn.simulation.db.neo4j.agents.interaction.FriendshipAgent;
 import grakn.simulation.db.neo4j.agents.interaction.MarriageAgent;
 import grakn.simulation.db.neo4j.agents.interaction.ParentshipAgent;
 import grakn.simulation.db.neo4j.agents.interaction.PersonBirthAgent;
 import grakn.simulation.db.neo4j.agents.interaction.ProductAgent;
 import grakn.simulation.db.neo4j.agents.interaction.RelocationAgent;
 import grakn.simulation.db.neo4j.agents.interaction.TransactionAgent;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import static grakn.simulation.db.common.agents.world.CityAgentRunner.SessionStrategy.COUNTRY;
 
@@ -65,6 +65,6 @@ public class Neo4jAgentPicker extends AgentPicker {
 
     @Override
     protected CityAgentRunner friendship() {
-        throw new NotImplementedException();
+        return new CityAgentRunner(FriendshipAgent.class, COUNTRY);
     }
 }

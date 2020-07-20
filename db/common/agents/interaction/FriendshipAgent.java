@@ -20,15 +20,11 @@ public abstract class FriendshipAgent extends CityAgent {
                 String friend1 = pickOne(residentEmails);
                 String friend2 = pickOne(residentEmails);
 
-                if (!checkIfFriendshipExists(friend1, friend2)) {
-                    insertFriendship(friend1, friend2);
-                }
+                insertFriendship(friend1, friend2);
             }
             tx().commit();
         }
     }
-
-    protected abstract boolean checkIfFriendshipExists(String friend1Email, String friend2Email);
 
     protected abstract List<String> getResidentEmails(LocalDateTime earliestDate);
 

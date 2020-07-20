@@ -18,8 +18,8 @@ agents:
     mode: "run"
   - name: "transaction"
     mode: "run"
-#  - name: "friendship"
-#    mode: "run"
+  - name: "friendship"
+    mode: "run"
 
 traceSampling:
   # Options: `"every"` for every K traces; `"log"` for logarithm with base N
