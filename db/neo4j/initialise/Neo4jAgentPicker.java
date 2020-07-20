@@ -12,10 +12,10 @@ import grakn.simulation.db.neo4j.agents.interaction.ParentshipAgent;
 import grakn.simulation.db.neo4j.agents.interaction.PersonBirthAgent;
 import grakn.simulation.db.neo4j.agents.interaction.ProductAgent;
 import grakn.simulation.db.neo4j.agents.interaction.RelocationAgent;
+import grakn.simulation.db.neo4j.agents.interaction.TransactionAgent;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import static grakn.simulation.db.common.agents.world.CityAgentRunner.SessionStrategy.COUNTRY;
-import static grakn.simulation.db.common.agents.world.CountryAgentRunner.SessionStrategy.CONTINENT;
 
 public class Neo4jAgentPicker extends AgentPicker {
     @Override
@@ -60,7 +60,7 @@ public class Neo4jAgentPicker extends AgentPicker {
 
     @Override
     protected CountryAgentRunner transaction() {
-        throw new NotImplementedException();
+        return new CountryAgentRunner(TransactionAgent.class, CountryAgentRunner.SessionStrategy.COUNTRY);
     }
 
     @Override

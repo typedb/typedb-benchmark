@@ -28,11 +28,11 @@ public class ProductAgent extends grakn.simulation.db.common.agents.interaction.
 
     static Neo4jQuery getProductsInContinentQuery(World.Continent continent) {
         String template = "" +
-                "MATCH (continent:Continent {locationName: $continentName})\n" +
+                "MATCH (continent:Continent {locationName: $continentName}),\n" +
                 "(product:Product)-[:PRODUCED_IN]->(continent)\n" +
                 "RETURN product.barcode";
         Object[] parameters = new Object[]{
-                "continentName", continent,
+                "continentName", continent.name(),
         };
         return new Neo4jQuery(template, parameters);
     }

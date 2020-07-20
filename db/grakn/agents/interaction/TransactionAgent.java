@@ -42,7 +42,7 @@ public class TransactionAgent extends grakn.simulation.db.common.agents.interact
                 .insert(
                         Graql.var("transaction")
                                 .isa("transaction")
-                                .rel("transaction_vendor", Graql.var("c-seller"))
+                                .rel("transaction_seller", Graql.var("c-seller"))
                                 .rel("transaction_buyer", Graql.var("c-buyer"))
                                 .rel("transaction_merchandise", Graql.var("product"))
 //                                .has("currency")  // TODO Add currency https://github.com/graknlabs/simulation/issues/31
