@@ -6,6 +6,7 @@ import grakn.simulation.db.common.agents.world.CountryAgentRunner;
 import grakn.simulation.db.common.initialise.AgentPicker;
 import grakn.simulation.db.neo4j.agents.interaction.AgeUpdateAgent;
 import grakn.simulation.db.neo4j.agents.interaction.CompanyAgent;
+import grakn.simulation.db.neo4j.agents.interaction.EmploymentAgent;
 import grakn.simulation.db.neo4j.agents.interaction.MarriageAgent;
 import grakn.simulation.db.neo4j.agents.interaction.ParentshipAgent;
 import grakn.simulation.db.neo4j.agents.interaction.PersonBirthAgent;
@@ -48,7 +49,7 @@ public class Neo4jAgentPicker extends AgentPicker {
 
     @Override
     protected CityAgentRunner employment() {
-        throw new NotImplementedException();
+        return new CityAgentRunner(EmploymentAgent.class, COUNTRY);
     }
 
     @Override
