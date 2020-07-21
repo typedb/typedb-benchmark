@@ -30,7 +30,7 @@ public class ParentshipAgent extends grakn.simulation.db.common.agents.interacti
         Neo4jQuery query = new Neo4jQuery(template, parameters);
 
         log().query("getMarriageEmails", query);
-        Result result = run(tx().forNeo4j(), query);
+        Result result = run(tx(), query);
 
         return result.stream().map(Record::asMap).map(r -> new HashMap<Email, String>() {{
             put(Email.WIFE, r.get("wife.email").toString());
@@ -54,7 +54,7 @@ public class ParentshipAgent extends grakn.simulation.db.common.agents.interacti
         Neo4jQuery childrenQuery = new Neo4jQuery(template, parameters);
 
         log().query("getChildrenEmails", childrenQuery);
-        return getOrderedAttribute(tx().forNeo4j(), childrenQuery, "child.email");
+        return getOrderedAttribute(tx(), childrenQuery, "child.email");
     }
 
     @Override
@@ -73,7 +73,7 @@ public class ParentshipAgent extends grakn.simulation.db.common.agents.interacti
             };
             Neo4jQuery parentshipQuery = new Neo4jQuery(template, parameters);
             log().query("insertParentShip", parentshipQuery);
-            run(tx().forNeo4j(), parentshipQuery);
+            run(tx(), parentshipQuery);
         }
     }
 }

@@ -12,7 +12,7 @@ public class EmploymentAgent extends grakn.simulation.db.common.agents.interacti
         Neo4jQuery companyNumbersQuery = CompanyAgent.getCompanyNumbersInCountryQuery(city().country());
         log().query("getEmployeeEmails", companyNumbersQuery);
         int numCompanies = world().getScaleFactor();
-        return ExecutorUtils.getOrderedAttribute(tx().forNeo4j(), companyNumbersQuery, "company.companyNumber", numCompanies);
+        return ExecutorUtils.getOrderedAttribute(tx(), companyNumbersQuery, "company.companyNumber", numCompanies);
     }
 
     @Override
@@ -20,7 +20,7 @@ public class EmploymentAgent extends grakn.simulation.db.common.agents.interacti
         Neo4jQuery getEmployeeEmailsQuery = cityResidentsQuery(city(), earliestDate);
         log().query("getEmployeeEmails", getEmployeeEmailsQuery);
         int numEmployments = world().getScaleFactor();
-        return ExecutorUtils.getOrderedAttribute(tx().forNeo4j(), getEmployeeEmailsQuery, "resident.email", numEmployments);
+        return ExecutorUtils.getOrderedAttribute(tx(), getEmployeeEmailsQuery, "resident.email", numEmployments);
     }
 
     @Override
@@ -48,6 +48,6 @@ public class EmploymentAgent extends grakn.simulation.db.common.agents.interacti
 
         Neo4jQuery insertEmploymentQuery = new Neo4jQuery(template, parameters);
         log().query("insertEmployment", insertEmploymentQuery);
-        run(tx().forNeo4j(), insertEmploymentQuery);
+        run(tx(), insertEmploymentQuery);
     }
 }

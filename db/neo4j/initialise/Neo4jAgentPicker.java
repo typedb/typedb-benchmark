@@ -59,8 +59,8 @@ public class Neo4jAgentPicker extends AgentPicker {
     }
 
     @Override
-    protected CountryAgentRunner transaction() {
-        return new CountryAgentRunner(TransactionAgent.class, CountryAgentRunner.SessionStrategy.COUNTRY);
+    protected ContinentAgentRunner transaction() {
+        return new ContinentAgentRunner(TransactionAgent.class);
     }
 
     @Override

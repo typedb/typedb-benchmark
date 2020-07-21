@@ -27,7 +27,7 @@ public class RelocationAgent extends grakn.simulation.db.common.agents.interacti
         Neo4jQuery cityResidentsQuery = cityResidentsQuery(city(), earliestDate);
         log().query("getResidentEmails", cityResidentsQuery);
         int numRelocations = world().getScaleFactor();
-        return getOrderedAttribute(tx().forNeo4j(), cityResidentsQuery, "resident.email", numRelocations);
+        return getOrderedAttribute(tx(), cityResidentsQuery, "resident.email", numRelocations);
     }
 
     @Override
@@ -45,7 +45,7 @@ public class RelocationAgent extends grakn.simulation.db.common.agents.interacti
         Neo4jQuery relocationCitiesQuery = new Neo4jQuery(template, parameters);
 
         log().query("getRelocationCityNames", relocationCitiesQuery);
-        return getOrderedAttribute(tx().forNeo4j(), relocationCitiesQuery, "city.locationName");
+        return getOrderedAttribute(tx(), relocationCitiesQuery, "city.locationName");
     }
 
     @Override
@@ -68,6 +68,6 @@ public class RelocationAgent extends grakn.simulation.db.common.agents.interacti
         };
         Neo4jQuery relocatePersonQuery = new Neo4jQuery(template, parameters);
         log().query("insertRelocation", relocatePersonQuery);
-        run(tx().forNeo4j(), relocatePersonQuery);
+        run(tx(), relocatePersonQuery);
     }
 }

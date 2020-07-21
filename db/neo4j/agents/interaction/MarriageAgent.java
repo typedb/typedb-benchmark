@@ -33,7 +33,7 @@ public class MarriageAgent extends grakn.simulation.db.common.agents.interaction
         Neo4jQuery query = new Neo4jQuery(template, parameters);
 
         log().query(scope, query);
-        return getOrderedAttribute(tx().forNeo4j(), query, "person.email");
+        return getOrderedAttribute(tx(), query, "person.email");
     }
 
     @Override
@@ -52,6 +52,6 @@ public class MarriageAgent extends grakn.simulation.db.common.agents.interaction
         Neo4jQuery query = new Neo4jQuery(template, parameters);
 
         log().query("insertMarriage", query);
-        run(tx().forNeo4j(), query);
+        run(tx(), query);
     }
 }

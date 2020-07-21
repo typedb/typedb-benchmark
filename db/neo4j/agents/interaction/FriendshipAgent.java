@@ -20,8 +20,8 @@ public class FriendshipAgent extends grakn.simulation.db.common.agents.interacti
         String template = "" +
                 "MATCH " +
                 "(p1:Person {p1Email:$p1Email}),\n" +
-                "(p2:Person {p2Email:$p2Email})," +
-                "WHERE NOT (p1)-[:FRIEND_OF]-(p2)" +
+                "(p2:Person {p2Email:$p2Email})\n" +
+                "WHERE NOT (p1)-[:FRIEND_OF]-(p2)\n" +
                 "CREATE (p1)-[:FRIEND_OF {startDate: $startDate}]->(p2)"; // TODO this will surely insert duplicates
 
         Object[] parameters = new Object[]{
@@ -31,6 +31,6 @@ public class FriendshipAgent extends grakn.simulation.db.common.agents.interacti
         };
         Neo4jQuery insertFriendshipQuery = new Neo4jQuery(template, parameters);
         log().query("insertFriendship", insertFriendshipQuery);
-        run(tx().forNeo4j(), insertFriendshipQuery);
+        run(tx(), insertFriendshipQuery);
     }
 }

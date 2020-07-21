@@ -7,22 +7,22 @@ import graql.lang.query.GraqlInsert;
 
 import java.util.List;
 
+import static grakn.simulation.db.grakn.agents.interaction.CompanyAgent.getCompanyNumbersInContinentQuery;
 import static grakn.simulation.db.grakn.agents.interaction.ExecutorUtils.getOrderedAttribute;
-import static grakn.simulation.db.grakn.agents.interaction.CompanyAgent.getCompanyNumbersInCountryQuery;
 import static grakn.simulation.db.grakn.agents.interaction.ProductAgent.getProductsInContinentQuery;
 
 public class TransactionAgent extends grakn.simulation.db.common.agents.interaction.TransactionAgent {
 
     @Override
-    protected List<Long> getCompanyNumbersInCountry(){
-        GraqlGet companiesQuery = getCompanyNumbersInCountryQuery(country());
+    protected List<Long> getCompanyNumbersInContinent(){
+        GraqlGet companiesQuery = getCompanyNumbersInContinentQuery(continent());
         log().query("getCompanyNumbersInCountry", companiesQuery);
         return getOrderedAttribute(tx().forGrakn(), companiesQuery, "company-number");
     }
 
     @Override
     protected List<Double> getProductBarcodesInContinent() {
-        GraqlGet productsQuery = getProductsInContinentQuery(country().continent());
+        GraqlGet productsQuery = getProductsInContinentQuery(continent());
         log().query("getProductBarcodesInContinent", productsQuery);
         return getOrderedAttribute(tx().forGrakn(), productsQuery, "product-barcode");
     }
@@ -37,8 +37,8 @@ public class TransactionAgent extends grakn.simulation.db.common.agents.interact
                         .has("company-number", transaction.getFirst()),
                 Graql.var("c-seller").isa("company")
                         .has("company-number", sellerCompanyNumber),
-                Graql.var("country").isa("country")
-                        .has("location-name", country().name()))
+                Graql.var("continent").isa("continent")
+                        .has("location-name", continent().name()))
                 .insert(
                         Graql.var("transaction")
                                 .isa("transaction")

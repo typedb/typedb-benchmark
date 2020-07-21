@@ -1,19 +1,19 @@
 package grakn.simulation.db.common.agents.interaction;
 
-import grakn.simulation.db.common.agents.world.CountryAgent;
+import grakn.simulation.db.common.agents.world.ContinentAgent;
 import grakn.simulation.db.common.agents.utils.Allocation;
 import grakn.simulation.db.common.agents.utils.Pair;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class TransactionAgent extends CountryAgent {
+public abstract class TransactionAgent extends ContinentAgent {
 
     private int NUM_TRANSACTIONS_PER_COMPANY_ON_AVERAGE = 1;
 
     @Override
     public final void iterate() {
-        List<Long> companyNumbers = getCompanyNumbersInCountry();
+        List<Long> companyNumbers = getCompanyNumbersInContinent();
         List<Double> productBarcodes = getProductBarcodesInContinent();
         shuffle(companyNumbers);
 
@@ -41,7 +41,7 @@ public abstract class TransactionAgent extends CountryAgent {
         tx().commit();
     }
 
-    abstract protected List<Long> getCompanyNumbersInCountry();
+    abstract protected List<Long> getCompanyNumbersInContinent();
 
     abstract protected List<Double> getProductBarcodesInContinent();
 

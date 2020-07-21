@@ -1,5 +1,7 @@
 package grakn.simulation.db.neo4j.agents.interaction;
 
+import grakn.simulation.db.common.driver.DriverWrapper;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -11,7 +13,7 @@ import static grakn.simulation.db.neo4j.driver.Neo4jDriverWrapper.run;
 public class ExecutorUtils {
 
     @SuppressWarnings("unchecked")
-    public static <T> List<T> getOrderedAttribute(org.neo4j.driver.Transaction tx, Neo4jQuery neo4jQuery, String attributeName, Integer limit){
+    public static <T> List<T> getOrderedAttribute(DriverWrapper.Session.Transaction tx, Neo4jQuery neo4jQuery, String attributeName, Integer limit){
         return run(tx, neo4jQuery).stream()
                 .map(record -> (T) record.asMap().get(attributeName))
                 .sorted()
@@ -20,7 +22,7 @@ public class ExecutorUtils {
     }
 
     @SuppressWarnings("unchecked")
-    public static <T> List<T> getOrderedAttribute(org.neo4j.driver.Transaction tx, Neo4jQuery neo4jQuery, String attributeName){
+    public static <T> List<T> getOrderedAttribute(DriverWrapper.Session.Transaction tx, Neo4jQuery neo4jQuery, String attributeName){
         return run(tx, neo4jQuery).stream()
                 .map(record -> (T) record.asMap().get(attributeName))
                 .sorted()

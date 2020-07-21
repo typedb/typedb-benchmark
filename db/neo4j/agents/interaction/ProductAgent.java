@@ -23,7 +23,7 @@ public class ProductAgent extends grakn.simulation.db.common.agents.interaction.
         };
         Neo4jQuery insertProductQuery = new Neo4jQuery(template, parameters);
         log().query("insertProduct", insertProductQuery);
-        run(tx().forNeo4j(), insertProductQuery);
+        run(tx(), insertProductQuery);
     }
 
     static Neo4jQuery getProductsInContinentQuery(World.Continent continent) {

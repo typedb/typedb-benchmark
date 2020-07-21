@@ -19,12 +19,23 @@ public class CompanyAgent extends grakn.simulation.db.common.agents.interaction.
         };
 
         Neo4jQuery companyQuery = new Neo4jQuery(template, parameters);
-        run(tx().forNeo4j(), companyQuery);
+        run(tx(), companyQuery);
+    }
+
+    static Neo4jQuery getCompanyNumbersInContinentQuery(World.Continent continent) {
+        String template = "" +
+                "MATCH (company:Company)-[:INCORPORATED_IN]->(country:Country)-[:LOCATED_IN]->(continent:Continent {locationName: $continentName})\n" +
+                "RETURN company.companyNumber";
+
+        Object[] parameters = new Object[]{
+                "continentName", continent.name(),
+        };
+        return new Neo4jQuery(template, parameters);
     }
 
     static Neo4jQuery getCompanyNumbersInCountryQuery(World.Country country) {
         String template = "" +
-                "MATCH (country:Country {locationName: $countryName})-[:INCORPORATED_IN]->(company:Company)\n" +
+                "MATCH (company:Company)-[:INCORPORATED_IN]->(country:Country {locationName: $countryName})\n" +
                 "RETURN company.companyNumber";
 
         Object[] parameters = new Object[]{

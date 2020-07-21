@@ -61,8 +61,8 @@ public class GraknAgentPicker extends AgentPicker {
     }
 
     @Override
-    protected CountryAgentRunner transaction() {
-        return new CountryAgentRunner(TransactionAgent.class, COUNTRY);
+    protected ContinentAgentRunner transaction() {
+        return new ContinentAgentRunner(TransactionAgent.class);
     }
 
     @Override

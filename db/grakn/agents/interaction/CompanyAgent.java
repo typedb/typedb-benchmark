@@ -38,4 +38,18 @@ public class CompanyAgent extends grakn.simulation.db.common.agents.interaction.
                         .rel("incorporation_incorporating", Graql.var("country"))
         ).get();
     }
+
+    static GraqlGet getCompanyNumbersInContinentQuery(World.Continent continent) {
+        return Graql.match(
+                Graql.var("continent").isa("continent")
+                        .has("location-name", continent.name()),
+                Graql.var("lh").isa("location-hierarchy").rel("country").rel("continent"),
+                Graql.var("country").isa("country"),
+                Graql.var("company").isa("company")
+                        .has("company-number", Graql.var("company-number")),
+                Graql.var("reg").isa("incorporation")
+                        .rel("incorporation_incorporated", Graql.var("company"))
+                        .rel("incorporation_incorporating", Graql.var("country"))
+        ).get();
+    }
 }

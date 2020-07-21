@@ -15,7 +15,7 @@ public abstract class AgentPicker {
     protected abstract CountryAgentRunner company();
     protected abstract CityAgentRunner employment();
     protected abstract ContinentAgentRunner product();
-    protected abstract CountryAgentRunner transaction();
+    protected abstract ContinentAgentRunner transaction();
     protected abstract CityAgentRunner friendship();
 
     public AgentRunner<?> get(String agentName) {
