@@ -1,6 +1,9 @@
 package grakn.simulation.db.neo4j.agents.interaction;
 
-import static grakn.simulation.db.neo4j.driver.Neo4jDriverWrapper.run;
+import grakn.simulation.db.neo4j.driver.Neo4jDriverWrapper;
+import org.neo4j.driver.Query;
+
+import java.util.HashMap;
 
 public class PersonBirthAgent extends grakn.simulation.db.common.agents.interaction.PersonBirthAgent {
 
@@ -16,20 +19,20 @@ public class PersonBirthAgent extends grakn.simulation.db.common.agents.interact
                 "})-[:BORN_IN]->(c)," +
                 "(p)-[:RESIDENT_OF {startDate: $date, isCurrent: $current}]->(c)";
 
-        Object[] parameters = new Object[]{
-                "locationName", city().toString(),
-                "email", email,
-                "date", today(),
-                "gender", gender,
-                "forename", forename,
-                "surname", surname,
-                "current", true
-        };
+        HashMap<String, Object> parameters = new HashMap<String, Object>(){{
+                put("locationName", city().toString());
+                put("email", email);
+                put("date", today());
+                put("gender", gender);
+                put("forename", forename);
+                put("surname", surname);
+                put("current", true);
+        }};
 
-        Neo4jQuery query = new Neo4jQuery(template, parameters);
+        Query query = new Query(template, parameters);
 
         log().query("insertPerson", query); //TODO Figure out to log Neo4j's pre-prepared queries
-        run(tx(), query);
+        ((Neo4jDriverWrapper.Session.Transaction) tx()).run(query);
 
 //        Key constraints are possible with Neo4j Enterprise
 //        https://neo4j.com/developer/kb/how-to-implement-a-primary-key-property-for-a-label/

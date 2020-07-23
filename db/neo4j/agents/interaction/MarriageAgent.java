@@ -1,9 +1,10 @@
 package grakn.simulation.db.neo4j.agents.interaction;
 
-import java.util.List;
+import grakn.simulation.db.neo4j.driver.Neo4jDriverWrapper;
+import org.neo4j.driver.Query;
 
-import static grakn.simulation.db.neo4j.agents.interaction.ExecutorUtils.getOrderedAttribute;
-import static grakn.simulation.db.neo4j.driver.Neo4jDriverWrapper.run;
+import java.util.HashMap;
+import java.util.List;
 
 public class MarriageAgent extends grakn.simulation.db.common.agents.interaction.MarriageAgent {
 
@@ -25,15 +26,15 @@ public class MarriageAgent extends grakn.simulation.db.common.agents.interaction
                 "AND NOT EXISTS (residency.endDate)\n" +
                 "RETURN person.email";
 
-        Object[] parameters = new Object[]{
-                "locationName", city().name(),
-                "gender", gender
-        };
+        HashMap<String, Object> parameters = new HashMap<String, Object>(){{
+                put("locationName", city().name());
+                put("gender", gender);
+        }};
 
-        Neo4jQuery query = new Neo4jQuery(template, parameters);
+        Query query = new Query(template, parameters);
 
         log().query(scope, query);
-        return getOrderedAttribute(tx(), query, "person.email");
+        return ((Neo4jDriverWrapper.Session.Transaction) tx()).getOrderedAttribute(query, "person.email", null);
     }
 
     @Override
@@ -42,16 +43,16 @@ public class MarriageAgent extends grakn.simulation.db.common.agents.interaction
                 "MATCH (wife:Person {email: $wifeEmail}), (husband:Person {email: $husbandEmail}), (city:City {locationName: $cityName})\n" +
                 "CREATE (husband)-[:MARRIED_TO {id: $marriageIdentifier, locationName: city.locationName}]->(wife)";
 
-        Object[] parameters = new Object[]{
-                "marriageIdentifier", marriageIdentifier,
-                "wifeEmail", wifeEmail,
-                "husbandEmail", husbandEmail,
-                "cityName", city().name(),
-        };
+        HashMap<String, Object> parameters = new HashMap<String, Object>(){{
+                put("marriageIdentifier", marriageIdentifier);
+                put("wifeEmail", wifeEmail);
+                put("husbandEmail", husbandEmail);
+                put("cityName", city().name());
+        }};
 
-        Neo4jQuery query = new Neo4jQuery(template, parameters);
+        Query query = new Query(template, parameters);
 
         log().query("insertMarriage", query);
-        run(tx(), query);
+        ((Neo4jDriverWrapper.Session.Transaction) tx()).run(query);
     }
 }

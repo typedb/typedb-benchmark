@@ -1,6 +1,9 @@
 package grakn.simulation.db.neo4j.agents.interaction;
 
-import static grakn.simulation.db.neo4j.driver.Neo4jDriverWrapper.run;
+import grakn.simulation.db.neo4j.driver.Neo4jDriverWrapper;
+import org.neo4j.driver.Query;
+
+import java.util.HashMap;
 
 public class AgeUpdateAgent extends grakn.simulation.db.common.agents.interaction.AgeUpdateAgent {
 
@@ -10,14 +13,14 @@ public class AgeUpdateAgent extends grakn.simulation.db.common.agents.interactio
                 "MATCH (person:Person), (city:City {locationName: $cityName})\n" +
                 "SET person.age = duration.between(person.dateOfBirth, localdatetime($dateToday)).years\n";
 
-        Object[] parameters = new Object[]{
-                "cityName", city().name(),
-                "dateToday", today()
-        };
+        HashMap<String, Object> parameters = new HashMap<String, Object>(){{
+                put("cityName", city().name());
+                put("dateToday", today());
+        }};
 
-        Neo4jQuery query = new Neo4jQuery(template, parameters);
+        Query query = new Query(template, parameters);
 
         log().query("updateAgesOfAllPeople", query);
-        run(tx(), query);
+        ((Neo4jDriverWrapper.Session.Transaction) tx()).run(query);
     }
 }

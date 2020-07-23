@@ -1,33 +1,33 @@
 package grakn.simulation.db.neo4j.agents.interaction;
 
 import grakn.simulation.db.common.world.World;
+import grakn.simulation.db.neo4j.driver.Neo4jDriverWrapper;
+import org.neo4j.driver.Query;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
-
-import static grakn.simulation.db.neo4j.agents.interaction.ExecutorUtils.getOrderedAttribute;
-import static grakn.simulation.db.neo4j.driver.Neo4jDriverWrapper.run;
 
 public class RelocationAgent extends grakn.simulation.db.common.agents.interaction.RelocationAgent {
 
-    static Neo4jQuery cityResidentsQuery(World.City city, LocalDateTime earliestDate) {
+    static Query cityResidentsQuery(World.City city, LocalDateTime earliestDate) {
         String template = "" +
                 "MATCH (resident:Person)-[residency:RESIDENT_OF]->(city:City {locationName: $locationName})" +
                 "WHERE datetime(residency.startDate) <= datetime($earliestDate)\n" +
                 "RETURN resident.email";
-        Object[] parameters = new Object[]{
-                "locationName", city.name(),
-                "earliestDate", earliestDate
-        };
-        return new Neo4jQuery(template, parameters);
+        HashMap<String, Object> parameters = new HashMap<String, Object>(){{
+                put("locationName", city.name());
+                put("earliestDate", earliestDate);
+        }};
+        return new Query(template, parameters);
     }
 
     @Override
     protected List<String> getResidentEmails(LocalDateTime earliestDate) {
-        Neo4jQuery cityResidentsQuery = cityResidentsQuery(city(), earliestDate);
+        Query cityResidentsQuery = cityResidentsQuery(city(), earliestDate);
         log().query("getResidentEmails", cityResidentsQuery);
         int numRelocations = world().getScaleFactor();
-        return getOrderedAttribute(tx(), cityResidentsQuery, "resident.email", numRelocations);
+        return ((Neo4jDriverWrapper.Session.Transaction) tx()).getOrderedAttribute(cityResidentsQuery, "resident.email", numRelocations);
     }
 
     @Override
@@ -37,15 +37,15 @@ public class RelocationAgent extends grakn.simulation.db.common.agents.interacti
                 "WHERE NOT city.locationName = $cityName\n" +
                 "RETURN city.locationName";
 
-        Object[] parameters = new Object[]{
-                "continentName", city().country().continent().name(),
-                "cityName", city().name()
-        };
+        HashMap<String, Object> parameters = new HashMap<String, Object>(){{
+                put("continentName", city().country().continent().name());
+                put("cityName", city().name());
+        }};
 
-        Neo4jQuery relocationCitiesQuery = new Neo4jQuery(template, parameters);
+        Query relocationCitiesQuery = new Query(template, parameters);
 
         log().query("getRelocationCityNames", relocationCitiesQuery);
-        return getOrderedAttribute(tx(), relocationCitiesQuery, "city.locationName");
+        return ((Neo4jDriverWrapper.Session.Transaction) tx()).getOrderedAttribute(relocationCitiesQuery, "city.locationName", null);
     }
 
     @Override
@@ -61,13 +61,13 @@ public class RelocationAgent extends grakn.simulation.db.common.agents.interacti
                 "MATCH (person:Person {email: $email}), (newCity:City {locationName: $newCityName})\n" +
                 "CREATE (person)-[:RELOCATED_TO {relocationDate:$relocationDate}]->(newCity)";
 
-        Object[] parameters = new Object[]{
-                "email", email,
-                "newCityName", newCityName,
-                "relocationDate", today()
-        };
-        Neo4jQuery relocatePersonQuery = new Neo4jQuery(template, parameters);
+        HashMap<String, Object> parameters = new HashMap<String, Object>(){{
+                put("email", email);
+                put("newCityName", newCityName);
+                put("relocationDate", today());
+        }};
+        Query relocatePersonQuery = new Query(template, parameters);
         log().query("insertRelocation", relocatePersonQuery);
-        run(tx(), relocatePersonQuery);
+        ((Neo4jDriverWrapper.Session.Transaction) tx()).run(relocatePersonQuery);
     }
 }

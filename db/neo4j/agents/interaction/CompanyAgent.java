@@ -1,8 +1,10 @@
 package grakn.simulation.db.neo4j.agents.interaction;
 
 import grakn.simulation.db.common.world.World;
+import grakn.simulation.db.neo4j.driver.Neo4jDriverWrapper;
+import org.neo4j.driver.Query;
 
-import static grakn.simulation.db.neo4j.driver.Neo4jDriverWrapper.run;
+import java.util.HashMap;
 
 public class CompanyAgent extends grakn.simulation.db.common.agents.interaction.CompanyAgent {
     @Override
@@ -11,36 +13,36 @@ public class CompanyAgent extends grakn.simulation.db.common.agents.interaction.
                 "MATCH (country:Country {locationName: $countryName})\n" +
                 "CREATE (country)-[:INCORPORATED_IN {dateOfIncorporation: $dateOfIncorporation}]->(company:Company {companyNumber: $companyNumber, companyName: $companyName})";
 
-        Object[] parameters = new Object[]{
-                "countryName", country().name(),
-                "companyNumber", companyNumber,
-                "companyName", companyName,
-                "dateOfIncorporation", today()
-        };
+        HashMap<String, Object> parameters = new HashMap<String, Object>(){{
+                put("countryName", country().name());
+                put("companyNumber", companyNumber);
+                put("companyName", companyName);
+                put("dateOfIncorporation", today());
+        }};
 
-        Neo4jQuery companyQuery = new Neo4jQuery(template, parameters);
-        run(tx(), companyQuery);
+        Query companyQuery = new Query(template, parameters);
+        ((Neo4jDriverWrapper.Session.Transaction) tx()).run(companyQuery);
     }
 
-    static Neo4jQuery getCompanyNumbersInContinentQuery(World.Continent continent) {
+    static Query getCompanyNumbersInContinentQuery(World.Continent continent) {
         String template = "" +
                 "MATCH (company:Company)-[:INCORPORATED_IN]->(country:Country)-[:LOCATED_IN]->(continent:Continent {locationName: $continentName})\n" +
                 "RETURN company.companyNumber";
 
-        Object[] parameters = new Object[]{
-                "continentName", continent.name(),
-        };
-        return new Neo4jQuery(template, parameters);
+        HashMap<String, Object> parameters = new HashMap<String, Object>(){{
+                put("continentName", continent.name());
+        }};
+        return new Query(template, parameters);
     }
 
-    static Neo4jQuery getCompanyNumbersInCountryQuery(World.Country country) {
+    static Query getCompanyNumbersInCountryQuery(World.Country country) {
         String template = "" +
                 "MATCH (company:Company)-[:INCORPORATED_IN]->(country:Country {locationName: $countryName})\n" +
                 "RETURN company.companyNumber";
 
-        Object[] parameters = new Object[]{
-                "countryName", country.name(),
-        };
-        return new Neo4jQuery(template, parameters);
+        HashMap<String, Object> parameters = new HashMap<String, Object>(){{
+                put("countryName", country.name());
+        }};
+        return new Query(template, parameters);
     }
 }

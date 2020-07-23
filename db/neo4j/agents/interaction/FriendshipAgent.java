@@ -1,18 +1,21 @@
 package grakn.simulation.db.neo4j.agents.interaction;
 
+import grakn.simulation.db.neo4j.driver.Neo4jDriverWrapper;
+import org.neo4j.driver.Query;
+
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
 
 import static grakn.simulation.db.neo4j.agents.interaction.RelocationAgent.cityResidentsQuery;
-import static grakn.simulation.db.neo4j.driver.Neo4jDriverWrapper.run;
 
 public class FriendshipAgent extends grakn.simulation.db.common.agents.interaction.FriendshipAgent {
 
     @Override
     protected List<String> getResidentEmails(LocalDateTime earliestDate) {
-        Neo4jQuery cityResidentsQuery = cityResidentsQuery(city(), earliestDate);
+        Query cityResidentsQuery = cityResidentsQuery(city(), earliestDate);
         log().query("getResidentEmails", cityResidentsQuery);
-        return ExecutorUtils.getOrderedAttribute(tx(), cityResidentsQuery, "resident.email");
+        return ((Neo4jDriverWrapper.Session.Transaction) tx()).getOrderedAttribute(cityResidentsQuery, "resident.email", null);
     }
 
     @Override
@@ -24,13 +27,13 @@ public class FriendshipAgent extends grakn.simulation.db.common.agents.interacti
                 "WHERE NOT (p1)-[:FRIEND_OF]-(p2)\n" +
                 "CREATE (p1)-[:FRIEND_OF {startDate: $startDate}]->(p2)"; // TODO this will surely insert duplicates
 
-        Object[] parameters = new Object[]{
-                "p1Email", friend1Email,
-                "p2Email", friend2Email,
-                "startDate", today()
-        };
-        Neo4jQuery insertFriendshipQuery = new Neo4jQuery(template, parameters);
+        HashMap<String, Object> parameters = new HashMap<String, Object>(){{
+                put("p1Email", friend1Email);
+                put("p2Email", friend2Email);
+                put("startDate", today());
+        }};
+        Query insertFriendshipQuery = new Query(template, parameters);
         log().query("insertFriendship", insertFriendshipQuery);
-        run(tx(), insertFriendshipQuery);
+        ((Neo4jDriverWrapper.Session.Transaction) tx()).run(insertFriendshipQuery);
     }
 }

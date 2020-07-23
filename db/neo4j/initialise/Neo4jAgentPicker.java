@@ -15,32 +15,33 @@ import grakn.simulation.db.neo4j.agents.interaction.ProductAgent;
 import grakn.simulation.db.neo4j.agents.interaction.RelocationAgent;
 import grakn.simulation.db.neo4j.agents.interaction.TransactionAgent;
 
+import static grakn.simulation.db.common.agents.world.CityAgentRunner.SessionStrategy.CITY;
 import static grakn.simulation.db.common.agents.world.CityAgentRunner.SessionStrategy.COUNTRY;
 
 public class Neo4jAgentPicker extends AgentPicker {
     @Override
     protected CityAgentRunner marriage() {
-        return new CityAgentRunner(MarriageAgent.class, COUNTRY);
+        return new CityAgentRunner(MarriageAgent.class, CITY);
     }
 
     @Override
     protected CityAgentRunner personBirth() {
-        return new CityAgentRunner(PersonBirthAgent.class, COUNTRY);
+        return new CityAgentRunner(PersonBirthAgent.class, CITY);
     }
 
     @Override
     protected CityAgentRunner ageUpdate() {
-        return new CityAgentRunner(AgeUpdateAgent.class, COUNTRY);
+        return new CityAgentRunner(AgeUpdateAgent.class, CITY);
     }
 
     @Override
     protected CityAgentRunner parentship() {
-        return new CityAgentRunner(ParentshipAgent.class, COUNTRY);
+        return new CityAgentRunner(ParentshipAgent.class, CITY);
     }
 
     @Override
     protected CityAgentRunner relocation() {
-        return new CityAgentRunner(RelocationAgent.class, COUNTRY);
+        return new CityAgentRunner(RelocationAgent.class, CITY);
     }
 
     @Override
@@ -50,7 +51,7 @@ public class Neo4jAgentPicker extends AgentPicker {
 
     @Override
     protected CityAgentRunner employment() {
-        return new CityAgentRunner(EmploymentAgent.class, COUNTRY);
+        return new CityAgentRunner(EmploymentAgent.class, CITY);
     }
 
     @Override
@@ -65,6 +66,6 @@ public class Neo4jAgentPicker extends AgentPicker {
 
     @Override
     protected CityAgentRunner friendship() {
-        return new CityAgentRunner(FriendshipAgent.class, COUNTRY);
+        return new CityAgentRunner(FriendshipAgent.class, CITY);
     }
 }

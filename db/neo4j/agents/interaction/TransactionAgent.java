@@ -1,27 +1,28 @@
 package grakn.simulation.db.neo4j.agents.interaction;
 
 import grakn.simulation.db.common.agents.utils.Pair;
+import grakn.simulation.db.neo4j.driver.Neo4jDriverWrapper;
+import org.neo4j.driver.Query;
 
+import java.util.HashMap;
 import java.util.List;
 
 import static grakn.simulation.db.neo4j.agents.interaction.CompanyAgent.getCompanyNumbersInContinentQuery;
-import static grakn.simulation.db.neo4j.agents.interaction.ExecutorUtils.getOrderedAttribute;
 import static grakn.simulation.db.neo4j.agents.interaction.ProductAgent.getProductsInContinentQuery;
-import static grakn.simulation.db.neo4j.driver.Neo4jDriverWrapper.run;
 
 public class TransactionAgent extends grakn.simulation.db.common.agents.interaction.TransactionAgent {
     @Override
     protected List<Long> getCompanyNumbersInContinent() {
-        Neo4jQuery companiesQuery = getCompanyNumbersInContinentQuery(continent());
+        Query companiesQuery = getCompanyNumbersInContinentQuery(continent());
         log().query("getCompanyNumbersInContinent", companiesQuery);
-        return getOrderedAttribute(tx(), companiesQuery, "company.companyNumber");
+        return ((Neo4jDriverWrapper.Session.Transaction) tx()).getOrderedAttribute(companiesQuery, "company.companyNumber", null);
     }
 
     @Override
     protected List<Double> getProductBarcodesInContinent() {
-        Neo4jQuery productsQuery = getProductsInContinentQuery(continent());
+        Query productsQuery = getProductsInContinentQuery(continent());
         log().query("getProductBarcodesInContinent", productsQuery);
-        return getOrderedAttribute(tx(), productsQuery, "product.barcode");
+        return ((Neo4jDriverWrapper.Session.Transaction) tx()).getOrderedAttribute(productsQuery, "product.barcode", null);
     }
 
     @Override
@@ -41,17 +42,17 @@ public class TransactionAgent extends grakn.simulation.db.common.agents.interact
                 "(transaction)-[:BUYER]->(buyer)," +
                 "(transaction)-[:MERCHANDISE]->(product)";
 
-        Object[] parameters = new Object[]{
-                "barcode", transaction.getSecond(),
-                "buyerNumber", transaction.getFirst(),
-                "sellerNumber", sellerCompanyNumber,
-                "continentName", continent().name(),
-                "value", value,
-                "productQuantity", productQuantity,
-                "isTaxable", isTaxable
-        };
-        Neo4jQuery insertTransactionQuery = new Neo4jQuery(template, parameters);
+        HashMap<String, Object> parameters = new HashMap<String, Object>(){{
+                put("barcode", transaction.getSecond());
+                put("buyerNumber", transaction.getFirst());
+                put("sellerNumber", sellerCompanyNumber);
+                put("continentName", continent().name());
+                put("value", value);
+                put("productQuantity", productQuantity);
+                put("isTaxable", isTaxable);
+        }};
+        Query insertTransactionQuery = new Query(template, parameters);
         log().query("insertTransaction", insertTransactionQuery);
-        run(tx(), insertTransactionQuery);
+        ((Neo4jDriverWrapper.Session.Transaction) tx()).run(insertTransactionQuery);
     }
 }

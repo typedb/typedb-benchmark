@@ -1,8 +1,10 @@
 package grakn.simulation.db.neo4j.agents.interaction;
 
 import grakn.simulation.db.common.world.World;
+import grakn.simulation.db.neo4j.driver.Neo4jDriverWrapper;
+import org.neo4j.driver.Query;
 
-import static grakn.simulation.db.neo4j.driver.Neo4jDriverWrapper.run;
+import java.util.HashMap;
 
 public class ProductAgent extends grakn.simulation.db.common.agents.interaction.ProductAgent {
 
@@ -15,25 +17,25 @@ public class ProductAgent extends grakn.simulation.db.common.agents.interaction.
                 "   name: $productName,\n" +
                 "   description: $description\n" +
                 "})-[:PRODUCED_IN]->(continent)";
-        Object[] parameters = new Object[]{
-                "continentName", continent().name(),
-                "barcode", barcode,
-                "productName", productName,
-                "description", productDescription
-        };
-        Neo4jQuery insertProductQuery = new Neo4jQuery(template, parameters);
+        HashMap<String, Object> parameters = new HashMap<String, Object>(){{
+                put("continentName", continent().name());
+                put("barcode", barcode);
+                put("productName", productName);
+                put("description", productDescription);
+        }};
+        Query insertProductQuery = new Query(template, parameters);
         log().query("insertProduct", insertProductQuery);
-        run(tx(), insertProductQuery);
+        ((Neo4jDriverWrapper.Session.Transaction) tx()).run(insertProductQuery);
     }
 
-    static Neo4jQuery getProductsInContinentQuery(World.Continent continent) {
+    static Query getProductsInContinentQuery(World.Continent continent) {
         String template = "" +
                 "MATCH (continent:Continent {locationName: $continentName}),\n" +
                 "(product:Product)-[:PRODUCED_IN]->(continent)\n" +
                 "RETURN product.barcode";
-        Object[] parameters = new Object[]{
-                "continentName", continent.name(),
-        };
-        return new Neo4jQuery(template, parameters);
+        HashMap<String, Object> parameters = new HashMap<String, Object>(){{
+                put("continentName", continent.name());
+        }};
+        return new Query(template, parameters);
     }
 }

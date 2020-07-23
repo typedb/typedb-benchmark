@@ -1,26 +1,29 @@
 package grakn.simulation.db.neo4j.agents.interaction;
 
+import grakn.simulation.db.neo4j.driver.Neo4jDriverWrapper;
+import org.neo4j.driver.Query;
+
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
 
 import static grakn.simulation.db.neo4j.agents.interaction.RelocationAgent.cityResidentsQuery;
-import static grakn.simulation.db.neo4j.driver.Neo4jDriverWrapper.run;
 
 public class EmploymentAgent extends grakn.simulation.db.common.agents.interaction.EmploymentAgent {
     @Override
     protected List<Long> getCompanyNumbers() {
-        Neo4jQuery companyNumbersQuery = CompanyAgent.getCompanyNumbersInCountryQuery(city().country());
+        Query companyNumbersQuery = CompanyAgent.getCompanyNumbersInCountryQuery(city().country());
         log().query("getEmployeeEmails", companyNumbersQuery);
         int numCompanies = world().getScaleFactor();
-        return ExecutorUtils.getOrderedAttribute(tx(), companyNumbersQuery, "company.companyNumber", numCompanies);
+        return ((Neo4jDriverWrapper.Session.Transaction) tx()).getOrderedAttribute(companyNumbersQuery, "company.companyNumber", numCompanies);
     }
 
     @Override
     protected List<String> getEmployeeEmails(LocalDateTime earliestDate) {
-        Neo4jQuery getEmployeeEmailsQuery = cityResidentsQuery(city(), earliestDate);
+        Query getEmployeeEmailsQuery = cityResidentsQuery(city(), earliestDate);
         log().query("getEmployeeEmails", getEmployeeEmailsQuery);
         int numEmployments = world().getScaleFactor();
-        return ExecutorUtils.getOrderedAttribute(tx(), getEmployeeEmailsQuery, "resident.email", numEmployments);
+        return ((Neo4jDriverWrapper.Session.Transaction) tx()).getOrderedAttribute(getEmployeeEmailsQuery, "resident.email", numEmployments);
     }
 
     @Override
@@ -37,17 +40,17 @@ public class EmploymentAgent extends grakn.simulation.db.common.agents.interacti
                 "   contractHours: $contractHours}\n" +
                 "]->(person)\n";
 
-        Object[] parameters = new Object[] {
-                "cityName", city().name(),
-                "employeeEmail", employeeEmail,
-                "companyNumber", companyNumber,
-                "contractContent", contractContent,
-                "contractHours", contractedHours,
-                "wage", wageValue
-        };
+        HashMap<String, Object> parameters = new HashMap<String, Object>(){{
+                put("cityName", city().name());
+                put("employeeEmail", employeeEmail);
+                put("companyNumber", companyNumber);
+                put("contractContent", contractContent);
+                put("contractHours", contractedHours);
+                put("wage", wageValue);
+        }};
 
-        Neo4jQuery insertEmploymentQuery = new Neo4jQuery(template, parameters);
+        Query insertEmploymentQuery = new Query(template, parameters);
         log().query("insertEmployment", insertEmploymentQuery);
-        run(tx(), insertEmploymentQuery);
+        ((Neo4jDriverWrapper.Session.Transaction) tx()).run(insertEmploymentQuery);
     }
 }
