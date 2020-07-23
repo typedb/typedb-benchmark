@@ -2,6 +2,7 @@ package grakn.simulation.db.common.agents.interaction;
 
 import grakn.simulation.db.common.agents.world.CityAgent;
 import grakn.simulation.db.common.agents.utils.Allocation;
+import grakn.simulation.db.common.driver.DriverWrapper;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -10,7 +11,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-public abstract class ParentshipAgent extends CityAgent {
+public abstract class ParentshipAgent<S extends DriverWrapper.Session, T extends DriverWrapper.Transaction> extends CityAgent<S, T> {
 
     protected enum Email {
         WIFE, HUSBAND

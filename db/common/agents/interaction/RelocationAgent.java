@@ -2,13 +2,14 @@ package grakn.simulation.db.common.agents.interaction;
 
 import grakn.simulation.db.common.agents.world.CityAgent;
 import grakn.simulation.db.common.agents.utils.Allocation;
+import grakn.simulation.db.common.driver.DriverWrapper;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 
-public abstract class RelocationAgent extends CityAgent {
+public abstract class RelocationAgent<S extends DriverWrapper.Session, T extends DriverWrapper.Transaction> extends CityAgent<S, T> {
 
     @Override
     public final void iterate() {

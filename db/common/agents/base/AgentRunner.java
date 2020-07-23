@@ -1,6 +1,7 @@
 package grakn.simulation.db.common.agents.base;
 
 import grakn.simulation.db.common.agents.utils.Pair;
+import grakn.simulation.db.common.driver.DriverWrapper;
 import grakn.simulation.utils.RandomSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,11 +22,11 @@ import java.util.Random;
  */
 public abstract class AgentRunner<T> {
 
-    private Constructor<? extends Agent<T>> agentConstructor;
+    private Constructor<? extends Agent<T, S, Tr>> agentConstructor;
     private Logger logger;
     private Boolean traceAgent = true;
 
-    protected AgentRunner(Class<? extends Agent<T>> agentClass) {
+    protected AgentRunner(Class<? extends Agent<T, S, Tr>> agentClass) {
         try {
             agentConstructor = agentClass.getDeclaredConstructor();
             agentConstructor.setAccessible(true);

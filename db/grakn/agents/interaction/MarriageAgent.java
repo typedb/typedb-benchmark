@@ -1,5 +1,6 @@
 package grakn.simulation.db.grakn.agents.interaction;
 
+import grakn.simulation.db.grakn.driver.GraknClientWrapper;
 import graql.lang.Graql;
 import graql.lang.query.GraqlGet;
 import graql.lang.query.GraqlInsert;
@@ -9,7 +10,7 @@ import java.util.List;
 
 import static grakn.simulation.db.grakn.agents.interaction.ExecutorUtils.getOrderedAttribute;
 
-public class MarriageAgent extends grakn.simulation.db.common.agents.interaction.MarriageAgent {
+public class MarriageAgent extends grakn.simulation.db.common.agents.interaction.MarriageAgent<GraknClientWrapper.Session, GraknClientWrapper.Transaction> {
 
     @Override
     protected List<String> getSingleWomen() {

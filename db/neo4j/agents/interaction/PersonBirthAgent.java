@@ -5,7 +5,7 @@ import org.neo4j.driver.Query;
 
 import java.util.HashMap;
 
-public class PersonBirthAgent extends grakn.simulation.db.common.agents.interaction.PersonBirthAgent {
+public class PersonBirthAgent extends grakn.simulation.db.common.agents.interaction.PersonBirthAgent<Neo4jDriverWrapper.Session, Neo4jDriverWrapper.Transaction> {
 
     @Override
     protected void insertPerson(String email, String gender, String forename, String surname) {
@@ -32,7 +32,7 @@ public class PersonBirthAgent extends grakn.simulation.db.common.agents.interact
         Query query = new Query(template, parameters);
 
         log().query("insertPerson", query); //TODO Figure out to log Neo4j's pre-prepared queries
-        ((Neo4jDriverWrapper.Session.Transaction) tx()).run(query);
+        tx().run(query);
 
 //        Key constraints are possible with Neo4j Enterprise
 //        https://neo4j.com/developer/kb/how-to-implement-a-primary-key-property-for-a-label/

@@ -22,17 +22,17 @@ import static grabl.tracing.client.GrablTracingThreadStatic.contextOnThread;
  *
  * The protected methods of this class provide useful simple methods for writing Agents as concisely as possible.
  */
-public abstract class Agent<T> implements AutoCloseable {
+public abstract class Agent<I, S extends DriverWrapper.Session<S, T>, T extends DriverWrapper.Transaction> implements AutoCloseable {
 
-    private IterationContext iterationContext;
+    private IterationContext<S> iterationContext;
     private Random random;
-    private T item;
+    private I item;
     private String sessionKey;
     private String tracker;
     private LogWrapper logWrapper;
     private ThreadContext context;
 
-    void init(IterationContext iterationContext, Random random, T item, String sessionKey, String tracker, Logger logger, Boolean trace) {
+    void init(IterationContext<S> iterationContext, Random random, I item, String sessionKey, String tracker, Logger logger, Boolean trace) {
         this.iterationContext = iterationContext;
         this.random = random;
         this.item = item;
@@ -45,7 +45,7 @@ public abstract class Agent<T> implements AutoCloseable {
         }
     }
 
-    private DriverWrapper.Session.Transaction tx;
+    private T tx;
     private LocalDateTime today;
 
     protected LogWrapper log() {
@@ -60,7 +60,7 @@ public abstract class Agent<T> implements AutoCloseable {
         return new RandomValueGenerator(random());
     }
 
-    protected T item() {
+    protected I item() {
         return item;
     }
 
@@ -68,11 +68,11 @@ public abstract class Agent<T> implements AutoCloseable {
         return tracker;
     }
 
-    protected DriverWrapper.Session session() {
+    protected S session() {
         return iterationContext.getIterationSessionFor(getSessionKey());
     }
 
-    protected DriverWrapper.Session.Transaction transaction() {
+    protected T transaction() {
         return iterationContext.getIterationSessionFor(getSessionKey()).transaction();
     }
 
@@ -80,7 +80,7 @@ public abstract class Agent<T> implements AutoCloseable {
         return sessionKey;
     }
 
-    protected DriverWrapper.Session.Transaction tx() {
+    protected T tx() {
         if (tx == null) {
             tx = transaction();
         }
@@ -94,7 +94,7 @@ public abstract class Agent<T> implements AutoCloseable {
         }
     }
 
-    protected void setTx(DriverWrapper.Session.Transaction tx) {
+    protected void setTx(T tx) {
         closeTx();
         this.tx = tx;
     }

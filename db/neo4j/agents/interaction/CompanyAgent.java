@@ -6,7 +6,7 @@ import org.neo4j.driver.Query;
 
 import java.util.HashMap;
 
-public class CompanyAgent extends grakn.simulation.db.common.agents.interaction.CompanyAgent {
+public class CompanyAgent extends grakn.simulation.db.common.agents.interaction.CompanyAgent<Neo4jDriverWrapper.Session, Neo4jDriverWrapper.Transaction> {
     @Override
     protected void insertCompany(int companyNumber, String companyName) {
         String template = "" +
@@ -21,7 +21,7 @@ public class CompanyAgent extends grakn.simulation.db.common.agents.interaction.
         }};
 
         Query companyQuery = new Query(template, parameters);
-        ((Neo4jDriverWrapper.Session.Transaction) tx()).run(companyQuery);
+        tx().run(companyQuery);
     }
 
     static Query getCompanyNumbersInContinentQuery(World.Continent continent) {

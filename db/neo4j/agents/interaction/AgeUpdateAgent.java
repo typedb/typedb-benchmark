@@ -5,7 +5,7 @@ import org.neo4j.driver.Query;
 
 import java.util.HashMap;
 
-public class AgeUpdateAgent extends grakn.simulation.db.common.agents.interaction.AgeUpdateAgent {
+public class AgeUpdateAgent extends grakn.simulation.db.common.agents.interaction.AgeUpdateAgent<Neo4jDriverWrapper.Session, Neo4jDriverWrapper.Transaction> {
 
     @Override
     protected void updateAgesOfAllPeople() {
@@ -21,6 +21,6 @@ public class AgeUpdateAgent extends grakn.simulation.db.common.agents.interactio
         Query query = new Query(template, parameters);
 
         log().query("updateAgesOfAllPeople", query);
-        ((Neo4jDriverWrapper.Session.Transaction) tx()).run(query);
+        tx().run(query);
     }
 }

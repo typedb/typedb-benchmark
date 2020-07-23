@@ -1,6 +1,7 @@
 package grakn.simulation.db.grakn.agents.interaction;
 
 import grakn.simulation.db.common.agents.utils.Pair;
+import grakn.simulation.db.grakn.driver.GraknClientWrapper;
 import graql.lang.Graql;
 import graql.lang.query.GraqlGet;
 import graql.lang.query.GraqlInsert;
@@ -11,7 +12,7 @@ import static grakn.simulation.db.grakn.agents.interaction.CompanyAgent.getCompa
 import static grakn.simulation.db.grakn.agents.interaction.ExecutorUtils.getOrderedAttribute;
 import static grakn.simulation.db.grakn.agents.interaction.ProductAgent.getProductsInContinentQuery;
 
-public class TransactionAgent extends grakn.simulation.db.common.agents.interaction.TransactionAgent {
+public class TransactionAgent extends grakn.simulation.db.common.agents.interaction.TransactionAgent<GraknClientWrapper.Session, GraknClientWrapper.Transaction> {
 
     @Override
     protected List<Long> getCompanyNumbersInContinent(){

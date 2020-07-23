@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 
-public class RelocationAgent extends grakn.simulation.db.common.agents.interaction.RelocationAgent {
+public class RelocationAgent extends grakn.simulation.db.common.agents.interaction.RelocationAgent<Neo4jDriverWrapper.Session, Neo4jDriverWrapper.Transaction> {
 
     static Query cityResidentsQuery(World.City city, LocalDateTime earliestDate) {
         String template = "" +
@@ -27,7 +27,7 @@ public class RelocationAgent extends grakn.simulation.db.common.agents.interacti
         Query cityResidentsQuery = cityResidentsQuery(city(), earliestDate);
         log().query("getResidentEmails", cityResidentsQuery);
         int numRelocations = world().getScaleFactor();
-        return ((Neo4jDriverWrapper.Session.Transaction) tx()).getOrderedAttribute(cityResidentsQuery, "resident.email", numRelocations);
+        return tx().getOrderedAttribute(cityResidentsQuery, "resident.email", numRelocations);
     }
 
     @Override
@@ -45,7 +45,7 @@ public class RelocationAgent extends grakn.simulation.db.common.agents.interacti
         Query relocationCitiesQuery = new Query(template, parameters);
 
         log().query("getRelocationCityNames", relocationCitiesQuery);
-        return ((Neo4jDriverWrapper.Session.Transaction) tx()).getOrderedAttribute(relocationCitiesQuery, "city.locationName", null);
+        return tx().getOrderedAttribute(relocationCitiesQuery, "city.locationName", null);
     }
 
     @Override
@@ -68,6 +68,6 @@ public class RelocationAgent extends grakn.simulation.db.common.agents.interacti
         }};
         Query relocatePersonQuery = new Query(template, parameters);
         log().query("insertRelocation", relocatePersonQuery);
-        ((Neo4jDriverWrapper.Session.Transaction) tx()).run(relocatePersonQuery);
+        tx().run(relocatePersonQuery);
     }
 }

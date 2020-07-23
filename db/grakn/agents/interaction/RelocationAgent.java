@@ -1,6 +1,7 @@
 package grakn.simulation.db.grakn.agents.interaction;
 
 import grakn.simulation.db.common.world.World;
+import grakn.simulation.db.grakn.driver.GraknClientWrapper;
 import graql.lang.Graql;
 import graql.lang.query.GraqlGet;
 import graql.lang.query.GraqlInsert;
@@ -10,7 +11,7 @@ import java.util.List;
 
 import static grakn.simulation.db.grakn.agents.interaction.ExecutorUtils.getOrderedAttribute;
 
-public class RelocationAgent extends grakn.simulation.db.common.agents.interaction.RelocationAgent {
+public class RelocationAgent extends grakn.simulation.db.common.agents.interaction.RelocationAgent<GraknClientWrapper.Session, GraknClientWrapper.Transaction> {
 
     static GraqlGet.Unfiltered cityResidentsQuery(World.City city, LocalDateTime earliestDate) {
         return Graql.match(

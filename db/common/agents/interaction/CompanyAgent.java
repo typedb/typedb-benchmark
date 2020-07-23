@@ -1,9 +1,10 @@
 package grakn.simulation.db.common.agents.interaction;
 
 import grakn.simulation.db.common.agents.world.CountryAgent;
+import grakn.simulation.db.common.driver.DriverWrapper;
 import org.apache.commons.lang3.StringUtils;
 
-public abstract class CompanyAgent extends CountryAgent {
+public abstract class CompanyAgent<S extends DriverWrapper.Session, T extends DriverWrapper.Transaction> extends CountryAgent<S, T> {
 
     @Override
     public final void iterate() {

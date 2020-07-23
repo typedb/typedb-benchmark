@@ -1,5 +1,6 @@
 package grakn.simulation.db.grakn.agents.interaction;
 
+import grakn.simulation.db.grakn.driver.GraknClientWrapper;
 import graql.lang.Graql;
 import graql.lang.query.GraqlGet;
 import graql.lang.query.GraqlInsert;
@@ -9,14 +10,14 @@ import java.util.List;
 
 import static grakn.simulation.db.grakn.agents.interaction.RelocationAgent.cityResidentsQuery;
 
-public class EmploymentAgent extends grakn.simulation.db.common.agents.interaction.EmploymentAgent {
+public class EmploymentAgent extends grakn.simulation.db.common.agents.interaction.EmploymentAgent<GraknClientWrapper.Session, GraknClientWrapper.Transaction> {
 
     @Override
     protected List<Long> getCompanyNumbers() {
         GraqlGet companyNumbersQuery = CompanyAgent.getCompanyNumbersInCountryQuery(city().country());
         log().query("getCompanyNumbers", companyNumbersQuery);
         int numCompanies = world().getScaleFactor();
-        return ExecutorUtils.getOrderedAttribute(tx().forGrakn(), companyNumbersQuery, "company-number", numCompanies);
+        return ((GraknClientWrapper.Transaction)tx()).getOrderedAttribute(companyNumbersQuery, "company-number", numCompanies);
     }
 
     @Override

@@ -1,13 +1,14 @@
 package grakn.simulation.db.common.agents.interaction;
 
 import grakn.simulation.db.common.agents.world.CityAgent;
+import grakn.simulation.db.common.driver.DriverWrapper;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 import static grakn.simulation.db.common.agents.utils.Allocation.allocate;
 
-public abstract class EmploymentAgent extends CityAgent {
+public abstract class EmploymentAgent<S extends DriverWrapper.Session, T extends DriverWrapper.Transaction> extends CityAgent<S, T> {
 
     private static final double MIN_ANNUAL_WAGE = 18000.00;
     private static final double MAX_ANNUAL_WAGE = 80000.00;

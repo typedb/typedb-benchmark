@@ -6,7 +6,7 @@ import org.neo4j.driver.Query;
 
 import java.util.HashMap;
 
-public class ProductAgent extends grakn.simulation.db.common.agents.interaction.ProductAgent {
+public class ProductAgent extends grakn.simulation.db.common.agents.interaction.ProductAgent<Neo4jDriverWrapper.Session, Neo4jDriverWrapper.Transaction> {
 
     @Override
     protected void insertProduct(Double barcode, String productName, String productDescription) {
@@ -25,7 +25,7 @@ public class ProductAgent extends grakn.simulation.db.common.agents.interaction.
         }};
         Query insertProductQuery = new Query(template, parameters);
         log().query("insertProduct", insertProductQuery);
-        ((Neo4jDriverWrapper.Session.Transaction) tx()).run(insertProductQuery);
+        tx().run(insertProductQuery);
     }
 
     static Query getProductsInContinentQuery(World.Continent continent) {

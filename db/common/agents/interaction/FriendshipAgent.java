@@ -1,11 +1,12 @@
 package grakn.simulation.db.common.agents.interaction;
 
 import grakn.simulation.db.common.agents.world.CityAgent;
+import grakn.simulation.db.common.driver.DriverWrapper;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
-public abstract class FriendshipAgent extends CityAgent {
+public abstract class FriendshipAgent<S extends DriverWrapper.Session, T extends DriverWrapper.Transaction> extends CityAgent<S, T> {
 
     @Override
     public final void iterate() {

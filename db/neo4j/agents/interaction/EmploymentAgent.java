@@ -9,13 +9,13 @@ import java.util.List;
 
 import static grakn.simulation.db.neo4j.agents.interaction.RelocationAgent.cityResidentsQuery;
 
-public class EmploymentAgent extends grakn.simulation.db.common.agents.interaction.EmploymentAgent {
+public class EmploymentAgent extends grakn.simulation.db.common.agents.interaction.EmploymentAgent<Neo4jDriverWrapper.Session, Neo4jDriverWrapper.Transaction> {
     @Override
     protected List<Long> getCompanyNumbers() {
         Query companyNumbersQuery = CompanyAgent.getCompanyNumbersInCountryQuery(city().country());
         log().query("getEmployeeEmails", companyNumbersQuery);
         int numCompanies = world().getScaleFactor();
-        return ((Neo4jDriverWrapper.Session.Transaction) tx()).getOrderedAttribute(companyNumbersQuery, "company.companyNumber", numCompanies);
+        return tx().getOrderedAttribute(companyNumbersQuery, "company.companyNumber", numCompanies);
     }
 
     @Override
@@ -23,7 +23,7 @@ public class EmploymentAgent extends grakn.simulation.db.common.agents.interacti
         Query getEmployeeEmailsQuery = cityResidentsQuery(city(), earliestDate);
         log().query("getEmployeeEmails", getEmployeeEmailsQuery);
         int numEmployments = world().getScaleFactor();
-        return ((Neo4jDriverWrapper.Session.Transaction) tx()).getOrderedAttribute(getEmployeeEmailsQuery, "resident.email", numEmployments);
+        return tx().getOrderedAttribute(getEmployeeEmailsQuery, "resident.email", numEmployments);
     }
 
     @Override
@@ -51,6 +51,6 @@ public class EmploymentAgent extends grakn.simulation.db.common.agents.interacti
 
         Query insertEmploymentQuery = new Query(template, parameters);
         log().query("insertEmployment", insertEmploymentQuery);
-        ((Neo4jDriverWrapper.Session.Transaction) tx()).run(insertEmploymentQuery);
+        tx().run(insertEmploymentQuery);
     }
 }

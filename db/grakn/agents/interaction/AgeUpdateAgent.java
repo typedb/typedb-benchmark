@@ -1,6 +1,8 @@
 package grakn.simulation.db.grakn.agents.interaction;
 
 import grakn.client.answer.ConceptMap;
+import grakn.simulation.db.common.driver.DriverWrapper;
+import grakn.simulation.db.grakn.driver.GraknClientWrapper;
 import graql.lang.Graql;
 import graql.lang.query.GraqlDelete;
 import graql.lang.query.GraqlGet;
@@ -10,7 +12,7 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.stream.Stream;
 
-public class AgeUpdateAgent extends grakn.simulation.db.common.agents.interaction.AgeUpdateAgent {
+public class AgeUpdateAgent extends grakn.simulation.db.common.agents.interaction.AgeUpdateAgent<GraknClientWrapper.Session, GraknClientWrapper.Transaction> {
 
     @Override
     protected void updateAgesOfAllPeople() {
