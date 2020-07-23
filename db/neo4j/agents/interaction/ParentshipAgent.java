@@ -6,7 +6,6 @@ import org.neo4j.driver.Record;
 import org.neo4j.driver.Result;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -31,32 +30,30 @@ public class ParentshipAgent extends grakn.simulation.db.common.agents.interacti
         Query query = new Query(template, parameters);
 
         log().query("getMarriageEmails", query);
-//        Result result = ((Neo4jDriverWrapper.Session.Transaction) tx()).run(query);
+        Result result = ((Neo4jDriverWrapper.Session.Transaction) tx()).run(query);
 
-//        return result.stream().map(Record::asMap).map(r -> new HashMap<Email, String>() {{
-//            put(Email.WIFE, r.get("wife.email").toString());
-//            put(Email.HUSBAND, r.get("husband.email").toString());
-//        }}).collect(toList());
-        return new ArrayList<>();
+        return result.stream().map(Record::asMap).map(r -> new HashMap<Email, String>() {{
+            put(Email.WIFE, r.get("wife.email").toString());
+            put(Email.HUSBAND, r.get("husband.email").toString());
+        }}).collect(toList());
     }
 
     @Override
     protected List<String> getChildrenEmailsBorn(LocalDateTime dateToday) {
-//        String template = "" +
-//                "MATCH (city:City {locationName: $locationName}),\n" +
-//                "(child:Person {dateOfBirth: $dateOfBirth})-[:BORN_IN]->(city)\n" +
-//                "RETURN child.email";
-//
-//        HashMap<String, Object> parameters = new HashMap<String, Object>(){{
-//                put("dateOfBirth", today());
-//                put("locationName", city().name());
-//        }};
-//
-//        Query childrenQuery = new Query(template, parameters);
-//
-//        log().query("getChildrenEmails", childrenQuery);
-//        return ((Neo4jDriverWrapper.Session.Transaction) tx()).getOrderedAttribute(childrenQuery, "child.email", null);
-        return new ArrayList<>();
+        String template = "" +
+                "MATCH (city:City {locationName: $locationName}),\n" +
+                "(child:Person {dateOfBirth: $dateOfBirth})-[:BORN_IN]->(city)\n" +
+                "RETURN child.email";
+
+        HashMap<String, Object> parameters = new HashMap<String, Object>(){{
+                put("dateOfBirth", today());
+                put("locationName", city().name());
+        }};
+
+        Query childrenQuery = new Query(template, parameters);
+
+        log().query("getChildrenEmails", childrenQuery);
+        return ((Neo4jDriverWrapper.Session.Transaction) tx()).getOrderedAttribute(childrenQuery, "child.email", null);
     }
 
     @Override
