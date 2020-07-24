@@ -22,6 +22,19 @@ commands:
           command: bazel run //agents/test:grakn-extractor -- dist/grakn-core-all-linux
       - run: nohup ./dist/grakn-core-all-linux/grakn server start
 
+  run-neo4j:
+    steps:
+      - run: sudo add-apt-repository -y ppa:openjdk-r/ppa
+      - run: curl https://cli-assets.heroku.com/apt/release.key | sudo apt-key add -
+      - run: curl https://dl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
+      - run: sudo apt-get update
+      - run: wget -O - https://debian.neo4j.com/neotechnology.gpg.key | sudo apt-key add -
+      - run: echo 'deb https://debian.neo4j.com stable 4.1' | sudo tee -a /etc/apt/sources.list.d/neo4j.list
+      - run: sudo apt-get update
+      - run: sudo apt-get install neo4j=1:4.1.0
+      - run: sudo update-java-alternatives --jre --set java-1.11.0-openjdk-amd64
+      - run: sudo neo4j start
+
 jobs:
   build:
     machine: 
@@ -39,22 +52,34 @@ jobs:
             git diff --exit-code dependencies/maven/artifacts.snapshot
       - run: bazel run @graknlabs_dependencies//tool/unuseddeps:unused-deps -- list
 
-  test-end-to-end:
+  test-end-to-end-neo4j:
     machine: 
       image: ubuntu-1604:201903-01
     working_directory: ~/simulation
     steps:
       - install-bazel
       - checkout
+      - run-neo4j
+
+  test-end-to-end-grakn:
+    machine:
+      image: ubuntu-1604:201903-01
+    working_directory: ~/simulation
+    steps:
+      - install-bazel
+      - checkout
       - run-grakn
-      - run: bazel run //:simulation -- -d -k world
-      - run: bazel test //agents/test/... --test_arg=localhost:48555 --test_output=all --test_timeout=7200
+      - run: bazel run //:simulation -- -d grakn -n
+      - run: bazel test //db/grakn/agents/test/... --test_arg=localhost:48555 --test_output=all --test_timeout=7200
 
 workflows:
   version: 2
   simulation:
     jobs:
       - build
-      - test-end-to-end:
+      - test-end-to-end-neo4j:
+          requires:
+            - build
+      - test-end-to-end-grakn:
           requires:
             - build

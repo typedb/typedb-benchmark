@@ -1,13 +1,20 @@
 package grakn.simulation.config;
 
-import grakn.simulation.agents.base.AgentRunner;
-
 import java.util.List;
 import java.util.function.Function;
 
 public class Config {
+    private final static long DEFAULT_RANDOM_SEED = 1;
+    private final static int DEFAULT_NUM_ITERATIONS = 10;
+    private final static int DEFAULT_SCALE_FACTOR = 5;
+    private final static String DEFAULT_DATABASE_NAME = "world";
+
     private List<Agent> agents;
     private TraceSampling traceSampling;
+    private long randomSeed = DEFAULT_RANDOM_SEED;
+    private int iterations = DEFAULT_NUM_ITERATIONS;
+    private int scaleFactor = DEFAULT_SCALE_FACTOR;
+    private String databaseName = DEFAULT_DATABASE_NAME;
 
     public List<Agent> getAgents() {
         return agents;
@@ -23,6 +30,38 @@ public class Config {
 
     public void setTraceSampling(TraceSampling traceSampling) {
         this.traceSampling = traceSampling;
+    }
+
+    public long getRandomSeed() {
+        return randomSeed;
+    }
+
+    public void setRandomSeed(long randomSeed) {
+        this.randomSeed = randomSeed;
+    }
+
+    public int getIterations() {
+        return iterations;
+    }
+
+    public void setIterations(int iterations) {
+        this.iterations = iterations;
+    }
+
+    public int getScaleFactor() {
+        return scaleFactor;
+    }
+
+    public void setScaleFactor(int scaleFactor) {
+        this.scaleFactor = scaleFactor;
+    }
+
+    public String getDatabaseName() {
+        return databaseName;
+    }
+
+    public void setDatabaseName(String databaseName) {
+        this.databaseName = databaseName;
     }
 
     public static class TraceSampling {
@@ -48,10 +87,14 @@ public class Config {
 
     public static class Agent {
         private Schema.AgentMode agentMode;
-        private AgentRunner<?> runner;
+        private String name;
 
         public void setName(String name) {
-            this.runner = Schema.AGENTS.get(name);
+            this.name = name;
+        }
+
+        public String getName() {
+            return name;
         }
 
         public void setMode(String mode) {
@@ -72,10 +115,6 @@ public class Config {
 
         public Schema.AgentMode getAgentMode() {
             return agentMode;
-        }
-
-        public AgentRunner<?> getRunner() {
-            return runner;
         }
     }
 }

@@ -1,28 +1,33 @@
 agents:
   # For each agent select a `mode`, `"run"` to run without tracing, `"trace"` to run with tracing, any other input to
   # not run or trace
-  - name: "MarriageAgent"
+  - name: "marriage"
     mode: "trace"
-  - name: "PersonBirthAgent"
+  - name: "personBirth"
     mode: "trace"
-  - name: "AgeUpdateAgent"
+  - name: "ageUpdate"
     mode: "run"
-  - name: "ParentshipAgent"
+  - name: "parentship"
     mode: "run"
-  - name: "RelocationAgent"
+  - name: "relocation"
     mode: "run"
-  - name: "CompanyAgent"
+  - name: "company"
     mode: "run"
-  - name: "EmploymentAgent"
+  - name: "employment"
     mode: "run"
-  - name: "ProductAgent"
+  - name: "product"
     mode: "run"
-  - name: "TransactionAgent"
+  - name: "transaction"
     mode: "run"
-  - name: "FriendshipAgent"
+  - name: "friendship"
     mode: "run"
 
 traceSampling:
   # Options: `"every"` for every K traces; `"log"` for logarithm with base N
   function: "every"
   arg: 5
+
+randomSeed: 1
+iterations: 10
+scaleFactor: 5
+databaseName: "world"

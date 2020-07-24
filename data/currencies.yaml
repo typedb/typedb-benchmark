@@ -1,9 +1,0 @@
-template: insert $x <0> isa currency, has currency-code <1>;
-data: |
-  American Dollar,USD
-  Great British Pound,GBP
-  Euro,EUR
-  Brazilian Real,BRL
-  South African Rand,ZAR
-  Renminbi,RMB
-  Australian Dollar,AUD

@@ -185,3 +185,14 @@ maven(
     graknlabs_protocol_artifacts +
     graknlabs_client_java_artifacts
 )
+
+load("@rules_jvm_external//:defs.bzl", rje_maven_install = "maven_install")
+rje_maven_install(
+    name = "neo4j",
+    artifacts = ["org.neo4j.driver:neo4j-java-driver:4.1.0"],
+    repositories = [
+        "https://repo1.maven.org/maven2",
+    ],
+    strict_visibility = True,
+    version_conflict_policy = "pinned"
+)

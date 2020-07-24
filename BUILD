@@ -1,35 +1,41 @@
 java_library(
     name = "simulation-lib",
-    srcs = glob(["*.java"]),
+    srcs = [
+        "Simulation.java",
+    ],
     resource_strip_prefix = "conf/",
     resources = [
         "conf/logback.xml",
     ],
     visibility = ["//visibility:public"],
     deps = [
-        "//agents",
-        "//common",
+        "//utils",
         "//config",
-        "//yaml_tool",
+        "//db/grakn",
+        "//db/common/agents",
+        "//db/common/driver",
+        "//db/common/initialise",
+        "//db/common/world",
+        "@graknlabs_client_java//:client-java",
+        "@graknlabs_grabl_tracing//client",
         "@maven//:ch_qos_logback_logback_classic",
         "@maven//:commons_cli_commons_cli",
         "@maven//:org_slf4j_slf4j_api",
-        "@graknlabs_client_java//:client-java",
-        "@graknlabs_grabl_tracing//client",
-        "@graknlabs_graql//java:graql",
     ],
 )
 
 java_binary(
     name = "simulation",
     args = [
-        "$(locations //data)",
-        "$(locations //schema)",
+        "$(locations //db/common/data)",
+        "$(locations //db/grakn/schema)",
+        "$(locations //db/grakn/data)",
     ],
     data = [
-        "//data",
-        "//schema",
         "//config:config.yaml",
+        "//db/common/data",
+        "//db/grakn/schema",
+        "//db/grakn/data",
     ],
     main_class = "grakn.simulation.Simulation",
     runtime_deps = [":simulation-lib"],
