@@ -1,14 +1,9 @@
 package grakn.simulation.db.grakn.driver;
 
 import grakn.client.GraknClient;
-import grakn.client.answer.ConceptMap;
 import grakn.simulation.db.common.driver.DriverWrapper;
-import graql.lang.query.GraqlGet;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
-public class GraknClientWrapper implements DriverWrapper<GraknClientWrapper.Session, GraknClientWrapper.Transaction> {
+public class GraknClientWrapper implements DriverWrapper {
 
     private GraknClient client = null;
 
@@ -32,7 +27,7 @@ public class GraknClientWrapper implements DriverWrapper<GraknClientWrapper.Sess
         return new Session(client.session(database));
     }
 
-    public static class Session extends DriverWrapper.Session<Session, Transaction> {
+    static class Session extends DriverWrapper.Session {
 
         private GraknClient.Session session;
 
@@ -46,46 +41,32 @@ public class GraknClientWrapper implements DriverWrapper<GraknClientWrapper.Sess
         }
 
         @Override
-        public GraknClientWrapper.Transaction transaction() {
-            return new GraknClientWrapper.Transaction(session.transaction(GraknClient.Transaction.Type.WRITE));
+        public Transaction transaction() {
+            return new Transaction(session.transaction(GraknClient.Transaction.Type.WRITE));
         }
 
-    }
+        class Transaction extends DriverWrapper.Session.Transaction {
 
-    public static class Transaction extends DriverWrapper.Transaction<GraqlGet, List<ConceptMap>> {
+            private GraknClient.Transaction transaction;
 
-        private GraknClient.Transaction transaction;
+            Transaction(GraknClient.Transaction transaction) {
+                this.transaction = transaction;
+            }
 
-        Transaction(GraknClient.Transaction transaction) {
-            this.transaction = transaction;
+            @Override
+            public void close() {
+                transaction.close();
+            }
+
+            @Override
+            public void commit() {
+                transaction.commit();
+            }
+
+            @Override
+            public GraknClient.Transaction forGrakn() {
+                return transaction;
+            }
         }
-
-        @Override
-        public void close() {
-            transaction.close();
-        }
-
-        @Override
-        public void commit() {
-            transaction.commit();
-        }
-
-        public GraknClient.Transaction forGrakn() {
-            return transaction;
-        }
-
-        @Override
-        public List<ConceptMap> run(GraqlGet query) {
-            return transaction.execute(query).get();
-        }
-
-        public <T> List<T> getOrderedAttribute(GraqlGet query, String attributeName, Integer limit){
-            return transaction.stream(query).get()
-                    .map(conceptMap -> (T) conceptMap.get(attributeName).asAttribute().value())
-                    .sorted()
-                    .limit(limit)
-                    .collect(Collectors.toList());
-        }
-
     }
 }

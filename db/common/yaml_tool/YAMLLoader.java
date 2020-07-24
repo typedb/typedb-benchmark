@@ -40,7 +40,7 @@ public abstract class YAMLLoader {
     }
 
     public void loadInputStream(InputStream inputStream) throws YAMLException {
-        try (DriverWrapper.Transaction tx = session.transaction()) {
+        try (DriverWrapper.Session.Transaction tx = session.transaction()) {
             for (Object document : THREAD_YAML.get().loadAll(inputStream)) {
                 loadDocument(tx, document);
             }
@@ -49,7 +49,7 @@ public abstract class YAMLLoader {
         }
     }
 
-    protected void loadDocument(DriverWrapper.Transaction tx, Object document) throws YAMLException {
+    protected void loadDocument(DriverWrapper.Session.Transaction tx, Object document) throws YAMLException {
         Map documentMap;
         try {
             documentMap = (Map) document;
@@ -76,7 +76,7 @@ public abstract class YAMLLoader {
         }
     }
 
-    protected abstract void parseCSV(DriverWrapper.Transaction tx, QueryTemplate template, CSVParser parser) throws IOException;
+    protected abstract void parseCSV(DriverWrapper.Session.Transaction tx, QueryTemplate template, CSVParser parser) throws IOException;
 
     /**
      * Helper method to avoid repeating nasty type checking code.

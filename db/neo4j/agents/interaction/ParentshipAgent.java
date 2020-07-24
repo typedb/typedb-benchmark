@@ -11,7 +11,7 @@ import java.util.List;
 
 import static java.util.stream.Collectors.toList;
 
-public class ParentshipAgent extends grakn.simulation.db.common.agents.interaction.ParentshipAgent<Neo4jDriverWrapper.Session, Neo4jDriverWrapper.Transaction> {
+public class ParentshipAgent extends grakn.simulation.db.common.agents.interaction.ParentshipAgent {
 
     @Override
     protected List<HashMap<Email, String>> getMarriageEmails() {
@@ -30,7 +30,7 @@ public class ParentshipAgent extends grakn.simulation.db.common.agents.interacti
         Query query = new Query(template, parameters);
 
         log().query("getMarriageEmails", query);
-        Result result = tx().run(query);
+        Result result = ((Neo4jDriverWrapper.Session.Transaction) tx()).run(query);
 
         return result.stream().map(Record::asMap).map(r -> new HashMap<Email, String>() {{
             put(Email.WIFE, r.get("wife.email").toString());
@@ -53,7 +53,7 @@ public class ParentshipAgent extends grakn.simulation.db.common.agents.interacti
         Query childrenQuery = new Query(template, parameters);
 
         log().query("getChildrenEmails", childrenQuery);
-        return tx().getOrderedAttribute(childrenQuery, "child.email", null);
+        return ((Neo4jDriverWrapper.Session.Transaction) tx()).getOrderedAttribute(childrenQuery, "child.email", null);
     }
 
     @Override
@@ -72,7 +72,7 @@ public class ParentshipAgent extends grakn.simulation.db.common.agents.interacti
             }};
             Query parentshipQuery = new Query(template, parameters);
             log().query("insertParentShip", parentshipQuery);
-            tx().run(parentshipQuery);
+            ((Neo4jDriverWrapper.Session.Transaction) tx()).run(parentshipQuery);
         }
     }
 }

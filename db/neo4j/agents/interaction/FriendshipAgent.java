@@ -9,13 +9,13 @@ import java.util.List;
 
 import static grakn.simulation.db.neo4j.agents.interaction.RelocationAgent.cityResidentsQuery;
 
-public class FriendshipAgent extends grakn.simulation.db.common.agents.interaction.FriendshipAgent<Neo4jDriverWrapper.Session, Neo4jDriverWrapper.Transaction> {
+public class FriendshipAgent extends grakn.simulation.db.common.agents.interaction.FriendshipAgent {
 
     @Override
     protected List<String> getResidentEmails(LocalDateTime earliestDate) {
         Query cityResidentsQuery = cityResidentsQuery(city(), earliestDate);
         log().query("getResidentEmails", cityResidentsQuery);
-        return tx().getOrderedAttribute(cityResidentsQuery, "resident.email", null);
+        return ((Neo4jDriverWrapper.Session.Transaction) tx()).getOrderedAttribute(cityResidentsQuery, "resident.email", null);
     }
 
     @Override
@@ -34,6 +34,6 @@ public class FriendshipAgent extends grakn.simulation.db.common.agents.interacti
         }};
         Query insertFriendshipQuery = new Query(template, parameters);
         log().query("insertFriendship", insertFriendshipQuery);
-        tx().run(insertFriendshipQuery);
+        ((Neo4jDriverWrapper.Session.Transaction) tx()).run(insertFriendshipQuery);
     }
 }

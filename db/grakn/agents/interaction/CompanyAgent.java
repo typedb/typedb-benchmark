@@ -1,13 +1,12 @@
 package grakn.simulation.db.grakn.agents.interaction;
 
 import grakn.simulation.db.common.world.World;
-import grakn.simulation.db.grakn.driver.GraknClientWrapper;
 import graql.lang.Graql;
 import graql.lang.query.GraqlGet;
 import graql.lang.query.GraqlInsert;
 import org.apache.commons.lang3.StringUtils;
 
-public class CompanyAgent extends grakn.simulation.db.common.agents.interaction.CompanyAgent<GraknClientWrapper.Session, GraknClientWrapper.Transaction> {
+public class CompanyAgent extends grakn.simulation.db.common.agents.interaction.CompanyAgent {
 
     @Override
     protected void insertCompany(int companyNumber, String companyName) {

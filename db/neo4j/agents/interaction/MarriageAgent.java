@@ -6,7 +6,7 @@ import org.neo4j.driver.Query;
 import java.util.HashMap;
 import java.util.List;
 
-public class MarriageAgent extends grakn.simulation.db.common.agents.interaction.MarriageAgent<Neo4jDriverWrapper.Session, Neo4jDriverWrapper.Transaction> {
+public class MarriageAgent extends grakn.simulation.db.common.agents.interaction.MarriageAgent {
 
     @Override
     protected List<String> getSingleWomen() {
@@ -34,7 +34,7 @@ public class MarriageAgent extends grakn.simulation.db.common.agents.interaction
         Query query = new Query(template, parameters);
 
         log().query(scope, query);
-        return tx().getOrderedAttribute(query, "person.email", null);
+        return ((Neo4jDriverWrapper.Session.Transaction) tx()).getOrderedAttribute(query, "person.email", null);
     }
 
     @Override
@@ -53,6 +53,6 @@ public class MarriageAgent extends grakn.simulation.db.common.agents.interaction
         Query query = new Query(template, parameters);
 
         log().query("insertMarriage", query);
-        tx().run(query);
+        ((Neo4jDriverWrapper.Session.Transaction) tx()).run(query);
     }
 }

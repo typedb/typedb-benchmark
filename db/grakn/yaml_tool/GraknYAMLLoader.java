@@ -19,7 +19,7 @@ public class GraknYAMLLoader extends YAMLLoader {
         super(session, accessibleFiles);
     }
 
-    protected void parseCSV(DriverWrapper.Transaction tx, QueryTemplate template, CSVParser parser) throws IOException {
+    protected void parseCSV(DriverWrapper.Session.Transaction tx, QueryTemplate template, CSVParser parser) throws IOException {
         for (CSVRecord record : parser.getRecords()) {
             String interpolatedQuery = template.interpolate(record::get);
             GraqlInsert insert = Graql.parse(interpolatedQuery);

@@ -1,9 +1,8 @@
 package grakn.simulation.db.common.agents.interaction;
 
 import grakn.simulation.db.common.agents.world.ContinentAgent;
-import grakn.simulation.db.common.driver.DriverWrapper;
 
-public abstract class ProductAgent<S extends DriverWrapper.Session, T extends DriverWrapper.Transaction> extends ContinentAgent<S, T> {
+public abstract class ProductAgent extends ContinentAgent {
 
     @Override
     public final void iterate() {

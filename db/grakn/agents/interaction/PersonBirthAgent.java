@@ -1,10 +1,9 @@
 package grakn.simulation.db.grakn.agents.interaction;
 
-import grakn.simulation.db.grakn.driver.GraknClientWrapper;
 import graql.lang.Graql;
 import graql.lang.query.GraqlInsert;
 
-public class PersonBirthAgent extends grakn.simulation.db.common.agents.interaction.PersonBirthAgent<GraknClientWrapper.Session, GraknClientWrapper.Transaction> {
+public class PersonBirthAgent extends grakn.simulation.db.common.agents.interaction.PersonBirthAgent {
 
     @Override
     protected void insertPerson(String email, String gender, String forename, String surname) {

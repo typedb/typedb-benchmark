@@ -22,17 +22,17 @@ import static grabl.tracing.client.GrablTracingThreadStatic.contextOnThread;
  *
  * The protected methods of this class provide useful simple methods for writing Agents as concisely as possible.
  */
-public abstract class Agent<I, S extends DriverWrapper.Session<S, T>, T extends DriverWrapper.Transaction> implements AutoCloseable {
+public abstract class Agent<T> implements AutoCloseable {
 
-    private IterationContext<S> iterationContext;
+    private IterationContext iterationContext;
     private Random random;
-    private I item;
+    private T item;
     private String sessionKey;
     private String tracker;
     private LogWrapper logWrapper;
     private ThreadContext context;
 
-    void init(IterationContext<S> iterationContext, Random random, I item, String sessionKey, String tracker, Logger logger, Boolean trace) {
+    void init(IterationContext iterationContext, Random random, T item, String sessionKey, String tracker, Logger logger, Boolean trace) {
         this.iterationContext = iterationContext;
         this.random = random;
         this.item = item;
@@ -45,7 +45,7 @@ public abstract class Agent<I, S extends DriverWrapper.Session<S, T>, T extends 
         }
     }
 
-    private T tx;
+    private DriverWrapper.Session.Transaction tx;
     private LocalDateTime today;
 
     protected LogWrapper log() {
@@ -60,7 +60,7 @@ public abstract class Agent<I, S extends DriverWrapper.Session<S, T>, T extends 
         return new RandomValueGenerator(random());
     }
 
-    protected I item() {
+    protected T item() {
         return item;
     }
 
@@ -68,11 +68,11 @@ public abstract class Agent<I, S extends DriverWrapper.Session<S, T>, T extends 
         return tracker;
     }
 
-    protected S session() {
+    protected DriverWrapper.Session session() {
         return iterationContext.getIterationSessionFor(getSessionKey());
     }
 
-    protected T transaction() {
+    protected DriverWrapper.Session.Transaction transaction() {
         return iterationContext.getIterationSessionFor(getSessionKey()).transaction();
     }
 
@@ -80,7 +80,7 @@ public abstract class Agent<I, S extends DriverWrapper.Session<S, T>, T extends 
         return sessionKey;
     }
 
-    protected T tx() {
+    protected DriverWrapper.Session.Transaction tx() {
         if (tx == null) {
             tx = transaction();
         }
@@ -94,7 +94,7 @@ public abstract class Agent<I, S extends DriverWrapper.Session<S, T>, T extends 
         }
     }
 
-    protected void setTx(T tx) {
+    protected void setTx(DriverWrapper.Session.Transaction tx) {
         closeTx();
         this.tx = tx;
     }

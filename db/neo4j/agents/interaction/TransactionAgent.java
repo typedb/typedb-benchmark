@@ -10,19 +10,19 @@ import java.util.List;
 import static grakn.simulation.db.neo4j.agents.interaction.CompanyAgent.getCompanyNumbersInContinentQuery;
 import static grakn.simulation.db.neo4j.agents.interaction.ProductAgent.getProductsInContinentQuery;
 
-public class TransactionAgent extends grakn.simulation.db.common.agents.interaction.TransactionAgent<Neo4jDriverWrapper.Session, Neo4jDriverWrapper.Transaction> {
+public class TransactionAgent extends grakn.simulation.db.common.agents.interaction.TransactionAgent {
     @Override
     protected List<Long> getCompanyNumbersInContinent() {
         Query companiesQuery = getCompanyNumbersInContinentQuery(continent());
         log().query("getCompanyNumbersInContinent", companiesQuery);
-        return tx().getOrderedAttribute(companiesQuery, "company.companyNumber", null);
+        return ((Neo4jDriverWrapper.Session.Transaction) tx()).getOrderedAttribute(companiesQuery, "company.companyNumber", null);
     }
 
     @Override
     protected List<Double> getProductBarcodesInContinent() {
         Query productsQuery = getProductsInContinentQuery(continent());
         log().query("getProductBarcodesInContinent", productsQuery);
-        return tx().getOrderedAttribute(productsQuery, "product.barcode", null);
+        return ((Neo4jDriverWrapper.Session.Transaction) tx()).getOrderedAttribute(productsQuery, "product.barcode", null);
     }
 
     @Override
@@ -53,6 +53,6 @@ public class TransactionAgent extends grakn.simulation.db.common.agents.interact
         }};
         Query insertTransactionQuery = new Query(template, parameters);
         log().query("insertTransaction", insertTransactionQuery);
-        tx().run(insertTransactionQuery);
+        ((Neo4jDriverWrapper.Session.Transaction) tx()).run(insertTransactionQuery);
     }
 }
