@@ -8,15 +8,14 @@ java_library(
     ]),
     visibility = ["//visibility:public"],
     deps = [
-        "//config",
         "//db/common/agents",
         "//db/common/driver",
-        "//db/common/yaml_tool",
         "//db/common/initialise",
         "//db/common/world",
+        "//db/common/yaml_tool",
         "@graknlabs_grabl_tracing//client",
-        "@neo4j//:org_neo4j_driver_neo4j_java_driver",
-        "@maven//:org_apache_commons_commons_lang3",
         "@maven//:org_apache_commons_commons_csv",
+        "@maven//:org_apache_commons_commons_lang3",
+        "@neo4j//:org_neo4j_driver_neo4j_java_driver",
     ],
 )
