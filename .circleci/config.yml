@@ -69,7 +69,7 @@ jobs:
       - install-bazel
       - checkout
       - run-grakn
-      - run: bazel run //:simulation -- -d -k world
+      - run: bazel run //:simulation -- -d grakn -n
       - run: bazel test //db/grakn/agents/test/... --test_arg=localhost:48555 --test_output=all --test_timeout=7200
 
 workflows:
