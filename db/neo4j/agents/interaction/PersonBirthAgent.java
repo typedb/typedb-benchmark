@@ -34,9 +34,7 @@ public class PersonBirthAgent extends grakn.simulation.db.common.agents.interact
         log().query("insertPerson", query); //TODO Figure out to log Neo4j's pre-prepared queries
         ((Neo4jDriverWrapper.Session.Transaction) tx()).run(query);
 
-//        Key constraints are possible with Neo4j Enterprise
+//        TODO Key constraints are possible with Neo4j Enterprise, and some constraints are supported in Community
 //        https://neo4j.com/developer/kb/how-to-implement-a-primary-key-property-for-a-label/
-//        CREATE CONSTRAINT ON (book:Book) ASSERT book.isbn IS UNIQUE
-//        CREATE CONSTRAINT ON (book:Book) ASSERT exists(book.isbn)
     }
 }

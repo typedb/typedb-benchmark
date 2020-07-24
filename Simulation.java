@@ -108,7 +108,7 @@ public class Simulation implements IterationContext, AutoCloseable {
                 break;
             case "neo4j":
                 db = Schema.Database.NEO4J;
-                defaultUri = "bolt://localhost:7687"; // TODO Check this
+                defaultUri = "bolt://localhost:7687";
                 agentPicker = new Neo4jAgentPicker();
                 initialiser = new Neo4jInitialiser(files);
                 driverWrapper = new Neo4jDriverWrapper();

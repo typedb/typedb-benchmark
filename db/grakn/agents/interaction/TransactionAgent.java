@@ -51,7 +51,7 @@ public class TransactionAgent extends grakn.simulation.db.common.agents.interact
                                 .has("is-taxable", isTaxable),
                         Graql.var("locates")
                                 .isa("locates")
-                                .rel("locates_location", Graql.var("country"))
+                                .rel("locates_location", Graql.var("continent"))
                                 .rel("locates_located", Graql.var("transaction"))
 
                 );
