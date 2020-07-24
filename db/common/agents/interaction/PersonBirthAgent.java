@@ -2,6 +2,9 @@ package grakn.simulation.db.common.agents.interaction;
 
 import grakn.simulation.db.common.agents.world.CityAgent;
 
+import static grabl.tracing.client.GrablTracingThreadStatic.ThreadTrace;
+import static grabl.tracing.client.GrablTracingThreadStatic.traceOnThread;
+
 public abstract class PersonBirthAgent extends CityAgent {
 
     @Override
@@ -32,7 +35,9 @@ public abstract class PersonBirthAgent extends CityAgent {
                     + city().country() + "_"
                     + city().country().continent()
                     + "@gmail.com";
-            insertPerson(email, gender, forename, surname);
+            try (ThreadTrace trace = traceOnThread("insertPersonAction")) {
+                insertPerson(email, gender, forename, surname);
+            }
         }
         tx().commit();
     }

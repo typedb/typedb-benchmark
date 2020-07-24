@@ -7,6 +7,8 @@ import graql.lang.statement.Statement;
 
 import java.util.List;
 
+import static grabl.tracing.client.GrablTracingThreadStatic.ThreadTrace;
+import static grabl.tracing.client.GrablTracingThreadStatic.traceOnThread;
 import static grakn.simulation.db.grakn.agents.interaction.ExecutorUtils.getOrderedAttribute;
 
 public class MarriageAgent extends grakn.simulation.db.common.agents.interaction.MarriageAgent {
@@ -35,7 +37,11 @@ public class MarriageAgent extends grakn.simulation.db.common.agents.interaction
         ).get("email");
 
         log().query(scope, query);
-        return getOrderedAttribute(tx().forGrakn(), query, "email");
+        List<String> result;
+        try (ThreadTrace trace = traceOnThread("execute")) {
+            result = getOrderedAttribute(tx().forGrakn(), query, "email");
+        }
+        return result;
     }
 
     @Override
@@ -53,6 +59,8 @@ public class MarriageAgent extends grakn.simulation.db.common.agents.interaction
                 Graql.var().isa("locates").rel("locates_located", Graql.var("m")).rel("locates_location", Graql.var("city"))
         );
         log().query("insertMarriage", marriageQuery);
-        tx().forGrakn().execute(marriageQuery);
+        try (ThreadTrace trace = traceOnThread("execute")) {
+            tx().forGrakn().execute(marriageQuery);
+        }
     }
 }

@@ -28,8 +28,8 @@ def graknlabs_dependencies():
 def graknlabs_client_java():
     git_repository(
         name = "graknlabs_client_java",
-        remote = "https://github.com/graknlabs/client-java",
-        commit = "0fa3309739c56dfe35cd513c889a6c611c32894a",
+        remote = "https://github.com/jmsfltchr/client-java",
+        commit = "730d539ba483a68ce3cc6a2b63515788474858ba",
     )
 
 def graknlabs_grabl_tracing():

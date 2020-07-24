@@ -1,6 +1,7 @@
 package grakn.simulation.db.common.agents.base;
 
 import grabl.tracing.client.GrablTracingThreadStatic.ThreadContext;
+import grabl.tracing.client.GrablTracingThreadStatic.ThreadTrace;
 import grakn.simulation.db.common.agents.interaction.RandomValueGenerator;
 import grakn.simulation.db.common.driver.DriverWrapper;
 import grakn.simulation.db.common.world.World;
@@ -12,6 +13,7 @@ import java.util.List;
 import java.util.Random;
 
 import static grabl.tracing.client.GrablTracingThreadStatic.contextOnThread;
+import static grabl.tracing.client.GrablTracingThreadStatic.traceOnThread;
 
 /**
  * An agent that performs some unit of work across an object in the simulation world. Agent definitions must extend
@@ -138,6 +140,17 @@ public abstract class Agent<T> implements AutoCloseable {
     protected int uniqueId(int iterationScopeId) {
         String id = simulationStep() + tracker() + iterationScopeId;
         return id.hashCode();
+    }
+
+    String name() {
+        return this.getClass().getSimpleName();
+    }
+
+    void iterateWithTracing() {
+        try (ThreadTrace trace = traceOnThread(name())) {
+            System.out.println(name());
+            iterate();
+        }
     }
 
     public abstract void iterate();

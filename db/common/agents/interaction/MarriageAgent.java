@@ -1,19 +1,28 @@
 package grakn.simulation.db.common.agents.interaction;
 
+import grabl.tracing.client.GrablTracingThreadStatic.ThreadTrace;
 import grakn.simulation.db.common.agents.world.CityAgent;
 
 import java.time.LocalDateTime;
 import java.util.List;
+
+import static grabl.tracing.client.GrablTracingThreadStatic.traceOnThread;
 
 public abstract class MarriageAgent extends CityAgent {
 
     @Override
     public final void iterate() {
         // Find bachelors and bachelorettes who are considered adults and who are not in a marriage and pair them off randomly
-        List<String> womenEmails = getSingleWomen();
+        List<String> womenEmails;
+        try (ThreadTrace trace1 = traceOnThread("womenEmails")) {
+            womenEmails = getSingleWomen();
+        }
         shuffle(womenEmails);
 
-        List<String> menEmails = getSingleMen();
+        List<String> menEmails;
+        try (ThreadTrace trace2 = traceOnThread("menEmails")) {
+            menEmails = getSingleMen();
+        }
         shuffle(menEmails);
 
         int numMarriages = world().getScaleFactor();
@@ -21,14 +30,17 @@ public abstract class MarriageAgent extends CityAgent {
         int numMarriagesPossible = Math.min(numMarriages, Math.min(womenEmails.size(), menEmails.size()));
 
         if (numMarriagesPossible > 0) {
-
-            for (int i = 0; i < numMarriagesPossible; i++) {
-                String wifeEmail = womenEmails.get(i);
-                String husbandEmail = menEmails.get(i);
-                int marriageIdentifier = (wifeEmail + husbandEmail).hashCode();
-                insertMarriage(marriageIdentifier, wifeEmail, husbandEmail);
+            try (ThreadTrace trace3 = traceOnThread("insertMarriage")) {
+                for (int i = 0; i < numMarriagesPossible; i++) {
+                    String wifeEmail = womenEmails.get(i);
+                    String husbandEmail = menEmails.get(i);
+                    int marriageIdentifier = (wifeEmail + husbandEmail).hashCode();
+                    insertMarriage(marriageIdentifier, wifeEmail, husbandEmail);
+                }
             }
-            tx().commit();
+            try (ThreadTrace trace4 = traceOnThread("commit")) {
+                tx().commit();
+            }
         }
     }
 
