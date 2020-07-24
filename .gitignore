@@ -19,6 +19,7 @@ tmp/
 # Compiled files
 target/
 bin/
+dist/
 
 # NPM
 node_modules/

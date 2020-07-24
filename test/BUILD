@@ -17,20 +17,9 @@
 # under the License.
 #
 
-java_test(
-    name = "QueryCountE2E",
-    srcs = [
-        "QueryCountE2E.java",
-        "common/TestArgsInterpreter.java",
-    ],
-    test_class = "grakn.simulation.agents.test.QueryCountE2E",
-    deps = [
-        # External dependencies from @graknlabs
-        "@graknlabs_client_java//:client-java",
-        "@graknlabs_graql//java:graql",
+load("@graknlabs_dependencies//distribution/artifact:rules.bzl", "artifact_extractor")
 
-        # External dependencies from Maven
-        "@maven//:org_hamcrest_hamcrest",
-    ],
-    size="enormous"
+artifact_extractor(
+    name = "grakn-extractor",
+    artifact = "@graknlabs_grakn_core_artifact//file",
 )
