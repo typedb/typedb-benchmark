@@ -68,7 +68,7 @@ public class Simulation implements IterationContext, AutoCloseable {
         }
 
         String dbName = getOption(commandLine, "d").orElse("grakn");
-        String hostUri = getOption(commandLine, "u").orElse(null);
+        String hostUri = getOption(commandLine, "s").orElse(null);
         String grablTracingUri = getOption(commandLine, "t").orElse("localhost:7979");
         String grablTracingOrganisation = commandLine.getOptionValue("o");
         String grablTracingRepository = commandLine.getOptionValue("r");
@@ -183,7 +183,7 @@ public class Simulation implements IterationContext, AutoCloseable {
         options.addOption(Option.builder("d")
                 .longOpt("database").desc("Database under test").hasArg().required().argName("database")
                 .build());
-        options.addOption(Option.builder("u")
+        options.addOption(Option.builder("s")
                 .longOpt("database-uri").desc("Database server URI").hasArg().argName("uri")
                 .build());
         options.addOption(Option.builder("t")
