@@ -27,7 +27,7 @@ public class GraknClientWrapper implements DriverWrapper {
         return new Session(client.session(database));
     }
 
-    class Session extends DriverWrapper.Session {
+    static class Session extends DriverWrapper.Session {
 
         private GraknClient.Session session;
 

@@ -327,7 +327,7 @@ company sub organisation,
     key company-name,
     key company-number,
     plays employment_employer,
-    plays transaction_vendor,
+    plays transaction_seller,
     plays transaction_buyer,
     plays incorporation_incorporated;
 
@@ -340,7 +340,7 @@ university sub organisation,
     has university-name,
     plays employment_employer,
     plays studentship_school,
-    plays transaction_vendor,
+    plays transaction_seller,
     plays transaction_buyer;
 
 charity sub organisation,
@@ -416,7 +416,7 @@ when {
 
 transaction sub relation,
     relates transaction_buyer,
-    relates transaction_vendor,
+    relates transaction_seller,
     relates transaction_merchandise,
     has currency,
     has value,

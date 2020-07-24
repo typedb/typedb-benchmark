@@ -15,41 +15,44 @@ import grakn.simulation.db.grakn.agents.interaction.ProductAgent;
 import grakn.simulation.db.grakn.agents.interaction.RelocationAgent;
 import grakn.simulation.db.grakn.agents.interaction.TransactionAgent;
 
+import static grakn.simulation.db.common.agents.world.CityAgentRunner.SessionStrategy.CONTINENT;
+import static grakn.simulation.db.common.agents.world.CountryAgentRunner.SessionStrategy.COUNTRY;
+
 public class GraknAgentPicker extends AgentPicker {
 
     @Override
     protected CityAgentRunner marriage() {
-        return new CityAgentRunner(MarriageAgent.class);
+        return new CityAgentRunner(MarriageAgent.class, CONTINENT);
     }
 
     @Override
     protected CityAgentRunner personBirth() {
-        return new CityAgentRunner(PersonBirthAgent.class);
+        return new CityAgentRunner(PersonBirthAgent.class, CONTINENT);
     }
 
     @Override
     protected CityAgentRunner ageUpdate() {
-        return new CityAgentRunner(AgeUpdateAgent.class);
+        return new CityAgentRunner(AgeUpdateAgent.class, CONTINENT);
     }
 
     @Override
     protected CityAgentRunner parentship() {
-        return new CityAgentRunner(ParentshipAgent.class);
+        return new CityAgentRunner(ParentshipAgent.class, CONTINENT);
     }
 
     @Override
     protected CityAgentRunner relocation() {
-        return new CityAgentRunner(RelocationAgent.class);
+        return new CityAgentRunner(RelocationAgent.class, CONTINENT);
     }
 
     @Override
     protected CountryAgentRunner company() {
-        return new CountryAgentRunner(CompanyAgent.class);
+        return new CountryAgentRunner(CompanyAgent.class, COUNTRY);
     }
 
     @Override
     protected CityAgentRunner employment() {
-        return new CityAgentRunner(EmploymentAgent.class);
+        return new CityAgentRunner(EmploymentAgent.class, CONTINENT);
     }
 
     @Override
@@ -58,13 +61,13 @@ public class GraknAgentPicker extends AgentPicker {
     }
 
     @Override
-    protected CountryAgentRunner transaction() {
-        return new CountryAgentRunner(TransactionAgent.class);
+    protected ContinentAgentRunner transaction() {
+        return new ContinentAgentRunner(TransactionAgent.class);
     }
 
     @Override
     protected CityAgentRunner friendship() {
-        return new CityAgentRunner(FriendshipAgent.class);
+        return new CityAgentRunner(FriendshipAgent.class, CONTINENT);
     }
 
 }

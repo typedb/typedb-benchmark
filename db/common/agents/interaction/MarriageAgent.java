@@ -23,7 +23,10 @@ public abstract class MarriageAgent extends CityAgent {
         if (numMarriagesPossible > 0) {
 
             for (int i = 0; i < numMarriagesPossible; i++) {
-                insertMarriage(womenEmails.get(i), menEmails.get(i));
+                String wifeEmail = womenEmails.get(i);
+                String husbandEmail = menEmails.get(i);
+                int marriageIdentifier = (wifeEmail + husbandEmail).hashCode();
+                insertMarriage(marriageIdentifier, wifeEmail, husbandEmail);
             }
             tx().commit();
         }
@@ -40,5 +43,5 @@ public abstract class MarriageAgent extends CityAgent {
 //    TODO Should this inner query be included at the top level?
 //    private GraqlGet.Unfiltered getSinglePeopleOfGenderQuery(String gender, String marriageRole);
 
-    protected abstract void insertMarriage(String wifeEmail, String husbandEmail);
+    protected abstract void insertMarriage(int marriageIdentifier, String wifeEmail, String husbandEmail);
 }

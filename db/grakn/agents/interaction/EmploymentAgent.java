@@ -14,7 +14,7 @@ public class EmploymentAgent extends grakn.simulation.db.common.agents.interacti
     @Override
     protected List<Long> getCompanyNumbers() {
         GraqlGet companyNumbersQuery = CompanyAgent.getCompanyNumbersInCountryQuery(city().country());
-        log().query("getEmployeeEmails", companyNumbersQuery);
+        log().query("getCompanyNumbers", companyNumbersQuery);
         int numCompanies = world().getScaleFactor();
         return ExecutorUtils.getOrderedAttribute(tx().forGrakn(), companyNumbersQuery, "company-number", numCompanies);
     }

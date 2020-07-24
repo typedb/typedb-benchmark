@@ -2,9 +2,8 @@ package grakn.simulation.db.common.agents.base;
 
 import grabl.tracing.client.GrablTracingThreadStatic.ThreadContext;
 import grakn.simulation.db.common.agents.interaction.RandomValueGenerator;
-import grakn.simulation.db.common.world.World;
 import grakn.simulation.db.common.driver.DriverWrapper;
-import graql.lang.query.GraqlQuery;
+import grakn.simulation.db.common.world.World;
 import org.slf4j.Logger;
 
 import java.time.LocalDateTime;
@@ -150,7 +149,11 @@ public abstract class Agent<T> implements AutoCloseable {
             this.logger = logger;
         }
 
-        public void query(String scope, GraqlQuery query) {
+        public void query(String scope, Object query) {
+            query(scope, query.toString());
+        }
+
+        public void query(String scope, String query) {
             logger.info("({}):{}:\n{}", tracker, scope, query);
         }
 

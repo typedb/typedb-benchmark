@@ -12,6 +12,9 @@ import grakn.simulation.db.common.initialise.Initialiser;
 import grakn.simulation.db.grakn.driver.GraknClientWrapper;
 import grakn.simulation.db.grakn.initialise.GraknAgentPicker;
 import grakn.simulation.db.grakn.initialise.GraknInitialiser;
+import grakn.simulation.db.neo4j.driver.Neo4jDriverWrapper;
+import grakn.simulation.db.neo4j.initialise.Neo4jAgentPicker;
+import grakn.simulation.db.neo4j.initialise.Neo4jInitialiser;
 import grakn.simulation.utils.RandomSource;
 import grakn.simulation.db.common.driver.DriverWrapper;
 import grakn.simulation.db.common.world.World;
@@ -65,7 +68,7 @@ public class Simulation implements IterationContext, AutoCloseable {
         }
 
         String dbName = getOption(commandLine, "d").orElse("grakn");
-        String hostUri = getOption(commandLine, "u").orElse(null);
+        String hostUri = getOption(commandLine, "s").orElse(null);
         String grablTracingUri = getOption(commandLine, "t").orElse("localhost:7979");
         String grablTracingOrganisation = commandLine.getOptionValue("o");
         String grablTracingRepository = commandLine.getOptionValue("r");
@@ -103,11 +106,13 @@ public class Simulation implements IterationContext, AutoCloseable {
                 initialiser = new GraknInitialiser(files);
                 driverWrapper = new GraknClientWrapper();
                 break;
-//            case "neo4j":
-//                db = Schema.Database.NEO4J;
-//                defaultUri = "localhost:7474"; // TODO Check this
-//                agentPicker = new Neo4jAgentPicker();
-//                break;
+            case "neo4j":
+                db = Schema.Database.NEO4J;
+                defaultUri = "bolt://localhost:7687";
+                agentPicker = new Neo4jAgentPicker();
+                initialiser = new Neo4jInitialiser(files);
+                driverWrapper = new Neo4jDriverWrapper();
+                break;
             default:
                 throw new IllegalArgumentException("Unexpected value: " + dbName);
         }
@@ -178,7 +183,7 @@ public class Simulation implements IterationContext, AutoCloseable {
         options.addOption(Option.builder("d")
                 .longOpt("database").desc("Database under test").hasArg().required().argName("database")
                 .build());
-        options.addOption(Option.builder("u")
+        options.addOption(Option.builder("s")
                 .longOpt("database-uri").desc("Database server URI").hasArg().argName("uri")
                 .build());
         options.addOption(Option.builder("t")
@@ -215,7 +220,7 @@ public class Simulation implements IterationContext, AutoCloseable {
     private final Random random;
     private Function<Integer, Boolean> iterationSamplingFunction;
     private final World world;
-    private int simulationStep = 1;
+    private int simulationStep = 0;
     private final ConcurrentMap<String, DriverWrapper.Session> sessionMap;
 
     Simulation(DriverWrapper driver, String database, List<AgentRunner> agentRunners, RandomSource randomSource, World world, Function<Integer, Boolean> iterationSamplingFunction) {

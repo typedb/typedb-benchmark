@@ -23,13 +23,11 @@ public class GraknInitialiser extends Initialiser {
     }
 
     private void initialiseSchema(DriverWrapper.Session session) throws IOException {
-        try (GrablTracingThreadStatic.ThreadContext context = GrablTracingThreadStatic.contextOnThread("db/grakn/schema", 0)) {
-            // TODO: merge these two schema files once this issue is fixed
-            // https://github.com/graknlabs/grakn/issues/5553
-            schemaFile(session,
-                    files.get("schema.gql"),
-                    files.get("schema-pt2.gql"));
-        }
+        // TODO: merge these two schema files once this issue is fixed
+        // https://github.com/graknlabs/grakn/issues/5553
+        schemaFile(session,
+                files.get("schema.gql"),
+                files.get("schema-pt2.gql"));
     }
 
     private static void schemaFile(DriverWrapper.Session session, Path... schemaPath) throws IOException {
@@ -47,15 +45,10 @@ public class GraknInitialiser extends Initialiser {
         System.out.println(">>>> trace: loadSchema: end");
     }
 
-    private void initialiseData(DriverWrapper.Session session) throws IOException, YAMLException {
-        try (GrablTracingThreadStatic.ThreadContext context = GrablTracingThreadStatic.contextOnThread("db/common/data", 0)) {
-            dataFile(session, files.get("data.yaml"));
-        }
-    }
-
-    private void dataFile(DriverWrapper.Session session, Path dataPath) throws IOException, YAMLException {
+    @Override
+    protected void initialiseData(DriverWrapper.Session session) throws IOException, YAMLException {
         YAMLLoader loader = new GraknYAMLLoader(session, files);
-        loader.loadFile(dataPath.toFile());
+        loader.loadFile(files.get("grakn_data.yaml").toFile());
     }
 
     @Override

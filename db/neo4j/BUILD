@@ -1,5 +1,5 @@
 java_library(
-    name = "grakn",
+    name = "neo4j",
     srcs = glob([
         "agents/interaction/*.java",
         "initialise/*.java",
@@ -13,10 +13,9 @@ java_library(
         "//db/common/initialise",
         "//db/common/world",
         "//db/common/yaml_tool",
-        "@graknlabs_client_java//:client-java",
         "@graknlabs_grabl_tracing//client",
-        "@graknlabs_graql//java:graql",
         "@maven//:org_apache_commons_commons_csv",
         "@maven//:org_apache_commons_commons_lang3",
+        "@neo4j//:org_neo4j_driver_neo4j_java_driver",
     ],
 )

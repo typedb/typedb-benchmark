@@ -13,8 +13,15 @@ import static java.util.stream.Collectors.toList;
 
 public class CountryAgentRunner extends AgentRunner<World.Country> {
 
-    public CountryAgentRunner(Class<? extends Agent<World.Country>> agentClass) {
+    private final SessionStrategy sessionStrategy;
+
+    public enum SessionStrategy {
+        COUNTRY, CONTINENT
+    }
+
+    public CountryAgentRunner(Class<? extends Agent<World.Country>> agentClass, SessionStrategy sessionStrategy) {
         super(agentClass);
+        this.sessionStrategy = sessionStrategy;
     }
 
     @Override
@@ -24,7 +31,14 @@ public class CountryAgentRunner extends AgentRunner<World.Country> {
 
     @Override
     protected String getSessionKey(IterationContext iterationContext, RandomSource randomSource, World.Country country) {
-        return country.name();
+        switch (sessionStrategy) {
+            case COUNTRY:
+                return country.name();
+            case CONTINENT:
+                return country.continent().name();
+            default:
+                throw new IllegalArgumentException("Unexpected session strategy: " + sessionStrategy.name());
+        }
     }
 
     @Override

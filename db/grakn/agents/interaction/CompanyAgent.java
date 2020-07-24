@@ -9,12 +9,7 @@ import org.apache.commons.lang3.StringUtils;
 public class CompanyAgent extends grakn.simulation.db.common.agents.interaction.CompanyAgent {
 
     @Override
-    protected void insertCompany(int i) {
-        String adjective = pickOne(world().getAdjectives());
-        String noun = pickOne(world().getNouns());
-
-        int companyNumber = uniqueId(i);
-        String companyName = StringUtils.capitalize(adjective) + StringUtils.capitalize(noun) + "-" + companyNumber;
+    protected void insertCompany(int companyNumber, String companyName) {
 
         GraqlInsert query =
                 Graql.match(
@@ -36,6 +31,20 @@ public class CompanyAgent extends grakn.simulation.db.common.agents.interaction.
         return Graql.match(
                 Graql.var("country").isa("country")
                         .has("location-name", country.name()),
+                Graql.var("company").isa("company")
+                        .has("company-number", Graql.var("company-number")),
+                Graql.var("reg").isa("incorporation")
+                        .rel("incorporation_incorporated", Graql.var("company"))
+                        .rel("incorporation_incorporating", Graql.var("country"))
+        ).get();
+    }
+
+    static GraqlGet getCompanyNumbersInContinentQuery(World.Continent continent) {
+        return Graql.match(
+                Graql.var("continent").isa("continent")
+                        .has("location-name", continent.name()),
+                Graql.var("lh").isa("location-hierarchy").rel("country").rel("continent"),
+                Graql.var("country").isa("country"),
                 Graql.var("company").isa("company")
                         .has("company-number", Graql.var("company-number")),
                 Graql.var("reg").isa("incorporation")
