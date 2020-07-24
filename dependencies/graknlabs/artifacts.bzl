@@ -17,27 +17,12 @@
 # under the License.
 #
 
-load("@graknlabs_dependencies//distribution/artifact:rules.bzl", "artifact_extractor")
+load("@graknlabs_dependencies//distribution/artifact:rules.bzl", "artifact_file")
 
-artifact_extractor(
-    name = "grakn-extractor",
-    artifact = "@graknlabs_grakn_core_artifact//file",
-)
-
-java_test(
-    name = "QueryCountE2E",
-    srcs = [
-        "QueryCountE2E.java",
-        "common/TestArgsInterpreter.java",
-    ],
-    test_class = "grakn.simulation.agents.test.QueryCountE2E",
-    deps = [
-        # External dependencies from @graknlabs
-        "@graknlabs_client_java//:client-java",
-        "@graknlabs_graql//java:graql",
-
-        # External dependencies from Maven
-        "@maven//:org_hamcrest_hamcrest",
-    ],
-    size="enormous"
-)
+def graknlabs_grakn_core_artifact():
+    artifact_file(
+        name = "graknlabs_grakn_core_artifact",
+        group_name = "graknlabs_grakn_core",
+        artifact_name = "grakn-core-all-linux-{version}.tar.gz",
+        commit = "7cc0fcc8e44eb419f540b5ccedb4fcfe23c26e32",
+    )
