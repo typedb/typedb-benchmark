@@ -220,7 +220,7 @@ public class Simulation implements IterationContext, AutoCloseable {
     private final Random random;
     private Function<Integer, Boolean> iterationSamplingFunction;
     private final World world;
-    private int simulationStep = 1;
+    private int simulationStep = 0;
     private final ConcurrentMap<String, DriverWrapper.Session> sessionMap;
 
     Simulation(DriverWrapper driver, String database, List<AgentRunner> agentRunners, RandomSource randomSource, World world, Function<Integer, Boolean> iterationSamplingFunction) {

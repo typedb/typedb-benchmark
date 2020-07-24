@@ -18,10 +18,8 @@ public class Neo4jInitialiser extends Initialiser {
     }
 
     protected void initialiseData(DriverWrapper.Session session) throws IOException, YAMLException {
-        try (GrablTracingThreadStatic.ThreadContext context = GrablTracingThreadStatic.contextOnThread("db/common/data", 0)) {
-            YAMLLoader loader = new Neo4jYAMLLoader(session, files);
-            loader.loadFile(files.get("neo4j_data.yaml").toFile());
-        }
+        YAMLLoader loader = new Neo4jYAMLLoader(session, files);
+        loader.loadFile(files.get("neo4j_data.yaml").toFile());
     }
 
     @Override
