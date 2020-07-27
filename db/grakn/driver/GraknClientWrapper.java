@@ -3,7 +3,6 @@ package grakn.simulation.db.grakn.driver;
 import grabl.tracing.client.GrablTracingThreadStatic;
 import grakn.client.GraknClient;
 import grakn.simulation.db.common.driver.DriverWrapper;
-import grakn.simulation.db.common.driver.QueryResult;
 import graql.lang.query.GraqlGet;
 
 import java.util.List;
