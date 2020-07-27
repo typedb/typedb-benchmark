@@ -35,7 +35,7 @@ public abstract class PersonBirthAgent extends CityAgent {
                     + city().country() + "_"
                     + city().country().continent()
                     + "@gmail.com";
-            try (ThreadTrace trace = traceOnThread("insertPersonAction")) {
+            try (ThreadTrace trace = traceOnThread(this.checkMethodTrace("insertPerson"))) {
                 insertPerson(email, gender, forename, surname);
             }
         }

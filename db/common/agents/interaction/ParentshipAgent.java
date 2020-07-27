@@ -1,7 +1,8 @@
 package grakn.simulation.db.common.agents.interaction;
 
-import grakn.simulation.db.common.agents.world.CityAgent;
+import grabl.tracing.client.GrablTracingThreadStatic.ThreadTrace;
 import grakn.simulation.db.common.agents.utils.Allocation;
+import grakn.simulation.db.common.agents.world.CityAgent;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -9,6 +10,8 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+
+import static grabl.tracing.client.GrablTracingThreadStatic.traceOnThread;
 
 public abstract class ParentshipAgent extends CityAgent {
 
@@ -19,10 +22,14 @@ public abstract class ParentshipAgent extends CityAgent {
     @Override
     public final void iterate() {
         // Query for married couples in the city who are not already in a parentship relation together
-
-        List<String> childrenEmails = getChildrenEmailsBorn(today());
-
-        List<HashMap<Email, String>> marriageEmails = getMarriageEmails();
+        List<String> childrenEmails;
+        try (ThreadTrace trace = traceOnThread(this.registerMethodTrace("getChildrenEmailsBorn"))) {
+            childrenEmails = getChildrenEmailsBorn(today());
+        }
+        List<HashMap<Email, String>> marriageEmails;
+        try (ThreadTrace trace = traceOnThread(this.registerMethodTrace("getMarriageEmails"))) {
+            marriageEmails = getMarriageEmails();
+        }
 
         if (marriageEmails.size() > 0 && childrenEmails.size() > 0) {
             LinkedHashMap<Integer, List<Integer>> childrenPerMarriage = Allocation.allocateEvenlyToMap(childrenEmails.size(), marriageEmails.size());
@@ -37,8 +44,9 @@ public abstract class ParentshipAgent extends CityAgent {
                 for (Integer childIndex : children) {
                     childEmails.add(childrenEmails.get(childIndex));
                 }
-
-                insertParentShip(marriage, childEmails);
+                try (ThreadTrace trace = traceOnThread(this.checkMethodTrace("insertParentShip"))) {
+                    insertParentShip(marriage, childEmails);
+                }
             }
             tx().commitWithTracing();
         }

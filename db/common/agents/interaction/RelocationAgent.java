@@ -1,12 +1,15 @@
 package grakn.simulation.db.common.agents.interaction;
 
-import grakn.simulation.db.common.agents.world.CityAgent;
 import grakn.simulation.db.common.agents.utils.Allocation;
+import grakn.simulation.db.common.agents.world.CityAgent;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
+
+import static grabl.tracing.client.GrablTracingThreadStatic.ThreadTrace;
+import static grabl.tracing.client.GrablTracingThreadStatic.traceOnThread;
 
 public abstract class RelocationAgent extends CityAgent {
 
@@ -28,12 +31,20 @@ public abstract class RelocationAgent extends CityAgent {
         List<String> residentEmails;
         List<String> relocationCityNames;
 
-        residentEmails = getResidentEmails(earliestDate);
+        try (ThreadTrace trace = traceOnThread(this.registerMethodTrace("getResidentEmails"))) {
+            residentEmails = getResidentEmails(earliestDate);
+        }
         shuffle(residentEmails);
 
-        relocationCityNames = getRelocationCityNames();
+        try (ThreadTrace trace = traceOnThread(this.registerMethodTrace("getRelocationCityNames"))) {
+            relocationCityNames = getRelocationCityNames();
+        }
 
-        Allocation.allocate(residentEmails, relocationCityNames, this::insertRelocation);
+        Allocation.allocate(residentEmails, relocationCityNames, (residentEmail, relocationCityName) -> {
+            try (ThreadTrace trace = traceOnThread(this.checkMethodTrace("insertRelocation"))) {
+                insertRelocation(residentEmail, relocationCityName);
+            }
+        });
 
         tx().commitWithTracing();
     }

@@ -5,6 +5,8 @@ import grakn.simulation.db.common.agents.world.CityAgent;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static grabl.tracing.client.GrablTracingThreadStatic.ThreadTrace;
+import static grabl.tracing.client.GrablTracingThreadStatic.traceOnThread;
 import static grakn.simulation.db.common.agents.utils.Allocation.allocate;
 
 public abstract class EmploymentAgent extends CityAgent {
@@ -24,8 +26,12 @@ public abstract class EmploymentAgent extends CityAgent {
 
         List<String> employeeEmails;
         List<Long> companyNumbers;
-        employeeEmails = getEmployeeEmails(employmentDate);
-        companyNumbers = getCompanyNumbers();
+        try (ThreadTrace trace = traceOnThread(this.registerMethodTrace("getEmployeeEmails"))) {
+            employeeEmails = getEmployeeEmails(employmentDate);
+        }
+        try (ThreadTrace trace = traceOnThread(this.registerMethodTrace("getCompanyNumbers"))) {
+            companyNumbers = getCompanyNumbers();
+        }
         tx().commitWithTracing();
         closeTx();
         // A second transaction is being used to circumvent graknlabs/grakn issue #5585
@@ -33,7 +39,9 @@ public abstract class EmploymentAgent extends CityAgent {
             double wageValue = randomAttributeGenerator().boundRandomDouble(MIN_ANNUAL_WAGE, MAX_ANNUAL_WAGE);
             String contractContent = randomAttributeGenerator().boundRandomLengthRandomString(MIN_CONTRACT_CHARACTER_LENGTH, MAX_CONTRACT_CHARACTER_LENGTH);
             double contractedHours = randomAttributeGenerator().boundRandomDouble(MIN_CONTRACTED_HOURS, MAX_CONTRACTED_HOURS);
-            insertEmployment(employeeEmail, companyNumber, employmentDate, wageValue, contractContent, contractedHours);
+            try (ThreadTrace trace = traceOnThread(this.checkMethodTrace("insertEmployment"))) {
+                insertEmployment(employeeEmail, companyNumber, employmentDate, wageValue, contractContent, contractedHours);
+            }
         });
         tx().commitWithTracing();
     }

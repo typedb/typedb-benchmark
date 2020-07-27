@@ -2,6 +2,9 @@ package grakn.simulation.db.common.agents.interaction;
 
 import grakn.simulation.db.common.agents.world.ContinentAgent;
 
+import static grabl.tracing.client.GrablTracingThreadStatic.ThreadTrace;
+import static grabl.tracing.client.GrablTracingThreadStatic.traceOnThread;
+
 public abstract class ProductAgent extends ContinentAgent {
 
     @Override
@@ -11,7 +14,9 @@ public abstract class ProductAgent extends ContinentAgent {
             String productName = randomAttributeGenerator().boundRandomLengthRandomString(5, 20);
             String productDescription = randomAttributeGenerator().boundRandomLengthRandomString(75, 100);
             Double barcode = (double) uniqueId(i);
-            insertProduct(barcode, productName, productDescription);
+            try (ThreadTrace trace = traceOnThread(this.checkMethodTrace("insertProduct"))) {
+                insertProduct(barcode, productName, productDescription);
+            }
         }
         tx().commitWithTracing();
     }

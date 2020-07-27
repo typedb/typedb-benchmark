@@ -1,7 +1,10 @@
 package grakn.simulation.db.common.agents.interaction;
 
+import grabl.tracing.client.GrablTracingThreadStatic.ThreadTrace;
 import grakn.simulation.db.common.agents.world.CountryAgent;
 import org.apache.commons.lang3.StringUtils;
+
+import static grabl.tracing.client.GrablTracingThreadStatic.traceOnThread;
 
 public abstract class CompanyAgent extends CountryAgent {
 
@@ -16,7 +19,9 @@ public abstract class CompanyAgent extends CountryAgent {
 
             int companyNumber = uniqueId(i);
             String companyName = StringUtils.capitalize(adjective) + StringUtils.capitalize(noun) + "-" + companyNumber;
-            insertCompany(companyNumber, companyName);
+            try (ThreadTrace trace = traceOnThread(this.checkMethodTrace("insertCompany"))) {
+                insertCompany(companyNumber, companyName);
+            }
         }
         tx().commitWithTracing();
     }

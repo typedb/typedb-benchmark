@@ -1,11 +1,14 @@
 package grakn.simulation.db.common.agents.interaction;
 
-import grakn.simulation.db.common.agents.world.ContinentAgent;
 import grakn.simulation.db.common.agents.utils.Allocation;
 import grakn.simulation.db.common.agents.utils.Pair;
+import grakn.simulation.db.common.agents.world.ContinentAgent;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static grabl.tracing.client.GrablTracingThreadStatic.ThreadTrace;
+import static grabl.tracing.client.GrablTracingThreadStatic.traceOnThread;
 
 public abstract class TransactionAgent extends ContinentAgent {
 
@@ -13,8 +16,14 @@ public abstract class TransactionAgent extends ContinentAgent {
 
     @Override
     public final void iterate() {
-        List<Long> companyNumbers = getCompanyNumbersInContinent();
-        List<Double> productBarcodes = getProductBarcodesInContinent();
+        List<Long> companyNumbers;
+        try (ThreadTrace trace = traceOnThread(this.registerMethodTrace("getCompanyNumbersInContinent"))) {
+            companyNumbers = getCompanyNumbersInContinent();
+        }
+        List<Double> productBarcodes;
+        try (ThreadTrace trace = traceOnThread(this.registerMethodTrace("getProductBarcodesInContinent"))) {
+            productBarcodes = getProductBarcodesInContinent();
+        }
         shuffle(companyNumbers);
 
         int numTransactions = NUM_TRANSACTIONS_PER_COMPANY_ON_AVERAGE * world().getScaleFactor() * companyNumbers.size();
@@ -36,7 +45,9 @@ public abstract class TransactionAgent extends ContinentAgent {
             Double value = randomAttributeGenerator().boundRandomDouble(0.01, 10000.00);
             Integer productQuantity = randomAttributeGenerator().boundRandomInt(1, 1000);
             Boolean isTaxable = randomAttributeGenerator().bool();
-            insertTransaction(transaction, sellerCompanyNumber, value, productQuantity, isTaxable);
+            try (ThreadTrace trace = traceOnThread(this.checkMethodTrace("insertTransaction"))) {
+                insertTransaction(transaction, sellerCompanyNumber, value, productQuantity, isTaxable);
+            }
         });
         tx().commitWithTracing();
     }

@@ -14,13 +14,13 @@ public abstract class MarriageAgent extends CityAgent {
     public final void iterate() {
         // Find bachelors and bachelorettes who are considered adults and who are not in a marriage and pair them off randomly
         List<String> womenEmails;
-        try (ThreadTrace trace1 = traceOnThread("womenEmails")) {
+        try (ThreadTrace trace = traceOnThread(this.registerMethodTrace("getSingleWomen"))) {
             womenEmails = getSingleWomen();
         }
         shuffle(womenEmails);
 
         List<String> menEmails;
-        try (ThreadTrace trace2 = traceOnThread("menEmails")) {
+        try (ThreadTrace trace = traceOnThread(this.registerMethodTrace("getSingleMen"))) {
             menEmails = getSingleMen();
         }
         shuffle(menEmails);
@@ -30,11 +30,11 @@ public abstract class MarriageAgent extends CityAgent {
         int numMarriagesPossible = Math.min(numMarriages, Math.min(womenEmails.size(), menEmails.size()));
 
         if (numMarriagesPossible > 0) {
-            try (ThreadTrace trace3 = traceOnThread("insertMarriage")) {
-                for (int i = 0; i < numMarriagesPossible; i++) {
-                    String wifeEmail = womenEmails.get(i);
-                    String husbandEmail = menEmails.get(i);
-                    int marriageIdentifier = (wifeEmail + husbandEmail).hashCode();
+            for (int i = 0; i < numMarriagesPossible; i++) {
+                String wifeEmail = womenEmails.get(i);
+                String husbandEmail = menEmails.get(i);
+                int marriageIdentifier = (wifeEmail + husbandEmail).hashCode();
+                try (ThreadTrace trace = traceOnThread(this.checkMethodTrace("insertMarriage"))) {
                     insertMarriage(marriageIdentifier, wifeEmail, husbandEmail);
                 }
             }

@@ -3,12 +3,14 @@ package grakn.simulation.db.common.agents.base;
 import grabl.tracing.client.GrablTracingThreadStatic.ThreadContext;
 import grabl.tracing.client.GrablTracingThreadStatic.ThreadTrace;
 import grakn.simulation.db.common.agents.interaction.RandomValueGenerator;
+import grakn.simulation.db.common.agents.utils.CheckMethod;
 import grakn.simulation.db.common.driver.DriverWrapper;
 import grakn.simulation.db.common.world.World;
 import org.slf4j.Logger;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 
@@ -33,6 +35,7 @@ public abstract class Agent<T> implements AutoCloseable {
     private String tracker;
     private LogWrapper logWrapper;
     private ThreadContext context;
+    private HashSet<String> tracedMethods = new HashSet<>();
 
     void init(IterationContext iterationContext, Random random, T item, String sessionKey, String tracker, Logger logger, Boolean trace) {
         this.iterationContext = iterationContext;
@@ -173,5 +176,19 @@ public abstract class Agent<T> implements AutoCloseable {
         public void message(String message) {
             logger.info("({}):{}", tracker, message);
         }
+    }
+
+    protected String registerMethodTrace(String methodName) {
+        CheckMethod.checkMethodExists(this, methodName);
+        if (tracedMethods.contains(methodName)) {
+            throw new RuntimeException(String.format("Method %s has already been registered for tracing for class %s", methodName, this.getClass().getName()));
+        }
+        tracedMethods.add(methodName);
+        return methodName;
+    }
+
+    protected String checkMethodTrace(String methodName) {
+        CheckMethod.checkMethodExists(this, methodName);
+        return methodName;
     }
 }
