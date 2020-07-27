@@ -38,9 +38,7 @@ public abstract class MarriageAgent extends CityAgent {
                     insertMarriage(marriageIdentifier, wifeEmail, husbandEmail);
                 }
             }
-            try (ThreadTrace trace4 = traceOnThread("commit")) {
-                tx().commit();
-            }
+            tx().commitWithTracing();
         }
     }
 

@@ -4,6 +4,7 @@ java_library(
     deps = [
         "@graknlabs_client_java//:client-java",
         "@neo4j//:org_neo4j_driver_neo4j_java_driver",
+        "@graknlabs_grabl_tracing//client",
     ],
     visibility = ["//visibility:public"],
 )

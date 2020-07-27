@@ -1,5 +1,6 @@
 package grakn.simulation.db.grakn.agents.interaction;
 
+import grakn.simulation.db.grakn.driver.GraknClientWrapper.Session.Transaction;
 import graql.lang.Graql;
 import graql.lang.query.GraqlGet;
 import graql.lang.query.GraqlInsert;
@@ -9,7 +10,6 @@ import java.util.List;
 
 import static grabl.tracing.client.GrablTracingThreadStatic.ThreadTrace;
 import static grabl.tracing.client.GrablTracingThreadStatic.traceOnThread;
-import static grakn.simulation.db.grakn.agents.interaction.ExecutorUtils.getOrderedAttribute;
 
 public class MarriageAgent extends grakn.simulation.db.common.agents.interaction.MarriageAgent {
 
@@ -39,7 +39,7 @@ public class MarriageAgent extends grakn.simulation.db.common.agents.interaction
         log().query(scope, query);
         List<String> result;
         try (ThreadTrace trace = traceOnThread("execute")) {
-            result = getOrderedAttribute(tx().forGrakn(), query, "email");
+            result = ((Transaction)tx()).getOrderedAttribute(query, "email", null);
         }
         return result;
     }

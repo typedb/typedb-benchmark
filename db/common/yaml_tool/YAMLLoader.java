@@ -45,7 +45,7 @@ public abstract class YAMLLoader {
                 loadDocument(tx, document);
             }
 
-            tx.commit();
+            tx.commitWithTracing();
         }
     }
 

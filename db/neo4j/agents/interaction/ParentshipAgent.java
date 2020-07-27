@@ -30,7 +30,7 @@ public class ParentshipAgent extends grakn.simulation.db.common.agents.interacti
         Query query = new Query(template, parameters);
 
         log().query("getMarriageEmails", query);
-        Result result = ((Neo4jDriverWrapper.Session.Transaction) tx()).run(query);
+        Result result = ((Neo4jDriverWrapper.Session.Transaction) tx()).execute(query);
 
         return result.stream().map(Record::asMap).map(r -> new HashMap<Email, String>() {{
             put(Email.WIFE, r.get("wife.email").toString());
@@ -72,7 +72,7 @@ public class ParentshipAgent extends grakn.simulation.db.common.agents.interacti
             }};
             Query parentshipQuery = new Query(template, parameters);
             log().query("insertParentShip", parentshipQuery);
-            ((Neo4jDriverWrapper.Session.Transaction) tx()).run(parentshipQuery);
+            ((Neo4jDriverWrapper.Session.Transaction) tx()).execute(parentshipQuery);
         }
     }
 }

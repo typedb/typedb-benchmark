@@ -21,7 +21,7 @@ public class Neo4jYAMLLoader extends YAMLLoader {
     protected void parseCSV(DriverWrapper.Session.Transaction tx, QueryTemplate template, CSVParser parser) throws IOException {
         for (CSVRecord record : parser.getRecords()) {
             Query interpolatedQuery = new Query(template.interpolate(record::get));
-            ((Neo4jDriverWrapper.Session.Transaction) tx).run(interpolatedQuery);
+            ((Neo4jDriverWrapper.Session.Transaction) tx).execute(interpolatedQuery);
         }
     }
 

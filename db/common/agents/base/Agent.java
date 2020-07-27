@@ -75,7 +75,7 @@ public abstract class Agent<T> implements AutoCloseable {
     }
 
     protected DriverWrapper.Session.Transaction transaction() {
-        return iterationContext.getIterationSessionFor(getSessionKey()).transaction();
+        return iterationContext.getIterationSessionFor(getSessionKey()).transactionWithTracing();
     }
 
     protected String getSessionKey() {

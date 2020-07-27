@@ -22,7 +22,7 @@ public abstract class FriendshipAgent extends CityAgent {
 
                 insertFriendship(friend1, friend2);
             }
-            tx().commit();
+            tx().commitWithTracing();
         }
     }
 

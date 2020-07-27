@@ -1,14 +1,13 @@
 package grakn.simulation.db.grakn.agents.interaction;
 
 import grakn.simulation.db.common.world.World;
+import grakn.simulation.db.grakn.driver.GraknClientWrapper.Session.Transaction;
 import graql.lang.Graql;
 import graql.lang.query.GraqlGet;
 import graql.lang.query.GraqlInsert;
 
 import java.time.LocalDateTime;
 import java.util.List;
-
-import static grakn.simulation.db.grakn.agents.interaction.ExecutorUtils.getOrderedAttribute;
 
 public class RelocationAgent extends grakn.simulation.db.common.agents.interaction.RelocationAgent {
 
@@ -30,7 +29,7 @@ public class RelocationAgent extends grakn.simulation.db.common.agents.interacti
         GraqlGet.Unfiltered cityResidentsQuery = cityResidentsQuery(city(), earliestDate);
         log().query("getResidentEmails", cityResidentsQuery);
         int numRelocations = world().getScaleFactor();
-        return ExecutorUtils.getOrderedAttribute(tx().forGrakn(), cityResidentsQuery, "email", numRelocations);
+        return ((Transaction)tx()).getOrderedAttribute(cityResidentsQuery, "email", numRelocations);
     }
 
     @Override
@@ -44,7 +43,7 @@ public class RelocationAgent extends grakn.simulation.db.common.agents.interacti
         ).get();
 
         log().query("getRelocationCityNames", relocationCitiesQuery);
-        return getOrderedAttribute(tx().forGrakn(), relocationCitiesQuery, "city-name");
+        return ((Transaction)tx()).getOrderedAttribute(relocationCitiesQuery, "city-name", null);
     }
 
     @Override

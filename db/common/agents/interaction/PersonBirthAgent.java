@@ -39,7 +39,7 @@ public abstract class PersonBirthAgent extends CityAgent {
                 insertPerson(email, gender, forename, surname);
             }
         }
-        tx().commit();
+        tx().commitWithTracing();
     }
 
     protected abstract void insertPerson(String email, String gender, String forename, String surname);

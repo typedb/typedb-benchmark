@@ -1,6 +1,6 @@
 package grakn.simulation.db.grakn.agents.interaction;
 
-import grakn.client.answer.Numeric;
+import grakn.simulation.db.grakn.driver.GraknClientWrapper.Session.Transaction;
 import graql.lang.Graql;
 import graql.lang.query.GraqlGet;
 import graql.lang.query.GraqlInsert;
@@ -15,7 +15,7 @@ public class FriendshipAgent extends grakn.simulation.db.common.agents.interacti
     protected List<String> getResidentEmails(LocalDateTime earliestDate) {
         GraqlGet cityResidentsQuery = cityResidentsQuery(city(), earliestDate);
         log().query("getResidentEmails", cityResidentsQuery);
-        return ExecutorUtils.getOrderedAttribute(tx().forGrakn(), cityResidentsQuery, "email");
+        return ((Transaction)tx()).getOrderedAttribute(cityResidentsQuery, "email", null);
     }
 
     protected void insertFriendship(String friend1Email, String friend2Email) {

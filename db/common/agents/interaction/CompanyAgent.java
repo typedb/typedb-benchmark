@@ -18,7 +18,7 @@ public abstract class CompanyAgent extends CountryAgent {
             String companyName = StringUtils.capitalize(adjective) + StringUtils.capitalize(noun) + "-" + companyNumber;
             insertCompany(companyNumber, companyName);
         }
-        tx().commit();
+        tx().commitWithTracing();
     }
 
     protected abstract void insertCompany(int companyNumber, String companyName);

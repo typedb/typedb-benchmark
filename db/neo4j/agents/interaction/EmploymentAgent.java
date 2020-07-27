@@ -51,6 +51,6 @@ public class EmploymentAgent extends grakn.simulation.db.common.agents.interacti
 
         Query insertEmploymentQuery = new Query(template, parameters);
         log().query("insertEmployment", insertEmploymentQuery);
-        ((Neo4jDriverWrapper.Session.Transaction) tx()).run(insertEmploymentQuery);
+        ((Neo4jDriverWrapper.Session.Transaction) tx()).execute(insertEmploymentQuery);
     }
 }

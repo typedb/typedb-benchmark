@@ -7,7 +7,7 @@ public abstract class AgeUpdateAgent extends CityAgent {
     @Override
     public final void iterate() {
         updateAgesOfAllPeople();
-        tx().commit();
+        tx().commitWithTracing();
     }
 
     protected abstract void updateAgesOfAllPeople();

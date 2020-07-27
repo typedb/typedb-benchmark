@@ -1,6 +1,7 @@
 package grakn.simulation.db.grakn.agents.interaction;
 
 import grakn.simulation.db.common.agents.utils.Pair;
+import grakn.simulation.db.grakn.driver.GraknClientWrapper.Session.Transaction;
 import graql.lang.Graql;
 import graql.lang.query.GraqlGet;
 import graql.lang.query.GraqlInsert;
@@ -8,7 +9,6 @@ import graql.lang.query.GraqlInsert;
 import java.util.List;
 
 import static grakn.simulation.db.grakn.agents.interaction.CompanyAgent.getCompanyNumbersInContinentQuery;
-import static grakn.simulation.db.grakn.agents.interaction.ExecutorUtils.getOrderedAttribute;
 import static grakn.simulation.db.grakn.agents.interaction.ProductAgent.getProductsInContinentQuery;
 
 public class TransactionAgent extends grakn.simulation.db.common.agents.interaction.TransactionAgent {
@@ -17,14 +17,14 @@ public class TransactionAgent extends grakn.simulation.db.common.agents.interact
     protected List<Long> getCompanyNumbersInContinent(){
         GraqlGet companiesQuery = getCompanyNumbersInContinentQuery(continent());
         log().query("getCompanyNumbersInCountry", companiesQuery);
-        return getOrderedAttribute(tx().forGrakn(), companiesQuery, "company-number");
+        return ((Transaction)tx()).getOrderedAttribute(companiesQuery, "company-number", null);
     }
 
     @Override
     protected List<Double> getProductBarcodesInContinent() {
         GraqlGet productsQuery = getProductsInContinentQuery(continent());
         log().query("getProductBarcodesInContinent", productsQuery);
-        return getOrderedAttribute(tx().forGrakn(), productsQuery, "product-barcode");
+        return ((Transaction)tx()).getOrderedAttribute(productsQuery, "product-barcode", null);
     }
 
     @Override

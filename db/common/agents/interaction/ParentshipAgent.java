@@ -40,7 +40,7 @@ public abstract class ParentshipAgent extends CityAgent {
 
                 insertParentShip(marriage, childEmails);
             }
-            tx().commit();
+            tx().commitWithTracing();
         }
     }
 

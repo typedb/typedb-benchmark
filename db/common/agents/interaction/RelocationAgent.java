@@ -35,7 +35,7 @@ public abstract class RelocationAgent extends CityAgent {
 
         Allocation.allocate(residentEmails, relocationCityNames, this::insertRelocation);
 
-        tx().commit();
+        tx().commitWithTracing();
     }
 
 //    TODO Should this be abstracted?

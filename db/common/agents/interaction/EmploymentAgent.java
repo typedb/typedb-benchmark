@@ -26,7 +26,7 @@ public abstract class EmploymentAgent extends CityAgent {
         List<Long> companyNumbers;
         employeeEmails = getEmployeeEmails(employmentDate);
         companyNumbers = getCompanyNumbers();
-        tx().commit();
+        tx().commitWithTracing();
         closeTx();
         // A second transaction is being used to circumvent graknlabs/grakn issue #5585
         allocate(employeeEmails, companyNumbers, (employeeEmail, companyNumber) -> {
@@ -35,7 +35,7 @@ public abstract class EmploymentAgent extends CityAgent {
             double contractedHours = randomAttributeGenerator().boundRandomDouble(MIN_CONTRACTED_HOURS, MAX_CONTRACTED_HOURS);
             insertEmployment(employeeEmail, companyNumber, employmentDate, wageValue, contractContent, contractedHours);
         });
-        tx().commit();
+        tx().commitWithTracing();
     }
 
     protected abstract List<Long> getCompanyNumbers();

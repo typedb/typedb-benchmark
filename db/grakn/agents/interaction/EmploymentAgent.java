@@ -1,5 +1,7 @@
 package grakn.simulation.db.grakn.agents.interaction;
 
+import grakn.simulation.db.grakn.driver.GraknClientWrapper;
+import grakn.simulation.db.grakn.driver.GraknClientWrapper.Session.Transaction;
 import graql.lang.Graql;
 import graql.lang.query.GraqlGet;
 import graql.lang.query.GraqlInsert;
@@ -16,7 +18,7 @@ public class EmploymentAgent extends grakn.simulation.db.common.agents.interacti
         GraqlGet companyNumbersQuery = CompanyAgent.getCompanyNumbersInCountryQuery(city().country());
         log().query("getCompanyNumbers", companyNumbersQuery);
         int numCompanies = world().getScaleFactor();
-        return ExecutorUtils.getOrderedAttribute(tx().forGrakn(), companyNumbersQuery, "company-number", numCompanies);
+        return ((Transaction)tx()).getOrderedAttribute(companyNumbersQuery, "company-number", numCompanies);
     }
 
     @Override
@@ -24,7 +26,7 @@ public class EmploymentAgent extends grakn.simulation.db.common.agents.interacti
         GraqlGet getEmployeeEmailsQuery = cityResidentsQuery(city(), earliestDate);
         log().query("getEmployeeEmails", getEmployeeEmailsQuery);
         int numEmployments = world().getScaleFactor();
-        return ExecutorUtils.getOrderedAttribute(tx().forGrakn(), getEmployeeEmailsQuery, "email", numEmployments);
+        return ((Transaction)tx()).getOrderedAttribute(getEmployeeEmailsQuery, "email", numEmployments);
     }
 
     @Override

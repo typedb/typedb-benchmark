@@ -249,7 +249,7 @@ public class Simulation implements IterationContext, AutoCloseable {
 
     private void closeAllSessionsInMap() {
         for (DriverWrapper.Session session : sessionMap.values()) {
-            session.close();
+            session.closeWithTracing();
         }
         sessionMap.clear();
     }
@@ -283,7 +283,7 @@ public class Simulation implements IterationContext, AutoCloseable {
     public void close() {
         closeAllSessionsInMap();
 
-        defaultSession.close();
+        defaultSession.closeWithTracing();
 
         if (driver != null) {
             driver.close();

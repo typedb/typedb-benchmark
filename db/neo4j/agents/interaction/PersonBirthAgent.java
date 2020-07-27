@@ -32,7 +32,7 @@ public class PersonBirthAgent extends grakn.simulation.db.common.agents.interact
         Query query = new Query(template, parameters);
 
         log().query("insertPerson", query); //TODO Figure out to log Neo4j's pre-prepared queries
-        ((Neo4jDriverWrapper.Session.Transaction) tx()).run(query);
+        ((Neo4jDriverWrapper.Session.Transaction) tx()).execute(query);
 
 //        TODO Key constraints are possible with Neo4j Enterprise, and some constraints are supported in Community
 //        https://neo4j.com/developer/kb/how-to-implement-a-primary-key-property-for-a-label/

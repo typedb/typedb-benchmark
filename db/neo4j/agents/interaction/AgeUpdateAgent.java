@@ -21,6 +21,6 @@ public class AgeUpdateAgent extends grakn.simulation.db.common.agents.interactio
         Query query = new Query(template, parameters);
 
         log().query("updateAgesOfAllPeople", query);
-        ((Neo4jDriverWrapper.Session.Transaction) tx()).run(query);
+        ((Neo4jDriverWrapper.Session.Transaction) tx()).execute(query);
     }
 }

@@ -13,7 +13,7 @@ public abstract class ProductAgent extends ContinentAgent {
             Double barcode = (double) uniqueId(i);
             insertProduct(barcode, productName, productDescription);
         }
-        tx().commit();
+        tx().commitWithTracing();
     }
 
     abstract protected void insertProduct(Double barcode, String productName, String productDescription);

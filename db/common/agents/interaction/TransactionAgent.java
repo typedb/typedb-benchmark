@@ -38,7 +38,7 @@ public abstract class TransactionAgent extends ContinentAgent {
             Boolean isTaxable = randomAttributeGenerator().bool();
             insertTransaction(transaction, sellerCompanyNumber, value, productQuantity, isTaxable);
         });
-        tx().commit();
+        tx().commitWithTracing();
     }
 
     abstract protected List<Long> getCompanyNumbersInContinent();

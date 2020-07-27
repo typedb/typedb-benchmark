@@ -25,7 +25,7 @@ public class ProductAgent extends grakn.simulation.db.common.agents.interaction.
         }};
         Query insertProductQuery = new Query(template, parameters);
         log().query("insertProduct", insertProductQuery);
-        ((Neo4jDriverWrapper.Session.Transaction) tx()).run(insertProductQuery);
+        ((Neo4jDriverWrapper.Session.Transaction) tx()).execute(insertProductQuery);
     }
 
     static Query getProductsInContinentQuery(World.Continent continent) {

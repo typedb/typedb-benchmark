@@ -1,6 +1,7 @@
 package grakn.simulation.db.grakn.agents.interaction;
 
 import grakn.client.answer.ConceptMap;
+import grakn.simulation.db.grakn.driver.GraknClientWrapper.Session.Transaction;
 import graql.lang.Graql;
 import graql.lang.query.GraqlGet;
 import graql.lang.query.GraqlInsert;
@@ -12,7 +13,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
-import static grakn.simulation.db.grakn.agents.interaction.ExecutorUtils.getOrderedAttribute;
 import static java.util.stream.Collectors.toList;
 
 public class ParentshipAgent extends grakn.simulation.db.common.agents.interaction.ParentshipAgent {
@@ -67,7 +67,7 @@ public class ParentshipAgent extends grakn.simulation.db.common.agents.interacti
         ).get();
 
         log().query("getChildrenEmails", childrenQuery);
-        return getOrderedAttribute(tx().forGrakn(), childrenQuery, "email");
+        return ((Transaction)tx()).getOrderedAttribute(childrenQuery, "email", null);
     }
 
     @Override
