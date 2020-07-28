@@ -76,4 +76,14 @@ public class AgeUpdateAgent extends grakn.simulation.db.common.agents.interactio
         });
         return peopleDobs;
     }
+
+    @Override
+    protected int checkCount() {
+        GraqlGet.Aggregate countQuery = Graql.match(
+                Graql.var("p").isa("person")
+                        .has("email", Graql.var("personEmail"))
+                        .has("age", Graql.var("age"))
+        ).get().count();
+        return tx().forGrakn().execute(countQuery).get().get(0).number().intValue();
+    }
 }

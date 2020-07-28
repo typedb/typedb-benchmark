@@ -12,6 +12,7 @@ public abstract class CompanyAgent extends CountryAgent {
     public final void iterate() {
 
         int numCompanies = world().getScaleFactor();
+        super.testCountUpperBound = numCompanies;
 
         for (int i = 0; i < numCompanies; i++) {
             String adjective = pickOne(world().getAdjectives());

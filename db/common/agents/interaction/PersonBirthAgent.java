@@ -7,10 +7,12 @@ import static grabl.tracing.client.GrablTracingThreadStatic.traceOnThread;
 
 public abstract class PersonBirthAgent extends CityAgent {
 
+    private int numBirths;
+
     @Override
     public final void iterate() {
         // Find bachelors and bachelorettes who are considered adults and who are not in a marriage and pair them off randomly
-        int numBirths = world().getScaleFactor();
+        numBirths = world().getScaleFactor();
         for (int i = 0; i < numBirths; i++) {
             String gender;
             String forename;

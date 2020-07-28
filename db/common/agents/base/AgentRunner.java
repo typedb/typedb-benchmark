@@ -24,6 +24,7 @@ public abstract class AgentRunner<T> {
     private Constructor<? extends Agent<T>> agentConstructor;
     private Logger logger;
     private Boolean traceAgent = true;
+    private int lastTestCount = 0;
 
     protected AgentRunner(Class<? extends Agent<T>> agentClass) {
         try {
@@ -66,6 +67,7 @@ public abstract class AgentRunner<T> {
             agent.init(iterationContext, agentRandom, item, sessionKey, tracker, logger, traceAgent && iterationContext.shouldTrace());
 //            agent.iterateWithTracing();
             agent.iterate(); // TODO Disabled for demo only
+            lastTestCount = agent.testByCount(lastTestCount);
 
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
             throw new RuntimeException(e);

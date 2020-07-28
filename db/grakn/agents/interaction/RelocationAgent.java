@@ -63,4 +63,28 @@ public class RelocationAgent extends grakn.simulation.db.common.agents.interacti
         log().query("insertRelocation", relocatePersonQuery);
         tx().forGrakn().execute(relocatePersonQuery);
     }
+
+    @Override
+    protected int checkCount() {
+        GraqlGet.Aggregate countQuery = Graql.match(
+                Graql.var("person").isa("person").has("email", Graql.var("email")),
+                Graql.var("old-city").isa("old-city").has("location-name", city().name()),
+                Graql.var("r").isa("residency")
+                        .rel("residency_resident", "person")
+                        .rel("residency_location", "old-city")
+                        .has("start-date", Graql.var("start-date")),
+                Graql.not(Graql.var("r").has("end-date", Graql.var("ed"))),
+//                Graql.var("start-date").lte(earliestDate),
+
+                Graql.var("new-city").isa("city").has("location-name", Graql.var("newCityName")),
+                Graql.var("old-city").isa("city").has("location-name", city().name()),
+
+                Graql.var("r").isa("relocation")
+                        .rel("relocation_previous-location", "old-city")
+                        .rel("relocation_new-location", "new-city")
+                        .rel("relocation_relocated-person", "person")
+                        .has("relocation-date", today())
+        ).get().count();
+        return tx().forGrakn().execute(countQuery).get().get(0).number().intValue();
+    }
 }

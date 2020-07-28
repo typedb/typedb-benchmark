@@ -10,7 +10,7 @@ public class AgeUpdateAgent extends grakn.simulation.db.common.agents.interactio
     @Override
     protected void updateAgesOfAllPeople() {
         String template = "" +
-                "MATCH (person:Person), (city:City {locationName: $cityName})\n" +
+                "MATCH (person:Person)-[:BORN_IN]->(city:City {locationName: $cityName})\n" +
                 "SET person.age = duration.between(person.dateOfBirth, localdatetime($dateToday)).years\n";
 
         HashMap<String, Object> parameters = new HashMap<String, Object>(){{

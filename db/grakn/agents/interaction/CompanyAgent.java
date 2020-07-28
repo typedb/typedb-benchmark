@@ -4,7 +4,6 @@ import grakn.simulation.db.common.world.World;
 import graql.lang.Graql;
 import graql.lang.query.GraqlGet;
 import graql.lang.query.GraqlInsert;
-import org.apache.commons.lang3.StringUtils;
 
 public class CompanyAgent extends grakn.simulation.db.common.agents.interaction.CompanyAgent {
 
@@ -51,5 +50,21 @@ public class CompanyAgent extends grakn.simulation.db.common.agents.interaction.
                         .rel("incorporation_incorporated", Graql.var("company"))
                         .rel("incorporation_incorporating", Graql.var("country"))
         ).get();
+    }
+
+    @Override
+    protected int checkCount() {
+        GraqlGet.Aggregate countQuery = Graql.match(
+                Graql.var("country").isa("country")
+                        .has("location-name", country().name()),
+                Graql.var("company").isa("company")
+                        .has("company-name", Graql.var("companyName"))
+                        .has("company-number", Graql.var("companyNumber")),
+                Graql.var("reg").isa("incorporation")
+                        .rel("incorporation_incorporated", Graql.var("company"))
+                        .rel("incorporation_incorporating", Graql.var("country"))
+                        .has("date-of-incorporation", today())
+        ).get().count();
+        return tx().forGrakn().execute(countQuery).get().get(0).number().intValue();
     }
 }

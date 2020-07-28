@@ -36,6 +36,8 @@ public abstract class Agent<T> implements AutoCloseable {
     private LogWrapper logWrapper;
     private ThreadContext context;
     private HashSet<String> tracedMethods = new HashSet<>();
+    protected Integer testCountUpperBound = null;
+    protected Integer testCountLowerBound = null;
 
     void init(IterationContext iterationContext, Random random, T item, String sessionKey, String tracker, Logger logger, Boolean trace) {
         this.iterationContext = iterationContext;
@@ -190,5 +192,24 @@ public abstract class Agent<T> implements AutoCloseable {
     protected String checkMethodTrace(String methodName) {
         CheckMethod.checkMethodExists(this, methodName);
         return methodName;
+    }
+
+    protected abstract int checkCount();
+
+    int testByCount(int previousCount) {
+        if (testCountUpperBound == null) {
+            throw new RuntimeException("An upper bound has not been set for the answer count");
+        }
+        if (testCountLowerBound == null) {
+            throw new RuntimeException("A lower bound has not been set for the answer count");
+        }
+        int count = checkCount();
+        int newlyInserted = count - previousCount;
+        if (newlyInserted < testCountLowerBound) {
+            throw new RuntimeException(String.format("Testing found that there were fewer results than expected. Expected more than &d, found %d", testCountLowerBound, count));
+        } else if (newlyInserted < testCountUpperBound) {
+            throw new RuntimeException(String.format("Testing found that there were more results than expected. Expected up to %d, found %d", testCountUpperBound, count));
+        }
+        return count;
     }
 }
