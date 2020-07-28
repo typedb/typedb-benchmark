@@ -8,20 +8,29 @@ import graql.lang.query.GraqlInsert;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 import java.util.stream.Stream;
+
+import static grabl.tracing.client.GrablTracingThreadStatic.ThreadTrace;
+import static grabl.tracing.client.GrablTracingThreadStatic.traceOnThread;
 
 public class AgeUpdateAgent extends grakn.simulation.db.common.agents.interaction.AgeUpdateAgent {
 
     @Override
     protected void updateAgesOfAllPeople() {
         // Get all people born in a city
-        Stream<ConceptMap> peopleAnswers = getPeopleBornInCity();
+        List<ConceptMap> peopleAnswers;
+        try (ThreadTrace trace = traceOnThread(this.checkMethodTrace("getPeopleBornInCity"))) {
+            peopleAnswers = getPeopleBornInCity();
+        }
         // Update their ages
         log().message("updateAgesOfAllPeople");
         peopleAnswers.forEach(personAnswer -> {
                     LocalDateTime dob = (LocalDateTime) personAnswer.get("dob").asAttribute().value();
                     long age = ChronoUnit.YEARS.between(dob, today());
-                    updatePersonAge(personAnswer.get("email").asAttribute().value().toString(), age);
+                    try (ThreadTrace trace = traceOnThread(this.checkMethodTrace("updatePersonAge"))) {
+                        updatePersonAge(personAnswer.get("email").asAttribute().value().toString(), age);
+                    }
                 }
         );
     }
@@ -48,7 +57,7 @@ public class AgeUpdateAgent extends grakn.simulation.db.common.agents.interactio
         tx().forGrakn().execute(insertNewAgeQuery);
     }
 
-    private Stream<ConceptMap> getPeopleBornInCity() {
+    private List<ConceptMap> getPeopleBornInCity() {
         GraqlGet.Sorted peopleQuery = Graql.match(
                 Graql.var("c").isa("city")
                         .has("location-name", city().toString()),
@@ -60,6 +69,6 @@ public class AgeUpdateAgent extends grakn.simulation.db.common.agents.interactio
                         .rel("born-in_place-of-birth", "c")
         ).get().sort("email");
         log().query("getPeopleBornInCity", peopleQuery);
-        return tx().forGrakn().stream(peopleQuery).get();
+        return tx().forGrakn().execute(peopleQuery).get();
     }
 }
