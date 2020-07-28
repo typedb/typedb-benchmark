@@ -1,6 +1,5 @@
 package grakn.simulation.db.grakn.agents.interaction;
 
-import grakn.client.answer.ConceptMap;
 import graql.lang.Graql;
 import graql.lang.query.GraqlDelete;
 import graql.lang.query.GraqlGet;
@@ -8,8 +7,7 @@ import graql.lang.query.GraqlInsert;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.List;
-import java.util.stream.Stream;
+import java.util.HashMap;
 
 import static grabl.tracing.client.GrablTracingThreadStatic.ThreadTrace;
 import static grabl.tracing.client.GrablTracingThreadStatic.traceOnThread;
@@ -19,17 +17,16 @@ public class AgeUpdateAgent extends grakn.simulation.db.common.agents.interactio
     @Override
     protected void updateAgesOfAllPeople() {
         // Get all people born in a city
-        List<ConceptMap> peopleAnswers;
+        HashMap<String, LocalDateTime> peopleAnswers;
         try (ThreadTrace trace = traceOnThread(this.checkMethodTrace("getPeopleBornInCity"))) {
             peopleAnswers = getPeopleBornInCity();
         }
         // Update their ages
         log().message("updateAgesOfAllPeople");
-        peopleAnswers.forEach(personAnswer -> {
-                    LocalDateTime dob = (LocalDateTime) personAnswer.get("dob").asAttribute().value();
-                    long age = ChronoUnit.YEARS.between(dob, today());
+        peopleAnswers.forEach((personEmail, personDob) -> {
+                    long age = ChronoUnit.YEARS.between(personDob, today());
                     try (ThreadTrace trace = traceOnThread(this.checkMethodTrace("updatePersonAge"))) {
-                        updatePersonAge(personAnswer.get("email").asAttribute().value().toString(), age);
+                        updatePersonAge(personEmail, age);
                     }
                 }
         );
@@ -57,7 +54,7 @@ public class AgeUpdateAgent extends grakn.simulation.db.common.agents.interactio
         tx().forGrakn().execute(insertNewAgeQuery);
     }
 
-    private List<ConceptMap> getPeopleBornInCity() {
+    private HashMap<String, LocalDateTime> getPeopleBornInCity() {
         GraqlGet.Sorted peopleQuery = Graql.match(
                 Graql.var("c").isa("city")
                         .has("location-name", city().toString()),
@@ -69,6 +66,14 @@ public class AgeUpdateAgent extends grakn.simulation.db.common.agents.interactio
                         .rel("born-in_place-of-birth", "c")
         ).get().sort("email");
         log().query("getPeopleBornInCity", peopleQuery);
-        return tx().forGrakn().execute(peopleQuery).get();
+
+        HashMap<String, LocalDateTime> peopleDobs = new HashMap<>();
+
+        tx().forGrakn().execute(peopleQuery).get().forEach(personAnswer -> {
+            LocalDateTime dob = (LocalDateTime) personAnswer.get("dob").asAttribute().value();
+            String email = personAnswer.get("email").asAttribute().value().toString();
+            peopleDobs.put(email, dob);
+        });
+        return peopleDobs;
     }
 }
