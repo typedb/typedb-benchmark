@@ -5,6 +5,17 @@ import graql.lang.query.GraqlInsert;
 
 import static grabl.tracing.client.GrablTracingThreadStatic.ThreadTrace;
 import static grabl.tracing.client.GrablTracingThreadStatic.traceOnThread;
+import static grakn.simulation.db.grakn.schema.Schema.BORN_IN;
+import static grakn.simulation.db.grakn.schema.Schema.BORN_IN_CHILD;
+import static grakn.simulation.db.grakn.schema.Schema.BORN_IN_PLACE_OF_BIRTH;
+import static grakn.simulation.db.grakn.schema.Schema.CITY;
+import static grakn.simulation.db.grakn.schema.Schema.DATE_OF_BIRTH;
+import static grakn.simulation.db.grakn.schema.Schema.EMAIL;
+import static grakn.simulation.db.grakn.schema.Schema.FORENAME;
+import static grakn.simulation.db.grakn.schema.Schema.GENDER;
+import static grakn.simulation.db.grakn.schema.Schema.LOCATION_NAME;
+import static grakn.simulation.db.grakn.schema.Schema.PERSON;
+import static grakn.simulation.db.grakn.schema.Schema.SURNAME;
 
 public class PersonBirthAgent extends grakn.simulation.db.common.agents.interaction.PersonBirthAgent {
 
@@ -12,17 +23,17 @@ public class PersonBirthAgent extends grakn.simulation.db.common.agents.interact
     protected void insertPerson(String email, String gender, String forename, String surname) {
         GraqlInsert query =
                 Graql.match(
-                        Graql.var("c").isa("city")
-                                .has("location-name", city().toString()))
-                        .insert(Graql.var("p").isa("person")
-                                        .has("email", email)
-                                        .has("date-of-birth", today())
-                                        .has("gender", gender)
-                                        .has("forename", forename)
-                                        .has("surname", surname),
-                                Graql.var("b").isa("born-in")
-                                        .rel("born-in_child", "p")
-                                        .rel("born-in_place-of-birth", "c")
+                        Graql.var("c").isa(CITY)
+                                .has(LOCATION_NAME, city().toString()))
+                        .insert(Graql.var("p").isa(PERSON)
+                                        .has(EMAIL, email)
+                                        .has(DATE_OF_BIRTH, today())
+                                        .has(GENDER, gender)
+                                        .has(FORENAME, forename)
+                                        .has(SURNAME, surname),
+                                Graql.var("b").isa(BORN_IN)
+                                        .rel(BORN_IN_CHILD, "p")
+                                        .rel(BORN_IN_PLACE_OF_BIRTH, "c")
                         );
         log().query("insertPerson", query);
         try (ThreadTrace trace = traceOnThread("execute")) {

@@ -10,36 +10,53 @@ import java.util.List;
 
 import static grabl.tracing.client.GrablTracingThreadStatic.ThreadTrace;
 import static grabl.tracing.client.GrablTracingThreadStatic.traceOnThread;
+import static grakn.simulation.db.grakn.schema.Schema.CITY;
+import static grakn.simulation.db.grakn.schema.Schema.DATE_OF_BIRTH;
+import static grakn.simulation.db.grakn.schema.Schema.EMAIL;
+import static grakn.simulation.db.grakn.schema.Schema.END_DATE;
+import static grakn.simulation.db.grakn.schema.Schema.GENDER;
+import static grakn.simulation.db.grakn.schema.Schema.LOCATES;
+import static grakn.simulation.db.grakn.schema.Schema.LOCATES_LOCATED;
+import static grakn.simulation.db.grakn.schema.Schema.LOCATES_LOCATION;
+import static grakn.simulation.db.grakn.schema.Schema.LOCATION_NAME;
+import static grakn.simulation.db.grakn.schema.Schema.MARRIAGE;
+import static grakn.simulation.db.grakn.schema.Schema.MARRIAGE_HUSBAND;
+import static grakn.simulation.db.grakn.schema.Schema.MARRIAGE_ID;
+import static grakn.simulation.db.grakn.schema.Schema.MARRIAGE_WIFE;
+import static grakn.simulation.db.grakn.schema.Schema.PERSON;
+import static grakn.simulation.db.grakn.schema.Schema.RESIDENCY;
+import static grakn.simulation.db.grakn.schema.Schema.RESIDENCY_LOCATION;
+import static grakn.simulation.db.grakn.schema.Schema.RESIDENCY_RESIDENT;
 
 public class MarriageAgent extends grakn.simulation.db.common.agents.interaction.MarriageAgent {
 
     @Override
     protected List<String> getSingleWomen() {
-        return getSinglePeopleOfGenderQuery("getSingleWomen", "female", "marriage_wife");
+        return getSinglePeopleOfGenderQuery("getSingleWomen", "female", MARRIAGE_WIFE);
     }
 
     @Override
     protected List<String> getSingleMen() {
-        return getSinglePeopleOfGenderQuery("getSingleMen", "male", "marriage_husband");
+        return getSinglePeopleOfGenderQuery("getSingleMen", "male", MARRIAGE_HUSBAND);
     }
 
     private List<String> getSinglePeopleOfGenderQuery(String scope, String gender, String marriageRole) {
-        Statement personVar = Graql.var("p");
-        Statement cityVar = Graql.var("city");
+        Statement personVar = Graql.var(PERSON);
+        Statement cityVar = Graql.var(CITY);
 
         GraqlGet query = Graql.match(
-                personVar.isa("person").has("gender", gender).has("email", Graql.var("email")).has("date-of-birth", Graql.var("dob")),
-                Graql.var("dob").lte(dobOfAdults()),
-                Graql.not(Graql.var("m").isa("marriage").rel(marriageRole, personVar)),
-                Graql.var("r").isa("residency").rel("residency_resident", personVar).rel("residency_location", cityVar),
-                Graql.not(Graql.var("r").has("end-date", Graql.var("ed"))),
-                cityVar.isa("city").has("location-name", city().name())
-        ).get("email");
+                personVar.isa(PERSON).has(GENDER, gender).has(EMAIL, Graql.var(EMAIL)).has(DATE_OF_BIRTH, Graql.var(DATE_OF_BIRTH)),
+                Graql.var(DATE_OF_BIRTH).lte(dobOfAdults()),
+                Graql.not(Graql.var("m").isa(MARRIAGE).rel(marriageRole, personVar)),
+                Graql.var("r").isa(RESIDENCY).rel(RESIDENCY_RESIDENT, personVar).rel(RESIDENCY_LOCATION, cityVar),
+                Graql.not(Graql.var("r").has(END_DATE, Graql.var(END_DATE))),
+                cityVar.isa(CITY).has(LOCATION_NAME, city().name())
+        ).get(EMAIL);
 
         log().query(scope, query);
         List<String> result;
         try (ThreadTrace trace = traceOnThread("execute")) {
-            result = ((Transaction)tx()).getOrderedAttribute(query, "email", null);
+            result = ((Transaction)tx()).getOrderedAttribute(query, EMAIL, null);
         }
         return result;
     }
@@ -48,15 +65,15 @@ public class MarriageAgent extends grakn.simulation.db.common.agents.interaction
     protected void insertMarriage(int marriageIdentifier, String wifeEmail, String husbandEmail) {
 
         GraqlInsert marriageQuery = Graql.match(
-                Graql.var("husband").isa("person").has("email", husbandEmail),
-                Graql.var("wife").isa("person").has("email", wifeEmail),
-                Graql.var("city").isa("city").has("location-name", city().name())
+                Graql.var("husband").isa(PERSON).has(EMAIL, husbandEmail),
+                Graql.var("wife").isa(PERSON).has(EMAIL, wifeEmail),
+                Graql.var(CITY).isa(CITY).has(LOCATION_NAME, city().name())
         ).insert(
-                Graql.var("m").isa("marriage")
-                        .rel("marriage_husband", "husband")
-                        .rel("marriage_wife", "wife")
-                        .has("marriage-id", marriageIdentifier),
-                Graql.var().isa("locates").rel("locates_located", Graql.var("m")).rel("locates_location", Graql.var("city"))
+                Graql.var("m").isa(MARRIAGE)
+                        .rel(MARRIAGE_HUSBAND, "husband")
+                        .rel(MARRIAGE_WIFE, "wife")
+                        .has(MARRIAGE_ID, marriageIdentifier),
+                Graql.var().isa(LOCATES).rel(LOCATES_LOCATED, Graql.var("m")).rel(LOCATES_LOCATION, Graql.var(CITY))
         );
         log().query("insertMarriage", marriageQuery);
         try (ThreadTrace trace = traceOnThread("execute")) {
