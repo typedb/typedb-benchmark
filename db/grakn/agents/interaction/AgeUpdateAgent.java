@@ -1,15 +1,16 @@
 package grakn.simulation.db.grakn.agents.interaction;
 
+import grakn.simulation.db.grakn.driver.GraknClientWrapper.Session.Transaction;
 import graql.lang.Graql;
 import graql.lang.query.GraqlDelete;
 import graql.lang.query.GraqlGet;
 import graql.lang.query.GraqlInsert;
+import graql.lang.statement.Statement;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 
-import static com.google.common.net.HttpHeaders.AGE;
 import static grabl.tracing.client.GrablTracingThreadStatic.ThreadTrace;
 import static grabl.tracing.client.GrablTracingThreadStatic.traceOnThread;
 import static grakn.simulation.db.grakn.schema.Schema.BORN_IN;
@@ -20,6 +21,7 @@ import static grakn.simulation.db.grakn.schema.Schema.DATE_OF_BIRTH;
 import static grakn.simulation.db.grakn.schema.Schema.EMAIL;
 import static grakn.simulation.db.grakn.schema.Schema.LOCATION_NAME;
 import static grakn.simulation.db.grakn.schema.Schema.PERSON;
+import static grakn.simulation.db.grakn.schema.Schema.AGE;
 
 public class AgeUpdateAgent extends grakn.simulation.db.common.agents.interaction.AgeUpdateAgent {
 
@@ -42,20 +44,28 @@ public class AgeUpdateAgent extends grakn.simulation.db.common.agents.interactio
     }
 
     private void updatePersonAge(String personEmail, long newAge) {
+        Statement person = Graql.var(PERSON);
+        Statement age = Graql.var(AGE);
         GraqlDelete deleteImplicitQuery = Graql.match(
-                Graql.var(PERSON).isa(PERSON)
+                person
+                        .isa(PERSON)
                         .has(EMAIL, personEmail)
-                        .has(AGE, Graql.var(AGE))
-        ).delete(Graql.var(PERSON).has(AGE, Graql.var(AGE)));
+                        .has(AGE, age)
+        ).delete(
+                person
+                        .has(AGE, age
+                        )
+        );
 
         log().query("deleteImplicitQuery", deleteImplicitQuery);
         tx().forGrakn().execute(deleteImplicitQuery);
 
         GraqlInsert insertNewAgeQuery = Graql.match(
-                Graql.var(PERSON).isa(PERSON)
+                person
+                        .isa(PERSON)
                         .has(EMAIL, personEmail)
         ).insert(
-                Graql.var(PERSON)
+                person
                         .has(AGE, newAge)
         );
 
@@ -64,15 +74,21 @@ public class AgeUpdateAgent extends grakn.simulation.db.common.agents.interactio
     }
 
     private HashMap<String, LocalDateTime> getPeopleBornInCity() {
+        Statement city = Graql.var(CITY);
+        Statement person = Graql.var(PERSON);
+        Statement bornIn = Graql.var(BORN_IN);
+        Statement dobVar = Graql.var(DATE_OF_BIRTH);
+        Statement emailVar = Graql.var(EMAIL);
+
         GraqlGet.Sorted peopleQuery = Graql.match(
-                Graql.var(CITY).isa(CITY)
+                city.isa(CITY)
                         .has(LOCATION_NAME, city().toString()),
-                Graql.var(PERSON).isa(PERSON)
-                        .has(EMAIL, Graql.var(EMAIL))
-                        .has(DATE_OF_BIRTH, Graql.var(DATE_OF_BIRTH)),
-                Graql.var(BORN_IN).isa(BORN_IN)
-                        .rel(BORN_IN_CHILD, PERSON)
-                        .rel(BORN_IN_PLACE_OF_BIRTH, CITY)
+                person.isa(PERSON)
+                        .has(EMAIL, emailVar)
+                        .has(DATE_OF_BIRTH, dobVar),
+                bornIn.isa(BORN_IN)
+                        .rel(BORN_IN_CHILD, person)
+                        .rel(BORN_IN_PLACE_OF_BIRTH, city)
         ).get().sort(EMAIL);
         log().query("getPeopleBornInCity", peopleQuery);
 
@@ -88,15 +104,29 @@ public class AgeUpdateAgent extends grakn.simulation.db.common.agents.interactio
 
     @Override
     protected int checkCount() {
-        if(simulationStep() == 0) {
+        Statement city = Graql.var(CITY);
+        Statement person = Graql.var(PERSON);
+        Statement bornIn = Graql.var(BORN_IN);
+        Statement dobVar = Graql.var(DATE_OF_BIRTH);
+        Statement emailVar = Graql.var(EMAIL);
+        Statement age = Graql.var(AGE);
+
+        if (simulationStep() == 0) {
             GraqlGet.Aggregate countQuery = Graql.match(
-                    Graql.var(PERSON).isa(PERSON)
-                            .has(EMAIL, Graql.var(EMAIL))
-                            .has(AGE, Graql.var(AGE))
+                    city.isa(CITY)
+                            .has(LOCATION_NAME, city().toString()),
+                    person.isa(PERSON)
+                            .has(EMAIL, emailVar)
+                            .has(DATE_OF_BIRTH, dobVar)
+                            .has(AGE, age),
+                    bornIn.isa(BORN_IN)
+                            .rel(BORN_IN_CHILD, person)
+                            .rel(BORN_IN_PLACE_OF_BIRTH, city)
             ).get().count();
-            return tx().forGrakn().execute(countQuery).get().get(0).number().intValue();
+            log().query("checkCount", countQuery);
+            return ((Transaction) tx()).count(countQuery);
         } else {
-            return 0; // TODO Actually return the number of people born in the last iteration
+            return world().getScaleFactor(); // TODO Actually return the number of people born in the last iteration
         }
     }
 }

@@ -1,6 +1,7 @@
 package grakn.simulation.db.common.agents.interaction;
 
 import grabl.tracing.client.GrablTracingThreadStatic.ThreadTrace;
+import grakn.simulation.db.common.agents.utils.Pair;
 import grakn.simulation.db.common.agents.world.CityAgent;
 
 import java.time.LocalDateTime;
@@ -29,11 +30,15 @@ public abstract class FriendshipAgent extends CityAgent {
                     insertFriendship(friend1, friend2);
                 }
             }
-            tx().commitWithTracing();
+            commitTxWithTracing();
         }
     }
 
     protected abstract List<String> getResidentEmails(LocalDateTime earliestDate);
 
     protected abstract void insertFriendship(String friend1Email, String friend2Email);
+
+    protected Pair<Integer, Integer> countBounds() {
+        return new Pair<>(0, world().getScaleFactor());
+    }
 }

@@ -1,6 +1,8 @@
 package grakn.simulation.db.grakn.agents.interaction;
 
+import grakn.simulation.db.grakn.driver.GraknClientWrapper.Session.Transaction;
 import graql.lang.Graql;
+import graql.lang.query.GraqlGet;
 import graql.lang.query.GraqlInsert;
 
 import static grabl.tracing.client.GrablTracingThreadStatic.ThreadTrace;
@@ -39,5 +41,14 @@ public class PersonBirthAgent extends grakn.simulation.db.common.agents.interact
         try (ThreadTrace trace = traceOnThread("execute")) {
             tx().forGrakn().execute(query);
         }
+    }
+
+    @Override
+    protected int checkCount() {
+//        GraqlGet.Aggregate countQuery = Graql.match(
+//
+//        ).get().count();
+//        return ((Transaction) tx()).count(countQuery);
+        return 0;
     }
 }

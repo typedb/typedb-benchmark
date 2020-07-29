@@ -1,6 +1,7 @@
 package grakn.simulation.db.common.agents.interaction;
 
 import grakn.simulation.db.common.agents.utils.Allocation;
+import grakn.simulation.db.common.agents.utils.Pair;
 import grakn.simulation.db.common.agents.world.CityAgent;
 
 import java.time.LocalDate;
@@ -45,8 +46,7 @@ public abstract class RelocationAgent extends CityAgent {
                 insertRelocation(residentEmail, relocationCityName);
             }
         });
-
-        tx().commitWithTracing();
+        commitTxWithTracing();
     }
 
 //    TODO Should this be abstracted?
@@ -57,4 +57,8 @@ public abstract class RelocationAgent extends CityAgent {
     abstract protected List<String> getRelocationCityNames();
 
     abstract protected void insertRelocation(String email, String newCityName);
+
+    protected Pair<Integer, Integer> countBounds() {
+        return new Pair<>(0, world().getScaleFactor());
+    }
 }

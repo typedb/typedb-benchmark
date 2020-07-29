@@ -55,4 +55,9 @@ public class TransactionAgent extends grakn.simulation.db.common.agents.interact
         log().query("insertTransaction", insertTransactionQuery);
         ((Neo4jDriverWrapper.Session.Transaction) tx()).execute(insertTransactionQuery);
     }
+
+    @Override
+    protected int checkCount() {
+        return 0;
+    }
 }

@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static com.google.common.collect.Iterables.getOnlyElement;
 import static grabl.tracing.client.GrablTracingThreadStatic.traceOnThread;
 import static grakn.simulation.db.common.driver.DriverWrapper.TracingLabel.STREAM_AND_SORT;
 
@@ -56,6 +57,8 @@ public class GraknClientWrapper implements DriverWrapper {
 
         public class Transaction extends DriverWrapper.Session.Transaction {
 
+            boolean closed = false;
+
             private GraknClient.Transaction transaction;
 
             Transaction(GraknClient.Transaction transaction) {
@@ -65,19 +68,28 @@ public class GraknClientWrapper implements DriverWrapper {
             @Override
             public void close() {
                 transaction.close();
+                closed = true;
             }
 
             @Override
             public void commit() {
                 transaction.commit();
+                closed = true;
+            }
+            private void throwIfClosed() {
+                if (closed) {
+                    throw new RuntimeException("Transaction is closed, please open a new one.");
+                }
             }
 
             @Override
             public GraknClient.Transaction forGrakn() {
+                throwIfClosed();
                 return transaction;
             }
 
             public <T> List<T> getOrderedAttribute(GraqlGet query, String attributeName, Integer limit){
+                throwIfClosed();
                 List<T> result;
                 try (GrablTracingThreadStatic.ThreadTrace trace = traceOnThread(STREAM_AND_SORT.getName())) {
                     Stream<T> answerStream = transaction.stream(query).get()
@@ -89,6 +101,11 @@ public class GraknClientWrapper implements DriverWrapper {
                     result = answerStream.collect(Collectors.toList());
                 }
                 return result;
+            }
+
+            public int count(GraqlGet.Aggregate countQuery) {
+                throwIfClosed();
+                return getOnlyElement(transaction.execute(countQuery).get()).number().intValue();
             }
 
 //            @Override

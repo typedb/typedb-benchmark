@@ -1,5 +1,7 @@
 package grakn.simulation.db.common.agents.interaction;
 
+import grabl.tracing.client.GrablTracingThreadStatic;
+import grakn.simulation.db.common.agents.utils.Pair;
 import grakn.simulation.db.common.agents.world.CityAgent;
 
 import java.time.LocalDateTime;
@@ -32,10 +34,9 @@ public abstract class EmploymentAgent extends CityAgent {
         try (ThreadTrace trace = traceOnThread(this.registerMethodTrace("getCompanyNumbers"))) {
             companyNumbers = getCompanyNumbers();
         }
-        tx().commitWithTracing();
-        closeTx();
+        commitTxWithTracing();
         // A second transaction is being used to circumvent graknlabs/grakn issue #5585
-        allocate(employeeEmails, companyNumbers, (employeeEmail, companyNumber) -> {
+        boolean allocated = allocate(employeeEmails, companyNumbers, (employeeEmail, companyNumber) -> {
             double wageValue = randomAttributeGenerator().boundRandomDouble(MIN_ANNUAL_WAGE, MAX_ANNUAL_WAGE);
             String contractContent = randomAttributeGenerator().boundRandomLengthRandomString(MIN_CONTRACT_CHARACTER_LENGTH, MAX_CONTRACT_CHARACTER_LENGTH);
             double contractedHours = randomAttributeGenerator().boundRandomDouble(MIN_CONTRACTED_HOURS, MAX_CONTRACTED_HOURS);
@@ -43,7 +44,9 @@ public abstract class EmploymentAgent extends CityAgent {
                 insertEmployment(employeeEmail, companyNumber, employmentDate, wageValue, contractContent, contractedHours);
             }
         });
-        tx().commitWithTracing();
+        if (allocated) {
+            commitTxWithTracing();
+        }
     }
 
     protected abstract List<Long> getCompanyNumbers();
@@ -51,4 +54,8 @@ public abstract class EmploymentAgent extends CityAgent {
     protected abstract List<String> getEmployeeEmails(LocalDateTime earliestDate);
 
     protected abstract void insertEmployment(String employeeEmail, long companyNumber, LocalDateTime employmentDate, double wageValue, String contractContent, double contractedHours);
+
+    protected Pair<Integer, Integer> countBounds() {
+        return new Pair<>(0, world().getScaleFactor());
+    }
 }

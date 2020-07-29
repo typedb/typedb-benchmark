@@ -10,14 +10,15 @@ public class Schema {
     public static final String COMPANY_NUMBER = "company-number";
 
     public static final String INCORPORATION = "incorporation";
-    public static final String INCORPORATION_INCORPORATED = "incorporation-incorporated";
-    public static final String INCORPORATION_INCORPORATING = "incorporation-incorporating";
+    public static final String INCORPORATION_INCORPORATED = "incorporation_incorporated";
+    public static final String INCORPORATION_INCORPORATING = "incorporation_incorporating";
     public static final String DATE_OF_INCORPORATION = "date-of-incorporation";
 
 
     public static final String PERSON = "person";
     public static final String EMAIL = "email";
     public static final String DATE_OF_BIRTH = "date-of-birth";
+    public static final String AGE = "age";
     public static final String GENDER = "gender";
     public static final String FORENAME = "forename";
     public static final String SURNAME = "surname";
@@ -59,7 +60,7 @@ public class Schema {
     public static final String CONTRACT_CONTENT = "contract-content";
     public static final String CONTRACTED_HOURS = "contracted-hours";
 
-    public static final String CONTRACT = "contract";
+    public static final String CONTRACT = "employment-contract";
 
     public static final String WAGE = "wage";
     public static final String WAGE_VALUE = "wage-value";

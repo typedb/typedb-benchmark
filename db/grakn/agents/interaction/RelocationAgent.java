@@ -99,7 +99,7 @@ public class RelocationAgent extends grakn.simulation.db.common.agents.interacti
     protected int checkCount() {
         GraqlGet.Aggregate countQuery = Graql.match(
                 Graql.var(PERSON).isa(PERSON).has(EMAIL, Graql.var(EMAIL)),
-                Graql.var("old-city").isa("old-city").has(LOCATION_NAME, city().name()),
+                Graql.var("old-city").isa(CITY).has(LOCATION_NAME, city().name()),
                 Graql.var(RESIDENCY).isa(RESIDENCY)
                         .rel(RESIDENCY_RESIDENT, PERSON)
                         .rel(RESIDENCY_LOCATION, "old-city")
@@ -116,6 +116,8 @@ public class RelocationAgent extends grakn.simulation.db.common.agents.interacti
                         .rel(RELOCATION_RELOCATED_PERSON, PERSON)
                         .has(RELOCATION_DATE, today())
         ).get().count();
-        return tx().forGrakn().execute(countQuery).get().get(0).number().intValue();
+        log().query("checkCount", countQuery);
+        return ((Transaction) tx()).count(countQuery);
     }
+
 }

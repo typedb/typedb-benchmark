@@ -1,6 +1,7 @@
 package grakn.simulation.db.grakn.agents.interaction;
 
 import grakn.simulation.db.common.world.World;
+import grakn.simulation.db.grakn.driver.GraknClientWrapper.Session.Transaction;
 import graql.lang.Graql;
 import graql.lang.query.GraqlGet;
 import graql.lang.query.GraqlInsert;
@@ -52,5 +53,14 @@ public class ProductAgent extends grakn.simulation.db.common.agents.interaction.
                         .rel(PRODUCED_IN_CONTINENT, Graql.var(CONTINENT))
 
         ).get();
+    }
+
+    @Override
+    protected int checkCount() {
+//        GraqlGet.Aggregate countQuery = Graql.match(
+//
+//        ).get().count();
+//        return ((Transaction) tx()).count(countQuery);
+        return 0;
     }
 }

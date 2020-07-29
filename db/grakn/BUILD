@@ -8,6 +8,7 @@ java_library(
     ]),
     visibility = ["//visibility:public"],
     deps = [
+        "//db/grakn/schema",
         "//db/common/agents",
         "//db/common/driver",
         "//db/common/initialise",
@@ -18,5 +19,6 @@ java_library(
         "@graknlabs_graql//java:graql",
         "@maven//:org_apache_commons_commons_csv",
         "@maven//:org_apache_commons_commons_lang3",
+        "@maven//:com_google_guava_guava",
     ],
 )

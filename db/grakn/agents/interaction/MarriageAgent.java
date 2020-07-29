@@ -5,6 +5,7 @@ import graql.lang.Graql;
 import graql.lang.query.GraqlGet;
 import graql.lang.query.GraqlInsert;
 import graql.lang.statement.Statement;
+import graql.lang.statement.StatementAttribute;
 
 import java.util.List;
 
@@ -63,21 +64,56 @@ public class MarriageAgent extends grakn.simulation.db.common.agents.interaction
 
     @Override
     protected void insertMarriage(int marriageIdentifier, String wifeEmail, String husbandEmail) {
+        Statement husband = Graql.var("husband");
+        Statement wife = Graql.var("wife");
+        Statement city = Graql.var(CITY);
+        Statement marriage = Graql.var("m");
+
+        StatementAttribute cityNameVar = Graql.var().val(city().name());
+        StatementAttribute marriageIdentifierVar = Graql.var().val(marriageIdentifier);
+        StatementAttribute husbandEmailVar = Graql.var().val(husbandEmail);
+        StatementAttribute wifeEmailVar = Graql.var().val(wifeEmail);
 
         GraqlInsert marriageQuery = Graql.match(
-                Graql.var("husband").isa(PERSON).has(EMAIL, husbandEmail),
-                Graql.var("wife").isa(PERSON).has(EMAIL, wifeEmail),
-                Graql.var(CITY).isa(CITY).has(LOCATION_NAME, city().name())
+                husband.isa(PERSON).has(EMAIL, husbandEmailVar),
+                wife.isa(PERSON).has(EMAIL, wifeEmailVar),
+                city.isa(CITY).has(LOCATION_NAME, cityNameVar)
         ).insert(
-                Graql.var("m").isa(MARRIAGE)
-                        .rel(MARRIAGE_HUSBAND, "husband")
-                        .rel(MARRIAGE_WIFE, "wife")
-                        .has(MARRIAGE_ID, marriageIdentifier),
-                Graql.var().isa(LOCATES).rel(LOCATES_LOCATED, Graql.var("m")).rel(LOCATES_LOCATION, Graql.var(CITY))
+                marriage.isa(MARRIAGE)
+                        .rel(MARRIAGE_HUSBAND, husband)
+                        .rel(MARRIAGE_WIFE, wife)
+                        .has(MARRIAGE_ID, marriageIdentifierVar),
+                Graql.var().isa(LOCATES).rel(LOCATES_LOCATED, marriage).rel(LOCATES_LOCATION, city)
         );
         log().query("insertMarriage", marriageQuery);
         try (ThreadTrace trace = traceOnThread("execute")) {
             tx().forGrakn().execute(marriageQuery);
         }
+    }
+
+    @Override
+    protected int checkCount() {
+        Statement husband = Graql.var("husband");
+        Statement wife = Graql.var("wife");
+        Statement city = Graql.var(CITY);
+        Statement marriage = Graql.var(MARRIAGE);
+
+        Statement cityNameVar = Graql.var().val(city().name());
+        Statement marriageIdentifierVar = Graql.var(MARRIAGE_ID);
+        Statement wifeEmailVar = Graql.var("wife-email");
+        Statement husbandEmailVar = Graql.var("husband-email");
+
+        GraqlGet.Aggregate countQuery = Graql.match(
+                husband.isa(PERSON).has(EMAIL, husbandEmailVar),
+                wife.isa(PERSON).has(EMAIL, wifeEmailVar),
+                city.isa(CITY).has(LOCATION_NAME, cityNameVar),
+                marriage.isa(MARRIAGE)
+                        .rel(MARRIAGE_WIFE, wife)
+                        .rel(MARRIAGE_HUSBAND, husband)
+                        .has(MARRIAGE_ID, marriageIdentifierVar),
+                Graql.var().isa(LOCATES).rel(LOCATES_LOCATED, marriage).rel(LOCATES_LOCATION, city)
+        ).get().count();
+        log().query("checkCount", countQuery);
+        return ((Transaction) tx()).count(countQuery);
     }
 }

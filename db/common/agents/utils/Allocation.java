@@ -30,7 +30,7 @@ public class Allocation {
         return allocationMap;
     }
 
-    public static <T, U> void allocate(List<T> toAllocate, List<U> buckets, BiConsumer<T, U> insertFunction) {
+    public static <T, U> boolean allocate(List<T> toAllocate, List<U> buckets, BiConsumer<T, U> insertFunction) {
         if (toAllocate.size() > 0 && buckets.size() > 0) {
 
             List<Integer> allocations = Allocation.allocateEvenly(toAllocate.size(), buckets.size());
@@ -40,6 +40,8 @@ public class Allocation {
                 U bucket = buckets.get(allocations.get(i));
                 insertFunction.accept(item, bucket);
             }
+            return true;
         }
+        return false;
     }
 }

@@ -75,4 +75,9 @@ public class ParentshipAgent extends grakn.simulation.db.common.agents.interacti
             ((Neo4jDriverWrapper.Session.Transaction) tx()).execute(parentshipQuery);
         }
     }
+
+    @Override
+    protected int checkCount() {
+        return 0;
+    }
 }

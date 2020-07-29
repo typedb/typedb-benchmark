@@ -29,14 +29,14 @@ java_binary(
     name = "simulation",
     args = [
         "$(locations //db/common/data)",
-        "$(locations //db/grakn/schema)",
+        "$(locations //db/grakn/schema:graql-schema)",
         "$(locations //db/grakn/data)",
         "$(locations //db/neo4j/data)",
     ],
     data = [
         "//config:config.yaml",
         "//db/common/data",
-        "//db/grakn/schema",
+        "//db/grakn/schema:graql-schema",
         "//db/grakn/data",
         "//db/neo4j/data",
     ],

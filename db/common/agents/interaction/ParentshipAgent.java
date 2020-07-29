@@ -2,6 +2,7 @@ package grakn.simulation.db.common.agents.interaction;
 
 import grabl.tracing.client.GrablTracingThreadStatic.ThreadTrace;
 import grakn.simulation.db.common.agents.utils.Allocation;
+import grakn.simulation.db.common.agents.utils.Pair;
 import grakn.simulation.db.common.agents.world.CityAgent;
 
 import java.time.LocalDateTime;
@@ -48,7 +49,7 @@ public abstract class ParentshipAgent extends CityAgent {
                     insertParentShip(marriage, childEmails);
                 }
             }
-            tx().commitWithTracing();
+            commitTxWithTracing();
         }
     }
 
@@ -57,4 +58,8 @@ public abstract class ParentshipAgent extends CityAgent {
     abstract protected List<String> getChildrenEmailsBorn(LocalDateTime dateToday);
 
     abstract protected void insertParentShip(HashMap<Email, String> marriage, List<String> childEmails);
+
+    protected Pair<Integer, Integer> countBounds() {
+        return new Pair<>(0, world().getScaleFactor());
+    }
 }

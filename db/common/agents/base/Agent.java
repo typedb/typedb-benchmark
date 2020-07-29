@@ -4,6 +4,7 @@ import grabl.tracing.client.GrablTracingThreadStatic.ThreadContext;
 import grabl.tracing.client.GrablTracingThreadStatic.ThreadTrace;
 import grakn.simulation.db.common.agents.interaction.RandomValueGenerator;
 import grakn.simulation.db.common.agents.utils.CheckMethod;
+import grakn.simulation.db.common.agents.utils.Pair;
 import grakn.simulation.db.common.driver.DriverWrapper;
 import grakn.simulation.db.common.world.World;
 import org.slf4j.Logger;
@@ -36,8 +37,6 @@ public abstract class Agent<T> implements AutoCloseable {
     private LogWrapper logWrapper;
     private ThreadContext context;
     private HashSet<String> tracedMethods = new HashSet<>();
-    protected Integer testCountUpperBound = null;
-    protected Integer testCountLowerBound = null;
 
     void init(IterationContext iterationContext, Random random, T item, String sessionKey, String tracker, Logger logger, Boolean trace) {
         this.iterationContext = iterationContext;
@@ -99,6 +98,11 @@ public abstract class Agent<T> implements AutoCloseable {
             tx.close();
             tx = null;
         }
+    }
+
+    protected void commitTxWithTracing() {
+        tx.commitWithTracing();
+        tx = null;
     }
 
     protected void setTx(DriverWrapper.Session.Transaction tx) {
@@ -196,18 +200,23 @@ public abstract class Agent<T> implements AutoCloseable {
 
     protected abstract int checkCount();
 
+    protected abstract Pair<Integer, Integer> countBounds();
+
     int testByCount(int previousCount) {
+        Integer testCountLowerBound = countBounds().getFirst();
+        Integer testCountUpperBound = countBounds().getSecond();
+
         if (testCountUpperBound == null) {
-            throw new RuntimeException("An upper bound has not been set for the answer count");
+            throw new RuntimeException(String.format("An upper bound has not been set for the answer count for agent %s", this.getClass().getName()));
         }
         if (testCountLowerBound == null) {
-            throw new RuntimeException("A lower bound has not been set for the answer count");
+            throw new RuntimeException(String.format("A lower bound has not been set for the answer count for agent %s", this.getClass().getName()));
         }
         int count = checkCount();
         int newlyInserted = count - previousCount;
         if (newlyInserted < testCountLowerBound) {
-            throw new RuntimeException(String.format("Testing found that there were fewer results than expected. Expected more than &d, found %d", testCountLowerBound, count));
-        } else if (newlyInserted < testCountUpperBound) {
+            throw new RuntimeException(String.format("Testing found that there were fewer results than expected. Expected more than %d, found %d", testCountLowerBound, count));
+        } else if (newlyInserted > testCountUpperBound) {
             throw new RuntimeException(String.format("Testing found that there were more results than expected. Expected up to %d, found %d", testCountUpperBound, count));
         }
         return count;

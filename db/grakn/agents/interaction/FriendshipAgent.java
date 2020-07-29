@@ -5,6 +5,7 @@ import graql.lang.Graql;
 import graql.lang.query.GraqlGet;
 import graql.lang.query.GraqlInsert;
 import graql.lang.statement.Statement;
+import graql.lang.statement.StatementAttribute;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -30,11 +31,15 @@ public class FriendshipAgent extends grakn.simulation.db.common.agents.interacti
         Statement person2 = Graql.var("p2");
         Statement friendship = Graql.var();
 
+        StatementAttribute friend1EmailVar = Graql.var().val(friend1Email);
+        StatementAttribute friend2EmailVar = Graql.var().val(friend2Email);
+        StatementAttribute startDate = Graql.var().val(today());
+
         GraqlInsert insertFriendshipQuery = Graql.match(
                 person1
-                        .isa(PERSON).has(EMAIL, friend1Email),
+                        .isa(PERSON).has(EMAIL, friend1EmailVar),
                 person2
-                        .isa(PERSON).has(EMAIL, friend2Email),
+                        .isa(PERSON).has(EMAIL, friend2EmailVar),
                 Graql.not(
                         friendship
                                 .isa(FRIENDSHIP)
@@ -46,7 +51,7 @@ public class FriendshipAgent extends grakn.simulation.db.common.agents.interacti
                         .isa(FRIENDSHIP)
                         .rel(FRIENDSHIP_FRIEND, person1)
                         .rel(FRIENDSHIP_FRIEND, person2)
-                        .has(START_DATE, today())
+                        .has(START_DATE, startDate)
         );
         log().query("insertFriendship", insertFriendshipQuery);
         tx().forGrakn().execute(insertFriendshipQuery);
@@ -54,9 +59,32 @@ public class FriendshipAgent extends grakn.simulation.db.common.agents.interacti
 
     @Override
     protected int checkCount() {
-        GraqlGet.Aggregate countQuery = Graql.match(
+        Statement person1 = Graql.var("p1");
+        Statement person2 = Graql.var("p2");
+        Statement friendship = Graql.var();
 
+        Statement friend1EmailVar = Graql.var("friend1-email");
+        Statement friend2EmailVar = Graql.var("friend2-email");
+        Statement startDate = Graql.var(START_DATE);
+
+        GraqlGet.Aggregate countQuery = Graql.match(
+                person1
+                        .isa(PERSON).has(EMAIL, friend1EmailVar),
+                person2
+                        .isa(PERSON).has(EMAIL, friend2EmailVar),
+                Graql.not(
+                        friendship
+                                .isa(FRIENDSHIP)
+                                .rel(FRIENDSHIP_FRIEND, person1)
+                                .rel(FRIENDSHIP_FRIEND, person2)
+                ),
+                Graql.var(FRIENDSHIP)
+                        .isa(FRIENDSHIP)
+                        .rel(FRIENDSHIP_FRIEND, person1)
+                        .rel(FRIENDSHIP_FRIEND, person2)
+                        .has(START_DATE, startDate)
         ).get().count();
-        return tx().forGrakn().execute(countQuery).get().get(0).number().intValue();
+        log().query("checkCount", countQuery);
+        return ((Transaction) tx()).count(countQuery);
     }
 }

@@ -1,6 +1,7 @@
 package grakn.simulation.db.common.agents.interaction;
 
 import grabl.tracing.client.GrablTracingThreadStatic.ThreadTrace;
+import grakn.simulation.db.common.agents.utils.Pair;
 import grakn.simulation.db.common.agents.world.CountryAgent;
 import org.apache.commons.lang3.StringUtils;
 
@@ -12,7 +13,6 @@ public abstract class CompanyAgent extends CountryAgent {
     public final void iterate() {
 
         int numCompanies = world().getScaleFactor();
-        super.testCountUpperBound = numCompanies;
 
         for (int i = 0; i < numCompanies; i++) {
             String adjective = pickOne(world().getAdjectives());
@@ -24,8 +24,12 @@ public abstract class CompanyAgent extends CountryAgent {
                 insertCompany(companyNumber, companyName);
             }
         }
-        tx().commitWithTracing();
+        commitTxWithTracing();
     }
 
     protected abstract void insertCompany(int companyNumber, String companyName);
+
+    protected Pair<Integer, Integer> countBounds() {
+        return new Pair<>(0, world().getScaleFactor());
+    }
 }

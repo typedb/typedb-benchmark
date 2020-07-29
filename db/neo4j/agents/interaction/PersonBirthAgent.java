@@ -37,4 +37,9 @@ public class PersonBirthAgent extends grakn.simulation.db.common.agents.interact
 //        TODO Key constraints are possible with Neo4j Enterprise, and some constraints are supported in Community
 //        https://neo4j.com/developer/kb/how-to-implement-a-primary-key-property-for-a-label/
     }
+
+    @Override
+    protected int checkCount() {
+        return 0;
+    }
 }

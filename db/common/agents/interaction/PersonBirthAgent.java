@@ -1,5 +1,6 @@
 package grakn.simulation.db.common.agents.interaction;
 
+import grakn.simulation.db.common.agents.utils.Pair;
 import grakn.simulation.db.common.agents.world.CityAgent;
 
 import static grabl.tracing.client.GrablTracingThreadStatic.ThreadTrace;
@@ -41,8 +42,12 @@ public abstract class PersonBirthAgent extends CityAgent {
                 insertPerson(email, gender, forename, surname);
             }
         }
-        tx().commitWithTracing();
+        commitTxWithTracing();
     }
 
     protected abstract void insertPerson(String email, String gender, String forename, String surname);
+
+    protected Pair<Integer, Integer> countBounds() {
+        return new Pair<>(0, world().getScaleFactor());
+    }
 }

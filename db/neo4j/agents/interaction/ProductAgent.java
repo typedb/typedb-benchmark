@@ -38,4 +38,9 @@ public class ProductAgent extends grakn.simulation.db.common.agents.interaction.
         }};
         return new Query(template, parameters);
     }
+
+    @Override
+    protected int checkCount() {
+        return 0;
+    }
 }

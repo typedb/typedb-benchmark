@@ -1,12 +1,11 @@
 package grakn.simulation.db.grakn.initialise;
 
-import grabl.tracing.client.GrablTracingThreadStatic;
 import grakn.client.GraknClient;
 import grakn.simulation.db.common.driver.DriverWrapper;
-import grakn.simulation.db.grakn.yaml_tool.GraknYAMLLoader;
 import grakn.simulation.db.common.initialise.Initialiser;
 import grakn.simulation.db.common.yaml_tool.YAMLException;
 import grakn.simulation.db.common.yaml_tool.YAMLLoader;
+import grakn.simulation.db.grakn.yaml_tool.GraknYAMLLoader;
 import graql.lang.Graql;
 import graql.lang.query.GraqlDefine;
 

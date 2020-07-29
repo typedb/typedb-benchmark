@@ -1,6 +1,7 @@
 package grakn.simulation.db.common.agents.interaction;
 
 import grabl.tracing.client.GrablTracingThreadStatic.ThreadTrace;
+import grakn.simulation.db.common.agents.utils.Pair;
 import grakn.simulation.db.common.agents.world.CityAgent;
 
 import java.time.LocalDateTime;
@@ -9,6 +10,8 @@ import java.util.List;
 import static grabl.tracing.client.GrablTracingThreadStatic.traceOnThread;
 
 public abstract class MarriageAgent extends CityAgent {
+
+    int numMarriagesPossible;
 
     @Override
     public final void iterate() {
@@ -27,7 +30,7 @@ public abstract class MarriageAgent extends CityAgent {
 
         int numMarriages = world().getScaleFactor();
 
-        int numMarriagesPossible = Math.min(numMarriages, Math.min(womenEmails.size(), menEmails.size()));
+        numMarriagesPossible = Math.min(numMarriages, Math.min(womenEmails.size(), menEmails.size()));
 
         if (numMarriagesPossible > 0) {
             for (int i = 0; i < numMarriagesPossible; i++) {
@@ -38,7 +41,7 @@ public abstract class MarriageAgent extends CityAgent {
                     insertMarriage(marriageIdentifier, wifeEmail, husbandEmail);
                 }
             }
-            tx().commitWithTracing();
+            commitTxWithTracing();
         }
     }
 
@@ -54,4 +57,11 @@ public abstract class MarriageAgent extends CityAgent {
 //    private GraqlGet.Unfiltered getSinglePeopleOfGenderQuery(String gender, String marriageRole);
 
     protected abstract void insertMarriage(int marriageIdentifier, String wifeEmail, String husbandEmail);
+
+    protected Pair<Integer, Integer> countBounds() {
+        if (simulationStep() >= world().AGE_OF_ADULTHOOD && numMarriagesPossible == 0) {
+            throw new RuntimeException("Marriages should be possible by now");
+        }
+        return new Pair<>(0, numMarriagesPossible);
+    }
 }

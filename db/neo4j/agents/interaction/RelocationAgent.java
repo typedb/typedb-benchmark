@@ -70,4 +70,9 @@ public class RelocationAgent extends grakn.simulation.db.common.agents.interacti
         log().query("insertRelocation", relocatePersonQuery);
         ((Neo4jDriverWrapper.Session.Transaction) tx()).execute(relocatePersonQuery);
     }
+
+    @Override
+    protected int checkCount() {
+        return 0;
+    }
 }

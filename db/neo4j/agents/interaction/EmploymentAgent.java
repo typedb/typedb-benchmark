@@ -53,4 +53,9 @@ public class EmploymentAgent extends grakn.simulation.db.common.agents.interacti
         log().query("insertEmployment", insertEmploymentQuery);
         ((Neo4jDriverWrapper.Session.Transaction) tx()).execute(insertEmploymentQuery);
     }
+
+    @Override
+    protected int checkCount() {
+        return 0;
+    }
 }

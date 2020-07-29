@@ -74,4 +74,13 @@ public class TransactionAgent extends grakn.simulation.db.common.agents.interact
         log().query("insertTransaction", insertTransactionQuery);
         tx().forGrakn().execute(insertTransactionQuery);
     }
+
+    @Override
+    protected int checkCount() {
+//        GraqlGet.Aggregate countQuery = Graql.match(
+//
+//        ).get().count();
+//        return ((Transaction) tx()).count(countQuery);
+        return 0;
+    }
 }

@@ -1,6 +1,7 @@
 package grakn.simulation.db.grakn.agents.interaction;
 
 import grakn.simulation.db.common.world.World;
+import grakn.simulation.db.grakn.driver.GraknClientWrapper.Session.Transaction;
 import graql.lang.Graql;
 import graql.lang.query.GraqlGet;
 import graql.lang.query.GraqlInsert;
@@ -77,6 +78,7 @@ public class CompanyAgent extends grakn.simulation.db.common.agents.interaction.
                         .rel(INCORPORATION_INCORPORATING, Graql.var(COUNTRY))
                         .has(DATE_OF_INCORPORATION, today())
         ).get().count();
-        return tx().forGrakn().execute(countQuery).get().get(0).number().intValue();
+        log().query("checkCount", countQuery);
+        return ((Transaction) tx()).count(countQuery);
     }
 }

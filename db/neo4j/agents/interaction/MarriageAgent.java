@@ -55,4 +55,9 @@ public class MarriageAgent extends grakn.simulation.db.common.agents.interaction
         log().query("insertMarriage", query);
         ((Neo4jDriverWrapper.Session.Transaction) tx()).execute(query);
     }
+
+    @Override
+    protected int checkCount() {
+        return 0;
+    }
 }

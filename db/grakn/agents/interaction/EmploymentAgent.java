@@ -17,6 +17,7 @@ import static grakn.simulation.db.grakn.schema.Schema.CONTRACT;
 import static grakn.simulation.db.grakn.schema.Schema.CONTRACTED_HOURS;
 import static grakn.simulation.db.grakn.schema.Schema.CONTRACT_CONTENT;
 import static grakn.simulation.db.grakn.schema.Schema.COUNTRY;
+import static grakn.simulation.db.grakn.schema.Schema.CURRENCY;
 import static grakn.simulation.db.grakn.schema.Schema.EMAIL;
 import static grakn.simulation.db.grakn.schema.Schema.EMPLOYMENT;
 import static grakn.simulation.db.grakn.schema.Schema.EMPLOYMENT_CONTRACT;
@@ -29,7 +30,6 @@ import static grakn.simulation.db.grakn.schema.Schema.LOCATES_LOCATION;
 import static grakn.simulation.db.grakn.schema.Schema.LOCATION_HIERARCHY;
 import static grakn.simulation.db.grakn.schema.Schema.LOCATION_NAME;
 import static grakn.simulation.db.grakn.schema.Schema.PERSON;
-import static grakn.simulation.db.grakn.schema.Schema.CURRENCY;
 import static grakn.simulation.db.grakn.schema.Schema.START_DATE;
 import static grakn.simulation.db.grakn.schema.Schema.WAGE;
 import static grakn.simulation.db.grakn.schema.Schema.WAGE_VALUE;
@@ -167,10 +167,11 @@ public class EmploymentAgent extends grakn.simulation.db.common.agents.interacti
                                 .rel(LOCATES_LOCATION, employment)
                                 .rel(LOCATES_LOCATED, city),
                         contract
-                                .isa(EMPLOYMENT_CONTRACT)
+                                .isa(CONTRACT)
                                 .has(CONTRACT_CONTENT, contractContentVar)
                                 .has(CONTRACTED_HOURS, contractedHoursVar)
         ).get().count();
-        return tx().forGrakn().execute(countQuery).get().get(0).number().intValue();
+        log().query("checkCount", countQuery);
+        return ((Transaction) tx()).count(countQuery);
     }
 }

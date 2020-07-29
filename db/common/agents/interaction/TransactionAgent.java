@@ -49,7 +49,7 @@ public abstract class TransactionAgent extends ContinentAgent {
                 insertTransaction(transaction, sellerCompanyNumber, value, productQuantity, isTaxable);
             }
         });
-        tx().commitWithTracing();
+        commitTxWithTracing();
     }
 
     abstract protected List<Long> getCompanyNumbersInContinent();
@@ -57,4 +57,8 @@ public abstract class TransactionAgent extends ContinentAgent {
     abstract protected List<Double> getProductBarcodesInContinent();
 
     abstract protected void insertTransaction(Pair<Long, Double> transaction, long sellerCompanyNumber, double value, int productQuantity, boolean isTaxable);
+
+    protected Pair<Integer, Integer> countBounds() {
+        return new Pair<>(0, world().getScaleFactor());
+    }
 }

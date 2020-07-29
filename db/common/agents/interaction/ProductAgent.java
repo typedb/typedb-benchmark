@@ -1,5 +1,6 @@
 package grakn.simulation.db.common.agents.interaction;
 
+import grakn.simulation.db.common.agents.utils.Pair;
 import grakn.simulation.db.common.agents.world.ContinentAgent;
 
 import static grabl.tracing.client.GrablTracingThreadStatic.ThreadTrace;
@@ -18,11 +19,15 @@ public abstract class ProductAgent extends ContinentAgent {
                 insertProduct(barcode, productName, productDescription);
             }
         }
-        tx().commitWithTracing();
+        commitTxWithTracing();
     }
 
     abstract protected void insertProduct(Double barcode, String productName, String productDescription);
 
 //    TODO Should this be abstracted?
 //    static GraqlGet.Unfiltered getProductsInContinentQuery(World.Continent continent);
+
+    protected Pair<Integer, Integer> countBounds() {
+        return new Pair<>(0, world().getScaleFactor());
+    }
 }

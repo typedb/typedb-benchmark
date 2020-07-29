@@ -122,4 +122,13 @@ public class ParentshipAgent extends grakn.simulation.db.common.agents.interacti
         log().query("insertParentShip", parentshipQuery);
         tx().forGrakn().execute(parentshipQuery);
     }
+
+    @Override
+    protected int checkCount() {
+//        GraqlGet.Aggregate countQuery = Graql.match(
+//
+//        ).get().count();
+//        return ((Transaction) tx()).count(countQuery);
+        return 0;
+    }
 }
