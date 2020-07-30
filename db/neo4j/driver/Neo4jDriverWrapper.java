@@ -11,6 +11,7 @@ import org.neo4j.driver.exceptions.TransientException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -163,6 +164,18 @@ public class Neo4jDriverWrapper implements DriverWrapper {
                     result = answerStream.collect(Collectors.toList());
                 }
                 return result;
+            }
+
+            public int count(Query countQuery) {
+                AtomicReference<Integer> count = new AtomicReference<>(null);
+                transaction.run(countQuery).single().values().forEach(v -> {
+                    if (count.get() == null) {
+                        count.set(v.asInt());
+                    } else if (count.get() != v.asInt()) {
+                        throw new RuntimeException("Not all returned counts were the same");
+                    }
+                });
+                return transaction.run(countQuery).single().get(0).asInt();
             }
         }
     }
