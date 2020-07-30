@@ -1,6 +1,7 @@
 package grakn.simulation.db.neo4j.agents.interaction;
 
 import grakn.simulation.db.neo4j.driver.Neo4jDriverWrapper;
+import grakn.simulation.db.neo4j.driver.Neo4jDriverWrapper.Session.Transaction;
 import org.neo4j.driver.Query;
 
 import java.util.HashMap;
@@ -34,7 +35,7 @@ public class MarriageAgent extends grakn.simulation.db.common.agents.interaction
         Query query = new Query(template, parameters);
 
         log().query(scope, query);
-        return ((Neo4jDriverWrapper.Session.Transaction) tx()).getOrderedAttribute(query, "person.email", null);
+        return ((Transaction) tx()).getOrderedAttribute(query, "person.email", null);
     }
 
     @Override
@@ -53,11 +54,23 @@ public class MarriageAgent extends grakn.simulation.db.common.agents.interaction
         Query query = new Query(template, parameters);
 
         log().query("insertMarriage", query);
-        ((Neo4jDriverWrapper.Session.Transaction) tx()).execute(query);
+        ((Transaction) tx()).execute(query);
     }
 
     @Override
     protected int checkCount() {
-        return 0;
+        String template = "" +
+                "MATCH (city:City {locationName: $cityName}), \n" +
+                "(husband:Person)-[marriage:MARRIED_TO {locationName: city.locationName}]->(wife:Person)\n" +
+                "RETURN count(marriage), count(marriage.id), count(wife.email), count(husband.email)";
+
+        HashMap<String, Object> parameters = new HashMap<String, Object>(){{
+            put("cityName", city().name());
+        }};
+
+        Query countQuery = new Query(template, parameters);
+
+        log().query("checkCount", countQuery);
+        return ((Transaction) tx()).count(countQuery);
     }
 }
