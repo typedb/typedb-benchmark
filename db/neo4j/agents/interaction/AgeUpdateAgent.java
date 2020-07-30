@@ -1,6 +1,6 @@
 package grakn.simulation.db.neo4j.agents.interaction;
 
-import grakn.simulation.db.neo4j.driver.Neo4jDriverWrapper;
+import grakn.simulation.db.neo4j.driver.Neo4jDriverWrapper.Session.Transaction;
 import org.neo4j.driver.Query;
 
 import java.util.HashMap;
@@ -21,11 +21,22 @@ public class AgeUpdateAgent extends grakn.simulation.db.common.agents.interactio
         Query query = new Query(template, parameters);
 
         log().query("updateAgesOfAllPeople", query);
-        ((Neo4jDriverWrapper.Session.Transaction) tx()).execute(query);
+        ((Transaction) tx()).execute(query);
     }
 
     @Override
     protected int checkCount() {
-        return 0;
+        String template = "" +
+                "MATCH (person:Person)-[:BORN_IN]->(city:City {locationName: $cityName})\n" +
+                "RETURN count(person.age)";
+
+        HashMap<String, Object> parameters = new HashMap<String, Object>(){{
+            put("cityName", city().name());
+        }};
+
+        Query countQuery = new Query(template, parameters);
+
+        log().query("checkCount", countQuery);
+        return ((Transaction) tx()).count(countQuery);
     }
 }

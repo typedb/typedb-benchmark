@@ -33,7 +33,6 @@ public class AgeUpdateAgent extends grakn.simulation.db.common.agents.interactio
             peopleAnswers = getPeopleBornInCity();
         }
         // Update their ages
-        log().message("updateAgesOfAllPeople");
         peopleAnswers.forEach((personEmail, personDob) -> {
                     long age = ChronoUnit.YEARS.between(personDob, today());
                     try (ThreadTrace trace = traceOnThread(this.checkMethodTrace("updatePersonAge"))) {
