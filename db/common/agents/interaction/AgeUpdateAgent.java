@@ -19,6 +19,6 @@ public abstract class AgeUpdateAgent extends CityAgent {
     protected abstract void updateAgesOfAllPeople();
 
     protected Pair<Integer, Integer> countBounds() {
-        return new Pair<>(0, world().getScaleFactor());
+        return new Pair<>(world().getScaleFactor(), world().getScaleFactor());
     }
 }

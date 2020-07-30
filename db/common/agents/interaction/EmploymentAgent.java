@@ -21,6 +21,7 @@ public abstract class EmploymentAgent extends CityAgent {
     private static final int MAX_CONTRACT_CHARACTER_LENGTH = 600;
 
     private LocalDateTime employmentDate;
+    private int numEmployments;
 
     @Override
     public final void iterate() {
@@ -31,6 +32,7 @@ public abstract class EmploymentAgent extends CityAgent {
         try (ThreadTrace trace = traceOnThread(this.registerMethodTrace("getEmployeeEmails"))) {
             employeeEmails = getEmployeeEmails(employmentDate);
         }
+        numEmployments = employeeEmails.size();
         try (ThreadTrace trace = traceOnThread(this.registerMethodTrace("getCompanyNumbers"))) {
             companyNumbers = getCompanyNumbers();
         }
@@ -56,6 +58,6 @@ public abstract class EmploymentAgent extends CityAgent {
     protected abstract void insertEmployment(String employeeEmail, long companyNumber, LocalDateTime employmentDate, double wageValue, String contractContent, double contractedHours);
 
     protected Pair<Integer, Integer> countBounds() {
-        return new Pair<>(0, world().getScaleFactor());
+        return new Pair<>(numEmployments, numEmployments);
     }
 }

@@ -106,7 +106,7 @@ public class EmploymentAgent extends grakn.simulation.db.common.agents.interacti
                         .rel(LOCATES_LOCATION, employment)
                         .rel(LOCATES_LOCATED, city),
                 contract
-                        .isa(EMPLOYMENT_CONTRACT)
+                        .isa(CONTRACT)
                         .has(CONTRACT_CONTENT, contractContentVar)
                         .has(CONTRACTED_HOURS, contractedHoursVar)
         );

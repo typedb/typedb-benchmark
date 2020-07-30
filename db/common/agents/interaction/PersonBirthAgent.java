@@ -48,6 +48,6 @@ public abstract class PersonBirthAgent extends CityAgent {
     protected abstract void insertPerson(String email, String gender, String forename, String surname);
 
     protected Pair<Integer, Integer> countBounds() {
-        return new Pair<>(0, world().getScaleFactor());
+        return new Pair<>(numBirths, numBirths);
     }
 }

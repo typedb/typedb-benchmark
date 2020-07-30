@@ -214,10 +214,11 @@ public abstract class Agent<T> implements AutoCloseable {
         }
         int count = checkCount();
         int newlyInserted = count - previousCount;
+        log().message(String.format("%s iteration count diff: %d", this.getClass().getSimpleName(), newlyInserted));
         if (newlyInserted < testCountLowerBound) {
-            throw new RuntimeException(String.format("Testing found that there were fewer results than expected. Expected more than %d, found %d", testCountLowerBound, count));
+            throw new RuntimeException(String.format("Testing found that there were fewer results than expected for agent %s. Expected %d or more, found %d", this.getClass().getName(), testCountLowerBound, newlyInserted));
         } else if (newlyInserted > testCountUpperBound) {
-            throw new RuntimeException(String.format("Testing found that there were more results than expected. Expected up to %d, found %d", testCountUpperBound, count));
+            throw new RuntimeException(String.format("Testing found that there were more results than expected for agent %s. Expected up to %d, found %d", this.getClass().getName(), testCountUpperBound, newlyInserted));
         }
         return count;
     }

@@ -9,10 +9,12 @@ import static grabl.tracing.client.GrablTracingThreadStatic.traceOnThread;
 
 public abstract class CompanyAgent extends CountryAgent {
 
+    int numCompanies;
+
     @Override
     public final void iterate() {
 
-        int numCompanies = world().getScaleFactor();
+        numCompanies = world().getScaleFactor();
 
         for (int i = 0; i < numCompanies; i++) {
             String adjective = pickOne(world().getAdjectives());
@@ -30,6 +32,6 @@ public abstract class CompanyAgent extends CountryAgent {
     protected abstract void insertCompany(int companyNumber, String companyName);
 
     protected Pair<Integer, Integer> countBounds() {
-        return new Pair<>(0, world().getScaleFactor());
+        return new Pair<>(numCompanies, numCompanies);
     }
 }

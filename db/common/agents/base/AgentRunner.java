@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 
@@ -24,7 +25,7 @@ public abstract class AgentRunner<T> {
     private Constructor<? extends Agent<T>> agentConstructor;
     private Logger logger;
     private Boolean traceAgent = true;
-    private int lastTestCount = 0;
+    private HashMap<String, Integer> lastTestCount = new HashMap<>();
 
     protected AgentRunner(Class<? extends Agent<T>> agentClass) {
         try {
@@ -67,7 +68,7 @@ public abstract class AgentRunner<T> {
             agent.init(iterationContext, agentRandom, item, sessionKey, tracker, logger, traceAgent && iterationContext.shouldTrace());
 //            agent.iterateWithTracing();
             agent.iterate(); // TODO Disabled for demo only
-            lastTestCount = agent.testByCount(lastTestCount);
+            lastTestCount.put(tracker, agent.testByCount(lastTestCount.getOrDefault(tracker, 0)));
 
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
             throw new RuntimeException(e);

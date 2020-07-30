@@ -59,9 +59,6 @@ public abstract class MarriageAgent extends CityAgent {
     protected abstract void insertMarriage(int marriageIdentifier, String wifeEmail, String husbandEmail);
 
     protected Pair<Integer, Integer> countBounds() {
-        if (simulationStep() >= world().AGE_OF_ADULTHOOD && numMarriagesPossible == 0) {
-            throw new RuntimeException("Marriages should be possible by now");
-        }
-        return new Pair<>(0, numMarriagesPossible);
+        return new Pair<>(numMarriagesPossible, numMarriagesPossible);
     }
 }

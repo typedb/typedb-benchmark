@@ -76,7 +76,7 @@ public class CompanyAgent extends grakn.simulation.db.common.agents.interaction.
                 Graql.var(INCORPORATION).isa(INCORPORATION)
                         .rel(INCORPORATION_INCORPORATED, Graql.var(COMPANY))
                         .rel(INCORPORATION_INCORPORATING, Graql.var(COUNTRY))
-                        .has(DATE_OF_INCORPORATION, today())
+                        .has(DATE_OF_INCORPORATION, Graql.var(DATE_OF_INCORPORATION))
         ).get().count();
         log().query("checkCount", countQuery);
         return ((Transaction) tx()).count(countQuery);

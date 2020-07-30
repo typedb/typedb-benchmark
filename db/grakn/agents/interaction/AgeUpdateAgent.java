@@ -111,22 +111,19 @@ public class AgeUpdateAgent extends grakn.simulation.db.common.agents.interactio
         Statement emailVar = Graql.var(EMAIL);
         Statement age = Graql.var(AGE);
 
-        if (simulationStep() == 0) {
-            GraqlGet.Aggregate countQuery = Graql.match(
-                    city.isa(CITY)
-                            .has(LOCATION_NAME, city().toString()),
-                    person.isa(PERSON)
-                            .has(EMAIL, emailVar)
-                            .has(DATE_OF_BIRTH, dobVar)
-                            .has(AGE, age),
-                    bornIn.isa(BORN_IN)
-                            .rel(BORN_IN_CHILD, person)
-                            .rel(BORN_IN_PLACE_OF_BIRTH, city)
-            ).get().count();
-            log().query("checkCount", countQuery);
-            return ((Transaction) tx()).count(countQuery);
-        } else {
-            return world().getScaleFactor(); // TODO Actually return the number of people born in the last iteration
-        }
+        // This works as the diff matches the number of people born in the last run of PersonBirthAgent
+        GraqlGet.Aggregate countQuery = Graql.match(
+                city.isa(CITY)
+                        .has(LOCATION_NAME, city().toString()),
+                person.isa(PERSON)
+                        .has(EMAIL, emailVar)
+                        .has(DATE_OF_BIRTH, dobVar)
+                        .has(AGE, age),
+                bornIn.isa(BORN_IN)
+                        .rel(BORN_IN_CHILD, person)
+                        .rel(BORN_IN_PLACE_OF_BIRTH, city)
+        ).get().count();
+        log().query("checkCount", countQuery);
+        return ((Transaction) tx()).count(countQuery);
     }
 }
