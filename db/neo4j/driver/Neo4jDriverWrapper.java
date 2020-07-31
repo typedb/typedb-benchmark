@@ -93,9 +93,7 @@ public class Neo4jDriverWrapper implements DriverWrapper {
 
             @Override
             public void close() {
-                try (ThreadTrace trace = traceOnThread("close")) {
-                    transaction.close();
-                }
+                transaction.close();
             }
 
             @Override
