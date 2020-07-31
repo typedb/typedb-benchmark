@@ -1,14 +1,16 @@
 package grakn.simulation;
 
 import grabl.tracing.client.GrablTracing;
-import grakn.client.GraknClient;
 import grakn.simulation.config.Config;
 import grakn.simulation.config.ConfigLoader;
 import grakn.simulation.config.Schema;
 import grakn.simulation.db.common.agents.base.AgentRunner;
 import grakn.simulation.db.common.agents.base.IterationContext;
+import grakn.simulation.db.common.driver.DriverWrapper;
 import grakn.simulation.db.common.initialise.AgentPicker;
 import grakn.simulation.db.common.initialise.Initialiser;
+import grakn.simulation.db.common.world.World;
+import grakn.simulation.db.common.yaml_tool.YAMLException;
 import grakn.simulation.db.grakn.driver.GraknClientWrapper;
 import grakn.simulation.db.grakn.initialise.GraknAgentPicker;
 import grakn.simulation.db.grakn.initialise.GraknInitialiser;
@@ -16,8 +18,6 @@ import grakn.simulation.db.neo4j.driver.Neo4jDriverWrapper;
 import grakn.simulation.db.neo4j.initialise.Neo4jAgentPicker;
 import grakn.simulation.db.neo4j.initialise.Neo4jInitialiser;
 import grakn.simulation.utils.RandomSource;
-import grakn.simulation.db.common.driver.DriverWrapper;
-import grakn.simulation.db.common.world.World;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
@@ -27,6 +27,7 @@ import org.apache.commons.cli.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
@@ -101,7 +102,7 @@ public class Simulation implements IterationContext, AutoCloseable {
         switch (dbName) {
             case "grakn":
                 db = Schema.Database.GRAKN;
-                defaultUri = GraknClient.DEFAULT_URI;
+                defaultUri = "localhost:48555";
                 agentPicker = new GraknAgentPicker();
                 initialiser = new GraknInitialiser(files);
                 driverWrapper = new GraknClientWrapper();
@@ -119,17 +120,6 @@ public class Simulation implements IterationContext, AutoCloseable {
 
         if (hostUri == null) hostUri = defaultUri;
 
-
-        // Get the agents with their runners
-        List<AgentRunner> agentRunners = new ArrayList<>();
-        for (Config.Agent agent : config.getAgents()) {
-            if (agent.getAgentMode().getRun()) {
-                AgentRunner<?> runner = agentPicker.get(agent.getName());
-                runner.setTrace(agent.getAgentMode().getTrace());
-                agentRunners.add(runner);
-            }
-        }
-
         LOG.info("Welcome to the Simulation!");
         LOG.info("Parsing world data...");
         World world = world(config.getScaleFactor(), files);
@@ -142,12 +132,11 @@ public class Simulation implements IterationContext, AutoCloseable {
 
                 try (DriverWrapper driverWrapperIgnored = driverWrapper.open(hostUri)) {
 
-                    initialiser.initialise(driverWrapper, config.getDatabaseName());
-
                     try (Simulation simulation = new Simulation(
                             driverWrapper,
                             config.getDatabaseName(),
-                            agentRunners,
+                            initialiser,
+                            agentRunnersFromConfig(config, agentPicker),
                             new RandomSource(config.getRandomSeed()),
                             world,
                             config.getTraceSampling().getSamplingFunction()
@@ -176,6 +165,19 @@ public class Simulation implements IterationContext, AutoCloseable {
         } else {
             return Optional.empty();
         }
+    }
+
+    public static List<AgentRunner> agentRunnersFromConfig(Config config, AgentPicker agentPicker) {
+        // Get the agents with their runners
+        List<AgentRunner> agentRunners = new ArrayList<>();
+        for (Config.Agent agent : config.getAgents()) {
+            if (agent.getAgentMode().getRun()) {
+                AgentRunner<?> runner = agentPicker.get(agent.getName());
+                runner.setTrace(agent.getAgentMode().getTrace());
+                agentRunners.add(runner);
+            }
+        }
+        return agentRunners;
     }
 
     private static Options cliOptions() {
@@ -223,7 +225,7 @@ public class Simulation implements IterationContext, AutoCloseable {
     private int simulationStep = 1;
     private final ConcurrentMap<String, DriverWrapper.Session> sessionMap;
 
-    Simulation(DriverWrapper driver, String database, List<AgentRunner> agentRunners, RandomSource randomSource, World world, Function<Integer, Boolean> iterationSamplingFunction) {
+    Simulation(DriverWrapper driver, String database, Initialiser initialiser, List<AgentRunner> agentRunners, RandomSource randomSource, World world, Function<Integer, Boolean> iterationSamplingFunction) {
         this.driver = driver;
         this.database = database;
         defaultSession = this.driver.session(database);
@@ -232,6 +234,12 @@ public class Simulation implements IterationContext, AutoCloseable {
         this.iterationSamplingFunction = iterationSamplingFunction;
         sessionMap = new ConcurrentHashMap<>();
         this.world = world;
+
+        try {
+            initialiser.initialise(driver, this.database);
+        } catch (IOException | YAMLException e) {
+            e.printStackTrace();
+        }
     }
 
     void iterate() {
