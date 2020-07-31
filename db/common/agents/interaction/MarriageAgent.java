@@ -15,6 +15,7 @@ public abstract class MarriageAgent extends CityAgent {
 
     @Override
     public final void iterate() {
+        log().message("MarriageAgent", String.format("Simulation step %d", simulationStep()));
         // Find bachelors and bachelorettes who are considered adults and who are not in a marriage and pair them off randomly
         List<String> womenEmails;
         try (ThreadTrace trace = traceOnThread(this.registerMethodTrace("getSingleWomen"))) {

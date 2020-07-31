@@ -1,6 +1,5 @@
 package grakn.simulation.db.neo4j.agents.interaction;
 
-import grakn.simulation.db.neo4j.driver.Neo4jDriverWrapper;
 import grakn.simulation.db.neo4j.driver.Neo4jDriverWrapper.Session.Transaction;
 import org.neo4j.driver.Query;
 
@@ -35,7 +34,9 @@ public class MarriageAgent extends grakn.simulation.db.common.agents.interaction
         Query query = new Query(template, parameters);
 
         log().query(scope, query);
-        return ((Transaction) tx()).getOrderedAttribute(query, "person.email", null);
+        List<String> results = ((Transaction) tx()).getOrderedAttribute(query, "person.email", null);
+        log().message(scope, results.toString());
+        return results;
     }
 
     @Override

@@ -59,6 +59,7 @@ public class MarriageAgent extends grakn.simulation.db.common.agents.interaction
         try (ThreadTrace trace = traceOnThread("execute")) {
             result = ((Transaction)tx()).getOrderedAttribute(query, EMAIL, null);
         }
+        log().message(scope, result.toString());
         return result;
     }
 
