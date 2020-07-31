@@ -56,7 +56,7 @@ public class PersonBirthAgent extends grakn.simulation.db.common.agents.interact
                         );
         log().query("insertPerson", query);
         try (ThreadTrace trace = traceOnThread("execute")) {
-            tx().forGrakn().execute(query);
+            tx().forGrakn().execute(query).get();
         }
     }
 

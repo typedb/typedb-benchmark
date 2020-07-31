@@ -88,7 +88,7 @@ public class MarriageAgent extends grakn.simulation.db.common.agents.interaction
         );
         log().query("insertMarriage", marriageQuery);
         try (ThreadTrace trace = traceOnThread("execute")) {
-            tx().forGrakn().execute(marriageQuery);
+            tx().forGrakn().execute(marriageQuery).get();
         }
     }
 

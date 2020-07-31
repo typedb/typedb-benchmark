@@ -120,7 +120,7 @@ public class ParentshipAgent extends grakn.simulation.db.common.agents.interacti
         );
 
         log().query("insertParentShip", parentshipQuery);
-        tx().forGrakn().execute(parentshipQuery);
+        tx().forGrakn().execute(parentshipQuery).get();
     }
 
     @Override

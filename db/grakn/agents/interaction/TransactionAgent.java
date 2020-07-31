@@ -72,7 +72,7 @@ public class TransactionAgent extends grakn.simulation.db.common.agents.interact
 
                 );
         log().query("insertTransaction", insertTransactionQuery);
-        tx().forGrakn().execute(insertTransactionQuery);
+        tx().forGrakn().execute(insertTransactionQuery).get();
     }
 
     @Override

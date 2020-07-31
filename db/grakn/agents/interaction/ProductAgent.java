@@ -36,7 +36,7 @@ public class ProductAgent extends grakn.simulation.db.common.agents.interaction.
                         .rel(PRODUCED_IN_CONTINENT, Graql.var(CONTINENT))
                 );
         log().query("insertProduct", insertProductQuery);
-        tx().forGrakn().execute(insertProductQuery);
+        tx().forGrakn().execute(insertProductQuery).get();
     }
 
     static GraqlGet getProductsInContinentQuery(World.Continent continent) {

@@ -92,7 +92,7 @@ public class RelocationAgent extends grakn.simulation.db.common.agents.interacti
         );
 
         log().query("insertRelocation", relocatePersonQuery);
-        tx().forGrakn().execute(relocatePersonQuery);
+        tx().forGrakn().execute(relocatePersonQuery).get();
     }
 
     @Override

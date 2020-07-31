@@ -36,7 +36,7 @@ public class CompanyAgent extends grakn.simulation.db.common.agents.interaction.
                                         .has(DATE_OF_INCORPORATION, today())
                         );
         log().query("insertCompany", query);
-        tx().forGrakn().execute(query);
+        tx().forGrakn().execute(query).get();
     }
 
     static GraqlGet getCompanyNumbersInCountryQuery(World.Country country) {

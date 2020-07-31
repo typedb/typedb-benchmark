@@ -54,7 +54,7 @@ public class FriendshipAgent extends grakn.simulation.db.common.agents.interacti
                         .has(START_DATE, startDate)
         );
         log().query("insertFriendship", insertFriendshipQuery);
-        tx().forGrakn().execute(insertFriendshipQuery);
+        tx().forGrakn().execute(insertFriendshipQuery).get();
     }
 
     @Override

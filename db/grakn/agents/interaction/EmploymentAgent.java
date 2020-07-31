@@ -111,7 +111,7 @@ public class EmploymentAgent extends grakn.simulation.db.common.agents.interacti
                         .has(CONTRACTED_HOURS, contractedHoursVar)
         );
         log().query("insertEmployment", insertEmploymentQuery);
-        tx().forGrakn().execute(insertEmploymentQuery);
+        tx().forGrakn().execute(insertEmploymentQuery).get();
     }
 
     @Override
