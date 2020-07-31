@@ -6,7 +6,7 @@ import org.neo4j.driver.AuthTokens;
 import org.neo4j.driver.Driver;
 import org.neo4j.driver.GraphDatabase;
 import org.neo4j.driver.Query;
-import org.neo4j.driver.Result;
+import org.neo4j.driver.Record;
 import org.neo4j.driver.exceptions.TransientException;
 
 import java.util.ArrayList;
@@ -143,10 +143,10 @@ public class Neo4jDriverWrapper implements DriverWrapper {
                 return transaction;
             }
 
-            public Result execute(Query query) {
+            public List<Record> execute(Query query) {
                 addQuery(query);
                 try (ThreadTrace trace = traceOnThread(EXECUTE.getName())) {
-                    return transaction.run(query);
+                    return transaction.run(query).list();
                 }
             }
 
