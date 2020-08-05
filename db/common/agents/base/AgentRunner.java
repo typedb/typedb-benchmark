@@ -64,10 +64,11 @@ public abstract class AgentRunner<T> {
         String tracker = getTracker(iterationContext, RandomSource.nextSource(random), item);
 
         try (Agent<T> agent = agentConstructor.newInstance()) {
-
             agent.init(iterationContext, agentRandom, item, sessionKey, tracker, logger, traceAgent && iterationContext.shouldTrace());
-//            agent.iterateWithTracing();
-            agent.iterate(); // TODO Disabled for demo only
+//            AgentResult agentResult = agent.iterateWithTracing();  // TODO Disabled for demo purposes
+            AgentResult agentResult = agent.iterate();  // TODO Bring this back
+//            agent.iterate();  // TODO Bring this back
+            iterationContext.getResultHandler().newResult(agent.getClass().getSimpleName(), agentResult);
             lastTestCount.put(tracker, agent.testByCount(lastTestCount.getOrDefault(tracker, 0)));
 
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {

@@ -1,5 +1,6 @@
 package grakn.simulation.db.common.agents.interaction;
 
+import grakn.simulation.db.common.agents.base.AgentResult;
 import grakn.simulation.db.common.agents.utils.Allocation;
 import grakn.simulation.db.common.agents.utils.Pair;
 import grakn.simulation.db.common.agents.world.ContinentAgent;
@@ -15,7 +16,7 @@ public abstract class TransactionAgent extends ContinentAgent {
     private int NUM_TRANSACTIONS_PER_COMPANY_ON_AVERAGE = 1;
 
     @Override
-    public final void iterate() {
+    public final AgentResult iterate() {
         List<Long> companyNumbers;
         try (ThreadTrace trace = traceOnThread(this.registerMethodTrace("getCompanyNumbersInContinent"))) {
             companyNumbers = getCompanyNumbersInContinent();
@@ -50,6 +51,7 @@ public abstract class TransactionAgent extends ContinentAgent {
             }
         });
         commitTxWithTracing();
+        return null;
     }
 
     abstract protected List<Long> getCompanyNumbersInContinent();

@@ -1,11 +1,17 @@
 package grakn.simulation.db.grakn.agents.interaction;
 
+import grakn.client.answer.ConceptMap;
+import grakn.simulation.db.common.agents.interaction.PersonBirthAgentBase;
 import grakn.simulation.db.grakn.driver.GraknClientWrapper.Session.Transaction;
 import graql.lang.Graql;
 import graql.lang.query.GraqlGet;
 import graql.lang.query.GraqlInsert;
 import graql.lang.statement.Statement;
 
+import java.util.HashMap;
+import java.util.List;
+
+import static com.google.common.collect.Iterables.getOnlyElement;
 import static grabl.tracing.client.GrablTracingThreadStatic.ThreadTrace;
 import static grabl.tracing.client.GrablTracingThreadStatic.traceOnThread;
 import static grakn.simulation.db.grakn.schema.Schema.BORN_IN;
@@ -20,10 +26,10 @@ import static grakn.simulation.db.grakn.schema.Schema.LOCATION_NAME;
 import static grakn.simulation.db.grakn.schema.Schema.PERSON;
 import static grakn.simulation.db.grakn.schema.Schema.SURNAME;
 
-public class PersonBirthAgent extends grakn.simulation.db.common.agents.interaction.PersonBirthAgent {
+public class PersonBirthAgent extends PersonBirthAgentBase {
 
     @Override
-    protected void insertPerson(String email, String gender, String forename, String surname) {
+    protected HashMap<PersonBirthAgentBase.Field, Object> insertPerson(String email, String gender, String forename, String surname) {
         Statement city = Graql.var(CITY);
         Statement person = Graql.var("p");
         Statement bornIn = Graql.var("b");
@@ -54,10 +60,21 @@ public class PersonBirthAgent extends grakn.simulation.db.common.agents.interact
                                 surnameVar.val(surname),
                                 dobVar.val(today())
                         );
+
+        List<ConceptMap> answers;
         log().query("insertPerson", query);
         try (ThreadTrace trace = traceOnThread("execute")) {
-            tx().forGrakn().execute(query).get();
+            answers = tx().forGrakn().execute(query).get();
         }
+
+        ConceptMap answer = getOnlyElement(answers);
+        return new HashMap<PersonBirthAgentBase.Field, Object>(){{
+            put(Field.EMAIL, answer.get(EMAIL).asAttribute().value());
+            put(Field.DATE_OF_BIRTH, answer.get(DATE_OF_BIRTH).asAttribute().value());
+            put(Field.GENDER, answer.get(GENDER).asAttribute().value());
+            put(Field.FORENAME, answer.get(FORENAME).asAttribute().value());
+            put(Field.SURNAME, answer.get(SURNAME).asAttribute().value());
+        }};
     }
 
     @Override

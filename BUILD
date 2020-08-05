@@ -25,33 +25,6 @@ java_library(
     ],
 )
 
-java_test(
-    name = "simulation-test",
-    srcs = [
-        "SimulationTest.java",
-    ],
-    data = [
-        "//db/common/data",
-        "//db/grakn/data",
-        "//db/grakn/schema:graql-schema",
-        "//db/neo4j/data",
-    ],
-    test_class = "grakn.simulation.SimulationTest",
-    deps = [
-        "simulation-lib",
-        "//config",
-        "//db/common/agents",
-        "//db/common/initialise",
-        "//db/common/world",
-        "//db/grakn",
-        "//db/neo4j",
-        "//utils",
-        "@maven//:ch_qos_logback_logback_classic",
-        "@maven//:commons_cli_commons_cli",
-        "@maven//:org_slf4j_slf4j_api",
-    ],
-)
-
 java_binary(
     name = "simulation",
     args = [

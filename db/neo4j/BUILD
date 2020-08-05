@@ -17,5 +17,6 @@ java_library(
         "@maven//:org_apache_commons_commons_csv",
         "@maven//:org_apache_commons_commons_lang3",
         "@neo4j//:org_neo4j_driver_neo4j_java_driver",
+        "@maven//:com_google_guava_guava",
     ],
 )

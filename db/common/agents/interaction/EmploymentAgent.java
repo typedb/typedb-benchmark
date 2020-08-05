@@ -1,6 +1,6 @@
 package grakn.simulation.db.common.agents.interaction;
 
-import grabl.tracing.client.GrablTracingThreadStatic;
+import grakn.simulation.db.common.agents.base.AgentResult;
 import grakn.simulation.db.common.agents.utils.Pair;
 import grakn.simulation.db.common.agents.world.CityAgent;
 
@@ -24,7 +24,7 @@ public abstract class EmploymentAgent extends CityAgent {
     private int numEmployments;
 
     @Override
-    public final void iterate() {
+    public final AgentResult iterate() {
         employmentDate = today().minusYears(2);
 
         List<String> employeeEmails;
@@ -49,6 +49,7 @@ public abstract class EmploymentAgent extends CityAgent {
         if (allocated) {
             commitTxWithTracing();
         }
+        return null;
     }
 
     protected abstract List<Long> getCompanyNumbers();

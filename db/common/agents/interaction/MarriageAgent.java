@@ -1,6 +1,7 @@
 package grakn.simulation.db.common.agents.interaction;
 
 import grabl.tracing.client.GrablTracingThreadStatic.ThreadTrace;
+import grakn.simulation.db.common.agents.base.AgentResult;
 import grakn.simulation.db.common.agents.utils.Pair;
 import grakn.simulation.db.common.agents.world.CityAgent;
 
@@ -14,7 +15,7 @@ public abstract class MarriageAgent extends CityAgent {
     int numMarriagesPossible;
 
     @Override
-    public final void iterate() {
+    public final AgentResult iterate() {
         log().message("MarriageAgent", String.format("Simulation step %d", simulationStep()));
         // Find bachelors and bachelorettes who are considered adults and who are not in a marriage and pair them off randomly
         List<String> womenEmails;
@@ -44,6 +45,7 @@ public abstract class MarriageAgent extends CityAgent {
             }
             commitTxWithTracing();
         }
+        return null;
     }
 
     protected LocalDateTime dobOfAdults() {

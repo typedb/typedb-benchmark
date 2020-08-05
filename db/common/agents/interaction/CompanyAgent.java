@@ -1,6 +1,7 @@
 package grakn.simulation.db.common.agents.interaction;
 
 import grabl.tracing.client.GrablTracingThreadStatic.ThreadTrace;
+import grakn.simulation.db.common.agents.base.AgentResult;
 import grakn.simulation.db.common.agents.utils.Pair;
 import grakn.simulation.db.common.agents.world.CountryAgent;
 import org.apache.commons.lang3.StringUtils;
@@ -12,7 +13,7 @@ public abstract class CompanyAgent extends CountryAgent {
     int numCompanies;
 
     @Override
-    public final void iterate() {
+    public final AgentResult iterate() {
 
         numCompanies = world().getScaleFactor();
 
@@ -27,6 +28,7 @@ public abstract class CompanyAgent extends CountryAgent {
             }
         }
         commitTxWithTracing();
+        return null;
     }
 
     protected abstract void insertCompany(int companyNumber, String companyName);

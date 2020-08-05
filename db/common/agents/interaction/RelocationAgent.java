@@ -1,5 +1,6 @@
 package grakn.simulation.db.common.agents.interaction;
 
+import grakn.simulation.db.common.agents.base.AgentResult;
 import grakn.simulation.db.common.agents.utils.Allocation;
 import grakn.simulation.db.common.agents.utils.Pair;
 import grakn.simulation.db.common.agents.world.CityAgent;
@@ -15,7 +16,7 @@ import static grabl.tracing.client.GrablTracingThreadStatic.traceOnThread;
 public abstract class RelocationAgent extends CityAgent {
 
     @Override
-    public final void iterate() {
+    public final AgentResult iterate() {
         /*
         Find people currently resident the city
         Find other cities in the continent
@@ -47,6 +48,7 @@ public abstract class RelocationAgent extends CityAgent {
             }
         });
         commitTxWithTracing();
+        return null;
     }
 
 //    TODO Should this be abstracted?

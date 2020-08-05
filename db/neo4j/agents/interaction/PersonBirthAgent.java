@@ -1,39 +1,61 @@
 package grakn.simulation.db.neo4j.agents.interaction;
 
-import grakn.simulation.db.neo4j.driver.Neo4jDriverWrapper;
+import grakn.simulation.db.common.agents.interaction.PersonBirthAgentBase;
 import grakn.simulation.db.neo4j.driver.Neo4jDriverWrapper.Session.Transaction;
 import org.neo4j.driver.Query;
+import org.neo4j.driver.Record;
 
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-public class PersonBirthAgent extends grakn.simulation.db.common.agents.interaction.PersonBirthAgent {
+import static com.google.common.collect.Iterables.getOnlyElement;
+
+public class PersonBirthAgent extends PersonBirthAgentBase {
+
+    String EMAIL = "email";
+    String DATE_OF_BIRTH = "dateOfBirth";
+    String GENDER = "gender";
+    String FORENAME = "forename";
+    String SURNAME = "surname";
+    String CURRENT = "current";
 
     @Override
-    protected void insertPerson(String email, String gender, String forename, String surname) {
+    protected HashMap<PersonBirthAgentBase.Field, Object> insertPerson(String email, String gender, String forename, String surname) {
         String template = "MATCH (c:City {locationName: $locationName})" +
-                "CREATE (p:Person {" +
+                "CREATE (person:Person {" +
                 "email: $email, " +
-                "dateOfBirth: $date, " +
+                "dateOfBirth: $dateOfBirth, " +
                 "gender: $gender, " +
                 "forename: $forename, " +
                 "surname: $surname" +
                 "})-[:BORN_IN]->(c)," +
-                "(p)-[:RESIDENT_OF {startDate: $date, isCurrent: $current}]->(c)";
+                "(person)-[:RESIDENT_OF {startDate: $dateOfBirth, isCurrent: $current}]->(c)" +
+                "RETURN person.email, person.dateOfBirth, person.gender, person.forename, person.surname";
 
         HashMap<String, Object> parameters = new HashMap<String, Object>(){{
                 put("locationName", city().toString());
-                put("email", email);
-                put("date", today());
-                put("gender", gender);
-                put("forename", forename);
-                put("surname", surname);
-                put("current", true);
+                put(EMAIL, email);
+                put(DATE_OF_BIRTH, today());
+                put(GENDER, gender);
+                put(FORENAME, forename);
+                put(SURNAME, surname);
+                put(CURRENT, true);
         }};
 
         Query query = new Query(template, parameters);
 
         log().query("insertPerson", query); //TODO Figure out to log Neo4j's pre-prepared queries
-        ((Transaction) tx()).execute(query);
+        List<Record> answers = ((Transaction) tx()).execute(query);
+
+        Map<String, Object> answer = getOnlyElement(answers).asMap();
+        return new HashMap<PersonBirthAgentBase.Field, Object>(){{
+            put(Field.EMAIL, answer.get("person." + EMAIL));
+            put(Field.DATE_OF_BIRTH, answer.get("person." + DATE_OF_BIRTH));
+            put(Field.GENDER, answer.get("person." + GENDER));
+            put(Field.FORENAME, answer.get("person." + FORENAME));
+            put(Field.SURNAME, answer.get("person." + SURNAME));
+        }};
 
 //        TODO Key constraints are possible with Neo4j Enterprise, and some constraints are supported in Community
 //        https://neo4j.com/developer/kb/how-to-implement-a-primary-key-property-for-a-label/

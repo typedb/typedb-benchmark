@@ -6,6 +6,7 @@ import grakn.simulation.config.ConfigLoader;
 import grakn.simulation.config.Schema;
 import grakn.simulation.db.common.agents.base.AgentRunner;
 import grakn.simulation.db.common.agents.base.IterationContext;
+import grakn.simulation.db.common.agents.base.ResultHandler;
 import grakn.simulation.db.common.driver.DriverWrapper;
 import grakn.simulation.db.common.initialise.AgentPicker;
 import grakn.simulation.db.common.initialise.Initialiser;
@@ -139,7 +140,8 @@ public class Simulation implements IterationContext, AutoCloseable {
                             agentRunnersFromConfig(config, agentPicker),
                             new RandomSource(config.getRandomSeed()),
                             world,
-                            config.getTraceSampling().getSamplingFunction()
+                            config.getTraceSampling().getSamplingFunction(),
+                            null
                     )) {
                         ///////////////
                         // MAIN LOOP //
@@ -167,9 +169,9 @@ public class Simulation implements IterationContext, AutoCloseable {
         }
     }
 
-    public static List<AgentRunner> agentRunnersFromConfig(Config config, AgentPicker agentPicker) {
+    public static List<AgentRunner<?>> agentRunnersFromConfig(Config config, AgentPicker agentPicker) {
         // Get the agents with their runners
-        List<AgentRunner> agentRunners = new ArrayList<>();
+        List<AgentRunner<?>> agentRunners = new ArrayList<>();
         for (Config.Agent agent : config.getAgents()) {
             if (agent.getAgentMode().getRun()) {
                 AgentRunner<?> runner = agentPicker.get(agent.getName());
@@ -218,20 +220,22 @@ public class Simulation implements IterationContext, AutoCloseable {
     private final DriverWrapper driver;
     private final String database;
     private final DriverWrapper.Session defaultSession;
-    private final List<AgentRunner> agentRunners;
+    private final List<AgentRunner<?>> agentRunners;
     private final Random random;
     private Function<Integer, Boolean> iterationSamplingFunction;
+    private final ResultHandler resultHandler;
     private final World world;
     private int simulationStep = 1;
     private final ConcurrentMap<String, DriverWrapper.Session> sessionMap;
 
-    Simulation(DriverWrapper driver, String database, Initialiser initialiser, List<AgentRunner> agentRunners, RandomSource randomSource, World world, Function<Integer, Boolean> iterationSamplingFunction) {
+    public Simulation(DriverWrapper driver, String database, Initialiser initialiser, List<AgentRunner<?>> agentRunners, RandomSource randomSource, World world, Function<Integer, Boolean> iterationSamplingFunction, ResultHandler resultHandler) {
         this.driver = driver;
         this.database = database;
         defaultSession = this.driver.session(database);
         this.agentRunners = agentRunners;
         random = randomSource.startNewRandom();
         this.iterationSamplingFunction = iterationSamplingFunction;
+        this.resultHandler = resultHandler;
         sessionMap = new ConcurrentHashMap<>();
         this.world = world;
 
@@ -242,17 +246,18 @@ public class Simulation implements IterationContext, AutoCloseable {
         }
     }
 
-    void iterate() {
+    public ResultHandler iterate() {
 
         LOG.info("Simulation step: {}", simulationStep);
-
-        for (AgentRunner agentRunner : agentRunners) {
+        resultHandler.clean();
+        for (AgentRunner<?> agentRunner : agentRunners) {
             agentRunner.iterate(this, RandomSource.nextSource(random));
         }
 
         closeAllSessionsInMap(); // We want to test opening new sessions each iteration.
 
         simulationStep++;
+        return resultHandler;
     }
 
     private void closeAllSessionsInMap() {
@@ -285,6 +290,11 @@ public class Simulation implements IterationContext, AutoCloseable {
     @Override
     public boolean shouldTrace() {
         return iterationSamplingFunction.apply(getSimulationStep());
+    }
+
+    @Override
+    public ResultHandler getResultHandler() {
+        return resultHandler;
     }
 
     @Override
