@@ -16,7 +16,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 
-workspace(name = "simulation")
+workspace(name = "graknlabs_simulation")
 
 ################################
 # Load @graknlabs_dependencies #
@@ -31,9 +31,7 @@ load("@rules_antlr//antlr:deps.bzl", "antlr_dependencies")
 antlr_dependencies()
 
 # Load Bazel
-load("@graknlabs_dependencies//builder/bazel:deps.bzl","bazel_common", "bazel_deps", "bazel_toolchain")
-bazel_common()
-bazel_deps()
+load("@graknlabs_dependencies//builder/bazel:deps.bzl", "bazel_toolchain")
 bazel_toolchain()
 
 # Load gRPC
@@ -62,7 +60,7 @@ kt_register_toolchains()
 # Load NodeJS
 load("@graknlabs_dependencies//builder/nodejs:deps.bzl", nodejs_deps = "deps")
 nodejs_deps()
-load("@build_bazel_rules_nodejs//:defs.bzl", "node_repositories")
+load("@build_bazel_rules_nodejs//:index.bzl", "node_repositories")
 node_repositories()
 
 # Load Python
@@ -97,8 +95,8 @@ unuseddeps_deps()
 #####################################################################
 # Load @graknlabs_bazel_distribution (from @graknlabs_dependencies) #
 #####################################################################
-load("@graknlabs_dependencies//distribution:deps.bzl", distribution_deps = "deps")
-distribution_deps()
+load("@graknlabs_dependencies//dependencies/graknlabs:repositories.bzl", "graknlabs_bazel_distribution")
+graknlabs_bazel_distribution()
 
 pip3_import(
     name = "graknlabs_bazel_distribution_pip",
@@ -110,25 +108,6 @@ graknlabs_bazel_distribution_pip_install()
 
 load("@graknlabs_bazel_distribution//github:dependencies.bzl", "tcnksm_ghr")
 tcnksm_ghr()
-
-load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
-git_repository(
-    name = "io_bazel_skydoc",
-    remote = "https://github.com/graknlabs/skydoc.git",
-    branch = "experimental-skydoc-allow-dep-on-bazel-tools",
-)
-
-load("@io_bazel_skydoc//:setup.bzl", "skydoc_repositories")
-skydoc_repositories()
-
-load("@io_bazel_rules_sass//:package.bzl", "rules_sass_dependencies")
-rules_sass_dependencies()
-
-load("@build_bazel_rules_nodejs//:defs.bzl", "node_repositories")
-node_repositories()
-
-load("@io_bazel_rules_sass//:defs.bzl", "sass_repositories")
-sass_repositories()
 
 load("@graknlabs_bazel_distribution//common:dependencies.bzl", "bazelbuild_rules_pkg")
 bazelbuild_rules_pkg()
@@ -152,20 +131,20 @@ load("@graknlabs_client_java//dependencies/maven:artifacts.bzl", graknlabs_clien
 ########################################################
 # Load @graknlabs_common (from @graknlabs_client_java) #
 #######################################################
-load("@graknlabs_client_java//dependencies/graknlabs:dependencies.bzl", "graknlabs_common")
+load("@graknlabs_client_java//dependencies/graknlabs:repositories.bzl", "graknlabs_common")
 graknlabs_common()
 
 #######################################################
 # Load @graknlabs_graql (from @graknlabs_client_java) #
 #######################################################
-load("@graknlabs_client_java//dependencies/graknlabs:dependencies.bzl", "graknlabs_graql")
+load("@graknlabs_client_java//dependencies/graknlabs:repositories.bzl", "graknlabs_graql")
 graknlabs_graql()
 load("@graknlabs_graql//dependencies/maven:artifacts.bzl", graknlabs_graql_artifacts = "artifacts")
 
 ##########################################################
 # Load @graknlabs_protocol (from @graknlabs_client_java) #
 ##########################################################
-load("@graknlabs_client_java//dependencies/graknlabs:dependencies.bzl", "graknlabs_protocol")
+load("@graknlabs_client_java//dependencies/graknlabs:repositories.bzl", "graknlabs_protocol")
 graknlabs_protocol()
 load("@graknlabs_protocol//dependencies/maven:artifacts.bzl", graknlabs_protocol_artifacts = "artifacts")
 
