@@ -7,6 +7,13 @@ commands:
       - run: curl -OL https://raw.githubusercontent.com/graknlabs/dependencies/master/tool/bazelinstall/rbe.sh
       - run: bash ./rbe.sh && rm ./rbe.sh          
 
+  install-artifact-credentials:
+    steps:
+      - run: |
+          ARTIFACT_USERNAME=$REPO_GRAKN_USERNAME \
+          ARTIFACT_PASSWORD=$REPO_GRAKN_PASSWORD \
+          bazel run @graknlabs_dependencies//distribution/artifact:create-netrc
+
   run-bazel:
     parameters:
       command:
@@ -41,8 +48,9 @@ jobs:
       image: ubuntu-1604:201903-01
     working_directory: ~/simulation
     steps:
-      - install-bazel
       - checkout
+      - install-bazel
+      - install-artifact-credentials
       - run-bazel:
           command: bazel build //...
       - run:
@@ -66,8 +74,9 @@ jobs:
       image: ubuntu-1604:201903-01
     working_directory: ~/simulation
     steps:
-      - install-bazel
       - checkout
+      - install-bazel
+      - install-artifact-credentials
       - run-grakn
       - run: bazel run //:simulation -- -d grakn -n
       - run: bazel test //db/grakn/agents/test/... --test_arg=localhost:48555 --test_output=all --test_timeout=7200
