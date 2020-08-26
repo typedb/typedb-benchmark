@@ -132,9 +132,9 @@ rje_maven_install(
     version_conflict_policy = "pinned"
 )
 
-###############
-# Load @maven #
-###############
+############################
+# Load @maven dependencies #
+############################
 
 load("@graknlabs_dependencies//library/maven:rules.bzl", "maven")
 maven(
