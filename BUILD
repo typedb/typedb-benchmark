@@ -53,3 +53,13 @@ java_binary(
     main_class = "grakn.simulation.Simulation",
     runtime_deps = [":simulation-lib"],
 )
+
+# CI targets that are not declared in any BUILD file, but are called externally
+filegroup(
+    name = "ci",
+    data = [
+        "@graknlabs_dependencies//tool/bazelrun:rbe",
+        "@graknlabs_dependencies//distribution/artifact:create-netrc",
+        "@graknlabs_dependencies//tool/unuseddeps:unused-deps",
+    ],
+)
