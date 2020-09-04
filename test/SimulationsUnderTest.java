@@ -29,7 +29,7 @@ import static grakn.simulation.db.common.initialise.Initialiser.world;
 public class SimulationsUnderTest {
     static final Simulation neo4jSimulation;
     static final Simulation graknSimulation;
-    static final int numIterations = 3;
+    static final int numIterations = 10;
 
     static {
         int scaleFactor = 5;
@@ -56,9 +56,9 @@ public class SimulationsUnderTest {
         });
 
         ArrayList<String> agentNames = new ArrayList<>();
-        agentNames.add("marriage");
+//        agentNames.add("marriage");
         agentNames.add("personBirth");
-        agentNames.add("ageUpdate");
+//        agentNames.add("ageUpdate");
 
         World world = world(scaleFactor, files);
 

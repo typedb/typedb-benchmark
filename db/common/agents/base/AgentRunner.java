@@ -66,9 +66,8 @@ public abstract class AgentRunner<T> {
         try (Agent<T> agent = agentConstructor.newInstance()) {
             agent.init(iterationContext, agentRandom, item, sessionKey, tracker, logger, traceAgent && iterationContext.shouldTrace());
 //            AgentResult agentResult = agent.iterateWithTracing();  // TODO Disabled for demo purposes
-            AgentResult agentResult = agent.iterate();  // TODO Bring this back
-//            agent.iterate();  // TODO Bring this back
-            iterationContext.getResultHandler().newResult(agent.getClass().getSimpleName(), agentResult);
+            AgentResult agentResult = agent.iterate();
+            iterationContext.getResultHandler().newResult(agent.getClass().getSimpleName(), tracker, agentResult);
             lastTestCount.put(tracker, agent.testByCount(lastTestCount.getOrDefault(tracker, 0)));
 
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
