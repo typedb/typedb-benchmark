@@ -28,6 +28,9 @@ java_test(
     name = "simulation-test",
     srcs = [
         "SimulationTest.java",
+        "SimulationTestSuite.java",
+        "SimulationRunner.java",
+        "SimulationsUnderTest.java",
     ],
     data = [
         "//db/common/data",
