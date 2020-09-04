@@ -17,7 +17,7 @@ public class SimulationTestSuite extends Suite {
     private static final List<Runner> NO_RUNNERS = Collections.emptyList();
     private final List<Runner> runners;
     private final Class<?> klass;
-    private static int iteration = 0;
+    private static int iteration = 1;
 
     public SimulationTestSuite(Class<?> klass) throws Throwable {
         super(klass, NO_RUNNERS);
@@ -27,7 +27,7 @@ public class SimulationTestSuite extends Suite {
 
     private List<Runner> createRunnersForIterations() {
         List<Runner> runners = new ArrayList<>();
-        for (int i = 0; i < SimulationsUnderTest.numIterations; i++) {
+        for (int i = 1; i <= SimulationsUnderTest.numIterations; i++) {
             try {
                 BlockJUnit4ClassRunner runner = new SimulationRunner(klass, i);
                 runners.add(runner);
@@ -43,7 +43,7 @@ public class SimulationTestSuite extends Suite {
         neo4jSimulation.iterate();
         graknSimulation.iterate();
         super.runChild(runner, notifier);
-        if (iteration == SimulationsUnderTest.numIterations) {
+        if (iteration == SimulationsUnderTest.numIterations + 1) {
             graknSimulation.close();
             neo4jSimulation.close();
         }
