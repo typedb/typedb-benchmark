@@ -14,6 +14,7 @@ import java.util.List;
 import static com.google.common.collect.Iterables.getOnlyElement;
 import static grabl.tracing.client.GrablTracingThreadStatic.ThreadTrace;
 import static grabl.tracing.client.GrablTracingThreadStatic.traceOnThread;
+import static grakn.simulation.db.grakn.agents.utils.Utils.getOnlyAttributeOfThing;
 import static grakn.simulation.db.grakn.schema.Schema.BORN_IN;
 import static grakn.simulation.db.grakn.schema.Schema.BORN_IN_CHILD;
 import static grakn.simulation.db.grakn.schema.Schema.BORN_IN_PLACE_OF_BIRTH;
@@ -29,10 +30,10 @@ import static grakn.simulation.db.grakn.schema.Schema.SURNAME;
 public class PersonBirthAgent extends PersonBirthAgentBase {
 
     @Override
-    protected HashMap<PersonBirthAgentBase.Field, Object> insertPerson(String email, String gender, String forename, String surname) {
+    protected HashMap<Field, Object> insertPerson(String email, String gender, String forename, String surname) {
         Statement city = Graql.var(CITY);
-        Statement person = Graql.var("p");
-        Statement bornIn = Graql.var("b");
+        Statement person = Graql.var(PERSON);
+        Statement bornIn = Graql.var(BORN_IN);
         Statement emailVar = Graql.var(EMAIL);
         Statement genderVar = Graql.var(GENDER);
         Statement forenameVar = Graql.var(FORENAME);
@@ -68,20 +69,21 @@ public class PersonBirthAgent extends PersonBirthAgentBase {
         }
 
         ConceptMap answer = getOnlyElement(answers);
-        return new HashMap<PersonBirthAgentBase.Field, Object>(){{
-            put(Field.EMAIL, answer.get(EMAIL).asAttribute().value());
-            put(Field.DATE_OF_BIRTH, answer.get(DATE_OF_BIRTH).asAttribute().value());
-            put(Field.GENDER, answer.get(GENDER).asAttribute().value());
-            put(Field.FORENAME, answer.get(FORENAME).asAttribute().value());
-            put(Field.SURNAME, answer.get(SURNAME).asAttribute().value());
-        }};
+        return new HashMap<Field, Object>(){
+            {
+                put(PersonBirthAgentField.EMAIL, getOnlyAttributeOfThing(answer, tx().forGrakn(), PERSON, EMAIL));
+                put(PersonBirthAgentField.DATE_OF_BIRTH, getOnlyAttributeOfThing(answer, tx().forGrakn(), PERSON, DATE_OF_BIRTH));
+                put(PersonBirthAgentField.GENDER, getOnlyAttributeOfThing(answer, tx().forGrakn(), PERSON, GENDER));
+                put(PersonBirthAgentField.FORENAME, getOnlyAttributeOfThing(answer, tx().forGrakn(), PERSON, FORENAME));
+                put(PersonBirthAgentField.SURNAME, getOnlyAttributeOfThing(answer, tx().forGrakn(), PERSON, SURNAME));
+            }};
     }
 
     @Override
     protected int checkCount() {
         Statement city = Graql.var(CITY);
-        Statement person = Graql.var("p");
-        Statement bornIn = Graql.var("b");
+        Statement person = Graql.var(PERSON);
+        Statement bornIn = Graql.var(BORN_IN);
 
         Statement emailVar = Graql.var(EMAIL);
         Statement genderVar = Graql.var(GENDER);

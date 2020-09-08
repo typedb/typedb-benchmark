@@ -1,7 +1,7 @@
 package grakn.simulation.test;
 
+import grakn.simulation.db.common.agents.base.Agent.Field;
 import grakn.simulation.db.common.agents.base.AgentResult;
-import grakn.simulation.db.common.agents.interaction.PersonBirthAgentBase;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -16,7 +16,7 @@ import static org.junit.Assert.assertEquals;
 @RunWith(SimulationTestSuite.class)
 public class SimulationTest {
 
-    private void compareBackends(String agentName) {
+    private void compareFields(String agentName) {
 
         ConcurrentHashMap<String, AgentResult> graknResult = graknSimulation.getResultHandler().getResultForAgent(agentName);
         ConcurrentHashMap<String, AgentResult> neo4jResult = neo4jSimulation.getResultHandler().getResultForAgent(agentName);
@@ -25,16 +25,23 @@ public class SimulationTest {
         assertEquals(graknResult.keySet(), neo4jResult.keySet());
 
         // Iterate over the trackers comparing the values
+//        TODO bring in a count check, as below
+//        graknResult.keySet().forEach(tracker -> assertEquals(graknResult.get(tracker), neo4jResult.get(tracker)));
         graknResult.keySet().forEach(tracker -> {
-            Collection<HashMap<PersonBirthAgentBase.Field, Object>> graknFields = graknResult.get(tracker).getAllFieldValues();
-            Collection<HashMap<PersonBirthAgentBase.Field, Object>> neo4jFields = neo4jResult.get(tracker).getAllFieldValues();
+            Collection<HashMap<Field, Object>> graknFields = graknResult.get(tracker).getAllFieldValues();
+            Collection<HashMap<Field, Object>> neo4jFields = neo4jResult.get(tracker).getAllFieldValues();
             assertEquals(graknFields, neo4jFields);
         });
     }
 
     @Test
     public void testPersonBirthAgent() {
-        compareBackends("PersonBirthAgent");
+        compareFields("PersonBirthAgent");
+    }
+
+    @Test
+    public void testMarriageAgent() {
+        compareFields("MarriageAgent");
     }
 
 //    @Test

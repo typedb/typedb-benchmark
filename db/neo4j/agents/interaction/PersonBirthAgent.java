@@ -21,7 +21,7 @@ public class PersonBirthAgent extends PersonBirthAgentBase {
     String CURRENT = "current";
 
     @Override
-    protected HashMap<PersonBirthAgentBase.Field, Object> insertPerson(String email, String gender, String forename, String surname) {
+    protected HashMap<Field, Object> insertPerson(String email, String gender, String forename, String surname) {
         String template = "MATCH (c:City {locationName: $locationName})" +
                 "CREATE (person:Person {" +
                 "email: $email, " +
@@ -49,12 +49,13 @@ public class PersonBirthAgent extends PersonBirthAgentBase {
         List<Record> answers = ((Transaction) tx()).execute(query);
 
         Map<String, Object> answer = getOnlyElement(answers).asMap();
-        return new HashMap<PersonBirthAgentBase.Field, Object>(){{
-            put(Field.EMAIL, answer.get("person." + EMAIL));
-            put(Field.DATE_OF_BIRTH, answer.get("person." + DATE_OF_BIRTH));
-            put(Field.GENDER, answer.get("person." + GENDER));
-            put(Field.FORENAME, answer.get("person." + FORENAME));
-            put(Field.SURNAME, answer.get("person." + SURNAME));
+
+        return new HashMap<Field, Object>() {{
+            put(PersonBirthAgentField.EMAIL, answer.get("person." + EMAIL));
+            put(PersonBirthAgentField.DATE_OF_BIRTH, answer.get("person." + DATE_OF_BIRTH));
+            put(PersonBirthAgentField.GENDER, answer.get("person." + GENDER));
+            put(PersonBirthAgentField.FORENAME, answer.get("person." + FORENAME));
+            put(PersonBirthAgentField.SURNAME, answer.get("person." + SURNAME));
         }};
 
 //        TODO Key constraints are possible with Neo4j Enterprise, and some constraints are supported in Community

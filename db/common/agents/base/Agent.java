@@ -198,6 +198,8 @@ public abstract class Agent<T> implements AutoCloseable {
         return methodName;
     }
 
+    public interface Field {}
+
     protected abstract int checkCount();
 
     protected abstract Pair<Integer, Integer> countBounds();

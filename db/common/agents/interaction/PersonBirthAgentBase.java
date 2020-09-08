@@ -14,7 +14,7 @@ public abstract class PersonBirthAgentBase extends CityAgent {
 
     private int numBirths;
 
-    public enum Field {
+    protected enum PersonBirthAgentField implements Field {
         EMAIL, GENDER, FORENAME, SURNAME, DATE_OF_BIRTH
     }
 

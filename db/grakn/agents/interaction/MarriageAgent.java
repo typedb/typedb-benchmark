@@ -1,5 +1,7 @@
 package grakn.simulation.db.grakn.agents.interaction;
 
+import grakn.client.answer.ConceptMap;
+import grakn.simulation.db.common.agents.interaction.MarriageAgentBase;
 import grakn.simulation.db.grakn.driver.GraknClientWrapper.Session.Transaction;
 import graql.lang.Graql;
 import graql.lang.query.GraqlGet;
@@ -7,10 +9,13 @@ import graql.lang.query.GraqlInsert;
 import graql.lang.statement.Statement;
 import graql.lang.statement.StatementAttribute;
 
+import java.util.HashMap;
 import java.util.List;
 
+import static com.google.common.collect.Iterables.getOnlyElement;
 import static grabl.tracing.client.GrablTracingThreadStatic.ThreadTrace;
 import static grabl.tracing.client.GrablTracingThreadStatic.traceOnThread;
+import static grakn.simulation.db.grakn.agents.utils.Utils.getOnlyAttributeOfThing;
 import static grakn.simulation.db.grakn.schema.Schema.CITY;
 import static grakn.simulation.db.grakn.schema.Schema.DATE_OF_BIRTH;
 import static grakn.simulation.db.grakn.schema.Schema.EMAIL;
@@ -29,7 +34,7 @@ import static grakn.simulation.db.grakn.schema.Schema.RESIDENCY;
 import static grakn.simulation.db.grakn.schema.Schema.RESIDENCY_LOCATION;
 import static grakn.simulation.db.grakn.schema.Schema.RESIDENCY_RESIDENT;
 
-public class MarriageAgent extends grakn.simulation.db.common.agents.interaction.MarriageAgent {
+public class MarriageAgent extends MarriageAgentBase {
 
     @Override
     protected List<String> getSingleWomen() {
@@ -64,11 +69,11 @@ public class MarriageAgent extends grakn.simulation.db.common.agents.interaction
     }
 
     @Override
-    protected void insertMarriage(int marriageIdentifier, String wifeEmail, String husbandEmail) {
+    protected HashMap<Field, Object> insertMarriage(int marriageIdentifier, String wifeEmail, String husbandEmail) {
         Statement husband = Graql.var("husband");
         Statement wife = Graql.var("wife");
         Statement city = Graql.var(CITY);
-        Statement marriage = Graql.var("m");
+        Statement marriage = Graql.var("marriage");
 
         StatementAttribute cityNameVar = Graql.var().val(city().name());
         StatementAttribute marriageIdentifierVar = Graql.var().val(marriageIdentifier);
@@ -86,10 +91,25 @@ public class MarriageAgent extends grakn.simulation.db.common.agents.interaction
                         .has(MARRIAGE_ID, marriageIdentifierVar),
                 Graql.var().isa(LOCATES).rel(LOCATES_LOCATED, marriage).rel(LOCATES_LOCATION, city)
         );
+
+        List<ConceptMap> answers;
         log().query("insertMarriage", marriageQuery);
         try (ThreadTrace trace = traceOnThread("execute")) {
-            tx().forGrakn().execute(marriageQuery).get();
+            answers = tx().forGrakn().execute(marriageQuery).get();
         }
+
+        ConceptMap answer = getOnlyElement(answers);
+        Object wifeEmailAns = getOnlyAttributeOfThing(answer, tx().forGrakn(), "wife", EMAIL);
+        Object husbandEmailAns = getOnlyAttributeOfThing(answer, tx().forGrakn(), "husband", EMAIL);
+        Object marriageIdentifierAns = getOnlyAttributeOfThing(answer, tx().forGrakn(), "marriage", MARRIAGE_ID);
+        Object cityNameAns = getOnlyAttributeOfThing(answer, tx().forGrakn(), CITY, LOCATION_NAME);
+
+        return new HashMap<Field, Object>(){{
+                put(MarriageAgentField.MARRIAGE_IDENTIFIER, marriageIdentifierAns);
+                put(MarriageAgentField.WIFE_EMAIL, wifeEmailAns);
+                put(MarriageAgentField.HUSBAND_EMAIL, husbandEmailAns);
+                put(MarriageAgentField.CITY_NAME, cityNameAns);
+            }};
     }
 
     @Override

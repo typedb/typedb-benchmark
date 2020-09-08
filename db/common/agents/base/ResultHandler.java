@@ -8,6 +8,9 @@ public class ResultHandler {
     HashMap<String, ConcurrentHashMap<String, AgentResult>> agentResults;
 
     public void newResult(String agentName, String tracker, AgentResult agentResult) {
+        if (agentResult == null) {
+            throw new NullPointerException(String.format("The result returned from a %s agent was null", agentName));
+        }
         ConcurrentHashMap<String, AgentResult> agentEntry = agentResults.computeIfAbsent(agentName, x -> new ConcurrentHashMap<>());
         agentEntry.put(tracker, agentResult);
     }
