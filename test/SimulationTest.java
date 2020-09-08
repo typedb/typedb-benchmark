@@ -1,6 +1,6 @@
 package grakn.simulation.test;
 
-import grakn.simulation.db.common.agents.base.Agent.Field;
+import grakn.simulation.db.common.agents.base.Agent.ComparableField;
 import grakn.simulation.db.common.agents.base.AgentResult;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -28,8 +28,8 @@ public class SimulationTest {
 //        TODO bring in a count check, as below
 //        graknResult.keySet().forEach(tracker -> assertEquals(graknResult.get(tracker), neo4jResult.get(tracker)));
         graknResult.keySet().forEach(tracker -> {
-            Collection<HashMap<Field, Object>> graknFields = graknResult.get(tracker).getAllFieldValues();
-            Collection<HashMap<Field, Object>> neo4jFields = neo4jResult.get(tracker).getAllFieldValues();
+            Collection<HashMap<ComparableField, Object>> graknFields = graknResult.get(tracker).getAllFieldValues();
+            Collection<HashMap<ComparableField, Object>> neo4jFields = neo4jResult.get(tracker).getAllFieldValues();
             assertEquals(graknFields, neo4jFields);
         });
     }

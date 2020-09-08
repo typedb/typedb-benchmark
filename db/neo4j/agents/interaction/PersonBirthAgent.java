@@ -21,7 +21,7 @@ public class PersonBirthAgent extends PersonBirthAgentBase {
     String CURRENT = "current";
 
     @Override
-    protected HashMap<Field, Object> insertPerson(String email, String gender, String forename, String surname) {
+    protected HashMap<ComparableField, Object> insertPerson(String email, String gender, String forename, String surname) {
         String template = "MATCH (c:City {locationName: $locationName})" +
                 "CREATE (person:Person {" +
                 "email: $email, " +
@@ -50,7 +50,7 @@ public class PersonBirthAgent extends PersonBirthAgentBase {
 
         Map<String, Object> answer = getOnlyElement(answers).asMap();
 
-        return new HashMap<Field, Object>() {{
+        return new HashMap<ComparableField, Object>() {{
             put(PersonBirthAgentField.EMAIL, answer.get("person." + EMAIL));
             put(PersonBirthAgentField.DATE_OF_BIRTH, answer.get("person." + DATE_OF_BIRTH));
             put(PersonBirthAgentField.GENDER, answer.get("person." + GENDER));

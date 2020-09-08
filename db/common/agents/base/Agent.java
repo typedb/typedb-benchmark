@@ -198,7 +198,7 @@ public abstract class Agent<T> implements AutoCloseable {
         return methodName;
     }
 
-    public interface Field {}
+    public interface ComparableField {}
 
     protected abstract int checkCount();
 

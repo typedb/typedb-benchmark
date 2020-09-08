@@ -14,7 +14,7 @@ public abstract class PersonBirthAgentBase extends CityAgent {
 
     private int numBirths;
 
-    protected enum PersonBirthAgentField implements Field {
+    protected enum PersonBirthAgentField implements ComparableField {
         EMAIL, GENDER, FORENAME, SURNAME, DATE_OF_BIRTH
     }
 
@@ -22,7 +22,7 @@ public abstract class PersonBirthAgentBase extends CityAgent {
     public final AgentResult iterate() {
         // Find bachelors and bachelorettes who are considered adults and who are not in a marriage and pair them off randomly
         numBirths = world().getScaleFactor();
-        HashSet<HashMap<Field, Object>> allFieldValues = new HashSet<>();
+        HashSet<HashMap<ComparableField, Object>> allFieldValues = new HashSet<>();
 
         for (int i = 0; i < numBirths; i++) {
             String gender;
@@ -48,7 +48,7 @@ public abstract class PersonBirthAgentBase extends CityAgent {
                     + city().country() + "_"
                     + city().country().continent()
                     + "@gmail.com";
-            HashMap<Field, Object> fieldValues;
+            HashMap<ComparableField, Object> fieldValues;
             try (ThreadTrace trace = traceOnThread(this.checkMethodTrace("insertPerson"))) {
                 fieldValues = insertPerson(email, gender, forename, surname);
             }
@@ -58,7 +58,7 @@ public abstract class PersonBirthAgentBase extends CityAgent {
         return new AgentResult(allFieldValues);
     }
 
-    protected abstract HashMap<Field, Object> insertPerson(String email, String gender, String forename, String surname);
+    protected abstract HashMap<ComparableField, Object> insertPerson(String email, String gender, String forename, String surname);
 
     protected Pair<Integer, Integer> countBounds() {
         return new Pair<>(numBirths, numBirths);

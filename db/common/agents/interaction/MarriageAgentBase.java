@@ -14,7 +14,7 @@ import static grabl.tracing.client.GrablTracingThreadStatic.traceOnThread;
 
 public abstract class MarriageAgentBase extends CityAgent {
 
-    public enum MarriageAgentField implements Field {
+    public enum MarriageAgentField implements ComparableField {
         MARRIAGE_IDENTIFIER, WIFE_EMAIL, HUSBAND_EMAIL, CITY_NAME
     }
 
@@ -22,7 +22,7 @@ public abstract class MarriageAgentBase extends CityAgent {
 
     @Override
     public final AgentResult iterate() {
-        HashSet<HashMap<Field, Object>> allFieldValues = new HashSet<>();
+        HashSet<HashMap<ComparableField, Object>> allFieldValues = new HashSet<>();
         log().message("MarriageAgent", String.format("Simulation step %d", simulationStep()));
         // Find bachelors and bachelorettes who are considered adults and who are not in a marriage and pair them off randomly
         List<String> womenEmails;
@@ -47,7 +47,7 @@ public abstract class MarriageAgentBase extends CityAgent {
                 String husbandEmail = menEmails.get(i);
                 int marriageIdentifier = (wifeEmail + husbandEmail).hashCode();
 
-                HashMap<Field, Object> fieldValues;
+                HashMap<ComparableField, Object> fieldValues;
                 try (ThreadTrace trace = traceOnThread(this.checkMethodTrace("insertMarriage"))) {
                     fieldValues = insertMarriage(marriageIdentifier, wifeEmail, husbandEmail);
                 }
@@ -69,7 +69,7 @@ public abstract class MarriageAgentBase extends CityAgent {
 //    TODO Should this inner query be included at the top level?
 //    private GraqlGet.Unfiltered getSinglePeopleOfGenderQuery(String gender, String marriageRole);
 
-    protected abstract HashMap<Field, Object> insertMarriage(int marriageIdentifier, String wifeEmail, String husbandEmail);
+    protected abstract HashMap<ComparableField, Object> insertMarriage(int marriageIdentifier, String wifeEmail, String husbandEmail);
 
     protected Pair<Integer, Integer> countBounds() {
         return new Pair<>(numMarriagesPossible, numMarriagesPossible);

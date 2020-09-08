@@ -45,7 +45,7 @@ public class MarriageAgent extends MarriageAgentBase {
     }
 
     @Override
-    protected HashMap<Field, Object> insertMarriage(int marriageIdentifier, String wifeEmail, String husbandEmail) {
+    protected HashMap<ComparableField, Object> insertMarriage(int marriageIdentifier, String wifeEmail, String husbandEmail) {
         String template = "" +
                 "MATCH (wife:Person {email: $wifeEmail}), (husband:Person {email: $husbandEmail}), (city:City {locationName: $cityName})\n" +
                 "CREATE (husband)-[marriage:MARRIED_TO {id: $marriageIdentifier, locationName: city.locationName}]->(wife)" +
@@ -65,7 +65,7 @@ public class MarriageAgent extends MarriageAgentBase {
 
         Map<String, Object> answer = getOnlyElement(answers).asMap();
 
-        return new HashMap<Field, Object>() {{
+        return new HashMap<ComparableField, Object>() {{
             put(MarriageAgentField.MARRIAGE_IDENTIFIER, answer.get("marriage.id"));
             put(MarriageAgentField.WIFE_EMAIL, answer.get("wife.email"));  // TODO we get back the variables matched for in an insert?
             put(MarriageAgentField.HUSBAND_EMAIL, answer.get("husband.email"));

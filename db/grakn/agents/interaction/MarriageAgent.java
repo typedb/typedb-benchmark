@@ -69,7 +69,7 @@ public class MarriageAgent extends MarriageAgentBase {
     }
 
     @Override
-    protected HashMap<Field, Object> insertMarriage(int marriageIdentifier, String wifeEmail, String husbandEmail) {
+    protected HashMap<ComparableField, Object> insertMarriage(int marriageIdentifier, String wifeEmail, String husbandEmail) {
         Statement husband = Graql.var("husband");
         Statement wife = Graql.var("wife");
         Statement city = Graql.var(CITY);
@@ -104,7 +104,7 @@ public class MarriageAgent extends MarriageAgentBase {
         Object marriageIdentifierAns = getOnlyAttributeOfThing(answer, tx().forGrakn(), "marriage", MARRIAGE_ID);
         Object cityNameAns = getOnlyAttributeOfThing(answer, tx().forGrakn(), CITY, LOCATION_NAME);
 
-        return new HashMap<Field, Object>(){{
+        return new HashMap<ComparableField, Object>(){{
                 put(MarriageAgentField.MARRIAGE_IDENTIFIER, marriageIdentifierAns);
                 put(MarriageAgentField.WIFE_EMAIL, wifeEmailAns);
                 put(MarriageAgentField.HUSBAND_EMAIL, husbandEmailAns);
