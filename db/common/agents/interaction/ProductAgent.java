@@ -1,6 +1,6 @@
 package grakn.simulation.db.common.agents.interaction;
 
-import grakn.simulation.db.common.agents.base.AgentResult;
+import grakn.simulation.db.common.agents.base.AgentResultSet;
 import grakn.simulation.db.common.agents.utils.Pair;
 import grakn.simulation.db.common.agents.world.ContinentAgent;
 
@@ -10,7 +10,7 @@ import static grabl.tracing.client.GrablTracingThreadStatic.traceOnThread;
 public abstract class ProductAgent extends ContinentAgent {
 
     @Override
-    public final AgentResult iterate() {
+    public final AgentResultSet iterate() {
         int numProducts = world().getScaleFactor();
         for (int i = 0; i < numProducts; i++) {
             String productName = randomAttributeGenerator().boundRandomLengthRandomString(5, 20);

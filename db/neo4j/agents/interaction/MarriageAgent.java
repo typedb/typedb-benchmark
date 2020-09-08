@@ -1,5 +1,6 @@
 package grakn.simulation.db.neo4j.agents.interaction;
 
+import grakn.simulation.db.common.agents.base.AgentResult;
 import grakn.simulation.db.common.agents.interaction.MarriageAgentBase;
 import grakn.simulation.db.neo4j.driver.Neo4jDriverWrapper.Session.Transaction;
 import org.neo4j.driver.Query;
@@ -49,7 +50,7 @@ public class MarriageAgent extends MarriageAgentBase {
     }
 
     @Override
-    protected HashMap<ComparableField, Object> insertMarriage(int marriageIdentifier, String wifeEmail, String husbandEmail) {
+    protected AgentResult insertMarriage(int marriageIdentifier, String wifeEmail, String husbandEmail) {
         String template = "" +
                 "MATCH (wife:Person {email: $wifeEmail}), (husband:Person {email: $husbandEmail}), (city:City {locationName: $locationName})\n" +
                 "CREATE (husband)-[marriage:MARRIED_TO {marriageId: $marriageId, locationName: city.locationName}]->(wife)" +
@@ -69,7 +70,7 @@ public class MarriageAgent extends MarriageAgentBase {
 
         Map<String, Object> answer = getOnlyElement(answers).asMap();
 
-        return new HashMap<ComparableField, Object>() {{
+        return new AgentResult() {{
             put(MarriageAgentField.MARRIAGE_IDENTIFIER, answer.get("marriage." + MARRIAGE_ID));
             put(MarriageAgentField.WIFE_EMAIL, answer.get("wife." + EMAIL));  // TODO we get back the variables matched for in an insert?
             put(MarriageAgentField.HUSBAND_EMAIL, answer.get("husband." + EMAIL));

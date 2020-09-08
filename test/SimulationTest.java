@@ -1,7 +1,7 @@
 package grakn.simulation.test;
 
 import grakn.simulation.db.common.agents.base.Agent.ComparableField;
-import grakn.simulation.db.common.agents.base.AgentResult;
+import grakn.simulation.db.common.agents.base.AgentResultSet;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -18,8 +18,8 @@ public class SimulationTest {
 
     private void compareFields(String agentName) {
 
-        ConcurrentHashMap<String, AgentResult> graknResult = graknSimulation.getResultHandler().getResultForAgent(agentName);
-        ConcurrentHashMap<String, AgentResult> neo4jResult = neo4jSimulation.getResultHandler().getResultForAgent(agentName);
+        ConcurrentHashMap<String, AgentResultSet> graknResult = graknSimulation.getResultHandler().getResultForAgent(agentName);
+        ConcurrentHashMap<String, AgentResultSet> neo4jResult = neo4jSimulation.getResultHandler().getResultForAgent(agentName);
 
         // Check both have the same trackers present
         assertEquals(graknResult.keySet(), neo4jResult.keySet());
@@ -28,8 +28,8 @@ public class SimulationTest {
 //        TODO bring in a count check, as below
 //        graknResult.keySet().forEach(tracker -> assertEquals(graknResult.get(tracker), neo4jResult.get(tracker)));
         graknResult.keySet().forEach(tracker -> {
-            Collection<HashMap<ComparableField, Object>> graknFields = graknResult.get(tracker).getAllFieldValues();
-            Collection<HashMap<ComparableField, Object>> neo4jFields = neo4jResult.get(tracker).getAllFieldValues();
+            Collection<HashMap<ComparableField, Object>> graknFields = graknResult.get(tracker);
+            Collection<HashMap<ComparableField, Object>> neo4jFields = neo4jResult.get(tracker);
             assertEquals(graknFields, neo4jFields);
         });
     }

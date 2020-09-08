@@ -1,5 +1,6 @@
 package grakn.simulation.db.grakn.agents.interaction;
 
+import grakn.simulation.db.common.agents.base.AgentResult;
 import grakn.simulation.db.grakn.driver.GraknClientWrapper.Session.Transaction;
 import graql.lang.Graql;
 import graql.lang.query.GraqlDelete;
@@ -26,7 +27,7 @@ import static grakn.simulation.db.grakn.schema.Schema.AGE;
 public class AgeUpdateAgent extends grakn.simulation.db.common.agents.interaction.AgeUpdateAgent {
 
     @Override
-    protected void updateAgesOfAllPeople() {
+    protected AgentResult updateAgesOfAllPeople() {
         // Get all people born in a city
         HashMap<String, LocalDateTime> peopleAnswers;
         try (ThreadTrace trace = traceOnThread(this.checkMethodTrace("getPeopleBornInCity"))) {
@@ -40,6 +41,7 @@ public class AgeUpdateAgent extends grakn.simulation.db.common.agents.interactio
                     }
                 }
         );
+        return null;
     }
 
     private void updatePersonAge(String personEmail, long newAge) {

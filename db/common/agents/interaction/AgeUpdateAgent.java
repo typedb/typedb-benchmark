@@ -1,6 +1,7 @@
 package grakn.simulation.db.common.agents.interaction;
 
 import grakn.simulation.db.common.agents.base.AgentResult;
+import grakn.simulation.db.common.agents.base.AgentResultSet;
 import grakn.simulation.db.common.agents.utils.Pair;
 import grakn.simulation.db.common.agents.world.CityAgent;
 
@@ -10,15 +11,16 @@ import static grabl.tracing.client.GrablTracingThreadStatic.traceOnThread;
 public abstract class AgeUpdateAgent extends CityAgent {
 
     @Override
-    public final AgentResult iterate() {
+    public final AgentResultSet iterate() {
+        AgentResultSet agentResultSet = new AgentResultSet();
         try (ThreadTrace trace = traceOnThread(this.registerMethodTrace("updateAgesOfAllPeople"))) {
-            updateAgesOfAllPeople();
+            agentResultSet.add(updateAgesOfAllPeople());
         }
         commitTxWithTracing();
-        return null;
+        return agentResultSet;
     }
 
-    protected abstract void updateAgesOfAllPeople();
+    protected abstract AgentResult updateAgesOfAllPeople();
 
     protected Pair<Integer, Integer> countBounds() {
         return new Pair<>(world().getScaleFactor(), world().getScaleFactor());

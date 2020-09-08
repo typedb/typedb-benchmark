@@ -1,6 +1,7 @@
 package grakn.simulation.db.grakn.agents.interaction;
 
 import grakn.client.answer.ConceptMap;
+import grakn.simulation.db.common.agents.base.AgentResult;
 import grakn.simulation.db.common.agents.interaction.PersonBirthAgentBase;
 import grakn.simulation.db.grakn.driver.GraknClientWrapper.Session.Transaction;
 import graql.lang.Graql;
@@ -30,7 +31,7 @@ import static grakn.simulation.db.grakn.schema.Schema.SURNAME;
 public class PersonBirthAgent extends PersonBirthAgentBase {
 
     @Override
-    protected HashMap<ComparableField, Object> insertPerson(String email, String gender, String forename, String surname) {
+    protected AgentResult insertPerson(String email, String gender, String forename, String surname) {
         Statement city = Graql.var(CITY);
         Statement person = Graql.var(PERSON);
         Statement bornIn = Graql.var(BORN_IN);
@@ -69,7 +70,7 @@ public class PersonBirthAgent extends PersonBirthAgentBase {
         }
 
         ConceptMap answer = getOnlyElement(answers);
-        return new HashMap<ComparableField, Object>(){
+        return new AgentResult(){
             {
                 put(PersonBirthAgentField.EMAIL, getOnlyAttributeOfThing(answer, tx().forGrakn(), PERSON, EMAIL));
                 put(PersonBirthAgentField.DATE_OF_BIRTH, getOnlyAttributeOfThing(answer, tx().forGrakn(), PERSON, DATE_OF_BIRTH));

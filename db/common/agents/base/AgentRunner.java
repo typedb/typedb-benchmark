@@ -66,7 +66,7 @@ public abstract class AgentRunner<T> {
         try (Agent<T> agent = agentConstructor.newInstance()) {
             agent.init(iterationContext, agentRandom, item, sessionKey, tracker, logger, traceAgent && iterationContext.shouldTrace());
 //            AgentResult agentResult = agent.iterateWithTracing();  // TODO Disabled for demo purposes
-            AgentResult agentResult = agent.iterate();
+            AgentResultSet agentResult = agent.iterate();
             iterationContext.getResultHandler().newResult(agent.getClass().getSimpleName(), tracker, agentResult);
 //            lastTestCount.put(tracker, agent.testByCount(lastTestCount.getOrDefault(tracker, 0)));
 

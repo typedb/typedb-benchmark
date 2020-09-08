@@ -1,7 +1,7 @@
 package grakn.simulation.db.common.agents.interaction;
 
 import grabl.tracing.client.GrablTracingThreadStatic.ThreadTrace;
-import grakn.simulation.db.common.agents.base.AgentResult;
+import grakn.simulation.db.common.agents.base.AgentResultSet;
 import grakn.simulation.db.common.agents.utils.Pair;
 import grakn.simulation.db.common.agents.world.CityAgent;
 
@@ -13,7 +13,7 @@ import static grabl.tracing.client.GrablTracingThreadStatic.traceOnThread;
 public abstract class FriendshipAgent extends CityAgent {
 
     @Override
-    public final AgentResult iterate() {
+    public final AgentResultSet iterate() {
 
         List<String> residentEmails;
         try (ThreadTrace trace = traceOnThread(this.registerMethodTrace("getResidentEmails"))) {

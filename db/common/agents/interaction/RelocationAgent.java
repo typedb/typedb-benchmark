@@ -1,6 +1,6 @@
 package grakn.simulation.db.common.agents.interaction;
 
-import grakn.simulation.db.common.agents.base.AgentResult;
+import grakn.simulation.db.common.agents.base.AgentResultSet;
 import grakn.simulation.db.common.agents.utils.Allocation;
 import grakn.simulation.db.common.agents.utils.Pair;
 import grakn.simulation.db.common.agents.world.CityAgent;
@@ -16,7 +16,7 @@ import static grabl.tracing.client.GrablTracingThreadStatic.traceOnThread;
 public abstract class RelocationAgent extends CityAgent {
 
     @Override
-    public final AgentResult iterate() {
+    public final AgentResultSet iterate() {
         /*
         Find people currently resident the city
         Find other cities in the continent

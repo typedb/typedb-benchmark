@@ -1,7 +1,7 @@
 package grakn.simulation.db.common.agents.interaction;
 
 import grabl.tracing.client.GrablTracingThreadStatic.ThreadTrace;
-import grakn.simulation.db.common.agents.base.AgentResult;
+import grakn.simulation.db.common.agents.base.AgentResultSet;
 import grakn.simulation.db.common.agents.utils.Allocation;
 import grakn.simulation.db.common.agents.utils.Pair;
 import grakn.simulation.db.common.agents.world.CityAgent;
@@ -22,7 +22,7 @@ public abstract class ParentshipAgent extends CityAgent {
     }
 
     @Override
-    public final AgentResult iterate() {
+    public final AgentResultSet iterate() {
         // Query for married couples in the city who are not already in a parentship relation together
         List<String> childrenEmails;
         try (ThreadTrace trace = traceOnThread(this.registerMethodTrace("getChildrenEmailsBorn"))) {

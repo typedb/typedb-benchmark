@@ -1,7 +1,7 @@
 package grakn.simulation.db.common.agents.interaction;
 
 import grabl.tracing.client.GrablTracingThreadStatic.ThreadTrace;
-import grakn.simulation.db.common.agents.base.AgentResult;
+import grakn.simulation.db.common.agents.base.AgentResultSet;
 import grakn.simulation.db.common.agents.utils.Pair;
 import grakn.simulation.db.common.agents.world.CountryAgent;
 import org.apache.commons.lang3.StringUtils;
@@ -13,7 +13,7 @@ public abstract class CompanyAgent extends CountryAgent {
     int numCompanies;
 
     @Override
-    public final AgentResult iterate() {
+    public final AgentResultSet iterate() {
 
         numCompanies = world().getScaleFactor();
 

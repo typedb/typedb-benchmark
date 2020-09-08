@@ -1,6 +1,7 @@
 package grakn.simulation.db.grakn.agents.interaction;
 
 import grakn.client.answer.ConceptMap;
+import grakn.simulation.db.common.agents.base.AgentResult;
 import grakn.simulation.db.common.agents.interaction.MarriageAgentBase;
 import grakn.simulation.db.grakn.driver.GraknClientWrapper.Session.Transaction;
 import graql.lang.Graql;
@@ -69,7 +70,7 @@ public class MarriageAgent extends MarriageAgentBase {
     }
 
     @Override
-    protected HashMap<ComparableField, Object> insertMarriage(int marriageIdentifier, String wifeEmail, String husbandEmail) {
+    protected AgentResult insertMarriage(int marriageIdentifier, String wifeEmail, String husbandEmail) {
         Statement husband = Graql.var("husband");
         Statement wife = Graql.var("wife");
         Statement city = Graql.var(CITY);
@@ -104,7 +105,7 @@ public class MarriageAgent extends MarriageAgentBase {
         Object marriageIdentifierAns = getOnlyAttributeOfThing(answer, tx().forGrakn(), "marriage", MARRIAGE_ID);
         Object cityNameAns = getOnlyAttributeOfThing(answer, tx().forGrakn(), CITY, LOCATION_NAME);
 
-        return new HashMap<ComparableField, Object>(){{
+        return new AgentResult(){{
                 put(MarriageAgentField.MARRIAGE_IDENTIFIER, marriageIdentifierAns);
                 put(MarriageAgentField.WIFE_EMAIL, wifeEmailAns);
                 put(MarriageAgentField.HUSBAND_EMAIL, husbandEmailAns);

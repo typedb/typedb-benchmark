@@ -1,5 +1,6 @@
 package grakn.simulation.db.neo4j.agents.interaction;
 
+import grakn.simulation.db.common.agents.base.AgentResult;
 import grakn.simulation.db.common.agents.interaction.PersonBirthAgentBase;
 import grakn.simulation.db.neo4j.driver.Neo4jDriverWrapper.Session.Transaction;
 import org.neo4j.driver.Query;
@@ -21,7 +22,7 @@ import static grakn.simulation.db.neo4j.schema.Schema.IS_CURRENT;
 public class PersonBirthAgent extends PersonBirthAgentBase {
 
     @Override
-    protected HashMap<ComparableField, Object> insertPerson(String email, String gender, String forename, String surname) {
+    protected AgentResult insertPerson(String email, String gender, String forename, String surname) {
         String template = "MATCH (c:City {locationName: $locationName})" +
                 "CREATE (person:Person {" +
                 "email: $email, " +
@@ -50,7 +51,7 @@ public class PersonBirthAgent extends PersonBirthAgentBase {
 
         Map<String, Object> answer = getOnlyElement(answers).asMap();
 
-        return new HashMap<ComparableField, Object>() {{
+        return new AgentResult() {{
             put(PersonBirthAgentField.EMAIL, answer.get("person." + EMAIL));
             put(PersonBirthAgentField.DATE_OF_BIRTH, answer.get("person." + DATE_OF_BIRTH));
             put(PersonBirthAgentField.GENDER, answer.get("person." + GENDER));

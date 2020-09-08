@@ -2,12 +2,12 @@ package grakn.simulation.db.common.agents.interaction;
 
 import grabl.tracing.client.GrablTracingThreadStatic.ThreadTrace;
 import grakn.simulation.db.common.agents.base.AgentResult;
+import grakn.simulation.db.common.agents.base.AgentResultSet;
 import grakn.simulation.db.common.agents.utils.Pair;
 import grakn.simulation.db.common.agents.world.CityAgent;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 
 import static grabl.tracing.client.GrablTracingThreadStatic.traceOnThread;
@@ -21,8 +21,8 @@ public abstract class MarriageAgentBase extends CityAgent {
     int numMarriagesPossible;
 
     @Override
-    public final AgentResult iterate() {
-        HashSet<HashMap<ComparableField, Object>> allFieldValues = new HashSet<>();
+    public final AgentResultSet iterate() {
+        AgentResultSet agentResultSet = new AgentResultSet();
         log().message("MarriageAgent", String.format("Simulation step %d", simulationStep()));
         // Find bachelors and bachelorettes who are considered adults and who are not in a marriage and pair them off randomly
         List<String> womenEmails;
@@ -47,15 +47,13 @@ public abstract class MarriageAgentBase extends CityAgent {
                 String husbandEmail = menEmails.get(i);
                 int marriageIdentifier = (wifeEmail + husbandEmail).hashCode();
 
-                HashMap<ComparableField, Object> fieldValues;
                 try (ThreadTrace trace = traceOnThread(this.checkMethodTrace("insertMarriage"))) {
-                    fieldValues = insertMarriage(marriageIdentifier, wifeEmail, husbandEmail);
+                    agentResultSet.add(insertMarriage(marriageIdentifier, wifeEmail, husbandEmail));
                 }
-                allFieldValues.add(fieldValues);
             }
             commitTxWithTracing();
         }
-        return new AgentResult(allFieldValues);
+        return agentResultSet;
     }
 
     protected LocalDateTime dobOfAdults() {
@@ -69,7 +67,7 @@ public abstract class MarriageAgentBase extends CityAgent {
 //    TODO Should this inner query be included at the top level?
 //    private GraqlGet.Unfiltered getSinglePeopleOfGenderQuery(String gender, String marriageRole);
 
-    protected abstract HashMap<ComparableField, Object> insertMarriage(int marriageIdentifier, String wifeEmail, String husbandEmail);
+    protected abstract AgentResult insertMarriage(int marriageIdentifier, String wifeEmail, String husbandEmail);
 
     protected Pair<Integer, Integer> countBounds() {
         return new Pair<>(numMarriagesPossible, numMarriagesPossible);

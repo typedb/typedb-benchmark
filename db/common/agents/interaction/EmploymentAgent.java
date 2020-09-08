@@ -1,6 +1,6 @@
 package grakn.simulation.db.common.agents.interaction;
 
-import grakn.simulation.db.common.agents.base.AgentResult;
+import grakn.simulation.db.common.agents.base.AgentResultSet;
 import grakn.simulation.db.common.agents.utils.Pair;
 import grakn.simulation.db.common.agents.world.CityAgent;
 
@@ -24,7 +24,7 @@ public abstract class EmploymentAgent extends CityAgent {
     private int numEmployments;
 
     @Override
-    public final AgentResult iterate() {
+    public final AgentResultSet iterate() {
         employmentDate = today().minusYears(2);
 
         List<String> employeeEmails;

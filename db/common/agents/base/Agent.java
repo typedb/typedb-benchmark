@@ -155,14 +155,14 @@ public abstract class Agent<T> implements AutoCloseable {
         return this.getClass().getSimpleName();
     }
 
-    AgentResult iterateWithTracing() {
+    AgentResultSet iterateWithTracing() {
         try (ThreadTrace trace = traceOnThread(name())) {
             System.out.println(name());
             return iterate();
         }
     }
 
-    public abstract AgentResult iterate();
+    public abstract AgentResultSet iterate();
 
     public class LogWrapper {
         private final Logger logger;
