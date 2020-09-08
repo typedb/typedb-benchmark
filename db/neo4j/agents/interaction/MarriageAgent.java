@@ -10,6 +10,10 @@ import java.util.List;
 import java.util.Map;
 
 import static com.google.common.collect.Iterables.getOnlyElement;
+import static grakn.simulation.db.neo4j.schema.Schema.EMAIL;
+import static grakn.simulation.db.neo4j.schema.Schema.GENDER;
+import static grakn.simulation.db.neo4j.schema.Schema.LOCATION_NAME;
+import static grakn.simulation.db.neo4j.schema.Schema.MARRIAGE_ID;
 
 public class MarriageAgent extends MarriageAgentBase {
 
@@ -32,14 +36,14 @@ public class MarriageAgent extends MarriageAgentBase {
                 "RETURN person.email";
 
         HashMap<String, Object> parameters = new HashMap<String, Object>(){{
-                put("locationName", city().name());
-                put("gender", gender);
+                put(LOCATION_NAME, city().name());
+                put(GENDER, gender);
         }};
 
         Query query = new Query(template, parameters);
 
         log().query(scope, query);
-        List<String> results = ((Transaction) tx()).getOrderedAttribute(query, "person.email", null);
+        List<String> results = ((Transaction) tx()).getOrderedAttribute(query, "person." + EMAIL, null);
         log().message(scope, results.toString());
         return results;
     }
@@ -47,15 +51,15 @@ public class MarriageAgent extends MarriageAgentBase {
     @Override
     protected HashMap<ComparableField, Object> insertMarriage(int marriageIdentifier, String wifeEmail, String husbandEmail) {
         String template = "" +
-                "MATCH (wife:Person {email: $wifeEmail}), (husband:Person {email: $husbandEmail}), (city:City {locationName: $cityName})\n" +
-                "CREATE (husband)-[marriage:MARRIED_TO {id: $marriageIdentifier, locationName: city.locationName}]->(wife)" +
-                "RETURN marriage.id, husband.email, wife.email, city.locationName";
+                "MATCH (wife:Person {email: $wifeEmail}), (husband:Person {email: $husbandEmail}), (city:City {locationName: $locationName})\n" +
+                "CREATE (husband)-[marriage:MARRIED_TO {marriageId: $marriageId, locationName: city.locationName}]->(wife)" +
+                "RETURN marriage.marriageId, husband.email, wife.email, city.locationName";
 
         HashMap<String, Object> parameters = new HashMap<String, Object>(){{
-                put("marriageIdentifier", marriageIdentifier);
+                put(MARRIAGE_ID, marriageIdentifier);
                 put("wifeEmail", wifeEmail);
                 put("husbandEmail", husbandEmail);
-                put("cityName", city().name());
+                put(LOCATION_NAME, city().name());
         }};
 
         Query query = new Query(template, parameters);
@@ -66,22 +70,22 @@ public class MarriageAgent extends MarriageAgentBase {
         Map<String, Object> answer = getOnlyElement(answers).asMap();
 
         return new HashMap<ComparableField, Object>() {{
-            put(MarriageAgentField.MARRIAGE_IDENTIFIER, answer.get("marriage.id"));
-            put(MarriageAgentField.WIFE_EMAIL, answer.get("wife.email"));  // TODO we get back the variables matched for in an insert?
-            put(MarriageAgentField.HUSBAND_EMAIL, answer.get("husband.email"));
-            put(MarriageAgentField.CITY_NAME, answer.get("city.locationName"));
+            put(MarriageAgentField.MARRIAGE_IDENTIFIER, answer.get("marriage." + MARRIAGE_ID));
+            put(MarriageAgentField.WIFE_EMAIL, answer.get("wife." + EMAIL));  // TODO we get back the variables matched for in an insert?
+            put(MarriageAgentField.HUSBAND_EMAIL, answer.get("husband." + EMAIL));
+            put(MarriageAgentField.CITY_NAME, answer.get("city." + LOCATION_NAME));
         }};
     }
 
     @Override
     protected int checkCount() {
         String template = "" +
-                "MATCH (city:City {locationName: $cityName}), \n" +
+                "MATCH (city:City {locationName: $locationName}), \n" +
                 "(husband:Person)-[marriage:MARRIED_TO {locationName: city.locationName}]->(wife:Person)\n" +
-                "RETURN count(marriage), count(marriage.id), count(wife.email), count(husband.email)";
+                "RETURN count(marriage), count(marriage.marriageId), count(wife.email), count(husband.email)";
 
         HashMap<String, Object> parameters = new HashMap<String, Object>(){{
-            put("cityName", city().name());
+            put(LOCATION_NAME, city().name());
         }};
 
         Query countQuery = new Query(template, parameters);

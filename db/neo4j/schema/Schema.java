@@ -1,4 +1,4 @@
-package grakn.simulation.db.grakn.schema;
+package grakn.simulation.db.neo4j.schema;
 
 public class Schema {
     public static final String CITY = "city";
@@ -15,18 +15,14 @@ public class Schema {
     public static final String DATE_OF_INCORPORATION = "date-of-incorporation";
 
 
-    public static final String PERSON = "person";
     public static final String EMAIL = "email";
-    public static final String DATE_OF_BIRTH = "date-of-birth";
+    public static final String DATE_OF_BIRTH = "dateOfBirth";
     public static final String AGE = "age";
     public static final String GENDER = "gender";
     public static final String FORENAME = "forename";
     public static final String SURNAME = "surname";
 
-    public static final String MARRIAGE = "marriage";
-    public static final String MARRIAGE_HUSBAND = "marriage_husband";
-    public static final String MARRIAGE_WIFE = "marriage_wife";
-    public static final String MARRIAGE_ID = "marriage-id";
+    public static final String MARRIAGE_ID = "marriageId";
 
     public static final String BORN_IN = "born-in";
     public static final String BORN_IN_CHILD = "born-in_child";
@@ -43,10 +39,10 @@ public class Schema {
     public static final String RESIDENCY_RESIDENT = "residency_resident";
     public static final String START_DATE = "start-date";
     public static final String END_DATE = "end-date";
-    public static final String IS_CURRENT = "is-current";
+    public static final String IS_CURRENT = "isCurrent";
 
     public static final String LOCATION_HIERARCHY = "location-hierarchy";
-    public static final String LOCATION_NAME = "location-name";
+    public static final String LOCATION_NAME = "locationName";
 
     public static final String LOCATES = "locates";
     public static final String LOCATES_LOCATED = "locates_located";

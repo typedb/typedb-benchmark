@@ -10,15 +10,15 @@ import java.util.List;
 import java.util.Map;
 
 import static com.google.common.collect.Iterables.getOnlyElement;
+import static grakn.simulation.db.neo4j.schema.Schema.EMAIL;
+import static grakn.simulation.db.neo4j.schema.Schema.DATE_OF_BIRTH;
+import static grakn.simulation.db.neo4j.schema.Schema.GENDER;
+import static grakn.simulation.db.neo4j.schema.Schema.FORENAME;
+import static grakn.simulation.db.neo4j.schema.Schema.LOCATION_NAME;
+import static grakn.simulation.db.neo4j.schema.Schema.SURNAME;
+import static grakn.simulation.db.neo4j.schema.Schema.IS_CURRENT;
 
 public class PersonBirthAgent extends PersonBirthAgentBase {
-
-    String EMAIL = "email";
-    String DATE_OF_BIRTH = "dateOfBirth";
-    String GENDER = "gender";
-    String FORENAME = "forename";
-    String SURNAME = "surname";
-    String CURRENT = "current";
 
     @Override
     protected HashMap<ComparableField, Object> insertPerson(String email, String gender, String forename, String surname) {
@@ -30,17 +30,17 @@ public class PersonBirthAgent extends PersonBirthAgentBase {
                 "forename: $forename, " +
                 "surname: $surname" +
                 "})-[:BORN_IN]->(c)," +
-                "(person)-[:RESIDENT_OF {startDate: $dateOfBirth, isCurrent: $current}]->(c)" +
+                "(person)-[:RESIDENT_OF {startDate: $dateOfBirth, isCurrent: $isCurrent}]->(c)" +
                 "RETURN person.email, person.dateOfBirth, person.gender, person.forename, person.surname";
 
         HashMap<String, Object> parameters = new HashMap<String, Object>(){{
-                put("locationName", city().toString());
+                put(LOCATION_NAME, city().toString());
                 put(EMAIL, email);
                 put(DATE_OF_BIRTH, today());
                 put(GENDER, gender);
                 put(FORENAME, forename);
                 put(SURNAME, surname);
-                put(CURRENT, true);
+                put(IS_CURRENT, true);
         }};
 
         Query query = new Query(template, parameters);
@@ -70,7 +70,7 @@ public class PersonBirthAgent extends PersonBirthAgentBase {
                 "RETURN count(p), count(p.email), count(p.dateOfBirth), count(p.gender), count(p.forename), count(p.surname)";
 
         HashMap<String, Object> parameters = new HashMap<String, Object>(){{
-            put("locationName", city().toString());
+            put(LOCATION_NAME, city().toString());
         }};
 
         Query countQuery = new Query(template, parameters);

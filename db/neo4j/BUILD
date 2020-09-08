@@ -8,6 +8,7 @@ java_library(
     ]),
     visibility = ["//visibility:public"],
     deps = [
+        "//db/neo4j/schema",
         "//db/common/agents",
         "//db/common/driver",
         "//db/common/initialise",
