@@ -68,7 +68,7 @@ public abstract class AgentRunner<T> {
 //            AgentResult agentResult = agent.iterateWithTracing();  // TODO Disabled for demo purposes
             AgentResult agentResult = agent.iterate();
             iterationContext.getResultHandler().newResult(agent.getClass().getSimpleName(), tracker, agentResult);
-            lastTestCount.put(tracker, agent.testByCount(lastTestCount.getOrDefault(tracker, 0)));
+//            lastTestCount.put(tracker, agent.testByCount(lastTestCount.getOrDefault(tracker, 0)));
 
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
             throw new RuntimeException(e);
