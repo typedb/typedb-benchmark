@@ -1,11 +1,10 @@
 package grakn.simulation.db.common.agents.base;
 
-import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class ResultHandler {
 
-    HashMap<String, ConcurrentHashMap<String, AgentResultSet>> agentResults;
+    ConcurrentHashMap<String, ConcurrentHashMap<String, AgentResultSet>> agentResults;
 
     public void newResult(String agentName, String tracker, AgentResultSet agentResult) {
         if (agentResult == null) {
@@ -20,6 +19,6 @@ public class ResultHandler {
     }
 
     public void clean() {
-        agentResults = new HashMap<>();
+        agentResults = new ConcurrentHashMap<>();
     }
 }
