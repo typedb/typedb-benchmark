@@ -1,6 +1,5 @@
 package grakn.simulation.db.neo4j.agents.interaction;
 
-import grakn.simulation.db.common.agents.base.AgentResult;
 import grakn.simulation.db.neo4j.driver.Neo4jDriverWrapper.Session.Transaction;
 import org.neo4j.driver.Query;
 
@@ -11,7 +10,7 @@ import static grakn.simulation.db.neo4j.schema.Schema.LOCATION_NAME;
 public class AgeUpdateAgent extends grakn.simulation.db.common.agents.interaction.AgeUpdateAgent {
 
     @Override
-    protected AgentResult updateAgesOfAllPeople() {
+    protected void updateAgesOfAllPeople() {
         String template = "" +
                 "MATCH (person:Person)-[:BORN_IN]->(city:City {locationName: $locationName})\n" +
                 "SET person.age = duration.between(person.dateOfBirth, localdatetime($dateToday)).years\n" +
@@ -26,7 +25,6 @@ public class AgeUpdateAgent extends grakn.simulation.db.common.agents.interactio
 
         log().query("updateAgesOfAllPeople", query);
         ((Transaction) tx()).execute(query);
-        return null;
     }
 
     @Override

@@ -58,7 +58,7 @@ public class SimulationsUnderTest {
         ArrayList<String> agentNames = new ArrayList<>();
         agentNames.add("marriage");
         agentNames.add("personBirth");
-//        agentNames.add("ageUpdate");
+        agentNames.add("ageUpdate");
 
         World world = world(scaleFactor, files);
 

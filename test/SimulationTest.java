@@ -46,6 +46,7 @@ public class SimulationTest {
 
 //    @Test
 //    public void testAgeUpdateAgent() {
-//
+//    Comparing results of this agent will require sending a set equal to the size of the number of people in each city,
+//    which doesn't scale well. So this is skipped in favour of spot-testing
 //    }
 }
