@@ -2,8 +2,10 @@ package grakn.simulation.db.grakn.driver;
 
 import grabl.tracing.client.GrablTracingThreadStatic;
 import grakn.client.GraknClient;
+import grakn.client.answer.ConceptMap;
 import grakn.simulation.db.common.driver.DriverWrapper;
 import graql.lang.query.GraqlGet;
+import graql.lang.query.GraqlQuery;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -11,6 +13,7 @@ import java.util.stream.Stream;
 
 import static com.google.common.collect.Iterables.getOnlyElement;
 import static grabl.tracing.client.GrablTracingThreadStatic.traceOnThread;
+import static grakn.simulation.db.common.driver.DriverWrapper.TracingLabel.EXECUTE;
 import static grakn.simulation.db.common.driver.DriverWrapper.TracingLabel.STREAM_AND_SORT;
 
 public class GraknClientWrapper implements DriverWrapper {
@@ -108,10 +111,11 @@ public class GraknClientWrapper implements DriverWrapper {
                 return getOnlyElement(transaction.execute(countQuery).get()).number().intValue();
             }
 
-//            @Override
-//            public QueryResult execute(Query query) {
-//                return transaction.execute(query.asGraql());
-//            }
+            public List<ConceptMap> execute(GraqlGet query) {
+                try (GrablTracingThreadStatic.ThreadTrace trace = traceOnThread(EXECUTE.getName())) {
+                    return transaction.execute(query).get();
+                }
+            }
 //
 //            @Override
 //            public <T> List<T> getOrderedAttribute(Query query, String attributeName, Integer limit) {

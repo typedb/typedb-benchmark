@@ -2,16 +2,8 @@ package grakn.simulation.db.common.driver;
 
 import grakn.client.GraknClient;
 
-import java.util.List;
-
 import static grabl.tracing.client.GrablTracingThreadStatic.ThreadTrace;
 import static grabl.tracing.client.GrablTracingThreadStatic.traceOnThread;
-import static grakn.simulation.db.common.driver.DriverWrapper.TracingLabel.CLOSE_SESSION;
-import static grakn.simulation.db.common.driver.DriverWrapper.TracingLabel.CLOSE_TRANSACTION;
-import static grakn.simulation.db.common.driver.DriverWrapper.TracingLabel.COMMIT_TRANSACTION;
-import static grakn.simulation.db.common.driver.DriverWrapper.TracingLabel.EXECUTE;
-import static grakn.simulation.db.common.driver.DriverWrapper.TracingLabel.OPEN_TRANSACTION;
-import static grakn.simulation.db.common.driver.DriverWrapper.TracingLabel.STREAM_AND_SORT;
 
 public interface DriverWrapper extends AutoCloseable {
 
@@ -44,13 +36,13 @@ public interface DriverWrapper extends AutoCloseable {
     abstract class Session {
         public abstract void close();
         public void closeWithTracing() {
-            try (ThreadTrace trace = traceOnThread(CLOSE_SESSION.getName())) {
+            try (ThreadTrace trace = traceOnThread(TracingLabel.CLOSE_SESSION.getName())) {
                 close();
             }
         }
         public abstract Transaction transaction();
         public Transaction transactionWithTracing() {
-            try (ThreadTrace trace = traceOnThread(OPEN_TRANSACTION.getName())) {
+            try (ThreadTrace trace = traceOnThread(TracingLabel.OPEN_TRANSACTION.getName())) {
                 return transaction();
             }
         }
@@ -58,13 +50,13 @@ public interface DriverWrapper extends AutoCloseable {
         public abstract class Transaction implements AutoCloseable {
             public abstract void close();
             public void closeWithTracing() {
-                try (ThreadTrace trace = traceOnThread(CLOSE_TRANSACTION.getName())) {
+                try (ThreadTrace trace = traceOnThread(TracingLabel.CLOSE_TRANSACTION.getName())) {
                     close();
                 }
             }
             public abstract void commit();
             public void commitWithTracing() {
-                try (ThreadTrace trace = traceOnThread(COMMIT_TRANSACTION.getName())) {
+                try (ThreadTrace trace = traceOnThread(TracingLabel.COMMIT_TRANSACTION.getName())) {
                     commit();
                 }
             }
