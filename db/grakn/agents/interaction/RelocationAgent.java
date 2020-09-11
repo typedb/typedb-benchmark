@@ -1,7 +1,8 @@
 package grakn.simulation.db.grakn.agents.interaction;
 
 import grakn.simulation.db.common.world.World;
-import grakn.simulation.db.grakn.driver.GraknClientWrapper.Session.Transaction;
+import grakn.simulation.db.grakn.GraknContext;
+import grakn.simulation.db.grakn.driver.Transaction;
 import graql.lang.Graql;
 import graql.lang.query.GraqlGet;
 import graql.lang.query.GraqlInsert;
@@ -27,7 +28,28 @@ import static grakn.simulation.db.grakn.schema.Schema.RESIDENCY_LOCATION;
 import static grakn.simulation.db.grakn.schema.Schema.RESIDENCY_RESIDENT;
 import static grakn.simulation.db.grakn.schema.Schema.START_DATE;
 
-public class RelocationAgent extends grakn.simulation.db.common.agents.interaction.RelocationAgent {
+public class RelocationAgent extends grakn.simulation.db.common.agents.interaction.RelocationAgent<GraknContext> {
+
+    private Transaction tx;
+
+    @Override
+    protected void openTx() {
+        if (tx == null) {
+            tx = backendContext().tx(getSessionKey());
+        }
+    }
+
+    @Override
+    protected void closeTx() {
+        tx.close();
+        tx = null;
+    }
+
+    @Override
+    protected void commitTx() {
+        tx.commit();
+        tx = null;
+    }
 
     static GraqlGet.Unfiltered cityResidentsQuery(World.City city, LocalDateTime earliestDate) {
 
@@ -60,7 +82,7 @@ public class RelocationAgent extends grakn.simulation.db.common.agents.interacti
         GraqlGet.Unfiltered cityResidentsQuery = cityResidentsQuery(city(), earliestDate);
         log().query("getResidentEmails", cityResidentsQuery);
         int numRelocations = world().getScaleFactor();
-        return ((Transaction)tx()).getOrderedAttribute(cityResidentsQuery, EMAIL, numRelocations);
+        return tx.getOrderedAttribute(cityResidentsQuery, EMAIL, numRelocations);
     }
 
     @Override
@@ -74,7 +96,7 @@ public class RelocationAgent extends grakn.simulation.db.common.agents.interacti
         ).get();
 
         log().query("getRelocationCityNames", relocationCitiesQuery);
-        return ((Transaction)tx()).getOrderedAttribute(relocationCitiesQuery, "city-name", null);
+        return tx.getOrderedAttribute(relocationCitiesQuery, "city-name", null);
     }
 
     @Override
@@ -92,7 +114,7 @@ public class RelocationAgent extends grakn.simulation.db.common.agents.interacti
         );
 
         log().query("insertRelocation", relocatePersonQuery);
-        tx().forGrakn().execute(relocatePersonQuery).get();
+        tx.execute(relocatePersonQuery);
     }
 
     @Override
@@ -117,7 +139,7 @@ public class RelocationAgent extends grakn.simulation.db.common.agents.interacti
                         .has(RELOCATION_DATE, today())
         ).get().count();
         log().query("checkCount", countQuery);
-        return ((Transaction) tx()).count(countQuery);
+        return tx.count(countQuery);
     }
 
 }

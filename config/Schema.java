@@ -6,19 +6,6 @@ import java.util.stream.Collectors;
 
 public class Schema {
 
-    public enum Database {
-        GRAKN {
-            public String toString() {
-                return "Grakn";
-            }
-        },
-        NEO4J {
-            public String toString() {
-                return "Neo4j";
-            }
-        },
-    }
-
     public enum AgentMode {
         TRACE(true, true),
         RUN(false, true),

@@ -16,56 +16,55 @@ import grakn.simulation.db.neo4j.agents.interaction.RelocationAgent;
 import grakn.simulation.db.neo4j.agents.interaction.TransactionAgent;
 
 import static grakn.simulation.db.common.agents.world.CityAgentRunner.SessionStrategy.CITY;
-import static grakn.simulation.db.common.agents.world.CityAgentRunner.SessionStrategy.COUNTRY;
 
 public class Neo4jAgentPicker extends AgentPicker {
     @Override
     protected CityAgentRunner marriage() {
-        return new CityAgentRunner(MarriageAgent.class, CITY);
+        return new CityAgentRunner(MarriageAgent.class, backendContext, CITY);
     }
 
     @Override
     protected CityAgentRunner personBirth() {
-        return new CityAgentRunner(PersonBirthAgent.class, CITY);
+        return new CityAgentRunner(PersonBirthAgent.class, backendContext, CITY);
     }
 
     @Override
     protected CityAgentRunner ageUpdate() {
-        return new CityAgentRunner(AgeUpdateAgent.class, CITY);
+        return new CityAgentRunner(AgeUpdateAgent.class, backendContext, CITY);
     }
 
     @Override
     protected CityAgentRunner parentship() {
-        return new CityAgentRunner(ParentshipAgent.class, CITY);
+        return new CityAgentRunner(ParentshipAgent.class, backendContext, CITY);
     }
 
     @Override
     protected CityAgentRunner relocation() {
-        return new CityAgentRunner(RelocationAgent.class, CITY);
+        return new CityAgentRunner(RelocationAgent.class, backendContext, CITY);
     }
 
     @Override
     protected CountryAgentRunner company() {
-        return new CountryAgentRunner(CompanyAgent.class, CountryAgentRunner.SessionStrategy.COUNTRY);
+        return new CountryAgentRunner(CompanyAgent.class, backendContext, CountryAgentRunner.SessionStrategy.COUNTRY);
     }
 
     @Override
     protected CityAgentRunner employment() {
-        return new CityAgentRunner(EmploymentAgent.class, CITY);
+        return new CityAgentRunner(EmploymentAgent.class, backendContext, CITY);
     }
 
     @Override
     protected ContinentAgentRunner product() {
-        return new ContinentAgentRunner(ProductAgent.class);
+        return new ContinentAgentRunner(ProductAgent.class, backendContext);
     }
 
     @Override
     protected ContinentAgentRunner transaction() {
-        return new ContinentAgentRunner(TransactionAgent.class);
+        return new ContinentAgentRunner(TransactionAgent.class, backendContext);
     }
 
     @Override
     protected CityAgentRunner friendship() {
-        return new CityAgentRunner(FriendshipAgent.class, CITY);
+        return new CityAgentRunner(FriendshipAgent.class, backendContext, CITY);
     }
 }

@@ -1,5 +1,6 @@
 package grakn.simulation.db.neo4j.agents.interaction;
 
+import grakn.simulation.db.neo4j.Neo4jContext;
 import grakn.simulation.db.neo4j.driver.Neo4jDriverWrapper.Session.Transaction;
 import org.neo4j.driver.Query;
 
@@ -7,7 +8,7 @@ import java.util.HashMap;
 
 import static grakn.simulation.db.neo4j.schema.Schema.LOCATION_NAME;
 
-public class AgeUpdateAgent extends grakn.simulation.db.common.agents.interaction.AgeUpdateAgent {
+public class AgeUpdateAgent extends grakn.simulation.db.common.agents.interaction.AgeUpdateAgent<Neo4jContext> {
 
     @Override
     protected void updateAgesOfAllPeople() {

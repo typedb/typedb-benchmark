@@ -1,5 +1,6 @@
 package grakn.simulation.db.neo4j.agents.interaction;
 
+import grakn.simulation.db.neo4j.Neo4jContext;
 import grakn.simulation.db.neo4j.driver.Neo4jDriverWrapper;
 import org.neo4j.driver.Query;
 
@@ -9,7 +10,7 @@ import java.util.List;
 
 import static grakn.simulation.db.neo4j.agents.interaction.RelocationAgent.cityResidentsQuery;
 
-public class EmploymentAgent extends grakn.simulation.db.common.agents.interaction.EmploymentAgent {
+public class EmploymentAgent extends grakn.simulation.db.common.agents.interaction.EmploymentAgent<Neo4jContext> {
     @Override
     protected List<Long> getCompanyNumbers() {
         Query companyNumbersQuery = CompanyAgent.getCompanyNumbersInCountryQuery(city().country());

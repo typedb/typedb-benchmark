@@ -5,12 +5,10 @@ import grakn.simulation.db.common.agents.base.AgentResultSet;
 import grakn.simulation.db.common.agents.utils.Pair;
 import grakn.simulation.db.common.agents.world.CityAgent;
 
-import java.util.HashMap;
-
 import static grabl.tracing.client.GrablTracingThreadStatic.ThreadTrace;
 import static grabl.tracing.client.GrablTracingThreadStatic.traceOnThread;
 
-public abstract class PersonBirthAgentBase extends CityAgent {
+public abstract class PersonBirthAgentBase<C> extends CityAgent<C> {
 
     private int numBirths;
 
@@ -23,7 +21,7 @@ public abstract class PersonBirthAgentBase extends CityAgent {
         // Find bachelors and bachelorettes who are considered adults and who are not in a marriage and pair them off randomly
         numBirths = world().getScaleFactor();
         AgentResultSet agentResultSet = new AgentResultSet();
-
+        openTx();
         for (int i = 0; i < numBirths; i++) {
             String gender;
             String forename;
@@ -52,7 +50,7 @@ public abstract class PersonBirthAgentBase extends CityAgent {
                 agentResultSet.add(insertPerson(email, gender, forename, surname));
             }
         }
-        commitTxWithTracing();
+        commitTx();
         return agentResultSet;
     }
 

@@ -1,7 +1,8 @@
 package grakn.simulation.db.grakn.agents.interaction;
 
 import grakn.simulation.db.common.world.World;
-import grakn.simulation.db.grakn.driver.GraknClientWrapper.Session.Transaction;
+import grakn.simulation.db.grakn.GraknContext;
+import grakn.simulation.db.grakn.driver.Transaction;
 import graql.lang.Graql;
 import graql.lang.query.GraqlGet;
 import graql.lang.query.GraqlInsert;
@@ -18,7 +19,28 @@ import static grakn.simulation.db.grakn.schema.Schema.INCORPORATION_INCORPORATIN
 import static grakn.simulation.db.grakn.schema.Schema.LOCATION_HIERARCHY;
 import static grakn.simulation.db.grakn.schema.Schema.LOCATION_NAME;
 
-public class CompanyAgent extends grakn.simulation.db.common.agents.interaction.CompanyAgent {
+public class CompanyAgent extends grakn.simulation.db.common.agents.interaction.CompanyAgent<GraknContext> {
+
+    private Transaction tx;
+
+    @Override
+    protected void openTx() {
+        if (tx == null) {
+            tx = backendContext().tx(getSessionKey());
+        }
+    }
+
+    @Override
+    protected void closeTx() {
+        tx.close();
+        tx = null;
+    }
+
+    @Override
+    protected void commitTx() {
+        tx.commit();
+        tx = null;
+    }
 
     @Override
     protected void insertCompany(int companyNumber, String companyName) {
@@ -36,7 +58,7 @@ public class CompanyAgent extends grakn.simulation.db.common.agents.interaction.
                                         .has(DATE_OF_INCORPORATION, today())
                         );
         log().query("insertCompany", query);
-        tx().forGrakn().execute(query).get();
+        tx.execute(query);
     }
 
     static GraqlGet getCompanyNumbersInCountryQuery(World.Country country) {
@@ -79,6 +101,6 @@ public class CompanyAgent extends grakn.simulation.db.common.agents.interaction.
                         .has(DATE_OF_INCORPORATION, Graql.var(DATE_OF_INCORPORATION))
         ).get().count();
         log().query("checkCount", countQuery);
-        return ((Transaction) tx()).count(countQuery);
+        return tx.count(countQuery);
     }
 }

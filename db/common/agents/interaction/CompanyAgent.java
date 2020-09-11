@@ -8,7 +8,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import static grabl.tracing.client.GrablTracingThreadStatic.traceOnThread;
 
-public abstract class CompanyAgent extends CountryAgent {
+public abstract class CompanyAgent<C> extends CountryAgent<C> {
 
     int numCompanies;
 
@@ -16,7 +16,7 @@ public abstract class CompanyAgent extends CountryAgent {
     public final AgentResultSet iterate() {
 
         numCompanies = world().getScaleFactor();
-
+        openTx();
         for (int i = 0; i < numCompanies; i++) {
             String adjective = pickOne(world().getAdjectives());
             String noun = pickOne(world().getNouns());
@@ -27,7 +27,7 @@ public abstract class CompanyAgent extends CountryAgent {
                 insertCompany(companyNumber, companyName);
             }
         }
-        commitTxWithTracing();
+        commitTx();
         return null;
     }
 

@@ -11,7 +11,7 @@ import java.util.List;
 import static grabl.tracing.client.GrablTracingThreadStatic.ThreadTrace;
 import static grabl.tracing.client.GrablTracingThreadStatic.traceOnThread;
 
-public abstract class TransactionAgent extends ContinentAgent {
+public abstract class TransactionAgent<C> extends ContinentAgent<C> {
 
     private int NUM_TRANSACTIONS_PER_COMPANY_ON_AVERAGE = 1;
 
@@ -35,7 +35,7 @@ public abstract class TransactionAgent extends ContinentAgent {
 
         // See if we can allocate with a Pair, which is the buyer and the product id
         List<Pair<Long, Double>> transactions = new ArrayList<>();
-
+        openTx();
         for (int i = 0; i < numTransactions; i++) {
             Long companyNumber = pickOne(companyNumbers);
             Double productBarcode = pickOne(productBarcodes);
@@ -50,7 +50,7 @@ public abstract class TransactionAgent extends ContinentAgent {
                 insertTransaction(transaction, sellerCompanyNumber, value, productQuantity, isTaxable);
             }
         });
-        commitTxWithTracing();
+        commitTx();
         return null;
     }
 

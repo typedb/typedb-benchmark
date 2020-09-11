@@ -11,10 +11,10 @@ import java.util.List;
 
 import static java.util.stream.Collectors.toList;
 
-public class ContinentAgentRunner extends AgentRunner<World.Continent> {
+public class ContinentAgentRunner<C> extends AgentRunner<World.Continent, C> {
 
-    public ContinentAgentRunner(Class<? extends Agent<World.Continent>> agentClass) {
-        super(agentClass);
+    public ContinentAgentRunner(Class<? extends Agent<World.Continent, C>> agentClass, C backendContext) {
+        super(agentClass, backendContext);
     }
 
     @Override

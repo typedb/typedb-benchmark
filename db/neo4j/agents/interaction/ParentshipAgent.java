@@ -1,5 +1,6 @@
 package grakn.simulation.db.neo4j.agents.interaction;
 
+import grakn.simulation.db.neo4j.Neo4jContext;
 import grakn.simulation.db.neo4j.driver.Neo4jDriverWrapper;
 import org.neo4j.driver.Query;
 import org.neo4j.driver.Record;
@@ -11,7 +12,7 @@ import java.util.List;
 
 import static java.util.stream.Collectors.toList;
 
-public class ParentshipAgent extends grakn.simulation.db.common.agents.interaction.ParentshipAgent {
+public class ParentshipAgent extends grakn.simulation.db.common.agents.interaction.ParentshipAgent<Neo4jContext> {
 
     @Override
     protected List<HashMap<Email, String>> getMarriageEmails() {

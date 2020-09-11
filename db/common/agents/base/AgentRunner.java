@@ -20,14 +20,16 @@ import java.util.Random;
  *
  * @param <T> The type of item used by the agent.
  */
-public abstract class AgentRunner<T> {
+public abstract class AgentRunner<T, C> {
 
-    private Constructor<? extends Agent<T>> agentConstructor;
+    private Constructor<? extends Agent<T, C>> agentConstructor;
     private Logger logger;
     private Boolean traceAgent = true;
     private HashMap<String, Integer> lastTestCount = new HashMap<>();
+    private C backendContext;
 
-    protected AgentRunner(Class<? extends Agent<T>> agentClass) {
+    protected AgentRunner(Class<? extends Agent<T, C>> agentClass, C backendContext) {
+        this.backendContext = backendContext;
         try {
             agentConstructor = agentClass.getDeclaredConstructor();
             agentConstructor.setAccessible(true);
@@ -57,14 +59,14 @@ public abstract class AgentRunner<T> {
         );
     }
 
-    private void runAgent(IterationContext iterationContext, RandomSource source, T item) {
+    private void runAgent(IterationContext iterationContext, RandomSource source, T worldLocality) {
         Random random = source.startNewRandom();
         Random agentRandom = RandomSource.nextSource(random).startNewRandom();
-        String sessionKey = getSessionKey(iterationContext, RandomSource.nextSource(random), item);
-        String tracker = getTracker(iterationContext, RandomSource.nextSource(random), item);
+        String sessionKey = getSessionKey(iterationContext, RandomSource.nextSource(random), worldLocality);
+        String tracker = getTracker(iterationContext, RandomSource.nextSource(random), worldLocality);
 
-        try (Agent<T> agent = agentConstructor.newInstance()) {
-            agent.init(iterationContext, agentRandom, item, sessionKey, tracker, logger, traceAgent && iterationContext.shouldTrace());
+        try (Agent<T, C> agent = agentConstructor.newInstance()) {
+            agent.init(iterationContext, agentRandom, worldLocality, backendContext, sessionKey, tracker, logger, traceAgent && iterationContext.shouldTrace());
 //            AgentResult agentResult = agent.iterateWithTracing();  // TODO Disabled for demo purposes
             AgentResultSet agentResult = agent.iterate();
             iterationContext.getResultHandler().newResult(agent.getClass().getSimpleName(), tracker, agentResult);

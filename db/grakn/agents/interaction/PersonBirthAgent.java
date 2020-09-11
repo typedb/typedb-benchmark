@@ -3,19 +3,18 @@ package grakn.simulation.db.grakn.agents.interaction;
 import grakn.client.answer.ConceptMap;
 import grakn.simulation.db.common.agents.base.AgentResult;
 import grakn.simulation.db.common.agents.interaction.PersonBirthAgentBase;
-import grakn.simulation.db.grakn.driver.GraknClientWrapper.Session.Transaction;
+import grakn.simulation.db.grakn.GraknContext;
+import grakn.simulation.db.grakn.driver.Transaction;
 import graql.lang.Graql;
 import graql.lang.query.GraqlGet;
 import graql.lang.query.GraqlInsert;
 import graql.lang.statement.Statement;
 
-import java.util.HashMap;
 import java.util.List;
 
 import static com.google.common.collect.Iterables.getOnlyElement;
 import static grabl.tracing.client.GrablTracingThreadStatic.ThreadTrace;
 import static grabl.tracing.client.GrablTracingThreadStatic.traceOnThread;
-import static grakn.simulation.db.grakn.agents.utils.Utils.getOnlyAttributeOfThing;
 import static grakn.simulation.db.grakn.schema.Schema.BORN_IN;
 import static grakn.simulation.db.grakn.schema.Schema.BORN_IN_CHILD;
 import static grakn.simulation.db.grakn.schema.Schema.BORN_IN_PLACE_OF_BIRTH;
@@ -28,7 +27,28 @@ import static grakn.simulation.db.grakn.schema.Schema.LOCATION_NAME;
 import static grakn.simulation.db.grakn.schema.Schema.PERSON;
 import static grakn.simulation.db.grakn.schema.Schema.SURNAME;
 
-public class PersonBirthAgent extends PersonBirthAgentBase {
+public class PersonBirthAgent extends PersonBirthAgentBase<GraknContext> {
+
+    private Transaction tx;
+
+    @Override
+    protected void openTx() {
+        if (tx == null) {
+            tx = backendContext().tx(getSessionKey());
+        }
+    }
+
+    @Override
+    protected void closeTx() {
+        tx.close();
+        tx = null;
+    }
+
+    @Override
+    protected void commitTx() {
+        tx.commit();
+        tx = null;
+    }
 
     @Override
     protected AgentResult insertPerson(String email, String gender, String forename, String surname) {
@@ -66,17 +86,17 @@ public class PersonBirthAgent extends PersonBirthAgentBase {
         List<ConceptMap> answers;
         log().query("insertPerson", query);
         try (ThreadTrace trace = traceOnThread("execute")) {
-            answers = tx().forGrakn().execute(query).get();
+            answers = tx.execute(query);
         }
 
         ConceptMap answer = getOnlyElement(answers);
         return new AgentResult(){
             {
-                put(PersonBirthAgentField.EMAIL, getOnlyAttributeOfThing(answer, tx().forGrakn(), PERSON, EMAIL));
-                put(PersonBirthAgentField.DATE_OF_BIRTH, getOnlyAttributeOfThing(answer, tx().forGrakn(), PERSON, DATE_OF_BIRTH));
-                put(PersonBirthAgentField.GENDER, getOnlyAttributeOfThing(answer, tx().forGrakn(), PERSON, GENDER));
-                put(PersonBirthAgentField.FORENAME, getOnlyAttributeOfThing(answer, tx().forGrakn(), PERSON, FORENAME));
-                put(PersonBirthAgentField.SURNAME, getOnlyAttributeOfThing(answer, tx().forGrakn(), PERSON, SURNAME));
+                put(PersonBirthAgentField.EMAIL, tx.getOnlyAttributeOfThing(answer, PERSON, EMAIL));
+                put(PersonBirthAgentField.DATE_OF_BIRTH, tx.getOnlyAttributeOfThing(answer, PERSON, DATE_OF_BIRTH));
+                put(PersonBirthAgentField.GENDER, tx.getOnlyAttributeOfThing(answer, PERSON, GENDER));
+                put(PersonBirthAgentField.FORENAME, tx.getOnlyAttributeOfThing(answer, PERSON, FORENAME));
+                put(PersonBirthAgentField.SURNAME, tx.getOnlyAttributeOfThing(answer, PERSON, SURNAME));
             }};
     }
 
@@ -106,6 +126,6 @@ public class PersonBirthAgent extends PersonBirthAgentBase {
                         .rel(BORN_IN_CHILD, person)
                         .rel(BORN_IN_PLACE_OF_BIRTH, city)
         ).get().count();
-        return ((Transaction) tx()).count(countQuery);
+        return tx.count(countQuery);
     }
 }

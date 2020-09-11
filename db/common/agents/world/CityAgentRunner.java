@@ -11,7 +11,7 @@ import java.util.List;
 
 import static java.util.stream.Collectors.toList;
 
-public class CityAgentRunner extends AgentRunner<World.City> {
+public class CityAgentRunner<C> extends AgentRunner<World.City, C> {
 
     private SessionStrategy sessionStrategy;
 
@@ -19,8 +19,8 @@ public class CityAgentRunner extends AgentRunner<World.City> {
         CITY, COUNTRY, CONTINENT
     }
 
-    public CityAgentRunner(Class<? extends Agent<World.City>> agentClass, SessionStrategy sessionStrategy) {
-        super(agentClass);
+    public CityAgentRunner(Class<? extends Agent<World.City, C>> agentClass, C backendContext, SessionStrategy sessionStrategy) {
+        super(agentClass, backendContext);
         this.sessionStrategy = sessionStrategy;
     }
 

@@ -5,20 +5,20 @@ import grakn.simulation.db.common.agents.world.CityAgentRunner;
 import grakn.simulation.db.common.agents.world.ContinentAgentRunner;
 import grakn.simulation.db.common.agents.world.CountryAgentRunner;
 
-public abstract class AgentPicker {
+public abstract class AgentPicker<C> {
 
-    protected abstract CityAgentRunner marriage();
-    protected abstract CityAgentRunner personBirth();
-    protected abstract CityAgentRunner ageUpdate();
-    protected abstract CityAgentRunner parentship();
-    protected abstract CityAgentRunner relocation();
-    protected abstract CountryAgentRunner company();
-    protected abstract CityAgentRunner employment();
-    protected abstract ContinentAgentRunner product();
-    protected abstract ContinentAgentRunner transaction();
-    protected abstract CityAgentRunner friendship();
+    protected abstract CityAgentRunner<C> marriage();
+    protected abstract CityAgentRunner<C> personBirth();
+    protected abstract CityAgentRunner<C> ageUpdate();
+    protected abstract CityAgentRunner<C> parentship();
+    protected abstract CityAgentRunner<C> relocation();
+    protected abstract CountryAgentRunner<C> company();
+    protected abstract CityAgentRunner<C> employment();
+    protected abstract ContinentAgentRunner<C> product();
+    protected abstract ContinentAgentRunner<C> transaction();
+    protected abstract CityAgentRunner<C> friendship();
 
-    public AgentRunner<?> get(String agentName) {
+    public AgentRunner<?, C> get(String agentName) {
         switch (agentName) {
             case "marriage":
                 return marriage();

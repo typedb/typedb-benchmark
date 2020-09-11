@@ -1,7 +1,8 @@
 package grakn.simulation.db.grakn.agents.interaction;
 
 import grakn.simulation.db.common.agents.utils.Pair;
-import grakn.simulation.db.grakn.driver.GraknClientWrapper.Session.Transaction;
+import grakn.simulation.db.grakn.GraknContext;
+import grakn.simulation.db.grakn.driver.Transaction;
 import graql.lang.Graql;
 import graql.lang.query.GraqlGet;
 import graql.lang.query.GraqlInsert;
@@ -27,20 +28,41 @@ import static grakn.simulation.db.grakn.schema.Schema.TRANSACTION_MERCHANDISE;
 import static grakn.simulation.db.grakn.schema.Schema.TRANSACTION_SELLER;
 import static grakn.simulation.db.grakn.schema.Schema.VALUE;
 
-public class TransactionAgent extends grakn.simulation.db.common.agents.interaction.TransactionAgent {
+public class TransactionAgent extends grakn.simulation.db.common.agents.interaction.TransactionAgent<GraknContext> {
+
+    private Transaction tx;
+
+    @Override
+    protected void openTx() {
+        if (tx == null) {
+            tx = backendContext().tx(getSessionKey());
+        }
+    }
+
+    @Override
+    protected void closeTx() {
+        tx.close();
+        tx = null;
+    }
+
+    @Override
+    protected void commitTx() {
+        tx.commit();
+        tx = null;
+    }
 
     @Override
     protected List<Long> getCompanyNumbersInContinent(){
         GraqlGet companiesQuery = getCompanyNumbersInContinentQuery(continent());
         log().query("getCompanyNumbersInCountry", companiesQuery);
-        return ((Transaction)tx()).getOrderedAttribute(companiesQuery, COMPANY_NUMBER, null);
+        return tx.getOrderedAttribute(companiesQuery, COMPANY_NUMBER, null);
     }
 
     @Override
     protected List<Double> getProductBarcodesInContinent() {
         GraqlGet productsQuery = getProductsInContinentQuery(continent());
         log().query("getProductBarcodesInContinent", productsQuery);
-        return ((Transaction)tx()).getOrderedAttribute(productsQuery, PRODUCT_BARCODE, null);
+        return tx.getOrderedAttribute(productsQuery, PRODUCT_BARCODE, null);
     }
 
     @Override
@@ -72,7 +94,7 @@ public class TransactionAgent extends grakn.simulation.db.common.agents.interact
 
                 );
         log().query("insertTransaction", insertTransactionQuery);
-        tx().forGrakn().execute(insertTransactionQuery).get();
+        tx.execute(insertTransactionQuery);
     }
 
     @Override
@@ -80,7 +102,7 @@ public class TransactionAgent extends grakn.simulation.db.common.agents.interact
 //        GraqlGet.Aggregate countQuery = Graql.match(
 //
 //        ).get().count();
-//        return ((Transaction) tx()).count(countQuery);
+//        return tx.count(countQuery);
         return 0;
     }
 }

@@ -7,11 +7,12 @@ import grakn.simulation.db.common.agents.world.ContinentAgent;
 import static grabl.tracing.client.GrablTracingThreadStatic.ThreadTrace;
 import static grabl.tracing.client.GrablTracingThreadStatic.traceOnThread;
 
-public abstract class ProductAgent extends ContinentAgent {
+public abstract class ProductAgent<C> extends ContinentAgent<C> {
 
     @Override
     public final AgentResultSet iterate() {
         int numProducts = world().getScaleFactor();
+        openTx();
         for (int i = 0; i < numProducts; i++) {
             String productName = randomAttributeGenerator().boundRandomLengthRandomString(5, 20);
             String productDescription = randomAttributeGenerator().boundRandomLengthRandomString(75, 100);
@@ -20,7 +21,7 @@ public abstract class ProductAgent extends ContinentAgent {
                 insertProduct(barcode, productName, productDescription);
             }
         }
-        commitTxWithTracing();
+        commitTx();
         return null;
     }
 

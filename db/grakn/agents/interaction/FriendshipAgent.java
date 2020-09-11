@@ -1,6 +1,7 @@
 package grakn.simulation.db.grakn.agents.interaction;
 
-import grakn.simulation.db.grakn.driver.GraknClientWrapper.Session.Transaction;
+import grakn.simulation.db.grakn.GraknContext;
+import grakn.simulation.db.grakn.driver.Transaction;
 import graql.lang.Graql;
 import graql.lang.query.GraqlGet;
 import graql.lang.query.GraqlInsert;
@@ -17,12 +18,33 @@ import static grakn.simulation.db.grakn.schema.Schema.FRIENDSHIP_FRIEND;
 import static grakn.simulation.db.grakn.schema.Schema.PERSON;
 import static grakn.simulation.db.grakn.schema.Schema.START_DATE;
 
-public class FriendshipAgent extends grakn.simulation.db.common.agents.interaction.FriendshipAgent {
+public class FriendshipAgent extends grakn.simulation.db.common.agents.interaction.FriendshipAgent<GraknContext> {
+
+    private Transaction tx;
+
+    @Override
+    protected void openTx() {
+        if (tx == null) {
+            tx = backendContext().tx(getSessionKey());
+        }
+    }
+
+    @Override
+    protected void closeTx() {
+        tx.close();
+        tx = null;
+    }
+
+    @Override
+    protected void commitTx() {
+        tx.commit();
+        tx = null;
+    }
 
     protected List<String> getResidentEmails(LocalDateTime earliestDate) {
         GraqlGet cityResidentsQuery = cityResidentsQuery(city(), earliestDate);
         log().query("getResidentEmails", cityResidentsQuery);
-        return ((Transaction)tx()).getOrderedAttribute(cityResidentsQuery, EMAIL, null);
+        return tx.getOrderedAttribute(cityResidentsQuery, EMAIL, null);
     }
 
     protected void insertFriendship(String friend1Email, String friend2Email) {
@@ -54,7 +76,7 @@ public class FriendshipAgent extends grakn.simulation.db.common.agents.interacti
                         .has(START_DATE, startDate)
         );
         log().query("insertFriendship", insertFriendshipQuery);
-        tx().forGrakn().execute(insertFriendshipQuery).get();
+        tx.execute(insertFriendshipQuery);
     }
 
     @Override
@@ -85,6 +107,6 @@ public class FriendshipAgent extends grakn.simulation.db.common.agents.interacti
                         .has(START_DATE, startDate)
         ).get().count();
         log().query("checkCount", countQuery);
-        return ((Transaction) tx()).count(countQuery);
+        return tx.count(countQuery);
     }
 }

@@ -11,7 +11,7 @@ import static grabl.tracing.client.GrablTracingThreadStatic.ThreadTrace;
 import static grabl.tracing.client.GrablTracingThreadStatic.traceOnThread;
 import static grakn.simulation.db.common.agents.utils.Allocation.allocate;
 
-public abstract class EmploymentAgent extends CityAgent {
+public abstract class EmploymentAgent<C> extends CityAgent<C> {
 
     private static final double MIN_ANNUAL_WAGE = 18000.00;
     private static final double MAX_ANNUAL_WAGE = 80000.00;
@@ -29,6 +29,7 @@ public abstract class EmploymentAgent extends CityAgent {
 
         List<String> employeeEmails;
         List<Long> companyNumbers;
+        openTx();
         try (ThreadTrace trace = traceOnThread(this.registerMethodTrace("getEmployeeEmails"))) {
             employeeEmails = getEmployeeEmails(employmentDate);
         }
@@ -36,7 +37,8 @@ public abstract class EmploymentAgent extends CityAgent {
         try (ThreadTrace trace = traceOnThread(this.registerMethodTrace("getCompanyNumbers"))) {
             companyNumbers = getCompanyNumbers();
         }
-        commitTxWithTracing();
+        commitTx();  //TODO Should be close not commit?
+        openTx();
         // A second transaction is being used to circumvent graknlabs/grakn issue #5585
         boolean allocated = allocate(employeeEmails, companyNumbers, (employeeEmail, companyNumber) -> {
             double wageValue = randomAttributeGenerator().boundRandomDouble(MIN_ANNUAL_WAGE, MAX_ANNUAL_WAGE);
@@ -47,7 +49,7 @@ public abstract class EmploymentAgent extends CityAgent {
             }
         });
         if (allocated) {
-            commitTxWithTracing();
+            commitTx();
         }
         return null;
     }

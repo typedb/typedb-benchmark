@@ -1,6 +1,7 @@
 package grakn.simulation.db.neo4j.agents.interaction;
 
 import grakn.simulation.db.common.agents.utils.Pair;
+import grakn.simulation.db.neo4j.Neo4jContext;
 import grakn.simulation.db.neo4j.driver.Neo4jDriverWrapper;
 import org.neo4j.driver.Query;
 
@@ -10,7 +11,7 @@ import java.util.List;
 import static grakn.simulation.db.neo4j.agents.interaction.CompanyAgent.getCompanyNumbersInContinentQuery;
 import static grakn.simulation.db.neo4j.agents.interaction.ProductAgent.getProductsInContinentQuery;
 
-public class TransactionAgent extends grakn.simulation.db.common.agents.interaction.TransactionAgent {
+public class TransactionAgent extends grakn.simulation.db.common.agents.interaction.TransactionAgent<Neo4jContext> {
     @Override
     protected List<Long> getCompanyNumbersInContinent() {
         Query companiesQuery = getCompanyNumbersInContinentQuery(continent());

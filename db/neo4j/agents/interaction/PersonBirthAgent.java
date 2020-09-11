@@ -2,6 +2,7 @@ package grakn.simulation.db.neo4j.agents.interaction;
 
 import grakn.simulation.db.common.agents.base.AgentResult;
 import grakn.simulation.db.common.agents.interaction.PersonBirthAgentBase;
+import grakn.simulation.db.neo4j.Neo4jContext;
 import grakn.simulation.db.neo4j.driver.Neo4jDriverWrapper.Session.Transaction;
 import org.neo4j.driver.Query;
 import org.neo4j.driver.Record;
@@ -19,7 +20,7 @@ import static grakn.simulation.db.neo4j.schema.Schema.LOCATION_NAME;
 import static grakn.simulation.db.neo4j.schema.Schema.SURNAME;
 import static grakn.simulation.db.neo4j.schema.Schema.IS_CURRENT;
 
-public class PersonBirthAgent extends PersonBirthAgentBase {
+public class PersonBirthAgent extends PersonBirthAgentBase<Neo4jContext> {
 
     @Override
     protected AgentResult insertPerson(String email, String gender, String forename, String surname) {

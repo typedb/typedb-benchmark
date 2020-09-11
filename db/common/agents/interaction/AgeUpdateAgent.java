@@ -7,14 +7,15 @@ import grakn.simulation.db.common.agents.world.CityAgent;
 import static grabl.tracing.client.GrablTracingThreadStatic.ThreadTrace;
 import static grabl.tracing.client.GrablTracingThreadStatic.traceOnThread;
 
-public abstract class AgeUpdateAgent extends CityAgent {
+public abstract class AgeUpdateAgent<C> extends CityAgent<C> {
 
     @Override
     public final AgentResultSet iterate() {
+        openTx();
         try (ThreadTrace trace = traceOnThread(this.registerMethodTrace("updateAgesOfAllPeople"))) {
             updateAgesOfAllPeople();
         }
-        commitTxWithTracing();
+        commitTx();
         return new AgentResultSet();
     }
 

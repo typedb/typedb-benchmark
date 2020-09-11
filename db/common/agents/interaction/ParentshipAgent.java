@@ -15,7 +15,7 @@ import java.util.Map;
 
 import static grabl.tracing.client.GrablTracingThreadStatic.traceOnThread;
 
-public abstract class ParentshipAgent extends CityAgent {
+public abstract class ParentshipAgent<C> extends CityAgent<C> {
 
     protected enum Email {
         WIFE, HUSBAND
@@ -25,6 +25,7 @@ public abstract class ParentshipAgent extends CityAgent {
     public final AgentResultSet iterate() {
         // Query for married couples in the city who are not already in a parentship relation together
         List<String> childrenEmails;
+        openTx();
         try (ThreadTrace trace = traceOnThread(this.registerMethodTrace("getChildrenEmailsBorn"))) {
             childrenEmails = getChildrenEmailsBorn(today());
         }
@@ -50,7 +51,9 @@ public abstract class ParentshipAgent extends CityAgent {
                     insertParentShip(marriage, childEmails);
                 }
             }
-            commitTxWithTracing();
+            commitTx();
+        } else {
+            closeTx();
         }
         return null;
     }

@@ -28,10 +28,9 @@ public abstract class YAMLLoader {
     // Instances of YAML should not be shared across threads but are okay to be re-used within a thread.
     protected static final ThreadLocal<Yaml> THREAD_YAML = ThreadLocal.withInitial(Yaml::new);
     protected DriverWrapper.Session session;
-    private Map<String, Path> accessibleFiles;
+    private final Map<String, Path> accessibleFiles;
 
-    public YAMLLoader(DriverWrapper.Session session, Map<String, Path> accessibleFiles) {
-        this.session = session;
+    public YAMLLoader(Map<String, Path> accessibleFiles) {
         this.accessibleFiles = accessibleFiles;
     }
 
@@ -40,16 +39,12 @@ public abstract class YAMLLoader {
     }
 
     public void loadInputStream(InputStream inputStream) throws YAMLException {
-        try (DriverWrapper.Session.Transaction tx = session.transaction()) {
-            for (Object document : THREAD_YAML.get().loadAll(inputStream)) {
-                loadDocument(tx, document);
-            }
-
-            tx.commitWithTracing();
+        for (Object document : THREAD_YAML.get().loadAll(inputStream)) {
+            loadDocument(document);
         }
     }
 
-    protected void loadDocument(DriverWrapper.Session.Transaction tx, Object document) throws YAMLException {
+    protected void loadDocument(Object document) throws YAMLException {
         Map documentMap;
         try {
             documentMap = (Map) document;
@@ -69,14 +64,14 @@ public abstract class YAMLLoader {
         if (dataFile != null) {
             try {
                 CSVParser parser = CSVParser.parse(accessibleFiles.get(dataFile), StandardCharsets.UTF_8, CSVFormat.DEFAULT);
-                parseCSV(tx, template, parser);
+                parseCSV(template, parser);
             } catch (IOException e) {
                 throw new YAMLException("Could not parse CSV data.", e);
             }
         }
     }
 
-    protected abstract void parseCSV(DriverWrapper.Session.Transaction tx, QueryTemplate template, CSVParser parser) throws IOException;
+    protected abstract void parseCSV(QueryTemplate template, CSVParser parser) throws IOException;
 
     /**
      * Helper method to avoid repeating nasty type checking code.

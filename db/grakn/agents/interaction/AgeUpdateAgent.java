@@ -1,6 +1,7 @@
 package grakn.simulation.db.grakn.agents.interaction;
 
-import grakn.simulation.db.grakn.driver.GraknClientWrapper.Session.Transaction;
+import grakn.simulation.db.grakn.GraknContext;
+import grakn.simulation.db.grakn.driver.Transaction;
 import graql.lang.Graql;
 import graql.lang.query.GraqlDelete;
 import graql.lang.query.GraqlGet;
@@ -23,7 +24,28 @@ import static grakn.simulation.db.grakn.schema.Schema.LOCATION_NAME;
 import static grakn.simulation.db.grakn.schema.Schema.PERSON;
 import static grakn.simulation.db.grakn.schema.Schema.AGE;
 
-public class AgeUpdateAgent extends grakn.simulation.db.common.agents.interaction.AgeUpdateAgent {
+public class AgeUpdateAgent extends grakn.simulation.db.common.agents.interaction.AgeUpdateAgent<GraknContext> {
+
+    private Transaction tx;
+
+    @Override
+    protected void openTx() {
+        if (tx == null) {
+            tx = backendContext().tx(getSessionKey());
+        }
+    }
+
+    @Override
+    protected void closeTx() {
+        tx.close();
+        tx = null;
+    }
+
+    @Override
+    protected void commitTx() {
+        tx.commit();
+        tx = null;
+    }
 
     @Override
     protected void updateAgesOfAllPeople() {
@@ -57,7 +79,7 @@ public class AgeUpdateAgent extends grakn.simulation.db.common.agents.interactio
         );
 
         log().query("deleteImplicitQuery", deleteImplicitQuery);
-        tx().forGrakn().execute(deleteImplicitQuery).get();
+        tx.execute(deleteImplicitQuery);
 
         GraqlInsert insertNewAgeQuery = Graql.match(
                 person
@@ -69,7 +91,7 @@ public class AgeUpdateAgent extends grakn.simulation.db.common.agents.interactio
         );
 
         log().query("insertNewAgeQuery", insertNewAgeQuery);
-        tx().forGrakn().execute(insertNewAgeQuery).get();
+        tx.execute(insertNewAgeQuery);
     }
 
     private HashMap<String, LocalDateTime> getPeopleBornInCity() {
@@ -93,7 +115,7 @@ public class AgeUpdateAgent extends grakn.simulation.db.common.agents.interactio
 
         HashMap<String, LocalDateTime> peopleDobs = new HashMap<>();
 
-        tx().forGrakn().execute(peopleQuery).get().forEach(personAnswer -> {
+        tx.execute(peopleQuery).forEach(personAnswer -> {
             LocalDateTime dob = (LocalDateTime) personAnswer.get(DATE_OF_BIRTH).asAttribute().value();
             String email = personAnswer.get(EMAIL).asAttribute().value().toString();
             peopleDobs.put(email, dob);
@@ -123,6 +145,6 @@ public class AgeUpdateAgent extends grakn.simulation.db.common.agents.interactio
                         .rel(BORN_IN_PLACE_OF_BIRTH, city)
         ).get().count();
         log().query("checkCount", countQuery);
-        return ((Transaction) tx()).count(countQuery);
+        return tx.count(countQuery);
     }
 }

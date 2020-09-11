@@ -1,7 +1,8 @@
 package grakn.simulation.db.grakn.agents.interaction;
 
 import grakn.simulation.db.common.world.World;
-import grakn.simulation.db.grakn.driver.GraknClientWrapper.Session.Transaction;
+import grakn.simulation.db.grakn.GraknContext;
+import grakn.simulation.db.grakn.driver.Transaction;
 import graql.lang.Graql;
 import graql.lang.query.GraqlGet;
 import graql.lang.query.GraqlInsert;
@@ -16,7 +17,28 @@ import static grakn.simulation.db.grakn.schema.Schema.PRODUCT_BARCODE;
 import static grakn.simulation.db.grakn.schema.Schema.PRODUCT_DESCRIPTION;
 import static grakn.simulation.db.grakn.schema.Schema.PRODUCT_NAME;
 
-public class ProductAgent extends grakn.simulation.db.common.agents.interaction.ProductAgent {
+public class ProductAgent extends grakn.simulation.db.common.agents.interaction.ProductAgent<GraknContext> {
+
+    private Transaction tx;
+
+    @Override
+    protected void openTx() {
+        if (tx == null) {
+            tx = backendContext().tx(getSessionKey());
+        }
+    }
+
+    @Override
+    protected void closeTx() {
+        tx.close();
+        tx = null;
+    }
+
+    @Override
+    protected void commitTx() {
+        tx.commit();
+        tx = null;
+    }
 
     @Override
     protected void insertProduct(Double barcode, String productName, String productDescription) {
@@ -36,7 +58,7 @@ public class ProductAgent extends grakn.simulation.db.common.agents.interaction.
                         .rel(PRODUCED_IN_CONTINENT, Graql.var(CONTINENT))
                 );
         log().query("insertProduct", insertProductQuery);
-        tx().forGrakn().execute(insertProductQuery).get();
+        tx.execute(insertProductQuery);
     }
 
     static GraqlGet getProductsInContinentQuery(World.Continent continent) {
@@ -60,7 +82,7 @@ public class ProductAgent extends grakn.simulation.db.common.agents.interaction.
 //        GraqlGet.Aggregate countQuery = Graql.match(
 //
 //        ).get().count();
-//        return ((Transaction) tx()).count(countQuery);
+//        return tx.count(countQuery);
         return 0;
     }
 }

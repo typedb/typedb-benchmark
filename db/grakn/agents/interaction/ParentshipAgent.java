@@ -1,7 +1,8 @@
 package grakn.simulation.db.grakn.agents.interaction;
 
 import grakn.client.answer.ConceptMap;
-import grakn.simulation.db.grakn.driver.GraknClientWrapper.Session.Transaction;
+import grakn.simulation.db.grakn.GraknContext;
+import grakn.simulation.db.grakn.driver.Transaction;
 import graql.lang.Graql;
 import graql.lang.query.GraqlGet;
 import graql.lang.query.GraqlInsert;
@@ -33,7 +34,28 @@ import static grakn.simulation.db.grakn.schema.Schema.PARENTSHIP_PARENT;
 import static grakn.simulation.db.grakn.schema.Schema.PERSON;
 import static java.util.stream.Collectors.toList;
 
-public class ParentshipAgent extends grakn.simulation.db.common.agents.interaction.ParentshipAgent {
+public class ParentshipAgent extends grakn.simulation.db.common.agents.interaction.ParentshipAgent<GraknContext> {
+
+    private Transaction tx;
+
+    @Override
+    protected void openTx() {
+        if (tx == null) {
+            tx = backendContext().tx(getSessionKey());
+        }
+    }
+
+    @Override
+    protected void closeTx() {
+        tx.close();
+        tx = null;
+    }
+
+    @Override
+    protected void commitTx() {
+        tx.commit();
+        tx = null;
+    }
 
     @Override
     protected List<HashMap<Email, String>> getMarriageEmails() {
@@ -59,7 +81,7 @@ public class ParentshipAgent extends grakn.simulation.db.common.agents.interacti
         ).get().sort(MARRIAGE_ID);
 
         log().query("getMarriageEmails", marriageQuery);
-        List<ConceptMap> marriageAnswers = tx().forGrakn().execute(marriageQuery).get();
+        List<ConceptMap> marriageAnswers = tx.execute(marriageQuery);
 
         return marriageAnswers
                 .stream()
@@ -85,7 +107,7 @@ public class ParentshipAgent extends grakn.simulation.db.common.agents.interacti
         ).get();
 
         log().query("getChildrenEmails", childrenQuery);
-        return ((Transaction)tx()).getOrderedAttribute(childrenQuery, EMAIL, null);
+        return tx.getOrderedAttribute(childrenQuery, EMAIL, null);
     }
 
     @Override
@@ -120,7 +142,7 @@ public class ParentshipAgent extends grakn.simulation.db.common.agents.interacti
         );
 
         log().query("insertParentShip", parentshipQuery);
-        tx().forGrakn().execute(parentshipQuery).get();
+        tx.execute(parentshipQuery);
     }
 
     @Override
@@ -128,7 +150,7 @@ public class ParentshipAgent extends grakn.simulation.db.common.agents.interacti
 //        GraqlGet.Aggregate countQuery = Graql.match(
 //
 //        ).get().count();
-//        return ((Transaction) tx()).count(countQuery);
+//        return tx.count(countQuery);
         return 0;
     }
 }

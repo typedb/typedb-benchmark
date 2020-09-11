@@ -10,16 +10,17 @@ import java.util.List;
 
 import static grabl.tracing.client.GrablTracingThreadStatic.traceOnThread;
 
-public abstract class FriendshipAgent extends CityAgent {
+public abstract class FriendshipAgent<C> extends CityAgent<C> {
 
     @Override
     public final AgentResultSet iterate() {
-
+        openTx();
         List<String> residentEmails;
         try (ThreadTrace trace = traceOnThread(this.registerMethodTrace("getResidentEmails"))) {
             residentEmails = getResidentEmails(today());
         }
         closeTx();  // TODO Closing and reopening the transaction here is a workaround for https://github.com/graknlabs/grakn/issues/5585
+        openTx();
         if (residentEmails.size() > 0) {
             shuffle(residentEmails);
             int numFriendships = world().getScaleFactor();
@@ -31,7 +32,7 @@ public abstract class FriendshipAgent extends CityAgent {
                     insertFriendship(friend1, friend2);
                 }
             }
-            commitTxWithTracing();
+            commitTx();
         }
         return null;
     }

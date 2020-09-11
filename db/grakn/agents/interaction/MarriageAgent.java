@@ -3,14 +3,14 @@ package grakn.simulation.db.grakn.agents.interaction;
 import grakn.client.answer.ConceptMap;
 import grakn.simulation.db.common.agents.base.AgentResult;
 import grakn.simulation.db.common.agents.interaction.MarriageAgentBase;
-import grakn.simulation.db.grakn.driver.GraknClientWrapper.Session.Transaction;
+import grakn.simulation.db.grakn.GraknContext;
+import grakn.simulation.db.grakn.driver.Transaction;
 import graql.lang.Graql;
 import graql.lang.query.GraqlGet;
 import graql.lang.query.GraqlInsert;
 import graql.lang.statement.Statement;
 import graql.lang.statement.StatementAttribute;
 
-import java.util.HashMap;
 import java.util.List;
 
 import static com.google.common.collect.Iterables.getOnlyElement;
@@ -35,7 +35,28 @@ import static grakn.simulation.db.grakn.schema.Schema.RESIDENCY;
 import static grakn.simulation.db.grakn.schema.Schema.RESIDENCY_LOCATION;
 import static grakn.simulation.db.grakn.schema.Schema.RESIDENCY_RESIDENT;
 
-public class MarriageAgent extends MarriageAgentBase {
+public class MarriageAgent extends MarriageAgentBase<GraknContext> {
+
+    private Transaction tx;
+
+    @Override
+    protected void openTx() {
+        if (tx == null) {
+            tx = backendContext().tx(getSessionKey());
+        }
+    }
+
+    @Override
+    protected void closeTx() {
+        tx.close();
+        tx = null;
+    }
+
+    @Override
+    protected void commitTx() {
+        tx.commit();
+        tx = null;
+    }
 
     @Override
     protected List<String> getSingleWomen() {
@@ -63,7 +84,7 @@ public class MarriageAgent extends MarriageAgentBase {
         log().query(scope, query);
         List<String> result;
         try (ThreadTrace trace = traceOnThread("execute")) {
-            result = ((Transaction)tx()).getOrderedAttribute(query, EMAIL, null);
+            result = tx.getOrderedAttribute(query, EMAIL, null);
         }
         log().message(scope, result.toString());
         return result;
@@ -96,14 +117,14 @@ public class MarriageAgent extends MarriageAgentBase {
         List<ConceptMap> answers;
         log().query("insertMarriage", marriageQuery);
         try (ThreadTrace trace = traceOnThread("execute")) {
-            answers = tx().forGrakn().execute(marriageQuery).get();
+            answers = tx.execute(marriageQuery);
         }
 
         ConceptMap answer = getOnlyElement(answers);
-        Object wifeEmailAns = getOnlyAttributeOfThing(answer, tx().forGrakn(), "wife", EMAIL);
-        Object husbandEmailAns = getOnlyAttributeOfThing(answer, tx().forGrakn(), "husband", EMAIL);
-        Object marriageIdentifierAns = getOnlyAttributeOfThing(answer, tx().forGrakn(), "marriage", MARRIAGE_ID);
-        Object cityNameAns = getOnlyAttributeOfThing(answer, tx().forGrakn(), CITY, LOCATION_NAME);
+        Object wifeEmailAns = tx.getOnlyAttributeOfThing(answer, "wife", EMAIL);
+        Object husbandEmailAns = tx.getOnlyAttributeOfThing(answer, "husband", EMAIL);
+        Object marriageIdentifierAns = tx.getOnlyAttributeOfThing(answer, "marriage", MARRIAGE_ID);
+        Object cityNameAns = tx.getOnlyAttributeOfThing(answer, CITY, LOCATION_NAME);
 
         return new AgentResult(){{
                 put(MarriageAgentField.MARRIAGE_IDENTIFIER, marriageIdentifierAns);
@@ -136,6 +157,6 @@ public class MarriageAgent extends MarriageAgentBase {
                 Graql.var().isa(LOCATES).rel(LOCATES_LOCATED, marriage).rel(LOCATES_LOCATION, city)
         ).get().count();
         log().query("checkCount", countQuery);
-        return ((Transaction) tx()).count(countQuery);
+        return tx.count(countQuery);
     }
 }

@@ -2,6 +2,7 @@ package grakn.simulation.db.neo4j.agents.interaction;
 
 import grakn.simulation.db.common.agents.base.AgentResult;
 import grakn.simulation.db.common.agents.interaction.MarriageAgentBase;
+import grakn.simulation.db.neo4j.Neo4jContext;
 import grakn.simulation.db.neo4j.driver.Neo4jDriverWrapper.Session.Transaction;
 import org.neo4j.driver.Query;
 import org.neo4j.driver.Record;
@@ -16,7 +17,7 @@ import static grakn.simulation.db.neo4j.schema.Schema.GENDER;
 import static grakn.simulation.db.neo4j.schema.Schema.LOCATION_NAME;
 import static grakn.simulation.db.neo4j.schema.Schema.MARRIAGE_ID;
 
-public class MarriageAgent extends MarriageAgentBase {
+public class MarriageAgent extends MarriageAgentBase<Neo4jContext> {
 
     @Override
     protected List<String> getSingleWomen() {

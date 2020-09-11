@@ -7,12 +7,11 @@ import grakn.simulation.db.common.agents.utils.Pair;
 import grakn.simulation.db.common.agents.world.CityAgent;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.List;
 
 import static grabl.tracing.client.GrablTracingThreadStatic.traceOnThread;
 
-public abstract class MarriageAgentBase extends CityAgent {
+public abstract class MarriageAgentBase<C> extends CityAgent<C> {
 
     public enum MarriageAgentField implements ComparableField {
         MARRIAGE_IDENTIFIER, WIFE_EMAIL, HUSBAND_EMAIL, CITY_NAME
@@ -26,6 +25,7 @@ public abstract class MarriageAgentBase extends CityAgent {
         log().message("MarriageAgent", String.format("Simulation step %d", simulationStep()));
         // Find bachelors and bachelorettes who are considered adults and who are not in a marriage and pair them off randomly
         List<String> womenEmails;
+        openTx();
         try (ThreadTrace trace = traceOnThread(this.registerMethodTrace("getSingleWomen"))) {
             womenEmails = getSingleWomen();
         }
@@ -51,7 +51,9 @@ public abstract class MarriageAgentBase extends CityAgent {
                     agentResultSet.add(insertMarriage(marriageIdentifier, wifeEmail, husbandEmail));
                 }
             }
-            commitTxWithTracing();
+            commitTx();
+        } else {
+            closeTx();
         }
         return agentResultSet;
     }

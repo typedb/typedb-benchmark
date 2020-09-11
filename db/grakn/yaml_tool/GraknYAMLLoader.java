@@ -1,6 +1,6 @@
 package grakn.simulation.db.grakn.yaml_tool;
 
-import grakn.simulation.db.common.driver.DriverWrapper;
+import grakn.client.GraknClient;
 import grakn.simulation.db.common.yaml_tool.QueryTemplate;
 import grakn.simulation.db.common.yaml_tool.YAMLLoader;
 import graql.lang.Graql;
@@ -14,17 +14,22 @@ import java.util.Map;
 
 public class GraknYAMLLoader extends YAMLLoader {
 
+    private final GraknClient.Session session;
 
-    public GraknYAMLLoader(DriverWrapper.Session session, Map<String, Path> accessibleFiles) {
-        super(session, accessibleFiles);
+    public GraknYAMLLoader(GraknClient.Session session, Map<String, Path> accessibleFiles) {
+        super(accessibleFiles);
+        this.session = session;
     }
 
-    protected void parseCSV(DriverWrapper.Session.Transaction tx, QueryTemplate template, CSVParser parser) throws IOException {
-        for (CSVRecord record : parser.getRecords()) {
-            String interpolatedQuery = template.interpolate(record::get);
-            GraqlInsert insert = Graql.parse(interpolatedQuery);
-            tx.forGrakn().execute(insert);
+    @Override
+    protected void parseCSV(QueryTemplate template, CSVParser parser) throws IOException {
+        try (GraknClient.Transaction tx = session.transaction(GraknClient.Transaction.Type.WRITE)) {
+            for (CSVRecord record : parser.getRecords()) {
+                String interpolatedQuery = template.interpolate(record::get);
+                GraqlInsert insert = Graql.parse(interpolatedQuery);
+                tx.execute(insert);
+            }
+            tx.commit();
         }
     }
-
 }

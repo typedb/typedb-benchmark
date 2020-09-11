@@ -13,7 +13,7 @@ import java.util.List;
 import static grabl.tracing.client.GrablTracingThreadStatic.ThreadTrace;
 import static grabl.tracing.client.GrablTracingThreadStatic.traceOnThread;
 
-public abstract class RelocationAgent extends CityAgent {
+public abstract class RelocationAgent<C> extends CityAgent<C> {
 
     @Override
     public final AgentResultSet iterate() {
@@ -33,6 +33,7 @@ public abstract class RelocationAgent extends CityAgent {
         List<String> residentEmails;
         List<String> relocationCityNames;
 
+        openTx();
         try (ThreadTrace trace = traceOnThread(this.registerMethodTrace("getResidentEmails"))) {
             residentEmails = getResidentEmails(earliestDate);
         }
@@ -47,7 +48,7 @@ public abstract class RelocationAgent extends CityAgent {
                 insertRelocation(residentEmail, relocationCityName);
             }
         });
-        commitTxWithTracing();
+        commitTx();
         return null;
     }
 

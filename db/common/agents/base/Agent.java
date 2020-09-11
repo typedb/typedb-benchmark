@@ -5,7 +5,6 @@ import grabl.tracing.client.GrablTracingThreadStatic.ThreadTrace;
 import grakn.simulation.db.common.agents.interaction.RandomValueGenerator;
 import grakn.simulation.db.common.agents.utils.CheckMethod;
 import grakn.simulation.db.common.agents.utils.Pair;
-import grakn.simulation.db.common.driver.DriverWrapper;
 import grakn.simulation.db.common.world.World;
 import org.slf4j.Logger;
 
@@ -23,25 +22,27 @@ import static grabl.tracing.client.GrablTracingThreadStatic.traceOnThread;
  * this class.
  *
  * This class is instantiated via reflection by {@link AgentRunner} and initialized using
- * {@link #init(IterationContext, Random, Object, String, String, Logger, Boolean)}.
+ * {@link #init(IterationContext, Random, Object, Object, String, String, Logger, Boolean)}.
  *
  * The protected methods of this class provide useful simple methods for writing Agents as concisely as possible.
  */
-public abstract class Agent<T> implements AutoCloseable {
+public abstract class Agent<T, C> implements AutoCloseable {
 
-    private IterationContext iterationContext;
+    protected IterationContext iterationContext;
     private Random random;
-    private T item;
+    private T worldLocality;
+    private C backendContext;
     private String sessionKey;
     private String tracker;
     private LogWrapper logWrapper;
     private ThreadContext context;
     private HashSet<String> tracedMethods = new HashSet<>();
 
-    void init(IterationContext iterationContext, Random random, T item, String sessionKey, String tracker, Logger logger, Boolean trace) {
+    void init(IterationContext iterationContext, Random random, T worldLocality, C backendContext, String sessionKey, String tracker, Logger logger, Boolean trace) {
         this.iterationContext = iterationContext;
         this.random = random;
-        this.item = item;
+        this.worldLocality = worldLocality;
+        this.backendContext = backendContext;
         this.sessionKey = sessionKey;
         this.tracker = tracker;
 
@@ -51,7 +52,6 @@ public abstract class Agent<T> implements AutoCloseable {
         }
     }
 
-    private DriverWrapper.Session.Transaction tx;
     private LocalDateTime today;
 
     protected LogWrapper log() {
@@ -66,49 +66,50 @@ public abstract class Agent<T> implements AutoCloseable {
         return new RandomValueGenerator(random());
     }
 
-    protected T item() {
-        return item;
+    protected T worldLocality() {
+        return worldLocality;
+    }
+
+    protected C backendContext() {
+        return backendContext;
     }
 
     protected String tracker() {
         return tracker;
     }
 
-    protected DriverWrapper.Session session() {
-        return iterationContext.getIterationSessionFor(getSessionKey());
-    }
-
-    protected DriverWrapper.Session.Transaction transaction() {
-        return iterationContext.getIterationSessionFor(getSessionKey()).transactionWithTracing();
-    }
-
     protected String getSessionKey() {
         return sessionKey;
     }
 
-    protected DriverWrapper.Session.Transaction tx() {
-        if (tx == null) {
-            tx = transaction();
-        }
-        return tx;
-    }
+//    protected DriverWrapper.Session.Transaction tx() {
+//        if (tx == null) {
+//            tx = iterationContext.getIterationSessionFor(getSessionKey()).transactionWithTracing();
+//        }
+//        return tx;
+//    }
 
-    protected void closeTx() {
-        if (tx != null) {
-            tx.close();
-            tx = null;
-        }
-    }
+//    protected void closeTx() {
+//        if (tx != null) {
+//            tx.close();
+//            tx = null;
+//        }
+//    }
 
-    protected void commitTxWithTracing() {
-        tx.commitWithTracing();
-        tx = null;
-    }
+    protected abstract void openTx();
 
-    protected void setTx(DriverWrapper.Session.Transaction tx) {
-        closeTx();
-        this.tx = tx;
-    }
+    protected abstract void closeTx();
+
+    protected abstract void commitTx();
+//    {
+//        tx.commitWithTracing();
+//        tx = null;
+//    }
+
+//    protected void setTx(DriverWrapper.Session.Transaction tx) {
+//        closeTx();
+//        this.tx = tx;
+//    }
 
     protected World world() {
         return iterationContext.getWorld();
@@ -135,7 +136,7 @@ public abstract class Agent<T> implements AutoCloseable {
 
     @Override
     public void close() {
-        closeTx();
+//        closeTx();
         if (context != null) {
             context.close();
         }

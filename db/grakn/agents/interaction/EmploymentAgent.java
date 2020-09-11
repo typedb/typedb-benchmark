@@ -1,6 +1,7 @@
 package grakn.simulation.db.grakn.agents.interaction;
 
-import grakn.simulation.db.grakn.driver.GraknClientWrapper.Session.Transaction;
+import grakn.simulation.db.grakn.GraknContext;
+import grakn.simulation.db.grakn.driver.Transaction;
 import graql.lang.Graql;
 import graql.lang.query.GraqlGet;
 import graql.lang.query.GraqlInsert;
@@ -34,14 +35,35 @@ import static grakn.simulation.db.grakn.schema.Schema.START_DATE;
 import static grakn.simulation.db.grakn.schema.Schema.WAGE;
 import static grakn.simulation.db.grakn.schema.Schema.WAGE_VALUE;
 
-public class EmploymentAgent extends grakn.simulation.db.common.agents.interaction.EmploymentAgent {
+public class EmploymentAgent extends grakn.simulation.db.common.agents.interaction.EmploymentAgent<GraknContext> {
+
+    private Transaction tx;
+
+    @Override
+    protected void openTx() {
+        if (tx == null) {
+            tx = backendContext().tx(getSessionKey());
+        }
+    }
+
+    @Override
+    protected void closeTx() {
+        tx.close();
+        tx = null;
+    }
+
+    @Override
+    protected void commitTx() {
+        tx.commit();
+        tx = null;
+    }
 
     @Override
     protected List<Long> getCompanyNumbers() {
         GraqlGet companyNumbersQuery = CompanyAgent.getCompanyNumbersInCountryQuery(city().country());
         log().query("getCompanyNumbers", companyNumbersQuery);
         int numCompanies = world().getScaleFactor();
-        return ((Transaction)tx()).getOrderedAttribute(companyNumbersQuery, COMPANY_NUMBER, numCompanies);
+        return tx.getOrderedAttribute(companyNumbersQuery, COMPANY_NUMBER, numCompanies);
     }
 
     @Override
@@ -49,7 +71,7 @@ public class EmploymentAgent extends grakn.simulation.db.common.agents.interacti
         GraqlGet getEmployeeEmailsQuery = cityResidentsQuery(city(), earliestDate);
         log().query("getEmployeeEmails", getEmployeeEmailsQuery);
         int numEmployments = world().getScaleFactor();
-        return ((Transaction)tx()).getOrderedAttribute(getEmployeeEmailsQuery, EMAIL, numEmployments);
+        return tx.getOrderedAttribute(getEmployeeEmailsQuery, EMAIL, numEmployments);
     }
 
     @Override
@@ -111,7 +133,7 @@ public class EmploymentAgent extends grakn.simulation.db.common.agents.interacti
                         .has(CONTRACTED_HOURS, contractedHoursVar)
         );
         log().query("insertEmployment", insertEmploymentQuery);
-        tx().forGrakn().execute(insertEmploymentQuery).get();
+        tx.execute(insertEmploymentQuery);
     }
 
     @Override
@@ -172,6 +194,6 @@ public class EmploymentAgent extends grakn.simulation.db.common.agents.interacti
                                 .has(CONTRACTED_HOURS, contractedHoursVar)
         ).get().count();
         log().query("checkCount", countQuery);
-        return ((Transaction) tx()).count(countQuery);
+        return tx.count(countQuery);
     }
 }
