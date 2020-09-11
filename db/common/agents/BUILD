@@ -4,7 +4,7 @@ java_library(
         "base/*.java",
         "interaction/*.java",
         "utils/*.java",
-        "world/*.java",
+        "region/*.java",
     ]),
     visibility = ["//visibility:public"],
     deps = [

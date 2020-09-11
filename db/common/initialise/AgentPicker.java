@@ -1,9 +1,9 @@
 package grakn.simulation.db.common.initialise;
 
 import grakn.simulation.db.common.agents.base.AgentRunner;
-import grakn.simulation.db.common.agents.world.CityAgentRunner;
-import grakn.simulation.db.common.agents.world.ContinentAgentRunner;
-import grakn.simulation.db.common.agents.world.CountryAgentRunner;
+import grakn.simulation.db.common.agents.region.CityAgentRunner;
+import grakn.simulation.db.common.agents.region.ContinentAgentRunner;
+import grakn.simulation.db.common.agents.region.CountryAgentRunner;
 import grakn.simulation.db.common.context.DatabaseContext;
 
 public abstract class AgentPicker<CONTEXT extends DatabaseContext> {

@@ -1,8 +1,8 @@
 package grakn.simulation.db.grakn.initialise;
 
-import grakn.simulation.db.common.agents.world.CityAgentRunner;
-import grakn.simulation.db.common.agents.world.ContinentAgentRunner;
-import grakn.simulation.db.common.agents.world.CountryAgentRunner;
+import grakn.simulation.db.common.agents.region.CityAgentRunner;
+import grakn.simulation.db.common.agents.region.ContinentAgentRunner;
+import grakn.simulation.db.common.agents.region.CountryAgentRunner;
 import grakn.simulation.db.common.initialise.AgentPicker;
 import grakn.simulation.db.grakn.context.GraknContext;
 import grakn.simulation.db.grakn.agents.interaction.AgeUpdateAgent;
@@ -16,8 +16,8 @@ import grakn.simulation.db.grakn.agents.interaction.ProductAgent;
 import grakn.simulation.db.grakn.agents.interaction.RelocationAgent;
 import grakn.simulation.db.grakn.agents.interaction.TransactionAgent;
 
-import static grakn.simulation.db.common.agents.world.CityAgentRunner.SessionStrategy.CONTINENT;
-import static grakn.simulation.db.common.agents.world.CountryAgentRunner.SessionStrategy.COUNTRY;
+import static grakn.simulation.db.common.agents.region.CityAgentRunner.SessionStrategy.CONTINENT;
+import static grakn.simulation.db.common.agents.region.CountryAgentRunner.SessionStrategy.COUNTRY;
 
 public class GraknAgentPicker extends AgentPicker<GraknContext> {
 

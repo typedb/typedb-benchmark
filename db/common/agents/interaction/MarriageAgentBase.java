@@ -4,7 +4,7 @@ import grabl.tracing.client.GrablTracingThreadStatic.ThreadTrace;
 import grakn.simulation.db.common.agents.base.AgentResult;
 import grakn.simulation.db.common.agents.base.AgentResultSet;
 import grakn.simulation.db.common.agents.utils.Pair;
-import grakn.simulation.db.common.agents.world.CityAgent;
+import grakn.simulation.db.common.agents.region.CityAgent;
 import grakn.simulation.db.common.context.DatabaseContext;
 
 import java.time.LocalDateTime;

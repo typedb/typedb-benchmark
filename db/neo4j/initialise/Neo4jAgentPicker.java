@@ -1,8 +1,8 @@
 package grakn.simulation.db.neo4j.initialise;
 
-import grakn.simulation.db.common.agents.world.CityAgentRunner;
-import grakn.simulation.db.common.agents.world.ContinentAgentRunner;
-import grakn.simulation.db.common.agents.world.CountryAgentRunner;
+import grakn.simulation.db.common.agents.region.CityAgentRunner;
+import grakn.simulation.db.common.agents.region.ContinentAgentRunner;
+import grakn.simulation.db.common.agents.region.CountryAgentRunner;
 import grakn.simulation.db.common.initialise.AgentPicker;
 import grakn.simulation.db.neo4j.agents.interaction.AgeUpdateAgent;
 import grakn.simulation.db.neo4j.agents.interaction.CompanyAgent;
@@ -15,7 +15,7 @@ import grakn.simulation.db.neo4j.agents.interaction.ProductAgent;
 import grakn.simulation.db.neo4j.agents.interaction.RelocationAgent;
 import grakn.simulation.db.neo4j.agents.interaction.TransactionAgent;
 
-import static grakn.simulation.db.common.agents.world.CityAgentRunner.SessionStrategy.CITY;
+import static grakn.simulation.db.common.agents.region.CityAgentRunner.SessionStrategy.CITY;
 
 public class Neo4jAgentPicker extends AgentPicker {
     @Override

@@ -2,7 +2,7 @@ package grakn.simulation.db.common.agents.interaction;
 
 import grakn.simulation.db.common.agents.base.AgentResultSet;
 import grakn.simulation.db.common.agents.utils.Pair;
-import grakn.simulation.db.common.agents.world.ContinentAgent;
+import grakn.simulation.db.common.agents.region.ContinentAgent;
 import grakn.simulation.db.common.context.DatabaseContext;
 
 import static grabl.tracing.client.GrablTracingThreadStatic.ThreadTrace;
