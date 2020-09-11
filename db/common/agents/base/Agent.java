@@ -2,6 +2,7 @@ package grakn.simulation.db.common.agents.base;
 
 import grabl.tracing.client.GrablTracingThreadStatic.ThreadContext;
 import grabl.tracing.client.GrablTracingThreadStatic.ThreadTrace;
+import grakn.simulation.db.common.world.Region;
 import grakn.simulation.db.common.context.DatabaseContext;
 import grakn.simulation.db.common.agents.interaction.RandomValueGenerator;
 import grakn.simulation.db.common.agents.utils.CheckMethod;
@@ -27,7 +28,7 @@ import static grabl.tracing.client.GrablTracingThreadStatic.traceOnThread;
  *
  * The protected methods of this class provide useful simple methods for writing Agents as concisely as possible.
  */
-public abstract class Agent<REGION, CONTEXT extends DatabaseContext> implements AutoCloseable {
+public abstract class Agent<REGION extends Region, CONTEXT extends DatabaseContext> implements AutoCloseable {
 
     protected IterationContext iterationContext;
     private Random random;

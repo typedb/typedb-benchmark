@@ -2,6 +2,7 @@ package grakn.simulation.db.common.agents.base;
 
 import grakn.simulation.db.common.agents.utils.Pair;
 import grakn.simulation.db.common.context.DatabaseContext;
+import grakn.simulation.db.common.world.Region;
 import grakn.simulation.utils.RandomSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,7 +23,7 @@ import java.util.Random;
  * @param <REGION> The type of region used by the agent.
  * @param <CONTEXT> The database context used by the agent.
  */
-public abstract class AgentRunner<REGION, CONTEXT extends DatabaseContext> {
+public abstract class AgentRunner<REGION extends Region, CONTEXT extends DatabaseContext> {
 
     private Constructor<? extends Agent<REGION, CONTEXT>> agentConstructor;
     private Logger logger;

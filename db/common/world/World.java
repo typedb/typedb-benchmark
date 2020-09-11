@@ -109,7 +109,7 @@ public class World {
         return scaleFactor;
     }
 
-    public class Continent {
+    public class Continent implements Region {
         private String continentName;
         private List<Country> countries = new ArrayList<>();
 
@@ -133,7 +133,7 @@ public class World {
         }
     }
 
-    public class Country {
+    public class Country implements Region {
         private String countryName;
         private Continent continent;
         private List<City> cities = new ArrayList<>();
@@ -163,7 +163,7 @@ public class World {
         }
     }
 
-    public class City {
+    public class City implements Region {
         private String cityName;
         private Country country;
 
