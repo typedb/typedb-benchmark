@@ -1,7 +1,7 @@
 package grakn.simulation.db.grakn.agents.interaction;
 
 import grakn.simulation.db.common.agents.utils.Pair;
-import grakn.simulation.db.grakn.GraknContext;
+import grakn.simulation.db.grakn.context.GraknContext;
 import grakn.simulation.db.grakn.driver.Transaction;
 import graql.lang.Graql;
 import graql.lang.query.GraqlGet;

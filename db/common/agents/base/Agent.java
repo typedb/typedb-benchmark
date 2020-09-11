@@ -2,6 +2,7 @@ package grakn.simulation.db.common.agents.base;
 
 import grabl.tracing.client.GrablTracingThreadStatic.ThreadContext;
 import grabl.tracing.client.GrablTracingThreadStatic.ThreadTrace;
+import grakn.simulation.db.common.context.DatabaseContext;
 import grakn.simulation.db.common.agents.interaction.RandomValueGenerator;
 import grakn.simulation.db.common.agents.utils.CheckMethod;
 import grakn.simulation.db.common.agents.utils.Pair;
@@ -26,26 +27,25 @@ import static grabl.tracing.client.GrablTracingThreadStatic.traceOnThread;
  *
  * The protected methods of this class provide useful simple methods for writing Agents as concisely as possible.
  */
-public abstract class Agent<T, C> implements AutoCloseable {
+public abstract class Agent<REGION, CONTEXT extends DatabaseContext> implements AutoCloseable {
 
     protected IterationContext iterationContext;
     private Random random;
-    private T worldLocality;
-    private C backendContext;
+    private REGION region;
+    private CONTEXT backendContext;
     private String sessionKey;
     private String tracker;
     private LogWrapper logWrapper;
     private ThreadContext context;
     private HashSet<String> tracedMethods = new HashSet<>();
 
-    void init(IterationContext iterationContext, Random random, T worldLocality, C backendContext, String sessionKey, String tracker, Logger logger, Boolean trace) {
+    void init(IterationContext iterationContext, Random random, REGION worldLocality, CONTEXT backendContext, String sessionKey, String tracker, Logger logger, Boolean trace) {
         this.iterationContext = iterationContext;
         this.random = random;
-        this.worldLocality = worldLocality;
+        this.region = worldLocality;
         this.backendContext = backendContext;
         this.sessionKey = sessionKey;
         this.tracker = tracker;
-
         this.logWrapper = new LogWrapper(logger);
         if (trace) {
             context = contextOnThread(tracker(), simulationStep());
@@ -66,11 +66,11 @@ public abstract class Agent<T, C> implements AutoCloseable {
         return new RandomValueGenerator(random());
     }
 
-    protected T worldLocality() {
-        return worldLocality;
+    protected REGION region() {
+        return region;
     }
 
-    protected C backendContext() {
+    protected CONTEXT backendContext() {
         return backendContext;
     }
 

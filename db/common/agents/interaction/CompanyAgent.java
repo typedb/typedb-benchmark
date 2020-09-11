@@ -4,11 +4,12 @@ import grabl.tracing.client.GrablTracingThreadStatic.ThreadTrace;
 import grakn.simulation.db.common.agents.base.AgentResultSet;
 import grakn.simulation.db.common.agents.utils.Pair;
 import grakn.simulation.db.common.agents.world.CountryAgent;
+import grakn.simulation.db.common.context.DatabaseContext;
 import org.apache.commons.lang3.StringUtils;
 
 import static grabl.tracing.client.GrablTracingThreadStatic.traceOnThread;
 
-public abstract class CompanyAgent<C> extends CountryAgent<C> {
+public abstract class CompanyAgent<CONTEXT extends DatabaseContext> extends CountryAgent<CONTEXT> {
 
     int numCompanies;
 

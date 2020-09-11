@@ -1,6 +1,7 @@
 package grakn.simulation.db.common.agents.base;
 
 import grakn.simulation.db.common.agents.utils.Pair;
+import grakn.simulation.db.common.context.DatabaseContext;
 import grakn.simulation.utils.RandomSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,17 +19,18 @@ import java.util.Random;
  * This class must be extended to provide the source of the random items and the methods to obtain the session key and
  * tracker from them.
  *
- * @param <T> The type of item used by the agent.
+ * @param <REGION> The type of region used by the agent.
+ * @param <CONTEXT> The database context used by the agent.
  */
-public abstract class AgentRunner<T, C> {
+public abstract class AgentRunner<REGION, CONTEXT extends DatabaseContext> {
 
-    private Constructor<? extends Agent<T, C>> agentConstructor;
+    private Constructor<? extends Agent<REGION, CONTEXT>> agentConstructor;
     private Logger logger;
     private Boolean traceAgent = true;
     private HashMap<String, Integer> lastTestCount = new HashMap<>();
-    private C backendContext;
+    private CONTEXT backendContext;
 
-    protected AgentRunner(Class<? extends Agent<T, C>> agentClass, C backendContext) {
+    protected AgentRunner(Class<? extends Agent<REGION, CONTEXT>> agentClass, CONTEXT backendContext) {
         this.backendContext = backendContext;
         try {
             agentConstructor = agentClass.getDeclaredConstructor();
@@ -44,14 +46,14 @@ public abstract class AgentRunner<T, C> {
         traceAgent = trace;
     }
 
-    abstract protected List<T> getParallelItems(IterationContext iterationContext, RandomSource randomSource);
+    abstract protected List<REGION> getParallelItems(IterationContext iterationContext, RandomSource randomSource);
 
-    abstract protected String getSessionKey(IterationContext iterationContext, RandomSource randomSource, T item);
+    abstract protected String getSessionKey(IterationContext iterationContext, RandomSource randomSource, REGION item);
 
-    abstract protected String getTracker(IterationContext iterationContext, RandomSource randomSource, T item);
+    abstract protected String getTracker(IterationContext iterationContext, RandomSource randomSource, REGION item);
 
     public void iterate(IterationContext iterationContext, RandomSource randomSource) {
-        List<T> items = getParallelItems(iterationContext, randomSource);
+        List<REGION> items = getParallelItems(iterationContext, randomSource);
         List<RandomSource> sources = randomSource.split(items.size());
 
         Pair.zip(sources, items).parallelStream().forEach(
@@ -59,13 +61,13 @@ public abstract class AgentRunner<T, C> {
         );
     }
 
-    private void runAgent(IterationContext iterationContext, RandomSource source, T worldLocality) {
+    private void runAgent(IterationContext iterationContext, RandomSource source, REGION worldLocality) {
         Random random = source.startNewRandom();
         Random agentRandom = RandomSource.nextSource(random).startNewRandom();
         String sessionKey = getSessionKey(iterationContext, RandomSource.nextSource(random), worldLocality);
         String tracker = getTracker(iterationContext, RandomSource.nextSource(random), worldLocality);
 
-        try (Agent<T, C> agent = agentConstructor.newInstance()) {
+        try (Agent<REGION, CONTEXT> agent = agentConstructor.newInstance()) {
             agent.init(iterationContext, agentRandom, worldLocality, backendContext, sessionKey, tracker, logger, traceAgent && iterationContext.shouldTrace());
 //            AgentResult agentResult = agent.iterateWithTracing();  // TODO Disabled for demo purposes
             AgentResultSet agentResult = agent.iterate();

@@ -3,11 +3,12 @@ package grakn.simulation.db.common.agents.interaction;
 import grakn.simulation.db.common.agents.base.AgentResultSet;
 import grakn.simulation.db.common.agents.utils.Pair;
 import grakn.simulation.db.common.agents.world.ContinentAgent;
+import grakn.simulation.db.common.context.DatabaseContext;
 
 import static grabl.tracing.client.GrablTracingThreadStatic.ThreadTrace;
 import static grabl.tracing.client.GrablTracingThreadStatic.traceOnThread;
 
-public abstract class ProductAgent<C> extends ContinentAgent<C> {
+public abstract class ProductAgent<CONTEXT extends DatabaseContext> extends ContinentAgent<CONTEXT> {
 
     @Override
     public final AgentResultSet iterate() {

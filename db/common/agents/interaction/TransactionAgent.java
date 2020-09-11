@@ -4,6 +4,7 @@ import grakn.simulation.db.common.agents.base.AgentResultSet;
 import grakn.simulation.db.common.agents.utils.Allocation;
 import grakn.simulation.db.common.agents.utils.Pair;
 import grakn.simulation.db.common.agents.world.ContinentAgent;
+import grakn.simulation.db.common.context.DatabaseContext;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,7 +12,7 @@ import java.util.List;
 import static grabl.tracing.client.GrablTracingThreadStatic.ThreadTrace;
 import static grabl.tracing.client.GrablTracingThreadStatic.traceOnThread;
 
-public abstract class TransactionAgent<C> extends ContinentAgent<C> {
+public abstract class TransactionAgent<CONTEXT extends DatabaseContext> extends ContinentAgent<CONTEXT> {
 
     private int NUM_TRANSACTIONS_PER_COMPANY_ON_AVERAGE = 1;
 

@@ -5,13 +5,14 @@ import grakn.simulation.db.common.agents.base.AgentResult;
 import grakn.simulation.db.common.agents.base.AgentResultSet;
 import grakn.simulation.db.common.agents.utils.Pair;
 import grakn.simulation.db.common.agents.world.CityAgent;
+import grakn.simulation.db.common.context.DatabaseContext;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 import static grabl.tracing.client.GrablTracingThreadStatic.traceOnThread;
 
-public abstract class MarriageAgentBase<C> extends CityAgent<C> {
+public abstract class MarriageAgentBase<CONTEXT extends DatabaseContext> extends CityAgent<CONTEXT> {
 
     public enum MarriageAgentField implements ComparableField {
         MARRIAGE_IDENTIFIER, WIFE_EMAIL, HUSBAND_EMAIL, CITY_NAME

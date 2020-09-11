@@ -5,6 +5,7 @@ import grakn.simulation.db.common.agents.base.AgentResultSet;
 import grakn.simulation.db.common.agents.utils.Allocation;
 import grakn.simulation.db.common.agents.utils.Pair;
 import grakn.simulation.db.common.agents.world.CityAgent;
+import grakn.simulation.db.common.context.DatabaseContext;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -15,7 +16,7 @@ import java.util.Map;
 
 import static grabl.tracing.client.GrablTracingThreadStatic.traceOnThread;
 
-public abstract class ParentshipAgent<C> extends CityAgent<C> {
+public abstract class ParentshipAgent<CONTEXT extends DatabaseContext> extends CityAgent<CONTEXT> {
 
     protected enum Email {
         WIFE, HUSBAND

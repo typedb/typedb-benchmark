@@ -3,6 +3,7 @@ package grakn.simulation.db.common.agents.interaction;
 import grakn.simulation.db.common.agents.base.AgentResultSet;
 import grakn.simulation.db.common.agents.utils.Pair;
 import grakn.simulation.db.common.agents.world.CityAgent;
+import grakn.simulation.db.common.context.DatabaseContext;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -11,7 +12,7 @@ import static grabl.tracing.client.GrablTracingThreadStatic.ThreadTrace;
 import static grabl.tracing.client.GrablTracingThreadStatic.traceOnThread;
 import static grakn.simulation.db.common.agents.utils.Allocation.allocate;
 
-public abstract class EmploymentAgent<C> extends CityAgent<C> {
+public abstract class EmploymentAgent<CONTEXT extends DatabaseContext> extends CityAgent<CONTEXT> {
 
     private static final double MIN_ANNUAL_WAGE = 18000.00;
     private static final double MAX_ANNUAL_WAGE = 80000.00;

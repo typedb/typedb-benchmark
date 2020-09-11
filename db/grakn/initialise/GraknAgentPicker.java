@@ -4,7 +4,7 @@ import grakn.simulation.db.common.agents.world.CityAgentRunner;
 import grakn.simulation.db.common.agents.world.ContinentAgentRunner;
 import grakn.simulation.db.common.agents.world.CountryAgentRunner;
 import grakn.simulation.db.common.initialise.AgentPicker;
-import grakn.simulation.db.grakn.GraknContext;
+import grakn.simulation.db.grakn.context.GraknContext;
 import grakn.simulation.db.grakn.agents.interaction.AgeUpdateAgent;
 import grakn.simulation.db.grakn.agents.interaction.CompanyAgent;
 import grakn.simulation.db.grakn.agents.interaction.EmploymentAgent;

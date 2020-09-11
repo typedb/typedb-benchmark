@@ -4,11 +4,12 @@ import grakn.simulation.db.common.agents.base.AgentResult;
 import grakn.simulation.db.common.agents.base.AgentResultSet;
 import grakn.simulation.db.common.agents.utils.Pair;
 import grakn.simulation.db.common.agents.world.CityAgent;
+import grakn.simulation.db.common.context.DatabaseContext;
 
 import static grabl.tracing.client.GrablTracingThreadStatic.ThreadTrace;
 import static grabl.tracing.client.GrablTracingThreadStatic.traceOnThread;
 
-public abstract class PersonBirthAgentBase<C> extends CityAgent<C> {
+public abstract class PersonBirthAgentBase<CONTEXT extends DatabaseContext> extends CityAgent<CONTEXT> {
 
     private int numBirths;
 

@@ -2,6 +2,7 @@ java_library(
     name = "grakn",
     srcs = glob([
         "*.java",
+        "context/*.java",
         "agents/interaction/*.java",
         "agents/utils/*.java",
         "initialise/*.java",
@@ -12,6 +13,7 @@ java_library(
     deps = [
         "//db/grakn/schema",
         "//db/common:simulation-common",
+        "//db/common/context",
         "//db/common/agents",
         "//db/common/driver",
         "//db/common/initialise",

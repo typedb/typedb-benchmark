@@ -4,6 +4,7 @@ import grakn.simulation.db.common.agents.base.AgentResultSet;
 import grakn.simulation.db.common.agents.utils.Allocation;
 import grakn.simulation.db.common.agents.utils.Pair;
 import grakn.simulation.db.common.agents.world.CityAgent;
+import grakn.simulation.db.common.context.DatabaseContext;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -13,7 +14,7 @@ import java.util.List;
 import static grabl.tracing.client.GrablTracingThreadStatic.ThreadTrace;
 import static grabl.tracing.client.GrablTracingThreadStatic.traceOnThread;
 
-public abstract class RelocationAgent<C> extends CityAgent<C> {
+public abstract class RelocationAgent<CONTEXT extends DatabaseContext> extends CityAgent<CONTEXT> {
 
     @Override
     public final AgentResultSet iterate() {

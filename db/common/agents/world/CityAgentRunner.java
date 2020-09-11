@@ -3,6 +3,7 @@ package grakn.simulation.db.common.agents.world;
 import grakn.simulation.db.common.agents.base.Agent;
 import grakn.simulation.db.common.agents.base.IterationContext;
 import grakn.simulation.db.common.agents.base.AgentRunner;
+import grakn.simulation.db.common.context.DatabaseContext;
 import grakn.simulation.utils.RandomSource;
 import grakn.simulation.db.common.agents.utils.Tracker;
 import grakn.simulation.db.common.world.World;
@@ -11,7 +12,7 @@ import java.util.List;
 
 import static java.util.stream.Collectors.toList;
 
-public class CityAgentRunner<C> extends AgentRunner<World.City, C> {
+public class CityAgentRunner<CONTEXT extends DatabaseContext> extends AgentRunner<World.City, CONTEXT> {
 
     private SessionStrategy sessionStrategy;
 
@@ -19,7 +20,7 @@ public class CityAgentRunner<C> extends AgentRunner<World.City, C> {
         CITY, COUNTRY, CONTINENT
     }
 
-    public CityAgentRunner(Class<? extends Agent<World.City, C>> agentClass, C backendContext, SessionStrategy sessionStrategy) {
+    public CityAgentRunner(Class<? extends Agent<World.City, CONTEXT>> agentClass, CONTEXT backendContext, SessionStrategy sessionStrategy) {
         super(agentClass, backendContext);
         this.sessionStrategy = sessionStrategy;
     }

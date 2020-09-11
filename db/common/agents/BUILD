@@ -8,6 +8,7 @@ java_library(
     ]),
     visibility = ["//visibility:public"],
     deps = [
+        "//db/common/context",
         "//db/common/driver",
         "//db/common/world",
         "//utils",

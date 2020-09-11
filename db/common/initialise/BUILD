@@ -4,6 +4,7 @@ java_library(
     visibility = ["//visibility:public"],
     deps = [
         "//db/common/agents",
+        "//db/common/context",
         "//db/common/driver",
         "//db/common/world",
         "//db/common/yaml_tool",
