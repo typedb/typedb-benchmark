@@ -23,20 +23,20 @@ public class FriendshipAgent extends grakn.simulation.db.common.agents.interacti
     private Transaction tx;
 
     @Override
-    protected void openTx() {
+    public void startAction() {
         if (tx == null) {
             tx = backendContext().tx(getSessionKey());
         }
     }
 
     @Override
-    protected void closeTx() {
+    protected void stopAction() {
         tx.close();
         tx = null;
     }
 
     @Override
-    protected void commitTx() {
+    protected void commitAction() {
         tx.commit();
         tx = null;
     }

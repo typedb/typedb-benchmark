@@ -2,11 +2,13 @@ package grakn.simulation.db.neo4j.agents.interaction;
 
 import grakn.simulation.db.common.agents.base.AgentResult;
 import grakn.simulation.db.common.agents.interaction.MarriageAgentBase;
+import grakn.simulation.db.common.world.World;
 import grakn.simulation.db.neo4j.common.Neo4jContext;
 import grakn.simulation.db.neo4j.driver.Neo4jDriverWrapper.Session.Transaction;
 import org.neo4j.driver.Query;
 import org.neo4j.driver.Record;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,7 +22,7 @@ import static grakn.simulation.db.neo4j.schema.Schema.MARRIAGE_ID;
 public class MarriageAgent extends MarriageAgentBase<Neo4jContext> {
 
     @Override
-    protected List<String> getSingleWomen() {
+    protected List<String> getSingleWomen(LocalDateTime dobOfAdults) {
         return getSinglePeopleOfGenderQuery("getSingleWomen", "female");
     }
 
@@ -51,7 +53,7 @@ public class MarriageAgent extends MarriageAgentBase<Neo4jContext> {
     }
 
     @Override
-    protected AgentResult insertMarriage(int marriageIdentifier, String wifeEmail, String husbandEmail) {
+    protected AgentResult insertMarriage(String scope, World.City city, int marriageIdentifier, String wifeEmail, String husbandEmail) {
         String template = "" +
                 "MATCH (wife:Person {email: $wifeEmail}), (husband:Person {email: $husbandEmail}), (city:City {locationName: $locationName})\n" +
                 "CREATE (husband)-[marriage:MARRIED_TO {marriageId: $marriageId, locationName: city.locationName}]->(wife)" +

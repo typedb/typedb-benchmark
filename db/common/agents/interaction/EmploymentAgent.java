@@ -30,7 +30,7 @@ public abstract class EmploymentAgent<CONTEXT extends DatabaseContext> extends C
 
         List<String> employeeEmails;
         List<Long> companyNumbers;
-        openTx();
+        startAction();
         try (ThreadTrace trace = traceOnThread(this.registerMethodTrace("getEmployeeEmails"))) {
             employeeEmails = getEmployeeEmails(employmentDate);
         }
@@ -38,8 +38,8 @@ public abstract class EmploymentAgent<CONTEXT extends DatabaseContext> extends C
         try (ThreadTrace trace = traceOnThread(this.registerMethodTrace("getCompanyNumbers"))) {
             companyNumbers = getCompanyNumbers();
         }
-        commitTx();  //TODO Should be close not commit?
-        openTx();
+        commitAction();  //TODO Should be close not commit?
+        startAction();
         // A second transaction is being used to circumvent graknlabs/grakn issue #5585
         boolean allocated = allocate(employeeEmails, companyNumbers, (employeeEmail, companyNumber) -> {
             double wageValue = randomAttributeGenerator().boundRandomDouble(MIN_ANNUAL_WAGE, MAX_ANNUAL_WAGE);
@@ -50,7 +50,7 @@ public abstract class EmploymentAgent<CONTEXT extends DatabaseContext> extends C
             }
         });
         if (allocated) {
-            commitTx();
+            commitAction();
         }
         return null;
     }

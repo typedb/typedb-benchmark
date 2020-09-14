@@ -1,5 +1,6 @@
 package grakn.simulation.db.common.world;
 
+import grakn.simulation.db.common.agents.utils.Tracker;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
@@ -131,6 +132,11 @@ public class World {
         public Stream<Country> countries() {
             return countries.stream();
         }
+
+        @Override
+        public String tracker() {
+            return Tracker.of(this);
+        }
     }
 
     public class Country implements Region {
@@ -161,6 +167,11 @@ public class World {
         public Stream<City> cities() {
             return cities.stream();
         }
+
+        @Override
+        public String tracker() {
+            return Tracker.of(this.continent(), this);
+        }
     }
 
     public class City implements Region {
@@ -185,6 +196,11 @@ public class World {
 
         public Country country() {
             return country;
+        }
+
+        @Override
+        public String tracker() {
+            return Tracker.of(country().continent(), country(), this);
         }
     }
 }

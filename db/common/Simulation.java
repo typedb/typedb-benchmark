@@ -79,23 +79,23 @@ public abstract class Simulation<CONTEXT extends DatabaseContext> implements Ite
     protected abstract void closeIteration();
 
     @Override
-    public int getSimulationStep() {
+    public int simulationStep() {
         return simulationStep;
     }
 
     @Override
-    public LocalDateTime getLocalDateTime() {
+    public LocalDateTime today() {
         return LocalDateTime.of(LocalDate.ofYearDay(simulationStep, 1), LocalTime.of(0, 0, 0));
     }
 
     @Override
-    public World getWorld() {
+    public World world() {
         return world;
     }
 
     @Override
     public boolean shouldTrace() {
-        return iterationSamplingFunction.apply(getSimulationStep());
+        return iterationSamplingFunction.apply(simulationStep());
     }
 
     @Override

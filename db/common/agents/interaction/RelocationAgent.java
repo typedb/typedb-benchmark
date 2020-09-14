@@ -34,7 +34,7 @@ public abstract class RelocationAgent<CONTEXT extends DatabaseContext> extends C
         List<String> residentEmails;
         List<String> relocationCityNames;
 
-        openTx();
+        startAction();
         try (ThreadTrace trace = traceOnThread(this.registerMethodTrace("getResidentEmails"))) {
             residentEmails = getResidentEmails(earliestDate);
         }
@@ -49,7 +49,7 @@ public abstract class RelocationAgent<CONTEXT extends DatabaseContext> extends C
                 insertRelocation(residentEmail, relocationCityName);
             }
         });
-        commitTx();
+        commitAction();
         return null;
     }
 

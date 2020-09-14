@@ -1,46 +1,50 @@
 package grakn.simulation.db.common.agents.interaction;
 
 import grabl.tracing.client.GrablTracingThreadStatic.ThreadTrace;
+import grakn.simulation.db.common.agents.base.Agent;
 import grakn.simulation.db.common.agents.base.AgentResult;
 import grakn.simulation.db.common.agents.base.AgentResultSet;
-import grakn.simulation.db.common.agents.utils.Pair;
-import grakn.simulation.db.common.agents.region.CityAgent;
-import grakn.simulation.db.common.context.DatabaseContext;
+import grakn.simulation.db.common.agents.base.IterationContext;
+import grakn.simulation.db.common.world.World;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 import static grabl.tracing.client.GrablTracingThreadStatic.traceOnThread;
+import static grakn.simulation.db.grakn.schema.Schema.MARRIAGE_HUSBAND;
+import static grakn.simulation.db.grakn.schema.Schema.MARRIAGE_WIFE;
+import static java.util.Collections.shuffle;
 
-public abstract class MarriageAgentBase<CONTEXT extends DatabaseContext> extends CityAgent<CONTEXT> {
+public interface MarriageAgentBase extends InteractionAgent<World.City> {
 
-    public enum MarriageAgentField implements ComparableField {
+    enum MarriageAgentField implements Agent.ComparableField {
         MARRIAGE_IDENTIFIER, WIFE_EMAIL, HUSBAND_EMAIL, CITY_NAME
     }
 
-    int numMarriagesPossible;
-
     @Override
-    public final AgentResultSet iterate() {
+    default AgentResultSet iterate(Agent<World.City, ?> agent, World.City city, IterationContext iterationContext) {
         AgentResultSet agentResultSet = new AgentResultSet();
-        log().message("MarriageAgent", String.format("Simulation step %d", simulationStep()));
+        agent.log().message("MarriageAgent", String.format("Simulation step %d", iterationContext.simulationStep()));
         // Find bachelors and bachelorettes who are considered adults and who are not in a marriage and pair them off randomly
         List<String> womenEmails;
-        openTx();
-        try (ThreadTrace trace = traceOnThread(this.registerMethodTrace("getSingleWomen"))) {
-            womenEmails = getSingleWomen();
+        agent.startAction();
+
+        LocalDateTime dobOfAdults = iterationContext.today().minusYears(iterationContext.world().AGE_OF_ADULTHOOD);
+
+        try (ThreadTrace trace = traceOnThread(agent.registerMethodTrace("getSingleWomen"))) {
+            womenEmails = getUnmarriedPeopleOfGender("getSingleWomen",city, "female", MARRIAGE_WIFE, dobOfAdults);
         }
         shuffle(womenEmails);
 
         List<String> menEmails;
-        try (ThreadTrace trace = traceOnThread(this.registerMethodTrace("getSingleMen"))) {
-            menEmails = getSingleMen();
+        try (ThreadTrace trace = traceOnThread(agent.registerMethodTrace("getSingleMen"))) {
+            menEmails = getUnmarriedPeopleOfGender("getSingleMen", city, "male", MARRIAGE_HUSBAND, dobOfAdults);
         }
         shuffle(menEmails);
 
-        int numMarriages = world().getScaleFactor();
+        int numMarriages = iterationContext.world().getScaleFactor();
 
-        numMarriagesPossible = Math.min(numMarriages, Math.min(womenEmails.size(), menEmails.size()));
+        int numMarriagesPossible = Math.min(numMarriages, Math.min(womenEmails.size(), menEmails.size()));
 
         if (numMarriagesPossible > 0) {
             for (int i = 0; i < numMarriagesPossible; i++) {
@@ -48,31 +52,19 @@ public abstract class MarriageAgentBase<CONTEXT extends DatabaseContext> extends
                 String husbandEmail = menEmails.get(i);
                 int marriageIdentifier = (wifeEmail + husbandEmail).hashCode();
 
-                try (ThreadTrace trace = traceOnThread(this.checkMethodTrace("insertMarriage"))) {
-                    agentResultSet.add(insertMarriage(marriageIdentifier, wifeEmail, husbandEmail));
+                String scope = "insertMarriage";
+                try (ThreadTrace trace = traceOnThread(agent.checkMethodTrace(scope))) {
+                    agentResultSet.add(insertMarriage(scope, city, marriageIdentifier, wifeEmail, husbandEmail));
                 }
             }
-            commitTx();
+            agent.commitAction();
         } else {
-            closeTx();
+            agent.stopAction();
         }
         return agentResultSet;
     }
 
-    protected LocalDateTime dobOfAdults() {
-        return today().minusYears(world().AGE_OF_ADULTHOOD);
-    }
+    List<String> getUnmarriedPeopleOfGender(String scope, World.City city, String gender, String marriageRole, LocalDateTime dobOfAdults);
 
-    protected abstract List<String> getSingleWomen();
-
-    protected abstract List<String> getSingleMen();
-
-//    TODO Should this inner query be included at the top level?
-//    private GraqlGet.Unfiltered getSinglePeopleOfGenderQuery(String gender, String marriageRole);
-
-    protected abstract AgentResult insertMarriage(int marriageIdentifier, String wifeEmail, String husbandEmail);
-
-    protected Pair<Integer, Integer> countBounds() {
-        return new Pair<>(numMarriagesPossible, numMarriagesPossible);
-    }
+    AgentResult insertMarriage(String scope, World.City city, int marriageIdentifier, String wifeEmail, String husbandEmail);
 }

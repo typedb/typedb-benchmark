@@ -13,7 +13,7 @@ public abstract class ProductAgent<CONTEXT extends DatabaseContext> extends Cont
     @Override
     public final AgentResultSet iterate() {
         int numProducts = world().getScaleFactor();
-        openTx();
+        startAction();
         for (int i = 0; i < numProducts; i++) {
             String productName = randomAttributeGenerator().boundRandomLengthRandomString(5, 20);
             String productDescription = randomAttributeGenerator().boundRandomLengthRandomString(75, 100);
@@ -22,7 +22,7 @@ public abstract class ProductAgent<CONTEXT extends DatabaseContext> extends Cont
                 insertProduct(barcode, productName, productDescription);
             }
         }
-        commitTx();
+        commitAction();
         return null;
     }
 

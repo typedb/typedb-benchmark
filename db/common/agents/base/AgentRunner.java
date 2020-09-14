@@ -9,7 +9,6 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 
@@ -25,11 +24,10 @@ import java.util.Random;
  */
 public abstract class AgentRunner<REGION extends Region, CONTEXT extends DatabaseContext> {
 
-    private Constructor<? extends Agent<REGION, CONTEXT>> agentConstructor;
-    private Logger logger;
+    private final Constructor<? extends Agent<REGION, CONTEXT>> agentConstructor;
+    private final Logger logger;
     private Boolean traceAgent = true;
-    private HashMap<String, Integer> lastTestCount = new HashMap<>();
-    private CONTEXT backendContext;
+    private final CONTEXT backendContext;
 
     protected AgentRunner(Class<? extends Agent<REGION, CONTEXT>> agentClass, CONTEXT backendContext) {
         this.backendContext = backendContext;
@@ -47,32 +45,29 @@ public abstract class AgentRunner<REGION extends Region, CONTEXT extends Databas
         traceAgent = trace;
     }
 
-    abstract protected List<REGION> getParallelItems(IterationContext iterationContext, RandomSource randomSource);
+    abstract protected List<REGION> getParallelItems(IterationContext iterationContext);
 
     abstract protected String getSessionKey(IterationContext iterationContext, RandomSource randomSource, REGION item);
 
-    abstract protected String getTracker(IterationContext iterationContext, RandomSource randomSource, REGION item);
-
     public void iterate(IterationContext iterationContext, RandomSource randomSource) {
-        List<REGION> items = getParallelItems(iterationContext, randomSource);
-        List<RandomSource> sources = randomSource.split(items.size());
+        List<REGION> regions = getParallelItems(iterationContext);
+        List<RandomSource> sources = randomSource.split(regions.size());
 
-        Pair.zip(sources, items).parallelStream().forEach(
+        Pair.zip(sources, regions).parallelStream().forEach(
                 pair -> runAgent(iterationContext, pair.getFirst(), pair.getSecond())
         );
     }
 
-    private void runAgent(IterationContext iterationContext, RandomSource source, REGION worldLocality) {
+    private void runAgent(IterationContext iterationContext, RandomSource source, REGION region) {
         Random random = source.startNewRandom();
         Random agentRandom = RandomSource.nextSource(random).startNewRandom();
-        String sessionKey = getSessionKey(iterationContext, RandomSource.nextSource(random), worldLocality);
-        String tracker = getTracker(iterationContext, RandomSource.nextSource(random), worldLocality);
+        String sessionKey = getSessionKey(iterationContext, RandomSource.nextSource(random), region);
 
         try (Agent<REGION, CONTEXT> agent = agentConstructor.newInstance()) {
-            agent.init(iterationContext, agentRandom, worldLocality, backendContext, sessionKey, tracker, logger, traceAgent && iterationContext.shouldTrace());
+            agent.init(iterationContext.simulationStep(), agentRandom, backendContext, sessionKey, region.tracker(), logger, traceAgent && iterationContext.shouldTrace());
 //            AgentResult agentResult = agent.iterateWithTracing();  // TODO Disabled for demo purposes
-            AgentResultSet agentResult = agent.iterate();
-            iterationContext.getResultHandler().newResult(agent.getClass().getSimpleName(), tracker, agentResult);
+            AgentResultSet agentResult = agent.iterate(agent, region, iterationContext);
+            iterationContext.getResultHandler().newResult(agent.getClass().getSimpleName(), region.tracker(), agentResult);
 //            lastTestCount.put(tracker, agent.testByCount(lastTestCount.getOrDefault(tracker, 0)));
 
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {

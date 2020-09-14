@@ -12,11 +12,11 @@ public abstract class AgeUpdateAgent<CONTEXT extends DatabaseContext> extends Ci
 
     @Override
     public final AgentResultSet iterate() {
-        openTx();
+        startAction();
         try (ThreadTrace trace = traceOnThread(this.registerMethodTrace("updateAgesOfAllPeople"))) {
             updateAgesOfAllPeople();
         }
-        commitTx();
+        commitAction();
         return new AgentResultSet();
     }
 

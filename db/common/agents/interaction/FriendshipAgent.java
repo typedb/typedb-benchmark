@@ -15,13 +15,13 @@ public abstract class FriendshipAgent<CONTEXT extends DatabaseContext> extends C
 
     @Override
     public final AgentResultSet iterate() {
-        openTx();
+        startAction();
         List<String> residentEmails;
         try (ThreadTrace trace = traceOnThread(this.registerMethodTrace("getResidentEmails"))) {
             residentEmails = getResidentEmails(today());
         }
-        closeTx();  // TODO Closing and reopening the transaction here is a workaround for https://github.com/graknlabs/grakn/issues/5585
-        openTx();
+        stopAction();  // TODO Closing and reopening the transaction here is a workaround for https://github.com/graknlabs/grakn/issues/5585
+        startAction();
         if (residentEmails.size() > 0) {
             shuffle(residentEmails);
             int numFriendships = world().getScaleFactor();
@@ -33,7 +33,7 @@ public abstract class FriendshipAgent<CONTEXT extends DatabaseContext> extends C
                     insertFriendship(friend1, friend2);
                 }
             }
-            commitTx();
+            commitAction();
         }
         return null;
     }

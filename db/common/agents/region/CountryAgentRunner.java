@@ -5,7 +5,6 @@ import grakn.simulation.db.common.agents.base.IterationContext;
 import grakn.simulation.db.common.agents.base.AgentRunner;
 import grakn.simulation.db.common.context.DatabaseContext;
 import grakn.simulation.utils.RandomSource;
-import grakn.simulation.db.common.agents.utils.Tracker;
 import grakn.simulation.db.common.world.World;
 
 import java.util.List;
@@ -26,8 +25,8 @@ public class CountryAgentRunner<CONTEXT extends DatabaseContext> extends AgentRu
     }
 
     @Override
-    protected List<World.Country> getParallelItems(IterationContext iterationContext, RandomSource randomSource) {
-        return iterationContext.getWorld().getCountries().collect(toList());
+    protected List<World.Country> getParallelItems(IterationContext iterationContext) {
+        return iterationContext.world().getCountries().collect(toList());
     }
 
     @Override
@@ -40,10 +39,5 @@ public class CountryAgentRunner<CONTEXT extends DatabaseContext> extends AgentRu
             default:
                 throw new IllegalArgumentException("Unexpected session strategy: " + sessionStrategy.name());
         }
-    }
-
-    @Override
-    protected String getTracker(IterationContext iterationContext, RandomSource randomSource, World.Country country) {
-        return Tracker.of(country.continent(), country);
     }
 }

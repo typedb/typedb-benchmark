@@ -17,7 +17,7 @@ public abstract class CompanyAgent<CONTEXT extends DatabaseContext> extends Coun
     public final AgentResultSet iterate() {
 
         numCompanies = world().getScaleFactor();
-        openTx();
+        startAction();
         for (int i = 0; i < numCompanies; i++) {
             String adjective = pickOne(world().getAdjectives());
             String noun = pickOne(world().getNouns());
@@ -28,7 +28,7 @@ public abstract class CompanyAgent<CONTEXT extends DatabaseContext> extends Coun
                 insertCompany(companyNumber, companyName);
             }
         }
-        commitTx();
+        commitAction();
         return null;
     }
 

@@ -6,9 +6,9 @@ import grakn.simulation.db.common.driver.DriverWrapper;
 import java.time.LocalDateTime;
 
 public interface IterationContext {
-    int getSimulationStep();
-    LocalDateTime getLocalDateTime();
-    World getWorld();
+    int simulationStep();
+    LocalDateTime today();
+    World world();
     boolean shouldTrace();
     ResultHandler getResultHandler();
 }

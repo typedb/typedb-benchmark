@@ -36,7 +36,7 @@ public abstract class TransactionAgent<CONTEXT extends DatabaseContext> extends 
 
         // See if we can allocate with a Pair, which is the buyer and the product id
         List<Pair<Long, Double>> transactions = new ArrayList<>();
-        openTx();
+        startAction();
         for (int i = 0; i < numTransactions; i++) {
             Long companyNumber = pickOne(companyNumbers);
             Double productBarcode = pickOne(productBarcodes);
@@ -51,7 +51,7 @@ public abstract class TransactionAgent<CONTEXT extends DatabaseContext> extends 
                 insertTransaction(transaction, sellerCompanyNumber, value, productQuantity, isTaxable);
             }
         });
-        commitTx();
+        commitAction();
         return null;
     }
 

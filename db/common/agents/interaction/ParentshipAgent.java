@@ -26,7 +26,7 @@ public abstract class ParentshipAgent<CONTEXT extends DatabaseContext> extends C
     public final AgentResultSet iterate() {
         // Query for married couples in the city who are not already in a parentship relation together
         List<String> childrenEmails;
-        openTx();
+        startAction();
         try (ThreadTrace trace = traceOnThread(this.registerMethodTrace("getChildrenEmailsBorn"))) {
             childrenEmails = getChildrenEmailsBorn(today());
         }
@@ -52,9 +52,9 @@ public abstract class ParentshipAgent<CONTEXT extends DatabaseContext> extends C
                     insertParentShip(marriage, childEmails);
                 }
             }
-            commitTx();
+            commitAction();
         } else {
-            closeTx();
+            stopAction();
         }
         return null;
     }
