@@ -1,29 +1,34 @@
 package grakn.simulation.db.common.agents.interaction;
 
+import grakn.simulation.db.common.agents.base.Agent;
 import grakn.simulation.db.common.agents.base.AgentResultSet;
+import grakn.simulation.db.common.agents.base.IterationContext;
 import grakn.simulation.db.common.agents.utils.Allocation;
 import grakn.simulation.db.common.agents.utils.Pair;
-import grakn.simulation.db.common.agents.region.ContinentAgent;
+import grakn.simulation.db.common.world.World;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static grabl.tracing.client.GrablTracingThreadStatic.ThreadTrace;
 import static grabl.tracing.client.GrablTracingThreadStatic.traceOnThread;
+import static java.util.Collections.shuffle;
 
-public interface TransactionAgent extends InteractionAgent<World.Continent> {
+public interface TransactionAgentBase extends InteractionAgent<World.Continent> {
 
-    private int NUM_TRANSACTIONS_PER_COMPANY_ON_AVERAGE = 1;
+    int NUM_TRANSACTIONS_PER_COMPANY_ON_AVERAGE = 1;
 
     @Override
-    default AgentResultSet iterate(Agent<World.City, ?> agent, World.City city, IterationContext iterationContext) {
+    default AgentResultSet iterate(Agent<World.Continent, ?> agent, World.Continent continent, IterationContext iterationContext) {
         List<Long> companyNumbers;
-        try (ThreadTrace trace = traceOnThread(agent.registerMethodTrace("getCompanyNumbersInContinent"))) {
-            companyNumbers = getCompanyNumbersInContinent();
+        String scope1 = "getCompanyNumbersInContinent";
+        try (ThreadTrace trace = traceOnThread(agent.registerMethodTrace(scope1))) {
+            companyNumbers = getCompanyNumbersInContinent(continent, scope1);
         }
         List<Double> productBarcodes;
-        try (ThreadTrace trace = traceOnThread(agent.registerMethodTrace("getProductBarcodesInContinent"))) {
-            productBarcodes = getProductBarcodesInContinent();
+        String scope2 = "getProductBarcodesInContinent";
+        try (ThreadTrace trace = traceOnThread(agent.registerMethodTrace(scope2))) {
+            productBarcodes = getProductBarcodesInContinent(continent, scope2);
         }
         shuffle(companyNumbers, agent.random());
 
@@ -47,17 +52,17 @@ public interface TransactionAgent extends InteractionAgent<World.Continent> {
             Integer productQuantity = agent.randomAttributeGenerator().boundRandomInt(1, 1000);
             Boolean isTaxable = agent.randomAttributeGenerator().bool();
             try (ThreadTrace trace = traceOnThread(agent.checkMethodTrace("insertTransaction"))) {
-                insertTransaction(transaction, sellerCompanyNumber, value, productQuantity, isTaxable);
+                insertTransaction(continent, transaction, sellerCompanyNumber, value, productQuantity, isTaxable);
             }
         });
         agent.commitAction();
         return null;
     }
 
-    abstract protected List<Long> getCompanyNumbersInContinent();
+    List<Long> getCompanyNumbersInContinent(World.Continent continent, String scope);
 
-    abstract protected List<Double> getProductBarcodesInContinent();
+    List<Double> getProductBarcodesInContinent(World.Continent continent, String scope);
 
-    abstract protected void insertTransaction(Pair<Long, Double> transaction, long sellerCompanyNumber, double value, int productQuantity, boolean isTaxable);
+    void insertTransaction(World.Continent continent, Pair<Long, Double> transaction, long sellerCompanyNumber, double value, int productQuantity, boolean isTaxable);
 
 }

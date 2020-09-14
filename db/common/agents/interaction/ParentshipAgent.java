@@ -1,9 +1,11 @@
 package grakn.simulation.db.common.agents.interaction;
 
 import grabl.tracing.client.GrablTracingThreadStatic.ThreadTrace;
+import grakn.simulation.db.common.agents.base.Agent;
 import grakn.simulation.db.common.agents.base.AgentResultSet;
+import grakn.simulation.db.common.agents.base.IterationContext;
 import grakn.simulation.db.common.agents.utils.Allocation;
-import grakn.simulation.db.common.agents.region.CityAgent;
+import grakn.simulation.db.common.world.World;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -16,7 +18,7 @@ import static grabl.tracing.client.GrablTracingThreadStatic.traceOnThread;
 
 public interface ParentshipAgent extends InteractionAgent<World.City> {
 
-    protected enum Email {
+    enum Email {
         WIFE, HUSBAND
     }
 
@@ -26,11 +28,11 @@ public interface ParentshipAgent extends InteractionAgent<World.City> {
         List<String> childrenEmails;
         agent.startAction();
         try (ThreadTrace trace = traceOnThread(agent.registerMethodTrace("getChildrenEmailsBorn"))) {
-            childrenEmails = getChildrenEmailsBorn(today());
+            childrenEmails = getChildrenEmailsBorn(city, iterationContext.today());
         }
         List<HashMap<Email, String>> marriageEmails;
         try (ThreadTrace trace = traceOnThread(agent.registerMethodTrace("getMarriageEmails"))) {
-            marriageEmails = getMarriageEmails();
+            marriageEmails = getMarriageEmails(city);
         }
 
         if (marriageEmails.size() > 0 && childrenEmails.size() > 0) {
@@ -52,15 +54,15 @@ public interface ParentshipAgent extends InteractionAgent<World.City> {
             }
             agent.commitAction();
         } else {
-            stopAction();
+            agent.stopAction();
         }
         return null;
     }
 
-    abstract protected List<HashMap<Email, String>> getMarriageEmails();
+    List<HashMap<Email, String>> getMarriageEmails(World.City city);
 
-    abstract protected List<String> getChildrenEmailsBorn(LocalDateTime dateToday);
+    List<String> getChildrenEmailsBorn(World.City city, LocalDateTime dateToday);
 
-    abstract protected void insertParentShip(HashMap<Email, String> marriage, List<String> childEmails);
+    void insertParentShip(HashMap<Email, String> marriage, List<String> childEmails);
 
 }

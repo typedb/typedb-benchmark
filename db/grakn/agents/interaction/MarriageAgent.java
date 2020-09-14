@@ -4,7 +4,6 @@ import grakn.client.answer.ConceptMap;
 import grakn.simulation.db.common.agents.base.AgentResult;
 import grakn.simulation.db.common.agents.interaction.MarriageAgentBase;
 import grakn.simulation.db.common.world.World;
-import grakn.simulation.db.grakn.context.GraknContext;
 import graql.lang.Graql;
 import graql.lang.query.GraqlGet;
 import graql.lang.query.GraqlInsert;
@@ -33,7 +32,7 @@ import static grakn.simulation.db.grakn.schema.Schema.RESIDENCY;
 import static grakn.simulation.db.grakn.schema.Schema.RESIDENCY_LOCATION;
 import static grakn.simulation.db.grakn.schema.Schema.RESIDENCY_RESIDENT;
 
-public class MarriageAgent extends GraknAgent<World.City, GraknContext> implements MarriageAgentBase {
+public class MarriageAgent extends GraknAgent<World.City> implements MarriageAgentBase {
 
     public List<String> getUnmarriedPeopleOfGender(String scope, World.City city, String gender, String marriageRole, LocalDateTime dobOfAdults) {
         Statement personVar = Graql.var(PERSON);

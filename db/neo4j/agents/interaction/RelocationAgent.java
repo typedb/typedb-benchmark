@@ -1,5 +1,6 @@
 package grakn.simulation.db.neo4j.agents.interaction;
 
+import grakn.simulation.db.common.agents.interaction.RelocationAgentBase;
 import grakn.simulation.db.common.world.World;
 import grakn.simulation.db.neo4j.common.Neo4jContext;
 import grakn.simulation.db.neo4j.driver.Neo4jDriverWrapper;
@@ -9,7 +10,7 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 
-public class RelocationAgent extends grakn.simulation.db.common.agents.interaction.RelocationAgent<Neo4jContext> {
+public class RelocationAgent extends RelocationAgentBase<Neo4jContext> {
 
     static Query cityResidentsQuery(World.City city, LocalDateTime earliestDate) {
         String template = "" +

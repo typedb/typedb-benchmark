@@ -1,5 +1,6 @@
 package grakn.simulation.db.neo4j.agents.interaction;
 
+import grakn.simulation.db.common.agents.interaction.ProductAgentBase;
 import grakn.simulation.db.common.world.World;
 import grakn.simulation.db.neo4j.common.Neo4jContext;
 import grakn.simulation.db.neo4j.driver.Neo4jDriverWrapper;
@@ -7,10 +8,10 @@ import org.neo4j.driver.Query;
 
 import java.util.HashMap;
 
-public class ProductAgent extends grakn.simulation.db.common.agents.interaction.ProductAgent<Neo4jContext> {
+public class ProductAgent extends ProductAgentBase<Neo4jContext> {
 
     @Override
-    protected void insertProduct(Double barcode, String productName, String productDescription) {
+    protected void insertProduct(World.Continent continent, Double barcode, String productName, String productDescription) {
         String template = "" +
                 "MATCH (continent:Continent {locationName: $continentName})\n" +
                 "CREATE (product:Product {\n" +
