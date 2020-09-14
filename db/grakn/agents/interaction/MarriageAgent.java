@@ -119,6 +119,6 @@ public class MarriageAgent extends GraknAgent<World.City, GraknContext> implemen
 //                Graql.var().isa(LOCATES).rel(LOCATES_LOCATED, marriage).rel(LOCATES_LOCATION, city)
 //        ).get().count();
 //        log().query("checkCount", countQuery);
-//        return tx.count(countQuery);
+//        return tx().count(countQuery);
 //    }
 }

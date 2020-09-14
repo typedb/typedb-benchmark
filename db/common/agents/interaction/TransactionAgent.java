@@ -4,7 +4,6 @@ import grakn.simulation.db.common.agents.base.AgentResultSet;
 import grakn.simulation.db.common.agents.utils.Allocation;
 import grakn.simulation.db.common.agents.utils.Pair;
 import grakn.simulation.db.common.agents.region.ContinentAgent;
-import grakn.simulation.db.common.context.DatabaseContext;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,23 +11,23 @@ import java.util.List;
 import static grabl.tracing.client.GrablTracingThreadStatic.ThreadTrace;
 import static grabl.tracing.client.GrablTracingThreadStatic.traceOnThread;
 
-public abstract class TransactionAgent<CONTEXT extends DatabaseContext> extends ContinentAgent<CONTEXT> {
+public interface TransactionAgent extends InteractionAgent<World.Continent> {
 
     private int NUM_TRANSACTIONS_PER_COMPANY_ON_AVERAGE = 1;
 
     @Override
-    public final AgentResultSet iterate() {
+    default AgentResultSet iterate(Agent<World.City, ?> agent, World.City city, IterationContext iterationContext) {
         List<Long> companyNumbers;
-        try (ThreadTrace trace = traceOnThread(this.registerMethodTrace("getCompanyNumbersInContinent"))) {
+        try (ThreadTrace trace = traceOnThread(agent.registerMethodTrace("getCompanyNumbersInContinent"))) {
             companyNumbers = getCompanyNumbersInContinent();
         }
         List<Double> productBarcodes;
-        try (ThreadTrace trace = traceOnThread(this.registerMethodTrace("getProductBarcodesInContinent"))) {
+        try (ThreadTrace trace = traceOnThread(agent.registerMethodTrace("getProductBarcodesInContinent"))) {
             productBarcodes = getProductBarcodesInContinent();
         }
-        shuffle(companyNumbers);
+        shuffle(companyNumbers, agent.random());
 
-        int numTransactions = NUM_TRANSACTIONS_PER_COMPANY_ON_AVERAGE * world().getScaleFactor() * companyNumbers.size();
+        int numTransactions = NUM_TRANSACTIONS_PER_COMPANY_ON_AVERAGE * iterationContext.world().getScaleFactor() * companyNumbers.size();
 
         // Company numbers is the list of sellers
         // Company numbers picked randomly is the list of buyers
@@ -36,22 +35,22 @@ public abstract class TransactionAgent<CONTEXT extends DatabaseContext> extends 
 
         // See if we can allocate with a Pair, which is the buyer and the product id
         List<Pair<Long, Double>> transactions = new ArrayList<>();
-        startAction();
+        agent.startAction();
         for (int i = 0; i < numTransactions; i++) {
-            Long companyNumber = pickOne(companyNumbers);
-            Double productBarcode = pickOne(productBarcodes);
+            Long companyNumber = agent.pickOne(companyNumbers);
+            Double productBarcode = agent.pickOne(productBarcodes);
             Pair<Long, Double> buyerAndProduct = new Pair(companyNumber, productBarcode);
             transactions.add(buyerAndProduct);
         }
         Allocation.allocate(transactions, companyNumbers, (transaction, sellerCompanyNumber) -> {
-            Double value = randomAttributeGenerator().boundRandomDouble(0.01, 10000.00);
-            Integer productQuantity = randomAttributeGenerator().boundRandomInt(1, 1000);
-            Boolean isTaxable = randomAttributeGenerator().bool();
-            try (ThreadTrace trace = traceOnThread(this.checkMethodTrace("insertTransaction"))) {
+            Double value = agent.randomAttributeGenerator().boundRandomDouble(0.01, 10000.00);
+            Integer productQuantity = agent.randomAttributeGenerator().boundRandomInt(1, 1000);
+            Boolean isTaxable = agent.randomAttributeGenerator().bool();
+            try (ThreadTrace trace = traceOnThread(agent.checkMethodTrace("insertTransaction"))) {
                 insertTransaction(transaction, sellerCompanyNumber, value, productQuantity, isTaxable);
             }
         });
-        commitAction();
+        agent.commitAction();
         return null;
     }
 
@@ -61,7 +60,4 @@ public abstract class TransactionAgent<CONTEXT extends DatabaseContext> extends 
 
     abstract protected void insertTransaction(Pair<Long, Double> transaction, long sellerCompanyNumber, double value, int productQuantity, boolean isTaxable);
 
-    protected Pair<Integer, Integer> countBounds() {
-        return new Pair<>(0, world().getScaleFactor());
-    }
 }

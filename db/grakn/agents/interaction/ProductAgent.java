@@ -17,7 +17,7 @@ import static grakn.simulation.db.grakn.schema.Schema.PRODUCT_BARCODE;
 import static grakn.simulation.db.grakn.schema.Schema.PRODUCT_DESCRIPTION;
 import static grakn.simulation.db.grakn.schema.Schema.PRODUCT_NAME;
 
-public class ProductAgent extends grakn.simulation.db.common.agents.interaction.ProductAgent<GraknContext> {
+public class ProductAgent extends GraknAgent<World.City> implements grakn.simulation.db.common.agents.interaction.ProductAgent {
 
     private Transaction tx;
 
@@ -30,13 +30,13 @@ public class ProductAgent extends grakn.simulation.db.common.agents.interaction.
 
     @Override
     protected void stopAction() {
-        tx.close();
+        tx().close();
         tx = null;
     }
 
     @Override
     protected void commitAction() {
-        tx.commit();
+        tx().commit();
         tx = null;
     }
 
@@ -58,7 +58,7 @@ public class ProductAgent extends grakn.simulation.db.common.agents.interaction.
                         .rel(PRODUCED_IN_CONTINENT, Graql.var(CONTINENT))
                 );
         log().query("insertProduct", insertProductQuery);
-        tx.execute(insertProductQuery);
+        tx().execute(insertProductQuery);
     }
 
     static GraqlGet getProductsInContinentQuery(World.Continent continent) {
@@ -82,7 +82,7 @@ public class ProductAgent extends grakn.simulation.db.common.agents.interaction.
 //        GraqlGet.Aggregate countQuery = Graql.match(
 //
 //        ).get().count();
-//        return tx.count(countQuery);
+//        return tx().count(countQuery);
         return 0;
     }
 }

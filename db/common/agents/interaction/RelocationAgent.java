@@ -2,9 +2,7 @@ package grakn.simulation.db.common.agents.interaction;
 
 import grakn.simulation.db.common.agents.base.AgentResultSet;
 import grakn.simulation.db.common.agents.utils.Allocation;
-import grakn.simulation.db.common.agents.utils.Pair;
 import grakn.simulation.db.common.agents.region.CityAgent;
-import grakn.simulation.db.common.context.DatabaseContext;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -14,10 +12,10 @@ import java.util.List;
 import static grabl.tracing.client.GrablTracingThreadStatic.ThreadTrace;
 import static grabl.tracing.client.GrablTracingThreadStatic.traceOnThread;
 
-public abstract class RelocationAgent<CONTEXT extends DatabaseContext> extends CityAgent<CONTEXT> {
+public interface RelocationAgent extends InteractionAgent<World.City> {
 
     @Override
-    public final AgentResultSet iterate() {
+    default AgentResultSet iterate(Agent<World.City, ?> agent, World.City city, IterationContext iterationContext) {
         /*
         Find people currently resident the city
         Find other cities in the continent
@@ -25,31 +23,31 @@ public abstract class RelocationAgent<CONTEXT extends DatabaseContext> extends C
          */
 
         LocalDateTime earliestDate;
-        if (today().minusYears(2).isBefore(LocalDateTime.of(LocalDate.ofYearDay(0, 1), LocalTime.of(0, 0, 0))))
-            earliestDate = today();
+        if (iterationContext.today().minusYears(2).isBefore(LocalDateTime.of(LocalDate.ofYearDay(0, 1), LocalTime.of(0, 0, 0))))
+            earliestDate = iterationContext.today();
         else {
-            earliestDate = today().minusYears(2);
+            earliestDate = iterationContext.today().minusYears(2);
         }
 
         List<String> residentEmails;
         List<String> relocationCityNames;
 
-        startAction();
-        try (ThreadTrace trace = traceOnThread(this.registerMethodTrace("getResidentEmails"))) {
+        agent.startAction();
+        try (ThreadTrace trace = traceOnThread(agent.registerMethodTrace("getResidentEmails"))) {
             residentEmails = getResidentEmails(earliestDate);
         }
-        shuffle(residentEmails);
+        shuffle(residentEmails, agent.random());
 
-        try (ThreadTrace trace = traceOnThread(this.registerMethodTrace("getRelocationCityNames"))) {
+        try (ThreadTrace trace = traceOnThread(agent.registerMethodTrace("getRelocationCityNames"))) {
             relocationCityNames = getRelocationCityNames();
         }
 
         Allocation.allocate(residentEmails, relocationCityNames, (residentEmail, relocationCityName) -> {
-            try (ThreadTrace trace = traceOnThread(this.checkMethodTrace("insertRelocation"))) {
+            try (ThreadTrace trace = traceOnThread(agent.checkMethodTrace("insertRelocation"))) {
                 insertRelocation(residentEmail, relocationCityName);
             }
         });
-        commitAction();
+        agent.commitAction();
         return null;
     }
 
@@ -62,7 +60,4 @@ public abstract class RelocationAgent<CONTEXT extends DatabaseContext> extends C
 
     abstract protected void insertRelocation(String email, String newCityName);
 
-    protected Pair<Integer, Integer> countBounds() {
-        return new Pair<>(0, world().getScaleFactor());
-    }
 }

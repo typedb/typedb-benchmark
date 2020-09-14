@@ -28,7 +28,7 @@ import static grakn.simulation.db.grakn.schema.Schema.RESIDENCY_LOCATION;
 import static grakn.simulation.db.grakn.schema.Schema.RESIDENCY_RESIDENT;
 import static grakn.simulation.db.grakn.schema.Schema.START_DATE;
 
-public class RelocationAgent extends grakn.simulation.db.common.agents.interaction.RelocationAgent<GraknContext> {
+public class RelocationAgent extends GraknAgent<World.City> implements grakn.simulation.db.common.agents.interaction.RelocationAgent {
 
     private Transaction tx;
 
@@ -41,13 +41,13 @@ public class RelocationAgent extends grakn.simulation.db.common.agents.interacti
 
     @Override
     protected void stopAction() {
-        tx.close();
+        tx().close();
         tx = null;
     }
 
     @Override
     protected void commitAction() {
-        tx.commit();
+        tx().commit();
         tx = null;
     }
 
@@ -82,7 +82,7 @@ public class RelocationAgent extends grakn.simulation.db.common.agents.interacti
         GraqlGet.Unfiltered cityResidentsQuery = cityResidentsQuery(city(), earliestDate);
         log().query("getResidentEmails", cityResidentsQuery);
         int numRelocations = world().getScaleFactor();
-        return tx.getOrderedAttribute(cityResidentsQuery, EMAIL, numRelocations);
+        return tx().getOrderedAttribute(cityResidentsQuery, EMAIL, numRelocations);
     }
 
     @Override
@@ -96,7 +96,7 @@ public class RelocationAgent extends grakn.simulation.db.common.agents.interacti
         ).get();
 
         log().query("getRelocationCityNames", relocationCitiesQuery);
-        return tx.getOrderedAttribute(relocationCitiesQuery, "city-name", null);
+        return tx().getOrderedAttribute(relocationCitiesQuery, "city-name", null);
     }
 
     @Override
@@ -114,7 +114,7 @@ public class RelocationAgent extends grakn.simulation.db.common.agents.interacti
         );
 
         log().query("insertRelocation", relocatePersonQuery);
-        tx.execute(relocatePersonQuery);
+        tx().execute(relocatePersonQuery);
     }
 
     @Override
@@ -139,7 +139,7 @@ public class RelocationAgent extends grakn.simulation.db.common.agents.interacti
                         .has(RELOCATION_DATE, today())
         ).get().count();
         log().query("checkCount", countQuery);
-        return tx.count(countQuery);
+        return tx().count(countQuery);
     }
 
 }

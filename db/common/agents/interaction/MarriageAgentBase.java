@@ -34,13 +34,13 @@ public interface MarriageAgentBase extends InteractionAgent<World.City> {
         try (ThreadTrace trace = traceOnThread(agent.registerMethodTrace("getSingleWomen"))) {
             womenEmails = getUnmarriedPeopleOfGender("getSingleWomen",city, "female", MARRIAGE_WIFE, dobOfAdults);
         }
-        shuffle(womenEmails);
+        shuffle(womenEmails, agent.random());
 
         List<String> menEmails;
         try (ThreadTrace trace = traceOnThread(agent.registerMethodTrace("getSingleMen"))) {
             menEmails = getUnmarriedPeopleOfGender("getSingleMen", city, "male", MARRIAGE_HUSBAND, dobOfAdults);
         }
-        shuffle(menEmails);
+        shuffle(menEmails, agent.random());
 
         int numMarriages = iterationContext.world().getScaleFactor();
 

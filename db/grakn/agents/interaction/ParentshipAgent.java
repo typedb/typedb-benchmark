@@ -34,7 +34,7 @@ import static grakn.simulation.db.grakn.schema.Schema.PARENTSHIP_PARENT;
 import static grakn.simulation.db.grakn.schema.Schema.PERSON;
 import static java.util.stream.Collectors.toList;
 
-public class ParentshipAgent extends grakn.simulation.db.common.agents.interaction.ParentshipAgent<GraknContext> {
+public class ParentshipAgent extends GraknAgent<World.City> implements grakn.simulation.db.common.agents.interaction.ParentshipAgent {
 
     private Transaction tx;
 
@@ -47,13 +47,13 @@ public class ParentshipAgent extends grakn.simulation.db.common.agents.interacti
 
     @Override
     protected void stopAction() {
-        tx.close();
+        tx().close();
         tx = null;
     }
 
     @Override
     protected void commitAction() {
-        tx.commit();
+        tx().commit();
         tx = null;
     }
 
@@ -81,7 +81,7 @@ public class ParentshipAgent extends grakn.simulation.db.common.agents.interacti
         ).get().sort(MARRIAGE_ID);
 
         log().query("getMarriageEmails", marriageQuery);
-        List<ConceptMap> marriageAnswers = tx.execute(marriageQuery);
+        List<ConceptMap> marriageAnswers = tx().execute(marriageQuery);
 
         return marriageAnswers
                 .stream()
@@ -107,7 +107,7 @@ public class ParentshipAgent extends grakn.simulation.db.common.agents.interacti
         ).get();
 
         log().query("getChildrenEmails", childrenQuery);
-        return tx.getOrderedAttribute(childrenQuery, EMAIL, null);
+        return tx().getOrderedAttribute(childrenQuery, EMAIL, null);
     }
 
     @Override
@@ -142,7 +142,7 @@ public class ParentshipAgent extends grakn.simulation.db.common.agents.interacti
         );
 
         log().query("insertParentShip", parentshipQuery);
-        tx.execute(parentshipQuery);
+        tx().execute(parentshipQuery);
     }
 
     @Override
@@ -150,7 +150,7 @@ public class ParentshipAgent extends grakn.simulation.db.common.agents.interacti
 //        GraqlGet.Aggregate countQuery = Graql.match(
 //
 //        ).get().count();
-//        return tx.count(countQuery);
+//        return tx().count(countQuery);
         return 0;
     }
 }

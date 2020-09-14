@@ -1,5 +1,7 @@
 package grakn.simulation.db.grakn.agents.interaction;
 
+import grakn.simulation.db.common.agents.interaction.EmploymentAgentBase;
+import grakn.simulation.db.common.world.World;
 import grakn.simulation.db.grakn.context.GraknContext;
 import grakn.simulation.db.grakn.driver.Transaction;
 import graql.lang.Graql;
@@ -35,47 +37,24 @@ import static grakn.simulation.db.grakn.schema.Schema.START_DATE;
 import static grakn.simulation.db.grakn.schema.Schema.WAGE;
 import static grakn.simulation.db.grakn.schema.Schema.WAGE_VALUE;
 
-public class EmploymentAgent extends grakn.simulation.db.common.agents.interaction.EmploymentAgent<GraknContext> {
-
-    private Transaction tx;
+public class EmploymentAgent extends GraknAgent<World.City> implements EmploymentAgentBase {
 
     @Override
-    public void startAction() {
-        if (tx == null) {
-            tx = backendContext().tx(getSessionKey());
-        }
-    }
-
-    @Override
-    protected void stopAction() {
-        tx.close();
-        tx = null;
-    }
-
-    @Override
-    protected void commitAction() {
-        tx.commit();
-        tx = null;
-    }
-
-    @Override
-    protected List<Long> getCompanyNumbers() {
-        GraqlGet companyNumbersQuery = CompanyAgent.getCompanyNumbersInCountryQuery(city().country());
+    public List<Long> getCompanyNumbers(World.Country country, int numCompanies) {
+        GraqlGet companyNumbersQuery = CompanyAgent.getCompanyNumbersInCountryQuery(country);
         log().query("getCompanyNumbers", companyNumbersQuery);
-        int numCompanies = world().getScaleFactor();
-        return tx.getOrderedAttribute(companyNumbersQuery, COMPANY_NUMBER, numCompanies);
+        return tx().getOrderedAttribute(companyNumbersQuery, COMPANY_NUMBER, numCompanies);
     }
 
     @Override
-    protected List<String> getEmployeeEmails(LocalDateTime earliestDate) {
-        GraqlGet getEmployeeEmailsQuery = cityResidentsQuery(city(), earliestDate);
+    public List<String> getEmployeeEmails(World.City city, int numEmployments, LocalDateTime earliestDate) {
+        GraqlGet getEmployeeEmailsQuery = cityResidentsQuery(city, earliestDate);
         log().query("getEmployeeEmails", getEmployeeEmailsQuery);
-        int numEmployments = world().getScaleFactor();
-        return tx.getOrderedAttribute(getEmployeeEmailsQuery, EMAIL, numEmployments);
+        return tx().getOrderedAttribute(getEmployeeEmailsQuery, EMAIL, numEmployments);
     }
 
     @Override
-    protected void insertEmployment(String employeeEmail, long companyNumber, LocalDateTime employmentDate, double wageValue, String contractContent, double contractedHours){
+    public void insertEmployment(World.City worldCity, String employeeEmail, long companyNumber, LocalDateTime employmentDate, double wageValue, String contractContent, double contractedHours){
         Statement city = Graql.var(CITY);
         Statement person = Graql.var(PERSON);
         Statement company = Graql.var(COMPANY);
@@ -97,7 +76,7 @@ public class EmploymentAgent extends grakn.simulation.db.common.agents.interacti
         GraqlInsert insertEmploymentQuery = Graql.match(
                 city
                         .isa(CITY)
-                        .has(LOCATION_NAME, city().name()),
+                        .has(LOCATION_NAME, worldCity.name()),
                 person
                         .isa(PERSON)
                         .has(EMAIL, employeeEmailVar),
@@ -133,67 +112,66 @@ public class EmploymentAgent extends grakn.simulation.db.common.agents.interacti
                         .has(CONTRACTED_HOURS, contractedHoursVar)
         );
         log().query("insertEmployment", insertEmploymentQuery);
-        tx.execute(insertEmploymentQuery);
+        tx().execute(insertEmploymentQuery);
     }
 
-    @Override
-    protected int checkCount() {
-        Statement city = Graql.var(CITY);
-        Statement person = Graql.var(PERSON);
-        Statement company = Graql.var(COMPANY);
-        Statement country = Graql.var(COUNTRY);
-        Statement locationHierarchy = Graql.var(LOCATION_HIERARCHY);
-        Statement employment = Graql.var(EMPLOYMENT);
-        Statement wage = Graql.var(WAGE);
-        Statement locates = Graql.var(LOCATES);
-        Statement contract = Graql.var(CONTRACT);
-        Statement currency = Graql.var(CURRENCY);
-
-        Statement employeeEmailVar = Graql.var("employee-email");
-        Statement companyNumberVar = Graql.var("company-number");
-        Statement employmentDateVar = Graql.var("employment-date");
-        Statement wageValueVar = Graql.var("wage-value");
-        Statement contractContentVar = Graql.var("contract-content");
-        Statement contractedHoursVar = Graql.var("contracted-hours");
-
-        GraqlGet.Aggregate countQuery = Graql.match(
-                        city
-                                .isa(CITY)
-                                .has(LOCATION_NAME, city().name()),
-                        person
-                                .isa(PERSON)
-                                .has(EMAIL, employeeEmailVar),
-                        company
-                                .isa(COMPANY)
-                                .has(COMPANY_NUMBER, companyNumberVar),
-                        country
-                                .isa(COUNTRY)
-                                .has(CURRENCY, currency),
-                        locationHierarchy
-                                .isa(LOCATION_HIERARCHY)
-                                .rel(city)
-                                .rel(country),
-                        employment
-                                .isa(EMPLOYMENT)
-                                .rel(EMPLOYMENT_EMPLOYEE, person)
-                                .rel(EMPLOYMENT_EMPLOYER, company)
-                                .rel(EMPLOYMENT_CONTRACT, contract)
-                                .rel(EMPLOYMENT_WAGE, wage)
-                                .has(START_DATE, employmentDateVar),
-                        wage
-                                .isa(WAGE)
-                                .has(WAGE_VALUE, wageValueVar)
-                                .has(CURRENCY, currency),
-                        locates
-                                .isa(LOCATES)
-                                .rel(LOCATES_LOCATION, employment)
-                                .rel(LOCATES_LOCATED, city),
-                        contract
-                                .isa(CONTRACT)
-                                .has(CONTRACT_CONTENT, contractContentVar)
-                                .has(CONTRACTED_HOURS, contractedHoursVar)
-        ).get().count();
-        log().query("checkCount", countQuery);
-        return tx.count(countQuery);
-    }
+//    protected int checkCount() {
+//        Statement city = Graql.var(CITY);
+//        Statement person = Graql.var(PERSON);
+//        Statement company = Graql.var(COMPANY);
+//        Statement country = Graql.var(COUNTRY);
+//        Statement locationHierarchy = Graql.var(LOCATION_HIERARCHY);
+//        Statement employment = Graql.var(EMPLOYMENT);
+//        Statement wage = Graql.var(WAGE);
+//        Statement locates = Graql.var(LOCATES);
+//        Statement contract = Graql.var(CONTRACT);
+//        Statement currency = Graql.var(CURRENCY);
+//
+//        Statement employeeEmailVar = Graql.var("employee-email");
+//        Statement companyNumberVar = Graql.var("company-number");
+//        Statement employmentDateVar = Graql.var("employment-date");
+//        Statement wageValueVar = Graql.var("wage-value");
+//        Statement contractContentVar = Graql.var("contract-content");
+//        Statement contractedHoursVar = Graql.var("contracted-hours");
+//
+//        GraqlGet.Aggregate countQuery = Graql.match(
+//                        city
+//                                .isa(CITY)
+//                                .has(LOCATION_NAME, city().name()),
+//                        person
+//                                .isa(PERSON)
+//                                .has(EMAIL, employeeEmailVar),
+//                        company
+//                                .isa(COMPANY)
+//                                .has(COMPANY_NUMBER, companyNumberVar),
+//                        country
+//                                .isa(COUNTRY)
+//                                .has(CURRENCY, currency),
+//                        locationHierarchy
+//                                .isa(LOCATION_HIERARCHY)
+//                                .rel(city)
+//                                .rel(country),
+//                        employment
+//                                .isa(EMPLOYMENT)
+//                                .rel(EMPLOYMENT_EMPLOYEE, person)
+//                                .rel(EMPLOYMENT_EMPLOYER, company)
+//                                .rel(EMPLOYMENT_CONTRACT, contract)
+//                                .rel(EMPLOYMENT_WAGE, wage)
+//                                .has(START_DATE, employmentDateVar),
+//                        wage
+//                                .isa(WAGE)
+//                                .has(WAGE_VALUE, wageValueVar)
+//                                .has(CURRENCY, currency),
+//                        locates
+//                                .isa(LOCATES)
+//                                .rel(LOCATES_LOCATION, employment)
+//                                .rel(LOCATES_LOCATED, city),
+//                        contract
+//                                .isa(CONTRACT)
+//                                .has(CONTRACT_CONTENT, contractContentVar)
+//                                .has(CONTRACTED_HOURS, contractedHoursVar)
+//        ).get().count();
+//        log().query("checkCount", countQuery);
+//        return tx().count(countQuery);
+//    }
 }

@@ -1,40 +1,37 @@
 package grakn.simulation.db.common.agents.interaction;
 
 import grabl.tracing.client.GrablTracingThreadStatic.ThreadTrace;
+import grakn.simulation.db.common.agents.base.Agent;
 import grakn.simulation.db.common.agents.base.AgentResultSet;
-import grakn.simulation.db.common.agents.utils.Pair;
-import grakn.simulation.db.common.agents.region.CountryAgent;
-import grakn.simulation.db.common.context.DatabaseContext;
+import grakn.simulation.db.common.agents.base.IterationContext;
+import grakn.simulation.db.common.world.World;
 import org.apache.commons.lang3.StringUtils;
+
+import java.time.LocalDateTime;
 
 import static grabl.tracing.client.GrablTracingThreadStatic.traceOnThread;
 
-public abstract class CompanyAgent<CONTEXT extends DatabaseContext> extends CountryAgent<CONTEXT> {
+public interface CompanyAgent extends InteractionAgent<World.Country> {
 
-    int numCompanies;
+    default AgentResultSet iterate(Agent<World.Country, ?> agent, World.Country country, IterationContext iterationContext) {
 
-    @Override
-    public final AgentResultSet iterate() {
-
-        numCompanies = world().getScaleFactor();
-        startAction();
+        int numCompanies = iterationContext.world().getScaleFactor();
+        agent.startAction();
         for (int i = 0; i < numCompanies; i++) {
-            String adjective = pickOne(world().getAdjectives());
-            String noun = pickOne(world().getNouns());
+            String adjective = agent.pickOne(iterationContext.world().getAdjectives());
+            String noun = agent.pickOne(iterationContext.world().getNouns());
 
-            int companyNumber = uniqueId(i);
+            int companyNumber = agent.uniqueId(iterationContext, i);
             String companyName = StringUtils.capitalize(adjective) + StringUtils.capitalize(noun) + "-" + companyNumber;
-            try (ThreadTrace trace = traceOnThread(this.checkMethodTrace("insertCompany"))) {
-                insertCompany(companyNumber, companyName);
+            String scope = "insertCompany";
+            try (ThreadTrace trace = traceOnThread(agent.checkMethodTrace(scope))) {
+                insertCompany(country, iterationContext.today(), scope, companyNumber, companyName);
             }
         }
-        commitAction();
+        agent.commitAction();
         return null;
     }
 
-    protected abstract void insertCompany(int companyNumber, String companyName);
+    void insertCompany(World.Country country, LocalDateTime today, String scope, int companyNumber, String companyName);
 
-    protected Pair<Integer, Integer> countBounds() {
-        return new Pair<>(numCompanies, numCompanies);
-    }
 }

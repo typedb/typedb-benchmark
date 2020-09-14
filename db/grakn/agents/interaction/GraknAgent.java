@@ -5,7 +5,7 @@ import grakn.simulation.db.common.world.Region;
 import grakn.simulation.db.grakn.context.GraknContext;
 import grakn.simulation.db.grakn.driver.Transaction;
 
-public abstract class GraknAgent<REGION extends Region, CONTEXT extends GraknContext> extends Agent<REGION, CONTEXT> {
+public abstract class GraknAgent<REGION extends Region> extends Agent<REGION, GraknContext> {
     private Transaction tx;
 
     public Transaction tx() {
@@ -21,13 +21,13 @@ public abstract class GraknAgent<REGION extends Region, CONTEXT extends GraknCon
 
     @Override
     public void stopAction() {
-        tx.close();
+        tx().close();
         tx = null;
     }
 
     @Override
     public void commitAction() {
-        tx.commit();
+        tx().commit();
         tx = null;
     }
 }

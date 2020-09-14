@@ -1,28 +1,26 @@
 package grakn.simulation.db.common.agents.interaction;
 
 import grakn.simulation.db.common.agents.base.AgentResultSet;
-import grakn.simulation.db.common.agents.utils.Pair;
 import grakn.simulation.db.common.agents.region.ContinentAgent;
-import grakn.simulation.db.common.context.DatabaseContext;
 
 import static grabl.tracing.client.GrablTracingThreadStatic.ThreadTrace;
 import static grabl.tracing.client.GrablTracingThreadStatic.traceOnThread;
 
-public abstract class ProductAgent<CONTEXT extends DatabaseContext> extends ContinentAgent<CONTEXT> {
+public interface ProductAgent extends InteractionAgent<World.Continent> {
 
     @Override
-    public final AgentResultSet iterate() {
-        int numProducts = world().getScaleFactor();
-        startAction();
+    default AgentResultSet iterate(Agent<World.City, ?> agent, World.City city, IterationContext iterationContext) {
+        int numProducts = iterationContext.world().getScaleFactor();
+        agent.startAction();
         for (int i = 0; i < numProducts; i++) {
-            String productName = randomAttributeGenerator().boundRandomLengthRandomString(5, 20);
-            String productDescription = randomAttributeGenerator().boundRandomLengthRandomString(75, 100);
-            Double barcode = (double) uniqueId(i);
-            try (ThreadTrace trace = traceOnThread(this.checkMethodTrace("insertProduct"))) {
+            String productName = agent.randomAttributeGenerator().boundRandomLengthRandomString(5, 20);
+            String productDescription = agent.randomAttributeGenerator().boundRandomLengthRandomString(75, 100);
+            Double barcode = (double) agent.uniqueId(i);
+            try (ThreadTrace trace = traceOnThread(agent.checkMethodTrace("insertProduct"))) {
                 insertProduct(barcode, productName, productDescription);
             }
         }
-        commitAction();
+        agent.commitAction();
         return null;
     }
 
@@ -31,7 +29,4 @@ public abstract class ProductAgent<CONTEXT extends DatabaseContext> extends Cont
 //    TODO Should this be abstracted?
 //    static GraqlGet.Unfiltered getProductsInContinentQuery(World.Continent continent);
 
-    protected Pair<Integer, Integer> countBounds() {
-        return new Pair<>(0, world().getScaleFactor());
-    }
 }

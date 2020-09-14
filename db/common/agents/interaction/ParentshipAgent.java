@@ -3,9 +3,7 @@ package grakn.simulation.db.common.agents.interaction;
 import grabl.tracing.client.GrablTracingThreadStatic.ThreadTrace;
 import grakn.simulation.db.common.agents.base.AgentResultSet;
 import grakn.simulation.db.common.agents.utils.Allocation;
-import grakn.simulation.db.common.agents.utils.Pair;
 import grakn.simulation.db.common.agents.region.CityAgent;
-import grakn.simulation.db.common.context.DatabaseContext;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -16,22 +14,22 @@ import java.util.Map;
 
 import static grabl.tracing.client.GrablTracingThreadStatic.traceOnThread;
 
-public abstract class ParentshipAgent<CONTEXT extends DatabaseContext> extends CityAgent<CONTEXT> {
+public interface ParentshipAgent extends InteractionAgent<World.City> {
 
     protected enum Email {
         WIFE, HUSBAND
     }
 
     @Override
-    public final AgentResultSet iterate() {
+    default AgentResultSet iterate(Agent<World.City, ?> agent, World.City city, IterationContext iterationContext) {
         // Query for married couples in the city who are not already in a parentship relation together
         List<String> childrenEmails;
-        startAction();
-        try (ThreadTrace trace = traceOnThread(this.registerMethodTrace("getChildrenEmailsBorn"))) {
+        agent.startAction();
+        try (ThreadTrace trace = traceOnThread(agent.registerMethodTrace("getChildrenEmailsBorn"))) {
             childrenEmails = getChildrenEmailsBorn(today());
         }
         List<HashMap<Email, String>> marriageEmails;
-        try (ThreadTrace trace = traceOnThread(this.registerMethodTrace("getMarriageEmails"))) {
+        try (ThreadTrace trace = traceOnThread(agent.registerMethodTrace("getMarriageEmails"))) {
             marriageEmails = getMarriageEmails();
         }
 
@@ -48,11 +46,11 @@ public abstract class ParentshipAgent<CONTEXT extends DatabaseContext> extends C
                 for (Integer childIndex : children) {
                     childEmails.add(childrenEmails.get(childIndex));
                 }
-                try (ThreadTrace trace = traceOnThread(this.checkMethodTrace("insertParentShip"))) {
+                try (ThreadTrace trace = traceOnThread(agent.checkMethodTrace("insertParentShip"))) {
                     insertParentShip(marriage, childEmails);
                 }
             }
-            commitAction();
+            agent.commitAction();
         } else {
             stopAction();
         }
@@ -65,7 +63,4 @@ public abstract class ParentshipAgent<CONTEXT extends DatabaseContext> extends C
 
     abstract protected void insertParentShip(HashMap<Email, String> marriage, List<String> childEmails);
 
-    protected Pair<Integer, Integer> countBounds() {
-        return new Pair<>(0, world().getScaleFactor());
-    }
 }

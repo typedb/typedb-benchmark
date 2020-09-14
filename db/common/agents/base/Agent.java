@@ -49,7 +49,7 @@ public abstract class Agent<REGION extends Region, CONTEXT extends DatabaseConte
         return logWrapper;
     }
 
-    protected RandomValueGenerator randomAttributeGenerator() {
+    public RandomValueGenerator randomAttributeGenerator() {
         return new RandomValueGenerator(random);
     }
 
@@ -93,7 +93,7 @@ public abstract class Agent<REGION extends Region, CONTEXT extends DatabaseConte
      * @param iterationScopeId An id that uniquely identifies a concept within the scope of the agent at a particular iteration
      * @return
      */
-    protected int uniqueId(IterationContext iterationContext, int iterationScopeId) {
+    public int uniqueId(IterationContext iterationContext, int iterationScopeId) {
         String id = iterationContext.simulationStep() + tracker() + iterationScopeId;
         return id.hashCode();
     }

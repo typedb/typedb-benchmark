@@ -1,5 +1,6 @@
 package grakn.simulation.db.neo4j.agents.interaction;
 
+import grakn.simulation.db.common.agents.interaction.FriendshipAgentBase;
 import grakn.simulation.db.neo4j.common.Neo4jContext;
 import grakn.simulation.db.neo4j.driver.Neo4jDriverWrapper;
 import org.neo4j.driver.Query;
@@ -10,7 +11,7 @@ import java.util.List;
 
 import static grakn.simulation.db.neo4j.agents.interaction.RelocationAgent.cityResidentsQuery;
 
-public class FriendshipAgent extends grakn.simulation.db.common.agents.interaction.FriendshipAgent<Neo4jContext> {
+public class FriendshipAgent extends FriendshipAgentBase<Neo4jContext> {
 
     @Override
     protected List<String> getResidentEmails(LocalDateTime earliestDate) {
