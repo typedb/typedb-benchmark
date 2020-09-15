@@ -60,17 +60,7 @@ jobs:
       - install-bazel
       - checkout
       - run-neo4j
-
-  test-end-to-end-grakn:
-    machine:
-      image: ubuntu-1604:201903-01
-    working_directory: ~/simulation
-    steps:
-      - install-bazel
-      - checkout
-      - run-grakn
-      - run: bazel run //:simulation -- -d grakn -n
-      - run: bazel test //db/grakn/agents/test/... --test_arg=localhost:48555 --test_output=all --test_timeout=7200
+      - run: bazel run //:simulation -- -d neo4j -n
 
 workflows:
   version: 2
