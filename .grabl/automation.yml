@@ -8,12 +8,7 @@ build:
       type: background
       timeout: "18000"
       script: |
-        cd ..
-        git clone https://github.com/graknlabs/grakn.git
-        cd grakn
-        bazel build //:assemble-linux-targz
-        mkdir dist
-        tar -xf ./bazel-bin/grakn-core-all-linux.tar.gz -C ./dist/
+        bazel run //test:grakn-extractor -- dist/grakn-core-all-linux
         cd ./dist/grakn-core-all-linux/
         ./grakn server start -- \
           --tracing-uri $GRABL_TRACING_URI \
@@ -136,18 +131,13 @@ build:
       type: background
       timeout: "18000"
       script: |
-        cd ..
-        git clone https://github.com/graknlabs/grakn.git
-        cd grakn
-        bazel build //:assemble-linux-targz
-        mkdir dist
-        tar -xf ./bazel-bin/grakn-core-all-linux.tar.gz -C ./dist/
+        bazel run //test:grakn-extractor -- dist/grakn-core-all-linux
         cd ./dist/grakn-core-all-linux/
         ./grakn server start -- \
           --tracing-uri $GRABL_TRACING_URI \
           --tracing-username $GRABL_OWNER \
           --tracing-access-token $GRABL_TOKEN
-        export GRABL_EXPORT_TEST_GRAKN_URI="${HOSTNAME}:48555"
+        export GRABL_EXPORT_TEST_COMPARISON_GRAKN_URI="${HOSTNAME}:48555"
     run-neo4j:
       machine: graknlabs-ubuntu-20.04-long
       type: background
@@ -166,7 +156,7 @@ build:
         echo 'dbms.security.auth_enabled=false' | sudo tee -a /etc/neo4j/neo4j.conf
         ps aux | grep "org.neo4j.server" | awk '{print $2}' | xargs sudo kill -9 >/dev/null 2&>1 || true
         sudo neo4j start
-        export GRABL_EXPORT_TEST_NEO4J_URI="bolt://${HOSTNAME}:7687"
+        export GRABL_EXPORT_TEST_COMPARISON_NEO4J_URI="bolt://${HOSTNAME}:7687"
     test-comparison-grakn-and-neo4j:
       machine: graknlabs-ubuntu-20.04-long
       timeout: "18000"
@@ -174,5 +164,5 @@ build:
       script: |
         bazel test //test:simulation-test \
           --test_output=all \
-          --test_arg=--grakn-uri=$GRABL_EXPORT_TEST_GRAKN_URI \
-          --test_arg=--neo4j-uri=$GRABL_EXPORT_TEST_NEO4J_URI
+          --test_arg=--grakn-uri=$GRABL_EXPORT_TEST_COMPARISON_GRAKN_URI \
+          --test_arg=--neo4j-uri=$GRABL_EXPORT_TEST_COMPARISON_NEO4J_URI
