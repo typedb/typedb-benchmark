@@ -141,7 +141,7 @@ public class Simulation implements IterationContext, AutoCloseable {
                             new RandomSource(config.getRandomSeed()),
                             world,
                             config.getTraceSampling().getSamplingFunction(),
-                            null
+                            new ResultHandler()
                     )) {
                         ///////////////
                         // MAIN LOOP //
