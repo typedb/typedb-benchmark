@@ -1,5 +1,6 @@
 exports_files([
-    "config.yaml",
+    "config_big.yml",
+    "config_small.yml",
 ])
 
 java_library(

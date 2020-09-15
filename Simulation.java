@@ -50,14 +50,14 @@ import static grakn.simulation.db.common.initialise.Initialiser.world;
 public class Simulation implements IterationContext, AutoCloseable {
 
     final static Logger LOG = LoggerFactory.getLogger(Simulation.class);
-    private final static String DEFAULT_CONFIG_YAML = "config/config.yaml";
+
 
     public static void main(String[] args) {
 
         ///////////////////
         // CONFIGURATION //
         ///////////////////
-
+        String default_config_yaml = args[0];  // The default config file is declared in the Bazel java_binary target
         Options options = cliOptions();
         CommandLineParser parser = new DefaultParser();
         CommandLine commandLine;
@@ -87,7 +87,7 @@ public class Simulation implements IterationContext, AutoCloseable {
             files.put(filename, path);
         }
 
-        Path configPath = Paths.get(getOption(commandLine, "b").orElse(DEFAULT_CONFIG_YAML));
+        Path configPath = Paths.get(getOption(commandLine, "b").orElse(default_config_yaml));
         Config config = ConfigLoader.loadConfigFromYaml(configPath.toFile());
 
         ////////////////////

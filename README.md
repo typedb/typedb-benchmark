@@ -37,7 +37,7 @@ diff -bur logs/ logs1/
 
 -b,--config-file <config-file-path>
     Absolute path to the YAML config file
-    default: config/config.yaml
+    default: config/config_big.yml
 ```
 
 ### Grabl Tracing Options
