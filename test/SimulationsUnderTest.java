@@ -13,6 +13,12 @@ import grakn.simulation.db.neo4j.driver.Neo4jDriverWrapper;
 import grakn.simulation.db.neo4j.initialise.Neo4jAgentPicker;
 import grakn.simulation.db.neo4j.initialise.Neo4jInitialiser;
 import grakn.simulation.utils.RandomSource;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -32,6 +38,30 @@ public class SimulationsUnderTest {
     static final int numIterations = 10;
 
     static {
+        String[] args = System.getProperty("sun.java.command").split(" ");
+
+        Options options = new Options();
+        options.addOption(Option.builder("g")
+                .longOpt("grakn-uri").desc("Grakn server URI").hasArg().required().argName("grakn-uri")
+                .build());
+        options.addOption(Option.builder("n")
+                .longOpt("neo4j-uri").desc("Neo4j server URI").hasArg().required().argName("neo4j-uri")
+                .build());
+
+        CommandLineParser parser = new DefaultParser();
+        CommandLine commandLine;
+
+        String graknUri = null;
+        String neo4jUri = null;
+        try {
+            commandLine = parser.parse(options, args);
+            graknUri = commandLine.getOptionValue("g");
+            neo4jUri = commandLine.getOptionValue("n");
+        } catch (ParseException e) {
+            System.err.println(e.getMessage());
+            System.exit(1);
+        }
+
         int scaleFactor = 5;
         int randomSeed = 1;
 
@@ -66,7 +96,6 @@ public class SimulationsUnderTest {
         // Grakn setup //
         /////////////////
 
-        String graknUri = "localhost:48555";
         GraknAgentPicker graknAgentPicker = new GraknAgentPicker();
         GraknInitialiser graknInitialiser = new GraknInitialiser(files);
         GraknClientWrapper graknDriverWrapper = new GraknClientWrapper();
@@ -90,7 +119,6 @@ public class SimulationsUnderTest {
         // Neo4j setup //
         /////////////////
 
-        String neo4jUri = "bolt://localhost:7687";
         Neo4jAgentPicker neo4jAgentPicker = new Neo4jAgentPicker();
         Neo4jInitialiser neo4jInitialiser = new Neo4jInitialiser(files);
         Neo4jDriverWrapper neo4jDriverWrapper = new Neo4jDriverWrapper();
