@@ -1,6 +1,6 @@
 build:
   performance:
-    run-performange-small-grakn:
+    run-performance-small-grakn:
       machine: graknlabs-ubuntu-20.04-long
       type: background
       timeout: "18000"
@@ -15,7 +15,7 @@ build:
     test-performance-small-grakn:
       machine: graknlabs-ubuntu-20.04-long
       timeout: "18000"
-      dependencies: [run-performange-small-grakn]
+      dependencies: [run-performance-small-grakn]
       script: |
         bazel run //:simulation-small -- \
           --database grakn \
@@ -27,7 +27,7 @@ build:
           --username $GRABL_OWNER \
           --api-token $GRABL_TOKEN \
           --config-file /home/grabl/simulation/config/config_small.yml
-    run-performange-small-neo4j:
+    run-performance-small-neo4j:
       machine: graknlabs-ubuntu-20.04-long
       type: background
       timeout: "18000"
@@ -48,7 +48,7 @@ build:
         export GRABL_EXPORT_PERFORMANCE_SMALL_NEO4J_URI="bolt://${HOSTNAME}:7687"
     test-performance-small-neo4j:
       machine: graknlabs-ubuntu-20.04-long
-      dependencies: [run-performange-small-neo4j]
+      dependencies: [run-performance-small-neo4j]
       timeout: "18000"
       script: |
         bazel run //:simulation-small -- \
@@ -61,7 +61,7 @@ build:
           --username $GRABL_OWNER \
           --api-token $GRABL_TOKEN \
           --config-file /home/grabl/simulation/config/config_small.yml
-    run-performange-big-grakn:
+    run-performance-big-grakn:
       filter:
         owner: graknlabs
         branch: core-1.8
@@ -82,7 +82,7 @@ build:
         branch: core-1.8
       machine: graknlabs-ubuntu-20.04-long
       timeout: "18000"
-      dependencies: [run-performange-big-grakn]
+      dependencies: [run-performance-big-grakn]
       script: |
         bazel run //:simulation-big -- \
           --database grakn \
@@ -94,7 +94,7 @@ build:
           --username $GRABL_OWNER \
           --api-token $GRABL_TOKEN \
           --config-file /home/grabl/simulation/config/config_big.yml
-    run-performange-big-neo4j:
+    run-performance-big-neo4j:
       filter:
         owner: graknlabs
         branch: core-1.8
@@ -121,7 +121,7 @@ build:
         owner: graknlabs
         branch: core-1.8
       machine: graknlabs-ubuntu-20.04-long
-      dependencies: [run-performange-big-neo4j]
+      dependencies: [run-performance-big-neo4j]
       timeout: "18000"
       script: |
         bazel run //:simulation-big -- \
