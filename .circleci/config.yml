@@ -62,6 +62,17 @@ jobs:
       - run-neo4j
       - run: bazel run //:simulation -- -d neo4j -n
 
+  test-comparison-grakn-and-neo4j:
+    machine:
+      image: ubuntu-1604:201903-01
+    working_directory: ~/simulation
+    steps:
+      - install-bazel
+      - checkout
+      - run-grakn
+      - run-neo4j
+      - run: bazel test //test:simulation-test --test_output=all --test_timeout=7200
+
 workflows:
   version: 2
   simulation:
@@ -71,5 +82,8 @@ workflows:
           requires:
             - build
       - test-end-to-end-grakn:
+          requires:
+            - build
+      - test-comparison-grakn-and-neo4j:
           requires:
             - build
