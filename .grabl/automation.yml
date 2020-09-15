@@ -1,6 +1,6 @@
 build:
   performance:
-    run-performance-small-grakn:
+    test-performance-small-grakn-background:
       machine: graknlabs-ubuntu-20.04-long
       type: background
       timeout: "18000"
@@ -15,7 +15,7 @@ build:
     test-performance-small-grakn:
       machine: graknlabs-ubuntu-20.04-long
       timeout: "18000"
-      dependencies: [run-performance-small-grakn]
+      dependencies: [test-performance-small-grakn-background]
       script: |
         bazel run //:simulation-small -- \
           --database grakn \
@@ -27,7 +27,7 @@ build:
           --username $GRABL_OWNER \
           --api-token $GRABL_TOKEN \
           --config-file /home/grabl/simulation/config/config_small.yml
-    run-performance-small-neo4j:
+    test-performance-small-neo4j-background:
       machine: graknlabs-ubuntu-20.04-long
       type: background
       timeout: "18000"
@@ -48,7 +48,7 @@ build:
         export GRABL_EXPORT_PERFORMANCE_SMALL_NEO4J_URI="bolt://${HOSTNAME}:7687"
     test-performance-small-neo4j:
       machine: graknlabs-ubuntu-20.04-long
-      dependencies: [run-performance-small-neo4j]
+      dependencies: [test-performance-small-neo4j-background]
       timeout: "18000"
       script: |
         bazel run //:simulation-small -- \
@@ -61,7 +61,7 @@ build:
           --username $GRABL_OWNER \
           --api-token $GRABL_TOKEN \
           --config-file /home/grabl/simulation/config/config_small.yml
-    run-performance-big-grakn:
+    test-performance-big-grakn-background:
       filter:
         owner: graknlabs
         branch: core-1.8
@@ -82,7 +82,7 @@ build:
         branch: core-1.8
       machine: graknlabs-ubuntu-20.04-long
       timeout: "18000"
-      dependencies: [run-performance-big-grakn]
+      dependencies: [test-performance-big-grakn-background]
       script: |
         bazel run //:simulation-big -- \
           --database grakn \
@@ -94,7 +94,7 @@ build:
           --username $GRABL_OWNER \
           --api-token $GRABL_TOKEN \
           --config-file /home/grabl/simulation/config/config_big.yml
-    run-performance-big-neo4j:
+    test-performance-big-neo4j-background:
       filter:
         owner: graknlabs
         branch: core-1.8
@@ -121,7 +121,7 @@ build:
         owner: graknlabs
         branch: core-1.8
       machine: graknlabs-ubuntu-20.04-long
-      dependencies: [run-performance-big-neo4j]
+      dependencies: [test-performance-big-neo4j-background]
       timeout: "18000"
       script: |
         bazel run //:simulation-big -- \
@@ -135,7 +135,7 @@ build:
           --api-token $GRABL_TOKEN \
           --config-file /home/grabl/simulation/config/config_big.yml
   correctness:
-    run-grakn:
+    test-comparison-grakn-background:
       machine: graknlabs-ubuntu-20.04-long
       type: background
       timeout: "18000"
@@ -147,7 +147,7 @@ build:
           --tracing-username $GRABL_OWNER \
           --tracing-access-token $GRABL_TOKEN
         export GRABL_EXPORT_TEST_COMPARISON_GRAKN_URI="${HOSTNAME}:48555"
-    run-neo4j:
+    test-comparison-neo4j-background:
       machine: graknlabs-ubuntu-20.04-long
       type: background
       timeout: "18000"
@@ -169,7 +169,7 @@ build:
     test-comparison-grakn-and-neo4j:
       machine: graknlabs-ubuntu-20.04-long
       timeout: "18000"
-      dependencies: [run-grakn, run-neo4j]
+      dependencies: [test-comparison-grakn-background, test-comparison-neo4j-background]
       script: |
         bazel test //test:simulation-test \
           --test_output=all \
