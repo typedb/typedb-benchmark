@@ -11,8 +11,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static grabl.tracing.client.GrablTracingThreadStatic.traceOnThread;
-import static grakn.simulation.db.grakn.schema.Schema.MARRIAGE_HUSBAND;
-import static grakn.simulation.db.grakn.schema.Schema.MARRIAGE_WIFE;
 import static java.util.Collections.shuffle;
 
 public interface MarriageAgentBase extends InteractionAgent<World.City> {
@@ -31,14 +29,16 @@ public interface MarriageAgentBase extends InteractionAgent<World.City> {
 
         LocalDateTime dobOfAdults = iterationContext.today().minusYears(iterationContext.world().AGE_OF_ADULTHOOD);
 
-        try (ThreadTrace trace = traceOnThread(agent.registerMethodTrace("getSingleWomen"))) {
-            womenEmails = getUnmarriedPeopleOfGender("getSingleWomen",city, "female", MARRIAGE_WIFE, dobOfAdults);
+        String scope1 = "getSingleWomen";
+        try (ThreadTrace trace = traceOnThread(scope1)) {
+            womenEmails = getUnmarriedPeopleOfGender(scope1, city, "female", dobOfAdults);
         }
         shuffle(womenEmails, agent.random());
 
+        String scope2 = "getSingleMen";
         List<String> menEmails;
-        try (ThreadTrace trace = traceOnThread(agent.registerMethodTrace("getSingleMen"))) {
-            menEmails = getUnmarriedPeopleOfGender("getSingleMen", city, "male", MARRIAGE_HUSBAND, dobOfAdults);
+        try (ThreadTrace trace = traceOnThread(scope2)) {
+            menEmails = getUnmarriedPeopleOfGender(scope2, city, "male", dobOfAdults);
         }
         shuffle(menEmails, agent.random());
 
@@ -64,7 +64,7 @@ public interface MarriageAgentBase extends InteractionAgent<World.City> {
         return agentResultSet;
     }
 
-    List<String> getUnmarriedPeopleOfGender(String scope, World.City city, String gender, String marriageRole, LocalDateTime dobOfAdults);
+    List<String> getUnmarriedPeopleOfGender(String scope, World.City city, String gender, LocalDateTime dobOfAdults);
 
     AgentResult insertMarriage(String scope, World.City city, int marriageIdentifier, String wifeEmail, String husbandEmail);
 }

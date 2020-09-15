@@ -34,9 +34,17 @@ import static grakn.simulation.db.grakn.schema.Schema.RESIDENCY_RESIDENT;
 
 public class MarriageAgent extends GraknAgent<World.City> implements MarriageAgentBase {
 
-    public List<String> getUnmarriedPeopleOfGender(String scope, World.City city, String gender, String marriageRole, LocalDateTime dobOfAdults) {
+    public List<String> getUnmarriedPeopleOfGender(String scope, World.City city, String gender, LocalDateTime dobOfAdults) {
         Statement personVar = Graql.var(PERSON);
         Statement cityVar = Graql.var(CITY);
+        String marriageRole;
+        if (gender.equals("female")) {
+            marriageRole = MARRIAGE_WIFE;
+        } else if (gender.equals("male")) {
+            marriageRole = MARRIAGE_HUSBAND;
+        } else {
+            throw new IllegalArgumentException("Gender must be male or female");
+        }
 
         GraqlGet query = Graql.match(
                 personVar.isa(PERSON).has(GENDER, gender).has(EMAIL, Graql.var(EMAIL)).has(DATE_OF_BIRTH, Graql.var(DATE_OF_BIRTH)),
