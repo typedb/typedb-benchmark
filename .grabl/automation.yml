@@ -124,9 +124,10 @@ build:
           --org $GRABL_OWNER \
           --repo $GRABL_REPO \
           --commit $GRABL_COMMIT \
-          --username $GRABL_OWNER) \
+          --username $GRABL_OWNER \
           --api-token $GRABL_TOKEN \
           --config-file /home/grabl/simulation/config.yml
+  correctness:
     run-grakn-test:
       machine: graknlabs-ubuntu-20.04-long
       type: background
