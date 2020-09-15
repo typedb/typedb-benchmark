@@ -5,7 +5,7 @@ agents:
   - name: "personBirth"
     mode: "trace"
   - name: "ageUpdate"
-    mode: "run"
+    mode: "trace"
 #  - name: "parentship"
 #    mode: "run"
 #  - name: "relocation"
@@ -24,9 +24,9 @@ agents:
 traceSampling:
   # Options: `"every"` for every K traces; `"log"` for logarithm with base N
   function: "every"
-  arg: 5
+  arg: 3
 
 randomSeed: 1
-iterations: 10
-scaleFactor: 5
+iterations: 30
+scaleFactor: 3
 databaseName: "world"
