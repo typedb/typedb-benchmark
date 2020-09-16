@@ -1,5 +1,6 @@
 package grakn.simulation.db.grakn.agents.interaction;
 
+import grakn.simulation.db.common.agents.interaction.CompanyAgentBase;
 import grakn.simulation.db.common.world.World;
 import graql.lang.Graql;
 import graql.lang.query.GraqlGet;
@@ -19,7 +20,7 @@ import static grakn.simulation.db.grakn.schema.Schema.INCORPORATION_INCORPORATIN
 import static grakn.simulation.db.grakn.schema.Schema.LOCATION_HIERARCHY;
 import static grakn.simulation.db.grakn.schema.Schema.LOCATION_NAME;
 
-public class CompanyAgent extends GraknAgent<World.Country> implements grakn.simulation.db.common.agents.interaction.CompanyAgent {
+public class CompanyAgent extends GraknAgent<World.Country> implements CompanyAgentBase {
 
     @Override
     public void insertCompany(World.Country country, LocalDateTime today, String scope, int companyNumber, String companyName) {

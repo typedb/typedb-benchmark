@@ -16,7 +16,7 @@ import java.util.Map;
 
 import static grabl.tracing.client.GrablTracingThreadStatic.traceOnThread;
 
-public interface ParentshipAgent extends InteractionAgent<World.City> {
+public interface ParentshipAgentBase extends InteractionAgent<World.City> {
 
     enum Email {
         WIFE, HUSBAND

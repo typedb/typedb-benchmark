@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 
 import static grabl.tracing.client.GrablTracingThreadStatic.traceOnThread;
 
-public interface CompanyAgent extends InteractionAgent<World.Country> {
+public interface CompanyAgentBase extends InteractionAgent<World.Country> {
 
     default AgentResultSet iterate(Agent<World.Country, ?> agent, World.Country country, IterationContext iterationContext) {
 

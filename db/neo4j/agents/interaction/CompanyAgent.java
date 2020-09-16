@@ -1,5 +1,6 @@
 package grakn.simulation.db.neo4j.agents.interaction;
 
+import grakn.simulation.db.common.agents.interaction.CompanyAgentBase;
 import grakn.simulation.db.common.world.World;
 import grakn.simulation.db.neo4j.common.Neo4jContext;
 import grakn.simulation.db.neo4j.driver.Neo4jDriverWrapper;
@@ -7,7 +8,7 @@ import org.neo4j.driver.Query;
 
 import java.util.HashMap;
 
-public class CompanyAgent extends grakn.simulation.db.common.agents.interaction.CompanyAgent<Neo4jContext> {
+public class CompanyAgent extends CompanyAgentBase<Neo4jContext> {
     @Override
     protected void insertCompany(int companyNumber, String companyName) {
         String template = "" +

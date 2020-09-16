@@ -1,6 +1,7 @@
 package grakn.simulation.db.grakn.agents.interaction;
 
 import grakn.client.answer.ConceptMap;
+import grakn.simulation.db.common.agents.interaction.ParentshipAgentBase;
 import grakn.simulation.db.common.world.World;
 import graql.lang.Graql;
 import graql.lang.query.GraqlGet;
@@ -33,7 +34,7 @@ import static grakn.simulation.db.grakn.schema.Schema.PARENTSHIP_PARENT;
 import static grakn.simulation.db.grakn.schema.Schema.PERSON;
 import static java.util.stream.Collectors.toList;
 
-public class ParentshipAgent extends GraknAgent<World.City> implements grakn.simulation.db.common.agents.interaction.ParentshipAgent {
+public class ParentshipAgent extends GraknAgent<World.City> implements ParentshipAgentBase {
 
     @Override
     public List<HashMap<Email, String>> getMarriageEmails(World.City city) {
