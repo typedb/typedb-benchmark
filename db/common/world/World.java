@@ -74,6 +74,28 @@ public class World {
         CSVParser.parse(path, StandardCharsets.UTF_8, CSVFormat.DEFAULT).forEach(action);
     }
 
+    public static World initialise(int scaleFactor, Map<String, Path> files) {
+        World world;
+        try {
+            world = new World(
+                    scaleFactor,
+                    files.get("continents.csv"),
+                    files.get("countries.csv"),
+                    files.get("cities.csv"),
+                    files.get("female_forenames.csv"),
+                    files.get("male_forenames.csv"),
+                    files.get("surnames.csv"),
+                    files.get("adjectives.csv"),
+                    files.get("nouns.csv")
+            );
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.exit(1);
+            return null;
+        }
+        return world;
+    }
+
     public Stream<Continent> getContinents() {
         return continents.stream();
     }

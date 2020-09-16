@@ -1,13 +1,13 @@
 package grakn.simulation;
 
 import grabl.tracing.client.GrablTracing;
+import grabl.tracing.client.GrablTracingThreadStatic;
 import grakn.simulation.config.Config;
 import grakn.simulation.config.ConfigLoader;
 import grakn.simulation.db.common.Simulation;
 import grakn.simulation.db.common.agents.base.AgentRunner;
 import grakn.simulation.db.common.agents.base.ResultHandler;
 import grakn.simulation.db.common.initialise.AgentPicker;
-import grakn.simulation.db.common.initialise.Initialiser;
 import grakn.simulation.db.common.world.World;
 import grakn.simulation.db.grakn.GraknSimulation;
 import grakn.simulation.utils.RandomSource;
@@ -27,8 +27,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import static grakn.simulation.db.common.initialise.Initialiser.grablTracing;
-import static grakn.simulation.db.common.initialise.Initialiser.world;
+import static grabl.tracing.client.GrablTracing.tracing;
+import static grabl.tracing.client.GrablTracing.tracingNoOp;
+import static grabl.tracing.client.GrablTracing.withLogging;
+import static grakn.simulation.db.common.world.World.initialise;
 
 public class SimulationRunner {
 
@@ -80,12 +82,11 @@ public class SimulationRunner {
         // Components customised based on the DB
         String defaultUri;
         AgentPicker agentPicker;
-        Initialiser initialiser;
         List<AgentRunner<?, ?>> agentRunnerList;
 
         LOG.info("Welcome to the Simulation!");
         LOG.info("Parsing world data...");
-        World world = world(config.getScaleFactor(), initialisationDataFiles);
+        World world = initialise(config.getScaleFactor(), initialisationDataFiles);
         if (world == null) return;
 
         LOG.info(String.format("Connecting to %s...", dbName));
@@ -188,5 +189,19 @@ public class SimulationRunner {
                 .longOpt("disable-tracing").desc("Disable grabl tracing")
                 .build());
         return options;
+    }
+
+    public static GrablTracing grablTracing(String grablTracingUri, String grablTracingOrganisation, String grablTracingRepository, String grablTracingCommit, String grablTracingUsername, String grablTracingToken, boolean disableTracing) {
+        GrablTracing tracing;
+        if (disableTracing) {
+            tracing = withLogging(tracingNoOp());
+        } else if (grablTracingUsername == null) {
+            tracing = withLogging(tracing(grablTracingUri));
+        } else {
+            tracing = withLogging(tracing(grablTracingUri, grablTracingUsername, grablTracingToken));
+        }
+        GrablTracingThreadStatic.setGlobalTracingClient(tracing);
+        GrablTracingThreadStatic.openGlobalAnalysis(grablTracingOrganisation, grablTracingRepository, grablTracingCommit);
+        return tracing;
     }
 }

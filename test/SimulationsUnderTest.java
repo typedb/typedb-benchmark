@@ -28,7 +28,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
 
-import static grakn.simulation.db.common.initialise.Initialiser.world;
+import static grakn.simulation.db.common.world.World.initialise;
 
 public class SimulationsUnderTest {
     static final Simulation neo4jSimulation;
@@ -88,7 +88,7 @@ public class SimulationsUnderTest {
         agentNames.add("personBirth");
         agentNames.add("ageUpdate");
 
-        World world = world(scaleFactor, files);
+        World world = initialise(scaleFactor, files);
 
         /////////////////
         // Grakn setup //
