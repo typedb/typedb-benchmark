@@ -1,15 +1,11 @@
 package grakn.simulation.test;
 
+import grakn.simulation.config.Config;
 import grakn.simulation.config.Schema;
-import grakn.simulation.db.common.Simulation;
-import grakn.simulation.db.common.agents.base.AgentRunner;
 import grakn.simulation.db.common.agents.base.ResultHandler;
-import grakn.simulation.db.common.initialise.AgentPicker;
 import grakn.simulation.db.common.world.World;
 import grakn.simulation.db.grakn.GraknSimulation;
-import grakn.simulation.db.grakn.initialise.GraknAgentPicker;
 import grakn.simulation.db.neo4j.Neo4jSimulation;
-import grakn.simulation.db.neo4j.initialise.Neo4jAgentPicker;
 import grakn.simulation.utils.RandomSource;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -31,8 +27,8 @@ import java.util.function.Function;
 import static grakn.simulation.db.common.world.World.initialise;
 
 public class SimulationsUnderTest {
-    static final Simulation neo4jSimulation;
-    static final Simulation graknSimulation;
+    static final Neo4jSimulation neo4jSimulation;
+    static final GraknSimulation graknSimulation;
     static final int numIterations = 3;
 
     static {
@@ -88,15 +84,15 @@ public class SimulationsUnderTest {
         agentNames.add("personBirth");
         agentNames.add("ageUpdate");
 
+        ArrayList<Config.Agent> agentConfigs = new ArrayList<>();
+        agentNames.forEach(name -> agentConfigs.add(new Config.Agent(name, Schema.AgentMode.RUN)));
+
         World world = initialise(scaleFactor, files);
 
         /////////////////
         // Grakn setup //
         /////////////////
 
-        GraknAgentPicker graknAgentPicker = new GraknAgentPicker();
-
-        List<AgentRunner<?, ?>> graknAgentRunners = getAgentRunners(graknAgentPicker, agentNames);
         ResultHandler graknResultHandler = new ResultHandler();
 
         graknSimulation = new GraknSimulation(
@@ -105,7 +101,7 @@ public class SimulationsUnderTest {
                 files,
                 new RandomSource(randomSeed),
                 world,
-                graknAgentRunners,
+                agentConfigs,
                 samplingFunction,
                 graknResultHandler
         );
@@ -114,9 +110,6 @@ public class SimulationsUnderTest {
         // Neo4j setup //
         /////////////////
 
-        Neo4jAgentPicker neo4jAgentPicker = new Neo4jAgentPicker();
-
-        List<AgentRunner<?, ?>> neo4jAgentRunners = getAgentRunners(neo4jAgentPicker, agentNames);
         ResultHandler neo4jResultHandler = new ResultHandler();
 
         neo4jSimulation = new Neo4jSimulation(
@@ -124,18 +117,9 @@ public class SimulationsUnderTest {
                 files,
                 new RandomSource(randomSeed),
                 world,
-                neo4jAgentRunners,
+                agentConfigs,
                 samplingFunction,
                 neo4jResultHandler
         );
-    }
-
-    private static List<AgentRunner<?, ?>> getAgentRunners(AgentPicker agentPicker, List<String> agentNames) {
-        List<AgentRunner<?, ?>> agentRunners = new ArrayList<>();
-        agentNames.forEach(agentName -> {
-            AgentRunner<?, ?> runner = agentPicker.get(agentName);
-            agentRunners.add(runner);
-        });
-        return agentRunners;
     }
 }
