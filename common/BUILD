@@ -21,6 +21,7 @@ java_library(
 
 checkstyle_test(
     name = "checkstyle",
-    targets = [":simulation-common"],
-    license_type = "agpl"
+    include = [":simulation-common"],
+    license_type = "agpl",
+    size = "small",
 )

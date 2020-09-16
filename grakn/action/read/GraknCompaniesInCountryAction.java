@@ -21,7 +21,7 @@ import grakn.simulation.common.action.read.CompaniesInCountryAction;
 import grakn.simulation.common.world.World;
 import grakn.simulation.grakn.driver.GraknOperation;
 import graql.lang.Graql;
-import graql.lang.query.GraqlGet;
+import graql.lang.query.GraqlMatch;
 
 import java.util.List;
 
@@ -40,19 +40,20 @@ public class GraknCompaniesInCountryAction extends CompaniesInCountryAction<Grak
 
     @Override
     public List<Long> run() {
-        GraqlGet.Unfiltered companyNumbersQuery = query(country.name());
+        GraqlMatch.Unfiltered companyNumbersQuery = query(country.name());
         return dbOperation.sortedExecute(companyNumbersQuery, COMPANY_NUMBER, numCompanies);
     }
 
-    public static GraqlGet.Unfiltered query(String countryName) {
+    public static GraqlMatch.Unfiltered query(String countryName) {
         return Graql.match(
                     Graql.var(COUNTRY).isa(COUNTRY)
                             .has(LOCATION_NAME, countryName),
                     Graql.var(COMPANY).isa(COMPANY)
                             .has(COMPANY_NUMBER, Graql.var(COMPANY_NUMBER)),
-                    Graql.var(INCORPORATION).isa(INCORPORATION)
+                    Graql.var(INCORPORATION)
                             .rel(INCORPORATION_INCORPORATED, Graql.var(COMPANY))
                             .rel(INCORPORATION_INCORPORATING, Graql.var(COUNTRY))
-            ).get();
+                            .isa(INCORPORATION)
+            );
     }
 }

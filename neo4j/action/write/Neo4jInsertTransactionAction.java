@@ -29,7 +29,7 @@ import java.util.HashMap;
 
 public class Neo4jInsertTransactionAction extends InsertTransactionAction<Neo4jOperation, Record> {
 
-    public Neo4jInsertTransactionAction(Neo4jOperation dbOperation, World.Country country, Pair<Long, Double> transaction, Long sellerCompanyNumber, double value, int productQuantity, boolean isTaxable) {
+    public Neo4jInsertTransactionAction(Neo4jOperation dbOperation, World.Country country, Pair<Long, Long> transaction, Long sellerCompanyNumber, double value, int productQuantity, boolean isTaxable) {
         super(dbOperation, country, transaction, sellerCompanyNumber, value, productQuantity, isTaxable);
     }
 

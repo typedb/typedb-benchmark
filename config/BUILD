@@ -15,6 +15,7 @@ java_library(
 
 checkstyle_test(
     name = "checkstyle",
-    targets = [":config"],
-    license_type = "agpl"
+    include = [":config"],
+    license_type = "agpl",
+    size = "small",
 )

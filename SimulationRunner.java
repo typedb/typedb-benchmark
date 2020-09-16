@@ -19,6 +19,7 @@ package grakn.simulation;
 
 import grabl.tracing.client.GrablTracing;
 import grabl.tracing.client.GrablTracingThreadStatic;
+import grakn.client.rpc.GraknClient;
 import grakn.simulation.config.Config;
 import grakn.simulation.config.ConfigLoader;
 import grakn.simulation.common.Simulation;
@@ -109,7 +110,7 @@ public class SimulationRunner {
                 Simulation<?, ?> simulation;
                 switch (dbName) {
                     case "grakn":
-                        defaultUri = "localhost:48555";
+                        defaultUri = GraknClient.DEFAULT_URI;
                         if (hostUri == null) hostUri = defaultUri;
 
                         simulation = new GraknSimulation(

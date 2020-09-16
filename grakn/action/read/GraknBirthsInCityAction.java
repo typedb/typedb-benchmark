@@ -21,7 +21,7 @@ import grakn.simulation.common.action.read.BirthsInCityAction;
 import grakn.simulation.common.world.World;
 import grakn.simulation.grakn.driver.GraknOperation;
 import graql.lang.Graql;
-import graql.lang.query.GraqlGet;
+import graql.lang.query.GraqlMatch;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -42,20 +42,21 @@ public class GraknBirthsInCityAction extends BirthsInCityAction<GraknOperation> 
 
     @Override
     public List<String> run() {
-        GraqlGet.Unfiltered childrenQuery = query(worldCity.name(), today);
+        GraqlMatch.Unfiltered childrenQuery = query(worldCity.name(), today);
         return dbOperation.sortedExecute(childrenQuery, EMAIL, null);
     }
 
-    public static GraqlGet.Unfiltered query(String worldCityName, LocalDateTime today) {
+    public static GraqlMatch.Unfiltered query(String worldCityName, LocalDateTime today) {
         return Graql.match(
                     Graql.var("c").isa(CITY)
                             .has(LOCATION_NAME, worldCityName),
                     Graql.var("child").isa(PERSON)
                             .has(EMAIL, Graql.var(EMAIL))
                             .has(DATE_OF_BIRTH, today),
-                    Graql.var("bi").isa(BORN_IN)
+                    Graql.var("bi")
                             .rel(BORN_IN_PLACE_OF_BIRTH, "c")
                             .rel(BORN_IN_CHILD, "child")
-            ).get();
+                            .isa(BORN_IN)
+            );
     }
 }

@@ -17,15 +17,15 @@
 
 package grakn.simulation.grakn.action.write;
 
-import grakn.client.answer.ConceptMap;
+import grakn.client.concept.answer.ConceptMap;
 import grakn.simulation.common.action.Action;
 import grakn.simulation.common.action.write.InsertMarriageAction;
 import grakn.simulation.common.world.World;
 import grakn.simulation.grakn.driver.GraknOperation;
 import graql.lang.Graql;
+import graql.lang.pattern.variable.ThingVariable;
+import graql.lang.pattern.variable.UnboundVariable;
 import graql.lang.query.GraqlInsert;
-import graql.lang.statement.Statement;
-import graql.lang.statement.StatementAttribute;
 
 import java.util.HashMap;
 
@@ -54,26 +54,27 @@ public class GraknInsertMarriageAction extends InsertMarriageAction<GraknOperati
     }
 
     private GraqlInsert query(String worldCityName, int marriageIdentifier, String wifeEmail, String husbandEmail) {
-        Statement husband = Graql.var("husband");
-        Statement wife = Graql.var("wife");
-        Statement city = Graql.var(CITY);
-        Statement marriage = Graql.var("marriage");
+        UnboundVariable husband = Graql.var("husband");
+        UnboundVariable wife = Graql.var("wife");
+        UnboundVariable city = Graql.var(CITY);
+        UnboundVariable marriage = Graql.var("marriage");
 
-        StatementAttribute cityNameVar = Graql.var().val(worldCityName);
-        StatementAttribute marriageIdentifierVar = Graql.var().val(marriageIdentifier);
-        StatementAttribute husbandEmailVar = Graql.var().val(husbandEmail);
-        StatementAttribute wifeEmailVar = Graql.var().val(wifeEmail);
+        ThingVariable.Attribute cityNameVar = Graql.var().eq(worldCityName);
+        ThingVariable.Attribute marriageIdentifierVar = Graql.var().eq(marriageIdentifier);
+        ThingVariable.Attribute husbandEmailVar = Graql.var().eq(husbandEmail);
+        ThingVariable.Attribute wifeEmailVar = Graql.var().eq(wifeEmail);
 
         return Graql.match(
-                husband.isa(PERSON).has(EMAIL, husbandEmailVar),
-                wife.isa(PERSON).has(EMAIL, wifeEmailVar),
-                city.isa(CITY).has(LOCATION_NAME, cityNameVar)
+                husband.isa(PERSON).has(EMAIL, husbandEmailVar.toString()),
+                wife.isa(PERSON).has(EMAIL, wifeEmailVar.toString()),
+                city.isa(CITY).has(LOCATION_NAME, cityNameVar.toString())
         ).insert(
-                marriage.isa(MARRIAGE)
-                        .rel(MARRIAGE_HUSBAND, husband)
-                        .rel(MARRIAGE_WIFE, wife)
-                        .has(MARRIAGE_ID, marriageIdentifierVar),
-                Graql.var().isa(LOCATES).rel(LOCATES_LOCATED, marriage).rel(LOCATES_LOCATION, city)
+                marriage
+                    .rel(MARRIAGE_HUSBAND, husband)
+                    .rel(MARRIAGE_WIFE, wife)
+                    .isa(MARRIAGE)
+                    .has(MARRIAGE_ID, marriageIdentifierVar.toString()),
+                Graql.var().rel(LOCATES_LOCATED, marriage).rel(LOCATES_LOCATION, city).isa(LOCATES)
         );
     }
 

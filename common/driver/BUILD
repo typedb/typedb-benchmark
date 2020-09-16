@@ -18,6 +18,7 @@ java_library(
 
 checkstyle_test(
     name = "checkstyle",
-    targets = [":driver"],
-    license_type = "agpl"
+    include = [":driver"],
+    license_type = "agpl",
+    size = "small",
 )

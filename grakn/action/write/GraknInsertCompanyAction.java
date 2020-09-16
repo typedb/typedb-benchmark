@@ -17,7 +17,7 @@
 
 package grakn.simulation.grakn.action.write;
 
-import grakn.client.answer.ConceptMap;
+import grakn.client.concept.answer.ConceptMap;
 import grakn.simulation.common.action.Action;
 import grakn.simulation.common.action.write.InsertCompanyAction;
 import grakn.simulation.common.world.World;
@@ -56,9 +56,10 @@ public class GraknInsertCompanyAction extends InsertCompanyAction<GraknOperation
                 .insert(Graql.var(COMPANY).isa(COMPANY)
                                 .has(COMPANY_NAME, companyName)
                                 .has(COMPANY_NUMBER, companyNumber),
-                        Graql.var(INCORPORATION).isa(INCORPORATION)
+                        Graql.var(INCORPORATION)
                                 .rel(INCORPORATION_INCORPORATED, Graql.var(COMPANY))
                                 .rel(INCORPORATION_INCORPORATING, Graql.var(COUNTRY))
+                                .isa(INCORPORATION)
                                 .has(DATE_OF_INCORPORATION, today)
                 );
     }

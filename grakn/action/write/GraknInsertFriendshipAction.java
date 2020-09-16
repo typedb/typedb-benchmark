@@ -17,14 +17,14 @@
 
 package grakn.simulation.grakn.action.write;
 
-import grakn.client.answer.ConceptMap;
+import grakn.client.concept.answer.ConceptMap;
 import grakn.simulation.common.action.Action;
 import grakn.simulation.common.action.write.InsertFriendshipAction;
 import grakn.simulation.grakn.driver.GraknOperation;
 import graql.lang.Graql;
+import graql.lang.pattern.variable.ThingVariable;
+import graql.lang.pattern.variable.UnboundVariable;
 import graql.lang.query.GraqlInsert;
-import graql.lang.statement.Statement;
-import graql.lang.statement.StatementAttribute;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -47,31 +47,31 @@ public class GraknInsertFriendshipAction extends InsertFriendshipAction<GraknOpe
     }
 
     public static GraqlInsert query(LocalDateTime today, String friend1Email, String friend2Email) {
-        Statement person1 = Graql.var("p1");
-        Statement person2 = Graql.var("p2");
-        Statement friendship = Graql.var();
+        UnboundVariable person1 = Graql.var("p1");
+        UnboundVariable person2 = Graql.var("p2");
+        UnboundVariable friendship = Graql.var();
 
-        StatementAttribute friend1EmailVar = Graql.var().val(friend1Email);
-        StatementAttribute friend2EmailVar = Graql.var().val(friend2Email);
-        StatementAttribute startDate = Graql.var().val(today);
+        ThingVariable.Attribute friend1EmailVar = Graql.var().eq(friend1Email);
+        ThingVariable.Attribute friend2EmailVar = Graql.var().eq(friend2Email);
+        ThingVariable.Attribute startDate = Graql.var().eq(today);
 
         return Graql.match(
                 person1
-                        .isa(PERSON).has(EMAIL, friend1EmailVar),
+                        .isa(PERSON).has(EMAIL, friend1EmailVar.toString()),
                 person2
-                        .isa(PERSON).has(EMAIL, friend2EmailVar),
+                        .isa(PERSON).has(EMAIL, friend2EmailVar.toString()),
                 Graql.not(
                         friendship
-                                .isa(FRIENDSHIP)
                                 .rel(FRIENDSHIP_FRIEND, person1)
                                 .rel(FRIENDSHIP_FRIEND, person2)
+                                .isa(FRIENDSHIP)
                 )
         ).insert(
                 Graql.var(FRIENDSHIP)
-                        .isa(FRIENDSHIP)
                         .rel(FRIENDSHIP_FRIEND, person1)
                         .rel(FRIENDSHIP_FRIEND, person2)
-                        .has(START_DATE, startDate)
+                        .isa(FRIENDSHIP)
+                        .has(START_DATE, startDate.toString())
         );
     }
 

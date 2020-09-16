@@ -18,12 +18,12 @@
 package grakn.simulation.grakn.driver;
 
 import grabl.tracing.client.GrablTracingThreadStatic;
-import grakn.client.GraknClient;
-import grakn.client.answer.ConceptMap;
+import grakn.client.Grakn;
+import grakn.client.concept.answer.ConceptMap;
 import grakn.simulation.common.driver.LogWrapper;
 import grakn.simulation.common.driver.TransactionalDbOperation;
 import graql.lang.query.GraqlDelete;
-import graql.lang.query.GraqlGet;
+import graql.lang.query.GraqlMatch;
 import graql.lang.query.GraqlInsert;
 
 import java.util.List;
@@ -37,14 +37,14 @@ import static grakn.simulation.common.driver.TransactionalDbDriver.TracingLabel.
 
 public class GraknOperation extends TransactionalDbOperation {
 
-    private final GraknClient.Transaction transaction;
+    private final Grakn.Transaction transaction;
     private final LogWrapper log;
 
     boolean closed = false;
 
-    public GraknOperation(GraknClient.Session session, LogWrapper log, String tracker, boolean trace) {
+    public GraknOperation(Grakn.Session session, LogWrapper log, String tracker, boolean trace) {
         super(tracker, trace);
-        this.transaction = session.transaction(GraknClient.Transaction.Type.WRITE);
+        this.transaction = session.transaction(Grakn.Transaction.Type.WRITE);
         this.log = log;
     }
 
@@ -67,12 +67,12 @@ public class GraknOperation extends TransactionalDbOperation {
         }
     }
 
-    public <T> List<T> sortedExecute(GraqlGet query, String attributeName, Integer limit){
+    public <T> List<T> sortedExecute(GraqlMatch query, String attributeName, Integer limit){
         throwIfClosed();
         log.query(tracker, query);
         return trace(() -> {
-            Stream<T> answerStream = transaction.stream(query).get()
-                    .map(conceptMap -> (T) conceptMap.get(attributeName).asAttribute().value())
+            Stream<T> answerStream = transaction.query().match(query)
+                    .map(conceptMap -> (T) conceptMap.get(attributeName).asThing().asAttribute().getValue())
                     .sorted();
             if (limit != null) {
                 answerStream = answerStream.limit(limit);
@@ -83,35 +83,36 @@ public class GraknOperation extends TransactionalDbOperation {
 
     public void execute(GraqlDelete query) {
         log.query(tracker, query);
-        trace(() -> transaction.execute(query).get(), EXECUTE.getName());
+        trace(() -> transaction.query().delete(query).get(), EXECUTE.getName());
     }
 
     public List<ConceptMap> execute(GraqlInsert query) {
         log.query(tracker, query);
         try (GrablTracingThreadStatic.ThreadTrace trace = traceOnThread(EXECUTE.getName())) {
-            return transaction.execute(query).get();
+            return transaction.query().insert(query).collect(Collectors.toList());
         }
     }
 
-    public List<ConceptMap> execute(GraqlGet query) {
+    public List<ConceptMap> execute(GraqlMatch query) {
         log.query(tracker, query);
         try (GrablTracingThreadStatic.ThreadTrace trace = traceOnThread(EXECUTE.getName())) {
-            return transaction.execute(query).get();
+            return transaction.query().match(query).collect(Collectors.toList());
         }
     }
 
-    public Number execute(GraqlGet.Aggregate query) {
+    public Number execute(GraqlMatch.Aggregate query) {
         log.query(tracker, query);
-        try (GrablTracingThreadStatic.ThreadTrace trace = traceOnThread(EXECUTE.getName())) {
-            return getOnlyElement(transaction.execute(query).get()).number();
-        }
+//        try (GrablTracingThreadStatic.ThreadTrace trace = traceOnThread(EXECUTE.getName())) {
+//            return getOnlyElement(transaction.query().match(query).get()).number();
+//        }
+        throw new RuntimeException("GraqlMatch.Aggregate is not implemented yet."); //todo
     }
 
     public Object getOnlyAttributeOfThing(ConceptMap answer, String varName, String attributeType) {
-        return getOnlyElement(answer.get(varName).asThing().asRemote(transaction).attributes(transaction.getAttributeType(attributeType)).collect(Collectors.toList())).value();
+        return getOnlyElement(answer.get(varName).asThing().asRemote(transaction).asThing().getHas(transaction.concepts().getAttributeType(attributeType)).collect(Collectors.toList())).getValue();
     }
 
     public Object getValueOfAttribute(ConceptMap answer, String varName) {
-        return answer.get(varName).asAttribute().value();
+        return answer.get(varName).asThing().asAttribute().getValue();
     }
 }

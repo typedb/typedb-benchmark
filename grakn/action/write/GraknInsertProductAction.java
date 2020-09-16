@@ -17,7 +17,7 @@
 
 package grakn.simulation.grakn.action.write;
 
-import grakn.client.answer.ConceptMap;
+import grakn.client.concept.answer.ConceptMap;
 import grakn.simulation.common.action.write.InsertProductAction;
 import grakn.simulation.common.world.World;
 import grakn.simulation.grakn.driver.GraknOperation;
@@ -37,7 +37,7 @@ import static grakn.simulation.grakn.action.Model.PRODUCT_DESCRIPTION;
 import static grakn.simulation.grakn.action.Model.PRODUCT_NAME;
 
 public class GraknInsertProductAction extends InsertProductAction<GraknOperation, ConceptMap> {
-    public GraknInsertProductAction(GraknOperation dbOperation, World.Continent continent, Double barcode, String productName, String productDescription) {
+    public GraknInsertProductAction(GraknOperation dbOperation, World.Continent continent, Long barcode, String productName, String productDescription) {
         super(dbOperation, continent, barcode, productName, productDescription);
     }
 
@@ -47,7 +47,7 @@ public class GraknInsertProductAction extends InsertProductAction<GraknOperation
         return singleResult(dbOperation.execute(insertProductQuery));
     }
 
-    public static GraqlInsert query(String continentName, Double barcode, String productName, String productDescription) {
+    public static GraqlInsert query(String continentName, Long barcode, String productName, String productDescription) {
         return Graql.match(
                     Graql.var(CONTINENT)
                             .isa(CONTINENT)
@@ -59,9 +59,9 @@ public class GraknInsertProductAction extends InsertProductAction<GraknOperation
                             .has(PRODUCT_NAME, productName)
                             .has(PRODUCT_DESCRIPTION, productDescription),
                     Graql.var(PRODUCED_IN)
-                            .isa(PRODUCED_IN)
                             .rel(PRODUCED_IN_PRODUCT, Graql.var(PRODUCT))
                             .rel(PRODUCED_IN_CONTINENT, Graql.var(CONTINENT))
+                            .isa(PRODUCED_IN)
             );
     }
 

@@ -17,8 +17,8 @@
 
 package grakn.simulation.grakn;
 
-import grakn.client.GraknClient;
-import grakn.client.GraknClient.Session;
+import grakn.client.Grakn;
+import grakn.client.Grakn.Session;
 import grakn.simulation.config.Config;
 import grakn.simulation.common.TransactionalSimulation;
 import grakn.simulation.common.action.ActionFactory;
@@ -30,7 +30,6 @@ import grakn.simulation.grakn.driver.GraknDriver;
 import grakn.simulation.grakn.driver.GraknOperation;
 import grakn.simulation.grakn.yaml_tool.GraknYAMLLoader;
 import graql.lang.Graql;
-import graql.lang.query.GraqlDefine;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -53,42 +52,34 @@ public class GraknSimulation extends TransactionalSimulation<GraknDriver, GraknO
 
     @Override
     protected void initialise(Map<String, Path> initialisationDataPaths) {
-        Session session = driver.session("initialise");
-        try {
-            initialiseSchema(session, initialisationDataPaths);
-            initialiseData(session, initialisationDataPaths);
+        driver.createDatabase();
+        try (Session schemaSession = driver.schemaSession("initialiseSchema")) {
+            initialiseSchema(schemaSession, initialisationDataPaths);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        try (Session dataSession = driver.session("initialiseData")) {
+            initialiseData(dataSession, initialisationDataPaths);
         } catch (IOException | YAMLException e) {
             e.printStackTrace();
         }
-        driver.closeSessions();
     }
 
-    private static void initialiseSchema(GraknClient.Session session, Map<String, Path> initialisationDataPaths) throws IOException {
-        // TODO: merge these two schema files once this issue is fixed
-        // https://github.com/graknlabs/grakn/issues/5553
-        loadSchemaFile(session,
-                initialisationDataPaths.get("schema.gql"),
-                initialisationDataPaths.get("schema-pt2.gql")
-        );
-    }
-
-    private static void loadSchemaFile(GraknClient.Session session, Path... schemaPath) throws IOException {
-        System.out.println(">>>> trace: loadSchema: start");
-        for (Path path : schemaPath) {
-            String schemaQuery = new String(Files.readAllBytes(path), StandardCharsets.UTF_8);
-
-            System.out.println(">>>> trace: loadSchema - session.tx.write: start");
-            try (GraknClient.Transaction tx = session.transaction(GraknClient.Transaction.Type.WRITE)) {
-                System.out.println(">>>> trace: loadSchema - session.tx.write: end");
-                tx.execute((GraqlDefine) Graql.parse(schemaQuery));
-                tx.commit();
-            }
+    private static void initialiseSchema(Grakn.Session session, Map<String, Path> initialisationDataPaths) throws IOException {
+        System.out.println(">>>> trace: initialiseSchema: start");
+        String schemaQuery = new String(Files.readAllBytes(initialisationDataPaths.get("schema.gql")), StandardCharsets.UTF_8);
+        try (Grakn.Transaction tx = session.transaction(Grakn.Transaction.Type.WRITE)) {
+            tx.query().define(Graql.parseQuery(schemaQuery));
+            tx.commit();
         }
-        System.out.println(">>>> trace: loadSchema: end");
+        System.out.println(">>>> trace: initialiseSchema: end");
     }
 
-    private static void initialiseData(GraknClient.Session session, Map<String, Path> initialisationDataPaths) throws IOException, YAMLException {
+    private static void initialiseData(Grakn.Session session, Map<String, Path> initialisationDataPaths) throws IOException, YAMLException {
+        System.out.println(">>>> trace: initialiseData: start");
         YAMLLoader loader = new GraknYAMLLoader(session, initialisationDataPaths);
         loader.loadFile(initialisationDataPaths.get("graql_templates.yml").toFile());
+        System.out.println(">>>> trace: initialiseData: end");
     }
 }

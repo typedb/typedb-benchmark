@@ -137,7 +137,7 @@ public class Neo4jActionFactory extends ActionFactory<Neo4jOperation, Record> {
     }
 
     @Override
-    public InsertProductAction<Neo4jOperation, Record> insertProductAction(Neo4jOperation dbOperation, World.Continent continent, Double barcode, String productName, String productDescription) {
+    public InsertProductAction<Neo4jOperation, Record> insertProductAction(Neo4jOperation dbOperation, World.Continent continent, Long barcode, String productName, String productDescription) {
         return new Neo4jInsertProductAction(dbOperation, continent, barcode, productName, productDescription);
     }
 
@@ -157,7 +157,7 @@ public class Neo4jActionFactory extends ActionFactory<Neo4jOperation, Record> {
     }
 
     @Override
-    public InsertTransactionAction<Neo4jOperation, Record> insertTransactionAction(Neo4jOperation dbOperation, World.Country country, Pair<Long, Double> transaction, Long sellerCompanyNumber, double value, int productQuantity, boolean isTaxable) {
+    public InsertTransactionAction<Neo4jOperation, Record> insertTransactionAction(Neo4jOperation dbOperation, World.Country country, Pair<Long, Long> transaction, Long sellerCompanyNumber, double value, int productQuantity, boolean isTaxable) {
         return new Neo4jInsertTransactionAction(dbOperation, country, transaction, sellerCompanyNumber, value, productQuantity, isTaxable);
     }
 

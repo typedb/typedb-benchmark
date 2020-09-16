@@ -20,7 +20,7 @@ package grakn.simulation.grakn.action.insight;
 import grakn.simulation.common.action.insight.FindSpecificMarriageAction;
 import grakn.simulation.grakn.driver.GraknOperation;
 import graql.lang.Graql;
-import graql.lang.query.GraqlGet;
+import graql.lang.query.GraqlMatch;
 
 import java.util.stream.Collectors;
 
@@ -34,14 +34,14 @@ public class GraknFindSpecificMarriageAction extends FindSpecificMarriageAction<
 
     @Override
     public String run() {
-        GraqlGet.Unfiltered query = query();
-        return optionalSingleResult(dbOperation.execute(query).stream().map(ans -> ans.get(MARRIAGE_ID).asAttribute().value().toString()).collect(Collectors.toList()));
+        GraqlMatch.Unfiltered query = query();
+        return optionalSingleResult(dbOperation.execute(query).stream().map(ans -> ans.get(MARRIAGE_ID).asThing().asAttribute().getValue().toString()).collect(Collectors.toList()));
     }
 
-    public static GraqlGet.Unfiltered query() {
+    public static GraqlMatch.Unfiltered query() {
         return Graql.match(
                     Graql.var(MARRIAGE).isa(MARRIAGE).has(MARRIAGE_ID, Graql.var(MARRIAGE_ID)),
-                    Graql.var(MARRIAGE_ID).isa(MARRIAGE_ID).val(MARRIAGE_ID_FOR_QUERY)
-            ).get();
+                    Graql.var(MARRIAGE_ID).eq(MARRIAGE_ID_FOR_QUERY).isa(MARRIAGE_ID)
+            );
     }
 }

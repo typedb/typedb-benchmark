@@ -17,14 +17,14 @@
 
 package grakn.simulation.grakn.action.write;
 
-import grakn.client.answer.ConceptMap;
+import grakn.client.concept.answer.ConceptMap;
 import grakn.simulation.common.action.Action;
 import grakn.simulation.common.action.SpouseType;
 import grakn.simulation.common.action.write.InsertParentShipAction;
 import grakn.simulation.grakn.driver.GraknOperation;
 import graql.lang.Graql;
+import graql.lang.pattern.variable.UnboundVariable;
 import graql.lang.query.GraqlInsert;
-import graql.lang.statement.Statement;
 
 import java.util.HashMap;
 
@@ -49,20 +49,21 @@ public class GraknInsertParentShipAction extends InsertParentShipAction<GraknOpe
     }
 
     public static GraqlInsert query(HashMap<SpouseType, String> marriage, String childEmail) {
-        Statement parentship = Graql.var(PARENTSHIP);
-        Statement child = Graql.var("child");
-        Statement mother = Graql.var("mother");
-        Statement father = Graql.var("father");
+        UnboundVariable parentship = Graql.var(PARENTSHIP);
+        UnboundVariable child = Graql.var("child");
+        UnboundVariable mother = Graql.var("mother");
+        UnboundVariable father = Graql.var("father");
 
         return Graql.match(
                 mother.isa(PERSON).has(EMAIL, marriage.get(SpouseType.WIFE)),
                 father.isa(PERSON).has(EMAIL, marriage.get(SpouseType.HUSBAND)),
                 child.isa(PERSON).has(EMAIL, childEmail)
         ).insert(
-                parentship.isa(PARENTSHIP)
-                        .rel(PARENTSHIP_PARENT, father)
-                        .rel(PARENTSHIP_PARENT, mother)
-                        .rel(PARENTSHIP_CHILD, child)
+                parentship
+                    .rel(PARENTSHIP_PARENT, father)
+                    .rel(PARENTSHIP_PARENT, mother)
+                    .rel(PARENTSHIP_CHILD, child)
+                    .isa(PARENTSHIP)
         );
     }
 

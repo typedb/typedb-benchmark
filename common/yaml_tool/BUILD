@@ -6,6 +6,7 @@ java_library(
     visibility = ["//visibility:public"],
     deps = [
         "@graknlabs_graql//java:graql",
+        "@graknlabs_graql//java/common",
         "@maven//:org_apache_commons_commons_csv",
         "@maven//:org_apache_commons_commons_lang3",
         "@maven//:org_yaml_snakeyaml",
@@ -14,6 +15,7 @@ java_library(
 
 checkstyle_test(
     name = "checkstyle",
-    targets = [":yaml_tool"],
-    license_type = "agpl"
+    include = [":yaml_tool"],
+    license_type = "agpl",
+    size = "small",
 )

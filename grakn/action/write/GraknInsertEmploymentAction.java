@@ -17,13 +17,13 @@
 
 package grakn.simulation.grakn.action.write;
 
-import grakn.client.answer.ConceptMap;
+import grakn.client.concept.answer.ConceptMap;
 import grakn.simulation.common.action.write.InsertEmploymentAction;
 import grakn.simulation.common.world.World;
 import grakn.simulation.grakn.driver.GraknOperation;
 import graql.lang.Graql;
+import graql.lang.pattern.variable.UnboundVariable;
 import graql.lang.query.GraqlInsert;
-import graql.lang.statement.Statement;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -63,16 +63,16 @@ public class GraknInsertEmploymentAction extends InsertEmploymentAction<GraknOpe
     }
 
     public static GraqlInsert query(String worldCityName, String employeeEmail, long companyNumber, LocalDateTime employmentDate, double wageValue, String contractContent, double contractedHours) {
-        Statement city = Graql.var(CITY);
-        Statement person = Graql.var(PERSON);
-        Statement company = Graql.var(COMPANY);
-        Statement country = Graql.var(COUNTRY);
-        Statement locationHierarchy = Graql.var(LOCATION_HIERARCHY);
-        Statement employment = Graql.var(EMPLOYMENT);
-        Statement wage = Graql.var(WAGE);
-        Statement locates = Graql.var(LOCATES);
-        Statement contract = Graql.var(CONTRACT);
-        Statement currency = Graql.var(CURRENCY);
+        UnboundVariable city = Graql.var(CITY);
+        UnboundVariable person = Graql.var(PERSON);
+        UnboundVariable company = Graql.var(COMPANY);
+        UnboundVariable country = Graql.var(COUNTRY);
+        UnboundVariable locationHierarchy = Graql.var(LOCATION_HIERARCHY);
+        UnboundVariable employment = Graql.var(EMPLOYMENT);
+        UnboundVariable wage = Graql.var(WAGE);
+        UnboundVariable locates = Graql.var(LOCATES);
+        UnboundVariable contract = Graql.var(CONTRACT);
+        UnboundVariable currency = Graql.var(CURRENCY);
 
         return Graql.match(
                 city
@@ -88,25 +88,25 @@ public class GraknInsertEmploymentAction extends InsertEmploymentAction<GraknOpe
                         .isa(COUNTRY)
                         .has(CURRENCY, currency),
                 locationHierarchy
-                        .isa(LOCATION_HIERARCHY)
                         .rel(city)
                         .rel(country)
+                        .isa(LOCATION_HIERARCHY)
         ).insert(
                 employment
-                        .isa(EMPLOYMENT)
                         .rel(EMPLOYMENT_EMPLOYEE, person)
                         .rel(EMPLOYMENT_EMPLOYER, company)
                         .rel(EMPLOYMENT_CONTRACT, contract)
                         .rel(EMPLOYMENT_WAGE, wage)
+                        .isa(EMPLOYMENT)
                         .has(START_DATE, employmentDate),
                 wage
                         .isa(WAGE)
                         .has(WAGE_VALUE, wageValue)
                         .has(CURRENCY, currency), //TODO Should this be inferred rather than inserted?
                 locates
-                        .isa(LOCATES)
                         .rel(LOCATES_LOCATION, city)
-                        .rel(LOCATES_LOCATED, employment),
+                        .rel(LOCATES_LOCATED, employment)
+                        .isa(LOCATES),
                 contract
                         .isa(CONTRACT)
                         .has(CONTRACT_CONTENT, contractContent)

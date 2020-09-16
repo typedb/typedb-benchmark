@@ -21,7 +21,7 @@ import grakn.simulation.common.action.read.CompaniesInContinentAction;
 import grakn.simulation.common.world.World;
 import grakn.simulation.grakn.driver.GraknOperation;
 import graql.lang.Graql;
-import graql.lang.query.GraqlGet;
+import graql.lang.query.GraqlMatch;
 
 import java.util.List;
 
@@ -42,21 +42,22 @@ public class GraknCompaniesInContinentAction extends CompaniesInContinentAction<
 
     @Override
     public List<Long> run() {
-        GraqlGet.Unfiltered query = query(continent.name());
+        GraqlMatch.Unfiltered query = query(continent.name());
         return dbOperation.sortedExecute(query, COMPANY_NUMBER, null);
     }
 
-    public static GraqlGet.Unfiltered query(String continentName) {
+    public static GraqlMatch.Unfiltered query(String continentName) {
         return Graql.match(
                     Graql.var(CONTINENT).isa(CONTINENT)
                             .has(LOCATION_NAME, continentName),
-                    Graql.var(LOCATION_HIERARCHY).isa(LOCATION_HIERARCHY).rel(COUNTRY).rel(CONTINENT),
+                    Graql.var(LOCATION_HIERARCHY).rel(COUNTRY).rel(CONTINENT).isa(LOCATION_HIERARCHY),
                     Graql.var(COUNTRY).isa(COUNTRY),
                     Graql.var(COMPANY).isa(COMPANY)
                             .has(COMPANY_NUMBER, Graql.var(COMPANY_NUMBER)),
-                    Graql.var(INCORPORATION).isa(INCORPORATION)
+                    Graql.var(INCORPORATION)
                             .rel(INCORPORATION_INCORPORATED, Graql.var(COMPANY))
                             .rel(INCORPORATION_INCORPORATING, Graql.var(COUNTRY))
-            ).get();
+                            .isa(INCORPORATION)
+            );
     }
 }

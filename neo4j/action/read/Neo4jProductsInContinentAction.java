@@ -32,7 +32,7 @@ public class Neo4jProductsInContinentAction extends ProductsInContinentAction<Ne
     }
 
     @Override
-    public List<Double> run() {
+    public List<Long> run() {
         HashMap<String, Object> parameters = new HashMap<String, Object>(){{
             put("continentName", continent.name());
         }};

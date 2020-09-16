@@ -22,10 +22,10 @@ import grakn.simulation.common.action.write.UpdateAgesOfPeopleInCityAction;
 import grakn.simulation.common.world.World;
 import grakn.simulation.grakn.driver.GraknOperation;
 import graql.lang.Graql;
+import graql.lang.pattern.variable.UnboundVariable;
 import graql.lang.query.GraqlDelete;
-import graql.lang.query.GraqlGet;
 import graql.lang.query.GraqlInsert;
-import graql.lang.statement.Statement;
+import graql.lang.query.GraqlMatch;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -65,12 +65,12 @@ public class GraknUpdateAgesOfPeopleInCityAction extends UpdateAgesOfPeopleInCit
         return null;
     }
 
-    public static GraqlGet.Sorted getPeopleBornInCityQuery(String worldCityName) {
-        Statement city = Graql.var(CITY);
-        Statement person = Graql.var(PERSON);
-        Statement bornIn = Graql.var(BORN_IN);
-        Statement dobVar = Graql.var(DATE_OF_BIRTH);
-        Statement emailVar = Graql.var(EMAIL);
+    public static GraqlMatch.Sorted getPeopleBornInCityQuery(String worldCityName) {
+        UnboundVariable city = Graql.var(CITY);
+        UnboundVariable person = Graql.var(PERSON);
+        UnboundVariable bornIn = Graql.var(BORN_IN);
+        UnboundVariable dobVar = Graql.var(DATE_OF_BIRTH);
+        UnboundVariable emailVar = Graql.var(EMAIL);
 
         return Graql.match(
                 city.isa(CITY)
@@ -78,19 +78,20 @@ public class GraknUpdateAgesOfPeopleInCityAction extends UpdateAgesOfPeopleInCit
                 person.isa(PERSON)
                         .has(EMAIL, emailVar)
                         .has(DATE_OF_BIRTH, dobVar),
-                bornIn.isa(BORN_IN)
+                bornIn
                         .rel(BORN_IN_CHILD, person)
                         .rel(BORN_IN_PLACE_OF_BIRTH, city)
-        ).get().sort(EMAIL);
+                        .isa(BORN_IN)
+        ).sort(EMAIL);
     }
 
     private HashMap<String, LocalDateTime> getPeopleBornInCity(World.City worldCity) {
-        GraqlGet.Sorted peopleQuery = getPeopleBornInCityQuery(worldCity.name());
+        GraqlMatch.Sorted peopleQuery = getPeopleBornInCityQuery(worldCity.name());
 
         HashMap<String, LocalDateTime> peopleDobs = new HashMap<>();
         dbOperation.execute(peopleQuery).forEach(personAnswer -> {
-            LocalDateTime dob = (LocalDateTime) personAnswer.get(DATE_OF_BIRTH).asAttribute().value();
-            String email = personAnswer.get(EMAIL).asAttribute().value().toString();
+            LocalDateTime dob = (LocalDateTime) personAnswer.get(DATE_OF_BIRTH).asThing().asAttribute().getValue();
+            String email = personAnswer.get(EMAIL).asThing().asAttribute().getValue().toString();
             peopleDobs.put(email, dob);
         });
         return peopleDobs;
@@ -102,7 +103,7 @@ public class GraknUpdateAgesOfPeopleInCityAction extends UpdateAgesOfPeopleInCit
     }
 
     public static GraqlInsert insertNewAgeQuery(String personEmail, long newAge) {
-        Statement person = Graql.var(PERSON);
+        UnboundVariable person = Graql.var(PERSON);
         return Graql.match(
                 person
                         .isa(PERSON)
@@ -114,8 +115,8 @@ public class GraknUpdateAgesOfPeopleInCityAction extends UpdateAgesOfPeopleInCit
     }
 
     public static GraqlDelete deleteHasQuery(String personEmail) {
-        Statement person = Graql.var(PERSON);
-        Statement age = Graql.var(AGE);
+        UnboundVariable person = Graql.var(PERSON);
+        UnboundVariable age = Graql.var(AGE);
         return Graql.match(
                     person
                             .isa(PERSON)
