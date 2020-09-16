@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 
-public class RelocationAgent extends Neo4jAgent<World.> implements RelocationAgentBase {
+public class RelocationAgent extends Neo4jAgent<World.City> implements RelocationAgentBase {
 
     static Query cityResidentsQuery(World.City city, LocalDateTime earliestDate) {
         String template = "" +
@@ -24,33 +24,32 @@ public class RelocationAgent extends Neo4jAgent<World.> implements RelocationAge
     }
 
     @Override
-    protected List<String> getResidentEmails(LocalDateTime earliestDate) {
-        Query cityResidentsQuery = cityResidentsQuery(city(), earliestDate);
+    public List<String> getResidentEmails(World.City city, LocalDateTime earliestDate, int numRelocations) {
+        Query cityResidentsQuery = cityResidentsQuery(city, earliestDate);
         log().query("getResidentEmails", cityResidentsQuery);
-        int numRelocations = world().getScaleFactor();
-        return ((Transaction) tx()).getOrderedAttribute(cityResidentsQuery, "resident.email", numRelocations);
+        return tx().getOrderedAttribute(cityResidentsQuery, "resident.email", numRelocations);
     }
 
     @Override
-    protected List<String> getRelocationCityNames() {
+    public List<String> getRelocationCityNames(World.City city) {
         String template = "" +
                 "MATCH (city:City)-[:LOCATED_IN*2]->(continent:Continent {locationName: $continentName})\n" +
                 "WHERE NOT city.locationName = $cityName\n" +
                 "RETURN city.locationName";
 
         HashMap<String, Object> parameters = new HashMap<String, Object>(){{
-                put("continentName", city().country().continent().name());
-                put("cityName", city().name());
+                put("continentName", city.country().continent().name());
+                put("cityName", city.name());
         }};
 
         Query relocationCitiesQuery = new Query(template, parameters);
 
         log().query("getRelocationCityNames", relocationCitiesQuery);
-        return ((Transaction) tx()).getOrderedAttribute(relocationCitiesQuery, "city.locationName", null);
+        return tx().getOrderedAttribute(relocationCitiesQuery, "city.locationName", null);
     }
 
     @Override
-    protected void insertRelocation(String email, String newCityName) {
+    public void insertRelocation(World.City city, LocalDateTime today, String email, String newCityName) {
         // This raises questions over whether the person's residency end-date should be updated in this step, or
         // figured out at query-time, which would be more in-line with Grakn
 
@@ -65,15 +64,10 @@ public class RelocationAgent extends Neo4jAgent<World.> implements RelocationAge
         HashMap<String, Object> parameters = new HashMap<String, Object>(){{
                 put("email", email);
                 put("newCityName", newCityName);
-                put("relocationDate", today());
+                put("relocationDate", today);
         }};
         Query relocatePersonQuery = new Query(template, parameters);
         log().query("insertRelocation", relocatePersonQuery);
-        ((Transaction) tx()).execute(relocatePersonQuery);
-    }
-
-    @Override
-    protected int checkCount() {
-        return 0;
+        tx().execute(relocatePersonQuery);
     }
 }

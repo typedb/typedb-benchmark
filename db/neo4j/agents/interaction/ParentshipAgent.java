@@ -1,6 +1,7 @@
 package grakn.simulation.db.neo4j.agents.interaction;
 
 import grakn.simulation.db.common.agents.interaction.ParentshipAgentBase;
+import grakn.simulation.db.common.world.World;
 import grakn.simulation.db.neo4j.driver.Transaction;
 import org.neo4j.driver.Query;
 import org.neo4j.driver.Record;
@@ -11,10 +12,10 @@ import java.util.List;
 
 import static java.util.stream.Collectors.toList;
 
-public class ParentshipAgent extends Neo4jAgent<World.> implements ParentshipAgentBase {
+public class ParentshipAgent extends Neo4jAgent<World.City> implements ParentshipAgentBase {
 
     @Override
-    protected List<HashMap<Email, String>> getMarriageEmails() {
+    public List<HashMap<Email, String>> getMarriageEmails(World.City city) {
 
         String template = "" +
                 "MATCH (city:City {locationName: $locationName}),\n" +
@@ -24,13 +25,13 @@ public class ParentshipAgent extends Neo4jAgent<World.> implements ParentshipAge
                 "ORDER BY marriage.id ASC\n";
 
         HashMap<String, Object> parameters = new HashMap<String, Object>(){{
-                put("locationName", city().name());
+                put("locationName", city.name());
         }};
 
         Query query = new Query(template, parameters);
 
         log().query("getMarriageEmails", query);
-        List<Record> records = ((Transaction) tx()).execute(query);
+        List<Record> records = tx().execute(query);
 
         return records.stream().map(Record::asMap).map(r -> new HashMap<Email, String>() {{
             put(Email.WIFE, r.get("wife.email").toString());
@@ -39,25 +40,25 @@ public class ParentshipAgent extends Neo4jAgent<World.> implements ParentshipAge
     }
 
     @Override
-    protected List<String> getChildrenEmailsBorn(LocalDateTime dateToday) {
+    public List<String> getChildrenEmailsBorn(World.City city, LocalDateTime today) {
         String template = "" +
                 "MATCH (city:City {locationName: $locationName}),\n" +
                 "(child:Person {dateOfBirth: $dateOfBirth})-[:BORN_IN]->(city)\n" +
                 "RETURN child.email";
 
         HashMap<String, Object> parameters = new HashMap<String, Object>(){{
-                put("dateOfBirth", today());
-                put("locationName", city().name());
+                put("dateOfBirth", today);
+                put("locationName", city.name());
         }};
 
         Query childrenQuery = new Query(template, parameters);
 
         log().query("getChildrenEmails", childrenQuery);
-        return ((Transaction) tx()).getOrderedAttribute(childrenQuery, "child.email", null);
+        return tx().getOrderedAttribute(childrenQuery, "child.email", null);
     }
 
     @Override
-    protected void insertParentShip(HashMap<Email, String> marriage, List<String> childEmails) {
+    public void insertParentShip(HashMap<Email, String> marriage, List<String> childEmails) {
 
         String template = "" +
                 "MATCH (mother:Person {email: $motherEmail}), (father:Person {email: $fatherEmail}),\n" +
@@ -72,12 +73,7 @@ public class ParentshipAgent extends Neo4jAgent<World.> implements ParentshipAge
             }};
             Query parentshipQuery = new Query(template, parameters);
             log().query("insertParentShip", parentshipQuery);
-            ((Transaction) tx()).execute(parentshipQuery);
+            tx().execute(parentshipQuery);
         }
-    }
-
-    @Override
-    protected int checkCount() {
-        return 0;
     }
 }

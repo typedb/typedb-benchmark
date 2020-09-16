@@ -7,10 +7,10 @@ import org.neo4j.driver.Query;
 
 import java.util.HashMap;
 
-public class ProductAgent extends Neo4jAgent<World.> implements ProductAgentBase {
+public class ProductAgent extends Neo4jAgent<World.Continent> implements ProductAgentBase {
 
     @Override
-    protected void insertProduct(World.Continent continent, Double barcode, String productName, String productDescription) {
+    public void insertProduct(World.Continent continent, Double barcode, String productName, String productDescription) {
         String template = "" +
                 "MATCH (continent:Continent {locationName: $continentName})\n" +
                 "CREATE (product:Product {\n" +
@@ -19,14 +19,14 @@ public class ProductAgent extends Neo4jAgent<World.> implements ProductAgentBase
                 "   description: $description\n" +
                 "})-[:PRODUCED_IN]->(continent)";
         HashMap<String, Object> parameters = new HashMap<String, Object>(){{
-                put("continentName", continent().name());
+                put("continentName", continent.name());
                 put("barcode", barcode);
                 put("productName", productName);
                 put("description", productDescription);
         }};
         Query insertProductQuery = new Query(template, parameters);
         log().query("insertProduct", insertProductQuery);
-        ((Transaction) tx()).execute(insertProductQuery);
+        tx().execute(insertProductQuery);
     }
 
     static Query getProductsInContinentQuery(World.Continent continent) {
@@ -38,10 +38,5 @@ public class ProductAgent extends Neo4jAgent<World.> implements ProductAgentBase
                 put("continentName", continent.name());
         }};
         return new Query(template, parameters);
-    }
-
-    @Override
-    protected int checkCount() {
-        return 0;
     }
 }

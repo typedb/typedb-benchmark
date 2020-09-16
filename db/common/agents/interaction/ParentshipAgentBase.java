@@ -61,7 +61,7 @@ public interface ParentshipAgentBase extends InteractionAgent<World.City> {
 
     List<HashMap<Email, String>> getMarriageEmails(World.City city);
 
-    List<String> getChildrenEmailsBorn(World.City city, LocalDateTime dateToday);
+    List<String> getChildrenEmailsBorn(World.City city, LocalDateTime today);
 
     void insertParentShip(HashMap<Email, String> marriage, List<String> childEmails);
 

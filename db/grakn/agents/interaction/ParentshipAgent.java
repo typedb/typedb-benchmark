@@ -72,14 +72,14 @@ public class ParentshipAgent extends GraknAgent<World.City> implements Parentshi
     }
 
     @Override
-    public List<String> getChildrenEmailsBorn(World.City worldCity, LocalDateTime dateToday) {
+    public List<String> getChildrenEmailsBorn(World.City worldCity, LocalDateTime today) {
 
         GraqlGet.Unfiltered childrenQuery = Graql.match(
                 Graql.var("c").isa(CITY)
                         .has(LOCATION_NAME, worldCity.name()),
                 Graql.var("child").isa(PERSON)
                         .has(EMAIL, Graql.var(EMAIL))
-                        .has(DATE_OF_BIRTH, dateToday),
+                        .has(DATE_OF_BIRTH, today),
                 Graql.var("bi").isa(BORN_IN)
                         .rel(BORN_IN_PLACE_OF_BIRTH, "c")
                         .rel(BORN_IN_CHILD, "child")

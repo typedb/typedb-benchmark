@@ -5,24 +5,26 @@ import grakn.simulation.db.common.world.World;
 import grakn.simulation.db.neo4j.driver.Transaction;
 import org.neo4j.driver.Query;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 
-public class CompanyAgent extends Neo4jAgent<World.> implements CompanyAgentBase {
+public class CompanyAgent extends Neo4jAgent<World.Country> implements CompanyAgentBase {
     @Override
-    protected void insertCompany(int companyNumber, String companyName) {
+    public void insertCompany(World.Country country, LocalDateTime today, String scope, int companyNumber, String companyName) {
         String template = "" +
                 "MATCH (country:Country {locationName: $countryName})\n" +
                 "CREATE (country)-[:INCORPORATED_IN {dateOfIncorporation: $dateOfIncorporation}]->(company:Company {companyNumber: $companyNumber, companyName: $companyName})";
 
         HashMap<String, Object> parameters = new HashMap<String, Object>(){{
-                put("countryName", country().name());
+                put("countryName", country.name());
                 put("companyNumber", companyNumber);
                 put("companyName", companyName);
-                put("dateOfIncorporation", today());
+                put("dateOfIncorporation", today);
         }};
 
         Query companyQuery = new Query(template, parameters);
-        ((Transaction) tx()).execute(companyQuery);
+        log().query(scope, companyQuery);
+        tx().execute(companyQuery);
     }
 
     static Query getCompanyNumbersInContinentQuery(World.Continent continent) {
@@ -45,10 +47,5 @@ public class CompanyAgent extends Neo4jAgent<World.> implements CompanyAgentBase
                 put("countryName", country.name());
         }};
         return new Query(template, parameters);
-    }
-
-    @Override
-    protected int checkCount() {
-        return 0;
     }
 }

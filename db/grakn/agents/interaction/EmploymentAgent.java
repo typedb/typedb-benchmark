@@ -2,8 +2,6 @@ package grakn.simulation.db.grakn.agents.interaction;
 
 import grakn.simulation.db.common.agents.interaction.EmploymentAgentBase;
 import grakn.simulation.db.common.world.World;
-import grakn.simulation.db.grakn.context.GraknContext;
-import grakn.simulation.db.grakn.driver.Transaction;
 import graql.lang.Graql;
 import graql.lang.query.GraqlGet;
 import graql.lang.query.GraqlInsert;
@@ -40,21 +38,21 @@ import static grakn.simulation.db.grakn.schema.Schema.WAGE_VALUE;
 public class EmploymentAgent extends GraknAgent<World.City> implements EmploymentAgentBase {
 
     @Override
-    public List<Long> getCompanyNumbers(World.Country country, int numCompanies) {
+    public List<Long> getCompanyNumbers(World.Country country, String scope, int numCompanies) {
         GraqlGet companyNumbersQuery = CompanyAgent.getCompanyNumbersInCountryQuery(country);
-        log().query("getCompanyNumbers", companyNumbersQuery);
+        log().query(scope, companyNumbersQuery);
         return tx().getOrderedAttribute(companyNumbersQuery, COMPANY_NUMBER, numCompanies);
     }
 
     @Override
-    public List<String> getEmployeeEmails(World.City city, int numEmployments, LocalDateTime earliestDate) {
+    public List<String> getEmployeeEmails(World.City city, String scope, int numEmployments, LocalDateTime earliestDate) {
         GraqlGet getEmployeeEmailsQuery = cityResidentsQuery(city, earliestDate);
-        log().query("getEmployeeEmails", getEmployeeEmailsQuery);
+        log().query(scope, getEmployeeEmailsQuery);
         return tx().getOrderedAttribute(getEmployeeEmailsQuery, EMAIL, numEmployments);
     }
 
     @Override
-    public void insertEmployment(World.City worldCity, String employeeEmail, long companyNumber, LocalDateTime employmentDate, double wageValue, String contractContent, double contractedHours){
+    public void insertEmployment(World.City worldCity, String scope, String employeeEmail, long companyNumber, LocalDateTime employmentDate, double wageValue, String contractContent, double contractedHours){
         Statement city = Graql.var(CITY);
         Statement person = Graql.var(PERSON);
         Statement company = Graql.var(COMPANY);
@@ -111,7 +109,7 @@ public class EmploymentAgent extends GraknAgent<World.City> implements Employmen
                         .has(CONTRACT_CONTENT, contractContentVar)
                         .has(CONTRACTED_HOURS, contractedHoursVar)
         );
-        log().query("insertEmployment", insertEmploymentQuery);
+        log().query(scope, insertEmploymentQuery);
         tx().execute(insertEmploymentQuery);
     }
 
