@@ -5,7 +5,7 @@ import grakn.simulation.db.common.yaml_tool.YAMLLoader;
 import grakn.simulation.db.neo4j.yaml_tool.Neo4jYAMLLoader;
 import org.neo4j.driver.Session;
 
-import java.io.IOException;
+import java.io.FileNotFoundException;
 import java.nio.file.Path;
 import java.util.Map;
 
@@ -19,9 +19,13 @@ public class Neo4jInitialiser {
         this.files = files;
     }
 
-    public void initialise() throws IOException, YAMLException {
+    public void initialise() {
         YAMLLoader loader = new Neo4jYAMLLoader(session, files);
-        loader.loadFile(files.get("neo4j_data.yml").toFile());
+        try {
+            loader.loadFile(files.get("neo4j_data.yml").toFile());
+        } catch (YAMLException | FileNotFoundException e) {
+            e.printStackTrace();
+        }
         // TODO Add key constraints
     }
 }
