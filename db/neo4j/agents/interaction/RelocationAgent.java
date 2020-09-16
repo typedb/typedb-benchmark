@@ -2,15 +2,14 @@ package grakn.simulation.db.neo4j.agents.interaction;
 
 import grakn.simulation.db.common.agents.interaction.RelocationAgentBase;
 import grakn.simulation.db.common.world.World;
-import grakn.simulation.db.neo4j.common.Neo4jContext;
-import grakn.simulation.db.neo4j.driver.Neo4jDriverWrapper;
+import grakn.simulation.db.neo4j.driver.Transaction;
 import org.neo4j.driver.Query;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 
-public class RelocationAgent extends RelocationAgentBase<Neo4jContext> {
+public class RelocationAgent extends Neo4jAgent<World.> implements RelocationAgentBase {
 
     static Query cityResidentsQuery(World.City city, LocalDateTime earliestDate) {
         String template = "" +
@@ -29,7 +28,7 @@ public class RelocationAgent extends RelocationAgentBase<Neo4jContext> {
         Query cityResidentsQuery = cityResidentsQuery(city(), earliestDate);
         log().query("getResidentEmails", cityResidentsQuery);
         int numRelocations = world().getScaleFactor();
-        return ((Neo4jDriverWrapper.Session.Transaction) tx()).getOrderedAttribute(cityResidentsQuery, "resident.email", numRelocations);
+        return ((Transaction) tx()).getOrderedAttribute(cityResidentsQuery, "resident.email", numRelocations);
     }
 
     @Override
@@ -47,7 +46,7 @@ public class RelocationAgent extends RelocationAgentBase<Neo4jContext> {
         Query relocationCitiesQuery = new Query(template, parameters);
 
         log().query("getRelocationCityNames", relocationCitiesQuery);
-        return ((Neo4jDriverWrapper.Session.Transaction) tx()).getOrderedAttribute(relocationCitiesQuery, "city.locationName", null);
+        return ((Transaction) tx()).getOrderedAttribute(relocationCitiesQuery, "city.locationName", null);
     }
 
     @Override
@@ -70,7 +69,7 @@ public class RelocationAgent extends RelocationAgentBase<Neo4jContext> {
         }};
         Query relocatePersonQuery = new Query(template, parameters);
         log().query("insertRelocation", relocatePersonQuery);
-        ((Neo4jDriverWrapper.Session.Transaction) tx()).execute(relocatePersonQuery);
+        ((Transaction) tx()).execute(relocatePersonQuery);
     }
 
     @Override

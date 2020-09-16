@@ -2,13 +2,12 @@ package grakn.simulation.db.neo4j.agents.interaction;
 
 import grakn.simulation.db.common.agents.interaction.CompanyAgentBase;
 import grakn.simulation.db.common.world.World;
-import grakn.simulation.db.neo4j.common.Neo4jContext;
-import grakn.simulation.db.neo4j.driver.Neo4jDriverWrapper;
+import grakn.simulation.db.neo4j.driver.Transaction;
 import org.neo4j.driver.Query;
 
 import java.util.HashMap;
 
-public class CompanyAgent extends CompanyAgentBase<Neo4jContext> {
+public class CompanyAgent extends Neo4jAgent<World.> implements CompanyAgentBase {
     @Override
     protected void insertCompany(int companyNumber, String companyName) {
         String template = "" +
@@ -23,7 +22,7 @@ public class CompanyAgent extends CompanyAgentBase<Neo4jContext> {
         }};
 
         Query companyQuery = new Query(template, parameters);
-        ((Neo4jDriverWrapper.Session.Transaction) tx()).execute(companyQuery);
+        ((Transaction) tx()).execute(companyQuery);
     }
 
     static Query getCompanyNumbersInContinentQuery(World.Continent continent) {

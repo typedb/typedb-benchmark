@@ -5,7 +5,6 @@ java_library(
     deps = [
         "//db/common/agents",
         "//db/common/context",
-        "//db/common/driver",
         "//db/common/world",
         "//db/common/yaml_tool",
         "@graknlabs_grabl_tracing//client",

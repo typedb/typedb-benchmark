@@ -1,10 +1,18 @@
 package grakn.simulation.db.grakn.context;
 
+import grabl.tracing.client.GrablTracingThreadStatic;
 import grakn.client.GraknClient;
 import grakn.simulation.db.common.context.DatabaseContext;
 import grakn.simulation.db.grakn.driver.Transaction;
 
 import java.util.concurrent.ConcurrentHashMap;
+
+import static grabl.tracing.client.GrablTracingThreadStatic.traceOnThread;
+import static grakn.simulation.db.common.context.DatabaseContext.TracingLabel.CLOSE_CLIENT;
+import static grakn.simulation.db.common.context.DatabaseContext.TracingLabel.CLOSE_SESSION;
+import static grakn.simulation.db.common.context.DatabaseContext.TracingLabel.OPEN_CLIENT;
+import static grakn.simulation.db.common.context.DatabaseContext.TracingLabel.OPEN_SESSION;
+import static grakn.simulation.db.common.context.DatabaseContext.TracingLabel.OPEN_TRANSACTION;
 
 public class GraknContext extends DatabaseContext {
 
@@ -13,27 +21,39 @@ public class GraknContext extends DatabaseContext {
     private final ConcurrentHashMap<String, GraknClient.Session> sessionMap = new ConcurrentHashMap<>();
 
     public GraknContext(String hostUri, String database) {
-        this.client = new GraknClient(hostUri);
+        try (GrablTracingThreadStatic.ThreadTrace trace = traceOnThread(OPEN_CLIENT.getName())) {
+            this.client = new GraknClient(hostUri);
+        }
         this.database = database;
     }
 
     public GraknClient.Session session(String sessionKey) {
-        return sessionMap.computeIfAbsent(sessionKey, k -> client.session(database));
+        return sessionMap.computeIfAbsent(sessionKey, k -> {
+            try (GrablTracingThreadStatic.ThreadTrace trace = traceOnThread(OPEN_SESSION.getName())) {
+                return client.session(database);
+            }
+        });
     }
 
     public Transaction tx(String sessionKey) {
-        return new Transaction(session(sessionKey).transaction(GraknClient.Transaction.Type.WRITE));
+        try (GrablTracingThreadStatic.ThreadTrace trace = traceOnThread(OPEN_TRANSACTION.getName())) {
+            return new Transaction(session(sessionKey).transaction(GraknClient.Transaction.Type.WRITE));
+        }
     }
 
     public void closeSessions() {
         for (GraknClient.Session session : sessionMap.values()) {
-            session.close();
+            try (GrablTracingThreadStatic.ThreadTrace trace = traceOnThread(CLOSE_SESSION.getName())) {
+                session.close();
+            }
         }
         sessionMap.clear();
     }
 
     public void close() {
         closeSessions();
-        client.close();
+        try (GrablTracingThreadStatic.ThreadTrace trace = traceOnThread(CLOSE_CLIENT.getName())) {
+            client.close();
+        }
     }
 }

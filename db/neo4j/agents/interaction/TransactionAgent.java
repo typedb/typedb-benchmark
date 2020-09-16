@@ -2,8 +2,7 @@ package grakn.simulation.db.neo4j.agents.interaction;
 
 import grakn.simulation.db.common.agents.interaction.TransactionAgentBase;
 import grakn.simulation.db.common.agents.utils.Pair;
-import grakn.simulation.db.neo4j.common.Neo4jContext;
-import grakn.simulation.db.neo4j.driver.Neo4jDriverWrapper;
+import grakn.simulation.db.neo4j.driver.Transaction;
 import org.neo4j.driver.Query;
 
 import java.util.HashMap;
@@ -12,19 +11,19 @@ import java.util.List;
 import static grakn.simulation.db.neo4j.agents.interaction.CompanyAgent.getCompanyNumbersInContinentQuery;
 import static grakn.simulation.db.neo4j.agents.interaction.ProductAgent.getProductsInContinentQuery;
 
-public class TransactionAgent extends TransactionAgentBase<Neo4jContext> {
+public class TransactionAgent extends Neo4jAgent<World.> implements TransactionAgentBase {
     @Override
     protected List<Long> getCompanyNumbersInContinent() {
         Query companiesQuery = getCompanyNumbersInContinentQuery(continent());
         log().query("getCompanyNumbersInContinent", companiesQuery);
-        return ((Neo4jDriverWrapper.Session.Transaction) tx()).getOrderedAttribute(companiesQuery, "company.companyNumber", null);
+        return ((Transaction) tx()).getOrderedAttribute(companiesQuery, "company.companyNumber", null);
     }
 
     @Override
     protected List<Double> getProductBarcodesInContinent() {
         Query productsQuery = getProductsInContinentQuery(continent());
         log().query("getProductBarcodesInContinent", productsQuery);
-        return ((Neo4jDriverWrapper.Session.Transaction) tx()).getOrderedAttribute(productsQuery, "product.barcode", null);
+        return ((Transaction) tx()).getOrderedAttribute(productsQuery, "product.barcode", null);
     }
 
     @Override
@@ -55,7 +54,7 @@ public class TransactionAgent extends TransactionAgentBase<Neo4jContext> {
         }};
         Query insertTransactionQuery = new Query(template, parameters);
         log().query("insertTransaction", insertTransactionQuery);
-        ((Neo4jDriverWrapper.Session.Transaction) tx()).execute(insertTransactionQuery);
+        ((Transaction) tx()).execute(insertTransactionQuery);
     }
 
     @Override

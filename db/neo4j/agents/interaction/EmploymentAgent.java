@@ -1,8 +1,7 @@
 package grakn.simulation.db.neo4j.agents.interaction;
 
 import grakn.simulation.db.common.agents.interaction.EmploymentAgentBase;
-import grakn.simulation.db.neo4j.common.Neo4jContext;
-import grakn.simulation.db.neo4j.driver.Neo4jDriverWrapper;
+import grakn.simulation.db.neo4j.driver.Transaction;
 import org.neo4j.driver.Query;
 
 import java.time.LocalDateTime;
@@ -11,13 +10,13 @@ import java.util.List;
 
 import static grakn.simulation.db.neo4j.agents.interaction.RelocationAgent.cityResidentsQuery;
 
-public class EmploymentAgent extends EmploymentAgentBase<Neo4jContext> {
+public class EmploymentAgent extends Neo4jAgent<World.> implements EmploymentAgentBase {
     @Override
     protected List<Long> getCompanyNumbers() {
         Query companyNumbersQuery = CompanyAgent.getCompanyNumbersInCountryQuery(city().country());
         log().query("getEmployeeEmails", companyNumbersQuery);
         int numCompanies = world().getScaleFactor();
-        return ((Neo4jDriverWrapper.Session.Transaction) tx()).getOrderedAttribute(companyNumbersQuery, "company.companyNumber", numCompanies);
+        return ((Transaction) tx()).getOrderedAttribute(companyNumbersQuery, "company.companyNumber", numCompanies);
     }
 
     @Override
@@ -25,7 +24,7 @@ public class EmploymentAgent extends EmploymentAgentBase<Neo4jContext> {
         Query getEmployeeEmailsQuery = cityResidentsQuery(city(), earliestDate);
         log().query("getEmployeeEmails", getEmployeeEmailsQuery);
         int numEmployments = world().getScaleFactor();
-        return ((Neo4jDriverWrapper.Session.Transaction) tx()).getOrderedAttribute(getEmployeeEmailsQuery, "resident.email", numEmployments);
+        return ((Transaction) tx()).getOrderedAttribute(getEmployeeEmailsQuery, "resident.email", numEmployments);
     }
 
     @Override
@@ -53,7 +52,7 @@ public class EmploymentAgent extends EmploymentAgentBase<Neo4jContext> {
 
         Query insertEmploymentQuery = new Query(template, parameters);
         log().query("insertEmployment", insertEmploymentQuery);
-        ((Neo4jDriverWrapper.Session.Transaction) tx()).execute(insertEmploymentQuery);
+        ((Transaction) tx()).execute(insertEmploymentQuery);
     }
 
     @Override

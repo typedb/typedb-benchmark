@@ -2,13 +2,12 @@ package grakn.simulation.db.neo4j.agents.interaction;
 
 import grakn.simulation.db.common.agents.interaction.ProductAgentBase;
 import grakn.simulation.db.common.world.World;
-import grakn.simulation.db.neo4j.common.Neo4jContext;
-import grakn.simulation.db.neo4j.driver.Neo4jDriverWrapper;
+import grakn.simulation.db.neo4j.driver.Transaction;
 import org.neo4j.driver.Query;
 
 import java.util.HashMap;
 
-public class ProductAgent extends ProductAgentBase<Neo4jContext> {
+public class ProductAgent extends Neo4jAgent<World.> implements ProductAgentBase {
 
     @Override
     protected void insertProduct(World.Continent continent, Double barcode, String productName, String productDescription) {
@@ -27,7 +26,7 @@ public class ProductAgent extends ProductAgentBase<Neo4jContext> {
         }};
         Query insertProductQuery = new Query(template, parameters);
         log().query("insertProduct", insertProductQuery);
-        ((Neo4jDriverWrapper.Session.Transaction) tx()).execute(insertProductQuery);
+        ((Transaction) tx()).execute(insertProductQuery);
     }
 
     static Query getProductsInContinentQuery(World.Continent continent) {

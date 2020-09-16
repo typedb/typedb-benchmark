@@ -1,8 +1,7 @@
 package grakn.simulation.db.neo4j.agents.interaction;
 
 import grakn.simulation.db.common.agents.interaction.ParentshipAgentBase;
-import grakn.simulation.db.neo4j.common.Neo4jContext;
-import grakn.simulation.db.neo4j.driver.Neo4jDriverWrapper;
+import grakn.simulation.db.neo4j.driver.Transaction;
 import org.neo4j.driver.Query;
 import org.neo4j.driver.Record;
 
@@ -12,7 +11,7 @@ import java.util.List;
 
 import static java.util.stream.Collectors.toList;
 
-public class ParentshipAgent extends ParentshipAgentBase<Neo4jContext> {
+public class ParentshipAgent extends Neo4jAgent<World.> implements ParentshipAgentBase {
 
     @Override
     protected List<HashMap<Email, String>> getMarriageEmails() {
@@ -31,7 +30,7 @@ public class ParentshipAgent extends ParentshipAgentBase<Neo4jContext> {
         Query query = new Query(template, parameters);
 
         log().query("getMarriageEmails", query);
-        List<Record> records = ((Neo4jDriverWrapper.Session.Transaction) tx()).execute(query);
+        List<Record> records = ((Transaction) tx()).execute(query);
 
         return records.stream().map(Record::asMap).map(r -> new HashMap<Email, String>() {{
             put(Email.WIFE, r.get("wife.email").toString());
@@ -54,7 +53,7 @@ public class ParentshipAgent extends ParentshipAgentBase<Neo4jContext> {
         Query childrenQuery = new Query(template, parameters);
 
         log().query("getChildrenEmails", childrenQuery);
-        return ((Neo4jDriverWrapper.Session.Transaction) tx()).getOrderedAttribute(childrenQuery, "child.email", null);
+        return ((Transaction) tx()).getOrderedAttribute(childrenQuery, "child.email", null);
     }
 
     @Override
@@ -73,7 +72,7 @@ public class ParentshipAgent extends ParentshipAgentBase<Neo4jContext> {
             }};
             Query parentshipQuery = new Query(template, parameters);
             log().query("insertParentShip", parentshipQuery);
-            ((Neo4jDriverWrapper.Session.Transaction) tx()).execute(parentshipQuery);
+            ((Transaction) tx()).execute(parentshipQuery);
         }
     }
 

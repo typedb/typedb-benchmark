@@ -1,8 +1,7 @@
 package grakn.simulation.db.neo4j.agents.interaction;
 
 import grakn.simulation.db.common.agents.interaction.FriendshipAgentBase;
-import grakn.simulation.db.neo4j.common.Neo4jContext;
-import grakn.simulation.db.neo4j.driver.Neo4jDriverWrapper;
+import grakn.simulation.db.neo4j.driver.Transaction;
 import org.neo4j.driver.Query;
 
 import java.time.LocalDateTime;
@@ -11,13 +10,13 @@ import java.util.List;
 
 import static grakn.simulation.db.neo4j.agents.interaction.RelocationAgent.cityResidentsQuery;
 
-public class FriendshipAgent extends FriendshipAgentBase<Neo4jContext> {
+public class FriendshipAgent extends Neo4jAgent<World.> implements FriendshipAgentBase {
 
     @Override
     protected List<String> getResidentEmails(LocalDateTime earliestDate) {
         Query cityResidentsQuery = cityResidentsQuery(city(), earliestDate);
         log().query("getResidentEmails", cityResidentsQuery);
-        return ((Neo4jDriverWrapper.Session.Transaction) tx()).getOrderedAttribute(cityResidentsQuery, "resident.email", null);
+        return ((Transaction) tx()).getOrderedAttribute(cityResidentsQuery, "resident.email", null);
     }
 
     @Override
@@ -36,7 +35,7 @@ public class FriendshipAgent extends FriendshipAgentBase<Neo4jContext> {
         }};
         Query insertFriendshipQuery = new Query(template, parameters);
         log().query("insertFriendship", insertFriendshipQuery);
-        ((Neo4jDriverWrapper.Session.Transaction) tx()).execute(insertFriendshipQuery);
+        ((Transaction) tx()).execute(insertFriendshipQuery);
     }
 
     @Override

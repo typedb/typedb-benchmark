@@ -14,7 +14,6 @@ java_library(
         "//db/common:simulation-common",
         "//db/common/context",
         "//db/common/agents",
-        "//db/common/driver",
         "//db/common/initialise",
         "//db/common/world",
         "//db/common/yaml_tool",

@@ -1,7 +1,5 @@
 package grakn.simulation.db.neo4j.initialise;
 
-import grabl.tracing.client.GrablTracingThreadStatic;
-import grakn.simulation.db.common.driver.DriverWrapper;
 import grakn.simulation.db.common.initialise.Initialiser;
 import grakn.simulation.db.common.yaml_tool.YAMLException;
 import grakn.simulation.db.common.yaml_tool.YAMLLoader;

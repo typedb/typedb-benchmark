@@ -6,7 +6,6 @@ import grakn.simulation.config.ConfigLoader;
 import grakn.simulation.db.common.Simulation;
 import grakn.simulation.db.common.agents.base.AgentRunner;
 import grakn.simulation.db.common.agents.base.ResultHandler;
-import grakn.simulation.db.common.driver.ConnectionWrapper;
 import grakn.simulation.db.common.initialise.AgentPicker;
 import grakn.simulation.db.common.initialise.Initialiser;
 import grakn.simulation.db.common.world.World;
@@ -82,7 +81,6 @@ public class SimulationRunner {
         String defaultUri;
         AgentPicker agentPicker;
         Initialiser initialiser;
-        ConnectionWrapper connectionWrapper;
         List<AgentRunner<?, ?>> agentRunnerList;
 
         LOG.info("Welcome to the Simulation!");

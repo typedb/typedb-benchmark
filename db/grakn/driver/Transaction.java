@@ -13,8 +13,8 @@ import java.util.stream.Stream;
 
 import static com.google.common.collect.Iterables.getOnlyElement;
 import static grabl.tracing.client.GrablTracingThreadStatic.traceOnThread;
-import static grakn.simulation.db.common.driver.DriverWrapper.TracingLabel.EXECUTE;
-import static grakn.simulation.db.common.driver.DriverWrapper.TracingLabel.STREAM_AND_SORT;
+import static grakn.simulation.db.common.context.DatabaseContext.TracingLabel.EXECUTE;
+import static grakn.simulation.db.common.context.DatabaseContext.TracingLabel.STREAM_AND_SORT;
 
 public class Transaction {
 
