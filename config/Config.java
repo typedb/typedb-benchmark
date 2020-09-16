@@ -93,7 +93,7 @@ public class Config {
             // This method is needed because snakeyaml doesn't support declaring a constructor for this class
             Agent agent = new Agent();
             agent.setName(name);
-            agent.setMode(agentMode.name());
+            agent.setMode(agentMode);
             return agent;
         }
 
@@ -119,6 +119,10 @@ public class Config {
                 default:
                     throw new IllegalArgumentException(String.format("Unrecognised agent mode %s", mode));
             }
+        }
+
+        public void setMode(AgentMode mode) {
+            this.agentMode = mode;
         }
 
         public AgentMode getAgentMode() {
