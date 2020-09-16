@@ -89,11 +89,12 @@ public class Config {
         private Schema.AgentMode agentMode;
         private String name;
 
-//        public static Agent ConstructAgent(String name, Schema.AgentMode agentMode) {
-        public Agent(String name, Schema.AgentMode agentMode) {
-            // snakeyaml doesn't support having a second constructor for this class
-            this.name = name;
-            this.agentMode = agentMode;
+        public static Agent ConstructAgentConfig(String name, Schema.AgentMode agentMode) {
+            // This method is needed because snakeyaml doesn't support declaring a constructor for this class
+            Agent agent = new Agent();
+            agent.setName(name);
+            agent.setMode(agentMode.name());
+            return agent;
         }
 
         public void setName(String name) {

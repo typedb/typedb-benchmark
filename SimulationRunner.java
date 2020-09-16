@@ -36,7 +36,7 @@ import static grakn.simulation.db.common.world.World.initialise;
 public class SimulationRunner {
 
     final static Logger LOG = LoggerFactory.getLogger(SimulationRunner.class);
-    private final static String DEFAULT_CONFIG_YAML = "config/config.yaml";
+    private final static String DEFAULT_CONFIG_YAML = "config/config_big.yml";
 
     public static void main(String[] args) {
 

@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
 
+import static grakn.simulation.config.Config.Agent.ConstructAgentConfig;
 import static grakn.simulation.db.common.world.World.initialise;
 
 public class SimulationsUnderTest {
@@ -85,7 +86,7 @@ public class SimulationsUnderTest {
         agentNames.add("ageUpdate");
 
         ArrayList<Config.Agent> agentConfigs = new ArrayList<>();
-        agentNames.forEach(name -> agentConfigs.add(new Config.Agent(name, Schema.AgentMode.RUN)));
+        agentNames.forEach(name -> agentConfigs.add(ConstructAgentConfig(name, Schema.AgentMode.RUN)));
 
         World world = initialise(scaleFactor, files);
 

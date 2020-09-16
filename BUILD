@@ -41,7 +41,7 @@ java_binary(
         "//db/grakn/schema:graql-schema",
         "//db/neo4j/data",
     ],
-    main_class = "grakn.simulation.Simulation",
+    main_class = "grakn.simulation.SimulationRunner",
     runtime_deps = [":simulation-lib"],
 )
 
