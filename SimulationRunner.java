@@ -10,6 +10,7 @@ import grakn.simulation.db.common.agents.base.ResultHandler;
 import grakn.simulation.db.common.initialise.AgentPicker;
 import grakn.simulation.db.common.world.World;
 import grakn.simulation.db.grakn.GraknSimulation;
+import grakn.simulation.db.neo4j.Neo4jSimulation;
 import grakn.simulation.utils.RandomSource;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -112,22 +113,20 @@ public class SimulationRunner {
                         );
                         break;
 
-//                    case "neo4j":
-//                        defaultUri = "bolt://localhost:7687";
-//                        if (hostUri == null) hostUri = defaultUri;
-//                        agentPicker = new Neo4jAgentPicker();
-//                        agentRunnerList = agentRunnerNamesFromConfig(config, agentPicker);
-//
-//                        simulation = new Neo4jSimulation(
-//                                hostUri,
-//                                initialisationDataFiles,
-//                                new RandomSource(config.getRandomSeed()),
-//                                world,
-//                                agentRunnerList,
-//                                config.getTraceSampling().getSamplingFunction(),
-//                                new ResultHandler()
-//                        );
-//                        break;
+                    case "neo4j":
+                        defaultUri = "bolt://localhost:7687";
+                        if (hostUri == null) hostUri = defaultUri;
+
+                        simulation = new Neo4jSimulation(
+                                hostUri,
+                                initialisationDataFiles,
+                                new RandomSource(config.getRandomSeed()),
+                                world,
+                                config.getAgents(),
+                                config.getTraceSampling().getSamplingFunction(),
+                                new ResultHandler()
+                        );
+                        break;
 
                     default:
                         throw new IllegalArgumentException("Unexpected value: " + dbName);
