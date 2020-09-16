@@ -47,7 +47,7 @@ public class GraknInitialiser extends Initialiser {
     @Override
     protected void initialiseData(DriverWrapper.Session session) throws IOException, YAMLException {
         YAMLLoader loader = new GraknYAMLLoader(session, files);
-        loader.loadFile(files.get("grakn_data.yaml").toFile());
+        loader.loadFile(files.get("grakn_data.yml").toFile());
     }
 
     @Override
