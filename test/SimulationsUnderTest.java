@@ -1,7 +1,8 @@
 package grakn.simulation.test;
 
+import grakn.simulation.config.AgentMode;
 import grakn.simulation.config.Config;
-import grakn.simulation.config.Schema;
+import grakn.simulation.config.SamplingFunction;
 import grakn.simulation.db.common.agents.base.ResultHandler;
 import grakn.simulation.db.common.world.World;
 import grakn.simulation.db.grakn.GraknSimulation;
@@ -60,7 +61,7 @@ public class SimulationsUnderTest {
         int scaleFactor = 5;
         int randomSeed = 1;
 
-        Function<Integer, Boolean> samplingFunction = Schema.SamplingFunction.applyArg(Schema.SamplingFunction.getByName("every"), 1);
+        Function<Integer, Boolean> samplingFunction = SamplingFunction.applyArg(SamplingFunction.getByName("every"), 1);
 
         Map<String, Path> files = new HashMap<>();
 
@@ -86,7 +87,7 @@ public class SimulationsUnderTest {
         agentNames.add("ageUpdate");
 
         ArrayList<Config.Agent> agentConfigs = new ArrayList<>();
-        agentNames.forEach(name -> agentConfigs.add(ConstructAgentConfig(name, Schema.AgentMode.RUN)));
+        agentNames.forEach(name -> agentConfigs.add(ConstructAgentConfig(name, AgentMode.RUN)));
 
         World world = initialise(scaleFactor, files);
 
