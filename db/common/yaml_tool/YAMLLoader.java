@@ -1,6 +1,5 @@
 package grakn.simulation.db.common.yaml_tool;
 
-import grakn.simulation.db.common.driver.DriverWrapper;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.yaml.snakeyaml.Yaml;
@@ -27,7 +26,6 @@ public abstract class YAMLLoader {
 
     // Instances of YAML should not be shared across threads but are okay to be re-used within a thread.
     protected static final ThreadLocal<Yaml> THREAD_YAML = ThreadLocal.withInitial(Yaml::new);
-    protected DriverWrapper.Session session;
     private final Map<String, Path> accessibleFiles;
 
     public YAMLLoader(Map<String, Path> accessibleFiles) {

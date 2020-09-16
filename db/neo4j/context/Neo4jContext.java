@@ -1,4 +1,4 @@
-package grakn.simulation.db.neo4j.common;
+package grakn.simulation.db.neo4j.context;
 
 import grabl.tracing.client.GrablTracingThreadStatic;
 import grakn.simulation.db.common.context.DatabaseContext;

@@ -18,6 +18,7 @@ java_library(
         "//db/common/world",
         "//db/common/yaml_tool",
         "//config:config",
+        "//utils",
         "@graknlabs_grabl_tracing//client",
         "@maven//:org_apache_commons_commons_csv",
         "@maven//:org_apache_commons_commons_lang3",

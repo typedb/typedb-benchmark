@@ -5,7 +5,7 @@ import grakn.simulation.db.common.Simulation;
 import grakn.simulation.db.common.agents.base.ResultHandler;
 import grakn.simulation.db.common.initialise.AgentPicker;
 import grakn.simulation.db.common.world.World;
-import grakn.simulation.db.neo4j.common.Neo4jContext;
+import grakn.simulation.db.neo4j.context.Neo4jContext;
 import grakn.simulation.db.neo4j.initialise.Neo4jAgentPicker;
 import grakn.simulation.db.neo4j.initialise.Neo4jInitialiser;
 import grakn.simulation.utils.RandomSource;

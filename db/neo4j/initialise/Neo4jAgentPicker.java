@@ -4,7 +4,6 @@ import grakn.simulation.db.common.agents.region.CityAgentRunner;
 import grakn.simulation.db.common.agents.region.ContinentAgentRunner;
 import grakn.simulation.db.common.agents.region.CountryAgentRunner;
 import grakn.simulation.db.common.initialise.AgentPicker;
-import grakn.simulation.db.grakn.context.GraknContext;
 import grakn.simulation.db.neo4j.agents.interaction.AgeUpdateAgent;
 import grakn.simulation.db.neo4j.agents.interaction.CompanyAgent;
 import grakn.simulation.db.neo4j.agents.interaction.EmploymentAgent;
@@ -15,7 +14,7 @@ import grakn.simulation.db.neo4j.agents.interaction.PersonBirthAgent;
 import grakn.simulation.db.neo4j.agents.interaction.ProductAgent;
 import grakn.simulation.db.neo4j.agents.interaction.RelocationAgent;
 import grakn.simulation.db.neo4j.agents.interaction.TransactionAgent;
-import grakn.simulation.db.neo4j.common.Neo4jContext;
+import grakn.simulation.db.neo4j.context.Neo4jContext;
 
 import static grakn.simulation.db.common.agents.region.CityAgentRunner.SessionStrategy.CITY;
 
