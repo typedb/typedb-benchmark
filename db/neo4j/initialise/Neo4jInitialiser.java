@@ -19,7 +19,7 @@ public class Neo4jInitialiser extends Initialiser {
 
     protected void initialiseData(DriverWrapper.Session session) throws IOException, YAMLException {
         YAMLLoader loader = new Neo4jYAMLLoader(session, files);
-        loader.loadFile(files.get("neo4j_data.yaml").toFile());
+        loader.loadFile(files.get("neo4j_data.yml").toFile());
     }
 
     @Override

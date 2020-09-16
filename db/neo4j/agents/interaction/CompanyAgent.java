@@ -21,7 +21,7 @@ public class CompanyAgent extends grakn.simulation.db.common.agents.interaction.
         }};
 
         Query companyQuery = new Query(template, parameters);
-        ((Neo4jDriverWrapper.Session.Transaction) tx()).run(companyQuery);
+        ((Neo4jDriverWrapper.Session.Transaction) tx()).execute(companyQuery);
     }
 
     static Query getCompanyNumbersInContinentQuery(World.Continent continent) {
@@ -44,5 +44,10 @@ public class CompanyAgent extends grakn.simulation.db.common.agents.interaction.
                 put("countryName", country.name());
         }};
         return new Query(template, parameters);
+    }
+
+    @Override
+    protected int checkCount() {
+        return 0;
     }
 }

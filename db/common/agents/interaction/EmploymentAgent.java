@@ -1,10 +1,14 @@
 package grakn.simulation.db.common.agents.interaction;
 
+import grakn.simulation.db.common.agents.base.AgentResultSet;
+import grakn.simulation.db.common.agents.utils.Pair;
 import grakn.simulation.db.common.agents.world.CityAgent;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static grabl.tracing.client.GrablTracingThreadStatic.ThreadTrace;
+import static grabl.tracing.client.GrablTracingThreadStatic.traceOnThread;
 import static grakn.simulation.db.common.agents.utils.Allocation.allocate;
 
 public abstract class EmploymentAgent extends CityAgent {
@@ -17,25 +21,35 @@ public abstract class EmploymentAgent extends CityAgent {
     private static final int MAX_CONTRACT_CHARACTER_LENGTH = 600;
 
     private LocalDateTime employmentDate;
+    private int numEmployments;
 
     @Override
-    public final void iterate() {
+    public final AgentResultSet iterate() {
         employmentDate = today().minusYears(2);
 
         List<String> employeeEmails;
         List<Long> companyNumbers;
-        employeeEmails = getEmployeeEmails(employmentDate);
-        companyNumbers = getCompanyNumbers();
-        tx().commit();
-        closeTx();
+        try (ThreadTrace trace = traceOnThread(this.registerMethodTrace("getEmployeeEmails"))) {
+            employeeEmails = getEmployeeEmails(employmentDate);
+        }
+        numEmployments = employeeEmails.size();
+        try (ThreadTrace trace = traceOnThread(this.registerMethodTrace("getCompanyNumbers"))) {
+            companyNumbers = getCompanyNumbers();
+        }
+        commitTxWithTracing();
         // A second transaction is being used to circumvent graknlabs/grakn issue #5585
-        allocate(employeeEmails, companyNumbers, (employeeEmail, companyNumber) -> {
+        boolean allocated = allocate(employeeEmails, companyNumbers, (employeeEmail, companyNumber) -> {
             double wageValue = randomAttributeGenerator().boundRandomDouble(MIN_ANNUAL_WAGE, MAX_ANNUAL_WAGE);
             String contractContent = randomAttributeGenerator().boundRandomLengthRandomString(MIN_CONTRACT_CHARACTER_LENGTH, MAX_CONTRACT_CHARACTER_LENGTH);
             double contractedHours = randomAttributeGenerator().boundRandomDouble(MIN_CONTRACTED_HOURS, MAX_CONTRACTED_HOURS);
-            insertEmployment(employeeEmail, companyNumber, employmentDate, wageValue, contractContent, contractedHours);
+            try (ThreadTrace trace = traceOnThread(this.checkMethodTrace("insertEmployment"))) {
+                insertEmployment(employeeEmail, companyNumber, employmentDate, wageValue, contractContent, contractedHours);
+            }
         });
-        tx().commit();
+        if (allocated) {
+            commitTxWithTracing();
+        }
+        return null;
     }
 
     protected abstract List<Long> getCompanyNumbers();
@@ -43,4 +57,8 @@ public abstract class EmploymentAgent extends CityAgent {
     protected abstract List<String> getEmployeeEmails(LocalDateTime earliestDate);
 
     protected abstract void insertEmployment(String employeeEmail, long companyNumber, LocalDateTime employmentDate, double wageValue, String contractContent, double contractedHours);
+
+    protected Pair<Integer, Integer> countBounds() {
+        return new Pair<>(numEmployments, numEmployments);
+    }
 }

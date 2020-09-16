@@ -53,6 +53,11 @@ public class TransactionAgent extends grakn.simulation.db.common.agents.interact
         }};
         Query insertTransactionQuery = new Query(template, parameters);
         log().query("insertTransaction", insertTransactionQuery);
-        ((Neo4jDriverWrapper.Session.Transaction) tx()).run(insertTransactionQuery);
+        ((Neo4jDriverWrapper.Session.Transaction) tx()).execute(insertTransactionQuery);
+    }
+
+    @Override
+    protected int checkCount() {
+        return 0;
     }
 }

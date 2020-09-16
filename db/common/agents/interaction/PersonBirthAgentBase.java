@@ -1,13 +1,29 @@
 package grakn.simulation.db.common.agents.interaction;
 
+import grakn.simulation.db.common.agents.base.AgentResult;
+import grakn.simulation.db.common.agents.base.AgentResultSet;
+import grakn.simulation.db.common.agents.utils.Pair;
 import grakn.simulation.db.common.agents.world.CityAgent;
 
-public abstract class PersonBirthAgent extends CityAgent {
+import java.util.HashMap;
+
+import static grabl.tracing.client.GrablTracingThreadStatic.ThreadTrace;
+import static grabl.tracing.client.GrablTracingThreadStatic.traceOnThread;
+
+public abstract class PersonBirthAgentBase extends CityAgent {
+
+    private int numBirths;
+
+    protected enum PersonBirthAgentField implements ComparableField {
+        EMAIL, GENDER, FORENAME, SURNAME, DATE_OF_BIRTH
+    }
 
     @Override
-    public final void iterate() {
+    public final AgentResultSet iterate() {
         // Find bachelors and bachelorettes who are considered adults and who are not in a marriage and pair them off randomly
-        int numBirths = world().getScaleFactor();
+        numBirths = world().getScaleFactor();
+        AgentResultSet agentResultSet = new AgentResultSet();
+
         for (int i = 0; i < numBirths; i++) {
             String gender;
             String forename;
@@ -32,10 +48,17 @@ public abstract class PersonBirthAgent extends CityAgent {
                     + city().country() + "_"
                     + city().country().continent()
                     + "@gmail.com";
-            insertPerson(email, gender, forename, surname);
+            try (ThreadTrace trace = traceOnThread(this.checkMethodTrace("insertPerson"))) {
+                agentResultSet.add(insertPerson(email, gender, forename, surname));
+            }
         }
-        tx().commit();
+        commitTxWithTracing();
+        return agentResultSet;
     }
 
-    protected abstract void insertPerson(String email, String gender, String forename, String surname);
+    protected abstract AgentResult insertPerson(String email, String gender, String forename, String surname);
+
+    protected Pair<Integer, Integer> countBounds() {
+        return new Pair<>(numBirths, numBirths);
+    }
 }

@@ -152,20 +152,20 @@ load("@graknlabs_client_java//dependencies/maven:artifacts.bzl", graknlabs_clien
 ########################################################
 # Load @graknlabs_common (from @graknlabs_client_java) #
 #######################################################
-load("@graknlabs_client_java//dependencies/graknlabs:dependencies.bzl", "graknlabs_common")
+load("@graknlabs_client_java//dependencies/graknlabs:repositories.bzl", "graknlabs_common")
 graknlabs_common()
 
 #######################################################
 # Load @graknlabs_graql (from @graknlabs_client_java) #
 #######################################################
-load("@graknlabs_client_java//dependencies/graknlabs:dependencies.bzl", "graknlabs_graql")
+load("@graknlabs_client_java//dependencies/graknlabs:repositories.bzl", "graknlabs_graql")
 graknlabs_graql()
 load("@graknlabs_graql//dependencies/maven:artifacts.bzl", graknlabs_graql_artifacts = "artifacts")
 
 ##########################################################
 # Load @graknlabs_protocol (from @graknlabs_client_java) #
 ##########################################################
-load("@graknlabs_client_java//dependencies/graknlabs:dependencies.bzl", "graknlabs_protocol")
+load("@graknlabs_client_java//dependencies/graknlabs:repositories.bzl", "graknlabs_protocol")
 graknlabs_protocol()
 load("@graknlabs_protocol//dependencies/maven:artifacts.bzl", graknlabs_protocol_artifacts = "artifacts")
 

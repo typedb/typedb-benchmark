@@ -9,15 +9,15 @@ java_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
-        "//utils",
         "//config",
-        "//db/grakn",
-        "//db/neo4j",
         "//db/common/agents",
         "//db/common/driver",
         "//db/common/initialise",
         "//db/common/world",
-        "@graknlabs_client_java//:client-java",
+        "//db/common/yaml_tool",
+        "//db/grakn",
+        "//db/neo4j",
+        "//utils",
         "@graknlabs_grabl_tracing//client",
         "@maven//:ch_qos_logback_logback_classic",
         "@maven//:commons_cli_commons_cli",
@@ -26,18 +26,39 @@ java_library(
 )
 
 java_binary(
-    name = "simulation",
+    name = "simulation-big",
     args = [
+        "config/config_big.yml",
         "$(locations //db/common/data)",
-        "$(locations //db/grakn/schema)",
+        "$(locations //db/grakn/schema:graql-schema)",
         "$(locations //db/grakn/data)",
         "$(locations //db/neo4j/data)",
     ],
     data = [
-        "//config:config.yaml",
+        "//config:config_big.yml",
         "//db/common/data",
-        "//db/grakn/schema",
         "//db/grakn/data",
+        "//db/grakn/schema:graql-schema",
+        "//db/neo4j/data",
+    ],
+    main_class = "grakn.simulation.Simulation",
+    runtime_deps = [":simulation-lib"],
+)
+
+java_binary(
+    name = "simulation-small",
+    args = [
+        "config/config_small.yml",
+        "$(locations //db/common/data)",
+        "$(locations //db/grakn/schema:graql-schema)",
+        "$(locations //db/grakn/data)",
+        "$(locations //db/neo4j/data)",
+    ],
+    data = [
+        "//config:config_small.yml",
+        "//db/common/data",
+        "//db/grakn/data",
+        "//db/grakn/schema:graql-schema",
         "//db/neo4j/data",
     ],
     main_class = "grakn.simulation.Simulation",

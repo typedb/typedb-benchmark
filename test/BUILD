@@ -23,3 +23,34 @@ artifact_extractor(
     name = "grakn-extractor",
     artifact = "@graknlabs_grakn_core_artifact//file",
 )
+
+java_test(
+    name = "simulation-test",
+    srcs = [
+        "SimulationTest.java",
+        "SimulationTestSuite.java",
+        "SimulationRunner.java",
+        "SimulationsUnderTest.java",
+    ],
+    data = [
+        "//db/common/data",
+        "//db/grakn/data",
+        "//db/grakn/schema:graql-schema",
+        "//db/neo4j/data",
+    ],
+    test_class = "grakn.simulation.test.SimulationTest",
+    deps = [
+        "//:simulation-lib",
+        "//config",
+        "//db/common/agents",
+        "//db/common/initialise",
+        "//db/common/world",
+        "//db/grakn",
+        "//db/neo4j",
+        "//utils",
+        "@maven//:ch_qos_logback_logback_classic",
+        "@maven//:commons_cli_commons_cli",
+        "@maven//:org_slf4j_slf4j_api",
+        "@maven//:junit_junit",
+    ],
+)

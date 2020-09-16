@@ -1,17 +1,28 @@
 package grakn.simulation.db.neo4j.driver;
 
+import grabl.tracing.client.GrablTracingThreadStatic;
 import grakn.simulation.db.common.driver.DriverWrapper;
 import org.neo4j.driver.AuthTokens;
 import org.neo4j.driver.Driver;
 import org.neo4j.driver.GraphDatabase;
 import org.neo4j.driver.Query;
-import org.neo4j.driver.Result;
+import org.neo4j.driver.Record;
 import org.neo4j.driver.exceptions.TransientException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static grabl.tracing.client.GrablTracingThreadStatic.*;
+import static grabl.tracing.client.GrablTracingThreadStatic.traceOnThread;
+import static grakn.simulation.db.common.driver.DriverWrapper.TracingLabel.CLOSE_SESSION;
+import static grakn.simulation.db.common.driver.DriverWrapper.TracingLabel.EXECUTE;
+import static grakn.simulation.db.common.driver.DriverWrapper.TracingLabel.OPEN_CLIENT;
+import static grakn.simulation.db.common.driver.DriverWrapper.TracingLabel.OPEN_SESSION;
+import static grakn.simulation.db.common.driver.DriverWrapper.TracingLabel.OPEN_TRANSACTION;
+import static grakn.simulation.db.common.driver.DriverWrapper.TracingLabel.STREAM_AND_SORT;
 
 public class Neo4jDriverWrapper implements DriverWrapper {
 
@@ -23,7 +34,9 @@ public class Neo4jDriverWrapper implements DriverWrapper {
 
     @Override
     public Neo4jDriverWrapper open(String uri) {
-        driver = GraphDatabase.driver( uri, AuthTokens.basic( "neo4j", "admin" ) );;
+        try (ThreadTrace trace = traceOnThread(OPEN_CLIENT.getName())) {
+            driver = GraphDatabase.driver(uri, AuthTokens.basic("neo4j", "admin"));
+        }
         return this;
     }
 
@@ -34,7 +47,9 @@ public class Neo4jDriverWrapper implements DriverWrapper {
 
     @Override
     public Session session(String database) {
-        return new Session(driver.session());
+        try (ThreadTrace trace = traceOnThread(OPEN_SESSION.getName())) {
+            return new Session(driver.session());
+        }
     }
 
     public static class Session extends DriverWrapper.Session {
@@ -47,12 +62,16 @@ public class Neo4jDriverWrapper implements DriverWrapper {
 
         @Override
         public void close() {
-            this.session.close();
+            try (GrablTracingThreadStatic.ThreadTrace trace = traceOnThread(CLOSE_SESSION.getName())) {
+                this.session.close();
+            }
         }
 
         @Override
         public Transaction transaction() {
-            return new Transaction(session);
+            try (GrablTracingThreadStatic.ThreadTrace trace = traceOnThread(OPEN_TRANSACTION.getName())) {
+                return new Transaction(session);
+            }
         }
 
         public class Transaction extends DriverWrapper.Session.Transaction {
@@ -67,7 +86,9 @@ public class Neo4jDriverWrapper implements DriverWrapper {
             }
 
             private org.neo4j.driver.Transaction newTransaction() {
-                return session.beginTransaction();
+                try (GrablTracingThreadStatic.ThreadTrace trace = traceOnThread(OPEN_TRANSACTION.getName())) {
+                    return session.beginTransaction();
+                }
             }
 
             @Override
@@ -122,19 +143,37 @@ public class Neo4jDriverWrapper implements DriverWrapper {
                 return transaction;
             }
 
-            public Result run(Query query) {
+            public List<Record> execute(Query query) {
                 addQuery(query);
-                return transaction.run(query);
+                try (ThreadTrace trace = traceOnThread(EXECUTE.getName())) {
+                    return transaction.run(query).list();
+                }
             }
 
-            public <T> List<T> getOrderedAttribute(Query query, String attributeName, Integer limit){
-                Stream<T> answerStream = run(query).stream()
-                        .map(record -> (T) record.asMap().get(attributeName))
-                        .sorted();
-                if (limit!= null) {
-                    answerStream = answerStream.limit(limit);
+            public <T> List<T> getOrderedAttribute(Query query, String attributeName, Integer limit) {
+                List<T> result;
+                try (ThreadTrace trace = traceOnThread(STREAM_AND_SORT.getName())) {
+                    Stream<T> answerStream = execute(query).stream()
+                            .map(record -> (T) record.asMap().get(attributeName))
+                            .sorted();
+                    if (limit != null) {
+                        answerStream = answerStream.limit(limit);
+                    }
+                    result = answerStream.collect(Collectors.toList());
                 }
-                return answerStream.collect(Collectors.toList());
+                return result;
+            }
+
+            public int count(Query countQuery) {
+                AtomicReference<Integer> count = new AtomicReference<>(null);
+                transaction.run(countQuery).single().values().forEach(v -> {
+                    if (count.get() == null) {
+                        count.set(v.asInt());
+                    } else if (count.get() != v.asInt()) {
+                        throw new RuntimeException("Not all returned counts were the same");
+                    }
+                });
+                return transaction.run(countQuery).single().get(0).asInt();
             }
         }
     }

@@ -34,6 +34,11 @@ public class FriendshipAgent extends grakn.simulation.db.common.agents.interacti
         }};
         Query insertFriendshipQuery = new Query(template, parameters);
         log().query("insertFriendship", insertFriendshipQuery);
-        ((Neo4jDriverWrapper.Session.Transaction) tx()).run(insertFriendshipQuery);
+        ((Neo4jDriverWrapper.Session.Transaction) tx()).execute(insertFriendshipQuery);
+    }
+
+    @Override
+    protected int checkCount() {
+        return 0;
     }
 }

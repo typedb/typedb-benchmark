@@ -1,7 +1,7 @@
-filegroup(
-    name = "data",
+java_library(
+    name = "schema",
     srcs = glob([
-        "*.yml",
+        "*.java",
     ]),
     visibility = ["//visibility:public"],
 )

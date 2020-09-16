@@ -11,4 +11,5 @@ public interface IterationContext {
     LocalDateTime getLocalDateTime();
     World getWorld();
     boolean shouldTrace();
+    ResultHandler getResultHandler();
 }

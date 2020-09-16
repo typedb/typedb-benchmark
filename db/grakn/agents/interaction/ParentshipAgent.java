@@ -1,6 +1,7 @@
 package grakn.simulation.db.grakn.agents.interaction;
 
 import grakn.client.answer.ConceptMap;
+import grakn.simulation.db.grakn.driver.GraknClientWrapper.Session.Transaction;
 import graql.lang.Graql;
 import graql.lang.query.GraqlGet;
 import graql.lang.query.GraqlInsert;
@@ -12,7 +13,24 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
-import static grakn.simulation.db.grakn.agents.interaction.ExecutorUtils.getOrderedAttribute;
+import static grakn.simulation.db.grakn.schema.Schema.BORN_IN;
+import static grakn.simulation.db.grakn.schema.Schema.BORN_IN_CHILD;
+import static grakn.simulation.db.grakn.schema.Schema.BORN_IN_PLACE_OF_BIRTH;
+import static grakn.simulation.db.grakn.schema.Schema.CITY;
+import static grakn.simulation.db.grakn.schema.Schema.DATE_OF_BIRTH;
+import static grakn.simulation.db.grakn.schema.Schema.EMAIL;
+import static grakn.simulation.db.grakn.schema.Schema.LOCATES;
+import static grakn.simulation.db.grakn.schema.Schema.LOCATES_LOCATED;
+import static grakn.simulation.db.grakn.schema.Schema.LOCATES_LOCATION;
+import static grakn.simulation.db.grakn.schema.Schema.LOCATION_NAME;
+import static grakn.simulation.db.grakn.schema.Schema.MARRIAGE;
+import static grakn.simulation.db.grakn.schema.Schema.MARRIAGE_HUSBAND;
+import static grakn.simulation.db.grakn.schema.Schema.MARRIAGE_ID;
+import static grakn.simulation.db.grakn.schema.Schema.MARRIAGE_WIFE;
+import static grakn.simulation.db.grakn.schema.Schema.PARENTSHIP;
+import static grakn.simulation.db.grakn.schema.Schema.PARENTSHIP_CHILD;
+import static grakn.simulation.db.grakn.schema.Schema.PARENTSHIP_PARENT;
+import static grakn.simulation.db.grakn.schema.Schema.PERSON;
 import static java.util.stream.Collectors.toList;
 
 public class ParentshipAgent extends grakn.simulation.db.common.agents.interaction.ParentshipAgent {
@@ -20,25 +38,25 @@ public class ParentshipAgent extends grakn.simulation.db.common.agents.interacti
     @Override
     protected List<HashMap<Email, String>> getMarriageEmails() {
         GraqlGet.Sorted marriageQuery = Graql.match(
-                Graql.var("city").isa("city")
-                        .has("location-name", city().name()),
-                Graql.var("m").isa("marriage")
-                        .rel("marriage_husband", Graql.var("husband"))
-                        .rel("marriage_wife", Graql.var("wife"))
-                        .has("marriage-id", Graql.var("marriage-id")),
+                Graql.var(CITY).isa(CITY)
+                        .has(LOCATION_NAME, city().name()),
+                Graql.var("m").isa(MARRIAGE)
+                        .rel(MARRIAGE_HUSBAND, Graql.var("husband"))
+                        .rel(MARRIAGE_WIFE, Graql.var("wife"))
+                        .has(MARRIAGE_ID, Graql.var(MARRIAGE_ID)),
                 Graql.not(
-                        Graql.var("par").isa("parentship")
-                                .rel("parentship_parent", "husband")
-                                .rel("parentship_parent", "wife")
+                        Graql.var("par").isa(PARENTSHIP)
+                                .rel(PARENTSHIP_PARENT, "husband")
+                                .rel(PARENTSHIP_PARENT, "wife")
                 ),
-                Graql.var("husband").isa("person")
-                        .has("email", Graql.var("husband-email")),
-                Graql.var("wife").isa("person")
-                        .has("email", Graql.var("wife-email")),
-                Graql.var().isa("locates")
-                        .rel("locates_located", Graql.var("m"))
-                        .rel("locates_location", Graql.var("city"))
-        ).get().sort("marriage-id");
+                Graql.var("husband").isa(PERSON)
+                        .has(EMAIL, Graql.var("husband-email")),
+                Graql.var("wife").isa(PERSON)
+                        .has(EMAIL, Graql.var("wife-email")),
+                Graql.var().isa(LOCATES)
+                        .rel(LOCATES_LOCATED, Graql.var("m"))
+                        .rel(LOCATES_LOCATION, Graql.var(CITY))
+        ).get().sort(MARRIAGE_ID);
 
         log().query("getMarriageEmails", marriageQuery);
         List<ConceptMap> marriageAnswers = tx().forGrakn().execute(marriageQuery).get();
@@ -56,33 +74,33 @@ public class ParentshipAgent extends grakn.simulation.db.common.agents.interacti
     protected List<String> getChildrenEmailsBorn(LocalDateTime dateToday) {
 
         GraqlGet.Unfiltered childrenQuery = Graql.match(
-                Graql.var("c").isa("city")
-                        .has("location-name", city().name()),
-                Graql.var("child").isa("person")
-                        .has("email", Graql.var("email"))
-                        .has("date-of-birth", dateToday),
-                Graql.var("bi").isa("born-in")
-                        .rel("born-in_place-of-birth", "c")
-                        .rel("born-in_child", "child")
+                Graql.var("c").isa(CITY)
+                        .has(LOCATION_NAME, city().name()),
+                Graql.var("child").isa(PERSON)
+                        .has(EMAIL, Graql.var(EMAIL))
+                        .has(DATE_OF_BIRTH, dateToday),
+                Graql.var("bi").isa(BORN_IN)
+                        .rel(BORN_IN_PLACE_OF_BIRTH, "c")
+                        .rel(BORN_IN_CHILD, "child")
         ).get();
 
         log().query("getChildrenEmails", childrenQuery);
-        return getOrderedAttribute(tx().forGrakn(), childrenQuery, "email");
+        return ((Transaction)tx()).getOrderedAttribute(childrenQuery, EMAIL, null);
     }
 
     @Override
     protected void insertParentShip(HashMap<Email, String> marriage, List<String> childEmails) {
         ArrayList<Statement> matchStatements = new ArrayList<>(Arrays.asList(
-                Graql.var("mother").isa("person").has("email", marriage.get(Email.WIFE)),
-                Graql.var("father").isa("person").has("email", marriage.get(Email.HUSBAND))
+                Graql.var("mother").isa(PERSON).has(EMAIL, marriage.get(Email.WIFE)),
+                Graql.var("father").isa(PERSON).has(EMAIL, marriage.get(Email.HUSBAND))
         ));
 
         Statement parentship = Graql.var("par");
 
         ArrayList<Statement> insertStatements = new ArrayList<>(Arrays.asList(
-                parentship.isa("parentship")
-                        .rel("parentship_parent", "father")
-                        .rel("parentship_parent", "mother")
+                parentship.isa(PARENTSHIP)
+                        .rel(PARENTSHIP_PARENT, "father")
+                        .rel(PARENTSHIP_PARENT, "mother")
         ));
 
         // This model currently inserts a single relation that combines both parents and all of the children they had.
@@ -91,8 +109,8 @@ public class ParentshipAgent extends grakn.simulation.db.common.agents.interacti
         for (int i = 0; i < childEmails.size(); i++) {
             String childEmail = childEmails.get(i);
             Statement childVar = Graql.var("child-" + i);
-            matchStatements.add(childVar.isa("person").has("email", childEmail));
-            insertStatements.add(parentship.rel("parentship_child", childVar));
+            matchStatements.add(childVar.isa(PERSON).has(EMAIL, childEmail));
+            insertStatements.add(parentship.rel(PARENTSHIP_CHILD, childVar));
         }
 
         GraqlInsert parentshipQuery = Graql.match(
@@ -102,6 +120,15 @@ public class ParentshipAgent extends grakn.simulation.db.common.agents.interacti
         );
 
         log().query("insertParentShip", parentshipQuery);
-        tx().forGrakn().execute(parentshipQuery);
+        tx().forGrakn().execute(parentshipQuery).get();
+    }
+
+    @Override
+    protected int checkCount() {
+//        GraqlGet.Aggregate countQuery = Graql.match(
+//
+//        ).get().count();
+//        return ((Transaction) tx()).count(countQuery);
+        return 0;
     }
 }

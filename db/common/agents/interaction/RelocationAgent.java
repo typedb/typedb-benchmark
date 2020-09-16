@@ -1,17 +1,22 @@
 package grakn.simulation.db.common.agents.interaction;
 
-import grakn.simulation.db.common.agents.world.CityAgent;
+import grakn.simulation.db.common.agents.base.AgentResultSet;
 import grakn.simulation.db.common.agents.utils.Allocation;
+import grakn.simulation.db.common.agents.utils.Pair;
+import grakn.simulation.db.common.agents.world.CityAgent;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 
+import static grabl.tracing.client.GrablTracingThreadStatic.ThreadTrace;
+import static grabl.tracing.client.GrablTracingThreadStatic.traceOnThread;
+
 public abstract class RelocationAgent extends CityAgent {
 
     @Override
-    public final void iterate() {
+    public final AgentResultSet iterate() {
         /*
         Find people currently resident the city
         Find other cities in the continent
@@ -28,14 +33,22 @@ public abstract class RelocationAgent extends CityAgent {
         List<String> residentEmails;
         List<String> relocationCityNames;
 
-        residentEmails = getResidentEmails(earliestDate);
+        try (ThreadTrace trace = traceOnThread(this.registerMethodTrace("getResidentEmails"))) {
+            residentEmails = getResidentEmails(earliestDate);
+        }
         shuffle(residentEmails);
 
-        relocationCityNames = getRelocationCityNames();
+        try (ThreadTrace trace = traceOnThread(this.registerMethodTrace("getRelocationCityNames"))) {
+            relocationCityNames = getRelocationCityNames();
+        }
 
-        Allocation.allocate(residentEmails, relocationCityNames, this::insertRelocation);
-
-        tx().commit();
+        Allocation.allocate(residentEmails, relocationCityNames, (residentEmail, relocationCityName) -> {
+            try (ThreadTrace trace = traceOnThread(this.checkMethodTrace("insertRelocation"))) {
+                insertRelocation(residentEmail, relocationCityName);
+            }
+        });
+        commitTxWithTracing();
+        return null;
     }
 
 //    TODO Should this be abstracted?
@@ -46,4 +59,8 @@ public abstract class RelocationAgent extends CityAgent {
     abstract protected List<String> getRelocationCityNames();
 
     abstract protected void insertRelocation(String email, String newCityName);
+
+    protected Pair<Integer, Integer> countBounds() {
+        return new Pair<>(0, world().getScaleFactor());
+    }
 }

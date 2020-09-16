@@ -1,0 +1,177 @@
+build:
+  performance:
+    test-performance-small-grakn-background:
+      machine: graknlabs-ubuntu-20.04-long
+      type: background
+      timeout: "18000"
+      script: |
+        bazel run //test:grakn-extractor -- dist/grakn-core-all-linux
+        cd ./dist/grakn-core-all-linux/
+        ./grakn server start -- \
+          --tracing-uri $GRABL_TRACING_URI \
+          --tracing-username $GRABL_OWNER \
+          --tracing-access-token $GRABL_TOKEN
+        export GRABL_EXPORT_PERFORMANCE_SMALL_GRAKN_URI="${HOSTNAME}:48555"
+    test-performance-small-grakn:
+      machine: graknlabs-ubuntu-20.04-long
+      timeout: "18000"
+      dependencies: [test-performance-small-grakn-background]
+      script: |
+        bazel run //:simulation-small -- \
+          --database grakn \
+          --database-uri $GRABL_EXPORT_PERFORMANCE_SMALL_GRAKN_URI \
+          --tracing-uri $GRABL_TRACING_URI \
+          --org $GRABL_OWNER \
+          --repo $GRABL_REPO \
+          --commit $GRABL_COMMIT \
+          --username $GRABL_OWNER \
+          --api-token $GRABL_TOKEN \
+          --config-file /home/grabl/simulation/config/config_small.yml
+    test-performance-small-neo4j-background:
+      machine: graknlabs-ubuntu-20.04-long
+      type: background
+      timeout: "18000"
+      script: |
+        sudo add-apt-repository -y ppa:openjdk-r/ppa
+        curl https://cli-assets.heroku.com/apt/release.key | sudo apt-key add -
+        curl https://dl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
+        sudo apt-get update
+        wget -O - https://debian.neo4j.com/neotechnology.gpg.key | sudo apt-key add -
+        echo 'deb https://debian.neo4j.com stable 4.1' | sudo tee -a /etc/apt/sources.list.d/neo4j.list
+        sudo apt-get update
+        sudo apt-get install -y neo4j=1:4.1.0
+        sudo update-java-alternatives --jre --set java-1.11.0-openjdk-amd64
+        echo 'dbms.connectors.default_listen_address=0.0.0.0' | sudo tee -a /etc/neo4j/neo4j.conf
+        echo 'dbms.security.auth_enabled=false' | sudo tee -a /etc/neo4j/neo4j.conf
+        ps aux | grep "org.neo4j.server" | awk '{print $2}' | xargs sudo kill -9 >/dev/null 2&>1 || true
+        sudo neo4j start
+        export GRABL_EXPORT_PERFORMANCE_SMALL_NEO4J_URI="bolt://${HOSTNAME}:7687"
+    test-performance-small-neo4j:
+      machine: graknlabs-ubuntu-20.04-long
+      dependencies: [test-performance-small-neo4j-background]
+      timeout: "18000"
+      script: |
+        bazel run //:simulation-small -- \
+          --database neo4j \
+          --database-uri $GRABL_EXPORT_PERFORMANCE_SMALL_NEO4J_URI \
+          --tracing-uri $GRABL_TRACING_URI \
+          --org $GRABL_OWNER \
+          --repo $GRABL_REPO \
+          --commit $GRABL_COMMIT \
+          --username $GRABL_OWNER \
+          --api-token $GRABL_TOKEN \
+          --config-file /home/grabl/simulation/config/config_small.yml
+    test-performance-big-grakn-background:
+      filter:
+        owner: graknlabs
+        branch: core-1.8
+      machine: graknlabs-ubuntu-20.04-long
+      type: background
+      timeout: "18000"
+      script: |
+        bazel run //test:grakn-extractor -- dist/grakn-core-all-linux
+        cd ./dist/grakn-core-all-linux/
+        ./grakn server start -- \
+          --tracing-uri $GRABL_TRACING_URI \
+          --tracing-username $GRABL_OWNER \
+          --tracing-access-token $GRABL_TOKEN
+        export GRABL_EXPORT_PERFORMANCE_BIG_GRAKN_URI="${HOSTNAME}:48555"
+    test-performance-big-grakn:
+      filter:
+        owner: graknlabs
+        branch: core-1.8
+      machine: graknlabs-ubuntu-20.04-long
+      timeout: "18000"
+      dependencies: [test-performance-big-grakn-background]
+      script: |
+        bazel run //:simulation-big -- \
+          --database grakn \
+          --database-uri $GRABL_EXPORT_PERFORMANCE_BIG_GRAKN_URI \
+          --tracing-uri $GRABL_TRACING_URI \
+          --org $GRABL_OWNER \
+          --repo $GRABL_REPO \
+          --commit $GRABL_COMMIT \
+          --username $GRABL_OWNER \
+          --api-token $GRABL_TOKEN \
+          --config-file /home/grabl/simulation/config/config_big.yml
+    test-performance-big-neo4j-background:
+      filter:
+        owner: graknlabs
+        branch: core-1.8
+      machine: graknlabs-ubuntu-20.04-long
+      type: background
+      timeout: "18000"
+      script: |
+        sudo add-apt-repository -y ppa:openjdk-r/ppa
+        curl https://cli-assets.heroku.com/apt/release.key | sudo apt-key add -
+        curl https://dl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
+        sudo apt-get update
+        wget -O - https://debian.neo4j.com/neotechnology.gpg.key | sudo apt-key add -
+        echo 'deb https://debian.neo4j.com stable 4.1' | sudo tee -a /etc/apt/sources.list.d/neo4j.list
+        sudo apt-get update
+        sudo apt-get install -y neo4j=1:4.1.0
+        sudo update-java-alternatives --jre --set java-1.11.0-openjdk-amd64
+        echo 'dbms.connectors.default_listen_address=0.0.0.0' | sudo tee -a /etc/neo4j/neo4j.conf
+        echo 'dbms.security.auth_enabled=false' | sudo tee -a /etc/neo4j/neo4j.conf
+        ps aux | grep "org.neo4j.server" | awk '{print $2}' | xargs sudo kill -9 >/dev/null 2&>1 || true
+        sudo neo4j start
+        export GRABL_EXPORT_PERFORMANCE_BIG_NEO4J_URI="bolt://${HOSTNAME}:7687"
+    test-performance-big-neo4j:
+      filter:
+        owner: graknlabs
+        branch: core-1.8
+      machine: graknlabs-ubuntu-20.04-long
+      dependencies: [test-performance-big-neo4j-background]
+      timeout: "18000"
+      script: |
+        bazel run //:simulation-big -- \
+          --database neo4j \
+          --database-uri $GRABL_EXPORT_PERFORMANCE_BIG_NEO4J_URI \
+          --tracing-uri $GRABL_TRACING_URI \
+          --org $GRABL_OWNER \
+          --repo $GRABL_REPO \
+          --commit $GRABL_COMMIT \
+          --username $GRABL_OWNER \
+          --api-token $GRABL_TOKEN \
+          --config-file /home/grabl/simulation/config/config_big.yml
+  correctness:
+    test-comparison-grakn-background:
+      machine: graknlabs-ubuntu-20.04-long
+      type: background
+      timeout: "18000"
+      script: |
+        bazel run //test:grakn-extractor -- dist/grakn-core-all-linux
+        cd ./dist/grakn-core-all-linux/
+        ./grakn server start -- \
+          --tracing-uri $GRABL_TRACING_URI \
+          --tracing-username $GRABL_OWNER \
+          --tracing-access-token $GRABL_TOKEN
+        export GRABL_EXPORT_TEST_COMPARISON_GRAKN_URI="${HOSTNAME}:48555"
+    test-comparison-neo4j-background:
+      machine: graknlabs-ubuntu-20.04-long
+      type: background
+      timeout: "18000"
+      script: |
+        sudo add-apt-repository -y ppa:openjdk-r/ppa
+        curl https://cli-assets.heroku.com/apt/release.key | sudo apt-key add -
+        curl https://dl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
+        sudo apt-get update
+        wget -O - https://debian.neo4j.com/neotechnology.gpg.key | sudo apt-key add -
+        echo 'deb https://debian.neo4j.com stable 4.1' | sudo tee -a /etc/apt/sources.list.d/neo4j.list
+        sudo apt-get update
+        sudo apt-get install -y neo4j=1:4.1.0
+        sudo update-java-alternatives --jre --set java-1.11.0-openjdk-amd64
+        echo 'dbms.connectors.default_listen_address=0.0.0.0' | sudo tee -a /etc/neo4j/neo4j.conf
+        echo 'dbms.security.auth_enabled=false' | sudo tee -a /etc/neo4j/neo4j.conf
+        ps aux | grep "org.neo4j.server" | awk '{print $2}' | xargs sudo kill -9 >/dev/null 2&>1 || true
+        sudo neo4j start
+        export GRABL_EXPORT_TEST_COMPARISON_NEO4J_URI="bolt://${HOSTNAME}:7687"
+    test-comparison-grakn-and-neo4j:
+      machine: graknlabs-ubuntu-20.04-long
+      timeout: "18000"
+      dependencies: [test-comparison-grakn-background, test-comparison-neo4j-background]
+      script: |
+        bazel test //test:simulation-test \
+          --test_output=all \
+          --test_arg=--grakn-uri=$GRABL_EXPORT_TEST_COMPARISON_GRAKN_URI \
+          --test_arg=--neo4j-uri=$GRABL_EXPORT_TEST_COMPARISON_NEO4J_URI
