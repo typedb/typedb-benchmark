@@ -105,22 +105,6 @@ public class Config {
             return name;
         }
 
-        public void setMode(String mode) {
-            switch (mode) {
-                case "trace":
-                    this.agentMode = AgentMode.TRACE;
-                    break;
-                case "run":
-                    this.agentMode = AgentMode.RUN;
-                    break;
-                case "off":
-                    this.agentMode = AgentMode.OFF;
-                    break;
-                default:
-                    throw new IllegalArgumentException(String.format("Unrecognised agent mode %s", mode));
-            }
-        }
-
         public void setMode(AgentMode mode) {
             this.agentMode = mode;
         }
@@ -128,6 +112,5 @@ public class Config {
         public AgentMode getAgentMode() {
             return agentMode;
         }
-
     }
 }
