@@ -17,6 +17,7 @@ build:
       timeout: "18000"
       dependencies: [test-performance-small-grakn-background]
       script: |
+        sleep 1h
         bazel run //:simulation-small -- \
           --database grakn \
           --database-uri $GRABL_EXPORT_PERFORMANCE_SMALL_GRAKN_URI \
