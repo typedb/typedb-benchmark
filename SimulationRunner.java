@@ -36,7 +36,6 @@ import static grakn.simulation.db.common.world.World.initialise;
 public class SimulationRunner {
 
     final static Logger LOG = LoggerFactory.getLogger(SimulationRunner.class);
-    private final static String DEFAULT_CONFIG_YAML = "config/config_big.yml";
 
     public static void main(String[] args) {
 
@@ -44,6 +43,7 @@ public class SimulationRunner {
         // CONFIGURATION //
         ///////////////////
 
+        String defaultConfigYaml = args[0];
         Options options = cliOptions();
         CommandLineParser parser = new DefaultParser();
         CommandLine commandLine;
@@ -73,7 +73,7 @@ public class SimulationRunner {
             initialisationDataFiles.put(filename, path);
         }
 
-        Path configPath = Paths.get(getOption(commandLine, "b").orElse(DEFAULT_CONFIG_YAML));
+        Path configPath = Paths.get(getOption(commandLine, "b").orElse(defaultConfigYaml));
         Config config = ConfigLoader.loadConfigFromYaml(configPath.toFile());
 
         ////////////////////
