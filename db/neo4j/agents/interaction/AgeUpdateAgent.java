@@ -25,7 +25,7 @@ public class AgeUpdateAgent extends Neo4jAgent<World.City> implements AgeUpdateA
 
         Query query = new Query(template, parameters);
 
-        log().query("updateAgesOfAllPeople", query);
+        log().query(this.tracker(), "updateAgesOfAllPeople", query);
         tx().execute(query);
     }
 

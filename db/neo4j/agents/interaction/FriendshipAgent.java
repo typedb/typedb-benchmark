@@ -2,7 +2,6 @@ package grakn.simulation.db.neo4j.agents.interaction;
 
 import grakn.simulation.db.common.agents.interaction.FriendshipAgentBase;
 import grakn.simulation.db.common.world.World;
-import grakn.simulation.db.neo4j.driver.Transaction;
 import org.neo4j.driver.Query;
 
 import java.time.LocalDateTime;
@@ -16,7 +15,7 @@ public class FriendshipAgent extends Neo4jAgent<World.City> implements Friendshi
     @Override
     public List<String> getResidentEmails(World.City city, LocalDateTime earliestDate) {
         Query cityResidentsQuery = cityResidentsQuery(city, earliestDate);
-        log().query("getResidentEmails", cityResidentsQuery);
+        log().query(this.tracker(), "getResidentEmails", cityResidentsQuery);
         return tx().getOrderedAttribute(cityResidentsQuery, "resident.email", null);
     }
 
@@ -35,7 +34,7 @@ public class FriendshipAgent extends Neo4jAgent<World.City> implements Friendshi
                 put("startDate", today);
         }};
         Query insertFriendshipQuery = new Query(template, parameters);
-        log().query("insertFriendship", insertFriendshipQuery);
+        log().query(this.tracker(), "insertFriendship", insertFriendshipQuery);
         tx().execute(insertFriendshipQuery);
     }
 }

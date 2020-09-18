@@ -55,10 +55,10 @@ public class MarriageAgent extends GraknAgent<World.City> implements MarriageAge
                 cityVar.isa(CITY).has(LOCATION_NAME, city.name())
         ).get(EMAIL);
 
-        log().query(scope, query);
+        log().query(this.tracker(), scope, query);
         List<String> result;
         result = tx().getOrderedAttribute(query, EMAIL, null);
-        log().message(scope, result.toString());
+        log().message(this.tracker(), scope, result.toString());
         return result;
     }
 
@@ -87,7 +87,7 @@ public class MarriageAgent extends GraknAgent<World.City> implements MarriageAge
         );
 
         List<ConceptMap> answers;
-        log().query(scope, marriageQuery);
+        log().query(this.tracker(), scope, marriageQuery);
         answers = tx().execute(marriageQuery);
 
         ConceptMap answer = getOnlyElement(answers);

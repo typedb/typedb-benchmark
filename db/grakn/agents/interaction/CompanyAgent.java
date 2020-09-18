@@ -37,7 +37,7 @@ public class CompanyAgent extends GraknAgent<World.Country> implements CompanyAg
                                         .rel(INCORPORATION_INCORPORATING, Graql.var(COUNTRY))
                                         .has(DATE_OF_INCORPORATION, today)
                         );
-        log().query(scope, query);
+        log().query(this.tracker(), scope, query);
         tx().execute(query);
     }
 

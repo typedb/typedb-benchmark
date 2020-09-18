@@ -22,7 +22,7 @@ public interface MarriageAgentBase extends InteractionAgent<World.City> {
     @Override
     default AgentResultSet iterate(Agent<World.City, ?> agent, World.City city, IterationContext iterationContext) {
         AgentResultSet agentResultSet = new AgentResultSet();
-        agent.log().message("MarriageAgent", String.format("Simulation step %d", iterationContext.simulationStep()));
+        agent.log().message(agent.tracker(), "MarriageAgent", String.format("Simulation step %d", iterationContext.simulationStep()));
         // Find bachelors and bachelorettes who are considered adults and who are not in a marriage and pair them off randomly
         List<String> womenEmails;
         agent.startAction();

@@ -4,7 +4,6 @@ import grakn.client.answer.ConceptMap;
 import grakn.simulation.db.common.agents.base.AgentResult;
 import grakn.simulation.db.common.agents.interaction.PersonBirthAgentBase;
 import grakn.simulation.db.common.world.World;
-import grakn.simulation.db.grakn.context.GraknContext;
 import graql.lang.Graql;
 import graql.lang.query.GraqlGet;
 import graql.lang.query.GraqlInsert;
@@ -14,8 +13,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static com.google.common.collect.Iterables.getOnlyElement;
-import static grabl.tracing.client.GrablTracingThreadStatic.ThreadTrace;
-import static grabl.tracing.client.GrablTracingThreadStatic.traceOnThread;
 import static grakn.simulation.db.grakn.schema.Schema.BORN_IN;
 import static grakn.simulation.db.grakn.schema.Schema.BORN_IN_CHILD;
 import static grakn.simulation.db.grakn.schema.Schema.BORN_IN_PLACE_OF_BIRTH;
@@ -64,7 +61,7 @@ public class PersonBirthAgent extends GraknAgent<World.City> implements PersonBi
                         );
 
         List<ConceptMap> answers;
-        log().query(scope, query); // TODO move logging into the transaction wrapper?
+        log().query(this.tracker(), scope, query); // TODO move logging into the transaction wrapper?
         answers = tx().execute(query);
 
         ConceptMap answer = getOnlyElement(answers);

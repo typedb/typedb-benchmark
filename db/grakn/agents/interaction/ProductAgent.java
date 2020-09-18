@@ -35,7 +35,7 @@ public class ProductAgent extends GraknAgent<World.Continent> implements Product
                         .rel(PRODUCED_IN_PRODUCT, Graql.var(PRODUCT))
                         .rel(PRODUCED_IN_CONTINENT, Graql.var(CONTINENT))
                 );
-        log().query("insertProduct", insertProductQuery);
+        log().query(this.tracker(), "insertProduct", insertProductQuery);
         tx().execute(insertProductQuery);
     }
 

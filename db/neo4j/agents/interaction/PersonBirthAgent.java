@@ -3,7 +3,6 @@ package grakn.simulation.db.neo4j.agents.interaction;
 import grakn.simulation.db.common.agents.base.AgentResult;
 import grakn.simulation.db.common.agents.interaction.PersonBirthAgentBase;
 import grakn.simulation.db.common.world.World;
-import grakn.simulation.db.neo4j.driver.Transaction;
 import org.neo4j.driver.Query;
 import org.neo4j.driver.Record;
 
@@ -48,7 +47,7 @@ public class PersonBirthAgent extends Neo4jAgent<World.City> implements PersonBi
 
         Query query = new Query(template, parameters);
 
-        log().query("insertPerson", query); //TODO Figure out to log Neo4j's pre-prepared queries
+        log().query(this.tracker(), "insertPerson", query); //TODO Figure out to log Neo4j's pre-prepared queries
         List<Record> answers = tx().execute(query);
 
         Map<String, Object> answer = getOnlyElement(answers).asMap();

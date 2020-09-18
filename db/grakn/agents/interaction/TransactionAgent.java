@@ -33,14 +33,14 @@ public class TransactionAgent extends GraknAgent<World.Continent> implements Tra
     @Override
     public List<Long> getCompanyNumbersInContinent(World.Continent continent, String scope){
         GraqlGet companiesQuery = getCompanyNumbersInContinentQuery(continent);
-        log().query(scope, companiesQuery);
+        log().query(this.tracker(), scope, companiesQuery);
         return tx().getOrderedAttribute(companiesQuery, COMPANY_NUMBER, null);
     }
 
     @Override
     public List<Double> getProductBarcodesInContinent(World.Continent continent, String scope) {
         GraqlGet productsQuery = getProductsInContinentQuery(continent);
-        log().query(scope, productsQuery);
+        log().query(this.tracker(), scope, productsQuery);
         return tx().getOrderedAttribute(productsQuery, PRODUCT_BARCODE, null);
     }
 
@@ -72,7 +72,7 @@ public class TransactionAgent extends GraknAgent<World.Continent> implements Tra
                                 .rel(LOCATES_LOCATED, Graql.var(TRANSACTION))
 
                 );
-        log().query("insertTransaction", insertTransactionQuery);
+        log().query(this.tracker(), "insertTransaction", insertTransactionQuery);
         tx().execute(insertTransactionQuery);
     }
 }

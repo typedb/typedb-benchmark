@@ -2,7 +2,6 @@ package grakn.simulation.db.grakn.agents.interaction;
 
 import grakn.simulation.db.common.agents.interaction.AgeUpdateAgentBase;
 import grakn.simulation.db.common.world.World;
-import grakn.simulation.db.grakn.context.GraknContext;
 import graql.lang.Graql;
 import graql.lang.query.GraqlDelete;
 import graql.lang.query.GraqlGet;
@@ -58,7 +57,7 @@ public class AgeUpdateAgent extends GraknAgent<World.City> implements AgeUpdateA
                         )
         );
 
-        log().query("deleteImplicitQuery", deleteImplicitQuery);
+        log().query(this.tracker(), "deleteImplicitQuery", deleteImplicitQuery);
         tx().execute(deleteImplicitQuery);
 
         GraqlInsert insertNewAgeQuery = Graql.match(
@@ -70,7 +69,7 @@ public class AgeUpdateAgent extends GraknAgent<World.City> implements AgeUpdateA
                         .has(AGE, newAge)
         );
 
-        log().query("insertNewAgeQuery", insertNewAgeQuery);
+        log().query(this.tracker(), "insertNewAgeQuery", insertNewAgeQuery);
         tx().execute(insertNewAgeQuery);
     }
 
@@ -91,7 +90,7 @@ public class AgeUpdateAgent extends GraknAgent<World.City> implements AgeUpdateA
                         .rel(BORN_IN_CHILD, person)
                         .rel(BORN_IN_PLACE_OF_BIRTH, city)
         ).get().sort(EMAIL);
-        log().query("getPeopleBornInCity", peopleQuery);
+        log().query(this.tracker(), "getPeopleBornInCity", peopleQuery);
 
         HashMap<String, LocalDateTime> peopleDobs = new HashMap<>();
 

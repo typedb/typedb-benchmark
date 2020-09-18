@@ -2,7 +2,6 @@ package grakn.simulation.db.neo4j.agents.interaction;
 
 import grakn.simulation.db.common.agents.interaction.CompanyAgentBase;
 import grakn.simulation.db.common.world.World;
-import grakn.simulation.db.neo4j.driver.Transaction;
 import org.neo4j.driver.Query;
 
 import java.time.LocalDateTime;
@@ -23,7 +22,7 @@ public class CompanyAgent extends Neo4jAgent<World.Country> implements CompanyAg
         }};
 
         Query companyQuery = new Query(template, parameters);
-        log().query(scope, companyQuery);
+        log().query(this.tracker(), scope, companyQuery);
         tx().execute(companyQuery);
     }
 

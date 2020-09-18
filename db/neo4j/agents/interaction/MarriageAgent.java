@@ -34,9 +34,9 @@ public class MarriageAgent extends Neo4jAgent<World.City> implements MarriageAge
 
         Query query = new Query(template, parameters);
 
-        log().query(scope, query);
+        log().query(this.tracker(), scope, query);
         List<String> results = tx().getOrderedAttribute(query, "person." + EMAIL, null);
-        log().message(scope, results.toString());
+        log().message(this.tracker(), scope, results.toString());
         return results;
     }
 
@@ -56,7 +56,7 @@ public class MarriageAgent extends Neo4jAgent<World.City> implements MarriageAge
 
         Query query = new Query(template, parameters);
 
-        log().query("insertMarriage", query);
+        log().query(this.tracker(), "insertMarriage", query);
         List<Record> answers = tx().execute(query);
 
         Map<String, Object> answer = getOnlyElement(answers).asMap();

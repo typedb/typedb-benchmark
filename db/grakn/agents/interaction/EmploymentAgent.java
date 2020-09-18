@@ -40,14 +40,14 @@ public class EmploymentAgent extends GraknAgent<World.City> implements Employmen
     @Override
     public List<Long> getCompanyNumbers(World.Country country, String scope, int numCompanies) {
         GraqlGet companyNumbersQuery = CompanyAgent.getCompanyNumbersInCountryQuery(country);
-        log().query(scope, companyNumbersQuery);
+        log().query(this.tracker(), scope, companyNumbersQuery);
         return tx().getOrderedAttribute(companyNumbersQuery, COMPANY_NUMBER, numCompanies);
     }
 
     @Override
     public List<String> getEmployeeEmails(World.City city, String scope, int numEmployments, LocalDateTime earliestDate) {
         GraqlGet getEmployeeEmailsQuery = cityResidentsQuery(city, earliestDate);
-        log().query(scope, getEmployeeEmailsQuery);
+        log().query(this.tracker(), scope, getEmployeeEmailsQuery);
         return tx().getOrderedAttribute(getEmployeeEmailsQuery, EMAIL, numEmployments);
     }
 
@@ -109,7 +109,7 @@ public class EmploymentAgent extends GraknAgent<World.City> implements Employmen
                         .has(CONTRACT_CONTENT, contractContentVar)
                         .has(CONTRACTED_HOURS, contractedHoursVar)
         );
-        log().query(scope, insertEmploymentQuery);
+        log().query(this.tracker(), scope, insertEmploymentQuery);
         tx().execute(insertEmploymentQuery);
     }
 

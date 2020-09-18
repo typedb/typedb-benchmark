@@ -3,7 +3,6 @@ package grakn.simulation.db.neo4j.agents.interaction;
 import grakn.simulation.db.common.agents.interaction.TransactionAgentBase;
 import grakn.simulation.db.common.agents.utils.Pair;
 import grakn.simulation.db.common.world.World;
-import grakn.simulation.db.neo4j.driver.Transaction;
 import org.neo4j.driver.Query;
 
 import java.util.HashMap;
@@ -16,14 +15,14 @@ public class TransactionAgent extends Neo4jAgent<World.Continent> implements Tra
     @Override
     public List<Long> getCompanyNumbersInContinent(World.Continent continent, String scope) {
         Query companiesQuery = getCompanyNumbersInContinentQuery(continent);
-        log().query(scope, companiesQuery);
+        log().query(this.tracker(), scope, companiesQuery);
         return tx().getOrderedAttribute(companiesQuery, "company.companyNumber", null);
     }
 
     @Override
     public List<Double> getProductBarcodesInContinent(World.Continent continent, String scope) {
         Query productsQuery = getProductsInContinentQuery(continent);
-        log().query(scope, productsQuery);
+        log().query(this.tracker(), scope, productsQuery);
         return tx().getOrderedAttribute(productsQuery, "product.barcode", null);
     }
 
@@ -54,7 +53,7 @@ public class TransactionAgent extends Neo4jAgent<World.Continent> implements Tra
                 put("isTaxable", isTaxable);
         }};
         Query insertTransactionQuery = new Query(template, parameters);
-        log().query("insertTransaction", insertTransactionQuery);
+        log().query(this.tracker(), "insertTransaction", insertTransactionQuery);
         tx().execute(insertTransactionQuery);
     }
 }

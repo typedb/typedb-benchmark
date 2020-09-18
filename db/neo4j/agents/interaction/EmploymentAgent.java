@@ -14,14 +14,14 @@ public class EmploymentAgent extends Neo4jAgent<World.City> implements Employmen
     @Override
     public List<Long> getCompanyNumbers(World.Country country, String scope, int numCompanies) {
         Query companyNumbersQuery = CompanyAgent.getCompanyNumbersInCountryQuery(country);
-        log().query(scope, companyNumbersQuery);
+        log().query(this.tracker(), scope, companyNumbersQuery);
         return tx().getOrderedAttribute(companyNumbersQuery, "company.companyNumber", numCompanies);
     }
 
     @Override
     public List<String> getEmployeeEmails(World.City city, String scope, int numEmployments, LocalDateTime earliestDate) {
         Query getEmployeeEmailsQuery = cityResidentsQuery(city, earliestDate);
-        log().query(scope, getEmployeeEmailsQuery);
+        log().query(this.tracker(), scope, getEmployeeEmailsQuery);
         return tx().getOrderedAttribute(getEmployeeEmailsQuery, "resident.email", numEmployments);
     }
 
@@ -49,7 +49,7 @@ public class EmploymentAgent extends Neo4jAgent<World.City> implements Employmen
         }};
 
         Query insertEmploymentQuery = new Query(template, parameters);
-        log().query(scope, insertEmploymentQuery);
+        log().query(this.tracker(), scope, insertEmploymentQuery);
         tx().execute(insertEmploymentQuery);
     }
 }

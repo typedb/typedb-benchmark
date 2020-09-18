@@ -57,7 +57,7 @@ public abstract class Agent<REGION extends Region, CONTEXT extends DatabaseConte
         return backendContext;
     }
 
-    protected String tracker() {
+    public String tracker() {
         return tracker;
     }
 
@@ -107,26 +107,6 @@ public abstract class Agent<REGION extends Region, CONTEXT extends DatabaseConte
 //        closeTx();
         if (context != null) {
             context.close();
-        }
-    }
-
-    public class LogWrapper {
-        private final Logger logger;
-
-        private LogWrapper(Logger logger) {
-            this.logger = logger;
-        }
-
-        public void query(String scope, Object query) {
-            query(scope, query.toString());
-        }
-
-        public void query(String scope, String query) {
-            logger.info("({}):{}:\n{}", tracker, scope, query);
-        }
-
-        public void message(String scope, String message) {
-            logger.info("({}):{}:\n{}", tracker, scope, message);
         }
     }
 

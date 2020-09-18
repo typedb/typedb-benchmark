@@ -58,7 +58,7 @@ public class RelocationAgent extends GraknAgent<World.City> implements Relocatio
     @Override
     public List<String> getResidentEmails(World.City city, LocalDateTime earliestDate, int numRelocations) {
         GraqlGet.Unfiltered cityResidentsQuery = cityResidentsQuery(city, earliestDate);
-        log().query("getResidentEmails", cityResidentsQuery);
+        log().query(this.tracker(), "getResidentEmails", cityResidentsQuery);
         return tx().getOrderedAttribute(cityResidentsQuery, EMAIL, numRelocations);
     }
 
@@ -72,7 +72,7 @@ public class RelocationAgent extends GraknAgent<World.City> implements Relocatio
                 Graql.var("city-name").neq(city.name())
         ).get();
 
-        log().query("getRelocationCityNames", relocationCitiesQuery);
+        log().query(this.tracker(), "getRelocationCityNames", relocationCitiesQuery);
         return tx().getOrderedAttribute(relocationCitiesQuery, "city-name", null);
     }
 
@@ -90,7 +90,7 @@ public class RelocationAgent extends GraknAgent<World.City> implements Relocatio
                         .has(RELOCATION_DATE, today)
         );
 
-        log().query("insertRelocation", relocatePersonQuery);
+        log().query(this.tracker(), "insertRelocation", relocatePersonQuery);
         tx().execute(relocatePersonQuery);
     }
 

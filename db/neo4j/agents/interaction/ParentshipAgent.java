@@ -2,7 +2,6 @@ package grakn.simulation.db.neo4j.agents.interaction;
 
 import grakn.simulation.db.common.agents.interaction.ParentshipAgentBase;
 import grakn.simulation.db.common.world.World;
-import grakn.simulation.db.neo4j.driver.Transaction;
 import org.neo4j.driver.Query;
 import org.neo4j.driver.Record;
 
@@ -30,7 +29,7 @@ public class ParentshipAgent extends Neo4jAgent<World.City> implements Parentshi
 
         Query query = new Query(template, parameters);
 
-        log().query("getMarriageEmails", query);
+        log().query(this.tracker(), "getMarriageEmails", query);
         List<Record> records = tx().execute(query);
 
         return records.stream().map(Record::asMap).map(r -> new HashMap<Email, String>() {{
@@ -53,7 +52,7 @@ public class ParentshipAgent extends Neo4jAgent<World.City> implements Parentshi
 
         Query childrenQuery = new Query(template, parameters);
 
-        log().query("getChildrenEmails", childrenQuery);
+        log().query(this.tracker(), "getChildrenEmails", childrenQuery);
         return tx().getOrderedAttribute(childrenQuery, "child.email", null);
     }
 
@@ -72,7 +71,7 @@ public class ParentshipAgent extends Neo4jAgent<World.City> implements Parentshi
                     put("childEmail", childEmail);
             }};
             Query parentshipQuery = new Query(template, parameters);
-            log().query("insertParentShip", parentshipQuery);
+            log().query(this.tracker(), "insertParentShip", parentshipQuery);
             tx().execute(parentshipQuery);
         }
     }

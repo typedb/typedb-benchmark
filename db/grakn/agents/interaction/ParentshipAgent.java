@@ -59,7 +59,7 @@ public class ParentshipAgent extends GraknAgent<World.City> implements Parentshi
                         .rel(LOCATES_LOCATION, Graql.var(CITY))
         ).get().sort(MARRIAGE_ID);
 
-        log().query("getMarriageEmails", marriageQuery);
+        log().query(this.tracker(), "getMarriageEmails", marriageQuery);
         List<ConceptMap> marriageAnswers = tx().execute(marriageQuery);
 
         return marriageAnswers
@@ -85,7 +85,7 @@ public class ParentshipAgent extends GraknAgent<World.City> implements Parentshi
                         .rel(BORN_IN_CHILD, "child")
         ).get();
 
-        log().query("getChildrenEmails", childrenQuery);
+        log().query(this.tracker(), "getChildrenEmails", childrenQuery);
         return tx().getOrderedAttribute(childrenQuery, EMAIL, null);
     }
 
@@ -120,7 +120,7 @@ public class ParentshipAgent extends GraknAgent<World.City> implements Parentshi
                 insertStatements
         );
 
-        log().query("insertParentShip", parentshipQuery);
+        log().query(this.tracker(), "insertParentShip", parentshipQuery);
         tx().execute(parentshipQuery);
     }
 }
