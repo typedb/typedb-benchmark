@@ -2,7 +2,7 @@
 
 ## Build and run Simulation
 ```shell script
-bazel run //:simulation -- -d -k world
+bazel run //:simulation -- -d grakn -n
 ```
 
 ## Running with Logsplit

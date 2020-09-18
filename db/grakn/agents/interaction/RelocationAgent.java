@@ -1,7 +1,7 @@
 package grakn.simulation.db.grakn.agents.interaction;
 
+import grakn.simulation.db.common.agents.interaction.RelocationAgentBase;
 import grakn.simulation.db.common.world.World;
-import grakn.simulation.db.grakn.driver.GraknClientWrapper.Session.Transaction;
 import graql.lang.Graql;
 import graql.lang.query.GraqlGet;
 import graql.lang.query.GraqlInsert;
@@ -27,7 +27,7 @@ import static grakn.simulation.db.grakn.schema.Schema.RESIDENCY_LOCATION;
 import static grakn.simulation.db.grakn.schema.Schema.RESIDENCY_RESIDENT;
 import static grakn.simulation.db.grakn.schema.Schema.START_DATE;
 
-public class RelocationAgent extends grakn.simulation.db.common.agents.interaction.RelocationAgent {
+public class RelocationAgent extends GraknAgent<World.City> implements RelocationAgentBase {
 
     static GraqlGet.Unfiltered cityResidentsQuery(World.City city, LocalDateTime earliestDate) {
 
@@ -56,68 +56,65 @@ public class RelocationAgent extends grakn.simulation.db.common.agents.interacti
     }
 
     @Override
-    protected List<String> getResidentEmails(LocalDateTime earliestDate) {
-        GraqlGet.Unfiltered cityResidentsQuery = cityResidentsQuery(city(), earliestDate);
+    public List<String> getResidentEmails(World.City city, LocalDateTime earliestDate, int numRelocations) {
+        GraqlGet.Unfiltered cityResidentsQuery = cityResidentsQuery(city, earliestDate);
         log().query("getResidentEmails", cityResidentsQuery);
-        int numRelocations = world().getScaleFactor();
-        return ((Transaction)tx()).getOrderedAttribute(cityResidentsQuery, EMAIL, numRelocations);
+        return tx().getOrderedAttribute(cityResidentsQuery, EMAIL, numRelocations);
     }
 
     @Override
-    protected List<String> getRelocationCityNames() {
+    public List<String> getRelocationCityNames(World.City city) {
 
         GraqlGet.Unfiltered relocationCitiesQuery = Graql.match(
                 Graql.var(CITY).isa(CITY).has(LOCATION_NAME, Graql.var("city-name")),
-                Graql.var(CONTINENT).isa(CONTINENT).has(LOCATION_NAME, city().country().continent().name()),
+                Graql.var(CONTINENT).isa(CONTINENT).has(LOCATION_NAME, city.country().continent().name()),
                 Graql.var("lh1").isa(LOCATION_HIERARCHY).rel(CITY).rel(CONTINENT),
-                Graql.var("city-name").neq(city().name())
+                Graql.var("city-name").neq(city.name())
         ).get();
 
         log().query("getRelocationCityNames", relocationCitiesQuery);
-        return ((Transaction)tx()).getOrderedAttribute(relocationCitiesQuery, "city-name", null);
+        return tx().getOrderedAttribute(relocationCitiesQuery, "city-name", null);
     }
 
     @Override
-    protected void insertRelocation(String email, String newCityName) {
+    public void insertRelocation(World.City city, LocalDateTime today, String email, String newCityName) {
         GraqlInsert relocatePersonQuery = Graql.match(
                 Graql.var("p").isa(PERSON).has(EMAIL, email),
                 Graql.var("new-city").isa(CITY).has(LOCATION_NAME, newCityName),
-                Graql.var("old-city").isa(CITY).has(LOCATION_NAME, city().name())
+                Graql.var("old-city").isa(CITY).has(LOCATION_NAME, city.name())
         ).insert(
                 Graql.var("r").isa(RELOCATION)
                         .rel(RELOCATION_PREVIOUS_LOCATION, "old-city")
                         .rel(RELOCATION_NEW_LOCATION, "new-city")
                         .rel(RELOCATION_RELOCATED_PERSON, "p")
-                        .has(RELOCATION_DATE, today())
+                        .has(RELOCATION_DATE, today)
         );
 
         log().query("insertRelocation", relocatePersonQuery);
-        tx().forGrakn().execute(relocatePersonQuery).get();
+        tx().execute(relocatePersonQuery);
     }
 
-    @Override
-    protected int checkCount() {
-        GraqlGet.Aggregate countQuery = Graql.match(
-                Graql.var(PERSON).isa(PERSON).has(EMAIL, Graql.var(EMAIL)),
-                Graql.var("old-city").isa(CITY).has(LOCATION_NAME, city().name()),
-                Graql.var(RESIDENCY).isa(RESIDENCY)
-                        .rel(RESIDENCY_RESIDENT, PERSON)
-                        .rel(RESIDENCY_LOCATION, "old-city")
-                        .has(START_DATE, Graql.var(START_DATE)),
-                Graql.not(Graql.var(RESIDENCY).has(END_DATE, Graql.var(END_DATE))),
-//                Graql.var(START_DATE).lte(earliestDate),
-
-                Graql.var("new-city").isa(CITY).has(LOCATION_NAME, Graql.var("newCityName")),
-                Graql.var("old-city").isa(CITY).has(LOCATION_NAME, city().name()),
-
-                Graql.var(RELOCATION).isa(RELOCATION)
-                        .rel(RELOCATION_PREVIOUS_LOCATION, "old-city")
-                        .rel(RELOCATION_NEW_LOCATION, "new-city")
-                        .rel(RELOCATION_RELOCATED_PERSON, PERSON)
-                        .has(RELOCATION_DATE, today())
-        ).get().count();
-        log().query("checkCount", countQuery);
-        return ((Transaction) tx()).count(countQuery);
-    }
-
+//    protected int checkCount() {
+//        GraqlGet.Aggregate countQuery = Graql.match(
+//                Graql.var(PERSON).isa(PERSON).has(EMAIL, Graql.var(EMAIL)),
+//                Graql.var("old-city").isa(CITY).has(LOCATION_NAME, city().name()),
+//                Graql.var(RESIDENCY).isa(RESIDENCY)
+//                        .rel(RESIDENCY_RESIDENT, PERSON)
+//                        .rel(RESIDENCY_LOCATION, "old-city")
+//                        .has(START_DATE, Graql.var(START_DATE)),
+//                Graql.not(Graql.var(RESIDENCY).has(END_DATE, Graql.var(END_DATE))),
+////                Graql.var(START_DATE).lte(earliestDate),
+//
+//                Graql.var("new-city").isa(CITY).has(LOCATION_NAME, Graql.var("newCityName")),
+//                Graql.var("old-city").isa(CITY).has(LOCATION_NAME, city().name()),
+//
+//                Graql.var(RELOCATION).isa(RELOCATION)
+//                        .rel(RELOCATION_PREVIOUS_LOCATION, "old-city")
+//                        .rel(RELOCATION_NEW_LOCATION, "new-city")
+//                        .rel(RELOCATION_RELOCATED_PERSON, PERSON)
+//                        .has(RELOCATION_DATE, today())
+//        ).get().count();
+//        log().query("checkCount", countQuery);
+//        return tx().count(countQuery);
+//    }
 }

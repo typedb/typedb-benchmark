@@ -1,24 +1,25 @@
 package grakn.simulation.db.common.initialise;
 
 import grakn.simulation.db.common.agents.base.AgentRunner;
-import grakn.simulation.db.common.agents.world.CityAgentRunner;
-import grakn.simulation.db.common.agents.world.ContinentAgentRunner;
-import grakn.simulation.db.common.agents.world.CountryAgentRunner;
+import grakn.simulation.db.common.agents.region.CityAgentRunner;
+import grakn.simulation.db.common.agents.region.ContinentAgentRunner;
+import grakn.simulation.db.common.agents.region.CountryAgentRunner;
+import grakn.simulation.db.common.context.DatabaseContext;
 
-public abstract class AgentPicker {
+public abstract class AgentPicker<CONTEXT extends DatabaseContext> {
 
-    protected abstract CityAgentRunner marriage();
-    protected abstract CityAgentRunner personBirth();
-    protected abstract CityAgentRunner ageUpdate();
-    protected abstract CityAgentRunner parentship();
-    protected abstract CityAgentRunner relocation();
-    protected abstract CountryAgentRunner company();
-    protected abstract CityAgentRunner employment();
-    protected abstract ContinentAgentRunner product();
-    protected abstract ContinentAgentRunner transaction();
-    protected abstract CityAgentRunner friendship();
+    protected abstract CityAgentRunner<CONTEXT> marriage();
+    protected abstract CityAgentRunner<CONTEXT> personBirth();
+    protected abstract CityAgentRunner<CONTEXT> ageUpdate();
+    protected abstract CityAgentRunner<CONTEXT> parentship();
+    protected abstract CityAgentRunner<CONTEXT> relocation();
+    protected abstract CountryAgentRunner<CONTEXT> company();
+    protected abstract CityAgentRunner<CONTEXT> employment();
+    protected abstract ContinentAgentRunner<CONTEXT> product();
+    protected abstract ContinentAgentRunner<CONTEXT> transaction();
+    protected abstract CityAgentRunner<CONTEXT> friendship();
 
-    public AgentRunner<?> get(String agentName) {
+    public AgentRunner<?, CONTEXT> get(String agentName) {
         switch (agentName) {
             case "marriage":
                 return marriage();

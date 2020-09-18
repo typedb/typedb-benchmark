@@ -2,10 +2,11 @@ package grakn.simulation.db.neo4j.agents.interaction;
 
 import grakn.simulation.db.common.agents.base.AgentResult;
 import grakn.simulation.db.common.agents.interaction.MarriageAgentBase;
-import grakn.simulation.db.neo4j.driver.Neo4jDriverWrapper.Session.Transaction;
+import grakn.simulation.db.common.world.World;
 import org.neo4j.driver.Query;
 import org.neo4j.driver.Record;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,41 +17,31 @@ import static grakn.simulation.db.neo4j.schema.Schema.GENDER;
 import static grakn.simulation.db.neo4j.schema.Schema.LOCATION_NAME;
 import static grakn.simulation.db.neo4j.schema.Schema.MARRIAGE_ID;
 
-public class MarriageAgent extends MarriageAgentBase {
+public class MarriageAgent extends Neo4jAgent<World.City> implements MarriageAgentBase {
 
-    @Override
-    protected List<String> getSingleWomen() {
-        return getSinglePeopleOfGenderQuery("getSingleWomen", "female");
-    }
-
-    @Override
-    protected List<String> getSingleMen() {
-        return getSinglePeopleOfGenderQuery("getSingleMen", "male");
-    }
-
-    private List<String> getSinglePeopleOfGenderQuery(String scope, String gender) {
+    public List<String> getUnmarriedPeopleOfGender(String scope, World.City city, String gender, LocalDateTime dobOfAdults) {
         String template = "" +
                 "MATCH (person:Person {gender: $gender})-[residency:RESIDENT_OF]->(city:City {locationName: $locationName})\n" +
-                "WHERE datetime(person.dateOfBirth) <= datetime(\"" + dobOfAdults() + "\")\n" +
+                "WHERE datetime(person.dateOfBirth) <= datetime(\"" + dobOfAdults + "\")\n" +
                 "AND NOT (person)-[:MARRIED_TO]-()\n" +
                 "AND NOT EXISTS (residency.endDate)\n" +
                 "RETURN person.email";
 
         HashMap<String, Object> parameters = new HashMap<String, Object>(){{
-                put(LOCATION_NAME, city().name());
+                put(LOCATION_NAME, city.name());
                 put(GENDER, gender);
         }};
 
         Query query = new Query(template, parameters);
 
         log().query(scope, query);
-        List<String> results = ((Transaction) tx()).getOrderedAttribute(query, "person." + EMAIL, null);
+        List<String> results = tx().getOrderedAttribute(query, "person." + EMAIL, null);
         log().message(scope, results.toString());
         return results;
     }
 
     @Override
-    protected AgentResult insertMarriage(int marriageIdentifier, String wifeEmail, String husbandEmail) {
+    public AgentResult insertMarriage(String scope, World.City city, int marriageIdentifier, String wifeEmail, String husbandEmail) {
         String template = "" +
                 "MATCH (wife:Person {email: $wifeEmail}), (husband:Person {email: $husbandEmail}), (city:City {locationName: $locationName})\n" +
                 "CREATE (husband)-[marriage:MARRIED_TO {marriageId: $marriageId, locationName: city.locationName}]->(wife)" +
@@ -60,13 +51,13 @@ public class MarriageAgent extends MarriageAgentBase {
                 put(MARRIAGE_ID, marriageIdentifier);
                 put("wifeEmail", wifeEmail);
                 put("husbandEmail", husbandEmail);
-                put(LOCATION_NAME, city().name());
+                put(LOCATION_NAME, city.name());
         }};
 
         Query query = new Query(template, parameters);
 
         log().query("insertMarriage", query);
-        List<Record> answers = ((Transaction) tx()).execute(query);
+        List<Record> answers = tx().execute(query);
 
         Map<String, Object> answer = getOnlyElement(answers).asMap();
 
@@ -78,20 +69,19 @@ public class MarriageAgent extends MarriageAgentBase {
         }};
     }
 
-    @Override
-    protected int checkCount() {
-        String template = "" +
-                "MATCH (city:City {locationName: $locationName}), \n" +
-                "(husband:Person)-[marriage:MARRIED_TO {locationName: city.locationName}]->(wife:Person)\n" +
-                "RETURN count(marriage), count(marriage.marriageId), count(wife.email), count(husband.email)";
-
-        HashMap<String, Object> parameters = new HashMap<String, Object>(){{
-            put(LOCATION_NAME, city().name());
-        }};
-
-        Query countQuery = new Query(template, parameters);
-
-        log().query("checkCount", countQuery);
-        return ((Transaction) tx()).count(countQuery);
-    }
+//    protected int checkCount() {
+//        String template = "" +
+//                "MATCH (city:City {locationName: $locationName}), \n" +
+//                "(husband:Person)-[marriage:MARRIED_TO {locationName: city.locationName}]->(wife:Person)\n" +
+//                "RETURN count(marriage), count(marriage.marriageId), count(wife.email), count(husband.email)";
+//
+//        HashMap<String, Object> parameters = new HashMap<String, Object>(){{
+//            put(LOCATION_NAME, city.name());
+//        }};
+//
+//        Query countQuery = new Query(template, parameters);
+//
+//        log().query("checkCount", countQuery);
+//        return tx().count(countQuery);
+//    }
 }

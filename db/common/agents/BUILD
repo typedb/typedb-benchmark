@@ -4,11 +4,11 @@ java_library(
         "base/*.java",
         "interaction/*.java",
         "utils/*.java",
-        "world/*.java",
+        "region/*.java",
     ]),
     visibility = ["//visibility:public"],
     deps = [
-        "//db/common/driver",
+        "//db/common/context",
         "//db/common/world",
         "//utils",
         "@graknlabs_grabl_tracing//client",

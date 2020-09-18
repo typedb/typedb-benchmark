@@ -1,10 +1,11 @@
 package grakn.simulation.db.common.agents.interaction;
 
 import grabl.tracing.client.GrablTracingThreadStatic.ThreadTrace;
+import grakn.simulation.db.common.agents.base.Agent;
 import grakn.simulation.db.common.agents.base.AgentResultSet;
+import grakn.simulation.db.common.agents.base.IterationContext;
 import grakn.simulation.db.common.agents.utils.Allocation;
-import grakn.simulation.db.common.agents.utils.Pair;
-import grakn.simulation.db.common.agents.world.CityAgent;
+import grakn.simulation.db.common.world.World;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -15,22 +16,23 @@ import java.util.Map;
 
 import static grabl.tracing.client.GrablTracingThreadStatic.traceOnThread;
 
-public abstract class ParentshipAgent extends CityAgent {
+public interface ParentshipAgentBase extends InteractionAgent<World.City> {
 
-    protected enum Email {
+    enum Email {
         WIFE, HUSBAND
     }
 
     @Override
-    public final AgentResultSet iterate() {
+    default AgentResultSet iterate(Agent<World.City, ?> agent, World.City city, IterationContext iterationContext) {
         // Query for married couples in the city who are not already in a parentship relation together
         List<String> childrenEmails;
-        try (ThreadTrace trace = traceOnThread(this.registerMethodTrace("getChildrenEmailsBorn"))) {
-            childrenEmails = getChildrenEmailsBorn(today());
+        agent.startAction();
+        try (ThreadTrace trace = traceOnThread(agent.registerMethodTrace("getChildrenEmailsBorn"))) {
+            childrenEmails = getChildrenEmailsBorn(city, iterationContext.today());
         }
         List<HashMap<Email, String>> marriageEmails;
-        try (ThreadTrace trace = traceOnThread(this.registerMethodTrace("getMarriageEmails"))) {
-            marriageEmails = getMarriageEmails();
+        try (ThreadTrace trace = traceOnThread(agent.registerMethodTrace("getMarriageEmails"))) {
+            marriageEmails = getMarriageEmails(city);
         }
 
         if (marriageEmails.size() > 0 && childrenEmails.size() > 0) {
@@ -46,22 +48,21 @@ public abstract class ParentshipAgent extends CityAgent {
                 for (Integer childIndex : children) {
                     childEmails.add(childrenEmails.get(childIndex));
                 }
-                try (ThreadTrace trace = traceOnThread(this.checkMethodTrace("insertParentShip"))) {
+                try (ThreadTrace trace = traceOnThread(agent.checkMethodTrace("insertParentShip"))) {
                     insertParentShip(marriage, childEmails);
                 }
             }
-            commitTxWithTracing();
+            agent.commitAction();
+        } else {
+            agent.stopAction();
         }
         return null;
     }
 
-    abstract protected List<HashMap<Email, String>> getMarriageEmails();
+    List<HashMap<Email, String>> getMarriageEmails(World.City city);
 
-    abstract protected List<String> getChildrenEmailsBorn(LocalDateTime dateToday);
+    List<String> getChildrenEmailsBorn(World.City city, LocalDateTime today);
 
-    abstract protected void insertParentShip(HashMap<Email, String> marriage, List<String> childEmails);
+    void insertParentShip(HashMap<Email, String> marriage, List<String> childEmails);
 
-    protected Pair<Integer, Integer> countBounds() {
-        return new Pair<>(0, world().getScaleFactor());
-    }
 }

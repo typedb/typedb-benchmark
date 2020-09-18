@@ -3,19 +3,19 @@ package grakn.simulation.db.grakn.agents.interaction;
 import grakn.client.answer.ConceptMap;
 import grakn.simulation.db.common.agents.base.AgentResult;
 import grakn.simulation.db.common.agents.interaction.PersonBirthAgentBase;
-import grakn.simulation.db.grakn.driver.GraknClientWrapper.Session.Transaction;
+import grakn.simulation.db.common.world.World;
+import grakn.simulation.db.grakn.context.GraknContext;
 import graql.lang.Graql;
 import graql.lang.query.GraqlGet;
 import graql.lang.query.GraqlInsert;
 import graql.lang.statement.Statement;
 
-import java.util.HashMap;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static com.google.common.collect.Iterables.getOnlyElement;
 import static grabl.tracing.client.GrablTracingThreadStatic.ThreadTrace;
 import static grabl.tracing.client.GrablTracingThreadStatic.traceOnThread;
-import static grakn.simulation.db.grakn.agents.utils.Utils.getOnlyAttributeOfThing;
 import static grakn.simulation.db.grakn.schema.Schema.BORN_IN;
 import static grakn.simulation.db.grakn.schema.Schema.BORN_IN_CHILD;
 import static grakn.simulation.db.grakn.schema.Schema.BORN_IN_PLACE_OF_BIRTH;
@@ -28,10 +28,10 @@ import static grakn.simulation.db.grakn.schema.Schema.LOCATION_NAME;
 import static grakn.simulation.db.grakn.schema.Schema.PERSON;
 import static grakn.simulation.db.grakn.schema.Schema.SURNAME;
 
-public class PersonBirthAgent extends PersonBirthAgentBase {
+public class PersonBirthAgent extends GraknAgent<World.City> implements PersonBirthAgentBase {
 
     @Override
-    protected AgentResult insertPerson(String email, String gender, String forename, String surname) {
+    public AgentResult insertPerson(String scope, World.City worldCity, LocalDateTime today, String email, String gender, String forename, String surname) {
         Statement city = Graql.var(CITY);
         Statement person = Graql.var(PERSON);
         Statement bornIn = Graql.var(BORN_IN);
@@ -44,7 +44,7 @@ public class PersonBirthAgent extends PersonBirthAgentBase {
         GraqlInsert query =
                 Graql.match(
                         city.isa(CITY)
-                                .has(LOCATION_NAME, city().name()))
+                                .has(LOCATION_NAME, worldCity.name()))
                         .insert(
                                 person.isa(PERSON)
                                         .has(EMAIL, emailVar)
@@ -60,28 +60,25 @@ public class PersonBirthAgent extends PersonBirthAgentBase {
                                 genderVar.val(gender),
                                 forenameVar.val(forename),
                                 surnameVar.val(surname),
-                                dobVar.val(today())
+                                dobVar.val(today)
                         );
 
         List<ConceptMap> answers;
-        log().query("insertPerson", query);
-        try (ThreadTrace trace = traceOnThread("execute")) {
-            answers = tx().forGrakn().execute(query).get();
-        }
+        log().query(scope, query); // TODO move logging into the transaction wrapper?
+        answers = tx().execute(query);
 
         ConceptMap answer = getOnlyElement(answers);
         return new AgentResult(){
             {
-                put(PersonBirthAgentField.EMAIL, getOnlyAttributeOfThing(answer, tx().forGrakn(), PERSON, EMAIL));
-                put(PersonBirthAgentField.DATE_OF_BIRTH, getOnlyAttributeOfThing(answer, tx().forGrakn(), PERSON, DATE_OF_BIRTH));
-                put(PersonBirthAgentField.GENDER, getOnlyAttributeOfThing(answer, tx().forGrakn(), PERSON, GENDER));
-                put(PersonBirthAgentField.FORENAME, getOnlyAttributeOfThing(answer, tx().forGrakn(), PERSON, FORENAME));
-                put(PersonBirthAgentField.SURNAME, getOnlyAttributeOfThing(answer, tx().forGrakn(), PERSON, SURNAME));
+                put(PersonBirthAgentField.EMAIL, tx().getOnlyAttributeOfThing(answer, PERSON, EMAIL));
+                put(PersonBirthAgentField.DATE_OF_BIRTH, tx().getOnlyAttributeOfThing(answer, PERSON, DATE_OF_BIRTH));
+                put(PersonBirthAgentField.GENDER, tx().getOnlyAttributeOfThing(answer, PERSON, GENDER));
+                put(PersonBirthAgentField.FORENAME, tx().getOnlyAttributeOfThing(answer, PERSON, FORENAME));
+                put(PersonBirthAgentField.SURNAME, tx().getOnlyAttributeOfThing(answer, PERSON, SURNAME));
             }};
     }
 
-    @Override
-    protected int checkCount() {
+    protected int checkCount(World.City worldCity) {
         Statement city = Graql.var(CITY);
         Statement person = Graql.var(PERSON);
         Statement bornIn = Graql.var(BORN_IN);
@@ -94,7 +91,7 @@ public class PersonBirthAgent extends PersonBirthAgentBase {
 
         GraqlGet.Aggregate countQuery = Graql.match(
                 city.isa(CITY)
-                        .has(LOCATION_NAME, city().name()),
+                        .has(LOCATION_NAME, worldCity.name()),
                 person.isa(PERSON)
                         .has(EMAIL, emailVar)
                         .has(DATE_OF_BIRTH, dobVar)
@@ -106,6 +103,6 @@ public class PersonBirthAgent extends PersonBirthAgentBase {
                         .rel(BORN_IN_CHILD, person)
                         .rel(BORN_IN_PLACE_OF_BIRTH, city)
         ).get().count();
-        return ((Transaction) tx()).count(countQuery);
+        return tx().count(countQuery);
     }
 }

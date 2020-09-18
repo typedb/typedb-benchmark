@@ -1,7 +1,7 @@
 java_library(
     name = "simulation-lib",
     srcs = [
-        "Simulation.java",
+        "SimulationRunner.java",
     ],
     resource_strip_prefix = "conf/",
     resources = [
@@ -10,8 +10,8 @@ java_library(
     visibility = ["//visibility:public"],
     deps = [
         "//config",
+        "//db/common:simulation-common",
         "//db/common/agents",
-        "//db/common/driver",
         "//db/common/initialise",
         "//db/common/world",
         "//db/common/yaml_tool",
@@ -41,7 +41,7 @@ java_binary(
         "//db/grakn/schema:graql-schema",
         "//db/neo4j/data",
     ],
-    main_class = "grakn.simulation.Simulation",
+    main_class = "grakn.simulation.SimulationRunner",
     runtime_deps = [":simulation-lib"],
 )
 
@@ -61,7 +61,7 @@ java_binary(
         "//db/grakn/schema:graql-schema",
         "//db/neo4j/data",
     ],
-    main_class = "grakn.simulation.Simulation",
+    main_class = "grakn.simulation.SimulationRunner",
     runtime_deps = [":simulation-lib"],
 )
 

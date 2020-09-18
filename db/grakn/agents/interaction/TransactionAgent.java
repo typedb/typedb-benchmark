@@ -1,7 +1,8 @@
 package grakn.simulation.db.grakn.agents.interaction;
 
+import grakn.simulation.db.common.agents.interaction.TransactionAgentBase;
 import grakn.simulation.db.common.agents.utils.Pair;
-import grakn.simulation.db.grakn.driver.GraknClientWrapper.Session.Transaction;
+import grakn.simulation.db.common.world.World;
 import graql.lang.Graql;
 import graql.lang.query.GraqlGet;
 import graql.lang.query.GraqlInsert;
@@ -27,24 +28,24 @@ import static grakn.simulation.db.grakn.schema.Schema.TRANSACTION_MERCHANDISE;
 import static grakn.simulation.db.grakn.schema.Schema.TRANSACTION_SELLER;
 import static grakn.simulation.db.grakn.schema.Schema.VALUE;
 
-public class TransactionAgent extends grakn.simulation.db.common.agents.interaction.TransactionAgent {
+public class TransactionAgent extends GraknAgent<World.Continent> implements TransactionAgentBase {
 
     @Override
-    protected List<Long> getCompanyNumbersInContinent(){
-        GraqlGet companiesQuery = getCompanyNumbersInContinentQuery(continent());
-        log().query("getCompanyNumbersInCountry", companiesQuery);
-        return ((Transaction)tx()).getOrderedAttribute(companiesQuery, COMPANY_NUMBER, null);
+    public List<Long> getCompanyNumbersInContinent(World.Continent continent, String scope){
+        GraqlGet companiesQuery = getCompanyNumbersInContinentQuery(continent);
+        log().query(scope, companiesQuery);
+        return tx().getOrderedAttribute(companiesQuery, COMPANY_NUMBER, null);
     }
 
     @Override
-    protected List<Double> getProductBarcodesInContinent() {
-        GraqlGet productsQuery = getProductsInContinentQuery(continent());
-        log().query("getProductBarcodesInContinent", productsQuery);
-        return ((Transaction)tx()).getOrderedAttribute(productsQuery, PRODUCT_BARCODE, null);
+    public List<Double> getProductBarcodesInContinent(World.Continent continent, String scope) {
+        GraqlGet productsQuery = getProductsInContinentQuery(continent);
+        log().query(scope, productsQuery);
+        return tx().getOrderedAttribute(productsQuery, PRODUCT_BARCODE, null);
     }
 
     @Override
-    protected void insertTransaction(Pair<Long, Double> transaction, long sellerCompanyNumber, double value, int productQuantity, boolean isTaxable){
+    public void insertTransaction(World.Continent continent, Pair<Long, Double> transaction, long sellerCompanyNumber, double value, int productQuantity, boolean isTaxable){
         GraqlInsert insertTransactionQuery = Graql.match(
                 Graql.var(PRODUCT)
                         .isa(PRODUCT)
@@ -54,7 +55,7 @@ public class TransactionAgent extends grakn.simulation.db.common.agents.interact
                 Graql.var("c-seller").isa(COMPANY)
                         .has(COMPANY_NUMBER, sellerCompanyNumber),
                 Graql.var(CONTINENT).isa(CONTINENT)
-                        .has(LOCATION_NAME, continent().name()))
+                        .has(LOCATION_NAME, continent.name()))
                 .insert(
                         Graql.var(TRANSACTION)
                                 .isa(TRANSACTION)
@@ -72,15 +73,6 @@ public class TransactionAgent extends grakn.simulation.db.common.agents.interact
 
                 );
         log().query("insertTransaction", insertTransactionQuery);
-        tx().forGrakn().execute(insertTransactionQuery).get();
-    }
-
-    @Override
-    protected int checkCount() {
-//        GraqlGet.Aggregate countQuery = Graql.match(
-//
-//        ).get().count();
-//        return ((Transaction) tx()).count(countQuery);
-        return 0;
+        tx().execute(insertTransactionQuery);
     }
 }

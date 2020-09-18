@@ -1,6 +1,8 @@
 java_library(
     name = "neo4j",
     srcs = glob([
+        "*.java",
+        "context/*.java",
         "agents/interaction/*.java",
         "initialise/*.java",
         "yaml_tool/*.java",
@@ -9,11 +11,14 @@ java_library(
     visibility = ["//visibility:public"],
     deps = [
         "//db/neo4j/schema",
+        "//db/common:simulation-common",
+        "//db/common/context",
         "//db/common/agents",
-        "//db/common/driver",
         "//db/common/initialise",
         "//db/common/world",
         "//db/common/yaml_tool",
+        "//config:config",
+        "//utils",
         "@graknlabs_grabl_tracing//client",
         "@maven//:org_apache_commons_commons_csv",
         "@maven//:org_apache_commons_commons_lang3",

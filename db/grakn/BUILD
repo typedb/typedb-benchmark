@@ -1,6 +1,8 @@
 java_library(
     name = "grakn",
     srcs = glob([
+        "*.java",
+        "context/*.java",
         "agents/interaction/*.java",
         "agents/utils/*.java",
         "initialise/*.java",
@@ -10,16 +12,18 @@ java_library(
     visibility = ["//visibility:public"],
     deps = [
         "//db/grakn/schema",
+        "//db/common:simulation-common",
+        "//db/common/context",
         "//db/common/agents",
-        "//db/common/driver",
         "//db/common/initialise",
         "//db/common/world",
         "//db/common/yaml_tool",
+        "//config:config",
+        "//utils",
+        "@maven//:org_apache_commons_commons_csv",
+        "@maven//:com_google_guava_guava",
         "@graknlabs_client_java//:client-java",
         "@graknlabs_grabl_tracing//client",
         "@graknlabs_graql//java:graql",
-        "@maven//:org_apache_commons_commons_csv",
-        "@maven//:org_apache_commons_commons_lang3",
-        "@maven//:com_google_guava_guava",
     ],
 )

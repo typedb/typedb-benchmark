@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class World {
@@ -73,6 +74,28 @@ public class World {
         CSVParser.parse(path, StandardCharsets.UTF_8, CSVFormat.DEFAULT).forEach(action);
     }
 
+    public static World initialise(int scaleFactor, Map<String, Path> files) {
+        World world;
+        try {
+            world = new World(
+                    scaleFactor,
+                    files.get("continents.csv"),
+                    files.get("countries.csv"),
+                    files.get("cities.csv"),
+                    files.get("female_forenames.csv"),
+                    files.get("male_forenames.csv"),
+                    files.get("surnames.csv"),
+                    files.get("adjectives.csv"),
+                    files.get("nouns.csv")
+            );
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.exit(1);
+            return null;
+        }
+        return world;
+    }
+
     public Stream<Continent> getContinents() {
         return continents.stream();
     }
@@ -109,7 +132,7 @@ public class World {
         return scaleFactor;
     }
 
-    public class Continent {
+    public class Continent implements Region {
         private String continentName;
         private List<Country> countries = new ArrayList<>();
 
@@ -131,9 +154,14 @@ public class World {
         public Stream<Country> countries() {
             return countries.stream();
         }
+
+        @Override
+        public String tracker() {
+            return Tracker.of(this);
+        }
     }
 
-    public class Country {
+    public class Country implements Region {
         private String countryName;
         private Continent continent;
         private List<City> cities = new ArrayList<>();
@@ -161,9 +189,14 @@ public class World {
         public Stream<City> cities() {
             return cities.stream();
         }
+
+        @Override
+        public String tracker() {
+            return Tracker.of(this.continent(), this);
+        }
     }
 
-    public class City {
+    public class City implements Region {
         private String cityName;
         private Country country;
 
@@ -185,6 +218,17 @@ public class World {
 
         public Country country() {
             return country;
+        }
+
+        @Override
+        public String tracker() {
+            return Tracker.of(country().continent(), country(), this);
+        }
+    }
+
+    public static class Tracker {
+        public static String of(Object... items) {
+            return Stream.of(items).map(Object::toString).collect(Collectors.joining(":"));
         }
     }
 }

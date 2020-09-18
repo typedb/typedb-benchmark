@@ -1,9 +1,10 @@
 package grakn.simulation.db.grakn.initialise;
 
+import grakn.simulation.db.common.agents.region.CityAgentRunner;
+import grakn.simulation.db.common.agents.region.ContinentAgentRunner;
+import grakn.simulation.db.common.agents.region.CountryAgentRunner;
 import grakn.simulation.db.common.initialise.AgentPicker;
-import grakn.simulation.db.common.agents.world.CityAgentRunner;
-import grakn.simulation.db.common.agents.world.ContinentAgentRunner;
-import grakn.simulation.db.common.agents.world.CountryAgentRunner;
+import grakn.simulation.db.grakn.context.GraknContext;
 import grakn.simulation.db.grakn.agents.interaction.AgeUpdateAgent;
 import grakn.simulation.db.grakn.agents.interaction.CompanyAgent;
 import grakn.simulation.db.grakn.agents.interaction.EmploymentAgent;
@@ -15,59 +16,65 @@ import grakn.simulation.db.grakn.agents.interaction.ProductAgent;
 import grakn.simulation.db.grakn.agents.interaction.RelocationAgent;
 import grakn.simulation.db.grakn.agents.interaction.TransactionAgent;
 
-import static grakn.simulation.db.common.agents.world.CityAgentRunner.SessionStrategy.CONTINENT;
-import static grakn.simulation.db.common.agents.world.CountryAgentRunner.SessionStrategy.COUNTRY;
+import static grakn.simulation.db.common.agents.region.CityAgentRunner.SessionStrategy.CONTINENT;
+import static grakn.simulation.db.common.agents.region.CountryAgentRunner.SessionStrategy.COUNTRY;
 
-public class GraknAgentPicker extends AgentPicker {
+public class GraknAgentPicker extends AgentPicker<GraknContext> {
 
-    @Override
-    protected CityAgentRunner marriage() {
-        return new CityAgentRunner(MarriageAgent.class, CONTINENT);
+    private final GraknContext backendContext;
+
+    public GraknAgentPicker(GraknContext backendContext) {
+        this.backendContext = backendContext;
     }
 
     @Override
-    protected CityAgentRunner personBirth() {
-        return new CityAgentRunner(PersonBirthAgent.class, CONTINENT);
+    protected CityAgentRunner<GraknContext> marriage() {
+        return new CityAgentRunner<>(MarriageAgent.class, backendContext, CONTINENT);
     }
 
     @Override
-    protected CityAgentRunner ageUpdate() {
-        return new CityAgentRunner(AgeUpdateAgent.class, CONTINENT);
+    protected CityAgentRunner<GraknContext> personBirth() {
+        return new CityAgentRunner<>(PersonBirthAgent.class, backendContext, CONTINENT);
     }
 
     @Override
-    protected CityAgentRunner parentship() {
-        return new CityAgentRunner(ParentshipAgent.class, CONTINENT);
+    protected CityAgentRunner<GraknContext> ageUpdate() {
+        return new CityAgentRunner<>(AgeUpdateAgent.class, backendContext, CONTINENT);
     }
 
     @Override
-    protected CityAgentRunner relocation() {
-        return new CityAgentRunner(RelocationAgent.class, CONTINENT);
+    protected CityAgentRunner<GraknContext> parentship() {
+        return new CityAgentRunner<>(ParentshipAgent.class, backendContext, CONTINENT);
     }
 
     @Override
-    protected CountryAgentRunner company() {
-        return new CountryAgentRunner(CompanyAgent.class, COUNTRY);
+    protected CityAgentRunner<GraknContext> relocation() {
+        return new CityAgentRunner<>(RelocationAgent.class, backendContext, CONTINENT);
     }
 
     @Override
-    protected CityAgentRunner employment() {
-        return new CityAgentRunner(EmploymentAgent.class, CONTINENT);
+    protected CountryAgentRunner<GraknContext> company() {
+        return new CountryAgentRunner<>(CompanyAgent.class, backendContext, COUNTRY);
     }
 
     @Override
-    protected ContinentAgentRunner product() {
-        return new ContinentAgentRunner(ProductAgent.class);
+    protected CityAgentRunner<GraknContext> employment() {
+        return new CityAgentRunner<>(EmploymentAgent.class, backendContext, CONTINENT);
     }
 
     @Override
-    protected ContinentAgentRunner transaction() {
-        return new ContinentAgentRunner(TransactionAgent.class);
+    protected ContinentAgentRunner<GraknContext> product() {
+        return new ContinentAgentRunner<>(ProductAgent.class, backendContext);
     }
 
     @Override
-    protected CityAgentRunner friendship() {
-        return new CityAgentRunner(FriendshipAgent.class, CONTINENT);
+    protected ContinentAgentRunner<GraknContext> transaction() {
+        return new ContinentAgentRunner<>(TransactionAgent.class, backendContext);
+    }
+
+    @Override
+    protected CityAgentRunner<GraknContext> friendship() {
+        return new CityAgentRunner<>(FriendshipAgent.class, backendContext, CONTINENT);
     }
 
 }

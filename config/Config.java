@@ -65,15 +65,15 @@ public class Config {
     }
 
     public static class TraceSampling {
-        private Schema.SamplingFunction function;
+        private SamplingFunction function;
         private Integer arg;
 
         public Function<Integer, Boolean> getSamplingFunction() {
-            return Schema.SamplingFunction.applyArg(function, arg);
+            return SamplingFunction.applyArg(function, arg);
         }
 
         public void setFunction(String function) {
-            this.function = Schema.SamplingFunction.getByName(function);
+            this.function = SamplingFunction.getByName(function);
         }
 
         public Integer getArg() {
@@ -86,8 +86,16 @@ public class Config {
     }
 
     public static class Agent {
-        private Schema.AgentMode agentMode;
+        private AgentMode agentMode;
         private String name;
+
+        public static Agent ConstructAgentConfig(String name, AgentMode agentMode) {
+            // This method is needed because snakeyaml doesn't support declaring a constructor for this class
+            Agent agent = new Agent();
+            agent.setName(name);
+            agent.setMode(agentMode);
+            return agent;
+        }
 
         public void setName(String name) {
             this.name = name;
@@ -97,23 +105,11 @@ public class Config {
             return name;
         }
 
-        public void setMode(String mode) {
-            switch (mode) {
-                case "trace":
-                    this.agentMode = Schema.AgentMode.TRACE;
-                    break;
-                case "run":
-                    this.agentMode = Schema.AgentMode.RUN;
-                    break;
-                case "off":
-                    this.agentMode = Schema.AgentMode.OFF;
-                    break;
-                default:
-                    throw new IllegalArgumentException(String.format("Unrecognised agent mode %s", mode));
-            }
+        public void setMode(AgentMode mode) {
+            this.agentMode = mode;
         }
 
-        public Schema.AgentMode getAgentMode() {
+        public AgentMode getAgentMode() {
             return agentMode;
         }
     }

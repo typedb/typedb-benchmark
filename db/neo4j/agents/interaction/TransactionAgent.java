@@ -1,7 +1,9 @@
 package grakn.simulation.db.neo4j.agents.interaction;
 
+import grakn.simulation.db.common.agents.interaction.TransactionAgentBase;
 import grakn.simulation.db.common.agents.utils.Pair;
-import grakn.simulation.db.neo4j.driver.Neo4jDriverWrapper;
+import grakn.simulation.db.common.world.World;
+import grakn.simulation.db.neo4j.driver.Transaction;
 import org.neo4j.driver.Query;
 
 import java.util.HashMap;
@@ -10,23 +12,23 @@ import java.util.List;
 import static grakn.simulation.db.neo4j.agents.interaction.CompanyAgent.getCompanyNumbersInContinentQuery;
 import static grakn.simulation.db.neo4j.agents.interaction.ProductAgent.getProductsInContinentQuery;
 
-public class TransactionAgent extends grakn.simulation.db.common.agents.interaction.TransactionAgent {
+public class TransactionAgent extends Neo4jAgent<World.Continent> implements TransactionAgentBase {
     @Override
-    protected List<Long> getCompanyNumbersInContinent() {
-        Query companiesQuery = getCompanyNumbersInContinentQuery(continent());
-        log().query("getCompanyNumbersInContinent", companiesQuery);
-        return ((Neo4jDriverWrapper.Session.Transaction) tx()).getOrderedAttribute(companiesQuery, "company.companyNumber", null);
+    public List<Long> getCompanyNumbersInContinent(World.Continent continent, String scope) {
+        Query companiesQuery = getCompanyNumbersInContinentQuery(continent);
+        log().query(scope, companiesQuery);
+        return tx().getOrderedAttribute(companiesQuery, "company.companyNumber", null);
     }
 
     @Override
-    protected List<Double> getProductBarcodesInContinent() {
-        Query productsQuery = getProductsInContinentQuery(continent());
-        log().query("getProductBarcodesInContinent", productsQuery);
-        return ((Neo4jDriverWrapper.Session.Transaction) tx()).getOrderedAttribute(productsQuery, "product.barcode", null);
+    public List<Double> getProductBarcodesInContinent(World.Continent continent, String scope) {
+        Query productsQuery = getProductsInContinentQuery(continent);
+        log().query(scope, productsQuery);
+        return tx().getOrderedAttribute(productsQuery, "product.barcode", null);
     }
 
     @Override
-    protected void insertTransaction(Pair<Long, Double> transaction, long sellerCompanyNumber, double value, int productQuantity, boolean isTaxable) {
+    public void insertTransaction(World.Continent continent, Pair<Long, Double> transaction, long sellerCompanyNumber, double value, int productQuantity, boolean isTaxable) {
         String template = "" +
                 "MATCH (product:Product {barcode: $barcode}),\n" +
                 "(buyer:Company {companyNumber: $buyerNumber}),\n" +
@@ -46,18 +48,13 @@ public class TransactionAgent extends grakn.simulation.db.common.agents.interact
                 put("barcode", transaction.getSecond());
                 put("buyerNumber", transaction.getFirst());
                 put("sellerNumber", sellerCompanyNumber);
-                put("continentName", continent().name());
+                put("continentName", continent.name());
                 put("value", value);
                 put("productQuantity", productQuantity);
                 put("isTaxable", isTaxable);
         }};
         Query insertTransactionQuery = new Query(template, parameters);
         log().query("insertTransaction", insertTransactionQuery);
-        ((Neo4jDriverWrapper.Session.Transaction) tx()).execute(insertTransactionQuery);
-    }
-
-    @Override
-    protected int checkCount() {
-        return 0;
+        tx().execute(insertTransactionQuery);
     }
 }

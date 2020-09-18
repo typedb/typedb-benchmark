@@ -1,17 +1,17 @@
-package grakn.simulation.db.common.agents.world;
+package grakn.simulation.db.common.agents.region;
 
 import grakn.simulation.db.common.agents.base.Agent;
 import grakn.simulation.db.common.agents.base.IterationContext;
 import grakn.simulation.db.common.agents.base.AgentRunner;
+import grakn.simulation.db.common.context.DatabaseContext;
 import grakn.simulation.utils.RandomSource;
-import grakn.simulation.db.common.agents.utils.Tracker;
 import grakn.simulation.db.common.world.World;
 
 import java.util.List;
 
 import static java.util.stream.Collectors.toList;
 
-public class CityAgentRunner extends AgentRunner<World.City> {
+public class CityAgentRunner<CONTEXT extends DatabaseContext> extends AgentRunner<World.City, CONTEXT> {
 
     private SessionStrategy sessionStrategy;
 
@@ -19,14 +19,14 @@ public class CityAgentRunner extends AgentRunner<World.City> {
         CITY, COUNTRY, CONTINENT
     }
 
-    public CityAgentRunner(Class<? extends Agent<World.City>> agentClass, SessionStrategy sessionStrategy) {
-        super(agentClass);
+    public CityAgentRunner(Class<? extends Agent<World.City, CONTEXT>> agentClass, CONTEXT backendContext, SessionStrategy sessionStrategy) {
+        super(agentClass, backendContext);
         this.sessionStrategy = sessionStrategy;
     }
 
     @Override
-    protected List<World.City> getParallelItems(IterationContext iterationContext, RandomSource randomSource) {
-        return iterationContext.getWorld().getCities().collect(toList());
+    protected List<World.City> getParallelItems(IterationContext iterationContext) {
+        return iterationContext.world().getCities().collect(toList());
     }
 
     @Override
@@ -41,11 +41,6 @@ public class CityAgentRunner extends AgentRunner<World.City> {
             default:
                 throw new IllegalArgumentException("Unexpected session strategy: " + sessionStrategy.name());
         }
-    }
-
-    @Override
-    protected String getTracker(IterationContext iterationContext, RandomSource randomSource, World.City city) {
-        return Tracker.of(city.country().continent(), city.country(), city);
     }
 }
 

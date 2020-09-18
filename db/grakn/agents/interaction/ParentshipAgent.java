@@ -1,7 +1,8 @@
 package grakn.simulation.db.grakn.agents.interaction;
 
 import grakn.client.answer.ConceptMap;
-import grakn.simulation.db.grakn.driver.GraknClientWrapper.Session.Transaction;
+import grakn.simulation.db.common.agents.interaction.ParentshipAgentBase;
+import grakn.simulation.db.common.world.World;
 import graql.lang.Graql;
 import graql.lang.query.GraqlGet;
 import graql.lang.query.GraqlInsert;
@@ -33,13 +34,13 @@ import static grakn.simulation.db.grakn.schema.Schema.PARENTSHIP_PARENT;
 import static grakn.simulation.db.grakn.schema.Schema.PERSON;
 import static java.util.stream.Collectors.toList;
 
-public class ParentshipAgent extends grakn.simulation.db.common.agents.interaction.ParentshipAgent {
+public class ParentshipAgent extends GraknAgent<World.City> implements ParentshipAgentBase {
 
     @Override
-    protected List<HashMap<Email, String>> getMarriageEmails() {
+    public List<HashMap<Email, String>> getMarriageEmails(World.City city) {
         GraqlGet.Sorted marriageQuery = Graql.match(
                 Graql.var(CITY).isa(CITY)
-                        .has(LOCATION_NAME, city().name()),
+                        .has(LOCATION_NAME, city.name()),
                 Graql.var("m").isa(MARRIAGE)
                         .rel(MARRIAGE_HUSBAND, Graql.var("husband"))
                         .rel(MARRIAGE_WIFE, Graql.var("wife"))
@@ -59,7 +60,7 @@ public class ParentshipAgent extends grakn.simulation.db.common.agents.interacti
         ).get().sort(MARRIAGE_ID);
 
         log().query("getMarriageEmails", marriageQuery);
-        List<ConceptMap> marriageAnswers = tx().forGrakn().execute(marriageQuery).get();
+        List<ConceptMap> marriageAnswers = tx().execute(marriageQuery);
 
         return marriageAnswers
                 .stream()
@@ -71,25 +72,25 @@ public class ParentshipAgent extends grakn.simulation.db.common.agents.interacti
     }
 
     @Override
-    protected List<String> getChildrenEmailsBorn(LocalDateTime dateToday) {
+    public List<String> getChildrenEmailsBorn(World.City worldCity, LocalDateTime today) {
 
         GraqlGet.Unfiltered childrenQuery = Graql.match(
                 Graql.var("c").isa(CITY)
-                        .has(LOCATION_NAME, city().name()),
+                        .has(LOCATION_NAME, worldCity.name()),
                 Graql.var("child").isa(PERSON)
                         .has(EMAIL, Graql.var(EMAIL))
-                        .has(DATE_OF_BIRTH, dateToday),
+                        .has(DATE_OF_BIRTH, today),
                 Graql.var("bi").isa(BORN_IN)
                         .rel(BORN_IN_PLACE_OF_BIRTH, "c")
                         .rel(BORN_IN_CHILD, "child")
         ).get();
 
         log().query("getChildrenEmails", childrenQuery);
-        return ((Transaction)tx()).getOrderedAttribute(childrenQuery, EMAIL, null);
+        return tx().getOrderedAttribute(childrenQuery, EMAIL, null);
     }
 
     @Override
-    protected void insertParentShip(HashMap<Email, String> marriage, List<String> childEmails) {
+    public void insertParentShip(HashMap<Email, String> marriage, List<String> childEmails) {
         ArrayList<Statement> matchStatements = new ArrayList<>(Arrays.asList(
                 Graql.var("mother").isa(PERSON).has(EMAIL, marriage.get(Email.WIFE)),
                 Graql.var("father").isa(PERSON).has(EMAIL, marriage.get(Email.HUSBAND))
@@ -120,15 +121,6 @@ public class ParentshipAgent extends grakn.simulation.db.common.agents.interacti
         );
 
         log().query("insertParentShip", parentshipQuery);
-        tx().forGrakn().execute(parentshipQuery).get();
-    }
-
-    @Override
-    protected int checkCount() {
-//        GraqlGet.Aggregate countQuery = Graql.match(
-//
-//        ).get().count();
-//        return ((Transaction) tx()).count(countQuery);
-        return 0;
+        tx().execute(parentshipQuery);
     }
 }
