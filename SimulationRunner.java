@@ -5,9 +5,7 @@ import grabl.tracing.client.GrablTracingThreadStatic;
 import grakn.simulation.config.Config;
 import grakn.simulation.config.ConfigLoader;
 import grakn.simulation.db.common.Simulation;
-import grakn.simulation.db.common.agents.base.AgentRunner;
 import grakn.simulation.db.common.agents.base.ResultHandler;
-import grakn.simulation.db.common.initialise.AgentPicker;
 import grakn.simulation.db.common.world.World;
 import grakn.simulation.db.grakn.GraknSimulation;
 import grakn.simulation.db.neo4j.Neo4jSimulation;
@@ -24,7 +22,6 @@ import org.slf4j.LoggerFactory;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -82,8 +79,6 @@ public class SimulationRunner {
 
         // Components customised based on the DB
         String defaultUri;
-        AgentPicker agentPicker;
-        List<AgentRunner<?, ?>> agentRunnerList;
 
         LOG.info("Welcome to the Simulation!");
         LOG.info("Parsing world data...");
@@ -138,6 +133,7 @@ public class SimulationRunner {
                 for (int i = 0; i < config.getIterations(); ++i) {
                     simulation.iterate();
                 }
+                simulation.close();
             }
         } catch (Exception ex) {
             ex.printStackTrace();
