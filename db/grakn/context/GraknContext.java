@@ -2,6 +2,7 @@ package grakn.simulation.db.grakn.context;
 
 import grabl.tracing.client.GrablTracingThreadStatic;
 import grakn.client.GraknClient;
+import grakn.simulation.db.common.agents.base.LogWrapper;
 import grakn.simulation.db.common.context.DatabaseContext;
 import grakn.simulation.db.grakn.driver.Transaction;
 
@@ -35,9 +36,9 @@ public class GraknContext extends DatabaseContext {
         });
     }
 
-    public Transaction tx(String sessionKey) {
+    public Transaction tx(String sessionKey, LogWrapper log, String tracker) {
         try (GrablTracingThreadStatic.ThreadTrace trace = traceOnThread(OPEN_TRANSACTION.getName())) {
-            return new Transaction(session(sessionKey).transaction(GraknClient.Transaction.Type.WRITE));
+            return new Transaction(session(sessionKey).transaction(GraknClient.Transaction.Type.WRITE), log, tracker);
         }
     }
 

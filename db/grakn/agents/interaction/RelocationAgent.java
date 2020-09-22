@@ -30,13 +30,11 @@ import static grakn.simulation.db.grakn.schema.Schema.START_DATE;
 public class RelocationAgent extends GraknAgent<World.City> implements RelocationAgentBase {
 
     static GraqlGet.Unfiltered cityResidentsQuery(World.City city, LocalDateTime earliestDate) {
-
         Statement person = Graql.var(PERSON);
         Statement cityVar = Graql.var(CITY);
         Statement residency = Graql.var("r");
         Statement startDate = Graql.var(START_DATE);
         Statement endDate = Graql.var(END_DATE);
-
         return Graql.match(
                 person.isa(PERSON)
                         .has(EMAIL, Graql.var(EMAIL)),
@@ -58,21 +56,17 @@ public class RelocationAgent extends GraknAgent<World.City> implements Relocatio
     @Override
     public List<String> getResidentEmails(World.City city, LocalDateTime earliestDate, int numRelocations) {
         GraqlGet.Unfiltered cityResidentsQuery = cityResidentsQuery(city, earliestDate);
-        log().query(this.tracker(), "getResidentEmails", cityResidentsQuery);
         return tx().getOrderedAttribute(cityResidentsQuery, EMAIL, numRelocations);
     }
 
     @Override
     public List<String> getRelocationCityNames(World.City city) {
-
         GraqlGet.Unfiltered relocationCitiesQuery = Graql.match(
                 Graql.var(CITY).isa(CITY).has(LOCATION_NAME, Graql.var("city-name")),
                 Graql.var(CONTINENT).isa(CONTINENT).has(LOCATION_NAME, city.country().continent().name()),
                 Graql.var("lh1").isa(LOCATION_HIERARCHY).rel(CITY).rel(CONTINENT),
                 Graql.var("city-name").neq(city.name())
         ).get();
-
-        log().query(this.tracker(), "getRelocationCityNames", relocationCitiesQuery);
         return tx().getOrderedAttribute(relocationCitiesQuery, "city-name", null);
     }
 
@@ -89,8 +83,6 @@ public class RelocationAgent extends GraknAgent<World.City> implements Relocatio
                         .rel(RELOCATION_RELOCATED_PERSON, "p")
                         .has(RELOCATION_DATE, today)
         );
-
-        log().query(this.tracker(), "insertRelocation", relocatePersonQuery);
         tx().execute(relocatePersonQuery);
     }
 

@@ -8,20 +8,28 @@ import grakn.simulation.db.neo4j.driver.Transaction;
 public abstract class Neo4jAgent<REGION extends Region> extends Agent<REGION, Neo4jContext> {
 
     private Transaction tx;
+    private String action;
 
     public Transaction tx() {
         return tx;
     }
 
     @Override
-    public void startAction() {
+    public String action() {
+        return action;
+    }
+
+    @Override
+    public void newAction(String action) {
+        registerMethodTrace(action);
+        this.action = action;
         if (tx == null) {
-            tx = backendContext().tx(getSessionKey());
+            tx = backendContext().tx(getSessionKey(), logger(), tracker() + ":" + this.action);
         }
     }
 
     @Override
-    public void stopAction() {
+    public void closeAction() {
         tx().close();
         tx = null;
     }

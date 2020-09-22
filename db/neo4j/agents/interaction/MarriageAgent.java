@@ -19,7 +19,7 @@ import static grakn.simulation.db.neo4j.schema.Schema.MARRIAGE_ID;
 
 public class MarriageAgent extends Neo4jAgent<World.City> implements MarriageAgentBase {
 
-    public List<String> getUnmarriedPeopleOfGender(String scope, World.City city, String gender, LocalDateTime dobOfAdults) {
+    public List<String> getUnmarriedPeopleOfGender(World.City city, String gender, LocalDateTime dobOfAdults) {
         String template = "" +
                 "MATCH (person:Person {gender: $gender})-[residency:RESIDENT_OF]->(city:City {locationName: $locationName})\n" +
                 "WHERE datetime(person.dateOfBirth) <= datetime(\"" + dobOfAdults + "\")\n" +
@@ -33,15 +33,11 @@ public class MarriageAgent extends Neo4jAgent<World.City> implements MarriageAge
         }};
 
         Query query = new Query(template, parameters);
-
-        log().query(this.tracker(), scope, query);
-        List<String> results = tx().getOrderedAttribute(query, "person." + EMAIL, null);
-        log().message(this.tracker(), scope, results.toString());
-        return results;
+        return tx().getOrderedAttribute(query, "person." + EMAIL, null);
     }
 
     @Override
-    public AgentResult insertMarriage(String scope, World.City city, int marriageIdentifier, String wifeEmail, String husbandEmail) {
+    public AgentResult insertMarriage(World.City city, int marriageIdentifier, String wifeEmail, String husbandEmail) {
         String template = "" +
                 "MATCH (wife:Person {email: $wifeEmail}), (husband:Person {email: $husbandEmail}), (city:City {locationName: $locationName})\n" +
                 "CREATE (husband)-[marriage:MARRIED_TO {marriageId: $marriageId, locationName: city.locationName}]->(wife)" +
@@ -55,8 +51,6 @@ public class MarriageAgent extends Neo4jAgent<World.City> implements MarriageAge
         }};
 
         Query query = new Query(template, parameters);
-
-        log().query(this.tracker(), "insertMarriage", query);
         List<Record> answers = tx().execute(query);
 
         Map<String, Object> answer = getOnlyElement(answers).asMap();

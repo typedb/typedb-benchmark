@@ -22,23 +22,21 @@ public interface MarriageAgentBase extends InteractionAgent<World.City> {
     @Override
     default AgentResultSet iterate(Agent<World.City, ?> agent, World.City city, IterationContext iterationContext) {
         AgentResultSet agentResultSet = new AgentResultSet();
-        agent.log().message(agent.tracker(), "MarriageAgent", String.format("Simulation step %d", iterationContext.simulationStep()));
         // Find bachelors and bachelorettes who are considered adults and who are not in a marriage and pair them off randomly
         List<String> womenEmails;
-        agent.startAction();
 
         LocalDateTime dobOfAdults = iterationContext.today().minusYears(iterationContext.world().AGE_OF_ADULTHOOD);
 
-        String scope1 = "getSingleWomen";
-        try (ThreadTrace trace = traceOnThread(scope1)) {
-            womenEmails = getUnmarriedPeopleOfGender(scope1, city, "female", dobOfAdults);
+        agent.newAction("getSingleWomen");
+        try (ThreadTrace trace = traceOnThread(agent.action())) {
+            womenEmails = getUnmarriedPeopleOfGender(city, "female", dobOfAdults);
         }
         shuffle(womenEmails, agent.random());
 
-        String scope2 = "getSingleMen";
+        agent.newAction("getSingleMen");
         List<String> menEmails;
-        try (ThreadTrace trace = traceOnThread(scope2)) {
-            menEmails = getUnmarriedPeopleOfGender(scope2, city, "male", dobOfAdults);
+        try (ThreadTrace trace = traceOnThread(agent.action())) {
+            menEmails = getUnmarriedPeopleOfGender(city, "male", dobOfAdults);
         }
         shuffle(menEmails, agent.random());
 
@@ -52,19 +50,19 @@ public interface MarriageAgentBase extends InteractionAgent<World.City> {
                 String husbandEmail = menEmails.get(i);
                 int marriageIdentifier = (wifeEmail + husbandEmail).hashCode();
 
-                String scope = "insertMarriage";
-                try (ThreadTrace trace = traceOnThread(agent.checkMethodTrace(scope))) {
-                    agentResultSet.add(insertMarriage(scope, city, marriageIdentifier, wifeEmail, husbandEmail));
+                agent.newAction("insertMarriage");
+                try (ThreadTrace trace = traceOnThread(agent.action())) {
+                    agentResultSet.add(insertMarriage(city, marriageIdentifier, wifeEmail, husbandEmail));
                 }
             }
             agent.commitAction();
         } else {
-            agent.stopAction();
+            agent.closeAction();
         }
         return agentResultSet;
     }
 
-    List<String> getUnmarriedPeopleOfGender(String scope, World.City city, String gender, LocalDateTime dobOfAdults);
+    List<String> getUnmarriedPeopleOfGender(World.City city, String gender, LocalDateTime dobOfAdults);
 
-    AgentResult insertMarriage(String scope, World.City city, int marriageIdentifier, String wifeEmail, String husbandEmail);
+    AgentResult insertMarriage(World.City city, int marriageIdentifier, String wifeEmail, String husbandEmail);
 }

@@ -23,7 +23,6 @@ public class FriendshipAgent extends GraknAgent<World.City> implements Friendshi
     @Override
     public List<String> getResidentEmails(World.City city, LocalDateTime earliestDate) {
         GraqlGet cityResidentsQuery = cityResidentsQuery(city, earliestDate);
-        log().query(this.tracker(), "getResidentEmails", cityResidentsQuery);
         return tx().getOrderedAttribute(cityResidentsQuery, EMAIL, null);
     }
 
@@ -56,7 +55,6 @@ public class FriendshipAgent extends GraknAgent<World.City> implements Friendshi
                         .rel(FRIENDSHIP_FRIEND, person2)
                         .has(START_DATE, startDate)
         );
-        log().query(this.tracker(), "insertFriendship", insertFriendshipQuery);
         tx().execute(insertFriendshipQuery);
     }
 

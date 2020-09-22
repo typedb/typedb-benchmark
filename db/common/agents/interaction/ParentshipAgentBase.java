@@ -26,12 +26,13 @@ public interface ParentshipAgentBase extends InteractionAgent<World.City> {
     default AgentResultSet iterate(Agent<World.City, ?> agent, World.City city, IterationContext iterationContext) {
         // Query for married couples in the city who are not already in a parentship relation together
         List<String> childrenEmails;
-        agent.startAction();
-        try (ThreadTrace trace = traceOnThread(agent.registerMethodTrace("getChildrenEmailsBorn"))) {
+        agent.newAction("getChildrenEmailsBorn");
+        try (ThreadTrace trace = traceOnThread(agent.action())) {
             childrenEmails = getChildrenEmailsBorn(city, iterationContext.today());
         }
         List<HashMap<Email, String>> marriageEmails;
-        try (ThreadTrace trace = traceOnThread(agent.registerMethodTrace("getMarriageEmails"))) {
+        agent.newAction("getMarriageEmails");
+        try (ThreadTrace trace = traceOnThread(agent.action())) {
             marriageEmails = getMarriageEmails(city);
         }
 
@@ -48,13 +49,14 @@ public interface ParentshipAgentBase extends InteractionAgent<World.City> {
                 for (Integer childIndex : children) {
                     childEmails.add(childrenEmails.get(childIndex));
                 }
-                try (ThreadTrace trace = traceOnThread(agent.checkMethodTrace("insertParentShip"))) {
+                agent.newAction("insertParentShip");
+                try (ThreadTrace trace = traceOnThread(agent.action())) {
                     insertParentShip(marriage, childEmails);
                 }
             }
             agent.commitAction();
         } else {
-            agent.stopAction();
+            agent.closeAction();
         }
         return null;
     }

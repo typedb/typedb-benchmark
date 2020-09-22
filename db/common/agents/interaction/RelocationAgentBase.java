@@ -36,18 +36,20 @@ public interface RelocationAgentBase extends InteractionAgent<World.City> {
         List<String> relocationCityNames;
 
         int numRelocations = iterationContext.world().getScaleFactor();
-        agent.startAction();
-        try (ThreadTrace trace = traceOnThread(agent.registerMethodTrace("getResidentEmails"))) {
+        agent.newAction("getResidentEmails");
+        try (ThreadTrace trace = traceOnThread(agent.action())) {
             residentEmails = getResidentEmails(city, earliestDate, numRelocations);
         }
         shuffle(residentEmails, agent.random());
 
-        try (ThreadTrace trace = traceOnThread(agent.registerMethodTrace("getRelocationCityNames"))) {
+        agent.newAction("getRelocationCityNames");
+        try (ThreadTrace trace = traceOnThread(agent.action())) {
             relocationCityNames = getRelocationCityNames(city);
         }
 
         Allocation.allocate(residentEmails, relocationCityNames, (residentEmail, relocationCityName) -> {
-            try (ThreadTrace trace = traceOnThread(agent.checkMethodTrace("insertRelocation"))) {
+            agent.newAction("insertRelocation");
+            try (ThreadTrace trace = traceOnThread(agent.action())) {
                 insertRelocation(city, iterationContext.today(), residentEmail, relocationCityName);
             }
         });

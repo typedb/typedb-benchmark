@@ -1,6 +1,7 @@
 package grakn.simulation.db.neo4j.driver;
 
 import grabl.tracing.client.GrablTracingThreadStatic;
+import grakn.simulation.db.common.agents.base.LogWrapper;
 import org.neo4j.driver.Query;
 import org.neo4j.driver.Record;
 import org.neo4j.driver.Session;
@@ -20,11 +21,15 @@ import static grakn.simulation.db.common.context.DatabaseContext.TracingLabel.ST
 public class Transaction {
 
     private final Session session;
+    private final LogWrapper log;
+    private final String tracker;
     private org.neo4j.driver.Transaction tx;
     private final List<Query> queries = new ArrayList<Query>();
 
-    public Transaction(Session session) {
+    public Transaction(Session session, LogWrapper log, String tracker) {
         this.session = session;
+        this.log = log;
+        this.tracker = tracker;
         this.tx = newTransaction();
     }
 
@@ -81,6 +86,7 @@ public class Transaction {
 
     public List<Record> execute(Query query) {
         addQuery(query);
+        log.query(tracker, query);
         try (GrablTracingThreadStatic.ThreadTrace trace = traceOnThread(EXECUTE.getName())) {
             return tx.run(query).list();
         }
@@ -88,6 +94,7 @@ public class Transaction {
 
     public <T> List<T> getOrderedAttribute(Query query, String attributeName, Integer limit) {
         List<T> result;
+        log.query(tracker, query);
         try (GrablTracingThreadStatic.ThreadTrace trace = traceOnThread(STREAM_AND_SORT.getName())) {
             Stream<T> answerStream = execute(query).stream()
                     .map(record -> (T) record.asMap().get(attributeName))
@@ -102,6 +109,7 @@ public class Transaction {
 
     public int count(Query countQuery) {
         AtomicReference<Integer> count = new AtomicReference<>(null);
+        log.query(tracker, countQuery);
         tx.run(countQuery).single().values().forEach(v -> {
             if (count.get() == null) {
                 count.set(v.asInt());

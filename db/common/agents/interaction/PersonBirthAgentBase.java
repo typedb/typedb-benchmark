@@ -4,7 +4,6 @@ import grakn.simulation.db.common.agents.base.Agent;
 import grakn.simulation.db.common.agents.base.AgentResult;
 import grakn.simulation.db.common.agents.base.AgentResultSet;
 import grakn.simulation.db.common.agents.base.IterationContext;
-import grakn.simulation.db.common.agents.utils.CheckMethod;
 import grakn.simulation.db.common.world.World;
 
 import java.time.LocalDateTime;
@@ -23,7 +22,6 @@ public interface PersonBirthAgentBase extends InteractionAgent<World.City> {
         // Find bachelors and bachelorettes who are considered adults and who are not in a marriage and pair them off randomly
         int numBirths = iterationContext.world().getScaleFactor();
         AgentResultSet agentResultSet = new AgentResultSet();
-        agent.startAction();
         for (int i = 0; i < numBirths; i++) {
             String gender;
             String forename;
@@ -48,14 +46,14 @@ public interface PersonBirthAgentBase extends InteractionAgent<World.City> {
                     + city.country() + "_"
                     + city.country().continent()
                     + "@gmail.com";
-            String scope = "insertPerson";
-            try (ThreadTrace trace = traceOnThread(CheckMethod.checkMethodExists(this, scope))) {
-                agentResultSet.add(insertPerson(scope, city, iterationContext.today(), email, gender, forename, surname));
+            agent.newAction("insertPerson");
+            try (ThreadTrace trace = traceOnThread(agent.action())) {
+                agentResultSet.add(insertPerson(city, iterationContext.today(), email, gender, forename, surname));
             }
         }
         agent.commitAction();
         return agentResultSet;
     }
 
-    AgentResult insertPerson(String scope, World.City city, LocalDateTime today, String email, String gender, String forename, String surname);
+    AgentResult insertPerson(World.City city, LocalDateTime today, String email, String gender, String forename, String surname);
 }

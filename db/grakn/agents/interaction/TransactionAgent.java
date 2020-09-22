@@ -4,7 +4,6 @@ import grakn.simulation.db.common.agents.interaction.TransactionAgentBase;
 import grakn.simulation.db.common.agents.utils.Pair;
 import grakn.simulation.db.common.world.World;
 import graql.lang.Graql;
-import graql.lang.query.GraqlGet;
 import graql.lang.query.GraqlInsert;
 
 import java.util.List;
@@ -31,17 +30,13 @@ import static grakn.simulation.db.grakn.schema.Schema.VALUE;
 public class TransactionAgent extends GraknAgent<World.Continent> implements TransactionAgentBase {
 
     @Override
-    public List<Long> getCompanyNumbersInContinent(World.Continent continent, String scope){
-        GraqlGet companiesQuery = getCompanyNumbersInContinentQuery(continent);
-        log().query(this.tracker(), scope, companiesQuery);
-        return tx().getOrderedAttribute(companiesQuery, COMPANY_NUMBER, null);
+    public List<Long> getCompanyNumbersInContinent(World.Continent continent){
+        return tx().getOrderedAttribute(getCompanyNumbersInContinentQuery(continent), COMPANY_NUMBER, null);
     }
 
     @Override
-    public List<Double> getProductBarcodesInContinent(World.Continent continent, String scope) {
-        GraqlGet productsQuery = getProductsInContinentQuery(continent);
-        log().query(this.tracker(), scope, productsQuery);
-        return tx().getOrderedAttribute(productsQuery, PRODUCT_BARCODE, null);
+    public List<Double> getProductBarcodesInContinent(World.Continent continent) {
+        return tx().getOrderedAttribute(getProductsInContinentQuery(continent), PRODUCT_BARCODE, null);
     }
 
     @Override
@@ -72,7 +67,6 @@ public class TransactionAgent extends GraknAgent<World.Continent> implements Tra
                                 .rel(LOCATES_LOCATED, Graql.var(TRANSACTION))
 
                 );
-        log().query(this.tracker(), "insertTransaction", insertTransactionQuery);
         tx().execute(insertTransactionQuery);
     }
 }

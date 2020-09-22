@@ -33,10 +33,11 @@ public class AgeUpdateAgent extends GraknAgent<World.City> implements AgeUpdateA
         try (ThreadTrace trace = traceOnThread(this.checkMethodTrace("getPeopleBornInCity"))) {
             peopleAnswers = getPeopleBornInCity(city);
         }
+        newAction("updatePersonAge");
         // Update their ages
         peopleAnswers.forEach((personEmail, personDob) -> {
                     long age = ChronoUnit.YEARS.between(personDob, today);
-                    try (ThreadTrace trace = traceOnThread(this.checkMethodTrace("updatePersonAge"))) {
+                    try (ThreadTrace trace = traceOnThread(action())) {
                         updatePersonAge(personEmail, age);
                     }
                 }
@@ -56,8 +57,6 @@ public class AgeUpdateAgent extends GraknAgent<World.City> implements AgeUpdateA
                         .has(AGE, age
                         )
         );
-
-        log().query(this.tracker(), "deleteImplicitQuery", deleteImplicitQuery);
         tx().execute(deleteImplicitQuery);
 
         GraqlInsert insertNewAgeQuery = Graql.match(
@@ -68,8 +67,6 @@ public class AgeUpdateAgent extends GraknAgent<World.City> implements AgeUpdateA
                 person
                         .has(AGE, newAge)
         );
-
-        log().query(this.tracker(), "insertNewAgeQuery", insertNewAgeQuery);
         tx().execute(insertNewAgeQuery);
     }
 
@@ -90,10 +87,9 @@ public class AgeUpdateAgent extends GraknAgent<World.City> implements AgeUpdateA
                         .rel(BORN_IN_CHILD, person)
                         .rel(BORN_IN_PLACE_OF_BIRTH, city)
         ).get().sort(EMAIL);
-        log().query(this.tracker(), "getPeopleBornInCity", peopleQuery);
 
         HashMap<String, LocalDateTime> peopleDobs = new HashMap<>();
-
+        newAction("getPeopleBornInCity");
         tx().execute(peopleQuery).forEach(personAnswer -> {
             LocalDateTime dob = (LocalDateTime) personAnswer.get(DATE_OF_BIRTH).asAttribute().value();
             String email = personAnswer.get(EMAIL).asAttribute().value().toString();

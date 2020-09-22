@@ -24,7 +24,6 @@ public class ProductAgent extends Neo4jAgent<World.Continent> implements Product
                 put("description", productDescription);
         }};
         Query insertProductQuery = new Query(template, parameters);
-        log().query(this.tracker(), "insertProduct", insertProductQuery);
         tx().execute(insertProductQuery);
     }
 

@@ -45,7 +45,7 @@ public abstract class Agent<REGION extends Region, CONTEXT extends DatabaseConte
         }
     }
 
-    public LogWrapper log() {
+    public LogWrapper logger() {
         return logWrapper;
     }
 
@@ -70,9 +70,9 @@ public abstract class Agent<REGION extends Region, CONTEXT extends DatabaseConte
     /////////////////////////////////////////////////
 
     // TODO Use Autoclosable classes for these actions
-    public abstract void startAction();
+    public abstract void newAction(String action);
 
-    public abstract void stopAction();
+    public abstract void closeAction();
 
     public abstract void commitAction();
 
@@ -104,7 +104,6 @@ public abstract class Agent<REGION extends Region, CONTEXT extends DatabaseConte
 
     @Override
     public void close() {
-//        closeTx();
         if (context != null) {
             context.close();
         }
@@ -123,6 +122,8 @@ public abstract class Agent<REGION extends Region, CONTEXT extends DatabaseConte
         CheckMethod.checkMethodExists(this, methodName);
         return methodName;
     }
+
+    public abstract String action();
 
     public interface ComparableField {}
 }

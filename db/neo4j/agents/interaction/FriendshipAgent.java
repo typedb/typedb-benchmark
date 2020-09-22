@@ -15,7 +15,6 @@ public class FriendshipAgent extends Neo4jAgent<World.City> implements Friendshi
     @Override
     public List<String> getResidentEmails(World.City city, LocalDateTime earliestDate) {
         Query cityResidentsQuery = cityResidentsQuery(city, earliestDate);
-        log().query(this.tracker(), "getResidentEmails", cityResidentsQuery);
         return tx().getOrderedAttribute(cityResidentsQuery, "resident.email", null);
     }
 
@@ -34,7 +33,6 @@ public class FriendshipAgent extends Neo4jAgent<World.City> implements Friendshi
                 put("startDate", today);
         }};
         Query insertFriendshipQuery = new Query(template, parameters);
-        log().query(this.tracker(), "insertFriendship", insertFriendshipQuery);
         tx().execute(insertFriendshipQuery);
     }
 }

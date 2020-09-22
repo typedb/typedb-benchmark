@@ -21,26 +21,24 @@ public interface TransactionAgentBase extends InteractionAgent<World.Continent> 
     @Override
     default AgentResultSet iterate(Agent<World.Continent, ?> agent, World.Continent continent, IterationContext iterationContext) {
         List<Long> companyNumbers;
-        String scope1 = "getCompanyNumbersInContinent";
-        try (ThreadTrace trace = traceOnThread(agent.registerMethodTrace(scope1))) {
-            companyNumbers = getCompanyNumbersInContinent(continent, scope1);
+        agent.newAction("getCompanyNumbersInContinent");
+        try (ThreadTrace trace = traceOnThread(agent.action())) {
+            companyNumbers = getCompanyNumbersInContinent(continent);
         }
         List<Double> productBarcodes;
-        String scope2 = "getProductBarcodesInContinent";
-        try (ThreadTrace trace = traceOnThread(agent.registerMethodTrace(scope2))) {
-            productBarcodes = getProductBarcodesInContinent(continent, scope2);
+        agent.newAction("getProductBarcodesInContinent");
+        try (ThreadTrace trace = traceOnThread(agent.action())) {
+            productBarcodes = getProductBarcodesInContinent(continent);
         }
         shuffle(companyNumbers, agent.random());
 
         int numTransactions = NUM_TRANSACTIONS_PER_COMPANY_ON_AVERAGE * iterationContext.world().getScaleFactor() * companyNumbers.size();
-
         // Company numbers is the list of sellers
         // Company numbers picked randomly is the list of buyers
         // Products randomly picked
 
         // See if we can allocate with a Pair, which is the buyer and the product id
         List<Pair<Long, Double>> transactions = new ArrayList<>();
-        agent.startAction();
         for (int i = 0; i < numTransactions; i++) {
             Long companyNumber = agent.pickOne(companyNumbers);
             Double productBarcode = agent.pickOne(productBarcodes);
@@ -48,10 +46,11 @@ public interface TransactionAgentBase extends InteractionAgent<World.Continent> 
             transactions.add(buyerAndProduct);
         }
         Allocation.allocate(transactions, companyNumbers, (transaction, sellerCompanyNumber) -> {
-            Double value = agent.randomAttributeGenerator().boundRandomDouble(0.01, 10000.00);
-            Integer productQuantity = agent.randomAttributeGenerator().boundRandomInt(1, 1000);
-            Boolean isTaxable = agent.randomAttributeGenerator().bool();
-            try (ThreadTrace trace = traceOnThread(agent.checkMethodTrace("insertTransaction"))) {
+            double value = agent.randomAttributeGenerator().boundRandomDouble(0.01, 10000.00);
+            int productQuantity = agent.randomAttributeGenerator().boundRandomInt(1, 1000);
+            boolean isTaxable = agent.randomAttributeGenerator().bool();
+            agent.newAction("insertTransaction");
+            try (ThreadTrace trace = traceOnThread(agent.action())) {
                 insertTransaction(continent, transaction, sellerCompanyNumber, value, productQuantity, isTaxable);
             }
         });
@@ -59,10 +58,9 @@ public interface TransactionAgentBase extends InteractionAgent<World.Continent> 
         return null;
     }
 
-    List<Long> getCompanyNumbersInContinent(World.Continent continent, String scope);
+    List<Long> getCompanyNumbersInContinent(World.Continent continent);
 
-    List<Double> getProductBarcodesInContinent(World.Continent continent, String scope);
+    List<Double> getProductBarcodesInContinent(World.Continent continent);
 
     void insertTransaction(World.Continent continent, Pair<Long, Double> transaction, long sellerCompanyNumber, double value, int productQuantity, boolean isTaxable);
-
 }

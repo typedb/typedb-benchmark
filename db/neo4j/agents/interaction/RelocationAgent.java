@@ -25,7 +25,6 @@ public class RelocationAgent extends Neo4jAgent<World.City> implements Relocatio
     @Override
     public List<String> getResidentEmails(World.City city, LocalDateTime earliestDate, int numRelocations) {
         Query cityResidentsQuery = cityResidentsQuery(city, earliestDate);
-        log().query(this.tracker(), "getResidentEmails", cityResidentsQuery);
         return tx().getOrderedAttribute(cityResidentsQuery, "resident.email", numRelocations);
     }
 
@@ -40,11 +39,7 @@ public class RelocationAgent extends Neo4jAgent<World.City> implements Relocatio
                 put("continentName", city.country().continent().name());
                 put("cityName", city.name());
         }};
-
-        Query relocationCitiesQuery = new Query(template, parameters);
-
-        log().query(this.tracker(), "getRelocationCityNames", relocationCitiesQuery);
-        return tx().getOrderedAttribute(relocationCitiesQuery, "city.locationName", null);
+        return tx().getOrderedAttribute(new Query(template, parameters), "city.locationName", null);
     }
 
     @Override
@@ -65,8 +60,6 @@ public class RelocationAgent extends Neo4jAgent<World.City> implements Relocatio
                 put("newCityName", newCityName);
                 put("relocationDate", today);
         }};
-        Query relocatePersonQuery = new Query(template, parameters);
-        log().query(this.tracker(), "insertRelocation", relocatePersonQuery);
-        tx().execute(relocatePersonQuery);
+        tx().execute(new Query(template, parameters));
     }
 }

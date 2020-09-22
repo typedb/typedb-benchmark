@@ -9,7 +9,7 @@ import java.util.HashMap;
 
 public class CompanyAgent extends Neo4jAgent<World.Country> implements CompanyAgentBase {
     @Override
-    public void insertCompany(World.Country country, LocalDateTime today, String scope, int companyNumber, String companyName) {
+    public void insertCompany(World.Country country, LocalDateTime today, int companyNumber, String companyName) {
         String template = "" +
                 "MATCH (country:Country {locationName: $countryName})\n" +
                 "CREATE (country)-[:INCORPORATED_IN {dateOfIncorporation: $dateOfIncorporation}]->(company:Company {companyNumber: $companyNumber, companyName: $companyName})";
@@ -22,7 +22,6 @@ public class CompanyAgent extends Neo4jAgent<World.Country> implements CompanyAg
         }};
 
         Query companyQuery = new Query(template, parameters);
-        log().query(this.tracker(), scope, companyQuery);
         tx().execute(companyQuery);
     }
 

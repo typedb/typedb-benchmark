@@ -9,15 +9,19 @@ public class LogWrapper {
         this.logger = logger;
     }
 
-    public void query(String tracker, String scope, Object query) {
-        query(tracker, scope, query.toString());
+    public void query(String tracker, String action, Object query) {
+        query(tracker, action, query.toString());
     }
 
-    public void query(String tracker, String scope, String query) {
-        logger.info("({}):{}:\n{}", tracker, scope, query);
+    public void query(String tracker, String action, String query) {
+        logger.info("({}):{}:\n{}", tracker, action, query);
     }
 
-    public void message(String tracker, String scope, String message) {
-        logger.info("({}):{}:\n{}", tracker, scope, message);
+    public void query(String tracker, Object query) {
+        query(tracker, query.toString());
+    }
+
+    public void query(String tracker, String query) {
+        logger.info("{}:\n{}", tracker, query);
     }
 }

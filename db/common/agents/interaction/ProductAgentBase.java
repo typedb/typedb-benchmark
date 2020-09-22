@@ -13,12 +13,12 @@ public interface ProductAgentBase extends InteractionAgent<World.Continent> {
     @Override
     default AgentResultSet iterate(Agent<World.Continent, ?> agent, World.Continent continent, IterationContext iterationContext) {
         int numProducts = iterationContext.world().getScaleFactor();
-        agent.startAction();
         for (int i = 0; i < numProducts; i++) {
             String productName = agent.randomAttributeGenerator().boundRandomLengthRandomString(5, 20);
             String productDescription = agent.randomAttributeGenerator().boundRandomLengthRandomString(75, 100);
             Double barcode = (double) agent.uniqueId(iterationContext, i);
-            try (ThreadTrace trace = traceOnThread(agent.checkMethodTrace("insertProduct"))) {
+            agent.newAction("insertProduct");
+            try (ThreadTrace trace = traceOnThread(agent.action())) {
                 insertProduct(continent, barcode, productName, productDescription);
             }
         }
