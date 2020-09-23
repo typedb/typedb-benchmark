@@ -29,27 +29,25 @@ public interface EmploymentAgentBase extends InteractionAgent<World.City> {
         int numEmployments = iterationContext.world().getScaleFactor();
         List<String> employeeEmails;
         List<Long> companyNumbers;
-        agent.startAction();
-        String scope1 = "getEmployeeEmails";
-        try (ThreadTrace trace = traceOnThread(agent.registerMethodTrace(scope1))) {
-            employeeEmails = getEmployeeEmails(city, scope1, numEmployments, employmentDate);
+        agent.newAction("getEmployeeEmails");
+        try (ThreadTrace trace = traceOnThread(agent.action())) {
+            employeeEmails = getEmployeeEmails(city, numEmployments, employmentDate);
         }
 
         int numCompanies = iterationContext.world().getScaleFactor();
-        String scope2 = "getCompanyNumbers";
-        try (ThreadTrace trace = traceOnThread(agent.registerMethodTrace(scope2))) {
-            companyNumbers = getCompanyNumbers(city.country(), scope2, numCompanies);
+        agent.newAction("getCompanyNumbers");
+        try (ThreadTrace trace = traceOnThread(agent.action())) {
+            companyNumbers = getCompanyNumbers(city.country(), numCompanies);
         }
         agent.commitAction();  //TODO Should be close not commit?
-        agent.startAction();
         // A second transaction is being used to circumvent graknlabs/grakn issue #5585
         boolean allocated = allocate(employeeEmails, companyNumbers, (employeeEmail, companyNumber) -> {
-            String scope3 = "insertEmployment";
             double wageValue = agent.randomAttributeGenerator().boundRandomDouble(MIN_ANNUAL_WAGE, MAX_ANNUAL_WAGE);
             String contractContent = agent.randomAttributeGenerator().boundRandomLengthRandomString(MIN_CONTRACT_CHARACTER_LENGTH, MAX_CONTRACT_CHARACTER_LENGTH);
             double contractedHours = agent.randomAttributeGenerator().boundRandomDouble(MIN_CONTRACTED_HOURS, MAX_CONTRACTED_HOURS);
-            try (ThreadTrace trace = traceOnThread(agent.checkMethodTrace(scope3))) {
-                insertEmployment(city, scope3, employeeEmail, companyNumber, employmentDate, wageValue, contractContent, contractedHours);
+            agent.newAction("insertEmployment");
+            try (ThreadTrace trace = traceOnThread(agent.action())) {
+                insertEmployment(city, employeeEmail, companyNumber, employmentDate, wageValue, contractContent, contractedHours);
             }
         });
         if (allocated) {
@@ -58,10 +56,10 @@ public interface EmploymentAgentBase extends InteractionAgent<World.City> {
         return null;
     }
 
-    List<Long> getCompanyNumbers(World.Country country, String scope, int numCompanies);
+    List<Long> getCompanyNumbers(World.Country country, int numCompanies);
 
-    List<String> getEmployeeEmails(World.City city, String scope, int numEmployments, LocalDateTime earliestDate);
+    List<String> getEmployeeEmails(World.City city, int numEmployments, LocalDateTime earliestDate);
 
-    void insertEmployment(World.City city, String scope, String employeeEmail, long companyNumber, LocalDateTime employmentDate, double wageValue, String contractContent, double contractedHours);
+    void insertEmployment(World.City city, String employeeEmail, long companyNumber, LocalDateTime employmentDate, double wageValue, String contractContent, double contractedHours);
 
 }

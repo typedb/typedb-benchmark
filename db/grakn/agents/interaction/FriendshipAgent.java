@@ -2,14 +2,12 @@ package grakn.simulation.db.grakn.agents.interaction;
 
 import grakn.simulation.db.common.agents.interaction.FriendshipAgentBase;
 import grakn.simulation.db.common.world.World;
-import grakn.simulation.db.grakn.driver.Transaction;
 import graql.lang.Graql;
 import graql.lang.query.GraqlGet;
 import graql.lang.query.GraqlInsert;
 import graql.lang.statement.Statement;
 import graql.lang.statement.StatementAttribute;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -25,7 +23,6 @@ public class FriendshipAgent extends GraknAgent<World.City> implements Friendshi
     @Override
     public List<String> getResidentEmails(World.City city, LocalDateTime earliestDate) {
         GraqlGet cityResidentsQuery = cityResidentsQuery(city, earliestDate);
-        log().query("getResidentEmails", cityResidentsQuery);
         return tx().getOrderedAttribute(cityResidentsQuery, EMAIL, null);
     }
 
@@ -58,7 +55,6 @@ public class FriendshipAgent extends GraknAgent<World.City> implements Friendshi
                         .rel(FRIENDSHIP_FRIEND, person2)
                         .has(START_DATE, startDate)
         );
-        log().query("insertFriendship", insertFriendshipQuery);
         tx().execute(insertFriendshipQuery);
     }
 

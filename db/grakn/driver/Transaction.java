@@ -3,6 +3,7 @@ package grakn.simulation.db.grakn.driver;
 import grabl.tracing.client.GrablTracingThreadStatic;
 import grakn.client.GraknClient;
 import grakn.client.answer.ConceptMap;
+import grakn.simulation.db.common.agents.base.LogWrapper;
 import graql.lang.query.GraqlDelete;
 import graql.lang.query.GraqlGet;
 import graql.lang.query.GraqlInsert;
@@ -21,9 +22,13 @@ public class Transaction {
     boolean closed = false;
 
     private GraknClient.Transaction transaction;
+    private final LogWrapper log;
+    private final String tracker;
 
-    public Transaction(GraknClient.Transaction transaction) {
+    public Transaction(GraknClient.Transaction transaction, LogWrapper log, String tracker) {
         this.transaction = transaction;
+        this.log = log;
+        this.tracker = tracker;
     }
 
     public void close() {
@@ -37,6 +42,7 @@ public class Transaction {
         transaction.commit();
         closed = true;
     }
+
     private void throwIfClosed() {
         if (closed) {
             throw new RuntimeException("Transaction is closed, please open a new one.");
@@ -46,6 +52,7 @@ public class Transaction {
     public <T> List<T> getOrderedAttribute(GraqlGet query, String attributeName, Integer limit){
         throwIfClosed();
         List<T> result;
+        log.query(tracker, query);
         try (GrablTracingThreadStatic.ThreadTrace trace = traceOnThread(STREAM_AND_SORT.getName())) {
             Stream<T> answerStream = transaction.stream(query).get()
                     .map(conceptMap -> (T) conceptMap.get(attributeName).asAttribute().value())
@@ -60,22 +67,26 @@ public class Transaction {
 
     public int count(GraqlGet.Aggregate countQuery) {
         throwIfClosed();
+        log.query(tracker, countQuery);
         return getOnlyElement(transaction.execute(countQuery).get()).number().intValue();
     }
 
     public void execute(GraqlDelete query) {
+        log.query(tracker, query);
         try (GrablTracingThreadStatic.ThreadTrace trace = traceOnThread(EXECUTE.getName())) {
             transaction.execute(query).get();
         }
     }
 
     public List<ConceptMap> execute(GraqlInsert query) {
+        log.query(tracker, query);
         try (GrablTracingThreadStatic.ThreadTrace trace = traceOnThread(EXECUTE.getName())) {
             return transaction.execute(query).get();
         }
     }
 
     public List<ConceptMap> execute(GraqlGet query) {
+        log.query(tracker, query);
         try (GrablTracingThreadStatic.ThreadTrace trace = traceOnThread(EXECUTE.getName())) {
             return transaction.execute(query).get();
         }

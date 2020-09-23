@@ -2,7 +2,6 @@ package grakn.simulation.db.neo4j.agents.interaction;
 
 import grakn.simulation.db.common.agents.interaction.ProductAgentBase;
 import grakn.simulation.db.common.world.World;
-import grakn.simulation.db.neo4j.driver.Transaction;
 import org.neo4j.driver.Query;
 
 import java.util.HashMap;
@@ -25,7 +24,6 @@ public class ProductAgent extends Neo4jAgent<World.Continent> implements Product
                 put("description", productDescription);
         }};
         Query insertProductQuery = new Query(template, parameters);
-        log().query("insertProduct", insertProductQuery);
         tx().execute(insertProductQuery);
     }
 

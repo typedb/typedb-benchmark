@@ -2,7 +2,6 @@ package grakn.simulation.db.grakn.agents.interaction;
 
 import grakn.simulation.db.common.agents.interaction.AgeUpdateAgentBase;
 import grakn.simulation.db.common.world.World;
-import grakn.simulation.db.grakn.context.GraknContext;
 import graql.lang.Graql;
 import graql.lang.query.GraqlDelete;
 import graql.lang.query.GraqlGet;
@@ -31,13 +30,15 @@ public class AgeUpdateAgent extends GraknAgent<World.City> implements AgeUpdateA
     public void updateAgesOfAllPeople(LocalDateTime today, World.City city) {
         // Get all people born in a city
         HashMap<String, LocalDateTime> peopleAnswers;
-        try (ThreadTrace trace = traceOnThread(this.checkMethodTrace("getPeopleBornInCity"))) {
+        newAction("getPeopleBornInCity");
+        try (ThreadTrace trace = traceOnThread(action())) {
             peopleAnswers = getPeopleBornInCity(city);
         }
+        newAction("updatePersonAge");
         // Update their ages
         peopleAnswers.forEach((personEmail, personDob) -> {
                     long age = ChronoUnit.YEARS.between(personDob, today);
-                    try (ThreadTrace trace = traceOnThread(this.checkMethodTrace("updatePersonAge"))) {
+                    try (ThreadTrace trace = traceOnThread(action())) {
                         updatePersonAge(personEmail, age);
                     }
                 }
@@ -57,8 +58,6 @@ public class AgeUpdateAgent extends GraknAgent<World.City> implements AgeUpdateA
                         .has(AGE, age
                         )
         );
-
-        log().query("deleteImplicitQuery", deleteImplicitQuery);
         tx().execute(deleteImplicitQuery);
 
         GraqlInsert insertNewAgeQuery = Graql.match(
@@ -69,8 +68,6 @@ public class AgeUpdateAgent extends GraknAgent<World.City> implements AgeUpdateA
                 person
                         .has(AGE, newAge)
         );
-
-        log().query("insertNewAgeQuery", insertNewAgeQuery);
         tx().execute(insertNewAgeQuery);
     }
 
@@ -91,10 +88,8 @@ public class AgeUpdateAgent extends GraknAgent<World.City> implements AgeUpdateA
                         .rel(BORN_IN_CHILD, person)
                         .rel(BORN_IN_PLACE_OF_BIRTH, city)
         ).get().sort(EMAIL);
-        log().query("getPeopleBornInCity", peopleQuery);
 
         HashMap<String, LocalDateTime> peopleDobs = new HashMap<>();
-
         tx().execute(peopleQuery).forEach(personAnswer -> {
             LocalDateTime dob = (LocalDateTime) personAnswer.get(DATE_OF_BIRTH).asAttribute().value();
             String email = personAnswer.get(EMAIL).asAttribute().value().toString();

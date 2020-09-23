@@ -1,6 +1,7 @@
 package grakn.simulation.db.neo4j.context;
 
 import grabl.tracing.client.GrablTracingThreadStatic;
+import grakn.simulation.db.common.agents.base.LogWrapper;
 import grakn.simulation.db.common.context.DatabaseContext;
 import grakn.simulation.db.neo4j.driver.Transaction;
 import org.neo4j.driver.AuthTokens;
@@ -36,9 +37,9 @@ public class Neo4jContext extends DatabaseContext {
         });
     }
 
-    public Transaction tx(String sessionKey) {
+    public Transaction tx(String sessionKey, LogWrapper log, String tracker) {
         try (GrablTracingThreadStatic.ThreadTrace trace = traceOnThread(OPEN_TRANSACTION.getName())) {
-            return new Transaction(session(sessionKey));
+            return new Transaction(session(sessionKey), log, tracker);
         }
     }
 

@@ -1,6 +1,5 @@
 package grakn.simulation.db.grakn.agents.interaction;
 
-import grakn.client.answer.ConceptMap;
 import grakn.simulation.db.common.agents.interaction.ParentshipAgentBase;
 import grakn.simulation.db.common.world.World;
 import graql.lang.Graql;
@@ -58,11 +57,7 @@ public class ParentshipAgent extends GraknAgent<World.City> implements Parentshi
                         .rel(LOCATES_LOCATED, Graql.var("m"))
                         .rel(LOCATES_LOCATION, Graql.var(CITY))
         ).get().sort(MARRIAGE_ID);
-
-        log().query("getMarriageEmails", marriageQuery);
-        List<ConceptMap> marriageAnswers = tx().execute(marriageQuery);
-
-        return marriageAnswers
+        return tx().execute(marriageQuery)
                 .stream()
                 .map(a -> new HashMap<Email, String>() {{
                     put(Email.WIFE, a.get("wife-email").asAttribute().value().toString());
@@ -73,7 +68,6 @@ public class ParentshipAgent extends GraknAgent<World.City> implements Parentshi
 
     @Override
     public List<String> getChildrenEmailsBorn(World.City worldCity, LocalDateTime today) {
-
         GraqlGet.Unfiltered childrenQuery = Graql.match(
                 Graql.var("c").isa(CITY)
                         .has(LOCATION_NAME, worldCity.name()),
@@ -84,8 +78,6 @@ public class ParentshipAgent extends GraknAgent<World.City> implements Parentshi
                         .rel(BORN_IN_PLACE_OF_BIRTH, "c")
                         .rel(BORN_IN_CHILD, "child")
         ).get();
-
-        log().query("getChildrenEmails", childrenQuery);
         return tx().getOrderedAttribute(childrenQuery, EMAIL, null);
     }
 
@@ -95,15 +87,12 @@ public class ParentshipAgent extends GraknAgent<World.City> implements Parentshi
                 Graql.var("mother").isa(PERSON).has(EMAIL, marriage.get(Email.WIFE)),
                 Graql.var("father").isa(PERSON).has(EMAIL, marriage.get(Email.HUSBAND))
         ));
-
         Statement parentship = Graql.var("par");
-
         ArrayList<Statement> insertStatements = new ArrayList<>(Arrays.asList(
                 parentship.isa(PARENTSHIP)
                         .rel(PARENTSHIP_PARENT, "father")
                         .rel(PARENTSHIP_PARENT, "mother")
         ));
-
         // This model currently inserts a single relation that combines both parents and all of the children they had.
         // They these children at the same time, and will not have any subsequently. This could be represented as
         // multiple ternary relations instead, each with both parents and one child.
@@ -113,14 +102,11 @@ public class ParentshipAgent extends GraknAgent<World.City> implements Parentshi
             matchStatements.add(childVar.isa(PERSON).has(EMAIL, childEmail));
             insertStatements.add(parentship.rel(PARENTSHIP_CHILD, childVar));
         }
-
         GraqlInsert parentshipQuery = Graql.match(
                 matchStatements
         ).insert(
                 insertStatements
         );
-
-        log().query("insertParentShip", parentshipQuery);
         tx().execute(parentshipQuery);
     }
 }

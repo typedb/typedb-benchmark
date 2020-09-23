@@ -2,7 +2,6 @@ package grakn.simulation.db.neo4j.agents.interaction;
 
 import grakn.simulation.db.common.agents.interaction.RelocationAgentBase;
 import grakn.simulation.db.common.world.World;
-import grakn.simulation.db.neo4j.driver.Transaction;
 import org.neo4j.driver.Query;
 
 import java.time.LocalDateTime;
@@ -26,7 +25,6 @@ public class RelocationAgent extends Neo4jAgent<World.City> implements Relocatio
     @Override
     public List<String> getResidentEmails(World.City city, LocalDateTime earliestDate, int numRelocations) {
         Query cityResidentsQuery = cityResidentsQuery(city, earliestDate);
-        log().query("getResidentEmails", cityResidentsQuery);
         return tx().getOrderedAttribute(cityResidentsQuery, "resident.email", numRelocations);
     }
 
@@ -41,11 +39,7 @@ public class RelocationAgent extends Neo4jAgent<World.City> implements Relocatio
                 put("continentName", city.country().continent().name());
                 put("cityName", city.name());
         }};
-
-        Query relocationCitiesQuery = new Query(template, parameters);
-
-        log().query("getRelocationCityNames", relocationCitiesQuery);
-        return tx().getOrderedAttribute(relocationCitiesQuery, "city.locationName", null);
+        return tx().getOrderedAttribute(new Query(template, parameters), "city.locationName", null);
     }
 
     @Override
@@ -66,8 +60,6 @@ public class RelocationAgent extends Neo4jAgent<World.City> implements Relocatio
                 put("newCityName", newCityName);
                 put("relocationDate", today);
         }};
-        Query relocatePersonQuery = new Query(template, parameters);
-        log().query("insertRelocation", relocatePersonQuery);
-        tx().execute(relocatePersonQuery);
+        tx().execute(new Query(template, parameters));
     }
 }

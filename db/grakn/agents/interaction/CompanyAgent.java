@@ -23,7 +23,7 @@ import static grakn.simulation.db.grakn.schema.Schema.LOCATION_NAME;
 public class CompanyAgent extends GraknAgent<World.Country> implements CompanyAgentBase {
 
     @Override
-    public void insertCompany(World.Country country, LocalDateTime today, String scope, int companyNumber, String companyName) {
+    public void insertCompany(World.Country country, LocalDateTime today, int companyNumber, String companyName) {
 
         GraqlInsert query =
                 Graql.match(
@@ -37,7 +37,6 @@ public class CompanyAgent extends GraknAgent<World.Country> implements CompanyAg
                                         .rel(INCORPORATION_INCORPORATING, Graql.var(COUNTRY))
                                         .has(DATE_OF_INCORPORATION, today)
                         );
-        log().query(scope, query);
         tx().execute(query);
     }
 

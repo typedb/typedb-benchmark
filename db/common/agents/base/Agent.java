@@ -45,7 +45,7 @@ public abstract class Agent<REGION extends Region, CONTEXT extends DatabaseConte
         }
     }
 
-    public LogWrapper log() {
+    public LogWrapper logger() {
         return logWrapper;
     }
 
@@ -57,7 +57,7 @@ public abstract class Agent<REGION extends Region, CONTEXT extends DatabaseConte
         return backendContext;
     }
 
-    protected String tracker() {
+    public String tracker() {
         return tracker;
     }
 
@@ -70,9 +70,9 @@ public abstract class Agent<REGION extends Region, CONTEXT extends DatabaseConte
     /////////////////////////////////////////////////
 
     // TODO Use Autoclosable classes for these actions
-    public abstract void startAction();
+    public abstract void newAction(String action);
 
-    public abstract void stopAction();
+    public abstract void closeAction();
 
     public abstract void commitAction();
 
@@ -104,45 +104,12 @@ public abstract class Agent<REGION extends Region, CONTEXT extends DatabaseConte
 
     @Override
     public void close() {
-//        closeTx();
         if (context != null) {
             context.close();
         }
     }
 
-    public class LogWrapper {
-        private final Logger logger;
-
-        private LogWrapper(Logger logger) {
-            this.logger = logger;
-        }
-
-        public void query(String scope, Object query) {
-            query(scope, query.toString());
-        }
-
-        public void query(String scope, String query) {
-            logger.info("({}):{}:\n{}", tracker, scope, query);
-        }
-
-        public void message(String scope, String message) {
-            logger.info("({}):{}:\n{}", tracker, scope, message);
-        }
-    }
-
-    public String registerMethodTrace(String methodName) {
-        CheckMethod.checkMethodExists(this, methodName);
-        if (tracedMethods.contains(methodName)) {
-            throw new RuntimeException(String.format("Method %s has already been registered for tracing for class %s", methodName, this.getClass().getName()));
-        }
-        tracedMethods.add(methodName);
-        return methodName;
-    }
-
-    public String checkMethodTrace(String methodName) {
-        CheckMethod.checkMethodExists(this, methodName);
-        return methodName;
-    }
+    public abstract String action();
 
     public interface ComparableField {}
 }

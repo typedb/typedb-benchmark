@@ -3,7 +3,6 @@ package grakn.simulation.db.neo4j.agents.interaction;
 import grakn.simulation.db.common.agents.base.AgentResult;
 import grakn.simulation.db.common.agents.interaction.PersonBirthAgentBase;
 import grakn.simulation.db.common.world.World;
-import grakn.simulation.db.neo4j.driver.Transaction;
 import org.neo4j.driver.Query;
 import org.neo4j.driver.Record;
 
@@ -24,7 +23,7 @@ import static grakn.simulation.db.neo4j.schema.Schema.IS_CURRENT;
 public class PersonBirthAgent extends Neo4jAgent<World.City> implements PersonBirthAgentBase {
 
     @Override
-    public AgentResult insertPerson(String scope, World.City city, LocalDateTime today, String email, String gender, String forename, String surname) {
+    public AgentResult insertPerson(World.City city, LocalDateTime today, String email, String gender, String forename, String surname) {
         String template = "MATCH (c:City {locationName: $locationName})" +
                 "CREATE (person:Person {" +
                 "email: $email, " +
@@ -45,14 +44,7 @@ public class PersonBirthAgent extends Neo4jAgent<World.City> implements PersonBi
                 put(SURNAME, surname);
                 put(IS_CURRENT, true);
         }};
-
-        Query query = new Query(template, parameters);
-
-        log().query("insertPerson", query); //TODO Figure out to log Neo4j's pre-prepared queries
-        List<Record> answers = tx().execute(query);
-
-        Map<String, Object> answer = getOnlyElement(answers).asMap();
-
+        Map<String, Object> answer = getOnlyElement(tx().execute(new Query(template, parameters))).asMap();
         return new AgentResult() {{
             put(PersonBirthAgentField.EMAIL, answer.get("person." + EMAIL));
             put(PersonBirthAgentField.DATE_OF_BIRTH, answer.get("person." + DATE_OF_BIRTH));
@@ -60,7 +52,6 @@ public class PersonBirthAgent extends Neo4jAgent<World.City> implements PersonBi
             put(PersonBirthAgentField.FORENAME, answer.get("person." + FORENAME));
             put(PersonBirthAgentField.SURNAME, answer.get("person." + SURNAME));
         }};
-
 //        TODO Key constraints are possible with Neo4j Enterprise, and some constraints are supported in Community
 //        https://neo4j.com/developer/kb/how-to-implement-a-primary-key-property-for-a-label/
     }

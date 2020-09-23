@@ -3,7 +3,6 @@ package grakn.simulation.db.neo4j.agents.interaction;
 import grakn.simulation.db.common.agents.interaction.TransactionAgentBase;
 import grakn.simulation.db.common.agents.utils.Pair;
 import grakn.simulation.db.common.world.World;
-import grakn.simulation.db.neo4j.driver.Transaction;
 import org.neo4j.driver.Query;
 
 import java.util.HashMap;
@@ -14,17 +13,13 @@ import static grakn.simulation.db.neo4j.agents.interaction.ProductAgent.getProdu
 
 public class TransactionAgent extends Neo4jAgent<World.Continent> implements TransactionAgentBase {
     @Override
-    public List<Long> getCompanyNumbersInContinent(World.Continent continent, String scope) {
-        Query companiesQuery = getCompanyNumbersInContinentQuery(continent);
-        log().query(scope, companiesQuery);
-        return tx().getOrderedAttribute(companiesQuery, "company.companyNumber", null);
+    public List<Long> getCompanyNumbersInContinent(World.Continent continent) {
+        return tx().getOrderedAttribute(getCompanyNumbersInContinentQuery(continent), "company.companyNumber", null);
     }
 
     @Override
-    public List<Double> getProductBarcodesInContinent(World.Continent continent, String scope) {
-        Query productsQuery = getProductsInContinentQuery(continent);
-        log().query(scope, productsQuery);
-        return tx().getOrderedAttribute(productsQuery, "product.barcode", null);
+    public List<Double> getProductBarcodesInContinent(World.Continent continent) {
+        return tx().getOrderedAttribute(getProductsInContinentQuery(continent), "product.barcode", null);
     }
 
     @Override
@@ -43,7 +38,6 @@ public class TransactionAgent extends Neo4jAgent<World.Continent> implements Tra
                 "(transaction)-[:SELLER]->(seller)," +
                 "(transaction)-[:BUYER]->(buyer)," +
                 "(transaction)-[:MERCHANDISE]->(product)";
-
         HashMap<String, Object> parameters = new HashMap<String, Object>(){{
                 put("barcode", transaction.getSecond());
                 put("buyerNumber", transaction.getFirst());
@@ -53,8 +47,6 @@ public class TransactionAgent extends Neo4jAgent<World.Continent> implements Tra
                 put("productQuantity", productQuantity);
                 put("isTaxable", isTaxable);
         }};
-        Query insertTransactionQuery = new Query(template, parameters);
-        log().query("insertTransaction", insertTransactionQuery);
-        tx().execute(insertTransactionQuery);
+        tx().execute(new Query(template, parameters));
     }
 }

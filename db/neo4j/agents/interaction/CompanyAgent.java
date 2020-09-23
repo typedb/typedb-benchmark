@@ -2,7 +2,6 @@ package grakn.simulation.db.neo4j.agents.interaction;
 
 import grakn.simulation.db.common.agents.interaction.CompanyAgentBase;
 import grakn.simulation.db.common.world.World;
-import grakn.simulation.db.neo4j.driver.Transaction;
 import org.neo4j.driver.Query;
 
 import java.time.LocalDateTime;
@@ -10,7 +9,7 @@ import java.util.HashMap;
 
 public class CompanyAgent extends Neo4jAgent<World.Country> implements CompanyAgentBase {
     @Override
-    public void insertCompany(World.Country country, LocalDateTime today, String scope, int companyNumber, String companyName) {
+    public void insertCompany(World.Country country, LocalDateTime today, int companyNumber, String companyName) {
         String template = "" +
                 "MATCH (country:Country {locationName: $countryName})\n" +
                 "CREATE (country)-[:INCORPORATED_IN {dateOfIncorporation: $dateOfIncorporation}]->(company:Company {companyNumber: $companyNumber, companyName: $companyName})";
@@ -23,7 +22,6 @@ public class CompanyAgent extends Neo4jAgent<World.Country> implements CompanyAg
         }};
 
         Query companyQuery = new Query(template, parameters);
-        log().query(scope, companyQuery);
         tx().execute(companyQuery);
     }
 

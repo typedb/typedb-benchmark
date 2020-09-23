@@ -34,7 +34,16 @@ import static grakn.simulation.db.grakn.schema.Schema.RESIDENCY_RESIDENT;
 
 public class MarriageAgent extends GraknAgent<World.City> implements MarriageAgentBase {
 
-    public List<String> getUnmarriedPeopleOfGender(String scope, World.City city, String gender, LocalDateTime dobOfAdults) {
+    @Override
+    public List<String> getSingleWomen(World.City city, LocalDateTime dobOfAdults) {
+        return getUnmarriedPeopleOfGender(city, "female", dobOfAdults);
+    }
+    @Override
+    public List<String> getSingleMen(World.City city, LocalDateTime dobOfAdults) {
+        return getUnmarriedPeopleOfGender(city, "male", dobOfAdults);
+    }
+
+    public List<String> getUnmarriedPeopleOfGender(World.City city, String gender, LocalDateTime dobOfAdults) {
         Statement personVar = Graql.var(PERSON);
         Statement cityVar = Graql.var(CITY);
         String marriageRole;
@@ -45,7 +54,6 @@ public class MarriageAgent extends GraknAgent<World.City> implements MarriageAge
         } else {
             throw new IllegalArgumentException("Gender must be male or female");
         }
-
         GraqlGet query = Graql.match(
                 personVar.isa(PERSON).has(GENDER, gender).has(EMAIL, Graql.var(EMAIL)).has(DATE_OF_BIRTH, Graql.var(DATE_OF_BIRTH)),
                 Graql.var(DATE_OF_BIRTH).lte(dobOfAdults),
@@ -54,16 +62,11 @@ public class MarriageAgent extends GraknAgent<World.City> implements MarriageAge
                 Graql.not(Graql.var("r").has(END_DATE, Graql.var(END_DATE))),
                 cityVar.isa(CITY).has(LOCATION_NAME, city.name())
         ).get(EMAIL);
-
-        log().query(scope, query);
-        List<String> result;
-        result = tx().getOrderedAttribute(query, EMAIL, null);
-        log().message(scope, result.toString());
-        return result;
+        return tx().getOrderedAttribute(query, EMAIL, null);
     }
 
     @Override
-    public AgentResult insertMarriage(String scope, World.City worldCity, int marriageIdentifier, String wifeEmail, String husbandEmail) {
+    public AgentResult insertMarriage(World.City worldCity, int marriageIdentifier, String wifeEmail, String husbandEmail) {
         Statement husband = Graql.var("husband");
         Statement wife = Graql.var("wife");
         Statement city = Graql.var(CITY);
@@ -86,9 +89,7 @@ public class MarriageAgent extends GraknAgent<World.City> implements MarriageAge
                 Graql.var().isa(LOCATES).rel(LOCATES_LOCATED, marriage).rel(LOCATES_LOCATION, city)
         );
 
-        List<ConceptMap> answers;
-        log().query(scope, marriageQuery);
-        answers = tx().execute(marriageQuery);
+        List<ConceptMap> answers = tx().execute(marriageQuery);
 
         ConceptMap answer = getOnlyElement(answers);
         Object wifeEmailAns = tx().getOnlyAttributeOfThing(answer, "wife", EMAIL);

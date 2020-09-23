@@ -14,9 +14,8 @@ public interface AgeUpdateAgentBase extends InteractionAgent<World.City> {
 
     @Override
     default AgentResultSet iterate(Agent<World.City, ?> agent, World.City city, IterationContext iterationContext) {
-        agent.startAction();
-        String scope = "updateAgesOfAllPeople";
-        try (ThreadTrace trace = traceOnThread(agent.registerMethodTrace(scope))) {
+        agent.newAction("updateAgesOfAllPeople");
+        try (ThreadTrace trace = traceOnThread(agent.action())) {
             updateAgesOfAllPeople(iterationContext.today(), city);
         }
         agent.commitAction();
