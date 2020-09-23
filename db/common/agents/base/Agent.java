@@ -109,11 +109,6 @@ public abstract class Agent<REGION extends Region, CONTEXT extends DatabaseConte
         }
     }
 
-    public String checkMethodTrace(String methodName) {
-        CheckMethod.checkMethodExists(this, methodName);
-        return methodName;
-    }
-
     public abstract String action();
 
     public interface ComparableField {}
