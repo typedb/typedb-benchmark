@@ -109,15 +109,6 @@ public abstract class Agent<REGION extends Region, CONTEXT extends DatabaseConte
         }
     }
 
-    public String registerMethodTrace(String methodName) {
-        CheckMethod.checkMethodExists(this, methodName);
-        if (tracedMethods.contains(methodName)) {
-            throw new RuntimeException(String.format("Method %s has already been registered for tracing for class %s", methodName, this.getClass().getName()));
-        }
-        tracedMethods.add(methodName);
-        return methodName;
-    }
-
     public String checkMethodTrace(String methodName) {
         CheckMethod.checkMethodExists(this, methodName);
         return methodName;

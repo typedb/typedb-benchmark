@@ -23,20 +23,18 @@ public interface MarriageAgentBase extends InteractionAgent<World.City> {
     default AgentResultSet iterate(Agent<World.City, ?> agent, World.City city, IterationContext iterationContext) {
         AgentResultSet agentResultSet = new AgentResultSet();
         // Find bachelors and bachelorettes who are considered adults and who are not in a marriage and pair them off randomly
-        List<String> womenEmails;
-
         LocalDateTime dobOfAdults = iterationContext.today().minusYears(iterationContext.world().AGE_OF_ADULTHOOD);
-
+        List<String> womenEmails;
         agent.newAction("getSingleWomen");
         try (ThreadTrace trace = traceOnThread(agent.action())) {
-            womenEmails = getUnmarriedPeopleOfGender(city, "female", dobOfAdults);
+            womenEmails = getSingleWomen(city, dobOfAdults);
         }
         shuffle(womenEmails, agent.random());
 
         agent.newAction("getSingleMen");
         List<String> menEmails;
         try (ThreadTrace trace = traceOnThread(agent.action())) {
-            menEmails = getUnmarriedPeopleOfGender(city, "male", dobOfAdults);
+            menEmails = getSingleMen(city, dobOfAdults);
         }
         shuffle(menEmails, agent.random());
 
@@ -61,6 +59,10 @@ public interface MarriageAgentBase extends InteractionAgent<World.City> {
         }
         return agentResultSet;
     }
+
+    List<String> getSingleWomen(World.City city, LocalDateTime dobOfAdults);
+
+    List<String> getSingleMen(World.City city, LocalDateTime dobOfAdults);
 
     List<String> getUnmarriedPeopleOfGender(World.City city, String gender, LocalDateTime dobOfAdults);
 

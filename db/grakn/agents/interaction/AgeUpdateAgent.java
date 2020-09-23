@@ -30,7 +30,8 @@ public class AgeUpdateAgent extends GraknAgent<World.City> implements AgeUpdateA
     public void updateAgesOfAllPeople(LocalDateTime today, World.City city) {
         // Get all people born in a city
         HashMap<String, LocalDateTime> peopleAnswers;
-        try (ThreadTrace trace = traceOnThread(this.checkMethodTrace("getPeopleBornInCity"))) {
+        newAction("getPeopleBornInCity");
+        try (ThreadTrace trace = traceOnThread(action())) {
             peopleAnswers = getPeopleBornInCity(city);
         }
         newAction("updatePersonAge");
@@ -89,7 +90,6 @@ public class AgeUpdateAgent extends GraknAgent<World.City> implements AgeUpdateA
         ).get().sort(EMAIL);
 
         HashMap<String, LocalDateTime> peopleDobs = new HashMap<>();
-        newAction("getPeopleBornInCity");
         tx().execute(peopleQuery).forEach(personAnswer -> {
             LocalDateTime dob = (LocalDateTime) personAnswer.get(DATE_OF_BIRTH).asAttribute().value();
             String email = personAnswer.get(EMAIL).asAttribute().value().toString();

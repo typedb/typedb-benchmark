@@ -34,6 +34,15 @@ import static grakn.simulation.db.grakn.schema.Schema.RESIDENCY_RESIDENT;
 
 public class MarriageAgent extends GraknAgent<World.City> implements MarriageAgentBase {
 
+    @Override
+    public List<String> getSingleWomen(World.City city, LocalDateTime dobOfAdults) {
+        return getUnmarriedPeopleOfGender(city, "female", dobOfAdults);
+    }
+    @Override
+    public List<String> getSingleMen(World.City city, LocalDateTime dobOfAdults) {
+        return getUnmarriedPeopleOfGender(city, "male", dobOfAdults);
+    }
+
     public List<String> getUnmarriedPeopleOfGender(World.City city, String gender, LocalDateTime dobOfAdults) {
         Statement personVar = Graql.var(PERSON);
         Statement cityVar = Graql.var(CITY);
@@ -45,7 +54,6 @@ public class MarriageAgent extends GraknAgent<World.City> implements MarriageAge
         } else {
             throw new IllegalArgumentException("Gender must be male or female");
         }
-
         GraqlGet query = Graql.match(
                 personVar.isa(PERSON).has(GENDER, gender).has(EMAIL, Graql.var(EMAIL)).has(DATE_OF_BIRTH, Graql.var(DATE_OF_BIRTH)),
                 Graql.var(DATE_OF_BIRTH).lte(dobOfAdults),
@@ -54,9 +62,7 @@ public class MarriageAgent extends GraknAgent<World.City> implements MarriageAge
                 Graql.not(Graql.var("r").has(END_DATE, Graql.var(END_DATE))),
                 cityVar.isa(CITY).has(LOCATION_NAME, city.name())
         ).get(EMAIL);
-
-        List<String> result = tx().getOrderedAttribute(query, EMAIL, null);
-        return result;
+        return tx().getOrderedAttribute(query, EMAIL, null);
     }
 
     @Override

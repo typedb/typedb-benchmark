@@ -1,6 +1,7 @@
 package grakn.simulation.db.neo4j.agents.interaction;
 
 import grakn.simulation.db.common.agents.base.Agent;
+import grakn.simulation.db.common.agents.utils.CheckMethod;
 import grakn.simulation.db.common.world.Region;
 import grakn.simulation.db.neo4j.context.Neo4jContext;
 import grakn.simulation.db.neo4j.driver.Transaction;
@@ -21,7 +22,7 @@ public abstract class Neo4jAgent<REGION extends Region> extends Agent<REGION, Ne
 
     @Override
     public void newAction(String action) {
-        registerMethodTrace(action);
+        CheckMethod.checkMethodExists(this, action);
         this.action = action;
         if (tx == null) {
             tx = backendContext().tx(getSessionKey(), logger(), tracker() + ":" + this.action);

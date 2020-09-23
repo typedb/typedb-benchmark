@@ -19,6 +19,15 @@ import static grakn.simulation.db.neo4j.schema.Schema.MARRIAGE_ID;
 
 public class MarriageAgent extends Neo4jAgent<World.City> implements MarriageAgentBase {
 
+    @Override
+    public List<String> getSingleWomen(World.City city, LocalDateTime dobOfAdults) {
+        return getUnmarriedPeopleOfGender(city, "female", dobOfAdults);
+    }
+    @Override
+    public List<String> getSingleMen(World.City city, LocalDateTime dobOfAdults) {
+        return getUnmarriedPeopleOfGender(city, "male", dobOfAdults);
+    }
+
     public List<String> getUnmarriedPeopleOfGender(World.City city, String gender, LocalDateTime dobOfAdults) {
         String template = "" +
                 "MATCH (person:Person {gender: $gender})-[residency:RESIDENT_OF]->(city:City {locationName: $locationName})\n" +
