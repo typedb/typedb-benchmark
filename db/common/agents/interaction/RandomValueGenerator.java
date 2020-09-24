@@ -27,7 +27,8 @@ public class RandomValueGenerator {
     }
 
     double boundRandomDouble(Double min, Double max) {
-        return doubleInterpolate(random.nextDouble(), min, max);
+        double value = doubleInterpolate(random.nextDouble(), min, max);
+        return (double)Math.round(value * 100000d) / 100000d; // Not 100% accurate, but serves our purpose to ensure different backends are given a precision they can handle
     }
 
     boolean bool() {

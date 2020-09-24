@@ -6,6 +6,7 @@ import grakn.simulation.db.common.agents.base.ResultHandler;
 import grakn.simulation.db.common.initialise.AgentPicker;
 import grakn.simulation.db.common.world.World;
 import grakn.simulation.db.neo4j.context.Neo4jContext;
+import grakn.simulation.db.neo4j.driver.Transaction;
 import grakn.simulation.db.neo4j.initialise.Neo4jAgentPicker;
 import grakn.simulation.db.neo4j.initialise.Neo4jInitialiser;
 import grakn.simulation.utils.RandomSource;
@@ -16,12 +17,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
-public class Neo4jSimulation extends Simulation<Neo4jContext> {
+public class Neo4jSimulation extends Simulation<Neo4jContext, Transaction> {
 
     private Neo4jContext neo4jContext;
 
-    public Neo4jSimulation(String hostUri, Map<String, Path> initialisationDataPaths, RandomSource randomSource, World world, List<Config.Agent> agentConfigs, Function<Integer, Boolean> iterationSamplingFunction, ResultHandler resultHandler) {
-        super(hostUri, null, initialisationDataPaths, randomSource, world, agentConfigs, iterationSamplingFunction, resultHandler);
+    public Neo4jSimulation(String hostUri, Map<String, Path> initialisationDataPaths, RandomSource randomSource, World world, List<Config.Agent> agentConfigs, Function<Integer, Boolean> iterationSamplingFunction, ResultHandler resultHandler, boolean test) {
+        super(hostUri, null, initialisationDataPaths, randomSource, world, agentConfigs, iterationSamplingFunction, resultHandler, test);
     }
 
     @Override

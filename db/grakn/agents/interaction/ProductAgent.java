@@ -1,5 +1,7 @@
 package grakn.simulation.db.grakn.agents.interaction;
 
+import grakn.client.answer.ConceptMap;
+import grakn.simulation.db.common.agents.base.AgentResult;
 import grakn.simulation.db.common.agents.interaction.ProductAgentBase;
 import grakn.simulation.db.common.world.World;
 import graql.lang.Graql;
@@ -52,5 +54,10 @@ public class ProductAgent extends GraknAgent<World.Continent> implements Product
                         .rel(PRODUCED_IN_CONTINENT, Graql.var(CONTINENT))
 
         ).get();
+    }
+
+    @Override
+    public AgentResult resultsForTesting(ConceptMap answer) {
+        return null;
     }
 }

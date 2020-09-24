@@ -1,11 +1,11 @@
-package grakn.simulation.db.common.agents.base;
+package grakn.simulation.db.common.context;
 
 import org.slf4j.Logger;
 
 public class LogWrapper {
     private final Logger logger;
 
-    LogWrapper(Logger logger) {
+    public LogWrapper(Logger logger) {
         this.logger = logger;
     }
 

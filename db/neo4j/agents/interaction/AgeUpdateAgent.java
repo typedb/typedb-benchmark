@@ -1,8 +1,10 @@
 package grakn.simulation.db.neo4j.agents.interaction;
 
+import grakn.simulation.db.common.agents.base.AgentResult;
 import grakn.simulation.db.common.agents.interaction.AgeUpdateAgentBase;
 import grakn.simulation.db.common.world.World;
 import org.neo4j.driver.Query;
+import org.neo4j.driver.Record;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -25,6 +27,11 @@ public class AgeUpdateAgent extends Neo4jAgent<World.City> implements AgeUpdateA
 
         Query query = new Query(template, parameters);
         tx().execute(query);
+    }
+
+    @Override
+    public AgentResult resultsForTesting(Record answer) {
+        return null;
     }
 
 //    protected int checkCount() {

@@ -1,7 +1,7 @@
 package grakn.simulation.db.common.agents.region;
 
 import grakn.simulation.db.common.agents.base.Agent;
-import grakn.simulation.db.common.agents.base.IterationContext;
+import grakn.simulation.db.common.agents.base.SimulationContext;
 import grakn.simulation.db.common.agents.base.AgentRunner;
 import grakn.simulation.db.common.context.DatabaseContext;
 import grakn.simulation.utils.RandomSource;
@@ -25,12 +25,12 @@ public class CityAgentRunner<CONTEXT extends DatabaseContext> extends AgentRunne
     }
 
     @Override
-    protected List<World.City> getParallelItems(IterationContext iterationContext) {
-        return iterationContext.world().getCities().collect(toList());
+    protected List<World.City> getParallelItems(SimulationContext simulationContext) {
+        return simulationContext.world().getCities().collect(toList());
     }
 
     @Override
-    protected String getSessionKey(IterationContext iterationContext, RandomSource randomSource, World.City city) {
+    protected String getSessionKey(SimulationContext simulationContext, RandomSource randomSource, World.City city) {
         switch (sessionStrategy) {
             case CITY:
                 return city.name();

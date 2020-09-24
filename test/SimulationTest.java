@@ -44,6 +44,16 @@ public class SimulationTest {
         compareFields("MarriageAgent");
     }
 
+    @Test
+    public void testCompanyAgent() {
+        compareFields("CompanyAgent");
+    }
+
+    @Test
+    public void testEmploymentAgent() {
+        compareFields("EmploymentAgent");
+    }
+
 //    @Test
 //    public void testAgeUpdateAgent() {
 //    Comparing results of this agent will require sending a set equal to the size of the number of people in each city,

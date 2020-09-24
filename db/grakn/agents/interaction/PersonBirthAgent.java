@@ -70,6 +70,11 @@ public class PersonBirthAgent extends GraknAgent<World.City> implements PersonBi
             }};
     }
 
+    @Override
+    public AgentResult resultsForTesting(ConceptMap answer) {
+        return null;
+    }
+
 //    protected int checkCount(World.City worldCity) {
 //        Statement city = Graql.var(CITY);
 //        Statement person = Graql.var(PERSON);

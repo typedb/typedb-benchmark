@@ -3,8 +3,8 @@ package grakn.simulation.db.common.agents.base;
 import grabl.tracing.client.GrablTracingThreadStatic.ThreadContext;
 import grakn.simulation.db.common.agents.interaction.InteractionAgent;
 import grakn.simulation.db.common.agents.interaction.RandomValueGenerator;
-import grakn.simulation.db.common.agents.utils.CheckMethod;
 import grakn.simulation.db.common.context.DatabaseContext;
+import grakn.simulation.db.common.context.LogWrapper;
 import grakn.simulation.db.common.world.Region;
 import org.slf4j.Logger;
 
@@ -20,7 +20,7 @@ import static grabl.tracing.client.GrablTracingThreadStatic.contextOnThread;
  * this class.
  *
  * This class is instantiated via reflection by {@link AgentRunner} and initialized using
- * {@link #init(IterationContext, Random, Object, Object, String, String, Logger, Boolean)}.
+ * {@link #init(SimulationContext, Random, Object, Object, String, String, Logger, Boolean)}.
  *
  * The protected methods of this class provide useful simple methods for writing Agents as concisely as possible.
  */
@@ -31,15 +31,17 @@ public abstract class Agent<REGION extends Region, CONTEXT extends DatabaseConte
     private String sessionKey;
     private String tracker;
     private LogWrapper logWrapper;
+    private Boolean test;
     private ThreadContext context;
     private HashSet<String> tracedMethods = new HashSet<>();
 
-    void init(int simulationStep, Random random, CONTEXT backendContext, String sessionKey, String tracker, Logger logger, Boolean trace) {
+    void init(int simulationStep, Random random, CONTEXT backendContext, String sessionKey, String tracker, Logger logger, Boolean trace, Boolean test) {
         this.random = random;
         this.backendContext = backendContext;
         this.sessionKey = sessionKey;
         this.tracker = tracker;
         this.logWrapper = new LogWrapper(logger);
+        this.test = test;
         if (trace) {
             context = contextOnThread(tracker(), simulationStep);
         }
@@ -93,8 +95,8 @@ public abstract class Agent<REGION extends Region, CONTEXT extends DatabaseConte
      * @param iterationScopeId An id that uniquely identifies a concept within the scope of the agent at a particular iteration
      * @return
      */
-    public int uniqueId(IterationContext iterationContext, int iterationScopeId) {
-        String id = iterationContext.simulationStep() + tracker() + iterationScopeId;
+    public int uniqueId(SimulationContext simulationContext, int iterationScopeId) {
+        String id = simulationContext.simulationStep() + tracker() + iterationScopeId;
         return id.hashCode();
     }
 
@@ -112,4 +114,8 @@ public abstract class Agent<REGION extends Region, CONTEXT extends DatabaseConte
     public abstract String action();
 
     public interface ComparableField {}
+
+    protected boolean test() {
+        return test;
+    }
 }

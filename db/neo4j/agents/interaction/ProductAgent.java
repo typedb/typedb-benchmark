@@ -1,8 +1,10 @@
 package grakn.simulation.db.neo4j.agents.interaction;
 
+import grakn.simulation.db.common.agents.base.AgentResult;
 import grakn.simulation.db.common.agents.interaction.ProductAgentBase;
 import grakn.simulation.db.common.world.World;
 import org.neo4j.driver.Query;
+import org.neo4j.driver.Record;
 
 import java.util.HashMap;
 
@@ -36,5 +38,10 @@ public class ProductAgent extends Neo4jAgent<World.Continent> implements Product
                 put("continentName", continent.name());
         }};
         return new Query(template, parameters);
+    }
+
+    @Override
+    public AgentResult resultsForTesting(Record answer) {
+        return null;
     }
 }

@@ -2,7 +2,7 @@ package grakn.simulation.db.common.agents.region;
 
 import grakn.simulation.db.common.agents.base.Agent;
 import grakn.simulation.db.common.agents.base.AgentRunner;
-import grakn.simulation.db.common.agents.base.IterationContext;
+import grakn.simulation.db.common.agents.base.SimulationContext;
 import grakn.simulation.db.common.context.DatabaseContext;
 import grakn.simulation.db.common.world.World;
 import grakn.simulation.utils.RandomSource;
@@ -18,12 +18,12 @@ public class ContinentAgentRunner<CONTEXT extends DatabaseContext> extends Agent
     }
 
     @Override
-    protected List<World.Continent> getParallelItems(IterationContext iterationContext) {
-        return iterationContext.world().getContinents().collect(toList());
+    protected List<World.Continent> getParallelItems(SimulationContext simulationContext) {
+        return simulationContext.world().getContinents().collect(toList());
     }
 
     @Override
-    protected String getSessionKey(IterationContext iterationContext, RandomSource randomSource, World.Continent continent) {
+    protected String getSessionKey(SimulationContext simulationContext, RandomSource randomSource, World.Continent continent) {
         return continent.name();
     }
 }

@@ -36,7 +36,7 @@ public class PersonBirthAgent extends Neo4jAgent<World.City> implements PersonBi
                 "RETURN person.email, person.dateOfBirth, person.gender, person.forename, person.surname";
 
         HashMap<String, Object> parameters = new HashMap<String, Object>(){{
-                put(LOCATION_NAME, city.toString());
+                put(LOCATION_NAME, city.name());
                 put(EMAIL, email);
                 put(DATE_OF_BIRTH, today);
                 put(GENDER, gender);
@@ -54,6 +54,11 @@ public class PersonBirthAgent extends Neo4jAgent<World.City> implements PersonBi
         }};
 //        TODO Key constraints are possible with Neo4j Enterprise, and some constraints are supported in Community
 //        https://neo4j.com/developer/kb/how-to-implement-a-primary-key-property-for-a-label/
+    }
+
+    @Override
+    public AgentResult resultsForTesting(Record answer) {
+        return null;
     }
 
 //    protected int checkCount() {

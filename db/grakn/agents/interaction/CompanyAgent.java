@@ -1,5 +1,7 @@
 package grakn.simulation.db.grakn.agents.interaction;
 
+import grakn.client.answer.ConceptMap;
+import grakn.simulation.db.common.agents.base.AgentResult;
 import grakn.simulation.db.common.agents.interaction.CompanyAgentBase;
 import grakn.simulation.db.common.world.World;
 import graql.lang.Graql;
@@ -8,6 +10,7 @@ import graql.lang.query.GraqlInsert;
 
 import java.time.LocalDateTime;
 
+import static com.google.common.collect.Iterables.getOnlyElement;
 import static grakn.simulation.db.grakn.schema.Schema.COMPANY;
 import static grakn.simulation.db.grakn.schema.Schema.COMPANY_NAME;
 import static grakn.simulation.db.grakn.schema.Schema.COMPANY_NUMBER;
@@ -23,7 +26,7 @@ import static grakn.simulation.db.grakn.schema.Schema.LOCATION_NAME;
 public class CompanyAgent extends GraknAgent<World.Country> implements CompanyAgentBase {
 
     @Override
-    public void insertCompany(World.Country country, LocalDateTime today, int companyNumber, String companyName) {
+    public AgentResult insertCompany(World.Country country, LocalDateTime today, int companyNumber, String companyName) {
 
         GraqlInsert query =
                 Graql.match(
@@ -37,7 +40,19 @@ public class CompanyAgent extends GraknAgent<World.Country> implements CompanyAg
                                         .rel(INCORPORATION_INCORPORATING, Graql.var(COUNTRY))
                                         .has(DATE_OF_INCORPORATION, today)
                         );
-        tx().execute(query);
+        return results(getOnlyElement(tx().execute(query)));
+    }
+
+    @Override
+    public AgentResult resultsForTesting(ConceptMap answer) {
+        return new AgentResult() {
+            {
+                put(CompanyAgentField.COMPANY_NAME, tx().getOnlyAttributeOfThing(answer, COMPANY, COMPANY_NAME));
+                put(CompanyAgentField.COMPANY_NUMBER, tx().getOnlyAttributeOfThing(answer, COMPANY, COMPANY_NUMBER));
+                put(CompanyAgentField.COUNTRY, tx().getOnlyAttributeOfThing(answer, COUNTRY, LOCATION_NAME));
+                put(CompanyAgentField.DATE_OF_INCORPORATION, tx().getOnlyAttributeOfThing(answer, INCORPORATION, DATE_OF_INCORPORATION));
+            }
+        };
     }
 
     static GraqlGet getCompanyNumbersInCountryQuery(World.Country country) {

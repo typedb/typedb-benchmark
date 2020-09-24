@@ -1,5 +1,7 @@
 package grakn.simulation.db.grakn.agents.interaction;
 
+import grakn.client.answer.ConceptMap;
+import grakn.simulation.db.common.agents.base.AgentResult;
 import grakn.simulation.db.common.agents.interaction.FriendshipAgentBase;
 import grakn.simulation.db.common.world.World;
 import graql.lang.Graql;
@@ -56,6 +58,11 @@ public class FriendshipAgent extends GraknAgent<World.City> implements Friendshi
                         .has(START_DATE, startDate)
         );
         tx().execute(insertFriendshipQuery);
+    }
+
+    @Override
+    public AgentResult resultsForTesting(ConceptMap answer) {
+        return null;
     }
 
 //    protected int checkCount() {

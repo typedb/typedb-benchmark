@@ -3,7 +3,7 @@ package grakn.simulation.db.common.agents.interaction;
 import grakn.simulation.db.common.agents.base.Agent;
 import grakn.simulation.db.common.agents.base.AgentResult;
 import grakn.simulation.db.common.agents.base.AgentResultSet;
-import grakn.simulation.db.common.agents.base.IterationContext;
+import grakn.simulation.db.common.agents.base.SimulationContext;
 import grakn.simulation.db.common.world.World;
 
 import java.time.LocalDateTime;
@@ -18,37 +18,37 @@ public interface PersonBirthAgentBase extends InteractionAgent<World.City> {
     }
 
     @Override
-    default AgentResultSet iterate(Agent<World.City, ?> agent, World.City city, IterationContext iterationContext) {
+    default AgentResultSet iterate(Agent<World.City, ?> agent, World.City city, SimulationContext simulationContext) {
         // Find bachelors and bachelorettes who are considered adults and who are not in a marriage and pair them off randomly
-        int numBirths = iterationContext.world().getScaleFactor();
+        int numBirths = simulationContext.world().getScaleFactor();
         AgentResultSet agentResultSet = new AgentResultSet();
         for (int i = 0; i < numBirths; i++) {
             String gender;
             String forename;
-            String surname = agent.pickOne(iterationContext.world().getSurnames());
+            String surname = agent.pickOne(simulationContext.world().getSurnames());
 
             boolean genderBool = agent.random().nextBoolean();
             if (genderBool) {
                 gender = "male";
-                forename = agent.pickOne(iterationContext.world().getMaleForenames());
+                forename = agent.pickOne(simulationContext.world().getMaleForenames());
             } else {
                 gender = "female";
-                forename = agent.pickOne(iterationContext.world().getFemaleForenames());
+                forename = agent.pickOne(simulationContext.world().getFemaleForenames());
             }
 
             // Email is used as a key and needs to be unique, which requires a lot of information
             String email = forename + "."
                     + surname + "_"
-                    + iterationContext.today().toString() + "_"
+                    + simulationContext.today().toString() + "_"
                     + i + "_"
-                    + iterationContext.simulationStep() + "_"
+                    + simulationContext.simulationStep() + "_"
                     + city + "_"
                     + city.country() + "_"
                     + city.country().continent()
                     + "@gmail.com";
             agent.newAction("insertPerson");
             try (ThreadTrace trace = traceOnThread(agent.action())) {
-                agentResultSet.add(insertPerson(city, iterationContext.today(), email, gender, forename, surname));
+                agentResultSet.add(insertPerson(city, simulationContext.today(), email, gender, forename, surname));
             }
         }
         agent.commitAction();

@@ -3,7 +3,7 @@ package grakn.simulation.db.common.agents.interaction;
 import grabl.tracing.client.GrablTracingThreadStatic.ThreadTrace;
 import grakn.simulation.db.common.agents.base.Agent;
 import grakn.simulation.db.common.agents.base.AgentResultSet;
-import grakn.simulation.db.common.agents.base.IterationContext;
+import grakn.simulation.db.common.agents.base.SimulationContext;
 import grakn.simulation.db.common.agents.utils.Allocation;
 import grakn.simulation.db.common.world.World;
 
@@ -23,12 +23,12 @@ public interface ParentshipAgentBase extends InteractionAgent<World.City> {
     }
 
     @Override
-    default AgentResultSet iterate(Agent<World.City, ?> agent, World.City city, IterationContext iterationContext) {
+    default AgentResultSet iterate(Agent<World.City, ?> agent, World.City city, SimulationContext simulationContext) {
         // Query for married couples in the city who are not already in a parentship relation together
         List<String> childrenEmails;
         agent.newAction("getChildrenEmailsBorn");
         try (ThreadTrace trace = traceOnThread(agent.action())) {
-            childrenEmails = getChildrenEmailsBorn(city, iterationContext.today());
+            childrenEmails = getChildrenEmailsBorn(city, simulationContext.today());
         }
         List<HashMap<Email, String>> marriageEmails;
         agent.newAction("getMarriageEmails");

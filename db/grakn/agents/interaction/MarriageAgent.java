@@ -105,6 +105,11 @@ public class MarriageAgent extends GraknAgent<World.City> implements MarriageAge
             }};
     }
 
+    @Override
+    public AgentResult resultsForTesting(ConceptMap answer) {
+        return null;
+    }
+
 //    protected int checkCount() {
 //        Statement husband = Graql.var("husband");
 //        Statement wife = Graql.var("wife");

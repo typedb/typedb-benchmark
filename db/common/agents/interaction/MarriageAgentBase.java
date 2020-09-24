@@ -4,7 +4,7 @@ import grabl.tracing.client.GrablTracingThreadStatic.ThreadTrace;
 import grakn.simulation.db.common.agents.base.Agent;
 import grakn.simulation.db.common.agents.base.AgentResult;
 import grakn.simulation.db.common.agents.base.AgentResultSet;
-import grakn.simulation.db.common.agents.base.IterationContext;
+import grakn.simulation.db.common.agents.base.SimulationContext;
 import grakn.simulation.db.common.world.World;
 
 import java.time.LocalDateTime;
@@ -20,10 +20,10 @@ public interface MarriageAgentBase extends InteractionAgent<World.City> {
     }
 
     @Override
-    default AgentResultSet iterate(Agent<World.City, ?> agent, World.City city, IterationContext iterationContext) {
+    default AgentResultSet iterate(Agent<World.City, ?> agent, World.City city, SimulationContext simulationContext) {
         AgentResultSet agentResultSet = new AgentResultSet();
         // Find bachelors and bachelorettes who are considered adults and who are not in a marriage and pair them off randomly
-        LocalDateTime dobOfAdults = iterationContext.today().minusYears(iterationContext.world().AGE_OF_ADULTHOOD);
+        LocalDateTime dobOfAdults = simulationContext.today().minusYears(simulationContext.world().AGE_OF_ADULTHOOD);
         List<String> womenEmails;
         agent.newAction("getSingleWomen");
         try (ThreadTrace trace = traceOnThread(agent.action())) {
@@ -38,7 +38,7 @@ public interface MarriageAgentBase extends InteractionAgent<World.City> {
         }
         shuffle(menEmails, agent.random());
 
-        int numMarriages = iterationContext.world().getScaleFactor();
+        int numMarriages = simulationContext.world().getScaleFactor();
 
         int numMarriagesPossible = Math.min(numMarriages, Math.min(womenEmails.size(), menEmails.size()));
 

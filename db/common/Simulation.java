@@ -2,8 +2,9 @@ package grakn.simulation.db.common;
 
 import grakn.simulation.config.Config;
 import grakn.simulation.db.common.agents.base.AgentRunner;
-import grakn.simulation.db.common.agents.base.IterationContext;
+import grakn.simulation.db.common.context.DatabaseTransaction;
 import grakn.simulation.db.common.agents.base.ResultHandler;
+import grakn.simulation.db.common.agents.base.SimulationContext;
 import grakn.simulation.db.common.context.DatabaseContext;
 import grakn.simulation.db.common.initialise.AgentPicker;
 import grakn.simulation.db.common.world.World;
@@ -21,7 +22,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.function.Function;
 
-public abstract class Simulation<CONTEXT extends DatabaseContext> implements IterationContext {
+public abstract class Simulation<CONTEXT extends DatabaseContext<TRANSACTION>, TRANSACTION extends DatabaseTransaction> implements SimulationContext {
 
     final static Logger LOG = LoggerFactory.getLogger(Simulation.class);
     private final List<AgentRunner<?, CONTEXT>> agentRunnerList;
@@ -30,14 +31,16 @@ public abstract class Simulation<CONTEXT extends DatabaseContext> implements Ite
     private final Function<Integer, Boolean> iterationSamplingFunction;
     private final ResultHandler resultHandler;
     private final World world;
+    private final boolean test;
     private int simulationStep = 1;
 
-    public Simulation(String hostUri, String database, Map<String, Path> initialisationDataPaths, RandomSource randomSource, World world, List<Config.Agent> agentConfigs, Function<Integer, Boolean> iterationSamplingFunction, ResultHandler resultHandler) {
+    public Simulation(String hostUri, String database, Map<String, Path> initialisationDataPaths, RandomSource randomSource, World world, List<Config.Agent> agentConfigs, Function<Integer, Boolean> iterationSamplingFunction, ResultHandler resultHandler, boolean test) {
         this.random = randomSource.startNewRandom();
         this.agentConfigs = agentConfigs;
         this.iterationSamplingFunction = iterationSamplingFunction;
         this.resultHandler = resultHandler;
         this.world = world;
+        this.test = test;
         setBackendContext(hostUri, database);
         initialise(initialisationDataPaths);
         this.agentRunnerList = agentRunnerListFromConfigs();
@@ -94,8 +97,13 @@ public abstract class Simulation<CONTEXT extends DatabaseContext> implements Ite
     }
 
     @Override
-    public boolean shouldTrace() {
+    public boolean trace() {
         return iterationSamplingFunction.apply(simulationStep());
+    }
+
+    @Override
+    public boolean test() {
+        return test;
     }
 
     @Override

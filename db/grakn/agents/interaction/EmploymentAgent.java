@@ -1,5 +1,7 @@
 package grakn.simulation.db.grakn.agents.interaction;
 
+import grakn.client.answer.ConceptMap;
+import grakn.simulation.db.common.agents.base.AgentResult;
 import grakn.simulation.db.common.agents.interaction.EmploymentAgentBase;
 import grakn.simulation.db.common.world.World;
 import graql.lang.Graql;
@@ -10,6 +12,7 @@ import graql.lang.statement.Statement;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static com.google.common.collect.Iterables.getOnlyElement;
 import static grakn.simulation.db.grakn.agents.interaction.RelocationAgent.cityResidentsQuery;
 import static grakn.simulation.db.grakn.schema.Schema.CITY;
 import static grakn.simulation.db.grakn.schema.Schema.COMPANY;
@@ -50,7 +53,7 @@ public class EmploymentAgent extends GraknAgent<World.City> implements Employmen
     }
 
     @Override
-    public void insertEmployment(World.City worldCity, String employeeEmail, long companyNumber, LocalDateTime employmentDate, double wageValue, String contractContent, double contractedHours){
+    public AgentResult insertEmployment(World.City worldCity, String employeeEmail, long companyNumber, LocalDateTime employmentDate, double wageValue, String contractContent, double contractedHours) {
         Statement city = Graql.var(CITY);
         Statement person = Graql.var(PERSON);
         Statement company = Graql.var(COMPANY);
@@ -62,23 +65,16 @@ public class EmploymentAgent extends GraknAgent<World.City> implements Employmen
         Statement contract = Graql.var(CONTRACT);
         Statement currency = Graql.var(CURRENCY);
 
-        Statement employeeEmailVar = Graql.var("employee-email").val(employeeEmail);
-        Statement companyNumberVar = Graql.var("company-number").val(companyNumber);
-        Statement employmentDateVar = Graql.var("employment-date").val(employmentDate);
-        Statement wageValueVar = Graql.var("wage-value").val(wageValue);
-        Statement contractContentVar = Graql.var("contract-content").val(contractContent);
-        Statement contractedHoursVar = Graql.var("contracted-hours").val(contractedHours);
-
         GraqlInsert insertEmploymentQuery = Graql.match(
                 city
                         .isa(CITY)
                         .has(LOCATION_NAME, worldCity.name()),
                 person
                         .isa(PERSON)
-                        .has(EMAIL, employeeEmailVar),
+                        .has(EMAIL, employeeEmail),
                 company
                         .isa(COMPANY)
-                        .has(COMPANY_NUMBER, companyNumberVar),
+                        .has(COMPANY_NUMBER, companyNumber),
                 country
                         .isa(COUNTRY)
                         .has(CURRENCY, currency),
@@ -93,21 +89,37 @@ public class EmploymentAgent extends GraknAgent<World.City> implements Employmen
                         .rel(EMPLOYMENT_EMPLOYER, company)
                         .rel(EMPLOYMENT_CONTRACT, contract)
                         .rel(EMPLOYMENT_WAGE, wage)
-                        .has(START_DATE, employmentDateVar),
+                        .has(START_DATE, employmentDate),
                 wage
                         .isa(WAGE)
-                        .has(WAGE_VALUE, wageValueVar)
+                        .has(WAGE_VALUE, wageValue)
                         .has(CURRENCY, currency), //TODO Should this be inferred rather than inserted?
                 locates
                         .isa(LOCATES)
-                        .rel(LOCATES_LOCATION, employment)
-                        .rel(LOCATES_LOCATED, city),
+                        .rel(LOCATES_LOCATION, city)
+                        .rel(LOCATES_LOCATED, employment),
                 contract
                         .isa(CONTRACT)
-                        .has(CONTRACT_CONTENT, contractContentVar)
-                        .has(CONTRACTED_HOURS, contractedHoursVar)
+                        .has(CONTRACT_CONTENT, contractContent)
+                        .has(CONTRACTED_HOURS, contractedHours)
         );
-        tx().execute(insertEmploymentQuery);
+        return results(getOnlyElement(tx().execute(insertEmploymentQuery)));
+    }
+
+    @Override
+    public AgentResult resultsForTesting(ConceptMap answer) {
+        return new AgentResult() {
+            {
+                put(EmploymentAgentField.CITY_NAME, tx().getOnlyAttributeOfThing(answer, CITY, LOCATION_NAME));
+                put(EmploymentAgentField.PERSON_EMAIL, tx().getOnlyAttributeOfThing(answer, PERSON, EMAIL));
+                put(EmploymentAgentField.COMPANY_NUMBER, tx().getOnlyAttributeOfThing(answer, COMPANY, COMPANY_NUMBER));
+                put(EmploymentAgentField.START_DATE, tx().getOnlyAttributeOfThing(answer, EMPLOYMENT, START_DATE));
+                put(EmploymentAgentField.WAGE, tx().getOnlyAttributeOfThing(answer, WAGE, WAGE_VALUE));
+                put(EmploymentAgentField.CURRENCY, tx().getOnlyAttributeOfThing(answer, WAGE, CURRENCY));
+                put(EmploymentAgentField.CONTRACT_CONTENT, tx().getOnlyAttributeOfThing(answer, CONTRACT, CONTRACT_CONTENT));
+                put(EmploymentAgentField.CONTRACTED_HOURS, tx().getOnlyAttributeOfThing(answer, CONTRACT, CONTRACTED_HOURS));
+            }
+        };
     }
 
 //    protected int checkCount() {

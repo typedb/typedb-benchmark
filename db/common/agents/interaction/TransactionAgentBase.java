@@ -2,7 +2,7 @@ package grakn.simulation.db.common.agents.interaction;
 
 import grakn.simulation.db.common.agents.base.Agent;
 import grakn.simulation.db.common.agents.base.AgentResultSet;
-import grakn.simulation.db.common.agents.base.IterationContext;
+import grakn.simulation.db.common.agents.base.SimulationContext;
 import grakn.simulation.db.common.agents.utils.Allocation;
 import grakn.simulation.db.common.agents.utils.Pair;
 import grakn.simulation.db.common.world.World;
@@ -19,7 +19,7 @@ public interface TransactionAgentBase extends InteractionAgent<World.Continent> 
     int NUM_TRANSACTIONS_PER_COMPANY_ON_AVERAGE = 1;
 
     @Override
-    default AgentResultSet iterate(Agent<World.Continent, ?> agent, World.Continent continent, IterationContext iterationContext) {
+    default AgentResultSet iterate(Agent<World.Continent, ?> agent, World.Continent continent, SimulationContext simulationContext) {
         List<Long> companyNumbers;
         agent.newAction("getCompanyNumbersInContinent");
         try (ThreadTrace trace = traceOnThread(agent.action())) {
@@ -32,7 +32,7 @@ public interface TransactionAgentBase extends InteractionAgent<World.Continent> 
         }
         shuffle(companyNumbers, agent.random());
 
-        int numTransactions = NUM_TRANSACTIONS_PER_COMPANY_ON_AVERAGE * iterationContext.world().getScaleFactor() * companyNumbers.size();
+        int numTransactions = NUM_TRANSACTIONS_PER_COMPANY_ON_AVERAGE * simulationContext.world().getScaleFactor() * companyNumbers.size();
         // Company numbers is the list of sellers
         // Company numbers picked randomly is the list of buyers
         // Products randomly picked

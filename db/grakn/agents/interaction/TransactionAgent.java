@@ -1,5 +1,7 @@
 package grakn.simulation.db.grakn.agents.interaction;
 
+import grakn.client.answer.ConceptMap;
+import grakn.simulation.db.common.agents.base.AgentResult;
 import grakn.simulation.db.common.agents.interaction.TransactionAgentBase;
 import grakn.simulation.db.common.agents.utils.Pair;
 import grakn.simulation.db.common.world.World;
@@ -68,5 +70,10 @@ public class TransactionAgent extends GraknAgent<World.Continent> implements Tra
 
                 );
         tx().execute(insertTransactionQuery);
+    }
+
+    @Override
+    public AgentResult resultsForTesting(ConceptMap answer) {
+        return null;
     }
 }

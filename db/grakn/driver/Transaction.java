@@ -3,7 +3,8 @@ package grakn.simulation.db.grakn.driver;
 import grabl.tracing.client.GrablTracingThreadStatic;
 import grakn.client.GraknClient;
 import grakn.client.answer.ConceptMap;
-import grakn.simulation.db.common.agents.base.LogWrapper;
+import grakn.simulation.db.common.context.DatabaseTransaction;
+import grakn.simulation.db.common.context.LogWrapper;
 import graql.lang.query.GraqlDelete;
 import graql.lang.query.GraqlGet;
 import graql.lang.query.GraqlInsert;
@@ -17,7 +18,7 @@ import static grabl.tracing.client.GrablTracingThreadStatic.traceOnThread;
 import static grakn.simulation.db.common.context.DatabaseContext.TracingLabel.EXECUTE;
 import static grakn.simulation.db.common.context.DatabaseContext.TracingLabel.STREAM_AND_SORT;
 
-public class Transaction {
+public class Transaction implements DatabaseTransaction {
 
     boolean closed = false;
 
@@ -94,6 +95,10 @@ public class Transaction {
 
     public Object getOnlyAttributeOfThing(ConceptMap answer, String varName, String attributeType) {
         return getOnlyElement(answer.get(varName).asThing().asRemote(transaction).attributes(transaction.getAttributeType(attributeType)).collect(Collectors.toList())).value();
+    }
+
+    public Object getValueOfAttribute(ConceptMap answer, String varName) {
+        return answer.get(varName).asAttribute().value();
     }
 //
 //            @Override

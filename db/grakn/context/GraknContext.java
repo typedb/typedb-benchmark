@@ -2,7 +2,7 @@ package grakn.simulation.db.grakn.context;
 
 import grabl.tracing.client.GrablTracingThreadStatic;
 import grakn.client.GraknClient;
-import grakn.simulation.db.common.agents.base.LogWrapper;
+import grakn.simulation.db.common.context.LogWrapper;
 import grakn.simulation.db.common.context.DatabaseContext;
 import grakn.simulation.db.grakn.driver.Transaction;
 
@@ -15,7 +15,7 @@ import static grakn.simulation.db.common.context.DatabaseContext.TracingLabel.OP
 import static grakn.simulation.db.common.context.DatabaseContext.TracingLabel.OPEN_SESSION;
 import static grakn.simulation.db.common.context.DatabaseContext.TracingLabel.OPEN_TRANSACTION;
 
-public class GraknContext extends DatabaseContext {
+public class GraknContext extends DatabaseContext<Transaction> {
 
     private final GraknClient client;
     private final String database;

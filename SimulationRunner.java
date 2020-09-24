@@ -89,7 +89,7 @@ public class SimulationRunner {
 
         try {
             try (GrablTracing tracingIgnored = grablTracing(grablTracingUri, grablTracingOrganisation, grablTracingRepository, grablTracingCommit, grablTracingUsername, grablTracingToken, disableTracing)) {
-
+                boolean test = false;
                 Simulation simulation;
                 switch (dbName) {
                     case "grakn":
@@ -104,8 +104,8 @@ public class SimulationRunner {
                                 world,
                                 config.getAgents(),
                                 config.getTraceSampling().getSamplingFunction(),
-                                new ResultHandler()
-                        );
+                                new ResultHandler(),
+                                test);
                         break;
 
                     case "neo4j":
@@ -119,8 +119,8 @@ public class SimulationRunner {
                                 world,
                                 config.getAgents(),
                                 config.getTraceSampling().getSamplingFunction(),
-                                new ResultHandler()
-                        );
+                                new ResultHandler(),
+                                test);
                         break;
 
                     default:

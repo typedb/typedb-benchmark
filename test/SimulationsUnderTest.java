@@ -85,6 +85,8 @@ public class SimulationsUnderTest {
         agentNames.add("marriage");
         agentNames.add("personBirth");
         agentNames.add("ageUpdate");
+        agentNames.add("company");
+        agentNames.add("employment");
 
         ArrayList<Config.Agent> agentConfigs = new ArrayList<>();
         agentNames.forEach(name -> agentConfigs.add(ConstructAgentConfig(name, AgentMode.RUN)));
@@ -96,6 +98,7 @@ public class SimulationsUnderTest {
         /////////////////
 
         ResultHandler graknResultHandler = new ResultHandler();
+        boolean test = true;
 
         graknSimulation = new GraknSimulation(
                 graknUri,
@@ -105,8 +108,8 @@ public class SimulationsUnderTest {
                 world,
                 agentConfigs,
                 samplingFunction,
-                graknResultHandler
-        );
+                graknResultHandler,
+                test);
 
         /////////////////
         // Neo4j setup //
@@ -121,7 +124,7 @@ public class SimulationsUnderTest {
                 world,
                 agentConfigs,
                 samplingFunction,
-                neo4jResultHandler
-        );
+                neo4jResultHandler,
+                test);
     }
 }

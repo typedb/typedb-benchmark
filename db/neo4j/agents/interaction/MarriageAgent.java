@@ -72,6 +72,11 @@ public class MarriageAgent extends Neo4jAgent<World.City> implements MarriageAge
         }};
     }
 
+    @Override
+    public AgentResult resultsForTesting(Record answer) {
+        return null;
+    }
+
 //    protected int checkCount() {
 //        String template = "" +
 //                "MATCH (city:City {locationName: $locationName}), \n" +

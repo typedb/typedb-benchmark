@@ -2,7 +2,7 @@ package grakn.simulation.db.common.agents.interaction;
 
 import grakn.simulation.db.common.agents.base.Agent;
 import grakn.simulation.db.common.agents.base.AgentResultSet;
-import grakn.simulation.db.common.agents.base.IterationContext;
+import grakn.simulation.db.common.agents.base.SimulationContext;
 import grakn.simulation.db.common.agents.utils.Allocation;
 import grakn.simulation.db.common.world.World;
 
@@ -18,7 +18,7 @@ import static java.util.Collections.shuffle;
 public interface RelocationAgentBase extends InteractionAgent<World.City> {
 
     @Override
-    default AgentResultSet iterate(Agent<World.City, ?> agent, World.City city, IterationContext iterationContext) {
+    default AgentResultSet iterate(Agent<World.City, ?> agent, World.City city, SimulationContext simulationContext) {
         /*
         Find people currently resident the city
         Find other cities in the continent
@@ -26,16 +26,16 @@ public interface RelocationAgentBase extends InteractionAgent<World.City> {
          */
 
         LocalDateTime earliestDate;
-        if (iterationContext.today().minusYears(2).isBefore(LocalDateTime.of(LocalDate.ofYearDay(0, 1), LocalTime.of(0, 0, 0))))
-            earliestDate = iterationContext.today();
+        if (simulationContext.today().minusYears(2).isBefore(LocalDateTime.of(LocalDate.ofYearDay(0, 1), LocalTime.of(0, 0, 0))))
+            earliestDate = simulationContext.today();
         else {
-            earliestDate = iterationContext.today().minusYears(2);
+            earliestDate = simulationContext.today().minusYears(2);
         }
 
         List<String> residentEmails;
         List<String> relocationCityNames;
 
-        int numRelocations = iterationContext.world().getScaleFactor();
+        int numRelocations = simulationContext.world().getScaleFactor();
         agent.newAction("getResidentEmails");
         try (ThreadTrace trace = traceOnThread(agent.action())) {
             residentEmails = getResidentEmails(city, earliestDate, numRelocations);
@@ -50,7 +50,7 @@ public interface RelocationAgentBase extends InteractionAgent<World.City> {
         Allocation.allocate(residentEmails, relocationCityNames, (residentEmail, relocationCityName) -> {
             agent.newAction("insertRelocation");
             try (ThreadTrace trace = traceOnThread(agent.action())) {
-                insertRelocation(city, iterationContext.today(), residentEmail, relocationCityName);
+                insertRelocation(city, simulationContext.today(), residentEmail, relocationCityName);
             }
         });
         agent.commitAction();

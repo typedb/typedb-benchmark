@@ -1,5 +1,6 @@
 package grakn.simulation.db.neo4j.agents.interaction;
 
+import grakn.simulation.db.common.agents.base.AgentResult;
 import grakn.simulation.db.common.agents.interaction.ParentshipAgentBase;
 import grakn.simulation.db.common.world.World;
 import org.neo4j.driver.Query;
@@ -58,5 +59,10 @@ public class ParentshipAgent extends Neo4jAgent<World.City> implements Parentshi
             }};
             tx().execute(new Query(template, parameters));
         }
+    }
+
+    @Override
+    public AgentResult resultsForTesting(Record answer) {
+        return null;
     }
 }

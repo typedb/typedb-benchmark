@@ -1,5 +1,7 @@
 package grakn.simulation.db.grakn.agents.interaction;
 
+import grakn.client.answer.ConceptMap;
+import grakn.simulation.db.common.agents.base.AgentResult;
 import grakn.simulation.db.common.agents.interaction.ParentshipAgentBase;
 import grakn.simulation.db.common.world.World;
 import graql.lang.Graql;
@@ -108,5 +110,10 @@ public class ParentshipAgent extends GraknAgent<World.City> implements Parentshi
                 insertStatements
         );
         tx().execute(parentshipQuery);
+    }
+
+    @Override
+    public AgentResult resultsForTesting(ConceptMap answer) {
+        return null;
     }
 }

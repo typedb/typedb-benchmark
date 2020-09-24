@@ -1,7 +1,7 @@
 package grakn.simulation.db.neo4j.context;
 
 import grabl.tracing.client.GrablTracingThreadStatic;
-import grakn.simulation.db.common.agents.base.LogWrapper;
+import grakn.simulation.db.common.context.LogWrapper;
 import grakn.simulation.db.common.context.DatabaseContext;
 import grakn.simulation.db.neo4j.driver.Transaction;
 import org.neo4j.driver.AuthTokens;
@@ -18,7 +18,7 @@ import static grakn.simulation.db.common.context.DatabaseContext.TracingLabel.OP
 import static grakn.simulation.db.common.context.DatabaseContext.TracingLabel.OPEN_SESSION;
 import static grakn.simulation.db.common.context.DatabaseContext.TracingLabel.OPEN_TRANSACTION;
 
-public class Neo4jContext extends DatabaseContext {
+public class Neo4jContext extends DatabaseContext<Transaction> {
 
     private final Driver driver;
     private final ConcurrentHashMap<String, Session> sessionMap = new ConcurrentHashMap<>();

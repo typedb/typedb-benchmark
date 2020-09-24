@@ -4,10 +4,11 @@ import grakn.simulation.db.common.world.World;
 
 import java.time.LocalDateTime;
 
-public interface IterationContext {
+public interface SimulationContext {
     int simulationStep();
     LocalDateTime today();
     World world();
-    boolean shouldTrace();
+    boolean trace();
+    boolean test();
     ResultHandler getResultHandler();
 }

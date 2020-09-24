@@ -1,5 +1,7 @@
 package grakn.simulation.db.grakn.agents.interaction;
 
+import grakn.client.answer.ConceptMap;
+import grakn.simulation.db.common.agents.base.AgentResult;
 import grakn.simulation.db.common.agents.interaction.RelocationAgentBase;
 import grakn.simulation.db.common.world.World;
 import graql.lang.Graql;
@@ -84,6 +86,11 @@ public class RelocationAgent extends GraknAgent<World.City> implements Relocatio
                         .has(RELOCATION_DATE, today)
         );
         tx().execute(relocatePersonQuery);
+    }
+
+    @Override
+    public AgentResult resultsForTesting(ConceptMap answer) {
+        return null;
     }
 
 //    protected int checkCount() {
