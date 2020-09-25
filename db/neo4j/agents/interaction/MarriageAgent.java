@@ -9,9 +9,7 @@ import org.neo4j.driver.Record;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import static com.google.common.collect.Iterables.getOnlyElement;
 import static grakn.simulation.db.neo4j.schema.Schema.EMAIL;
 import static grakn.simulation.db.neo4j.schema.Schema.GENDER;
 import static grakn.simulation.db.neo4j.schema.Schema.LOCATION_NAME;
@@ -23,6 +21,7 @@ public class MarriageAgent extends Neo4jAgent<World.City> implements MarriageAge
     public List<String> getSingleWomen(World.City city, LocalDateTime dobOfAdults) {
         return getUnmarriedPeopleOfGender(city, "female", dobOfAdults);
     }
+
     @Override
     public List<String> getSingleMen(World.City city, LocalDateTime dobOfAdults) {
         return getUnmarriedPeopleOfGender(city, "male", dobOfAdults);
@@ -60,21 +59,17 @@ public class MarriageAgent extends Neo4jAgent<World.City> implements MarriageAge
         }};
 
         Query query = new Query(template, parameters);
-        List<Record> answers = tx().execute(query);
-
-        Map<String, Object> answer = getOnlyElement(answers).asMap();
-
-        return new AgentResult() {{
-            put(MarriageAgentField.MARRIAGE_IDENTIFIER, answer.get("marriage." + MARRIAGE_ID));
-            put(MarriageAgentField.WIFE_EMAIL, answer.get("wife." + EMAIL));  // TODO we get back the variables matched for in an insert?
-            put(MarriageAgentField.HUSBAND_EMAIL, answer.get("husband." + EMAIL));
-            put(MarriageAgentField.CITY_NAME, answer.get("city." + LOCATION_NAME));
-        }};
+        return single_result(tx().execute(query));
     }
 
     @Override
     public AgentResult resultsForTesting(Record answer) {
-        return null;
+        return new AgentResult() {{
+            put(MarriageAgentField.MARRIAGE_IDENTIFIER, answer.asMap().get("marriage." + MARRIAGE_ID));
+            put(MarriageAgentField.WIFE_EMAIL, answer.asMap().get("wife." + EMAIL));  // TODO we get back the variables matched for in an insert?
+            put(MarriageAgentField.HUSBAND_EMAIL, answer.asMap().get("husband." + EMAIL));
+            put(MarriageAgentField.CITY_NAME, answer.asMap().get("city." + LOCATION_NAME));
+        }};
     }
 
 //    protected int checkCount() {

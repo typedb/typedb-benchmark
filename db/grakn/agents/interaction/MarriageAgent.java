@@ -13,7 +13,6 @@ import graql.lang.statement.StatementAttribute;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static com.google.common.collect.Iterables.getOnlyElement;
 import static grakn.simulation.db.grakn.schema.Schema.CITY;
 import static grakn.simulation.db.grakn.schema.Schema.DATE_OF_BIRTH;
 import static grakn.simulation.db.grakn.schema.Schema.EMAIL;
@@ -38,6 +37,7 @@ public class MarriageAgent extends GraknAgent<World.City> implements MarriageAge
     public List<String> getSingleWomen(World.City city, LocalDateTime dobOfAdults) {
         return getUnmarriedPeopleOfGender(city, "female", dobOfAdults);
     }
+
     @Override
     public List<String> getSingleMen(World.City city, LocalDateTime dobOfAdults) {
         return getUnmarriedPeopleOfGender(city, "male", dobOfAdults);
@@ -88,26 +88,17 @@ public class MarriageAgent extends GraknAgent<World.City> implements MarriageAge
                         .has(MARRIAGE_ID, marriageIdentifierVar),
                 Graql.var().isa(LOCATES).rel(LOCATES_LOCATED, marriage).rel(LOCATES_LOCATION, city)
         );
-
-        List<ConceptMap> answers = tx().execute(marriageQuery);
-
-        ConceptMap answer = getOnlyElement(answers);
-        Object wifeEmailAns = tx().getOnlyAttributeOfThing(answer, "wife", EMAIL);
-        Object husbandEmailAns = tx().getOnlyAttributeOfThing(answer, "husband", EMAIL);
-        Object marriageIdentifierAns = tx().getOnlyAttributeOfThing(answer, "marriage", MARRIAGE_ID);
-        Object cityNameAns = tx().getOnlyAttributeOfThing(answer, CITY, LOCATION_NAME);
-
-        return new AgentResult(){{
-                put(MarriageAgentField.MARRIAGE_IDENTIFIER, marriageIdentifierAns);
-                put(MarriageAgentField.WIFE_EMAIL, wifeEmailAns);
-                put(MarriageAgentField.HUSBAND_EMAIL, husbandEmailAns);
-                put(MarriageAgentField.CITY_NAME, cityNameAns);
-            }};
+        return single_result(tx().execute(marriageQuery));
     }
 
     @Override
     public AgentResult resultsForTesting(ConceptMap answer) {
-        return null;
+        return new AgentResult(){{
+            put(MarriageAgentField.MARRIAGE_IDENTIFIER, tx().getOnlyAttributeOfThing(answer, "marriage", MARRIAGE_ID));
+            put(MarriageAgentField.WIFE_EMAIL, tx().getOnlyAttributeOfThing(answer, "wife", EMAIL));
+            put(MarriageAgentField.HUSBAND_EMAIL, tx().getOnlyAttributeOfThing(answer, "husband", EMAIL));
+            put(MarriageAgentField.CITY_NAME, tx().getOnlyAttributeOfThing(answer, CITY, LOCATION_NAME));
+        }};
     }
 
 //    protected int checkCount() {
