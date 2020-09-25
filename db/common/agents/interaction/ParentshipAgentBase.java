@@ -2,13 +2,13 @@ package grakn.simulation.db.common.agents.interaction;
 
 import grabl.tracing.client.GrablTracingThreadStatic.ThreadTrace;
 import grakn.simulation.db.common.agents.base.Agent;
+import grakn.simulation.db.common.agents.base.AgentResult;
 import grakn.simulation.db.common.agents.base.AgentResultSet;
 import grakn.simulation.db.common.agents.base.SimulationContext;
 import grakn.simulation.db.common.agents.utils.Allocation;
 import grakn.simulation.db.common.world.World;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -18,8 +18,12 @@ import static grabl.tracing.client.GrablTracingThreadStatic.traceOnThread;
 
 public interface ParentshipAgentBase extends InteractionAgent<World.City> {
 
-    enum Email {
+    enum SpouseType {
         WIFE, HUSBAND
+    }
+
+    enum ParentshipField implements Agent.ComparableField {
+        HUSBAND_EMAIL, WIFE_EMAIL, CHILD_EMAIL
     }
 
     @Override
@@ -30,12 +34,13 @@ public interface ParentshipAgentBase extends InteractionAgent<World.City> {
         try (ThreadTrace trace = traceOnThread(agent.action())) {
             childrenEmails = getChildrenEmailsBorn(city, simulationContext.today());
         }
-        List<HashMap<Email, String>> marriageEmails;
+        List<HashMap<SpouseType, String>> marriageEmails;
         agent.newAction("getMarriageEmails");
         try (ThreadTrace trace = traceOnThread(agent.action())) {
             marriageEmails = getMarriageEmails(city);
         }
 
+        AgentResultSet agentResultSet = new AgentResultSet();
         if (marriageEmails.size() > 0 && childrenEmails.size() > 0) {
             LinkedHashMap<Integer, List<Integer>> childrenPerMarriage = Allocation.allocateEvenlyToMap(childrenEmails.size(), marriageEmails.size());
 
@@ -43,28 +48,26 @@ public interface ParentshipAgentBase extends InteractionAgent<World.City> {
                 Integer marriageIndex = childrenForMarriage.getKey();
                 List<Integer> children = childrenForMarriage.getValue();
 
-                HashMap<Email, String> marriage = marriageEmails.get(marriageIndex);
+                HashMap<SpouseType, String> marriage = marriageEmails.get(marriageIndex);
 
-                List<String> childEmails = new ArrayList<>();
                 for (Integer childIndex : children) {
-                    childEmails.add(childrenEmails.get(childIndex));
-                }
-                agent.newAction("insertParentShip");
-                try (ThreadTrace trace = traceOnThread(agent.action())) {
-                    insertParentShip(marriage, childEmails);
+                    String childEmail = childrenEmails.get(childIndex);
+                    agent.newAction("insertParentShip");
+                    try (ThreadTrace trace = traceOnThread(agent.action())) {
+                        agentResultSet.add(insertParentShip(marriage, childEmail));
+                    }
                 }
             }
             agent.commitAction();
         } else {
             agent.closeAction();
         }
-        return null;
+        return agentResultSet;
     }
 
-    List<HashMap<Email, String>> getMarriageEmails(World.City city);
+    List<HashMap<SpouseType, String>> getMarriageEmails(World.City city);
 
     List<String> getChildrenEmailsBorn(World.City city, LocalDateTime today);
 
-    void insertParentShip(HashMap<Email, String> marriage, List<String> childEmails);
-
+    AgentResult insertParentShip(HashMap<SpouseType, String> marriage, String childEmail);
 }

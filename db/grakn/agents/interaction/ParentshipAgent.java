@@ -38,7 +38,7 @@ import static java.util.stream.Collectors.toList;
 public class ParentshipAgent extends GraknAgent<World.City> implements ParentshipAgentBase {
 
     @Override
-    public List<HashMap<Email, String>> getMarriageEmails(World.City city) {
+    public List<HashMap<SpouseType, String>> getMarriageEmails(World.City city) {
         GraqlGet.Sorted marriageQuery = Graql.match(
                 Graql.var(CITY).isa(CITY)
                         .has(LOCATION_NAME, city.name()),
@@ -61,9 +61,9 @@ public class ParentshipAgent extends GraknAgent<World.City> implements Parentshi
         ).get().sort(MARRIAGE_ID);
         return tx().execute(marriageQuery)
                 .stream()
-                .map(a -> new HashMap<Email, String>() {{
-                    put(Email.WIFE, a.get("wife-email").asAttribute().value().toString());
-                    put(Email.HUSBAND, a.get("husband-email").asAttribute().value().toString());
+                .map(a -> new HashMap<SpouseType, String>() {{
+                    put(SpouseType.WIFE, a.get("wife-email").asAttribute().value().toString());
+                    put(SpouseType.HUSBAND, a.get("husband-email").asAttribute().value().toString());
                 }})
                 .collect(toList());
     }
@@ -84,36 +84,35 @@ public class ParentshipAgent extends GraknAgent<World.City> implements Parentshi
     }
 
     @Override
-    public void insertParentShip(HashMap<Email, String> marriage, List<String> childEmails) {
-        ArrayList<Statement> matchStatements = new ArrayList<>(Arrays.asList(
-                Graql.var("mother").isa(PERSON).has(EMAIL, marriage.get(Email.WIFE)),
-                Graql.var("father").isa(PERSON).has(EMAIL, marriage.get(Email.HUSBAND))
-        ));
-        Statement parentship = Graql.var("par");
-        ArrayList<Statement> insertStatements = new ArrayList<>(Arrays.asList(
-                parentship.isa(PARENTSHIP)
-                        .rel(PARENTSHIP_PARENT, "father")
-                        .rel(PARENTSHIP_PARENT, "mother")
-        ));
-        // This model currently inserts a single relation that combines both parents and all of the children they had.
-        // They these children at the same time, and will not have any subsequently. This could be represented as
-        // multiple ternary relations instead, each with both parents and one child.
-        for (int i = 0; i < childEmails.size(); i++) {
-            String childEmail = childEmails.get(i);
-            Statement childVar = Graql.var("child-" + i);
-            matchStatements.add(childVar.isa(PERSON).has(EMAIL, childEmail));
-            insertStatements.add(parentship.rel(PARENTSHIP_CHILD, childVar));
-        }
+    public AgentResult insertParentShip(HashMap<SpouseType, String> marriage, String childEmail) {
+        // Parentship where parents have multiple children is represented as multiple ternary relations, each with
+        // both parents and one child. They had these children at the same time, and will not have any subsequently.
+        Statement parentship = Graql.var(PARENTSHIP);
+        Statement child = Graql.var("child");
+        Statement mother = Graql.var("mother");
+        Statement father = Graql.var("father");
+
         GraqlInsert parentshipQuery = Graql.match(
-                matchStatements
+                mother.isa(PERSON).has(EMAIL, marriage.get(SpouseType.WIFE)),
+                father.isa(PERSON).has(EMAIL, marriage.get(SpouseType.HUSBAND)),
+                child.isa(PERSON).has(EMAIL, childEmail)
         ).insert(
-                insertStatements
+                parentship.isa(PARENTSHIP)
+                        .rel(PARENTSHIP_PARENT, father)
+                        .rel(PARENTSHIP_PARENT, mother)
+                        .rel(PARENTSHIP_CHILD, child)
         );
-        tx().execute(parentshipQuery);
+        return single_result(tx().execute(parentshipQuery));
     }
 
     @Override
     public AgentResult resultsForTesting(ConceptMap answer) {
-        return null;
+        return new AgentResult() {
+            {
+                put(ParentshipField.WIFE_EMAIL, tx().getOnlyAttributeOfThing(answer, "mother", EMAIL));
+                put(ParentshipField.HUSBAND_EMAIL, tx().getOnlyAttributeOfThing(answer, "father", EMAIL));
+                put(ParentshipField.CHILD_EMAIL, tx().getOnlyAttributeOfThing(answer, "child", EMAIL));
+            }
+        };
     }
 }

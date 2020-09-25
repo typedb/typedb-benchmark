@@ -50,10 +50,10 @@ public class SimulationTest {
 //    which doesn't scale well. So this is skipped in favour of spot-testing
 //    }
 
-//    @Test
-//    public void testParentshipAgent() {
-//        compareFields("ParentshipAgent");
-//    }
+    @Test
+    public void testParentshipAgent() {
+        compareFields("ParentshipAgent");
+    }
 //
 //    @Test
 //    public void testRelocationAgent() {
@@ -79,9 +79,9 @@ public class SimulationTest {
 //    public void testTransactionAgent() {
 //        compareFields("TransactionAgent");
 //    }
-
-    @Test
-    public void testFriendshipAgent() {
-        compareFields("FriendshipAgent");
-    }
+//
+//    @Test
+//    public void testFriendshipAgent() {
+//        compareFields("FriendshipAgent");
+//    }
 }
