@@ -44,21 +44,20 @@ public class PersonBirthAgent extends Neo4jAgent<World.City> implements PersonBi
                 put(SURNAME, surname);
                 put(IS_CURRENT, true);
         }};
-        Map<String, Object> answer = getOnlyElement(tx().execute(new Query(template, parameters))).asMap();
-        return new AgentResult() {{
-            put(PersonBirthAgentField.EMAIL, answer.get("person." + EMAIL));
-            put(PersonBirthAgentField.DATE_OF_BIRTH, answer.get("person." + DATE_OF_BIRTH));
-            put(PersonBirthAgentField.GENDER, answer.get("person." + GENDER));
-            put(PersonBirthAgentField.FORENAME, answer.get("person." + FORENAME));
-            put(PersonBirthAgentField.SURNAME, answer.get("person." + SURNAME));
-        }};
+        return single_result(tx().execute(new Query(template, parameters)));
 //        TODO Key constraints are possible with Neo4j Enterprise, and some constraints are supported in Community
 //        https://neo4j.com/developer/kb/how-to-implement-a-primary-key-property-for-a-label/
     }
 
     @Override
     public AgentResult resultsForTesting(Record answer) {
-        return null;
+        return new AgentResult() {{
+            put(PersonBirthAgentField.EMAIL, answer.asMap().get("person." + EMAIL));
+            put(PersonBirthAgentField.DATE_OF_BIRTH, answer.asMap().get("person." + DATE_OF_BIRTH));
+            put(PersonBirthAgentField.GENDER, answer.asMap().get("person." + GENDER));
+            put(PersonBirthAgentField.FORENAME, answer.asMap().get("person." + FORENAME));
+            put(PersonBirthAgentField.SURNAME, answer.asMap().get("person." + SURNAME));
+        }};
     }
 
 //    protected int checkCount() {

@@ -59,7 +59,11 @@ public class PersonBirthAgent extends GraknAgent<World.City> implements PersonBi
                                 surnameVar.val(surname),
                                 dobVar.val(today)
                         );
-        ConceptMap answer = getOnlyElement(tx().execute(query));
+        return single_result(tx().execute(query));
+    }
+
+    @Override
+    public AgentResult resultsForTesting(ConceptMap answer) {
         return new AgentResult(){
             {
                 put(PersonBirthAgentField.EMAIL, tx().getOnlyAttributeOfThing(answer, PERSON, EMAIL));
@@ -68,11 +72,6 @@ public class PersonBirthAgent extends GraknAgent<World.City> implements PersonBi
                 put(PersonBirthAgentField.FORENAME, tx().getOnlyAttributeOfThing(answer, PERSON, FORENAME));
                 put(PersonBirthAgentField.SURNAME, tx().getOnlyAttributeOfThing(answer, PERSON, SURNAME));
             }};
-    }
-
-    @Override
-    public AgentResult resultsForTesting(ConceptMap answer) {
-        return null;
     }
 
 //    protected int checkCount(World.City worldCity) {
