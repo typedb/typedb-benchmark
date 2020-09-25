@@ -80,20 +80,4 @@ public class CompanyAgent extends GraknAgent<World.Country> implements CompanyAg
                         .rel(INCORPORATION_INCORPORATING, Graql.var(COUNTRY))
         ).get();
     }
-
-//    protected int checkCount() {
-//        GraqlGet.Aggregate countQuery = Graql.match(
-//                Graql.var(COUNTRY).isa(COUNTRY)
-//                        .has(LOCATION_NAME, country().name()),
-//                Graql.var(COMPANY).isa(COMPANY)
-//                        .has(COMPANY_NAME, Graql.var(COMPANY_NAME))
-//                        .has(COMPANY_NUMBER, Graql.var(COMPANY_NUMBER)),
-//                Graql.var(INCORPORATION).isa(INCORPORATION)
-//                        .rel(INCORPORATION_INCORPORATED, Graql.var(COMPANY))
-//                        .rel(INCORPORATION_INCORPORATING, Graql.var(COUNTRY))
-//                        .has(DATE_OF_INCORPORATION, Graql.var(DATE_OF_INCORPORATION))
-//        ).get().count();
-//        log().query("checkCount", countQuery);
-//        return tx().count(countQuery);
-//    }
 }

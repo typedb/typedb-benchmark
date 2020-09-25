@@ -59,20 +59,4 @@ public class PersonBirthAgent extends Neo4jAgent<World.City> implements PersonBi
             put(PersonBirthAgentField.SURNAME, answer.asMap().get("person." + SURNAME));
         }};
     }
-
-//    protected int checkCount() {
-//        String template = "" +
-//                "MATCH " +
-//                "(p:Person)-[:BORN_IN]->(c:City {locationName: $locationName})" +
-//                "RETURN count(p), count(p.email), count(p.dateOfBirth), count(p.gender), count(p.forename), count(p.surname)";
-//
-//        HashMap<String, Object> parameters = new HashMap<String, Object>(){{
-//            put(LOCATION_NAME, city().toString());
-//        }};
-//
-//        Query countQuery = new Query(template, parameters);
-//
-//        log().query("checkCount", countQuery);
-//        return tx().count(countQuery);
-//    }
 }

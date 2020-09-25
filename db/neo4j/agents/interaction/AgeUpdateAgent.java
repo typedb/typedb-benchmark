@@ -33,19 +33,4 @@ public class AgeUpdateAgent extends Neo4jAgent<World.City> implements AgeUpdateA
     public AgentResult resultsForTesting(Record answer) {
         return null;
     }
-
-//    protected int checkCount() {
-//        String template = "" +
-//                "MATCH (person:Person)-[:BORN_IN]->(city:City {locationName: $cityName})\n" +
-//                "RETURN count(person.age)";
-//
-//        HashMap<String, Object> parameters = new HashMap<String, Object>(){{
-//            put("cityName", city.name());
-//        }};
-//
-//        Query countQuery = new Query(template, parameters);
-//
-//        log().query("checkCount", countQuery);
-//        return tx().count(countQuery);
-//    }
 }

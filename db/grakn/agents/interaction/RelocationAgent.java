@@ -92,28 +92,4 @@ public class RelocationAgent extends GraknAgent<World.City> implements Relocatio
     public AgentResult resultsForTesting(ConceptMap answer) {
         return null;
     }
-
-//    protected int checkCount() {
-//        GraqlGet.Aggregate countQuery = Graql.match(
-//                Graql.var(PERSON).isa(PERSON).has(EMAIL, Graql.var(EMAIL)),
-//                Graql.var("old-city").isa(CITY).has(LOCATION_NAME, city().name()),
-//                Graql.var(RESIDENCY).isa(RESIDENCY)
-//                        .rel(RESIDENCY_RESIDENT, PERSON)
-//                        .rel(RESIDENCY_LOCATION, "old-city")
-//                        .has(START_DATE, Graql.var(START_DATE)),
-//                Graql.not(Graql.var(RESIDENCY).has(END_DATE, Graql.var(END_DATE))),
-////                Graql.var(START_DATE).lte(earliestDate),
-//
-//                Graql.var("new-city").isa(CITY).has(LOCATION_NAME, Graql.var("newCityName")),
-//                Graql.var("old-city").isa(CITY).has(LOCATION_NAME, city().name()),
-//
-//                Graql.var(RELOCATION).isa(RELOCATION)
-//                        .rel(RELOCATION_PREVIOUS_LOCATION, "old-city")
-//                        .rel(RELOCATION_NEW_LOCATION, "new-city")
-//                        .rel(RELOCATION_RELOCATED_PERSON, PERSON)
-//                        .has(RELOCATION_DATE, today())
-//        ).get().count();
-//        log().query("checkCount", countQuery);
-//        return tx().count(countQuery);
-//    }
 }

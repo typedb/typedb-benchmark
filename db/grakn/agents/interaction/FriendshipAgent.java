@@ -71,34 +71,4 @@ public class FriendshipAgent extends GraknAgent<World.City> implements Friendshi
             }
         };
     }
-
-//    protected int checkCount() {
-//        Statement person1 = Graql.var("p1");
-//        Statement person2 = Graql.var("p2");
-//        Statement friendship = Graql.var();
-//
-//        Statement friend1EmailVar = Graql.var("friend1-email");
-//        Statement friend2EmailVar = Graql.var("friend2-email");
-//        Statement startDate = Graql.var(START_DATE);
-//
-//        GraqlGet.Aggregate countQuery = Graql.match(
-//                person1
-//                        .isa(PERSON).has(EMAIL, friend1EmailVar),
-//                person2
-//                        .isa(PERSON).has(EMAIL, friend2EmailVar),
-//                Graql.not(
-//                        friendship
-//                                .isa(FRIENDSHIP)
-//                                .rel(FRIENDSHIP_FRIEND, person1)
-//                                .rel(FRIENDSHIP_FRIEND, person2)
-//                ),
-//                Graql.var(FRIENDSHIP)
-//                        .isa(FRIENDSHIP)
-//                        .rel(FRIENDSHIP_FRIEND, person1)
-//                        .rel(FRIENDSHIP_FRIEND, person2)
-//                        .has(START_DATE, startDate)
-//        ).get().count();
-//        log().query("checkCount", countQuery);
-//        return tx().count(countQuery);
-//    }
 }

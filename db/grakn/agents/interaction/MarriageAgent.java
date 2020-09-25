@@ -100,29 +100,4 @@ public class MarriageAgent extends GraknAgent<World.City> implements MarriageAge
             put(MarriageAgentField.CITY_NAME, tx().getOnlyAttributeOfThing(answer, CITY, LOCATION_NAME));
         }};
     }
-
-//    protected int checkCount() {
-//        Statement husband = Graql.var("husband");
-//        Statement wife = Graql.var("wife");
-//        Statement city = Graql.var(CITY);
-//        Statement marriage = Graql.var(MARRIAGE);
-//
-//        Statement cityNameVar = Graql.var().val(worldCity.name());
-//        Statement marriageIdentifierVar = Graql.var(MARRIAGE_ID);
-//        Statement wifeEmailVar = Graql.var("wife-email");
-//        Statement husbandEmailVar = Graql.var("husband-email");
-//
-//        GraqlGet.Aggregate countQuery = Graql.match(
-//                husband.isa(PERSON).has(EMAIL, husbandEmailVar),
-//                wife.isa(PERSON).has(EMAIL, wifeEmailVar),
-//                city.isa(CITY).has(LOCATION_NAME, cityNameVar),
-//                marriage.isa(MARRIAGE)
-//                        .rel(MARRIAGE_WIFE, wife)
-//                        .rel(MARRIAGE_HUSBAND, husband)
-//                        .has(MARRIAGE_ID, marriageIdentifierVar),
-//                Graql.var().isa(LOCATES).rel(LOCATES_LOCATED, marriage).rel(LOCATES_LOCATION, city)
-//        ).get().count();
-//        log().query("checkCount", countQuery);
-//        return tx().count(countQuery);
-//    }
 }

@@ -73,32 +73,4 @@ public class PersonBirthAgent extends GraknAgent<World.City> implements PersonBi
                 put(PersonBirthAgentField.SURNAME, tx().getOnlyAttributeOfThing(answer, PERSON, SURNAME));
             }};
     }
-
-//    protected int checkCount(World.City worldCity) {
-//        Statement city = Graql.var(CITY);
-//        Statement person = Graql.var(PERSON);
-//        Statement bornIn = Graql.var(BORN_IN);
-//
-//        Statement emailVar = Graql.var(EMAIL);
-//        Statement genderVar = Graql.var(GENDER);
-//        Statement forenameVar = Graql.var(FORENAME);
-//        Statement surnameVar = Graql.var(SURNAME);
-//        Statement dobVar = Graql.var(DATE_OF_BIRTH);
-//
-//        GraqlGet.Aggregate countQuery = Graql.match(
-//                city.isa(CITY)
-//                        .has(LOCATION_NAME, worldCity.name()),
-//                person.isa(PERSON)
-//                        .has(EMAIL, emailVar)
-//                        .has(DATE_OF_BIRTH, dobVar)
-//                        .has(GENDER, genderVar)
-//                        .has(FORENAME, forenameVar)
-//                        .has(SURNAME, surnameVar),
-//                bornIn
-//                        .isa(BORN_IN)
-//                        .rel(BORN_IN_CHILD, person)
-//                        .rel(BORN_IN_PLACE_OF_BIRTH, city)
-//        ).get().count();
-//        return tx().count(countQuery);
-//    }
 }

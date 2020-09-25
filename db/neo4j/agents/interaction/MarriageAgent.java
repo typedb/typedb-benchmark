@@ -71,20 +71,4 @@ public class MarriageAgent extends Neo4jAgent<World.City> implements MarriageAge
             put(MarriageAgentField.CITY_NAME, answer.asMap().get("city." + LOCATION_NAME));
         }};
     }
-
-//    protected int checkCount() {
-//        String template = "" +
-//                "MATCH (city:City {locationName: $locationName}), \n" +
-//                "(husband:Person)-[marriage:MARRIED_TO {locationName: city.locationName}]->(wife:Person)\n" +
-//                "RETURN count(marriage), count(marriage.marriageId), count(wife.email), count(husband.email)";
-//
-//        HashMap<String, Object> parameters = new HashMap<String, Object>(){{
-//            put(LOCATION_NAME, city.name());
-//        }};
-//
-//        Query countQuery = new Query(template, parameters);
-//
-//        log().query("checkCount", countQuery);
-//        return tx().count(countQuery);
-//    }
 }
