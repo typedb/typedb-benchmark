@@ -85,8 +85,13 @@ public class SimulationsUnderTest {
         agentNames.add("marriage");
         agentNames.add("personBirth");
         agentNames.add("ageUpdate");
+//        agentNames.add("parentship");
+//        agentNames.add("relocation");
         agentNames.add("company");
         agentNames.add("employment");
+//        agentNames.add("product");
+//        agentNames.add("transaction");
+        agentNames.add("friendship");
 
         ArrayList<Config.Agent> agentConfigs = new ArrayList<>();
         agentNames.forEach(name -> agentConfigs.add(ConstructAgentConfig(name, AgentMode.RUN)));

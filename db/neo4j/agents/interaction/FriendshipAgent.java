@@ -11,6 +11,8 @@ import java.util.HashMap;
 import java.util.List;
 
 import static grakn.simulation.db.neo4j.agents.interaction.RelocationAgent.cityResidentsQuery;
+import static grakn.simulation.db.neo4j.schema.Schema.EMAIL;
+import static grakn.simulation.db.neo4j.schema.Schema.START_DATE;
 
 public class FriendshipAgent extends Neo4jAgent<World.City> implements FriendshipAgentBase {
 
@@ -21,13 +23,14 @@ public class FriendshipAgent extends Neo4jAgent<World.City> implements Friendshi
     }
 
     @Override
-    public void insertFriendship(LocalDateTime today, String friend1Email, String friend2Email) {
+    public AgentResult insertFriendship(LocalDateTime today, String friend1Email, String friend2Email) {
         String template = "" +
                 "MATCH " +
-                "(p1:Person {p1Email:$p1Email}),\n" +
-                "(p2:Person {p2Email:$p2Email})\n" +
-                "WHERE NOT (p1)-[:FRIEND_OF]-(p2)\n" +
-                "CREATE (p1)-[:FRIEND_OF {startDate: $startDate}]->(p2)"; // TODO this will surely insert duplicates
+                "(p1:Person),\n" +
+                "(p2:Person)\n" +
+                "WHERE p1.email = $p1Email AND p2.email = $p2Email AND NOT (p1)-[:FRIEND_OF]-(p2)\n" +
+                "CREATE (p1)-[friendOf:FRIEND_OF {startDate: $startDate}]->(p2)\n" +
+                "RETURN p1.email, p2.email, friendOf.startDate";
 
         HashMap<String, Object> parameters = new HashMap<String, Object>(){{
                 put("p1Email", friend1Email);
@@ -35,11 +38,17 @@ public class FriendshipAgent extends Neo4jAgent<World.City> implements Friendshi
                 put("startDate", today);
         }};
         Query insertFriendshipQuery = new Query(template, parameters);
-        tx().execute(insertFriendshipQuery);
+        return optional_single_result(tx().execute(insertFriendshipQuery));
     }
 
     @Override
     public AgentResult resultsForTesting(Record answer) {
-        return null;
+        return new AgentResult() {
+            {
+                put(FriendshipField.FRIEND1_EMAIL, answer.asMap().get("p1." + EMAIL));
+                put(FriendshipField.FRIEND2_EMAIL, answer.asMap().get("p2." + EMAIL));
+                put(FriendshipField.START_DATE, answer.asMap().get("friendOf." + START_DATE));
+            }
+        };
     }
 }

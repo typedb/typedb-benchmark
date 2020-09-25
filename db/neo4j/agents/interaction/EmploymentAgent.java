@@ -61,7 +61,7 @@ public class EmploymentAgent extends Neo4jAgent<World.City> implements Employmen
             put("contractedHours", contractedHours);
         }};
         Query insertEmploymentQuery = new Query(template, parameters);
-        return results(getOnlyElement(tx().execute(insertEmploymentQuery)));
+        return single_result(tx().execute(insertEmploymentQuery));
     }
 
     @Override

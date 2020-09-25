@@ -5,6 +5,10 @@ import grakn.simulation.db.common.context.DatabaseContext;
 import grakn.simulation.db.common.context.DatabaseTransaction;
 import grakn.simulation.db.common.world.Region;
 
+import java.util.List;
+
+import static com.google.common.collect.Iterables.getOnlyElement;
+
 public abstract class TransactionalAgent<REGION extends Region, CONTEXT extends DatabaseContext<TRANSACTION>, TRANSACTION extends DatabaseTransaction, DB_ANSWER_TYPE> extends Agent<REGION, CONTEXT> {
     private TRANSACTION tx;
     private String action;
@@ -41,9 +45,21 @@ public abstract class TransactionalAgent<REGION extends Region, CONTEXT extends 
 
     public abstract AgentResult resultsForTesting(DB_ANSWER_TYPE answer);
 
-    protected AgentResult results(DB_ANSWER_TYPE answer) {
+    protected AgentResult single_result(List<DB_ANSWER_TYPE> answers) {
         if (test()) { // testing is active
-            return resultsForTesting(answer);
+            return resultsForTesting(getOnlyElement(answers));
+        } else {
+            return null;
+        }
+    }
+
+    protected AgentResult optional_single_result(List<DB_ANSWER_TYPE> answers) {
+        if (test()) { // testing is active
+            if (answers.size() == 0) {
+                return new AgentResult();
+            } else {
+                return resultsForTesting(getOnlyElement(answers));
+            }
         } else {
             return null;
         }

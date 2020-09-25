@@ -30,7 +30,7 @@ public class CompanyAgent extends Neo4jAgent<World.Country> implements CompanyAg
                 put("dateOfIncorporation", today);
         }};
         Query companyQuery = new Query(template, parameters);
-        return results(getOnlyElement(tx().execute(companyQuery)));
+        return single_result(tx().execute(companyQuery));
     }
 
     @Override

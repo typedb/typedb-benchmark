@@ -13,6 +13,7 @@ import graql.lang.statement.StatementAttribute;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static com.google.common.collect.Iterables.getOnlyElement;
 import static grakn.simulation.db.grakn.agents.interaction.RelocationAgent.cityResidentsQuery;
 import static grakn.simulation.db.grakn.schema.Schema.EMAIL;
 import static grakn.simulation.db.grakn.schema.Schema.FRIENDSHIP;
@@ -29,7 +30,7 @@ public class FriendshipAgent extends GraknAgent<World.City> implements Friendshi
     }
 
     @Override
-    public void insertFriendship(LocalDateTime today, String friend1Email, String friend2Email) {
+    public AgentResult insertFriendship(LocalDateTime today, String friend1Email, String friend2Email) {
 
         Statement person1 = Graql.var("p1");
         Statement person2 = Graql.var("p2");
@@ -57,12 +58,18 @@ public class FriendshipAgent extends GraknAgent<World.City> implements Friendshi
                         .rel(FRIENDSHIP_FRIEND, person2)
                         .has(START_DATE, startDate)
         );
-        tx().execute(insertFriendshipQuery);
+        return optional_single_result(tx().execute(insertFriendshipQuery));
     }
 
     @Override
     public AgentResult resultsForTesting(ConceptMap answer) {
-        return null;
+        return new AgentResult() {
+            {
+                put(FriendshipField.FRIEND1_EMAIL, tx().getOnlyAttributeOfThing(answer, "p1", EMAIL));
+                put(FriendshipField.FRIEND2_EMAIL, tx().getOnlyAttributeOfThing(answer, "p2", EMAIL));
+                put(FriendshipField.START_DATE, tx().getOnlyAttributeOfThing(answer, FRIENDSHIP, START_DATE));
+            }
+        };
     }
 
 //    protected int checkCount() {

@@ -14,8 +14,8 @@ public class RelocationAgent extends Neo4jAgent<World.City> implements Relocatio
 
     static Query cityResidentsQuery(World.City city, LocalDateTime earliestDate) {
         String template = "" +
-                "MATCH (resident:Person)-[residency:RESIDENT_OF]->(city:City {locationName: $locationName})" +
-                "WHERE datetime(residency.startDate) <= datetime($earliestDate)\n" +
+                "MATCH (resident:Person)-[residentOf:RESIDENT_OF]->(city:City {locationName: $locationName})" +
+                "WHERE datetime(residentOf.startDate) <= datetime($earliestDate) AND NOT EXISTS (residentOf.endDate)\n" +
                 "RETURN resident.email";
         HashMap<String, Object> parameters = new HashMap<String, Object>(){{
                 put("locationName", city.name());
@@ -46,10 +46,10 @@ public class RelocationAgent extends Neo4jAgent<World.City> implements Relocatio
 
     @Override
     public void insertRelocation(World.City city, LocalDateTime today, String email, String newCityName) {
-        // This raises questions over whether the person's residency end-date should be updated in this step, or
+        // This raises questions over whether the person's ResidentOf end-date should be updated in this step, or
         // figured out at query-time, which would be more in-line with Grakn
 
-        // In either case, their old residency should be given an `endDate`, and they should have a new residency
+        // In either case, their old ResidentOf should be given an `endDate`, and they should have a new ResidentOf
         // alongside this relation
 
         // As it is, not making this ternary is losing the information of where the person if relocating from

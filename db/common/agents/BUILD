@@ -16,5 +16,6 @@ java_library(
         "@maven//:org_apache_commons_commons_csv",
         "@maven//:org_apache_commons_commons_lang3",
         "@maven//:org_slf4j_slf4j_api",
+        "@maven//:com_google_guava_guava",
     ],
 )

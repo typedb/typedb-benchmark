@@ -35,23 +35,13 @@ public class SimulationTest {
     }
 
     @Test
-    public void testPersonBirthAgent() {
-        compareFields("PersonBirthAgent");
-    }
-
-    @Test
     public void testMarriageAgent() {
         compareFields("MarriageAgent");
     }
 
     @Test
-    public void testCompanyAgent() {
-        compareFields("CompanyAgent");
-    }
-
-    @Test
-    public void testEmploymentAgent() {
-        compareFields("EmploymentAgent");
+    public void testPersonBirthAgent() {
+        compareFields("PersonBirthAgent");
     }
 
 //    @Test
@@ -59,4 +49,39 @@ public class SimulationTest {
 //    Comparing results of this agent will require sending a set equal to the size of the number of people in each city,
 //    which doesn't scale well. So this is skipped in favour of spot-testing
 //    }
+
+//    @Test
+//    public void testParentshipAgent() {
+//        compareFields("ParentshipAgent");
+//    }
+//
+//    @Test
+//    public void testRelocationAgent() {
+//        compareFields("RelocationAgent");
+//    }
+//
+//    @Test
+//    public void testCompanyAgent() {
+//        compareFields("CompanyAgent");
+//    }
+//
+//    @Test
+//    public void testEmploymentAgent() {
+//        compareFields("EmploymentAgent");
+//    }
+//
+//    @Test
+//    public void testProductAgent() {
+//        compareFields("ProductAgent");
+//    }
+//
+//    @Test
+//    public void testTransactionAgent() {
+//        compareFields("TransactionAgent");
+//    }
+
+    @Test
+    public void testFriendshipAgent() {
+        compareFields("FriendshipAgent");
+    }
 }

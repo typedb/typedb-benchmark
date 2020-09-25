@@ -103,7 +103,7 @@ public class EmploymentAgent extends GraknAgent<World.City> implements Employmen
                         .has(CONTRACT_CONTENT, contractContent)
                         .has(CONTRACTED_HOURS, contractedHours)
         );
-        return results(getOnlyElement(tx().execute(insertEmploymentQuery)));
+        return single_result(tx().execute(insertEmploymentQuery));
     }
 
     @Override
