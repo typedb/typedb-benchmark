@@ -54,22 +54,22 @@ public class SimulationTest {
     public void testParentshipAgent() {
         compareFields("ParentshipAgent");
     }
-//
+
 //    @Test
 //    public void testRelocationAgent() {
 //        compareFields("RelocationAgent");
 //    }
-//
-//    @Test
-//    public void testCompanyAgent() {
-//        compareFields("CompanyAgent");
-//    }
-//
-//    @Test
-//    public void testEmploymentAgent() {
-//        compareFields("EmploymentAgent");
-//    }
-//
+
+    @Test
+    public void testCompanyAgent() {
+        compareFields("CompanyAgent");
+    }
+
+    @Test
+    public void testEmploymentAgent() {
+        compareFields("EmploymentAgent");
+    }
+
 //    @Test
 //    public void testProductAgent() {
 //        compareFields("ProductAgent");

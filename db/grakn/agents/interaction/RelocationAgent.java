@@ -73,23 +73,30 @@ public class RelocationAgent extends GraknAgent<World.City> implements Relocatio
     }
 
     @Override
-    public void insertRelocation(World.City city, LocalDateTime today, String email, String newCityName) {
+    public AgentResult insertRelocation(World.City city, LocalDateTime today, String email, String newCityName) {
         GraqlInsert relocatePersonQuery = Graql.match(
-                Graql.var("p").isa(PERSON).has(EMAIL, email),
+                Graql.var(PERSON).isa(PERSON).has(EMAIL, email),
                 Graql.var("new-city").isa(CITY).has(LOCATION_NAME, newCityName),
                 Graql.var("old-city").isa(CITY).has(LOCATION_NAME, city.name())
         ).insert(
-                Graql.var("r").isa(RELOCATION)
+                Graql.var(RELOCATION).isa(RELOCATION)
                         .rel(RELOCATION_PREVIOUS_LOCATION, "old-city")
                         .rel(RELOCATION_NEW_LOCATION, "new-city")
-                        .rel(RELOCATION_RELOCATED_PERSON, "p")
+                        .rel(RELOCATION_RELOCATED_PERSON, PERSON)
                         .has(RELOCATION_DATE, today)
         );
-        tx().execute(relocatePersonQuery);
+        return single_result(tx().execute(relocatePersonQuery));
     }
 
     @Override
     public AgentResult resultsForTesting(ConceptMap answer) {
-        return null;
+        return new AgentResult() {
+            {
+                put(RelocationAgentField.PERSON_EMAIL, tx().getOnlyAttributeOfThing(answer, PERSON, EMAIL));
+                //put(RelocationAgentField.OLD_CITY_NAME, tx().getOnlyAttributeOfThing(answer, "old-city", LOCATION_NAME)); //TODO Can't be compared with Neo4j as Neo doesn't support ternary relations
+                put(RelocationAgentField.NEW_CITY_NAME, tx().getOnlyAttributeOfThing(answer, "new-city", LOCATION_NAME));
+                put(RelocationAgentField.RELOCATION_DATE, tx().getOnlyAttributeOfThing(answer, RELOCATION, RELOCATION_DATE));
+            }
+        };
     }
 }

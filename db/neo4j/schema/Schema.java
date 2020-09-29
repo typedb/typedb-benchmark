@@ -32,7 +32,7 @@ public class Schema {
     public static final String RELOCATION_PREVIOUS_LOCATION = "relocation_previous-location";
     public static final String RELOCATION_NEW_LOCATION = "relocation_new-location";
     public static final String RELOCATION_RELOCATED_PERSON = "relocation_relocated-person";
-    public static final String RELOCATION_DATE = "relocation-date";
+    public static final String RELOCATION_DATE = "relocationDate";
 
     public static final String RESIDENCY = "residency";
     public static final String RESIDENCY_LOCATION = "residency_location";

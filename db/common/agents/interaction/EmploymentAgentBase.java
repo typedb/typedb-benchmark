@@ -11,6 +11,8 @@ import java.util.List;
 
 import static grabl.tracing.client.GrablTracingThreadStatic.ThreadTrace;
 import static grabl.tracing.client.GrablTracingThreadStatic.traceOnThread;
+import static grakn.simulation.db.common.agents.interaction.EmploymentAgentBase.EmploymentAgentField.COMPANY_NUMBERS;
+import static grakn.simulation.db.common.agents.interaction.EmploymentAgentBase.EmploymentAgentField.EMPLOYEE_EMAILS;
 import static grakn.simulation.db.common.agents.utils.Allocation.allocate;
 
 public interface EmploymentAgentBase extends InteractionAgent<World.City> {
@@ -23,7 +25,8 @@ public interface EmploymentAgentBase extends InteractionAgent<World.City> {
     int MAX_CONTRACT_CHARACTER_LENGTH = 600;
 
     enum EmploymentAgentField implements Agent.ComparableField {
-        CITY_NAME, PERSON_EMAIL, COMPANY_NUMBER, START_DATE, WAGE, CURRENCY, CONTRACT_CONTENT, CONTRACTED_HOURS
+        CITY_NAME, PERSON_EMAIL, COMPANY_NUMBER, START_DATE, WAGE, CURRENCY, CONTRACT_CONTENT, CONTRACTED_HOURS,
+        EMPLOYEE_EMAILS, COMPANY_NUMBERS
     }
 
     @Override
@@ -36,14 +39,21 @@ public interface EmploymentAgentBase extends InteractionAgent<World.City> {
         try (ThreadTrace trace = traceOnThread(agent.action())) {
             employeeEmails = getEmployeeEmails(city, numEmployments, employmentDate);
         }
+        AgentResultSet agentResultSet = new AgentResultSet();
+        agentResultSet.add(new AgentResult(){{
+            put(EMPLOYEE_EMAILS, employeeEmails);
+        }});
 
         int numCompanies = simulationContext.world().getScaleFactor();
         agent.newAction("getCompanyNumbers");
         try (ThreadTrace trace = traceOnThread(agent.action())) {
             companyNumbers = getCompanyNumbers(city.country(), numCompanies);
         }
+        agentResultSet.add(new AgentResult(){{
+            put(COMPANY_NUMBERS, companyNumbers);
+        }});
+
         agent.commitAction();  //TODO Should be close not commit?
-        AgentResultSet agentResultSet = new AgentResultSet();
         // A second transaction is being used to circumvent graknlabs/grakn issue #5585
         boolean allocated = allocate(employeeEmails, companyNumbers, (employeeEmail, companyNumber) -> {
             double wageValue = agent.randomAttributeGenerator().boundRandomDouble(MIN_ANNUAL_WAGE, MAX_ANNUAL_WAGE);

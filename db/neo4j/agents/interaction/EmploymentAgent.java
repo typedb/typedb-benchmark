@@ -10,7 +10,6 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 
-import static com.google.common.collect.Iterables.getOnlyElement;
 import static grakn.simulation.db.neo4j.agents.interaction.RelocationAgent.cityResidentsQuery;
 import static grakn.simulation.db.neo4j.schema.Schema.COMPANY_NUMBER;
 import static grakn.simulation.db.neo4j.schema.Schema.CONTRACTED_HOURS;

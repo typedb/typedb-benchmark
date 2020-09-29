@@ -29,10 +29,10 @@ public class MarriageAgent extends Neo4jAgent<World.City> implements MarriageAge
 
     public List<String> getUnmarriedPeopleOfGender(World.City city, String gender, LocalDateTime dobOfAdults) {
         String template = "" +
-                "MATCH (person:Person {gender: $gender})-[residency:RESIDENT_OF]->(city:City {locationName: $locationName})\n" +
+                "MATCH (person:Person {gender: $gender})-[residentOf:RESIDENT_OF]->(city:City {locationName: $locationName})\n" +
                 "WHERE datetime(person.dateOfBirth) <= datetime(\"" + dobOfAdults + "\")\n" +
                 "AND NOT (person)-[:MARRIED_TO]-()\n" +
-                "AND NOT EXISTS (residency.endDate)\n" +
+                "AND NOT EXISTS (residentOf.endDate)\n" +
                 "RETURN person.email";
 
         HashMap<String, Object> parameters = new HashMap<String, Object>(){{

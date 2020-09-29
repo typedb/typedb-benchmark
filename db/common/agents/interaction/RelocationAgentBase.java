@@ -1,6 +1,7 @@
 package grakn.simulation.db.common.agents.interaction;
 
 import grakn.simulation.db.common.agents.base.Agent;
+import grakn.simulation.db.common.agents.base.AgentResult;
 import grakn.simulation.db.common.agents.base.AgentResultSet;
 import grakn.simulation.db.common.agents.base.SimulationContext;
 import grakn.simulation.db.common.agents.utils.Allocation;
@@ -13,9 +14,16 @@ import java.util.List;
 
 import static grabl.tracing.client.GrablTracingThreadStatic.ThreadTrace;
 import static grabl.tracing.client.GrablTracingThreadStatic.traceOnThread;
+import static grakn.simulation.db.common.agents.interaction.RelocationAgentBase.RelocationAgentField.RELOCATION_CITY_NAMES;
+import static grakn.simulation.db.common.agents.interaction.RelocationAgentBase.RelocationAgentField.RESIDENT_EMAILS;
 import static java.util.Collections.shuffle;
 
 public interface RelocationAgentBase extends InteractionAgent<World.City> {
+
+    enum RelocationAgentField implements Agent.ComparableField {
+        PERSON_EMAIL, OLD_CITY_NAME, NEW_CITY_NAME, RELOCATION_DATE,
+        RESIDENT_EMAILS, RELOCATION_CITY_NAMES
+    }
 
     @Override
     default AgentResultSet iterate(Agent<World.City, ?> agent, World.City city, SimulationContext simulationContext) {
@@ -25,12 +33,8 @@ public interface RelocationAgentBase extends InteractionAgent<World.City> {
         Distribute the people among those cities via a relocation
          */
 
-        LocalDateTime earliestDate;
-        if (simulationContext.today().minusYears(2).isBefore(LocalDateTime.of(LocalDate.ofYearDay(0, 1), LocalTime.of(0, 0, 0))))
-            earliestDate = simulationContext.today();
-        else {
-            earliestDate = simulationContext.today().minusYears(2);
-        }
+        LocalDateTime earliestDateOfResidencyToRelocate;
+        earliestDateOfResidencyToRelocate = simulationContext.today().minusYears(2);
 
         List<String> residentEmails;
         List<String> relocationCityNames;
@@ -38,23 +42,31 @@ public interface RelocationAgentBase extends InteractionAgent<World.City> {
         int numRelocations = simulationContext.world().getScaleFactor();
         agent.newAction("getResidentEmails");
         try (ThreadTrace trace = traceOnThread(agent.action())) {
-            residentEmails = getResidentEmails(city, earliestDate, numRelocations);
+            residentEmails = getResidentEmails(city, earliestDateOfResidencyToRelocate, numRelocations);
         }
         shuffle(residentEmails, agent.random());
+
+        AgentResultSet agentResultSet = new AgentResultSet();
+        agentResultSet.add(new AgentResult(){{
+            put(RESIDENT_EMAILS, residentEmails);
+        }});
 
         agent.newAction("getRelocationCityNames");
         try (ThreadTrace trace = traceOnThread(agent.action())) {
             relocationCityNames = getRelocationCityNames(city);
         }
+        agentResultSet.add(new AgentResult(){{
+            put(RELOCATION_CITY_NAMES, relocationCityNames);
+        }});
 
         Allocation.allocate(residentEmails, relocationCityNames, (residentEmail, relocationCityName) -> {
             agent.newAction("insertRelocation");
             try (ThreadTrace trace = traceOnThread(agent.action())) {
-                insertRelocation(city, simulationContext.today(), residentEmail, relocationCityName);
+                agentResultSet.add(insertRelocation(city, simulationContext.today(), residentEmail, relocationCityName));
             }
         });
         agent.commitAction();
-        return null;
+        return agentResultSet;
     }
 
 //    TODO Should this be abstracted?
@@ -64,6 +76,6 @@ public interface RelocationAgentBase extends InteractionAgent<World.City> {
 
     List<String> getRelocationCityNames(World.City city);
 
-    void insertRelocation(World.City city, LocalDateTime today, String email, String newCityName);
+    AgentResult insertRelocation(World.City city, LocalDateTime today, String email, String newCityName);
 
 }

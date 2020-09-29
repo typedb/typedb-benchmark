@@ -31,7 +31,7 @@ import static grakn.simulation.db.common.world.World.initialise;
 public class SimulationsUnderTest {
     static final Neo4jSimulation neo4jSimulation;
     static final GraknSimulation graknSimulation;
-    static final int numIterations = 3;
+    static final int numIterations = 5;
 
     static {
         String[] args = System.getProperty("sun.java.command").split(" ");
