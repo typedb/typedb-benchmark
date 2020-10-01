@@ -1,6 +1,6 @@
 package grakn.simulation.db.neo4j.agents.interaction;
 
-import grakn.simulation.db.common.agents.base.AgentResult;
+import grakn.simulation.db.common.agents.base.ActionResult;
 import grakn.simulation.db.common.agents.interaction.AgeUpdateAgentBase;
 import grakn.simulation.db.common.world.World;
 import org.neo4j.driver.Query;
@@ -30,7 +30,7 @@ public class AgeUpdateAgent extends Neo4jAgent<World.City> implements AgeUpdateA
     }
 
     @Override
-    public AgentResult resultsForTesting(Record answer) {
+    public ActionResult resultsForTesting(Record answer) {
         return null;
     }
 }

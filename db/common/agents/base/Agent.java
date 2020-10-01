@@ -1,6 +1,9 @@
 package grakn.simulation.db.common.agents.base;
 
+import grabl.tracing.client.GrablTracingThreadStatic;
 import grabl.tracing.client.GrablTracingThreadStatic.ThreadContext;
+import grakn.simulation.db.common.agents.action.Action;
+import grakn.simulation.db.common.agents.action.ActionFactory;
 import grakn.simulation.db.common.agents.interaction.InteractionAgent;
 import grakn.simulation.db.common.agents.interaction.RandomValueGenerator;
 import grakn.simulation.db.common.context.DatabaseContext;
@@ -8,12 +11,16 @@ import grakn.simulation.db.common.context.LogWrapper;
 import grakn.simulation.db.common.world.Region;
 import org.slf4j.Logger;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 
+import static com.google.common.collect.Iterables.getOnlyElement;
 import static grabl.tracing.client.GrablTracingThreadStatic.contextOnThread;
+import static grabl.tracing.client.GrablTracingThreadStatic.traceOnThread;
 
 /**
  * An agent that performs some unit of work across an object in the simulation world. Agent definitions must extend
@@ -24,16 +31,18 @@ import static grabl.tracing.client.GrablTracingThreadStatic.contextOnThread;
  *
  * The protected methods of this class provide useful simple methods for writing Agents as concisely as possible.
  */
-public abstract class Agent<REGION extends Region, CONTEXT extends DatabaseContext> implements InteractionAgent<REGION>, AutoCloseable {
+public abstract class Agent<CONTEXT extends DatabaseContext<?>> implements InteractionAgent<Region>, AutoCloseable {
 
     private Random random;
     private CONTEXT backendContext;
     private String sessionKey;
     private String tracker;
     private LogWrapper logWrapper;
-    private Boolean test;
+    private Boolean testing;
     private ThreadContext context;
     private HashSet<String> tracedMethods = new HashSet<>();
+    protected Action<?, ?> action;
+    private HashMap<String, ArrayList<Action.Report>> actionResults = new HashMap<>();
 
     void init(int simulationStep, Random random, CONTEXT backendContext, String sessionKey, String tracker, Logger logger, Boolean trace, Boolean test) {
         this.random = random;
@@ -41,7 +50,7 @@ public abstract class Agent<REGION extends Region, CONTEXT extends DatabaseConte
         this.sessionKey = sessionKey;
         this.tracker = tracker;
         this.logWrapper = new LogWrapper(logger);
-        this.test = test;
+        this.testing = test;
         if (trace) {
             context = contextOnThread(tracker(), simulationStep);
         }
@@ -67,16 +76,22 @@ public abstract class Agent<REGION extends Region, CONTEXT extends DatabaseConte
         return sessionKey;
     }
 
+    protected abstract void startDbOperation(Action<?, ?> action);
+
+    protected abstract void closeDbOperation();
+
+    protected abstract void saveDbOperation();
+
+    public abstract class DbOperation implements AutoCloseable {
+        public abstract void close();
+        public abstract void commit();
+    }
+
+    public abstract DbOperation dbOperation(Action<?, ?> action);
+
     /////////////////////////////////////////////////
     // Helper methods called from agent interfaces //
     /////////////////////////////////////////////////
-
-    // TODO Use Autoclosable classes for these actions
-    public abstract void newAction(String action);
-
-    public abstract void closeAction();
-
-    public abstract void commitAction();
 
     public <U> U pickOne(List<U> list) { // TODO can be a util
         return list.get(random().nextInt(list.size()));
@@ -100,9 +115,9 @@ public abstract class Agent<REGION extends Region, CONTEXT extends DatabaseConte
         return id.hashCode();
     }
 
-    ///////////////////////////////////////////////////////
-    // [End] Helper methods called from agent interfaces //
-    ///////////////////////////////////////////////////////
+    /////////////////////////////////////////////////
+    // Action methods called from agent interfaces //
+    /////////////////////////////////////////////////
 
     @Override
     public void close() {
@@ -111,11 +126,29 @@ public abstract class Agent<REGION extends Region, CONTEXT extends DatabaseConte
         }
     }
 
-    public abstract String action();
-
-    public interface ComparableField {}
-
-    protected boolean test() {
-        return test;
+    public Action<?, ?> action() {
+        return action;
     }
+
+    public abstract ActionFactory<?, ?> actionFactory();
+
+    public HashMap<String, ArrayList<Action.Report>> getActionResults() {
+        return actionResults;
+    }
+
+    public <ACTION_RETURN_TYPE> ACTION_RETURN_TYPE runAction(Action<?, ACTION_RETURN_TYPE> action) {
+        ACTION_RETURN_TYPE actionAnswer;
+        try (GrablTracingThreadStatic.ThreadTrace trace = traceOnThread(action.name())) {
+            actionAnswer = action.run();
+        }
+        if (testing) {
+            Action.Report actionResult = action.report(actionAnswer);
+//            if (!action.resultsOptional() && actionResult.size() == 0) {
+//                throw new RuntimeException();
+//            }
+            actionResults.computeIfAbsent(action.name(), x -> new ArrayList<>()).add(actionResult);
+        }
+        return actionAnswer;
+    }
+
 }

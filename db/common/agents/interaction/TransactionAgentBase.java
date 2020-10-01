@@ -1,7 +1,6 @@
 package grakn.simulation.db.common.agents.interaction;
 
 import grakn.simulation.db.common.agents.base.Agent;
-import grakn.simulation.db.common.agents.base.AgentResultSet;
 import grakn.simulation.db.common.agents.base.SimulationContext;
 import grakn.simulation.db.common.agents.utils.Allocation;
 import grakn.simulation.db.common.agents.utils.Pair;
@@ -19,14 +18,14 @@ public interface TransactionAgentBase extends InteractionAgent<World.Continent> 
     int NUM_TRANSACTIONS_PER_COMPANY_ON_AVERAGE = 1;
 
     @Override
-    default AgentResultSet iterate(Agent<World.Continent, ?> agent, World.Continent continent, SimulationContext simulationContext) {
+    default void iterate(Agent<World.Continent, ?> agent, World.Continent continent, SimulationContext simulationContext) {
         List<Long> companyNumbers;
-        agent.newAction("getCompanyNumbersInContinent");
+        agent.startDbOperation("getCompanyNumbersInContinent");
         try (ThreadTrace trace = traceOnThread(agent.action())) {
             companyNumbers = getCompanyNumbersInContinent(continent);
         }
         List<Double> productBarcodes;
-        agent.newAction("getProductBarcodesInContinent");
+        agent.startDbOperation("getProductBarcodesInContinent");
         try (ThreadTrace trace = traceOnThread(agent.action())) {
             productBarcodes = getProductBarcodesInContinent(continent);
         }
@@ -49,12 +48,12 @@ public interface TransactionAgentBase extends InteractionAgent<World.Continent> 
             double value = agent.randomAttributeGenerator().boundRandomDouble(0.01, 10000.00);
             int productQuantity = agent.randomAttributeGenerator().boundRandomInt(1, 1000);
             boolean isTaxable = agent.randomAttributeGenerator().bool();
-            agent.newAction("insertTransaction");
+            agent.startDbOperation("insertTransaction");
             try (ThreadTrace trace = traceOnThread(agent.action())) {
                 insertTransaction(continent, transaction, sellerCompanyNumber, value, productQuantity, isTaxable);
             }
         });
-        agent.commitAction();
+        agent.saveDbOperation();
         return null;
     }
 

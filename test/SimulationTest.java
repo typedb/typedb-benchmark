@@ -1,7 +1,7 @@
 package grakn.simulation.test;
 
 import grakn.simulation.db.common.agents.base.Agent.ComparableField;
-import grakn.simulation.db.common.agents.base.AgentResultSet;
+import grakn.simulation.db.common.agents.base.ActionResultList;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -18,8 +18,8 @@ public class SimulationTest {
 
     private void compareFields(String agentName) {
 
-        ConcurrentHashMap<String, AgentResultSet> graknResult = graknSimulation.getResultHandler().getResultForAgent(agentName);
-        ConcurrentHashMap<String, AgentResultSet> neo4jResult = neo4jSimulation.getResultHandler().getResultForAgent(agentName);
+        ConcurrentHashMap<String, ActionResultList> graknResult = graknSimulation.getResultHandler().getResultForAgent(agentName);
+        ConcurrentHashMap<String, ActionResultList> neo4jResult = neo4jSimulation.getResultHandler().getResultForAgent(agentName);
 
         // Check both have the same trackers present
         assertEquals(graknResult.keySet(), neo4jResult.keySet());

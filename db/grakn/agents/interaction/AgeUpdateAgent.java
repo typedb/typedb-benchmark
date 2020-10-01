@@ -1,7 +1,7 @@
 package grakn.simulation.db.grakn.agents.interaction;
 
 import grakn.client.answer.ConceptMap;
-import grakn.simulation.db.common.agents.base.AgentResult;
+import grakn.simulation.db.common.agents.base.ActionResult;
 import grakn.simulation.db.common.agents.interaction.AgeUpdateAgentBase;
 import grakn.simulation.db.common.world.World;
 import graql.lang.Graql;
@@ -32,11 +32,11 @@ public class AgeUpdateAgent extends GraknAgent<World.City> implements AgeUpdateA
     public void updateAgesOfAllPeople(LocalDateTime today, World.City city) {
         // Get all people born in a city
         HashMap<String, LocalDateTime> peopleAnswers;
-        newAction("getPeopleBornInCity");
+        startDbOperation("getPeopleBornInCity");
         try (ThreadTrace trace = traceOnThread(action())) {
             peopleAnswers = getPeopleBornInCity(city);
         }
-        newAction("updatePersonAge");
+        startDbOperation("updatePersonAge");
         // Update their ages
         peopleAnswers.forEach((personEmail, personDob) -> {
                     long age = ChronoUnit.YEARS.between(personDob, today);
@@ -101,7 +101,7 @@ public class AgeUpdateAgent extends GraknAgent<World.City> implements AgeUpdateA
     }
 
     @Override
-    public AgentResult resultsForTesting(ConceptMap answer) {
+    public ActionResult resultsForTesting(ConceptMap answer) {
         return null;
     }
 }

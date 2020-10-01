@@ -1,6 +1,7 @@
 package grakn.simulation.db.neo4j.agents.interaction;
 
-import grakn.simulation.db.common.agents.base.AgentResult;
+import grakn.simulation.db.common.agents.action.Action;
+import grakn.simulation.db.common.agents.base.ActionResult;
 import grakn.simulation.db.common.agents.interaction.RelocationAgentBase;
 import grakn.simulation.db.common.world.World;
 import grakn.simulation.db.neo4j.driver.Transaction;
@@ -50,7 +51,7 @@ public class RelocationAgent extends Neo4jAgent<World.City> implements Relocatio
     }
 
     @Override
-    public AgentResult insertRelocation(World.City city, LocalDateTime today, String email, String newCityName) {
+    public ActionResult insertRelocation(World.City city, LocalDateTime today, String email, String newCityName) {
         // This raises questions over whether the person's ResidentOf end-date should be updated in this step, or
         // figured out at query-time, which would be more in-line with Grakn
 
@@ -71,7 +72,7 @@ public class RelocationAgent extends Neo4jAgent<World.City> implements Relocatio
                 put("newCityName", newCityName);
                 put("relocationDate", today);
         }};
-        return single_result(tx().execute(new Query(template, parameters)));
+        return Action.singleResult(tx().execute(new Query(template, parameters)));
     }
 
     public static void endPastResidencies(Transaction tx, String email, LocalDateTime today){
@@ -88,8 +89,8 @@ public class RelocationAgent extends Neo4jAgent<World.City> implements Relocatio
     }
 
     @Override
-    public AgentResult resultsForTesting(Record answer) {
-        return new AgentResult() {
+    public ActionResult resultsForTesting(Record answer) {
+        return new ActionResult() {
             {
                 put(RelocationAgentField.PERSON_EMAIL, answer.asMap().get("person." + EMAIL));
                 put(RelocationAgentField.NEW_CITY_NAME, answer.asMap().get("newCity." + LOCATION_NAME));

@@ -1,30 +1,17 @@
 package grakn.simulation.db.common.agents.base;
 
-import grakn.simulation.db.common.agents.utils.CheckMethod;
+import grakn.simulation.db.common.agents.action.Action;
 import grakn.simulation.db.common.context.DatabaseContext;
 import grakn.simulation.db.common.context.DatabaseTransaction;
-import grakn.simulation.db.common.world.Region;
 
-import java.util.List;
-
-import static com.google.common.collect.Iterables.getOnlyElement;
-
-public abstract class TransactionalAgent<REGION extends Region, CONTEXT extends DatabaseContext<TRANSACTION>, TRANSACTION extends DatabaseTransaction, DB_ANSWER_TYPE> extends Agent<REGION, CONTEXT> {
+public abstract class TransactionalAgent<CONTEXT extends DatabaseContext<TRANSACTION>, TRANSACTION extends DatabaseTransaction> extends Agent<CONTEXT> {
     private TRANSACTION tx;
-    private String action;
 
-    public TRANSACTION tx() {
-        return tx;
-    }
+    // TODO Make two types of AutoClosable DB operations - one for opening a read transaction and closing, the other for opening a write transaction and committing
+    // TODO however the current flow may also be needed, see EmploymentAgent's allocation for an example
 
     @Override
-    public String action() {
-        return action;
-    }
-
-    @Override
-    public void newAction(String action) {
-        CheckMethod.checkMethodExists(this, action);
+    protected void startDbOperation(Action<?, ?> action) {
         this.action = action;
         if (tx == null) {
             tx = backendContext().tx(getSessionKey(), logger(), tracker() + ":" + this.action);
@@ -32,36 +19,39 @@ public abstract class TransactionalAgent<REGION extends Region, CONTEXT extends 
     }
 
     @Override
-    public void closeAction() {
-        tx().close();
+    protected void closeDbOperation() {
+        tx.close();
         tx = null;
     }
 
     @Override
-    public void commitAction() {
-        tx().commit();
+    protected void saveDbOperation() {
+        tx.commit();
         tx = null;
     }
 
-    public abstract AgentResult resultsForTesting(DB_ANSWER_TYPE answer);
-
-    protected AgentResult single_result(List<DB_ANSWER_TYPE> answers) {
-        if (test()) { // testing is active
-            return resultsForTesting(getOnlyElement(answers));
-        } else {
-            return null;
-        }
+    public DbOperation dbOperation(Action<?, ?> action) {
+        return new TransactionalDbOperation(action);
     }
 
-    protected AgentResult optional_single_result(List<DB_ANSWER_TYPE> answers) {
-        if (test()) { // testing is active
-            if (answers.size() == 0) {
-                return new AgentResult();
-            } else {
-                return resultsForTesting(getOnlyElement(answers));
-            }
-        } else {
-            return null;
+    public class TransactionalDbOperation extends DbOperation implements AutoCloseable {
+
+        public TransactionalDbOperation(Action<?, ?> action) {
+            startDbOperation(action);
+        }
+
+        @Override
+        public void commit() {
+            saveDbOperation();
+        }
+
+        @Override
+        public void close() {
+            closeDbOperation();
+        }
+
+        public TRANSACTION tx() {
+            return tx;
         }
     }
 }

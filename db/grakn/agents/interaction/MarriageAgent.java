@@ -1,7 +1,8 @@
 package grakn.simulation.db.grakn.agents.interaction;
 
 import grakn.client.answer.ConceptMap;
-import grakn.simulation.db.common.agents.base.AgentResult;
+import grakn.simulation.db.common.agents.action.Action;
+import grakn.simulation.db.common.agents.base.ActionResult;
 import grakn.simulation.db.common.agents.interaction.MarriageAgentBase;
 import grakn.simulation.db.common.world.World;
 import graql.lang.Graql;
@@ -66,7 +67,7 @@ public class MarriageAgent extends GraknAgent<World.City> implements MarriageAge
     }
 
     @Override
-    public AgentResult insertMarriage(World.City worldCity, int marriageIdentifier, String wifeEmail, String husbandEmail) {
+    public ActionResult insertMarriage(World.City worldCity, int marriageIdentifier, String wifeEmail, String husbandEmail) {
         Statement husband = Graql.var("husband");
         Statement wife = Graql.var("wife");
         Statement city = Graql.var(CITY);
@@ -88,12 +89,12 @@ public class MarriageAgent extends GraknAgent<World.City> implements MarriageAge
                         .has(MARRIAGE_ID, marriageIdentifierVar),
                 Graql.var().isa(LOCATES).rel(LOCATES_LOCATED, marriage).rel(LOCATES_LOCATION, city)
         );
-        return single_result(tx().execute(marriageQuery));
+        return Action.singleResult(tx().execute(marriageQuery));
     }
 
     @Override
-    public AgentResult resultsForTesting(ConceptMap answer) {
-        return new AgentResult(){{
+    public ActionResult resultsForTesting(ConceptMap answer) {
+        return new ActionResult(){{
             put(MarriageAgentField.MARRIAGE_IDENTIFIER, tx().getOnlyAttributeOfThing(answer, "marriage", MARRIAGE_ID));
             put(MarriageAgentField.WIFE_EMAIL, tx().getOnlyAttributeOfThing(answer, "wife", EMAIL));
             put(MarriageAgentField.HUSBAND_EMAIL, tx().getOnlyAttributeOfThing(answer, "husband", EMAIL));

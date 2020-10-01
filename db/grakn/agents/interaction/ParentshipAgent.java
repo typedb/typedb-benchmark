@@ -1,7 +1,8 @@
 package grakn.simulation.db.grakn.agents.interaction;
 
 import grakn.client.answer.ConceptMap;
-import grakn.simulation.db.common.agents.base.AgentResult;
+import grakn.simulation.db.common.agents.action.Action;
+import grakn.simulation.db.common.agents.base.ActionResult;
 import grakn.simulation.db.common.agents.interaction.ParentshipAgentBase;
 import grakn.simulation.db.common.world.World;
 import graql.lang.Graql;
@@ -10,8 +11,6 @@ import graql.lang.query.GraqlInsert;
 import graql.lang.statement.Statement;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -84,7 +83,7 @@ public class ParentshipAgent extends GraknAgent<World.City> implements Parentshi
     }
 
     @Override
-    public AgentResult insertParentShip(HashMap<SpouseType, String> marriage, String childEmail) {
+    public ActionResult insertParentShip(HashMap<SpouseType, String> marriage, String childEmail) {
         // Parentship where parents have multiple children is represented as multiple ternary relations, each with
         // both parents and one child. They had these children at the same time, and will not have any subsequently.
         Statement parentship = Graql.var(PARENTSHIP);
@@ -102,12 +101,12 @@ public class ParentshipAgent extends GraknAgent<World.City> implements Parentshi
                         .rel(PARENTSHIP_PARENT, mother)
                         .rel(PARENTSHIP_CHILD, child)
         );
-        return single_result(tx().execute(parentshipQuery));
+        return Action.singleResult(tx().execute(parentshipQuery));
     }
 
     @Override
-    public AgentResult resultsForTesting(ConceptMap answer) {
-        return new AgentResult() {
+    public ActionResult resultsForTesting(ConceptMap answer) {
+        return new ActionResult() {
             {
                 put(ParentshipField.WIFE_EMAIL, tx().getOnlyAttributeOfThing(answer, "mother", EMAIL));
                 put(ParentshipField.HUSBAND_EMAIL, tx().getOnlyAttributeOfThing(answer, "father", EMAIL));

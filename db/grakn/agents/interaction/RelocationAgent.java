@@ -1,7 +1,8 @@
 package grakn.simulation.db.grakn.agents.interaction;
 
 import grakn.client.answer.ConceptMap;
-import grakn.simulation.db.common.agents.base.AgentResult;
+import grakn.simulation.db.common.agents.action.Action;
+import grakn.simulation.db.common.agents.base.ActionResult;
 import grakn.simulation.db.common.agents.interaction.RelocationAgentBase;
 import grakn.simulation.db.common.world.World;
 import graql.lang.Graql;
@@ -73,7 +74,7 @@ public class RelocationAgent extends GraknAgent<World.City> implements Relocatio
     }
 
     @Override
-    public AgentResult insertRelocation(World.City city, LocalDateTime today, String email, String newCityName) {
+    public ActionResult insertRelocation(World.City city, LocalDateTime today, String email, String newCityName) {
         GraqlInsert relocatePersonQuery = Graql.match(
                 Graql.var(PERSON).isa(PERSON).has(EMAIL, email),
                 Graql.var("new-city").isa(CITY).has(LOCATION_NAME, newCityName),
@@ -85,12 +86,12 @@ public class RelocationAgent extends GraknAgent<World.City> implements Relocatio
                         .rel(RELOCATION_RELOCATED_PERSON, PERSON)
                         .has(RELOCATION_DATE, today)
         );
-        return single_result(tx().execute(relocatePersonQuery));
+        return Action.singleResult(tx().execute(relocatePersonQuery));
     }
 
     @Override
-    public AgentResult resultsForTesting(ConceptMap answer) {
-        return new AgentResult() {
+    public ActionResult resultsForTesting(ConceptMap answer) {
+        return new ActionResult() {
             {
                 put(RelocationAgentField.PERSON_EMAIL, tx().getOnlyAttributeOfThing(answer, PERSON, EMAIL));
                 //put(RelocationAgentField.OLD_CITY_NAME, tx().getOnlyAttributeOfThing(answer, "old-city", LOCATION_NAME)); //TODO Can't be compared with Neo4j as Neo doesn't support ternary relations

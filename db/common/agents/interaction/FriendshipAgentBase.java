@@ -2,8 +2,8 @@ package grakn.simulation.db.common.agents.interaction;
 
 import grabl.tracing.client.GrablTracingThreadStatic.ThreadTrace;
 import grakn.simulation.db.common.agents.base.Agent;
-import grakn.simulation.db.common.agents.base.AgentResult;
-import grakn.simulation.db.common.agents.base.AgentResultSet;
+import grakn.simulation.db.common.agents.base.ActionResult;
+import grakn.simulation.db.common.agents.base.ActionResultList;
 import grakn.simulation.db.common.agents.base.SimulationContext;
 import grakn.simulation.db.common.world.World;
 
@@ -20,15 +20,15 @@ public interface FriendshipAgentBase extends InteractionAgent<World.City> {
     }
 
     @Override
-    default AgentResultSet iterate(Agent<World.City, ?> agent, World.City city, SimulationContext simulationContext) {
+    default void iterate(Agent<World.City, ?> agent, World.City city, SimulationContext simulationContext) {
         List<String> residentEmails;
-        AgentResultSet agentResultSet = new AgentResultSet();
-        agent.newAction("getResidentEmails");
+        ActionResultList agentResultSet = new ActionResultList();
+        agent.startDbOperation("getResidentEmails");
         try (ThreadTrace trace = traceOnThread(agent.action())) {
             residentEmails = getResidentEmails(city, simulationContext.today());
         }
-        agent.closeAction();  // TODO Closing and reopening the transaction here is a workaround for https://github.com/graknlabs/grakn/issues/5585
-        agent.newAction("insertFriendship");
+        agent.closeDbOperation();  // TODO Closing and reopening the transaction here is a workaround for https://github.com/graknlabs/grakn/issues/5585
+        agent.startDbOperation("insertFriendship");
         if (residentEmails.size() > 0) {
             shuffle(residentEmails, agent.random());
             int numFriendships = simulationContext.world().getScaleFactor();
@@ -37,12 +37,12 @@ public interface FriendshipAgentBase extends InteractionAgent<World.City> {
                     agentResultSet.add(insertFriendship(simulationContext.today(), agent.pickOne(residentEmails), agent.pickOne(residentEmails)));
                 }
             }
-            agent.commitAction();
+            agent.saveDbOperation();
         }
         return agentResultSet;
     }
 
     List<String> getResidentEmails(World.City city, LocalDateTime earliestDate);
 
-    AgentResult insertFriendship(LocalDateTime today, String friend1Email, String friend2Email);
+    ActionResult insertFriendship(LocalDateTime today, String friend1Email, String friend2Email);
 }

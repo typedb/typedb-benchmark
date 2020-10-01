@@ -22,15 +22,14 @@ import java.util.Random;
  * @param <REGION> The type of region used by the agent.
  * @param <CONTEXT> The database context used by the agent.
  */
-public abstract class AgentRunner<REGION extends Region, CONTEXT extends DatabaseContext> {
+public abstract class AgentRunner<REGION extends Region, CONTEXT extends DatabaseContext<?>> {
 
-    private final Constructor<? extends Agent<REGION, CONTEXT>> agentConstructor;
+    private final Constructor<? extends Agent<CONTEXT>> agentConstructor;
     private final Logger logger;
     private Boolean traceAgent = true;
-    private Boolean testAgent = true;
     private final CONTEXT backendContext;
 
-    protected AgentRunner(Class<? extends Agent<REGION, CONTEXT>> agentClass, CONTEXT backendContext) {
+    protected AgentRunner(Class<? extends Agent<CONTEXT>> agentClass, CONTEXT backendContext) {
         this.backendContext = backendContext;
         try {
             agentConstructor = agentClass.getDeclaredConstructor();
@@ -64,11 +63,11 @@ public abstract class AgentRunner<REGION extends Region, CONTEXT extends Databas
         Random agentRandom = RandomSource.nextSource(random).startNewRandom();
         String sessionKey = getSessionKey(simulationContext, RandomSource.nextSource(random), region);
 
-        try (Agent<REGION, CONTEXT> agent = agentConstructor.newInstance()) {
+        try (Agent<CONTEXT> agent = agentConstructor.newInstance()) {
             agent.init(simulationContext.simulationStep(), agentRandom, backendContext, sessionKey, region.tracker(), logger, traceAgent && simulationContext.trace(), simulationContext.test());
 //            AgentResult agentResult = agent.iterateWithTracing();  // TODO Disabled for demo purposes
-            AgentResultSet agentResult = agent.iterate(agent, region, simulationContext);
-            simulationContext.getResultHandler().newResult(agent.getClass().getSimpleName(), region.tracker(), agentResult);
+            agent.iterate(agent, region, simulationContext);
+            simulationContext.getResultHandler().newResult(agent.getClass().getSimpleName(), region.tracker(), agent.getActionResults());
 //            lastTestCount.put(tracker, agent.testByCount(lastTestCount.getOrDefault(tracker, 0)));
 
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {

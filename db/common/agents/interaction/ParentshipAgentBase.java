@@ -2,8 +2,8 @@ package grakn.simulation.db.common.agents.interaction;
 
 import grabl.tracing.client.GrablTracingThreadStatic.ThreadTrace;
 import grakn.simulation.db.common.agents.base.Agent;
-import grakn.simulation.db.common.agents.base.AgentResult;
-import grakn.simulation.db.common.agents.base.AgentResultSet;
+import grakn.simulation.db.common.agents.base.ActionResult;
+import grakn.simulation.db.common.agents.base.ActionResultList;
 import grakn.simulation.db.common.agents.base.SimulationContext;
 import grakn.simulation.db.common.agents.utils.Allocation;
 import grakn.simulation.db.common.world.World;
@@ -27,20 +27,20 @@ public interface ParentshipAgentBase extends InteractionAgent<World.City> {
     }
 
     @Override
-    default AgentResultSet iterate(Agent<World.City, ?> agent, World.City city, SimulationContext simulationContext) {
+    default void iterate(Agent<World.City, ?> agent, World.City city, SimulationContext simulationContext) {
         // Query for married couples in the city who are not already in a parentship relation together
         List<String> childrenEmails;
-        agent.newAction("getChildrenEmailsBorn");
+        agent.startDbOperation("getChildrenEmailsBorn");
         try (ThreadTrace trace = traceOnThread(agent.action())) {
             childrenEmails = getChildrenEmailsBorn(city, simulationContext.today());
         }
         List<HashMap<SpouseType, String>> marriageEmails;
-        agent.newAction("getMarriageEmails");
+        agent.startDbOperation("getMarriageEmails");
         try (ThreadTrace trace = traceOnThread(agent.action())) {
             marriageEmails = getMarriageEmails(city);
         }
 
-        AgentResultSet agentResultSet = new AgentResultSet();
+        ActionResultList agentResultSet = new ActionResultList();
         if (marriageEmails.size() > 0 && childrenEmails.size() > 0) {
             LinkedHashMap<Integer, List<Integer>> childrenPerMarriage = Allocation.allocateEvenlyToMap(childrenEmails.size(), marriageEmails.size());
 
@@ -52,15 +52,15 @@ public interface ParentshipAgentBase extends InteractionAgent<World.City> {
 
                 for (Integer childIndex : children) {
                     String childEmail = childrenEmails.get(childIndex);
-                    agent.newAction("insertParentShip");
+                    agent.startDbOperation("insertParentShip");
                     try (ThreadTrace trace = traceOnThread(agent.action())) {
                         agentResultSet.add(insertParentShip(marriage, childEmail));
                     }
                 }
             }
-            agent.commitAction();
+            agent.saveDbOperation();
         } else {
-            agent.closeAction();
+            agent.closeDbOperation();
         }
         return agentResultSet;
     }
@@ -69,5 +69,5 @@ public interface ParentshipAgentBase extends InteractionAgent<World.City> {
 
     List<String> getChildrenEmailsBorn(World.City city, LocalDateTime today);
 
-    AgentResult insertParentShip(HashMap<SpouseType, String> marriage, String childEmail);
+    ActionResult insertParentShip(HashMap<SpouseType, String> marriage, String childEmail);
 }

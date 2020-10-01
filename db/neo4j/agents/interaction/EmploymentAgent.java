@@ -1,6 +1,8 @@
 package grakn.simulation.db.neo4j.agents.interaction;
 
-import grakn.simulation.db.common.agents.base.AgentResult;
+import grakn.simulation.db.common.agents.action.Action;
+import grakn.simulation.db.common.agents.action.EmployeeEmailsAction;
+import grakn.simulation.db.common.agents.base.ActionResult;
 import grakn.simulation.db.common.agents.interaction.EmploymentAgentBase;
 import grakn.simulation.db.common.world.World;
 import org.neo4j.driver.Query;
@@ -27,14 +29,31 @@ public class EmploymentAgent extends Neo4jAgent<World.City> implements Employmen
         return tx().getOrderedAttribute(companyNumbersQuery, "company.companyNumber", numCompanies);
     }
 
-    @Override
-    public List<String> getEmployeeEmails(World.City city, int numEmployments, LocalDateTime earliestDate) {
-        Query getEmployeeEmailsQuery = cityResidentsQuery(city, earliestDate);
-        return tx().getOrderedAttribute(getEmployeeEmailsQuery, "resident.email", numEmployments);
+//    @Override
+//    public List<String> getEmployeeEmails(World.City city, int numEmployments, LocalDateTime earliestDate) {
+//        Query getEmployeeEmailsQuery = cityResidentsQuery(city, earliestDate);
+//        return tx().getOrderedAttribute(getEmployeeEmailsQuery, "resident.email", numEmployments);
+//    }
+
+//    public GetEmployeeEmailsAction getEmployeeEmails(World.City city, int numEmployments, LocalDateTime earliestDate) {
+//        return new GraknGetEmployeeEmailsAction();
+//    }
+
+    public class Neo4jEmployeeEmailsAction extends EmployeeEmailsAction {
+
+        Neo4jEmployeeEmailsAction(World.City city, int numEmployments, LocalDateTime earliestDate) {
+            super(city, numEmployments, earliestDate);
+        }
+
+        @Override
+        public List<String> action() {
+            Query getEmployeeEmailsQuery = cityResidentsQuery(city, earliestDate);
+            return tx().getOrderedAttribute(getEmployeeEmailsQuery, "resident.email", numEmployments);
+        }
     }
 
     @Override
-    public AgentResult insertEmployment(World.City city, String employeeEmail, long companyNumber, LocalDateTime employmentDate, double wageValue, String contractContent, double contractedHours) {
+    public ActionResult insertEmployment(World.City city, String employeeEmail, long companyNumber, LocalDateTime employmentDate, double wageValue, String contractContent, double contractedHours) {
         String template = "" +
                 "MATCH (city:City {locationName: $locationName})-[:LOCATED_IN]->(country:Country),\n" +
                 "(person:Person {email: $email}),\n" +
@@ -60,12 +79,12 @@ public class EmploymentAgent extends Neo4jAgent<World.City> implements Employmen
             put("contractedHours", contractedHours);
         }};
         Query insertEmploymentQuery = new Query(template, parameters);
-        return single_result(tx().execute(insertEmploymentQuery));
+        return Action.singleResult(tx().execute(insertEmploymentQuery));
     }
 
     @Override
-    public AgentResult resultsForTesting(Record answer) {
-        return new AgentResult() {
+    public ActionResult resultsForTesting(Record answer) {
+        return new ActionResult() {
             {
                 put(EmploymentAgentField.CITY_NAME, answer.asMap().get("city." + LOCATION_NAME));
                 put(EmploymentAgentField.PERSON_EMAIL, answer.asMap().get("person." + EMAIL));

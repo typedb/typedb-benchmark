@@ -1,18 +1,16 @@
-package grakn.simulation.db.grakn.agents.interaction;
+package grakn.simulation.db.grakn.agents.action;
 
-import grakn.simulation.db.common.agents.action.Action;
-import grakn.simulation.db.common.agents.base.ActionResult;
-import grakn.simulation.db.common.agents.interaction.EmploymentAgentBase;
+import grakn.client.answer.ConceptMap;
+import grakn.simulation.db.common.agents.action.InsertEmploymentAction;
 import grakn.simulation.db.common.world.World;
+import grakn.simulation.db.grakn.agents.interaction.GraknAgent;
 import graql.lang.Graql;
-import graql.lang.query.GraqlGet;
 import graql.lang.query.GraqlInsert;
 import graql.lang.statement.Statement;
 
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.HashMap;
 
-import static grakn.simulation.db.grakn.agents.interaction.RelocationAgent.cityResidentsQuery;
 import static grakn.simulation.db.grakn.schema.Schema.CITY;
 import static grakn.simulation.db.grakn.schema.Schema.COMPANY;
 import static grakn.simulation.db.grakn.schema.Schema.COMPANY_NUMBER;
@@ -37,22 +35,13 @@ import static grakn.simulation.db.grakn.schema.Schema.START_DATE;
 import static grakn.simulation.db.grakn.schema.Schema.WAGE;
 import static grakn.simulation.db.grakn.schema.Schema.WAGE_VALUE;
 
-public class EmploymentAgent extends GraknAgent implements EmploymentAgentBase {
-
-    @Override
-    public List<Long> getCompanyNumbers(World.Country country, int numCompanies) {
-        GraqlGet companyNumbersQuery = CompanyAgent.getCompanyNumbersInCountryQuery(country);
-        return tx().getOrderedAttribute(companyNumbersQuery, COMPANY_NUMBER, numCompanies);
+public class GraknInsertEmploymentAction extends InsertEmploymentAction<GraknAgent.TransactionalDbOperation, ConceptMap> {
+    public GraknInsertEmploymentAction(GraknAgent.TransactionalDbOperation dbOperation, World.City worldCity, String employeeEmail, long companyNumber, LocalDateTime employmentDate, double wageValue, String contractContent, double contractedHours) {
+        super(dbOperation, worldCity, employeeEmail, companyNumber, employmentDate, wageValue, contractContent, contractedHours);
     }
 
     @Override
-    public List<String> getEmployeeEmails(World.City city, int numEmployments, LocalDateTime earliestDate) {
-        GraqlGet getEmployeeEmailsQuery = cityResidentsQuery(city, earliestDate);
-        return tx().getOrderedAttribute(getEmployeeEmailsQuery, EMAIL, numEmployments);
-    }
-
-    @Override
-    public ActionResult insertEmployment(World.City worldCity, String employeeEmail, long companyNumber, LocalDateTime employmentDate, double wageValue, String contractContent, double contractedHours) {
+    public ConceptMap run() {
         Statement city = Graql.var(CITY);
         Statement person = Graql.var(PERSON);
         Statement company = Graql.var(COMPANY);
@@ -102,22 +91,20 @@ public class EmploymentAgent extends GraknAgent implements EmploymentAgentBase {
                         .has(CONTRACT_CONTENT, contractContent)
                         .has(CONTRACTED_HOURS, contractedHours)
         );
-        return Action.singleResult(tx().execute(insertEmploymentQuery));
+        return singleResult(dbOperation.tx().execute(insertEmploymentQuery));
     }
 
-//    @Override
-//    public ActionResult resultsForTesting(ConceptMap answer) {
-//        return new ActionResult() {
-//            {
-//                put(EmploymentAgentField.CITY_NAME, tx().getOnlyAttributeOfThing(answer, CITY, LOCATION_NAME));
-//                put(EmploymentAgentField.PERSON_EMAIL, tx().getOnlyAttributeOfThing(answer, PERSON, EMAIL));
-//                put(EmploymentAgentField.COMPANY_NUMBER, tx().getOnlyAttributeOfThing(answer, COMPANY, COMPANY_NUMBER));
-//                put(EmploymentAgentField.START_DATE, tx().getOnlyAttributeOfThing(answer, EMPLOYMENT, START_DATE));
-//                put(EmploymentAgentField.WAGE, tx().getOnlyAttributeOfThing(answer, WAGE, WAGE_VALUE));
-//                put(EmploymentAgentField.CURRENCY, tx().getOnlyAttributeOfThing(answer, WAGE, CURRENCY));
-//                put(EmploymentAgentField.CONTRACT_CONTENT, tx().getOnlyAttributeOfThing(answer, CONTRACT, CONTRACT_CONTENT));
-//                put(EmploymentAgentField.CONTRACTED_HOURS, tx().getOnlyAttributeOfThing(answer, CONTRACT, CONTRACTED_HOURS));
-//            }
-//        };
-//    }
+    @Override
+    public HashMap<String, Object> outputForReport(ConceptMap answer) {
+        return new HashMap<String, Object>() {{
+                put("CITY_NAME", dbOperation.tx().getOnlyAttributeOfThing(answer, CITY, LOCATION_NAME));
+                put("PERSON_EMAIL", dbOperation.tx().getOnlyAttributeOfThing(answer, PERSON, EMAIL));
+                put("COMPANY_NUMBER", dbOperation.tx().getOnlyAttributeOfThing(answer, COMPANY, COMPANY_NUMBER));
+                put("START_DATE", dbOperation.tx().getOnlyAttributeOfThing(answer, EMPLOYMENT, START_DATE));
+                put("WAGE", dbOperation.tx().getOnlyAttributeOfThing(answer, WAGE, WAGE_VALUE));
+                put("CURRENCY", dbOperation.tx().getOnlyAttributeOfThing(answer, WAGE, CURRENCY));
+                put("CONTRACT_CONTENT", dbOperation.tx().getOnlyAttributeOfThing(answer, CONTRACT, CONTRACT_CONTENT));
+                put("CONTRACTED_HOURS", dbOperation.tx().getOnlyAttributeOfThing(answer, CONTRACT, CONTRACTED_HOURS));
+            }};
+    }
 }

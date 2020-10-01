@@ -1,6 +1,6 @@
 package grakn.simulation.db.neo4j.agents.interaction;
 
-import grakn.simulation.db.common.agents.base.AgentResult;
+import grakn.simulation.db.common.agents.base.ActionResult;
 import grakn.simulation.db.common.agents.interaction.TransactionAgentBase;
 import grakn.simulation.db.common.agents.utils.Pair;
 import grakn.simulation.db.common.world.World;
@@ -53,7 +53,7 @@ public class TransactionAgent extends Neo4jAgent<World.Continent> implements Tra
     }
 
     @Override
-    public AgentResult resultsForTesting(Record answer) {
+    public ActionResult resultsForTesting(Record answer) {
         return null;
     }
 }

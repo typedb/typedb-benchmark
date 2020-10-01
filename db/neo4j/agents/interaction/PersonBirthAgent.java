@@ -1,6 +1,7 @@
 package grakn.simulation.db.neo4j.agents.interaction;
 
-import grakn.simulation.db.common.agents.base.AgentResult;
+import grakn.simulation.db.common.agents.action.Action;
+import grakn.simulation.db.common.agents.base.ActionResult;
 import grakn.simulation.db.common.agents.interaction.PersonBirthAgentBase;
 import grakn.simulation.db.common.world.World;
 import org.neo4j.driver.Query;
@@ -8,8 +9,6 @@ import org.neo4j.driver.Record;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import static com.google.common.collect.Iterables.getOnlyElement;
 import static grakn.simulation.db.neo4j.schema.Schema.EMAIL;
@@ -23,7 +22,7 @@ import static grakn.simulation.db.neo4j.schema.Schema.IS_CURRENT;
 public class PersonBirthAgent extends Neo4jAgent<World.City> implements PersonBirthAgentBase {
 
     @Override
-    public AgentResult insertPerson(World.City city, LocalDateTime today, String email, String gender, String forename, String surname) {
+    public ActionResult insertPerson(World.City city, LocalDateTime today, String email, String gender, String forename, String surname) {
         String template = "MATCH (c:City {locationName: $locationName})" +
                 "CREATE (person:Person {" +
                 "email: $email, " +
@@ -44,14 +43,14 @@ public class PersonBirthAgent extends Neo4jAgent<World.City> implements PersonBi
                 put(SURNAME, surname);
                 put(IS_CURRENT, true);
         }};
-        return single_result(tx().execute(new Query(template, parameters)));
+        return Action.singleResult(tx().execute(new Query(template, parameters)));
 //        TODO Key constraints are possible with Neo4j Enterprise, and some constraints are supported in Community
 //        https://neo4j.com/developer/kb/how-to-implement-a-primary-key-property-for-a-label/
     }
 
     @Override
-    public AgentResult resultsForTesting(Record answer) {
-        return new AgentResult() {{
+    public ActionResult resultsForTesting(Record answer) {
+        return new ActionResult() {{
             put(PersonBirthAgentField.EMAIL, answer.asMap().get("person." + EMAIL));
             put(PersonBirthAgentField.DATE_OF_BIRTH, answer.asMap().get("person." + DATE_OF_BIRTH));
             put(PersonBirthAgentField.GENDER, answer.asMap().get("person." + GENDER));

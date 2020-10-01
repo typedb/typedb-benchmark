@@ -1,6 +1,7 @@
 package grakn.simulation.db.neo4j.agents.interaction;
 
-import grakn.simulation.db.common.agents.base.AgentResult;
+import grakn.simulation.db.common.agents.action.Action;
+import grakn.simulation.db.common.agents.base.ActionResult;
 import grakn.simulation.db.common.agents.interaction.ParentshipAgentBase;
 import grakn.simulation.db.common.world.World;
 import org.neo4j.driver.Query;
@@ -47,7 +48,7 @@ public class ParentshipAgent extends Neo4jAgent<World.City> implements Parentshi
     }
 
     @Override
-    public AgentResult insertParentShip(HashMap<SpouseType, String> marriage, String childEmail) {
+    public ActionResult insertParentShip(HashMap<SpouseType, String> marriage, String childEmail) {
         String template = "" +
                 "MATCH (mother:Person {email: $motherEmail}), (father:Person {email: $fatherEmail}),\n" +
                 "(child:Person {email: $childEmail})\n" +
@@ -58,12 +59,12 @@ public class ParentshipAgent extends Neo4jAgent<World.City> implements Parentshi
                 put("fatherEmail", marriage.get(SpouseType.HUSBAND));
                 put("childEmail", childEmail);
         }};
-        return single_result(tx().execute(new Query(template, parameters)));
+        return Action.singleResult(tx().execute(new Query(template, parameters)));
     }
 
     @Override
-    public AgentResult resultsForTesting(Record answer) {
-        return new AgentResult() {
+    public ActionResult resultsForTesting(Record answer) {
+        return new ActionResult() {
             {
                 put(ParentshipField.WIFE_EMAIL, answer.asMap().get("mother." + EMAIL));
                 put(ParentshipField.HUSBAND_EMAIL, answer.asMap().get("father." + EMAIL));

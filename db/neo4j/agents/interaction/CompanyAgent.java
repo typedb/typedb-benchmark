@@ -1,6 +1,7 @@
 package grakn.simulation.db.neo4j.agents.interaction;
 
-import grakn.simulation.db.common.agents.base.AgentResult;
+import grakn.simulation.db.common.agents.action.Action;
+import grakn.simulation.db.common.agents.base.ActionResult;
 import grakn.simulation.db.common.agents.interaction.CompanyAgentBase;
 import grakn.simulation.db.common.world.World;
 import org.neo4j.driver.Query;
@@ -17,7 +18,7 @@ import static grakn.simulation.db.neo4j.schema.Schema.LOCATION_NAME;
 
 public class CompanyAgent extends Neo4jAgent<World.Country> implements CompanyAgentBase {
     @Override
-    public AgentResult insertCompany(World.Country country, LocalDateTime today, int companyNumber, String companyName) {
+    public ActionResult insertCompany(World.Country country, LocalDateTime today, int companyNumber, String companyName) {
         String template = "" +
                 "MATCH (country:Country {locationName: $countryName})\n" +
                 "CREATE (company:Company {companyNumber: $companyNumber, companyName: $companyName})-[incorporation:INCORPORATED_IN {dateOfIncorporation: $dateOfIncorporation}]->(country)" +
@@ -30,12 +31,12 @@ public class CompanyAgent extends Neo4jAgent<World.Country> implements CompanyAg
                 put("dateOfIncorporation", today);
         }};
         Query companyQuery = new Query(template, parameters);
-        return single_result(tx().execute(companyQuery));
+        return Action.singleResult(tx().execute(companyQuery));
     }
 
     @Override
-    public AgentResult resultsForTesting(Record answer) {
-        return new AgentResult() {
+    public ActionResult resultsForTesting(Record answer) {
+        return new ActionResult() {
             {
                 put(CompanyAgentField.COMPANY_NAME, answer.asMap().get("company." + COMPANY_NAME));
                 put(CompanyAgentField.COMPANY_NUMBER, answer.asMap().get("company." + COMPANY_NUMBER));

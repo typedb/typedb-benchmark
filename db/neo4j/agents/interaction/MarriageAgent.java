@@ -1,6 +1,7 @@
 package grakn.simulation.db.neo4j.agents.interaction;
 
-import grakn.simulation.db.common.agents.base.AgentResult;
+import grakn.simulation.db.common.agents.action.Action;
+import grakn.simulation.db.common.agents.base.ActionResult;
 import grakn.simulation.db.common.agents.interaction.MarriageAgentBase;
 import grakn.simulation.db.common.world.World;
 import org.neo4j.driver.Query;
@@ -45,7 +46,7 @@ public class MarriageAgent extends Neo4jAgent<World.City> implements MarriageAge
     }
 
     @Override
-    public AgentResult insertMarriage(World.City city, int marriageIdentifier, String wifeEmail, String husbandEmail) {
+    public ActionResult insertMarriage(World.City city, int marriageIdentifier, String wifeEmail, String husbandEmail) {
         String template = "" +
                 "MATCH (wife:Person {email: $wifeEmail}), (husband:Person {email: $husbandEmail}), (city:City {locationName: $locationName})\n" +
                 "CREATE (husband)-[marriage:MARRIED_TO {marriageId: $marriageId, locationName: city.locationName}]->(wife)" +
@@ -59,12 +60,12 @@ public class MarriageAgent extends Neo4jAgent<World.City> implements MarriageAge
         }};
 
         Query query = new Query(template, parameters);
-        return single_result(tx().execute(query));
+        return Action.singleResult(tx().execute(query));
     }
 
     @Override
-    public AgentResult resultsForTesting(Record answer) {
-        return new AgentResult() {{
+    public ActionResult resultsForTesting(Record answer) {
+        return new ActionResult() {{
             put(MarriageAgentField.MARRIAGE_IDENTIFIER, answer.asMap().get("marriage." + MARRIAGE_ID));
             put(MarriageAgentField.WIFE_EMAIL, answer.asMap().get("wife." + EMAIL));  // TODO we get back the variables matched for in an insert?
             put(MarriageAgentField.HUSBAND_EMAIL, answer.asMap().get("husband." + EMAIL));

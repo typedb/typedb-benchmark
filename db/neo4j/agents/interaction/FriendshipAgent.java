@@ -1,6 +1,7 @@
 package grakn.simulation.db.neo4j.agents.interaction;
 
-import grakn.simulation.db.common.agents.base.AgentResult;
+import grakn.simulation.db.common.agents.action.Action;
+import grakn.simulation.db.common.agents.base.ActionResult;
 import grakn.simulation.db.common.agents.interaction.FriendshipAgentBase;
 import grakn.simulation.db.common.world.World;
 import org.neo4j.driver.Query;
@@ -23,7 +24,7 @@ public class FriendshipAgent extends Neo4jAgent<World.City> implements Friendshi
     }
 
     @Override
-    public AgentResult insertFriendship(LocalDateTime today, String friend1Email, String friend2Email) {
+    public ActionResult insertFriendship(LocalDateTime today, String friend1Email, String friend2Email) {
         String template = "" +
                 "MATCH " +
                 "(p1:Person),\n" +
@@ -38,12 +39,12 @@ public class FriendshipAgent extends Neo4jAgent<World.City> implements Friendshi
                 put("startDate", today);
         }};
         Query insertFriendshipQuery = new Query(template, parameters);
-        return optional_single_result(tx().execute(insertFriendshipQuery));
+        return Action.optionalSingleResult(tx().execute(insertFriendshipQuery));
     }
 
     @Override
-    public AgentResult resultsForTesting(Record answer) {
-        return new AgentResult() {
+    public ActionResult resultsForTesting(Record answer) {
+        return new ActionResult() {
             {
                 put(FriendshipField.FRIEND1_EMAIL, answer.asMap().get("p1." + EMAIL));
                 put(FriendshipField.FRIEND2_EMAIL, answer.asMap().get("p2." + EMAIL));

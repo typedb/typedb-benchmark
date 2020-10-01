@@ -1,7 +1,8 @@
 package grakn.simulation.db.grakn.agents.interaction;
 
 import grakn.client.answer.ConceptMap;
-import grakn.simulation.db.common.agents.base.AgentResult;
+import grakn.simulation.db.common.agents.action.Action;
+import grakn.simulation.db.common.agents.base.ActionResult;
 import grakn.simulation.db.common.agents.interaction.FriendshipAgentBase;
 import grakn.simulation.db.common.world.World;
 import graql.lang.Graql;
@@ -30,7 +31,7 @@ public class FriendshipAgent extends GraknAgent<World.City> implements Friendshi
     }
 
     @Override
-    public AgentResult insertFriendship(LocalDateTime today, String friend1Email, String friend2Email) {
+    public ActionResult insertFriendship(LocalDateTime today, String friend1Email, String friend2Email) {
 
         Statement person1 = Graql.var("p1");
         Statement person2 = Graql.var("p2");
@@ -58,12 +59,12 @@ public class FriendshipAgent extends GraknAgent<World.City> implements Friendshi
                         .rel(FRIENDSHIP_FRIEND, person2)
                         .has(START_DATE, startDate)
         );
-        return optional_single_result(tx().execute(insertFriendshipQuery));
+        return Action.optionalSingleResult(tx().execute(insertFriendshipQuery));
     }
 
     @Override
-    public AgentResult resultsForTesting(ConceptMap answer) {
-        return new AgentResult() {
+    public ActionResult resultsForTesting(ConceptMap answer) {
+        return new ActionResult() {
             {
                 put(FriendshipField.FRIEND1_EMAIL, tx().getOnlyAttributeOfThing(answer, "p1", EMAIL));
                 put(FriendshipField.FRIEND2_EMAIL, tx().getOnlyAttributeOfThing(answer, "p2", EMAIL));

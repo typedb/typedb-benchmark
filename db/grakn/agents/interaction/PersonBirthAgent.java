@@ -1,16 +1,15 @@
 package grakn.simulation.db.grakn.agents.interaction;
 
 import grakn.client.answer.ConceptMap;
-import grakn.simulation.db.common.agents.base.AgentResult;
+import grakn.simulation.db.common.agents.action.Action;
+import grakn.simulation.db.common.agents.base.ActionResult;
 import grakn.simulation.db.common.agents.interaction.PersonBirthAgentBase;
 import grakn.simulation.db.common.world.World;
 import graql.lang.Graql;
-import graql.lang.query.GraqlGet;
 import graql.lang.query.GraqlInsert;
 import graql.lang.statement.Statement;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 import static com.google.common.collect.Iterables.getOnlyElement;
 import static grakn.simulation.db.grakn.schema.Schema.BORN_IN;
@@ -28,7 +27,7 @@ import static grakn.simulation.db.grakn.schema.Schema.SURNAME;
 public class PersonBirthAgent extends GraknAgent<World.City> implements PersonBirthAgentBase {
 
     @Override
-    public AgentResult insertPerson(World.City worldCity, LocalDateTime today, String email, String gender, String forename, String surname) {
+    public ActionResult insertPerson(World.City worldCity, LocalDateTime today, String email, String gender, String forename, String surname) {
         Statement city = Graql.var(CITY);
         Statement person = Graql.var(PERSON);
         Statement bornIn = Graql.var(BORN_IN);
@@ -59,12 +58,12 @@ public class PersonBirthAgent extends GraknAgent<World.City> implements PersonBi
                                 surnameVar.val(surname),
                                 dobVar.val(today)
                         );
-        return single_result(tx().execute(query));
+        return Action.singleResult(tx().execute(query));
     }
 
     @Override
-    public AgentResult resultsForTesting(ConceptMap answer) {
-        return new AgentResult(){
+    public ActionResult resultsForTesting(ConceptMap answer) {
+        return new ActionResult(){
             {
                 put(PersonBirthAgentField.EMAIL, tx().getOnlyAttributeOfThing(answer, PERSON, EMAIL));
                 put(PersonBirthAgentField.DATE_OF_BIRTH, tx().getOnlyAttributeOfThing(answer, PERSON, DATE_OF_BIRTH));

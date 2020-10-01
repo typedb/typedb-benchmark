@@ -1,7 +1,8 @@
 package grakn.simulation.db.grakn.agents.interaction;
 
 import grakn.client.answer.ConceptMap;
-import grakn.simulation.db.common.agents.base.AgentResult;
+import grakn.simulation.db.common.agents.action.Action;
+import grakn.simulation.db.common.agents.base.ActionResult;
 import grakn.simulation.db.common.agents.interaction.CompanyAgentBase;
 import grakn.simulation.db.common.world.World;
 import graql.lang.Graql;
@@ -26,7 +27,7 @@ import static grakn.simulation.db.grakn.schema.Schema.LOCATION_NAME;
 public class CompanyAgent extends GraknAgent<World.Country> implements CompanyAgentBase {
 
     @Override
-    public AgentResult insertCompany(World.Country country, LocalDateTime today, int companyNumber, String companyName) {
+    public ActionResult insertCompany(World.Country country, LocalDateTime today, int companyNumber, String companyName) {
 
         GraqlInsert query =
                 Graql.match(
@@ -40,12 +41,12 @@ public class CompanyAgent extends GraknAgent<World.Country> implements CompanyAg
                                         .rel(INCORPORATION_INCORPORATING, Graql.var(COUNTRY))
                                         .has(DATE_OF_INCORPORATION, today)
                         );
-        return single_result(tx().execute(query));
+        return Action.singleResult(tx().execute(query));
     }
 
     @Override
-    public AgentResult resultsForTesting(ConceptMap answer) {
-        return new AgentResult() {
+    public ActionResult resultsForTesting(ConceptMap answer) {
+        return new ActionResult() {
             {
                 put(CompanyAgentField.COMPANY_NAME, tx().getOnlyAttributeOfThing(answer, COMPANY, COMPANY_NAME));
                 put(CompanyAgentField.COMPANY_NUMBER, tx().getOnlyAttributeOfThing(answer, COMPANY, COMPANY_NUMBER));
