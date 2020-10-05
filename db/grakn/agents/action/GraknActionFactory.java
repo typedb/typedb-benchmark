@@ -2,8 +2,6 @@ package grakn.simulation.db.grakn.agents.action;
 
 import grakn.client.answer.ConceptMap;
 import grakn.simulation.db.common.agents.action.ActionFactory;
-import grakn.simulation.db.common.agents.action.CompanyNumbersAction;
-import grakn.simulation.db.common.agents.action.EmployeeEmailsAction;
 import grakn.simulation.db.common.agents.action.InsertEmploymentAction;
 import grakn.simulation.db.common.world.World;
 import grakn.simulation.db.grakn.agents.interaction.GraknDbOperationController;
@@ -16,13 +14,13 @@ public class GraknActionFactory extends ActionFactory<GraknDbOperationController
     }
 
     @Override
-    public EmployeeEmailsAction employeeEmailsAction(World.City city, int numEmployments, LocalDateTime earliestDate) {
-        return null;
+    public GraknResidentsInCityAction residentsInCityAction(World.City city, int numResidents, LocalDateTime earliestDate) {
+        return new GraknResidentsInCityAction(dbOpController.dbOperation(), city, numResidents, earliestDate);
     }
 
     @Override
-    public CompanyNumbersAction companyNumbersAction(World.Country country, int numCompanies) {
-        return null;
+    public GraknCompanyNumbersAction companyNumbersInCountryAction(World.Country country, int numCompanies) {
+        return new GraknCompanyNumbersAction(dbOpController.dbOperation(), country, numCompanies);
     }
 
     @Override

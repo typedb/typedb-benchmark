@@ -1,8 +1,5 @@
 package grakn.simulation.db.grakn.agents.interaction;
 
-import grakn.simulation.db.common.agents.interaction.EmploymentAgent;
-import grakn.simulation.db.grakn.context.GraknDriver;
-
 //public class GraknEmploymentAgent extends EmploymentAgent<GraknDriver> {
 //    public GraknEmploymentAgent(GraknDriver dbDriver, SessionStrategy sessionStrategy) {
 //        super(dbDriver, sessionStrategy);

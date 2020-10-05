@@ -1,7 +1,7 @@
 package grakn.simulation.db.common.agents.interaction;
 
 import grakn.simulation.db.common.agents.action.CompanyNumbersAction;
-import grakn.simulation.db.common.agents.action.EmployeeEmailsAction;
+import grakn.simulation.db.common.agents.action.ResidentsInCityAction;
 import grakn.simulation.db.common.agents.action.InsertEmploymentAction;
 import grakn.simulation.db.common.agents.base.DbOperationController;
 import grakn.simulation.db.common.agents.base.SimulationContext;
@@ -17,12 +17,12 @@ import static grakn.simulation.db.common.agents.utils.Allocation.allocate;
 
 public class EmploymentAgent<DB_DRIVER extends DbDriver> extends CityAgent<DB_DRIVER> {
 
-    public EmploymentAgent(DB_DRIVER dbDriver, SessionStrategy sessionStrategy) {
+    public EmploymentAgent(DB_DRIVER dbDriver) {
         super(dbDriver);
     }
 
     @Override
-    protected RegionalAgent getRegionalAgent(int simulationStep, String tracker, Random random, boolean test) {
+    protected RegionalEmploymentAgent getRegionalAgent(int simulationStep, String tracker, Random random, boolean test) {
         return new RegionalEmploymentAgent(simulationStep, tracker, random, test);
     }
 
@@ -39,32 +39,31 @@ public class EmploymentAgent<DB_DRIVER extends DbDriver> extends CityAgent<DB_DR
         }
 
         @Override
-        protected void iterate(DbOperationController dbOperationController, World.City city, SimulationContext simulationContext) {
+        protected void run(DbOperationController dbOperationController, World.City city, SimulationContext simulationContext) {
             LocalDateTime employmentDate = simulationContext.today().minusYears(0);
             List<String> employeeEmails;
             List<Long> companyNumbers;
 
-            EmployeeEmailsAction<?> employeeEmailsAction = dbOperationController.actionFactory().employeeEmailsAction(city, simulationContext.world().getScaleFactor(), employmentDate);
+            ResidentsInCityAction<?> employeeEmailsAction = dbOperationController.actionFactory().residentsInCityAction(city, simulationContext.world().getScaleFactor(), employmentDate);
             try (DbOperationController.DbOperation dbOperation = dbOperationController.newDbOperation(employeeEmailsAction, tracker())) {
                 employeeEmails = runAction(employeeEmailsAction);
             }
 
-            CompanyNumbersAction<?> companyNumbersAction = dbOperationController.actionFactory().companyNumbersAction(city.country(), simulationContext.world().getScaleFactor());
+            CompanyNumbersAction<?> companyNumbersAction = dbOperationController.actionFactory().companyNumbersInCountryAction(city.country(), simulationContext.world().getScaleFactor());
             try (DbOperationController.DbOperation dbOperation = dbOperationController.newDbOperation(companyNumbersAction, tracker())) {
                 companyNumbers = runAction(companyNumbersAction);
             }
 
-            try (DbOperationController.DbOperation dbOperation = dbOperationController.newDbOperation(employeeEmailsAction, tracker())) {
+            try (DbOperationController.DbOperation dbOperation = dbOperationController.newDbOperation("InsertEmploymentAction", tracker())) {
                 // A second transaction is being used to circumvent graknlabs/grakn issue #5585
                 boolean allocated = allocate(employeeEmails, companyNumbers, (employeeEmail, companyNumber) -> {
                     double wageValue = randomAttributeGenerator().boundRandomDouble(MIN_ANNUAL_WAGE, MAX_ANNUAL_WAGE);
                     String contractContent = randomAttributeGenerator().boundRandomLengthRandomString(MIN_CONTRACT_CHARACTER_LENGTH, MAX_CONTRACT_CHARACTER_LENGTH);
                     double contractedHours = randomAttributeGenerator().boundRandomDouble(MIN_CONTRACTED_HOURS, MAX_CONTRACTED_HOURS);
-                    InsertEmploymentAction<?, ?> insertEmploymentAction = dbOperationController.actionFactory().insertEmploymentAction(city, employeeEmail, companyNumber, employmentDate, wageValue, contractContent, contractedHours);
-                    runAction(insertEmploymentAction);
+                    runAction(dbOperationController.actionFactory().insertEmploymentAction(city, employeeEmail, companyNumber, employmentDate, wageValue, contractContent, contractedHours));
                 });
                 if (allocated) {
-                    dbOperation.commit();
+                    dbOperation.save();
                 }
             }
         }

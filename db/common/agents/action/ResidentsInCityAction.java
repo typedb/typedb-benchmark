@@ -7,23 +7,23 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 
-public abstract class EmployeeEmailsAction<DB_OPERATION extends DbOperationController.DbOperation> extends Action<DB_OPERATION, List<String>> {
+public abstract class ResidentsInCityAction<DB_OPERATION extends DbOperationController.DbOperation> extends Action<DB_OPERATION, List<String>> {
 
     protected final World.City city;
-    protected final int numEmployments;
+    protected final int numResidents;
     protected final LocalDateTime earliestDate;
 
-    public EmployeeEmailsAction(DB_OPERATION dbOperation, World.City city, int numEmployments, LocalDateTime earliestDate) {
+    public ResidentsInCityAction(DB_OPERATION dbOperation, World.City city, int numResidents, LocalDateTime earliestDate) {
         super(dbOperation);
         this.city = city;
-        this.numEmployments = numEmployments;
+        this.numResidents = numResidents;
         this.earliestDate = earliestDate;
     }
 
     @Override
-    public HashMap<String, Object> outputForReport(List<String> employeeEmails) {
+    public HashMap<String, Object> outputForReport(List<String> residentEmails) {
         return new HashMap<String, Object>(){{
-            put("EMPLOYEE_EMAILS", employeeEmails);
+            put("RESIDENT_EMAILS", residentEmails);
         }};
     }
 }

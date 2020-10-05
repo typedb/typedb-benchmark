@@ -13,9 +13,11 @@ public abstract class ActionFactory<DB_OP_CONTROLLER extends DbOperationControll
         this.dbOpController = dbOpController;
     }
 
-    public abstract EmployeeEmailsAction<?> employeeEmailsAction(World.City city, int numEmployments, LocalDateTime earliestDate);
+    public abstract ResidentsInCityAction<?> residentsInCityAction(World.City city, int numEmployments, LocalDateTime earliestDate);
 
-    public abstract CompanyNumbersAction<?> companyNumbersAction(World.Country country, int numCompanies);
+    public abstract CompanyNumbersAction<?> companyNumbersInCountryAction(World.Country country, int numCompanies);
 
     public abstract InsertEmploymentAction<?, DB_RETURN_TYPE> insertEmploymentAction(World.City city, String employeeEmail, long companyNumber, LocalDateTime employmentDate, double wageValue, String contractContent, double contractedHours);
+
+    public abstract UpdateAgesOfPeopleInCityAction<?> updateAgesOfPeopleInCityAction(LocalDateTime today, World.City city);
 }

@@ -2,7 +2,6 @@ package grakn.simulation.db.common.agents.base;
 
 import grabl.tracing.client.GrablTracingThreadStatic;
 import grakn.simulation.db.common.agents.action.Action;
-import grakn.simulation.db.common.agents.interaction.RandomValueGenerator;
 import grakn.simulation.db.common.agents.utils.Pair;
 import grakn.simulation.db.common.context.DbDriver;
 import grakn.simulation.db.common.world.Region;
@@ -69,7 +68,7 @@ public abstract class Agent<REGION extends Region, DB_DRIVER extends DbDriver> {
         RegionalAgent regionalAgent = getRegionalAgent(simulationContext.simulationStep(), region.tracker(), agentRandom, simulationContext.test());
         DbOperationController dbOpController = dbDriver.getDbOpController(region, logger);
 
-        RegionalAgent.Report report = regionalAgent.iterate(dbOpController, region, simulationContext);
+        RegionalAgent.Report report = regionalAgent.runWithReport(dbOpController, region, simulationContext);
         this.report.addRegionalAgentReport(region.tracker(), report);
     }
 
@@ -115,13 +114,18 @@ public abstract class Agent<REGION extends Region, DB_DRIVER extends DbDriver> {
             return tracker;
         }
 
-        protected abstract Report iterate(DbOperationController dbOperationController, REGION region, SimulationContext simulationContext);
+        protected Report runWithReport(DbOperationController dbOperationController, REGION region, SimulationContext simulationContext) {
+            run(dbOperationController, region, simulationContext);
+            return report;
+        }
 
-        void iterateWithTracing(DbOperationController dbOperationController, REGION region, SimulationContext simulationContext) {
+        protected abstract void run(DbOperationController dbOperationController, REGION region, SimulationContext simulationContext);
+
+        void runWithTracing(DbOperationController dbOperationController, REGION region, SimulationContext simulationContext) {
             String name = this.getClass().getSimpleName();
             try (GrablTracingThreadStatic.ThreadTrace trace = traceOnThread(name)) {
                 System.out.println(name);
-                iterate(dbOperationController, region, simulationContext);
+                runWithReport(dbOperationController, region, simulationContext);
             }
         }
 

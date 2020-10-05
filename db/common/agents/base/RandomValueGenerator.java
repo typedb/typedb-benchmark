@@ -1,4 +1,4 @@
-package grakn.simulation.db.common.agents.interaction;
+package grakn.simulation.db.common.agents.base;
 
 import org.apache.commons.lang3.RandomStringUtils;
 

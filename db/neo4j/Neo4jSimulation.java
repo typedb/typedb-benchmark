@@ -5,7 +5,7 @@ import grakn.simulation.db.common.TransactionalSimulation;
 import grakn.simulation.db.common.world.World;
 import grakn.simulation.db.common.yaml_tool.YAMLException;
 import grakn.simulation.db.common.yaml_tool.YAMLLoader;
-import grakn.simulation.db.neo4j.context.Neo4jDriver;
+import grakn.simulation.db.neo4j.driver.Neo4jDriver;
 import grakn.simulation.db.neo4j.driver.Neo4jTransaction;
 import grakn.simulation.db.neo4j.yaml_tool.Neo4jYAMLLoader;
 import grakn.simulation.utils.RandomSource;

@@ -1,7 +1,7 @@
 package grakn.simulation.db.neo4j.agents.interaction;
 
 import grakn.simulation.db.common.agents.action.Action;
-import grakn.simulation.db.common.agents.action.EmployeeEmailsAction;
+import grakn.simulation.db.common.agents.action.ResidentsInCityAction;
 import grakn.simulation.db.common.agents.base.ActionResult;
 import grakn.simulation.db.common.world.World;
 import org.neo4j.driver.Query;
@@ -38,7 +38,7 @@ public class EmploymentAgent extends Neo4jAgent<World.City> implements grakn.sim
 //        return new GraknGetEmployeeEmailsAction();
 //    }
 
-    public class Neo4jEmployeeEmailsAction extends EmployeeEmailsAction {
+    public class Neo4jEmployeeEmailsAction extends ResidentsInCityAction {
 
         Neo4jEmployeeEmailsAction(World.City city, int numEmployments, LocalDateTime earliestDate) {
             super(dbOperation, city, numEmployments, earliestDate);
@@ -47,7 +47,7 @@ public class EmploymentAgent extends Neo4jAgent<World.City> implements grakn.sim
         @Override
         public List<String> action() {
             Query getEmployeeEmailsQuery = cityResidentsQuery(city, earliestDate);
-            return tx().getOrderedAttribute(getEmployeeEmailsQuery, "resident.email", numEmployments);
+            return tx().getOrderedAttribute(getEmployeeEmailsQuery, "resident.email", numResidents);
         }
     }
 

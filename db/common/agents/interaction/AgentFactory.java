@@ -1,7 +1,6 @@
 package grakn.simulation.db.common.agents.interaction;
 
 import grakn.simulation.db.common.agents.base.Agent;
-import grakn.simulation.db.common.agents.region.CityAgent;
 import grakn.simulation.db.common.context.DbDriver;
 
 public class AgentFactory<DB_DRIVER extends DbDriver> {
@@ -19,7 +18,7 @@ public class AgentFactory<DB_DRIVER extends DbDriver> {
 //    protected abstract CityAgent<DB_DRIVER> relocation();
 //    protected abstract CountryAgent<DB_DRIVER> company();
     public EmploymentAgent<DB_DRIVER> employment() {
-        return new EmploymentAgent<>(dbDriver, CityAgent.SessionStrategy.CITY);
+        return new EmploymentAgent<>(dbDriver);
     }
 //    protected abstract ContinentAgent<DB_DRIVER> product();
 //    protected abstract ContinentAgent<DB_DRIVER> transaction();

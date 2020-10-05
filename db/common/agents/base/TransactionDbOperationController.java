@@ -16,9 +16,9 @@ public abstract class TransactionDbOperationController<TRANSACTION extends DbTra
     }
 
     @Override
-    protected void startDbOperation(Action<?, ?> action, String tracker) {
+    protected void startDbOperation(String actionName, String tracker) {
         if (tx == null) {
-            tx = session.tx(logger(), tracker + ":" + action.name());
+            tx = session.tx(logger(), tracker + ":" + actionName);
         }
     }
 
@@ -39,18 +39,25 @@ public abstract class TransactionDbOperationController<TRANSACTION extends DbTra
     }
 
     public DbOperation newDbOperation(Action<?, ?> action, String tracker) {
-        dbOperation = new TransactionalDbOperation(action, tracker);
-        return dbOperation;
+        return new TransactionalDbOperation(action, tracker);
+    }
+
+    public DbOperation newDbOperation(String actionName, String tracker) {
+        return new TransactionalDbOperation(actionName, tracker);
     }
 
     public class TransactionalDbOperation extends DbOperation implements AutoCloseable {
 
         public TransactionalDbOperation(Action<?, ?> action, String tracker) {
-            startDbOperation(action, tracker);
+            startDbOperation(action.name(), tracker);
+        }
+
+        public TransactionalDbOperation(String actionName, String tracker) {
+            startDbOperation(actionName, tracker);
         }
 
         @Override
-        public void commit() {
+        public void save() {
             saveDbOperation();
         }
 

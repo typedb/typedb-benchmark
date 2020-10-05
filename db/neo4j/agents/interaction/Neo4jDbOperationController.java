@@ -1,11 +1,9 @@
 package grakn.simulation.db.neo4j.agents.interaction;
 
 import grakn.simulation.db.common.agents.action.ActionFactory;
-import grakn.simulation.db.common.agents.base.DbOperationController;
 import grakn.simulation.db.common.agents.base.TransactionDbOperationController;
-import grakn.simulation.db.grakn.driver.GraknTransaction;
 import grakn.simulation.db.neo4j.agents.action.Neo4jActionFactory;
-import grakn.simulation.db.neo4j.context.Neo4jDriver;
+import grakn.simulation.db.neo4j.driver.Neo4jDriver;
 import grakn.simulation.db.neo4j.driver.Neo4jTransaction;
 import org.slf4j.Logger;
 

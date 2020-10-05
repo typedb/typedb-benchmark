@@ -21,7 +21,7 @@ public abstract class DbOperationController {
 
     public abstract ActionFactory<?, ?> actionFactory(); // Get an AgentFactory specific to this DB
 
-    protected abstract void startDbOperation(Action<?, ?> action, String tracker);
+    protected abstract void startDbOperation(String actionName, String tracker);
 
     protected abstract void closeDbOperation();
 
@@ -29,10 +29,12 @@ public abstract class DbOperationController {
 
     public abstract class DbOperation implements AutoCloseable {
         public abstract void close();
-        public abstract void commit();
+        public abstract void save();
     }
 
     public abstract DbOperation dbOperation();
 
-    protected abstract DbOperation newDbOperation(Action<?, ?> action, String tracker);
+    public abstract DbOperation newDbOperation(Action<?, ?> action, String tracker);
+
+    public abstract DbOperation newDbOperation(String actionName, String tracker);
 }

@@ -7,7 +7,7 @@ import grakn.simulation.db.common.TransactionalSimulation;
 import grakn.simulation.db.common.world.World;
 import grakn.simulation.db.common.yaml_tool.YAMLException;
 import grakn.simulation.db.common.yaml_tool.YAMLLoader;
-import grakn.simulation.db.grakn.context.GraknDriver;
+import grakn.simulation.db.grakn.driver.GraknDriver;
 import grakn.simulation.db.grakn.driver.GraknTransaction;
 import grakn.simulation.db.grakn.yaml_tool.GraknYAMLLoader;
 import grakn.simulation.utils.RandomSource;
