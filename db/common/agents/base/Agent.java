@@ -1,154 +1,188 @@
 package grakn.simulation.db.common.agents.base;
 
 import grabl.tracing.client.GrablTracingThreadStatic;
-import grabl.tracing.client.GrablTracingThreadStatic.ThreadContext;
 import grakn.simulation.db.common.agents.action.Action;
-import grakn.simulation.db.common.agents.action.ActionFactory;
-import grakn.simulation.db.common.agents.interaction.InteractionAgent;
 import grakn.simulation.db.common.agents.interaction.RandomValueGenerator;
-import grakn.simulation.db.common.context.DatabaseContext;
-import grakn.simulation.db.common.context.LogWrapper;
+import grakn.simulation.db.common.agents.utils.Pair;
+import grakn.simulation.db.common.context.DbDriver;
 import grakn.simulation.db.common.world.Region;
+import grakn.simulation.db.common.world.World;
+import grakn.simulation.utils.RandomSource;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
-import static com.google.common.collect.Iterables.getOnlyElement;
 import static grabl.tracing.client.GrablTracingThreadStatic.contextOnThread;
 import static grabl.tracing.client.GrablTracingThreadStatic.traceOnThread;
 
 /**
- * An agent that performs some unit of work across an object in the simulation world. Agent definitions must extend
- * this class.
+ * Agent constructs regional agents of a given class and runs them in parallel, providing them with the appropriate
+ * region, a deterministic random and the tracker and session key for tracing and grakn transactions.
  *
- * This class is instantiated via reflection by {@link AgentRunner} and initialized using
- * {@link #init(SimulationContext, Random, Object, Object, String, String, Logger, Boolean)}.
+ * This class must be extended to provide the source of the random items and the methods to obtain the session key and
+ * tracker from them.
  *
- * The protected methods of this class provide useful simple methods for writing Agents as concisely as possible.
+ * @param <REGION> The type of region used by the agent.
+ * @param <DB_DRIVER> The database context used by the agent.
  */
-public abstract class Agent<CONTEXT extends DatabaseContext<?>> implements InteractionAgent<Region>, AutoCloseable {
+public abstract class Agent<REGION extends Region, DB_DRIVER extends DbDriver> {
 
-    private Random random;
-    private CONTEXT backendContext;
-    private String sessionKey;
-    private String tracker;
-    private LogWrapper logWrapper;
-    private Boolean testing;
-    private ThreadContext context;
-    private HashSet<String> tracedMethods = new HashSet<>();
-    protected Action<?, ?> action;
-    private HashMap<String, ArrayList<Action.Report>> actionResults = new HashMap<>();
+    private final Logger logger;
+    private boolean traceAgent = true;
+    private final DB_DRIVER dbDriver;
+    private final Report report = new Report();
 
-    void init(int simulationStep, Random random, CONTEXT backendContext, String sessionKey, String tracker, Logger logger, Boolean trace, Boolean test) {
-        this.random = random;
-        this.backendContext = backendContext;
-        this.sessionKey = sessionKey;
-        this.tracker = tracker;
-        this.logWrapper = new LogWrapper(logger);
-        this.testing = test;
-        if (trace) {
-            context = contextOnThread(tracker(), simulationStep);
+    protected Agent(DB_DRIVER dbDriver) {
+        this.dbDriver = dbDriver;
+        logger = LoggerFactory.getLogger(this.getClass());
+    }
+
+    public void setTrace(boolean trace) {
+        traceAgent = trace;
+    }
+
+    abstract protected List<REGION> getRegions(World world);
+
+    public Report iterate(SimulationContext simulationContext, RandomSource randomSource) {
+        List<REGION> regions = getRegions(simulationContext.world());
+        List<RandomSource> randomSources = randomSource.split(regions.size());
+
+        Pair.zip(randomSources, regions).parallelStream().forEach(
+                pair -> iterateRegionalAgent(simulationContext, pair.getFirst(), pair.getSecond())
+        );
+        return report;
+    }
+
+    protected abstract RegionalAgent getRegionalAgent(int simulationStep, String tracker, Random random, boolean test);
+
+    private void iterateRegionalAgent(SimulationContext simulationContext, RandomSource source, REGION region) {
+        Random random = source.startNewRandom();
+        Random agentRandom = RandomSource.nextSource(random).startNewRandom();
+
+        RegionalAgent regionalAgent = getRegionalAgent(simulationContext.simulationStep(), region.tracker(), agentRandom, simulationContext.test());
+        DbOperationController dbOpController = dbDriver.getDbOpController(region, logger);
+
+        RegionalAgent.Report report = regionalAgent.iterate(dbOpController, region, simulationContext);
+        this.report.addRegionalAgentReport(region.tracker(), report);
+    }
+
+    public class Report {
+        ConcurrentHashMap<String, RegionalAgent.Report> regionalAgentReports = new ConcurrentHashMap<>();
+
+        public void addRegionalAgentReport(String tracker, RegionalAgent.Report regionalAgentReport) {
+            regionalAgentReports.put(tracker, regionalAgentReport);
+        }
+
+        public Set<String> trackers() {
+            return regionalAgentReports.keySet();
+        }
+
+        public RegionalAgent.Report getRegionalAgentReport(String tracker) {
+            return regionalAgentReports.get(tracker);
         }
     }
 
-    public LogWrapper logger() {
-        return logWrapper;
-    }
+    ///////////////////
+    // RegionalAgent //
+    ///////////////////
 
-    public RandomValueGenerator randomAttributeGenerator() {
-        return new RandomValueGenerator(random);
-    }
+    public abstract class RegionalAgent implements AutoCloseable {
 
-    protected CONTEXT backendContext() {
-        return backendContext;
-    }
+        private final Random random;
+        private final Boolean testing;
+        private final Report report = new Report();
+        protected Action<?, ?> action;
+        private final String tracker;
+        private GrablTracingThreadStatic.ThreadContext context;
 
-    public String tracker() {
-        return tracker;
-    }
+        public RegionalAgent(int simulationStep, String tracker, Random random, boolean test) {
+            this.tracker = tracker;
+            this.random = random;
+            this.testing = test;
+            if (traceAgent) {
+                context = contextOnThread(tracker(), simulationStep);
+            }
+        }
 
-    protected String getSessionKey() {
-        return sessionKey;
-    }
+        public String tracker() {
+            return tracker;
+        }
 
-    protected abstract void startDbOperation(Action<?, ?> action);
+        protected abstract Report iterate(DbOperationController dbOperationController, REGION region, SimulationContext simulationContext);
 
-    protected abstract void closeDbOperation();
+        void iterateWithTracing(DbOperationController dbOperationController, REGION region, SimulationContext simulationContext) {
+            String name = this.getClass().getSimpleName();
+            try (GrablTracingThreadStatic.ThreadTrace trace = traceOnThread(name)) {
+                System.out.println(name);
+                iterate(dbOperationController, region, simulationContext);
+            }
+        }
 
-    protected abstract void saveDbOperation();
+        public <U> U pickOne(List<U> list) { // TODO can be a util
+            return list.get(random().nextInt(list.size()));
+        }
 
-    public abstract class DbOperation implements AutoCloseable {
-        public abstract void close();
-        public abstract void commit();
-    }
+        public Random random() {
+            return random;
+        }
 
-    public abstract DbOperation dbOperation(Action<?, ?> action);
+        protected void shuffle(List<?> list) {
+            Collections.shuffle(list, random());
+        }
 
-    /////////////////////////////////////////////////
-    // Helper methods called from agent interfaces //
-    /////////////////////////////////////////////////
+        /**
+         * Create a unique identifier, useful for creating keys without risk of collision
+         * @param iterationScopeId An id that uniquely identifies a concept within the scope of the agent at a particular iteration
+         * @return
+         */
+        public int uniqueId(SimulationContext simulationContext, int iterationScopeId) {
+            String id = simulationContext.simulationStep() + tracker() + iterationScopeId;
+            return id.hashCode();
+        }
 
-    public <U> U pickOne(List<U> list) { // TODO can be a util
-        return list.get(random().nextInt(list.size()));
-    }
+        public RandomValueGenerator randomAttributeGenerator() {
+            return new RandomValueGenerator(random);
+        }
 
-    public Random random() {
-        return random;
-    }
+        public Action<?, ?> action() {
+            return action;
+        }
 
-    protected void shuffle(List<?> list) {
-        Collections.shuffle(list, random());
-    }
+        public <ACTION_RETURN_TYPE> void setAction(Action<?, ACTION_RETURN_TYPE> action) {
+            this.action = action;
+        }
 
-    /**
-     * Create a unique identifier, useful for creating keys without risk of collision
-     * @param iterationScopeId An id that uniquely identifies a concept within the scope of the agent at a particular iteration
-     * @return
-     */
-    public int uniqueId(SimulationContext simulationContext, int iterationScopeId) {
-        String id = simulationContext.simulationStep() + tracker() + iterationScopeId;
-        return id.hashCode();
-    }
+        public <ACTION_RETURN_TYPE> ACTION_RETURN_TYPE runAction(Action<?, ACTION_RETURN_TYPE> action) {
+            ACTION_RETURN_TYPE actionAnswer;
+            try (GrablTracingThreadStatic.ThreadTrace trace = traceOnThread(action.name())) {
+                actionAnswer = action.run();
+            }
+            if (testing) {
+                report.addActionReport(action.report(actionAnswer));
+            }
+            return actionAnswer;
+        }
 
-    /////////////////////////////////////////////////
-    // Action methods called from agent interfaces //
-    /////////////////////////////////////////////////
+        public class Report {
+            HashMap<String, ArrayList<Action<?, ?>.Report>> actionReports = new HashMap<>();
 
-    @Override
-    public void close() {
-        if (context != null) {
-            context.close();
+            public void addActionReport(Action<?, ?>.Report actionReport) {
+                actionReports.computeIfAbsent(action.name(), x -> new ArrayList<>()).add(actionReport);
+            }
+        }
+
+        @Override
+        public void close() {
+            if (context != null) {
+                context.close();
+            }
         }
     }
-
-    public Action<?, ?> action() {
-        return action;
-    }
-
-    public abstract ActionFactory<?, ?> actionFactory();
-
-    public HashMap<String, ArrayList<Action.Report>> getActionResults() {
-        return actionResults;
-    }
-
-    public <ACTION_RETURN_TYPE> ACTION_RETURN_TYPE runAction(Action<?, ACTION_RETURN_TYPE> action) {
-        ACTION_RETURN_TYPE actionAnswer;
-        try (GrablTracingThreadStatic.ThreadTrace trace = traceOnThread(action.name())) {
-            actionAnswer = action.run();
-        }
-        if (testing) {
-            Action.Report actionResult = action.report(actionAnswer);
-//            if (!action.resultsOptional() && actionResult.size() == 0) {
-//                throw new RuntimeException();
-//            }
-            actionResults.computeIfAbsent(action.name(), x -> new ArrayList<>()).add(actionResult);
-        }
-        return actionAnswer;
-    }
-
 }

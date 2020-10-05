@@ -26,17 +26,17 @@ import static grakn.simulation.db.grakn.schema.Schema.LOCATION_NAME;
 import static grakn.simulation.db.grakn.schema.Schema.PERSON;
 import static grakn.simulation.db.grakn.schema.Schema.AGE;
 
-public class AgeUpdateAgent extends GraknAgent<World.City> implements AgeUpdateAgentBase {
+public abstract class AgeUpdateAgent<DB_DRIVER extends DatabaseContext> extends Agent<World.City, DB_DRIVER> implements AgeUpdateAgentBase {
 
     @Override
     public void updateAgesOfAllPeople(LocalDateTime today, World.City city) {
         // Get all people born in a city
         HashMap<String, LocalDateTime> peopleAnswers;
-        startDbOperation("getPeopleBornInCity");
+        startDbOperation("getPeopleBornInCity", tracker);
         try (ThreadTrace trace = traceOnThread(action())) {
             peopleAnswers = getPeopleBornInCity(city);
         }
-        startDbOperation("updatePersonAge");
+        startDbOperation("updatePersonAge", tracker);
         // Update their ages
         peopleAnswers.forEach((personEmail, personDob) -> {
                     long age = ChronoUnit.YEARS.between(personDob, today);

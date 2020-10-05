@@ -34,7 +34,7 @@ import static grakn.simulation.db.grakn.schema.Schema.PARENTSHIP_PARENT;
 import static grakn.simulation.db.grakn.schema.Schema.PERSON;
 import static java.util.stream.Collectors.toList;
 
-public class ParentshipAgent extends GraknAgent<World.City> implements ParentshipAgentBase {
+public abstract class ParentshipAgent<DB_DRIVER extends DatabaseContext> extends Agent<World.City, DB_DRIVER> implements ParentshipAgentBase {
 
     @Override
     public List<HashMap<SpouseType, String>> getMarriageEmails(World.City city) {

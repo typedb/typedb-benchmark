@@ -1,7 +1,7 @@
 package grakn.simulation.db.neo4j.driver;
 
 import grabl.tracing.client.GrablTracingThreadStatic;
-import grakn.simulation.db.common.context.DatabaseTransaction;
+import grakn.simulation.db.common.context.DbTransaction;
 import grakn.simulation.db.common.context.LogWrapper;
 import org.neo4j.driver.Query;
 import org.neo4j.driver.Record;
@@ -15,11 +15,11 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static grabl.tracing.client.GrablTracingThreadStatic.traceOnThread;
-import static grakn.simulation.db.common.context.DatabaseContext.TracingLabel.EXECUTE;
-import static grakn.simulation.db.common.context.DatabaseContext.TracingLabel.OPEN_TRANSACTION;
-import static grakn.simulation.db.common.context.DatabaseContext.TracingLabel.STREAM_AND_SORT;
+import static grakn.simulation.db.common.context.TransactionalDbDriver.TracingLabel.EXECUTE;
+import static grakn.simulation.db.common.context.TransactionalDbDriver.TracingLabel.OPEN_TRANSACTION;
+import static grakn.simulation.db.common.context.TransactionalDbDriver.TracingLabel.STREAM_AND_SORT;
 
-public class Transaction implements DatabaseTransaction {
+public class Neo4jTransaction implements DbTransaction {
 
     private final Session session;
     private final LogWrapper log;
@@ -27,7 +27,7 @@ public class Transaction implements DatabaseTransaction {
     private org.neo4j.driver.Transaction tx;
     private final List<Query> queries = new ArrayList<Query>();
 
-    public Transaction(Session session, LogWrapper log, String tracker) {
+    public Neo4jTransaction(Session session, LogWrapper log, String tracker) {
         this.session = session;
         this.log = log;
         this.tracker = tracker;

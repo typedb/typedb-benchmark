@@ -1,13 +1,14 @@
 package grakn.simulation.test;
 
-import grakn.simulation.db.common.agents.base.Agent.ComparableField;
-import grakn.simulation.db.common.agents.base.ActionResultList;
+import grakn.simulation.db.common.agents.base.Agent;
+import grakn.simulation.db.common.agents.base.DbOperationController.ComparableField;
+import grakn.simulation.db.grakn.context.GraknDriver;
+import grakn.simulation.db.neo4j.context.Neo4jDriver;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.concurrent.ConcurrentHashMap;
 
 import static grakn.simulation.test.SimulationsUnderTest.graknSimulation;
 import static grakn.simulation.test.SimulationsUnderTest.neo4jSimulation;
@@ -18,18 +19,18 @@ public class SimulationTest {
 
     private void compareFields(String agentName) {
 
-        ConcurrentHashMap<String, ActionResultList> graknResult = graknSimulation.getResultHandler().getResultForAgent(agentName);
-        ConcurrentHashMap<String, ActionResultList> neo4jResult = neo4jSimulation.getResultHandler().getResultForAgent(agentName);
+        Agent<?, GraknDriver>.Report graknReport = graknSimulation.getReport().getAgentReport(agentName);
+        Agent<?, Neo4jDriver>.Report neo4jReport = neo4jSimulation.getReport().getAgentReport(agentName);
 
         // Check both have the same trackers present
-        assertEquals(graknResult.keySet(), neo4jResult.keySet());
+        assertEquals(graknReport.trackers(), neo4jReport.trackers());
 
         // Iterate over the trackers comparing the values
 //        TODO bring in a count check, as below
 //        graknResult.keySet().forEach(tracker -> assertEquals(graknResult.get(tracker), neo4jResult.get(tracker)));
-        graknResult.keySet().forEach(tracker -> {
-            Collection<HashMap<ComparableField, Object>> graknFields = graknResult.get(tracker);
-            Collection<HashMap<ComparableField, Object>> neo4jFields = neo4jResult.get(tracker);
+        graknReport.trackers().forEach(tracker -> {
+            Collection<HashMap<ComparableField, Object>> graknFields = graknReport.getRegionalAgentReport(tracker);
+            Collection<HashMap<ComparableField, Object>> neo4jFields = neo4jReport.getRegionalAgentReport(tracker);
             assertEquals(graknFields, neo4jFields);
         });
     }

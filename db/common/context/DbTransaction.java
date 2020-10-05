@@ -1,6 +1,6 @@
 package grakn.simulation.db.common.context;
 
-public interface DatabaseTransaction {
+public interface DbTransaction {
     void close();
     void commit();
 }

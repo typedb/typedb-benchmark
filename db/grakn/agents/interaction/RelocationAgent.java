@@ -3,7 +3,8 @@ package grakn.simulation.db.grakn.agents.interaction;
 import grakn.client.answer.ConceptMap;
 import grakn.simulation.db.common.agents.action.Action;
 import grakn.simulation.db.common.agents.base.ActionResult;
-import grakn.simulation.db.common.agents.interaction.RelocationAgentBase;
+import grakn.simulation.db.common.agents.base.Agent;
+import grakn.simulation.db.common.context.DbDriver;
 import grakn.simulation.db.common.world.World;
 import graql.lang.Graql;
 import graql.lang.query.GraqlGet;
@@ -30,7 +31,7 @@ import static grakn.simulation.db.grakn.schema.Schema.RESIDENCY_LOCATION;
 import static grakn.simulation.db.grakn.schema.Schema.RESIDENCY_RESIDENT;
 import static grakn.simulation.db.grakn.schema.Schema.START_DATE;
 
-public class RelocationAgent extends GraknAgent<World.City> implements RelocationAgentBase {
+public abstract class RelocationAgent<DB_DRIVER extends DbDriver> extends Agent<World.City, DB_DRIVER> {
 
     static GraqlGet.Unfiltered cityResidentsQuery(World.City city, LocalDateTime earliestDate) {
         Statement person = Graql.var(PERSON);

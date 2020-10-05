@@ -8,7 +8,6 @@ java_library(
         "//db/common/context",
         "//db/common/agents",
         "//db/common/world",
-        "//db/common/initialise",
         "//config",
         "//utils",
         "@maven//:ch_qos_logback_logback_classic",

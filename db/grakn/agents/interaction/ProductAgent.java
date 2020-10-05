@@ -18,7 +18,7 @@ import static grakn.simulation.db.grakn.schema.Schema.PRODUCT_BARCODE;
 import static grakn.simulation.db.grakn.schema.Schema.PRODUCT_DESCRIPTION;
 import static grakn.simulation.db.grakn.schema.Schema.PRODUCT_NAME;
 
-public class ProductAgent extends GraknAgent<World.Continent> implements ProductAgentBase {
+public abstract class ProductAgent<DB_DRIVER extends DatabaseContext> extends Agent<World.Continent, DB_DRIVER> implements ProductAgentBase {
 
     @Override
     public void insertProduct(World.Continent continent, Double barcode, String productName, String productDescription) {

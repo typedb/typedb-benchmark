@@ -3,7 +3,7 @@ package grakn.simulation.db.grakn.driver;
 import grabl.tracing.client.GrablTracingThreadStatic;
 import grakn.client.GraknClient;
 import grakn.client.answer.ConceptMap;
-import grakn.simulation.db.common.context.DatabaseTransaction;
+import grakn.simulation.db.common.context.DbTransaction;
 import grakn.simulation.db.common.context.LogWrapper;
 import graql.lang.query.GraqlDelete;
 import graql.lang.query.GraqlGet;
@@ -15,10 +15,10 @@ import java.util.stream.Stream;
 
 import static com.google.common.collect.Iterables.getOnlyElement;
 import static grabl.tracing.client.GrablTracingThreadStatic.traceOnThread;
-import static grakn.simulation.db.common.context.DatabaseContext.TracingLabel.EXECUTE;
-import static grakn.simulation.db.common.context.DatabaseContext.TracingLabel.STREAM_AND_SORT;
+import static grakn.simulation.db.common.context.TransactionalDbDriver.TracingLabel.EXECUTE;
+import static grakn.simulation.db.common.context.TransactionalDbDriver.TracingLabel.STREAM_AND_SORT;
 
-public class Transaction implements DatabaseTransaction {
+public class GraknTransaction implements DbTransaction {
 
     boolean closed = false;
 
@@ -26,7 +26,7 @@ public class Transaction implements DatabaseTransaction {
     private final LogWrapper log;
     private final String tracker;
 
-    public Transaction(GraknClient.Transaction transaction, LogWrapper log, String tracker) {
+    public GraknTransaction(GraknClient.Transaction transaction, LogWrapper log, String tracker) {
         this.transaction = transaction;
         this.log = log;
         this.tracker = tracker;

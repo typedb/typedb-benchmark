@@ -1,6 +1,7 @@
 package grakn.simulation.db.common.agents.interaction;
 
 import grakn.simulation.db.common.agents.base.Agent;
+import grakn.simulation.db.common.agents.base.DbOperationController;
 import grakn.simulation.db.common.agents.base.ActionResult;
 import grakn.simulation.db.common.agents.base.ActionResultList;
 import grakn.simulation.db.common.agents.base.SimulationContext;
@@ -16,15 +17,15 @@ import static grakn.simulation.db.common.agents.interaction.RelocationAgentBase.
 import static grakn.simulation.db.common.agents.interaction.RelocationAgentBase.RelocationAgentField.RESIDENT_EMAILS;
 import static java.util.Collections.shuffle;
 
-public interface RelocationAgentBase extends InteractionAgent<World.City> {
+public interface RelocationAgentBase extends Agent.RegionalAgent<World.City> {
 
-    enum RelocationAgentField implements Agent.ComparableField {
+    enum RelocationAgentField implements DbOperationController.ComparableField {
         PERSON_EMAIL, OLD_CITY_NAME, NEW_CITY_NAME, RELOCATION_DATE,
         RESIDENT_EMAILS, RELOCATION_CITY_NAMES
     }
 
     @Override
-    default void iterate(Agent<World.City, ?> agent, World.City city, SimulationContext simulationContext) {
+    default void iterate(DbOperationController<World.City, ?> agent, World.City city, SimulationContext simulationContext) {
         /*
         Find people currently resident the city
         Find other cities in the continent
@@ -38,7 +39,7 @@ public interface RelocationAgentBase extends InteractionAgent<World.City> {
         List<String> relocationCityNames;
 
         int numRelocations = simulationContext.world().getScaleFactor();
-        agent.startDbOperation("getResidentEmails");
+        agent.startDbOperation("getResidentEmails", tracker);
         try (ThreadTrace trace = traceOnThread(agent.action())) {
             residentEmails = getResidentEmails(city, earliestDateOfResidencyToRelocate, numRelocations);
         }
@@ -49,7 +50,7 @@ public interface RelocationAgentBase extends InteractionAgent<World.City> {
             put(RESIDENT_EMAILS, residentEmails);
         }});
 
-        agent.startDbOperation("getRelocationCityNames");
+        agent.startDbOperation("getRelocationCityNames", tracker);
         try (ThreadTrace trace = traceOnThread(agent.action())) {
             relocationCityNames = getRelocationCityNames(city);
         }
@@ -58,7 +59,7 @@ public interface RelocationAgentBase extends InteractionAgent<World.City> {
         }});
 
         Allocation.allocate(residentEmails, relocationCityNames, (residentEmail, relocationCityName) -> {
-            agent.startDbOperation("insertRelocation");
+            agent.startDbOperation("insertRelocation", tracker);
             try (ThreadTrace trace = traceOnThread(agent.action())) {
                 agentResultSet.add(insertRelocation(city, simulationContext.today(), residentEmail, relocationCityName));
             }

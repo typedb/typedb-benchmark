@@ -22,7 +22,7 @@ import static grakn.simulation.db.grakn.schema.Schema.FRIENDSHIP_FRIEND;
 import static grakn.simulation.db.grakn.schema.Schema.PERSON;
 import static grakn.simulation.db.grakn.schema.Schema.START_DATE;
 
-public class FriendshipAgent extends GraknAgent<World.City> implements FriendshipAgentBase {
+public abstract class FriendshipAgent<DB_DRIVER extends DatabaseContext> extends Agent<World.City, DB_DRIVER> implements FriendshipAgentBase {
 
     @Override
     public List<String> getResidentEmails(World.City city, LocalDateTime earliestDate) {

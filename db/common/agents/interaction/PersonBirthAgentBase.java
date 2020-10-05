@@ -1,6 +1,7 @@
 package grakn.simulation.db.common.agents.interaction;
 
 import grakn.simulation.db.common.agents.base.Agent;
+import grakn.simulation.db.common.agents.base.DbOperationController;
 import grakn.simulation.db.common.agents.base.ActionResult;
 import grakn.simulation.db.common.agents.base.ActionResultList;
 import grakn.simulation.db.common.agents.base.SimulationContext;
@@ -11,14 +12,14 @@ import java.time.LocalDateTime;
 import static grabl.tracing.client.GrablTracingThreadStatic.ThreadTrace;
 import static grabl.tracing.client.GrablTracingThreadStatic.traceOnThread;
 
-public interface PersonBirthAgentBase extends InteractionAgent<World.City> {
+public interface PersonBirthAgentBase extends Agent.RegionalAgent<World.City> {
 
-    enum PersonBirthAgentField implements Agent.ComparableField {
+    enum PersonBirthAgentField implements DbOperationController.ComparableField {
         EMAIL, GENDER, FORENAME, SURNAME, DATE_OF_BIRTH
     }
 
     @Override
-    default void iterate(Agent<World.City, ?> agent, World.City city, SimulationContext simulationContext) {
+    default void iterate(DbOperationController<World.City, ?> agent, World.City city, SimulationContext simulationContext) {
         // Find bachelors and bachelorettes who are considered adults and who are not in a marriage and pair them off randomly
         int numBirths = simulationContext.world().getScaleFactor();
         ActionResultList agentResultSet = new ActionResultList();
@@ -46,7 +47,7 @@ public interface PersonBirthAgentBase extends InteractionAgent<World.City> {
                     + city.country() + "_"
                     + city.country().continent()
                     + "@gmail.com";
-            agent.startDbOperation("insertPerson");
+            agent.startDbOperation("insertPerson", tracker);
             try (ThreadTrace trace = traceOnThread(agent.action())) {
                 agentResultSet.add(insertPerson(city, simulationContext.today(), email, gender, forename, surname));
             }

@@ -2,6 +2,7 @@ package grakn.simulation.db.common.agents.interaction;
 
 import grabl.tracing.client.GrablTracingThreadStatic.ThreadTrace;
 import grakn.simulation.db.common.agents.base.Agent;
+import grakn.simulation.db.common.agents.base.DbOperationController;
 import grakn.simulation.db.common.agents.base.ActionResult;
 import grakn.simulation.db.common.agents.base.ActionResultList;
 import grakn.simulation.db.common.agents.base.SimulationContext;
@@ -13,25 +14,25 @@ import java.util.List;
 import static grabl.tracing.client.GrablTracingThreadStatic.traceOnThread;
 import static java.util.Collections.shuffle;
 
-public interface MarriageAgentBase extends InteractionAgent<World.City> {
+public interface MarriageAgentBase extends Agent.RegionalAgent<World.City> {
 
-    enum MarriageAgentField implements Agent.ComparableField {
+    enum MarriageAgentField implements DbOperationController.ComparableField {
         MARRIAGE_IDENTIFIER, WIFE_EMAIL, HUSBAND_EMAIL, CITY_NAME
     }
 
     @Override
-    default void iterate(Agent<World.City, ?> agent, World.City city, SimulationContext simulationContext) {
+    default void iterate(DbOperationController<World.City, ?> agent, World.City city, SimulationContext simulationContext) {
         ActionResultList agentResultSet = new ActionResultList();
         // Find bachelors and bachelorettes who are considered adults and who are not in a marriage and pair them off randomly
         LocalDateTime dobOfAdults = simulationContext.today().minusYears(simulationContext.world().AGE_OF_ADULTHOOD);
         List<String> womenEmails;
-        agent.startDbOperation("getSingleWomen");
+        agent.startDbOperation("getSingleWomen", tracker);
         try (ThreadTrace trace = traceOnThread(agent.action())) {
             womenEmails = getSingleWomen(city, dobOfAdults);
         }
         shuffle(womenEmails, agent.random());
 
-        agent.startDbOperation("getSingleMen");
+        agent.startDbOperation("getSingleMen", tracker);
         List<String> menEmails;
         try (ThreadTrace trace = traceOnThread(agent.action())) {
             menEmails = getSingleMen(city, dobOfAdults);
@@ -48,7 +49,7 @@ public interface MarriageAgentBase extends InteractionAgent<World.City> {
                 String husbandEmail = menEmails.get(i);
                 int marriageIdentifier = (wifeEmail + husbandEmail).hashCode();
 
-                agent.startDbOperation("insertMarriage");
+                agent.startDbOperation("insertMarriage", tracker);
                 try (ThreadTrace trace = traceOnThread(agent.action())) {
                     agentResultSet.add(insertMarriage(city, marriageIdentifier, wifeEmail, husbandEmail));
                 }

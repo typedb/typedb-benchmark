@@ -1,5 +1,6 @@
 package grakn.simulation.db.common.agents.base;
 
+import grakn.simulation.db.common.Simulation;
 import grakn.simulation.db.common.world.World;
 
 import java.time.LocalDateTime;
@@ -10,5 +11,5 @@ public interface SimulationContext {
     World world();
     boolean trace();
     boolean test();
-    ResultHandler getResultHandler();
+    Simulation.Report getReport();
 }

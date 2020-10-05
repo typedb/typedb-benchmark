@@ -4,7 +4,7 @@ import grakn.simulation.db.common.agents.action.Action;
 import grakn.simulation.db.common.agents.base.ActionResult;
 import grakn.simulation.db.common.agents.interaction.RelocationAgentBase;
 import grakn.simulation.db.common.world.World;
-import grakn.simulation.db.neo4j.driver.Transaction;
+import grakn.simulation.db.neo4j.driver.Neo4jTransaction;
 import org.neo4j.driver.Query;
 import org.neo4j.driver.Record;
 
@@ -75,7 +75,7 @@ public class RelocationAgent extends Neo4jAgent<World.City> implements Relocatio
         return Action.singleResult(tx().execute(new Query(template, parameters)));
     }
 
-    public static void endPastResidencies(Transaction tx, String email, LocalDateTime today){
+    public static void endPastResidencies(Neo4jTransaction tx, String email, LocalDateTime today){
         String template = "" +
                 "MATCH (person:Person {email: $email})-[residentOf:RESIDENT_OF]->(oldCity:City)\n" +
                 "WHERE NOT EXISTS (residentOf.endDate)\n" +

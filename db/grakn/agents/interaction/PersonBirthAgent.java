@@ -24,7 +24,7 @@ import static grakn.simulation.db.grakn.schema.Schema.LOCATION_NAME;
 import static grakn.simulation.db.grakn.schema.Schema.PERSON;
 import static grakn.simulation.db.grakn.schema.Schema.SURNAME;
 
-public class PersonBirthAgent extends GraknAgent<World.City> implements PersonBirthAgentBase {
+public abstract class PersonBirthAgent<DB_DRIVER extends DatabaseContext> extends Agent<World.City, DB_DRIVER> implements PersonBirthAgentBase {
 
     @Override
     public ActionResult insertPerson(World.City worldCity, LocalDateTime today, String email, String gender, String forename, String surname) {

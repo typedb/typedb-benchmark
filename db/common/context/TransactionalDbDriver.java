@@ -1,6 +1,6 @@
 package grakn.simulation.db.common.context;
 
-public abstract class DatabaseContext<TRANSACTION extends DatabaseTransaction> {
+public abstract class TransactionalDbDriver<TRANSACTION extends DbTransaction, SESSION> extends DbDriver {
     public enum TracingLabel {
         OPEN_CLIENT("openClient"),
         CLOSE_CLIENT("closeClient"),
@@ -23,5 +23,13 @@ public abstract class DatabaseContext<TRANSACTION extends DatabaseTransaction> {
         }
     }
 
-    abstract public TRANSACTION tx(String sessionKey, LogWrapper log, String tracker);
+    public abstract SESSION session(String sessionKey);
+
+    public abstract void closeSessions();
+
+    public abstract void close();
+
+    public abstract class Session {
+        public abstract TRANSACTION tx(LogWrapper log, String tracker);
+    }
 }

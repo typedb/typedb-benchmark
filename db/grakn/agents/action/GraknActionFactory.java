@@ -6,13 +6,13 @@ import grakn.simulation.db.common.agents.action.CompanyNumbersAction;
 import grakn.simulation.db.common.agents.action.EmployeeEmailsAction;
 import grakn.simulation.db.common.agents.action.InsertEmploymentAction;
 import grakn.simulation.db.common.world.World;
-import grakn.simulation.db.grakn.agents.interaction.GraknAgent;
+import grakn.simulation.db.grakn.agents.interaction.GraknDbOperationController;
 
 import java.time.LocalDateTime;
 
-public class GraknActionFactory extends ActionFactory<GraknAgent, ConceptMap> {
-    public GraknActionFactory(GraknAgent agent) {
-        super(agent);
+public class GraknActionFactory extends ActionFactory<GraknDbOperationController, ConceptMap> {
+    public GraknActionFactory(GraknDbOperationController dbOperationController) {
+        super(dbOperationController);
     }
 
     @Override
@@ -26,7 +26,7 @@ public class GraknActionFactory extends ActionFactory<GraknAgent, ConceptMap> {
     }
 
     @Override
-    public InsertEmploymentAction<ConceptMap> insertEmploymentAction(World.City city, String employeeEmail, long companyNumber, LocalDateTime employmentDate, double wageValue, String contractContent, double contractedHours) {
-        return new GraknInsertEmploymentAction(agent, city, employeeEmail, companyNumber, employmentDate, wageValue, contractContent, contractedHours);
+    public InsertEmploymentAction<?, ConceptMap> insertEmploymentAction(World.City city, String employeeEmail, long companyNumber, LocalDateTime employmentDate, double wageValue, String contractContent, double contractedHours) {
+        return new GraknInsertEmploymentAction(dbOpController.dbOperation(), city, employeeEmail, companyNumber, employmentDate, wageValue, contractContent, contractedHours);
     }
 }

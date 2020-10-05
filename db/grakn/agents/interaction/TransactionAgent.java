@@ -29,7 +29,7 @@ import static grakn.simulation.db.grakn.schema.Schema.TRANSACTION_MERCHANDISE;
 import static grakn.simulation.db.grakn.schema.Schema.TRANSACTION_SELLER;
 import static grakn.simulation.db.grakn.schema.Schema.VALUE;
 
-public class TransactionAgent extends GraknAgent<World.Continent> implements TransactionAgentBase {
+public abstract class TransactionAgent<DB_DRIVER extends DatabaseContext> extends Agent<World.Continent, DB_DRIVER> implements TransactionAgentBase {
 
     @Override
     public List<Long> getCompanyNumbersInContinent(World.Continent continent){

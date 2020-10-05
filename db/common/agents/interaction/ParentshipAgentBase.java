@@ -2,6 +2,7 @@ package grakn.simulation.db.common.agents.interaction;
 
 import grabl.tracing.client.GrablTracingThreadStatic.ThreadTrace;
 import grakn.simulation.db.common.agents.base.Agent;
+import grakn.simulation.db.common.agents.base.DbOperationController;
 import grakn.simulation.db.common.agents.base.ActionResult;
 import grakn.simulation.db.common.agents.base.ActionResultList;
 import grakn.simulation.db.common.agents.base.SimulationContext;
@@ -16,26 +17,26 @@ import java.util.Map;
 
 import static grabl.tracing.client.GrablTracingThreadStatic.traceOnThread;
 
-public interface ParentshipAgentBase extends InteractionAgent<World.City> {
+public interface ParentshipAgentBase extends Agent.RegionalAgent<World.City> {
 
     enum SpouseType {
         WIFE, HUSBAND
     }
 
-    enum ParentshipField implements Agent.ComparableField {
+    enum ParentshipField implements DbOperationController.ComparableField {
         HUSBAND_EMAIL, WIFE_EMAIL, CHILD_EMAIL
     }
 
     @Override
-    default void iterate(Agent<World.City, ?> agent, World.City city, SimulationContext simulationContext) {
+    default void iterate(DbOperationController<World.City, ?> agent, World.City city, SimulationContext simulationContext) {
         // Query for married couples in the city who are not already in a parentship relation together
         List<String> childrenEmails;
-        agent.startDbOperation("getChildrenEmailsBorn");
+        agent.startDbOperation("getChildrenEmailsBorn", tracker);
         try (ThreadTrace trace = traceOnThread(agent.action())) {
             childrenEmails = getChildrenEmailsBorn(city, simulationContext.today());
         }
         List<HashMap<SpouseType, String>> marriageEmails;
-        agent.startDbOperation("getMarriageEmails");
+        agent.startDbOperation("getMarriageEmails", tracker);
         try (ThreadTrace trace = traceOnThread(agent.action())) {
             marriageEmails = getMarriageEmails(city);
         }
@@ -52,7 +53,7 @@ public interface ParentshipAgentBase extends InteractionAgent<World.City> {
 
                 for (Integer childIndex : children) {
                     String childEmail = childrenEmails.get(childIndex);
-                    agent.startDbOperation("insertParentShip");
+                    agent.startDbOperation("insertParentShip", tracker);
                     try (ThreadTrace trace = traceOnThread(agent.action())) {
                         agentResultSet.add(insertParentShip(marriage, childEmail));
                     }

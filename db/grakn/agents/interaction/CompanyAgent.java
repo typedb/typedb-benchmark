@@ -24,7 +24,7 @@ import static grakn.simulation.db.grakn.schema.Schema.INCORPORATION_INCORPORATIN
 import static grakn.simulation.db.grakn.schema.Schema.LOCATION_HIERARCHY;
 import static grakn.simulation.db.grakn.schema.Schema.LOCATION_NAME;
 
-public class CompanyAgent extends GraknAgent<World.Country> implements CompanyAgentBase {
+public abstract class CompanyAgent<DB_DRIVER extends DatabaseContext> extends Agent<World.Country, DB_DRIVER> implements CompanyAgentBase {
 
     @Override
     public ActionResult insertCompany(World.Country country, LocalDateTime today, int companyNumber, String companyName) {

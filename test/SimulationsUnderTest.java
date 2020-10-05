@@ -3,10 +3,11 @@ package grakn.simulation.test;
 import grakn.simulation.config.AgentMode;
 import grakn.simulation.config.Config;
 import grakn.simulation.config.SamplingFunction;
-import grakn.simulation.db.common.agents.base.ResultHandler;
 import grakn.simulation.db.common.world.World;
 import grakn.simulation.db.grakn.GraknSimulation;
+import grakn.simulation.db.grakn.context.GraknDriver;
 import grakn.simulation.db.neo4j.Neo4jSimulation;
+import grakn.simulation.db.neo4j.context.Neo4jDriver;
 import grakn.simulation.utils.RandomSource;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -72,7 +73,6 @@ public class SimulationsUnderTest {
         dirPaths.add("db/grakn/data");
         dirPaths.add("db/neo4j/data");
 
-
         dirPaths.forEach(dirPath -> {
             Arrays.asList(Objects.requireNonNull(Paths.get(dirPath).toFile().listFiles())).forEach(file -> {
                 Path path = file.toPath();
@@ -97,39 +97,32 @@ public class SimulationsUnderTest {
         agentNames.forEach(name -> agentConfigs.add(ConstructAgentConfig(name, AgentMode.RUN)));
 
         World world = initialise(scaleFactor, files);
+        boolean test = true;
 
         /////////////////
         // Grakn setup //
         /////////////////
 
-        ResultHandler graknResultHandler = new ResultHandler();
-        boolean test = true;
-
         graknSimulation = new GraknSimulation(
-                graknUri,
-                "world",
+                new GraknDriver(graknUri,"world"),
                 files,
                 new RandomSource(randomSeed),
                 world,
                 agentConfigs,
                 samplingFunction,
-                graknResultHandler,
                 test);
 
         /////////////////
         // Neo4j setup //
         /////////////////
 
-        ResultHandler neo4jResultHandler = new ResultHandler();
-
         neo4jSimulation = new Neo4jSimulation(
-                neo4jUri,
+                new Neo4jDriver(neo4jUri),
                 files,
                 new RandomSource(randomSeed),
                 world,
                 agentConfigs,
                 samplingFunction,
-                neo4jResultHandler,
                 test);
     }
 }

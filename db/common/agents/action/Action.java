@@ -1,6 +1,6 @@
 package grakn.simulation.db.common.agents.action;
 
-import grakn.simulation.db.common.agents.base.Agent;
+import grakn.simulation.db.common.agents.base.DbOperationController;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -8,7 +8,7 @@ import java.util.List;
 
 import static com.google.common.collect.Iterables.getOnlyElement;
 
-public abstract class Action<DB_OPERATION extends Agent<?>.DbOperation, ACTION_RETURN_TYPE> {
+public abstract class Action<DB_OPERATION extends DbOperationController.DbOperation, ACTION_RETURN_TYPE> {
 
     protected DB_OPERATION dbOperation;
     protected ArrayList<Object> inputArgs;

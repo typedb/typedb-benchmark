@@ -1,12 +1,12 @@
 package grakn.simulation.db.common.agents.action;
 
-import grakn.simulation.db.common.agents.base.Agent;
+import grakn.simulation.db.common.agents.base.DbOperationController;
 import grakn.simulation.db.common.world.World;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 
-public abstract class InsertEmploymentAction<DB_OPERATION extends Agent<?>.DbOperation, ACTION_RETURN_TYPE> extends Action<DB_OPERATION, ACTION_RETURN_TYPE> {
+public abstract class InsertEmploymentAction<DB_OPERATION extends DbOperationController.DbOperation, ACTION_RETURN_TYPE> extends Action<DB_OPERATION, ACTION_RETURN_TYPE> {
 
     protected final World.City worldCity;
     protected final String employeeEmail;

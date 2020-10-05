@@ -32,7 +32,7 @@ import static grakn.simulation.db.grakn.schema.Schema.RESIDENCY;
 import static grakn.simulation.db.grakn.schema.Schema.RESIDENCY_LOCATION;
 import static grakn.simulation.db.grakn.schema.Schema.RESIDENCY_RESIDENT;
 
-public class MarriageAgent extends GraknAgent<World.City> implements MarriageAgentBase {
+public abstract class MarriageAgent<DB_DRIVER extends DatabaseContext> extends Agent<World.City, DB_DRIVER> implements MarriageAgentBase {
 
     @Override
     public List<String> getSingleWomen(World.City city, LocalDateTime dobOfAdults) {

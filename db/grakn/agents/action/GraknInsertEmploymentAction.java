@@ -3,7 +3,7 @@ package grakn.simulation.db.grakn.agents.action;
 import grakn.client.answer.ConceptMap;
 import grakn.simulation.db.common.agents.action.InsertEmploymentAction;
 import grakn.simulation.db.common.world.World;
-import grakn.simulation.db.grakn.agents.interaction.GraknAgent;
+import grakn.simulation.db.grakn.agents.interaction.GraknDbOperationController;
 import graql.lang.Graql;
 import graql.lang.query.GraqlInsert;
 import graql.lang.statement.Statement;
@@ -35,8 +35,8 @@ import static grakn.simulation.db.grakn.schema.Schema.START_DATE;
 import static grakn.simulation.db.grakn.schema.Schema.WAGE;
 import static grakn.simulation.db.grakn.schema.Schema.WAGE_VALUE;
 
-public class GraknInsertEmploymentAction extends InsertEmploymentAction<GraknAgent.TransactionalDbOperation, ConceptMap> {
-    public GraknInsertEmploymentAction(GraknAgent.TransactionalDbOperation dbOperation, World.City worldCity, String employeeEmail, long companyNumber, LocalDateTime employmentDate, double wageValue, String contractContent, double contractedHours) {
+public class GraknInsertEmploymentAction extends InsertEmploymentAction<GraknDbOperationController.TransactionalDbOperation, ConceptMap> {
+    public GraknInsertEmploymentAction(GraknDbOperationController.TransactionalDbOperation dbOperation, World.City worldCity, String employeeEmail, long companyNumber, LocalDateTime employmentDate, double wageValue, String contractContent, double contractedHours) {
         super(dbOperation, worldCity, employeeEmail, companyNumber, employmentDate, wageValue, contractContent, contractedHours);
     }
 

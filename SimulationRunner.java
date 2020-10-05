@@ -5,7 +5,6 @@ import grabl.tracing.client.GrablTracingThreadStatic;
 import grakn.simulation.config.Config;
 import grakn.simulation.config.ConfigLoader;
 import grakn.simulation.db.common.Simulation;
-import grakn.simulation.db.common.agents.base.ResultHandler;
 import grakn.simulation.db.common.world.World;
 import grakn.simulation.db.grakn.GraknSimulation;
 import grakn.simulation.db.neo4j.Neo4jSimulation;
@@ -97,14 +96,12 @@ public class SimulationRunner {
                         if (hostUri == null) hostUri = defaultUri;
 
                         simulation = new GraknSimulation(
-                                hostUri,
-                                config.getDatabaseName(),
+                                driver,
                                 initialisationDataFiles,
                                 new RandomSource(config.getRandomSeed()),
                                 world,
                                 config.getAgents(),
                                 config.getTraceSampling().getSamplingFunction(),
-                                new ResultHandler(),
                                 test);
                         break;
 
@@ -113,13 +110,12 @@ public class SimulationRunner {
                         if (hostUri == null) hostUri = defaultUri;
 
                         simulation = new Neo4jSimulation(
-                                hostUri,
+                                neo4jDriver,
                                 initialisationDataFiles,
                                 new RandomSource(config.getRandomSeed()),
                                 world,
                                 config.getAgents(),
                                 config.getTraceSampling().getSamplingFunction(),
-                                new ResultHandler(),
                                 test);
                         break;
 
