@@ -1,8 +1,8 @@
 package grakn.simulation.db.neo4j.agents.interaction;
 
-import grakn.simulation.db.common.agents.action.Action;
-import grakn.simulation.db.common.agents.action.ResidentsInCityAction;
-import grakn.simulation.db.common.agents.base.ActionResult;
+import grakn.simulation.db.common.action.Action;
+import grakn.simulation.db.common.action.read.ResidentsInCityAction;
+import grakn.simulation.db.common.agent.base.ActionResult;
 import grakn.simulation.db.common.world.World;
 import org.neo4j.driver.Query;
 import org.neo4j.driver.Record;
@@ -21,7 +21,7 @@ import static grakn.simulation.db.neo4j.schema.Schema.LOCATION_NAME;
 import static grakn.simulation.db.neo4j.schema.Schema.START_DATE;
 import static grakn.simulation.db.neo4j.schema.Schema.WAGE;
 
-public class EmploymentAgent extends Neo4jAgent<World.City> implements grakn.simulation.db.common.agents.interaction.EmploymentAgent {
+public class EmploymentAgent extends Neo4jAgent<World.City> implements grakn.simulation.db.common.agent.interaction.EmploymentAgent {
     @Override
     public List<Long> getCompanyNumbers(World.Country country, int numCompanies) {
         Query companyNumbersQuery = CompanyAgent.getCompanyNumbersInCountryQuery(country);

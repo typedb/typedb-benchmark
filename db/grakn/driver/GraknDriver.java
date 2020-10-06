@@ -2,22 +2,20 @@ package grakn.simulation.db.grakn.driver;
 
 import grabl.tracing.client.GrablTracingThreadStatic;
 import grakn.client.GraknClient;
-import grakn.simulation.db.common.agents.base.DbOperationController;
-import grakn.simulation.db.common.context.LogWrapper;
-import grakn.simulation.db.common.context.TransactionalDbDriver;
+import grakn.simulation.db.common.operation.LogWrapper;
+import grakn.simulation.db.common.driver.TransactionalDbDriver;
+import grakn.simulation.db.common.operation.DbOperationController;
 import grakn.simulation.db.common.world.Region;
-import grakn.simulation.db.grakn.agents.interaction.GraknDbOperationController;
-import grakn.simulation.db.grakn.driver.GraknTransaction;
 import org.slf4j.Logger;
 
 import java.util.concurrent.ConcurrentHashMap;
 
 import static grabl.tracing.client.GrablTracingThreadStatic.traceOnThread;
-import static grakn.simulation.db.common.context.TransactionalDbDriver.TracingLabel.CLOSE_CLIENT;
-import static grakn.simulation.db.common.context.TransactionalDbDriver.TracingLabel.CLOSE_SESSION;
-import static grakn.simulation.db.common.context.TransactionalDbDriver.TracingLabel.OPEN_CLIENT;
-import static grakn.simulation.db.common.context.TransactionalDbDriver.TracingLabel.OPEN_SESSION;
-import static grakn.simulation.db.common.context.TransactionalDbDriver.TracingLabel.OPEN_TRANSACTION;
+import static grakn.simulation.db.common.driver.TransactionalDbDriver.TracingLabel.CLOSE_CLIENT;
+import static grakn.simulation.db.common.driver.TransactionalDbDriver.TracingLabel.CLOSE_SESSION;
+import static grakn.simulation.db.common.driver.TransactionalDbDriver.TracingLabel.OPEN_CLIENT;
+import static grakn.simulation.db.common.driver.TransactionalDbDriver.TracingLabel.OPEN_SESSION;
+import static grakn.simulation.db.common.driver.TransactionalDbDriver.TracingLabel.OPEN_TRANSACTION;
 
 public class GraknDriver extends TransactionalDbDriver<GraknTransaction, GraknClient.Session> {
 

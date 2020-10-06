@@ -3,7 +3,7 @@ java_library(
     srcs = glob([
         "*.java",
         "context/*.java",
-        "agents/interaction/*.java",
+        "agent/interaction/*.java",
         "yaml_tool/*.java",
         "driver/*.java",
     ]),
@@ -11,8 +11,8 @@ java_library(
     deps = [
         "//db/neo4j/schema",
         "//db/common:simulation-common",
-        "//db/common/context",
-        "//db/common/agents",
+        "//db/common/driver:context",
+        "//db/common/agent",
         "//db/common/world",
         "//db/common/yaml_tool",
         "//config:config",

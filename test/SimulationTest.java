@@ -1,7 +1,6 @@
 package grakn.simulation.test;
 
-import grakn.simulation.db.common.agents.base.Agent;
-import grakn.simulation.db.common.agents.base.DbOperationController.ComparableField;
+import grakn.simulation.db.common.agent.base.Agent;
 import grakn.simulation.db.grakn.driver.GraknDriver;
 import grakn.simulation.db.neo4j.driver.Neo4jDriver;
 import org.junit.Test;

@@ -5,9 +5,10 @@ java_library(
     ]),
     visibility = ["//visibility:public"],
     deps = [
-        "//db/common/context",
-        "//db/common/agents",
-        "//db/common/world",
+        "//db/common/agent",
+#        "//db/common/action",
+#        "//db/common/driver",
+#        "//db/common/world",
         "//config",
         "//utils",
         "@maven//:ch_qos_logback_logback_classic",

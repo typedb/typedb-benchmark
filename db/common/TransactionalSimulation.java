@@ -1,8 +1,8 @@
 package grakn.simulation.db.common;
 
 import grakn.simulation.config.Config;
-import grakn.simulation.db.common.context.DbTransaction;
-import grakn.simulation.db.common.context.TransactionalDbDriver;
+import grakn.simulation.db.common.driver.DbTransaction;
+import grakn.simulation.db.common.driver.TransactionalDbDriver;
 import grakn.simulation.db.common.world.World;
 import grakn.simulation.utils.RandomSource;
 

@@ -12,7 +12,6 @@ java_library(
         "//config",
         "//db/common:simulation-common",
         "//db/common/agents",
-        "//db/common/initialise",
         "//db/common/world",
         "//db/common/yaml_tool",
         "//db/grakn",

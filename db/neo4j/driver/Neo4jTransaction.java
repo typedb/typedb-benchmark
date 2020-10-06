@@ -1,8 +1,8 @@
 package grakn.simulation.db.neo4j.driver;
 
 import grabl.tracing.client.GrablTracingThreadStatic;
-import grakn.simulation.db.common.context.DbTransaction;
-import grakn.simulation.db.common.context.LogWrapper;
+import grakn.simulation.db.common.driver.DbTransaction;
+import grakn.simulation.db.common.operation.LogWrapper;
 import org.neo4j.driver.Query;
 import org.neo4j.driver.Record;
 import org.neo4j.driver.Session;
@@ -15,9 +15,9 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static grabl.tracing.client.GrablTracingThreadStatic.traceOnThread;
-import static grakn.simulation.db.common.context.TransactionalDbDriver.TracingLabel.EXECUTE;
-import static grakn.simulation.db.common.context.TransactionalDbDriver.TracingLabel.OPEN_TRANSACTION;
-import static grakn.simulation.db.common.context.TransactionalDbDriver.TracingLabel.STREAM_AND_SORT;
+import static grakn.simulation.db.common.driver.TransactionalDbDriver.TracingLabel.EXECUTE;
+import static grakn.simulation.db.common.driver.TransactionalDbDriver.TracingLabel.OPEN_TRANSACTION;
+import static grakn.simulation.db.common.driver.TransactionalDbDriver.TracingLabel.STREAM_AND_SORT;
 
 public class Neo4jTransaction implements DbTransaction {
 

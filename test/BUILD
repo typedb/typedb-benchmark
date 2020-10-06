@@ -43,7 +43,6 @@ java_test(
         "//:simulation-lib",
         "//config",
         "//db/common/agents",
-        "//db/common/initialise",
         "//db/common/world",
         "//db/grakn",
         "//db/neo4j",

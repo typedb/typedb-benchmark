@@ -3,8 +3,8 @@ package grakn.simulation.db.grakn.driver;
 import grabl.tracing.client.GrablTracingThreadStatic;
 import grakn.client.GraknClient;
 import grakn.client.answer.ConceptMap;
-import grakn.simulation.db.common.context.DbTransaction;
-import grakn.simulation.db.common.context.LogWrapper;
+import grakn.simulation.db.common.driver.DbTransaction;
+import grakn.simulation.db.common.operation.LogWrapper;
 import graql.lang.query.GraqlDelete;
 import graql.lang.query.GraqlGet;
 import graql.lang.query.GraqlInsert;
@@ -15,8 +15,8 @@ import java.util.stream.Stream;
 
 import static com.google.common.collect.Iterables.getOnlyElement;
 import static grabl.tracing.client.GrablTracingThreadStatic.traceOnThread;
-import static grakn.simulation.db.common.context.TransactionalDbDriver.TracingLabel.EXECUTE;
-import static grakn.simulation.db.common.context.TransactionalDbDriver.TracingLabel.STREAM_AND_SORT;
+import static grakn.simulation.db.common.driver.TransactionalDbDriver.TracingLabel.EXECUTE;
+import static grakn.simulation.db.common.driver.TransactionalDbDriver.TracingLabel.STREAM_AND_SORT;
 
 public class GraknTransaction implements DbTransaction {
 
@@ -100,9 +100,4 @@ public class GraknTransaction implements DbTransaction {
     public Object getValueOfAttribute(ConceptMap answer, String varName) {
         return answer.get(varName).asAttribute().value();
     }
-//
-//            @Override
-//            public <T> List<T> getOrderedAttribute(Query query, String attributeName, Integer limit) {
-//                return null;
-//            }
 }

@@ -1,8 +1,8 @@
 package grakn.simulation.db.neo4j.agents.interaction;
 
-import grakn.simulation.db.common.agents.action.Action;
-import grakn.simulation.db.common.agents.base.ActionResult;
-import grakn.simulation.db.common.agents.interaction.ParentshipAgentBase;
+import grakn.simulation.db.common.action.Action;
+import grakn.simulation.db.common.agent.base.ActionResult;
+import grakn.simulation.db.common.agent.interaction.ParentshipAgentBase;
 import grakn.simulation.db.common.world.World;
 import org.neo4j.driver.Query;
 import org.neo4j.driver.Record;

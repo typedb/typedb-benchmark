@@ -1,10 +1,9 @@
 package grakn.simulation.db.common;
 
 import grakn.simulation.config.Config;
-import grakn.simulation.db.common.agents.base.Agent;
-import grakn.simulation.db.common.agents.interaction.AgentFactory;
-import grakn.simulation.db.common.context.DbDriver;
-import grakn.simulation.db.common.agents.base.SimulationContext;
+import grakn.simulation.db.common.agent.base.Agent;
+import grakn.simulation.db.common.agent.interaction.AgentFactory;
+import grakn.simulation.db.common.driver.DbDriver;
 import grakn.simulation.db.common.world.World;
 import grakn.simulation.utils.RandomSource;
 import org.slf4j.Logger;
