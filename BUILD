@@ -13,7 +13,7 @@ java_library(
         "//db/common:simulation-common",
         "//db/common/world",
         "//db/grakn",
-#        "//db/neo4j",
+        "//db/neo4j",
         "//utils",
         "@graknlabs_grabl_tracing//client",
         "@maven//:ch_qos_logback_logback_classic",

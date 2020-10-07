@@ -58,6 +58,6 @@ public class Neo4jDriver extends TransactionalDbDriver<org.neo4j.driver.Transact
 
     @Override
     public DbOperationFactory<Neo4jOperation> getDbOperationFactory(Region region, Logger logger) {
-        return new Neo4jOperationFactory(session(region.continent().name()), logger);
+        return new Neo4jOperationFactory(session(region.name()), logger);
     }
 }
