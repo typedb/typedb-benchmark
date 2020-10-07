@@ -46,6 +46,11 @@ public class GraknInsertProductAction extends InsertProductAction<GraknOperation
 
     @Override
     protected HashMap<ComparableField, Object> outputForReport(ConceptMap answer) {
-        return null;
+        return new HashMap<ComparableField, Object>() {{
+            put(InsertProductActionField.PRODUCT_BARCODE, dbOperation.getOnlyAttributeOfThing(answer, PRODUCT, PRODUCT_BARCODE));
+            put(InsertProductActionField.PRODUCT_NAME, dbOperation.getOnlyAttributeOfThing(answer, PRODUCT, PRODUCT_NAME));
+            put(InsertProductActionField.PRODUCT_DESCRIPTION, dbOperation.getOnlyAttributeOfThing(answer, PRODUCT, PRODUCT_DESCRIPTION));
+            put(InsertProductActionField.CONTINENT, dbOperation.getOnlyAttributeOfThing(answer, CONTINENT, LOCATION_NAME));
+        }};
     }
 }

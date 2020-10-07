@@ -1,8 +1,9 @@
 package grakn.simulation.db.neo4j.driver;
 
 import grabl.tracing.client.GrablTracingThreadStatic;
-import grakn.simulation.db.common.driver.DbTransaction;
+import grakn.simulation.db.common.driver.DbOperation;
 import grakn.simulation.db.common.driver.LogWrapper;
+import grakn.simulation.db.common.driver.TransactionalDbOperation;
 import org.neo4j.driver.Query;
 import org.neo4j.driver.Record;
 import org.neo4j.driver.Session;
@@ -19,18 +20,17 @@ import static grakn.simulation.db.common.driver.TransactionalDbDriver.TracingLab
 import static grakn.simulation.db.common.driver.TransactionalDbDriver.TracingLabel.OPEN_TRANSACTION;
 import static grakn.simulation.db.common.driver.TransactionalDbDriver.TracingLabel.STREAM_AND_SORT;
 
-public class Neo4jTransaction implements DbTransaction {
+public class Neo4jOperation extends TransactionalDbOperation {
 
     private final Session session;
     private final LogWrapper log;
-    private final String tracker;
     private org.neo4j.driver.Transaction tx;
     private final List<Query> queries = new ArrayList<Query>();
 
-    public Neo4jTransaction(Session session, LogWrapper log, String tracker) {
+    public Neo4jOperation(Session session, LogWrapper log, String tracker) {
+        super(tracker);
         this.session = session;
         this.log = log;
-        this.tracker = tracker;
         this.tx = newTransaction();
     }
 
@@ -40,11 +40,13 @@ public class Neo4jTransaction implements DbTransaction {
         }
     }
 
+    @Override
     public void close() {
         tx.close();
     }
 
-    public void commit() {
+    @Override
+    public void save() {
         Throwable txEx = null;
         int RETRIES = 5;
         int BACKOFF = 100;

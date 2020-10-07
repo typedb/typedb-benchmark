@@ -1,16 +1,16 @@
-package grakn.simulation.db.neo4j.action;
+package grakn.simulation.db.neo4j.action.read;
 
 import grakn.simulation.db.common.action.read.UpdateAgesOfPeopleInCityAction;
-import grakn.simulation.db.common.driver.TransactionalDbOperation;
 import grakn.simulation.db.common.world.World;
+import grakn.simulation.db.neo4j.driver.Neo4jOperation;
 import grakn.simulation.db.neo4j.schema.Schema;
 import org.neo4j.driver.Query;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
 
-public class Neo4jUpdateAgesOfPeopleInCityAction extends UpdateAgesOfPeopleInCityAction<TransactionalDbOperation> {
-    public Neo4jUpdateAgesOfPeopleInCityAction(TransactionalDbOperation dbOperation, LocalDateTime today, World.City city) {
+public class Neo4jUpdateAgesOfPeopleInCityAction extends UpdateAgesOfPeopleInCityAction<Neo4jOperation> {
+    public Neo4jUpdateAgesOfPeopleInCityAction(Neo4jOperation dbOperation, LocalDateTime today, World.City city) {
         super(dbOperation, today, city);
     }
 
@@ -25,10 +25,7 @@ public class Neo4jUpdateAgesOfPeopleInCityAction extends UpdateAgesOfPeopleInCit
             put(Schema.LOCATION_NAME, city.name());
             put("dateToday", today);
         }};
-
-        Query query = new Query(template, parameters);
-        dbOperation.tx().execute(query);
+        dbOperation.execute(new Query(template, parameters));
         return null;
     }
-
 }

@@ -18,7 +18,7 @@ import static grakn.simulation.db.common.driver.TransactionalDbDriver.TracingLab
 import static grakn.simulation.db.common.driver.TransactionalDbDriver.TracingLabel.OPEN_SESSION;
 import static grakn.simulation.db.common.driver.TransactionalDbDriver.TracingLabel.OPEN_TRANSACTION;
 
-public class Neo4jDriver extends TransactionalDbDriver<Neo4jTransaction, org.neo4j.driver.Session> {
+public class Neo4jDriver extends TransactionalDbDriver<org.neo4j.driver.Transaction, org.neo4j.driver.Session, Neo4jOperation> {
 
     private final Driver driver;
     private final ConcurrentHashMap<String, org.neo4j.driver.Session> sessionMap = new ConcurrentHashMap<>();
@@ -57,22 +57,7 @@ public class Neo4jDriver extends TransactionalDbDriver<Neo4jTransaction, org.neo
     }
 
     @Override
-    public DbOperationFactory<DB_OPERATION> getDbOperationFactory(Region region, Logger logger) {
-        return new Neo4jOperationFactory(new Neo4jDriver.Neo4jSession(session(region.continent().name())), logger);
-    }
-
-    public class Neo4jSession extends Session {
-        private final org.neo4j.driver.Session session;
-
-        public Neo4jSession(org.neo4j.driver.Session session) {
-            this.session = session;
-        }
-
-        @Override
-        public Neo4jTransaction tx() {
-            try (GrablTracingThreadStatic.ThreadTrace trace = traceOnThread(OPEN_TRANSACTION.getName())) {
-                return new Neo4jTransaction(session, null, null);
-            }
-        }
+    public DbOperationFactory<Neo4jOperation> getDbOperationFactory(Region region, Logger logger) {
+        return new Neo4jOperationFactory(session(region.continent().name()), logger);
     }
 }

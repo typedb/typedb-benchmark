@@ -24,4 +24,8 @@ public abstract class InsertProductAction<DB_OPERATION extends DbOperation, ACTI
     protected ArrayList<Object> inputForReport() {
         return argsList(continent, barcode, productName, productDescription);
     }
+
+    public enum InsertProductActionField implements ComparableField {
+        PRODUCT_BARCODE, PRODUCT_NAME, PRODUCT_DESCRIPTION, CONTINENT
+    }
 }
