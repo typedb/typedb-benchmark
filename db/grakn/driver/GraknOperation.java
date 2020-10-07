@@ -33,7 +33,6 @@ public class GraknOperation extends TransactionalDbOperation {
 
     @Override
     public void close() {
-        throwIfClosed();
         transaction.close();
         closed = true;
     }
