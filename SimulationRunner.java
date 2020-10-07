@@ -7,7 +7,7 @@ import grakn.simulation.config.ConfigLoader;
 import grakn.simulation.db.common.Simulation;
 import grakn.simulation.db.common.world.World;
 import grakn.simulation.db.grakn.GraknSimulation;
-import grakn.simulation.db.neo4j.Neo4jSimulation;
+import grakn.simulation.db.grakn.driver.GraknDriver;
 import grakn.simulation.utils.RandomSource;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -96,7 +96,7 @@ public class SimulationRunner {
                         if (hostUri == null) hostUri = defaultUri;
 
                         simulation = new GraknSimulation(
-                                driver,
+                                new GraknDriver(hostUri, "world"),
                                 initialisationDataFiles,
                                 new RandomSource(config.getRandomSeed()),
                                 world,
@@ -105,19 +105,19 @@ public class SimulationRunner {
                                 test);
                         break;
 
-                    case "neo4j":
-                        defaultUri = "bolt://localhost:7687";
-                        if (hostUri == null) hostUri = defaultUri;
-
-                        simulation = new Neo4jSimulation(
-                                neo4jDriver,
-                                initialisationDataFiles,
-                                new RandomSource(config.getRandomSeed()),
-                                world,
-                                config.getAgents(),
-                                config.getTraceSampling().getSamplingFunction(),
-                                test);
-                        break;
+//                    case "neo4j":
+//                        defaultUri = "bolt://localhost:7687";
+//                        if (hostUri == null) hostUri = defaultUri;
+//
+//                        simulation = new Neo4jSimulation(
+//                                neo4jDriver,
+//                                initialisationDataFiles,
+//                                new RandomSource(config.getRandomSeed()),
+//                                world,
+//                                config.getAgents(),
+//                                config.getTraceSampling().getSamplingFunction(),
+//                                test);
+//                        break;
 
                     default:
                         throw new IllegalArgumentException("Unexpected value: " + dbName);

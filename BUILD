@@ -11,11 +11,9 @@ java_library(
     deps = [
         "//config",
         "//db/common:simulation-common",
-        "//db/common/agents",
         "//db/common/world",
-        "//db/common/yaml_tool",
         "//db/grakn",
-        "//db/neo4j",
+#        "//db/neo4j",
         "//utils",
         "@graknlabs_grabl_tracing//client",
         "@maven//:ch_qos_logback_logback_classic",
