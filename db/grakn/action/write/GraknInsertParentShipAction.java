@@ -4,7 +4,7 @@ import grakn.client.answer.ConceptMap;
 import grakn.simulation.db.common.action.Action;
 import grakn.simulation.db.common.action.SpouseType;
 import grakn.simulation.db.common.action.write.InsertParentShipAction;
-import grakn.simulation.db.common.driver.GraknOperation;
+import grakn.simulation.db.grakn.driver.GraknOperation;
 import graql.lang.Graql;
 import graql.lang.query.GraqlInsert;
 import graql.lang.statement.Statement;

@@ -56,7 +56,7 @@ public class GraknDriver extends TransactionalDbDriver<GraknClient.Transaction, 
     }
 
     @Override
-    public DbOperationFactory<DB_OPERATION> getDbOperationFactory(Region region, Logger logger) {
+    public DbOperationFactory<GraknOperation> getDbOperationFactory(Region region, Logger logger) {
         return new GraknOperationFactory(session(region.continent().name()), logger);
     }
 

@@ -1,6 +1,8 @@
 package grakn.simulation.db.grakn.driver;
 
 import grabl.tracing.client.GrablTracingThreadStatic;
+import grakn.client.GraknClient;
+import grakn.client.answer.ConceptMap;
 import grakn.simulation.db.common.driver.LogWrapper;
 import grakn.simulation.db.common.driver.TransactionalDbOperation;
 import graql.lang.query.GraqlDelete;
@@ -25,7 +27,7 @@ public class GraknOperation extends TransactionalDbOperation {
 
     public GraknOperation(GraknClient.Session session, LogWrapper log, String tracker) {
         super(tracker);
-        this.transaction = session.transaction();
+        this.transaction = session.transaction(GraknClient.Transaction.Type.WRITE);
         this.log = log;
     }
 

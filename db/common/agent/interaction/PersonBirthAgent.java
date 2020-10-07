@@ -54,7 +54,7 @@ public class PersonBirthAgent<DB_DRIVER extends DbDriver<DB_OPERATION>, DB_OPERA
                             + city.country() + "_"
                             + city.country().continent()
                             + "@gmail.com";
-                    runAction(actionFactory().insertPersonAction(city, simulationContext.today(), email, gender, forename, surname));
+                    runAction(actionFactory().insertPersonAction(dbOperation, city, simulationContext.today(), email, gender, forename, surname));
                 }
                 dbOperation.save();
             }

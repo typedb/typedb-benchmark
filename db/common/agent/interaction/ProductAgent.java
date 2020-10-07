@@ -34,7 +34,7 @@ public class ProductAgent<DB_DRIVER extends DbDriver<DB_OPERATION>, DB_OPERATION
                     String productName = randomAttributeGenerator().boundRandomLengthRandomString(5, 20);
                     String productDescription = randomAttributeGenerator().boundRandomLengthRandomString(75, 100);
                     Double barcode = (double) uniqueId(simulationContext, i);
-                    runAction(actionFactory().insertProductAction(continent, barcode, productName, productDescription));
+                    runAction(actionFactory().insertProductAction(dbOperation, continent, barcode, productName, productDescription));
                 }
                 dbOperation.save();
             }

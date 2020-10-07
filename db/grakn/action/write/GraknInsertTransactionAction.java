@@ -2,7 +2,6 @@ package grakn.simulation.db.grakn.action.write;
 
 import grakn.client.answer.ConceptMap;
 import grakn.simulation.db.common.action.write.InsertTransactionAction;
-import grakn.simulation.db.common.driver.GraknOperation;
 import grakn.simulation.db.common.utils.Pair;
 import grakn.simulation.db.common.world.World;
 import grakn.simulation.db.grakn.driver.GraknOperation;

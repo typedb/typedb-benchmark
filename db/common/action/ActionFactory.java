@@ -47,11 +47,11 @@ public abstract class ActionFactory<DB_OPERATION extends DbOperation, DB_RETURN_
 
     public abstract MarriedCoupleAction<DB_OPERATION> marriedCoupleAction(DB_OPERATION dbOperation, World.City city, LocalDateTime today);
 
-    public abstract InsertParentShipAction<DB_OPERATION, DB_RETURN_TYPE> insertParentshipAction(HashMap<SpouseType, String> marriage, String childEmail);
+    public abstract InsertParentShipAction<DB_OPERATION, DB_RETURN_TYPE> insertParentshipAction(DB_OPERATION dbOperation, HashMap<SpouseType, String> marriage, String childEmail);
 
-    public abstract InsertPersonAction<DB_OPERATION, DB_RETURN_TYPE> insertPersonAction(World.City city, LocalDateTime today, String email, String gender, String forename, String surname);
+    public abstract InsertPersonAction<DB_OPERATION, DB_RETURN_TYPE> insertPersonAction(DB_OPERATION dbOperation, World.City city, LocalDateTime today, String email, String gender, String forename, String surname);
 
-    public abstract InsertProductAction<DB_OPERATION, DB_RETURN_TYPE> insertProductAction(World.Continent continent, Double barcode, String productName, String productDescription);
+    public abstract InsertProductAction<DB_OPERATION, DB_RETURN_TYPE> insertProductAction(DB_OPERATION dbOperation, World.Continent continent, Double barcode, String productName, String productDescription);
 
     public abstract CitiesInContinentAction<DB_OPERATION> citiesInContinentAction(DB_OPERATION dbOperation, World.City city);
 

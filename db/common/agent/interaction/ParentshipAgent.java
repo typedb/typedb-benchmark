@@ -61,7 +61,7 @@ public class ParentshipAgent<DB_DRIVER extends DbDriver<DB_OPERATION>, DB_OPERAT
 
                         for (Integer childIndex : children) {
                             String childEmail = childrenEmails.get(childIndex);
-                            runAction(actionFactory().insertParentshipAction(marriage, childEmail));
+                            runAction(actionFactory().insertParentshipAction(dbOperation, marriage, childEmail));
                         }
                     }
                     dbOperation.save();

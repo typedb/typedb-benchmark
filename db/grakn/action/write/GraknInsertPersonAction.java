@@ -3,7 +3,6 @@ package grakn.simulation.db.grakn.action.write;
 import grakn.client.answer.ConceptMap;
 import grakn.simulation.db.common.action.Action;
 import grakn.simulation.db.common.action.write.InsertPersonAction;
-import grakn.simulation.db.common.driver.GraknOperation;
 import grakn.simulation.db.common.world.World;
 import grakn.simulation.db.grakn.driver.GraknOperation;
 import graql.lang.Graql;
