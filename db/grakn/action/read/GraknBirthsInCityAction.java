@@ -1,10 +1,9 @@
 package grakn.simulation.db.grakn.action.read;
 
 import grakn.simulation.db.common.action.read.BirthsInCityAction;
-import grakn.simulation.db.common.operation.TransactionDbOperationController;
+import grakn.simulation.db.common.driver.TransactionalDbOperation;
 import grakn.simulation.db.common.world.World;
-import grakn.simulation.db.grakn.driver.GraknDbOperationController;
-import grakn.simulation.db.grakn.driver.GraknTransaction;
+import grakn.simulation.db.grakn.driver.GraknOperation;
 import graql.lang.Graql;
 import graql.lang.query.GraqlGet;
 
@@ -20,8 +19,8 @@ import static grakn.simulation.db.grakn.schema.Schema.EMAIL;
 import static grakn.simulation.db.grakn.schema.Schema.LOCATION_NAME;
 import static grakn.simulation.db.grakn.schema.Schema.PERSON;
 
-public class GraknBirthsInCityAction extends BirthsInCityAction<GraknDbOperationController.TransactionalDbOperation> {
-    public GraknBirthsInCityAction(TransactionDbOperationController<GraknTransaction>.TransactionalDbOperation dbOperation, World.City city, LocalDateTime today) {
+public class GraknBirthsInCityAction extends BirthsInCityAction<GraknOperation> {
+    public GraknBirthsInCityAction(GraknOperation dbOperation, World.City city, LocalDateTime today) {
         super(dbOperation, city, today);
     }
 
@@ -37,6 +36,6 @@ public class GraknBirthsInCityAction extends BirthsInCityAction<GraknDbOperation
                         .rel(BORN_IN_PLACE_OF_BIRTH, "c")
                         .rel(BORN_IN_CHILD, "child")
         ).get();
-        return dbOperation.tx().getOrderedAttribute(childrenQuery, EMAIL, null);
+        return dbOperation.getOrderedAttribute(childrenQuery, EMAIL, null);
     }
 }

@@ -2,11 +2,10 @@ package grakn.simulation.db.grakn.action.write;
 
 import grakn.client.answer.ConceptMap;
 import grakn.simulation.db.common.action.write.InsertTransactionAction;
-import grakn.simulation.db.common.agent.utils.Pair;
-import grakn.simulation.db.common.operation.TransactionDbOperationController;
+import grakn.simulation.db.common.driver.GraknOperation;
+import grakn.simulation.db.common.utils.Pair;
 import grakn.simulation.db.common.world.World;
-import grakn.simulation.db.grakn.driver.GraknDbOperationController;
-import grakn.simulation.db.grakn.driver.GraknTransaction;
+import grakn.simulation.db.grakn.driver.GraknOperation;
 import graql.lang.Graql;
 import graql.lang.query.GraqlInsert;
 
@@ -29,9 +28,9 @@ import static grakn.simulation.db.grakn.schema.Schema.TRANSACTION_MERCHANDISE;
 import static grakn.simulation.db.grakn.schema.Schema.TRANSACTION_SELLER;
 import static grakn.simulation.db.grakn.schema.Schema.VALUE;
 
-public class GraknInsertTransactionAction extends InsertTransactionAction<GraknDbOperationController.TransactionalDbOperation, ConceptMap> {
+public class GraknInsertTransactionAction extends InsertTransactionAction<GraknOperation, ConceptMap> {
 
-    public GraknInsertTransactionAction(TransactionDbOperationController<GraknTransaction>.TransactionalDbOperation dbOperation, World.Continent continent, Pair<Long, Double> transaction, Long sellerCompanyNumber, double value, int productQuantity, boolean isTaxable) {
+    public GraknInsertTransactionAction(GraknOperation dbOperation, World.Continent continent, Pair<Long, Double> transaction, Long sellerCompanyNumber, double value, int productQuantity, boolean isTaxable) {
         super(dbOperation, continent, transaction, sellerCompanyNumber, value, productQuantity, isTaxable);
     }
 
@@ -62,19 +61,19 @@ public class GraknInsertTransactionAction extends InsertTransactionAction<GraknD
                                 .rel(LOCATES_LOCATION, Graql.var(CONTINENT))
                                 .rel(LOCATES_LOCATED, Graql.var(TRANSACTION))
                 );
-        return singleResult(dbOperation.tx().execute(insertTransactionQuery));
+        return singleResult(dbOperation.execute(insertTransactionQuery));
     }
 
     @Override
     protected HashMap<ComparableField, Object> outputForReport(ConceptMap answer) {
         return new HashMap<ComparableField, Object>() {{
-            put(InsertTransactionActionField.SELLER, dbOperation.tx().getOnlyAttributeOfThing(answer, "c-seller", COMPANY_NUMBER));
-            put(InsertTransactionActionField.BUYER, dbOperation.tx().getOnlyAttributeOfThing(answer, "c-buyer", COMPANY_NUMBER));
-            put(InsertTransactionActionField.MERCHANDISE, dbOperation.tx().getOnlyAttributeOfThing(answer, PRODUCT, PRODUCT_BARCODE));
-            put(InsertTransactionActionField.VALUE, dbOperation.tx().getOnlyAttributeOfThing(answer, TRANSACTION, VALUE));
-            put(InsertTransactionActionField.PRODUCT_QUANTITY, dbOperation.tx().getOnlyAttributeOfThing(answer, TRANSACTION, PRODUCT_QUANTITY));
-            put(InsertTransactionActionField.IS_TAXABLE, dbOperation.tx().getOnlyAttributeOfThing(answer, TRANSACTION, IS_TAXABLE));
-            put(InsertTransactionActionField.CONTINENT, dbOperation.tx().getOnlyAttributeOfThing(answer, CONTINENT, LOCATION_NAME));
+            put(InsertTransactionActionField.SELLER, dbOperation.getOnlyAttributeOfThing(answer, "c-seller", COMPANY_NUMBER));
+            put(InsertTransactionActionField.BUYER, dbOperation.getOnlyAttributeOfThing(answer, "c-buyer", COMPANY_NUMBER));
+            put(InsertTransactionActionField.MERCHANDISE, dbOperation.getOnlyAttributeOfThing(answer, PRODUCT, PRODUCT_BARCODE));
+            put(InsertTransactionActionField.VALUE, dbOperation.getOnlyAttributeOfThing(answer, TRANSACTION, VALUE));
+            put(InsertTransactionActionField.PRODUCT_QUANTITY, dbOperation.getOnlyAttributeOfThing(answer, TRANSACTION, PRODUCT_QUANTITY));
+            put(InsertTransactionActionField.IS_TAXABLE, dbOperation.getOnlyAttributeOfThing(answer, TRANSACTION, IS_TAXABLE));
+            put(InsertTransactionActionField.CONTINENT, dbOperation.getOnlyAttributeOfThing(answer, CONTINENT, LOCATION_NAME));
         }};
     }
 }

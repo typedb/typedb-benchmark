@@ -1,11 +1,10 @@
 package grakn.simulation.db.grakn.action.read;
 
+import grakn.simulation.db.common.action.SpouseType;
 import grakn.simulation.db.common.action.read.MarriedCoupleAction;
-import grakn.simulation.db.common.agent.interaction.ParentshipAgent;
-import grakn.simulation.db.common.operation.TransactionDbOperationController;
+import grakn.simulation.db.common.driver.TransactionalDbOperation;
 import grakn.simulation.db.common.world.World;
-import grakn.simulation.db.grakn.driver.GraknDbOperationController;
-import grakn.simulation.db.grakn.driver.GraknTransaction;
+import grakn.simulation.db.grakn.driver.GraknOperation;
 import graql.lang.Graql;
 import graql.lang.query.GraqlGet;
 
@@ -28,13 +27,13 @@ import static grakn.simulation.db.grakn.schema.Schema.PARENTSHIP_PARENT;
 import static grakn.simulation.db.grakn.schema.Schema.PERSON;
 import static java.util.stream.Collectors.toList;
 
-public class GraknMarriedCoupleAction extends MarriedCoupleAction<GraknDbOperationController.TransactionalDbOperation> {
-    public GraknMarriedCoupleAction(TransactionDbOperationController<GraknTransaction>.TransactionalDbOperation dbOperation, World.City city, LocalDateTime today) {
+public class GraknMarriedCoupleAction extends MarriedCoupleAction<GraknOperation> {
+    public GraknMarriedCoupleAction(GraknOperation dbOperation, World.City city, LocalDateTime today) {
         super(dbOperation, city, today);
     }
 
     @Override
-    public List<HashMap<ParentshipAgent.SpouseType, String>> run() {
+    public List<HashMap<SpouseType, String>> run() {
         GraqlGet.Sorted marriageQuery = Graql.match(
                 Graql.var(CITY).isa(CITY)
                         .has(LOCATION_NAME, city.name()),
@@ -55,11 +54,11 @@ public class GraknMarriedCoupleAction extends MarriedCoupleAction<GraknDbOperati
                         .rel(LOCATES_LOCATED, Graql.var("m"))
                         .rel(LOCATES_LOCATION, Graql.var(CITY))
         ).get().sort(MARRIAGE_ID);
-        return dbOperation.tx().execute(marriageQuery)
+        return dbOperation.execute(marriageQuery)
                 .stream()
-                .map(a -> new HashMap<ParentshipAgent.SpouseType, String>() {{
-                    put(ParentshipAgent.SpouseType.WIFE, a.get("wife-email").asAttribute().value().toString());
-                    put(ParentshipAgent.SpouseType.HUSBAND, a.get("husband-email").asAttribute().value().toString());
+                .map(a -> new HashMap<SpouseType, String>() {{
+                    put(SpouseType.WIFE, a.get("wife-email").asAttribute().value().toString());
+                    put(SpouseType.HUSBAND, a.get("husband-email").asAttribute().value().toString());
                 }})
                 .collect(toList());
     }

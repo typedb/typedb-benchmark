@@ -1,10 +1,9 @@
 package grakn.simulation.db.common.driver;
 
-import grakn.simulation.db.common.operation.DbOperationController;
 import grakn.simulation.db.common.world.Region;
 import org.slf4j.Logger;
 
-public abstract class DbDriver {
+public abstract class DbDriver<DB_OPERATION extends DbOperation> {
 //    TODO should have enums for tracing for the universal names of DB operations that we want to compare across
 //     different backends
 
@@ -24,5 +23,5 @@ public abstract class DbDriver {
         }
     }
 
-    public abstract DbOperationController getDbOpController(Region region, Logger logger);
+    public abstract DbOperationFactory<DB_OPERATION> getDbOperationFactory(Region region, Logger logger);
 }

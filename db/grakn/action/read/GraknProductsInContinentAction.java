@@ -1,10 +1,9 @@
 package grakn.simulation.db.grakn.action.read;
 
 import grakn.simulation.db.common.action.read.ProductsInContinentAction;
-import grakn.simulation.db.common.operation.TransactionDbOperationController;
+import grakn.simulation.db.common.driver.TransactionalDbOperation;
 import grakn.simulation.db.common.world.World;
-import grakn.simulation.db.grakn.driver.GraknDbOperationController;
-import grakn.simulation.db.grakn.driver.GraknTransaction;
+import grakn.simulation.db.grakn.driver.GraknOperation;
 import graql.lang.Graql;
 import graql.lang.query.GraqlGet;
 
@@ -18,9 +17,9 @@ import static grakn.simulation.db.grakn.schema.Schema.PRODUCED_IN_PRODUCT;
 import static grakn.simulation.db.grakn.schema.Schema.PRODUCT;
 import static grakn.simulation.db.grakn.schema.Schema.PRODUCT_BARCODE;
 
-public class GraknProductsInContinentAction extends ProductsInContinentAction<GraknDbOperationController.TransactionalDbOperation> {
+public class GraknProductsInContinentAction extends ProductsInContinentAction<GraknOperation> {
 
-    public GraknProductsInContinentAction(TransactionDbOperationController<GraknTransaction>.TransactionalDbOperation dbOperation, World.Continent continent) {
+    public GraknProductsInContinentAction(GraknOperation dbOperation, World.Continent continent) {
         super(dbOperation, continent);
     }
 
@@ -39,6 +38,6 @@ public class GraknProductsInContinentAction extends ProductsInContinentAction<Gr
                         .rel(PRODUCED_IN_CONTINENT, Graql.var(CONTINENT))
 
         ).get();
-        return dbOperation.tx().getOrderedAttribute(query, PRODUCT_BARCODE, null);
+        return dbOperation.getOrderedAttribute(query, PRODUCT_BARCODE, null);
     }
 }

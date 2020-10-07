@@ -1,18 +1,20 @@
 package grakn.simulation.db.common.agent.interaction;
 
+import grakn.simulation.db.common.agent.base.SimulationContext;
+import grakn.simulation.db.common.action.ActionFactory;
 import grakn.simulation.db.common.action.read.UpdateAgesOfPeopleInCityAction;
-import grakn.simulation.db.common.operation.DbOperationController;
-import grakn.simulation.db.common.SimulationContext;
 import grakn.simulation.db.common.agent.region.CityAgent;
 import grakn.simulation.db.common.driver.DbDriver;
+import grakn.simulation.db.common.driver.DbOperation;
+import grakn.simulation.db.common.driver.DbOperationFactory;
 import grakn.simulation.db.common.world.World;
 
 import java.util.Random;
 
-public class AgeUpdateAgent<DB_DRIVER extends DbDriver> extends CityAgent<DB_DRIVER> {
+public class AgeUpdateAgent<DB_DRIVER extends DbDriver<DB_OPERATION>, DB_OPERATION extends DbOperation> extends CityAgent<DB_DRIVER, DB_OPERATION> {
 
-    public AgeUpdateAgent(DB_DRIVER dbDriver) {
-        super(dbDriver);
+    public AgeUpdateAgent(DB_DRIVER dbDriver, ActionFactory<DB_OPERATION, ?> actionFactory) {
+        super(dbDriver, actionFactory);
     }
 
     @Override
@@ -26,9 +28,9 @@ public class AgeUpdateAgent<DB_DRIVER extends DbDriver> extends CityAgent<DB_DRI
         }
 
         @Override
-        protected void run(DbOperationController dbOperationController, World.City city, SimulationContext simulationContext) {
-            UpdateAgesOfPeopleInCityAction<?> updateAgesOfAllPeopleInCityAction = dbOperationController.actionFactory().updateAgesOfPeopleInCityAction(simulationContext.today(), city);
-            try (DbOperationController.DbOperation dbOperation = dbOperationController.newDbOperation(updateAgesOfAllPeopleInCityAction, tracker())) {
+        protected void run(DbOperationFactory<DB_OPERATION> dbOperationFactory, World.City city, SimulationContext simulationContext) {
+            try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker())) {
+                UpdateAgesOfPeopleInCityAction<DB_OPERATION> updateAgesOfAllPeopleInCityAction = actionFactory().updateAgesOfPeopleInCityAction(dbOperation, simulationContext.today(), city);
                 runAction(updateAgesOfAllPeopleInCityAction);
                 dbOperation.save();
             }

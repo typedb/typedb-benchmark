@@ -1,9 +1,8 @@
 package grakn.simulation.db.grakn.action.read;
 
 import grakn.simulation.db.common.action.read.ResidentsInCityAction;
-import grakn.simulation.db.common.operation.TransactionDbOperationController;
 import grakn.simulation.db.common.world.World;
-import grakn.simulation.db.grakn.driver.GraknTransaction;
+import grakn.simulation.db.grakn.driver.GraknOperation;
 import graql.lang.Graql;
 import graql.lang.query.GraqlGet;
 import graql.lang.statement.Statement;
@@ -21,9 +20,9 @@ import static grakn.simulation.db.grakn.schema.Schema.RESIDENCY_LOCATION;
 import static grakn.simulation.db.grakn.schema.Schema.RESIDENCY_RESIDENT;
 import static grakn.simulation.db.grakn.schema.Schema.START_DATE;
 
-public class GraknResidentsInCityAction extends ResidentsInCityAction<TransactionDbOperationController<GraknTransaction>.TransactionalDbOperation> {
+public class GraknResidentsInCityAction extends ResidentsInCityAction<GraknOperation> {
 
-    public GraknResidentsInCityAction(TransactionDbOperationController<GraknTransaction>.TransactionalDbOperation dbOperation, World.City city, int numResidents, LocalDateTime earliestDate) {
+    public GraknResidentsInCityAction(GraknOperation dbOperation, World.City city, int numResidents, LocalDateTime earliestDate) {
         super(dbOperation, city, numResidents, earliestDate);
     }
 
@@ -51,6 +50,6 @@ public class GraknResidentsInCityAction extends ResidentsInCityAction<Transactio
                 startDate.lte(earliestDate)
         ).get();
 
-        return dbOperation.tx().getOrderedAttribute(cityResidentsQuery, EMAIL, numResidents);
+        return dbOperation.getOrderedAttribute(cityResidentsQuery, EMAIL, numResidents);
     }
 }

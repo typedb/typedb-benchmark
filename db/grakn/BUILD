@@ -12,7 +12,7 @@ java_library(
     deps = [
         "//db/grakn/schema",
         "//db/common:simulation-common",
-        "//db/common/driver:context",
+        "//db/common/driver",
         "//db/common/agent",
         "//db/common/world",
         "//db/common/yaml_tool",

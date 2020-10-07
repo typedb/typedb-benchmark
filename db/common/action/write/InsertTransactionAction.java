@@ -1,13 +1,13 @@
 package grakn.simulation.db.common.action.write;
 
 import grakn.simulation.db.common.action.Action;
-import grakn.simulation.db.common.operation.DbOperationController;
-import grakn.simulation.db.common.agent.utils.Pair;
+import grakn.simulation.db.common.driver.DbOperation;
+import grakn.simulation.db.common.utils.Pair;
 import grakn.simulation.db.common.world.World;
 
 import java.util.ArrayList;
 
-public abstract class InsertTransactionAction<DB_OPERATION extends DbOperationController.DbOperation, ACTION_RETURN_TYPE> extends Action<DB_OPERATION, ACTION_RETURN_TYPE> {
+public abstract class InsertTransactionAction<DB_OPERATION extends DbOperation, ACTION_RETURN_TYPE> extends Action<DB_OPERATION, ACTION_RETURN_TYPE> {
     protected final World.Continent continent;
     protected final Pair<Long, Double> transaction;
     protected final Long sellerCompanyNumber;

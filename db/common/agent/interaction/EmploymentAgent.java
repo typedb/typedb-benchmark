@@ -1,11 +1,13 @@
 package grakn.simulation.db.common.agent.interaction;
 
+import grakn.simulation.db.common.agent.base.SimulationContext;
+import grakn.simulation.db.common.action.ActionFactory;
 import grakn.simulation.db.common.action.read.CompanyNumbersAction;
 import grakn.simulation.db.common.action.read.ResidentsInCityAction;
-import grakn.simulation.db.common.operation.DbOperationController;
-import grakn.simulation.db.common.SimulationContext;
 import grakn.simulation.db.common.agent.region.CityAgent;
 import grakn.simulation.db.common.driver.DbDriver;
+import grakn.simulation.db.common.driver.DbOperation;
+import grakn.simulation.db.common.driver.DbOperationFactory;
 import grakn.simulation.db.common.world.World;
 
 import java.time.LocalDateTime;
@@ -14,10 +16,10 @@ import java.util.Random;
 
 import static grakn.simulation.db.common.agent.utils.Allocation.allocate;
 
-public class EmploymentAgent<DB_DRIVER extends DbDriver> extends CityAgent<DB_DRIVER> {
+public class EmploymentAgent<DB_DRIVER extends DbDriver<DB_OPERATION>, DB_OPERATION extends DbOperation> extends CityAgent<DB_DRIVER, DB_OPERATION> {
 
-    public EmploymentAgent(DB_DRIVER dbDriver) {
-        super(dbDriver);
+    public EmploymentAgent(DB_DRIVER dbDriver, ActionFactory<DB_OPERATION, ?> actionFactory) {
+        super(dbDriver, actionFactory);
     }
 
     @Override
@@ -38,28 +40,28 @@ public class EmploymentAgent<DB_DRIVER extends DbDriver> extends CityAgent<DB_DR
         }
 
         @Override
-        protected void run(DbOperationController dbOperationController, World.City city, SimulationContext simulationContext) {
+        protected void run(DbOperationFactory<DB_OPERATION> dbOperationFactory, World.City city, SimulationContext simulationContext) {
             LocalDateTime employmentDate = simulationContext.today().minusYears(0);
             List<String> employeeEmails;
             List<Long> companyNumbers;
 
-            ResidentsInCityAction<?> employeeEmailsAction = dbOperationController.actionFactory().residentsInCityAction(city, simulationContext.world().getScaleFactor(), employmentDate);
-            try (DbOperationController.DbOperation dbOperation = dbOperationController.newDbOperation(employeeEmailsAction, tracker())) {
+            try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker())) {
+                ResidentsInCityAction<DB_OPERATION> employeeEmailsAction = actionFactory().residentsInCityAction(dbOperation, city, simulationContext.world().getScaleFactor(), employmentDate);
                 employeeEmails = runAction(employeeEmailsAction);
             }
 
-            CompanyNumbersAction<?> companyNumbersAction = dbOperationController.actionFactory().companyNumbersInCountryAction(city.country(), simulationContext.world().getScaleFactor());
-            try (DbOperationController.DbOperation dbOperation = dbOperationController.newDbOperation(companyNumbersAction, tracker())) {
+            try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker())) {
+                CompanyNumbersAction<DB_OPERATION> companyNumbersAction = actionFactory().companyNumbersInCountryAction(dbOperation, city.country(), simulationContext.world().getScaleFactor());
                 companyNumbers = runAction(companyNumbersAction);
             }
 
-            try (DbOperationController.DbOperation dbOperation = dbOperationController.newDbOperation("InsertEmploymentAction", tracker())) {
+            try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker())) {
                 // A second transaction is being used to circumvent graknlabs/grakn issue #5585
                 boolean allocated = allocate(employeeEmails, companyNumbers, (employeeEmail, companyNumber) -> {
                     double wageValue = randomAttributeGenerator().boundRandomDouble(MIN_ANNUAL_WAGE, MAX_ANNUAL_WAGE);
                     String contractContent = randomAttributeGenerator().boundRandomLengthRandomString(MIN_CONTRACT_CHARACTER_LENGTH, MAX_CONTRACT_CHARACTER_LENGTH);
                     double contractedHours = randomAttributeGenerator().boundRandomDouble(MIN_CONTRACTED_HOURS, MAX_CONTRACTED_HOURS);
-                    runAction(dbOperationController.actionFactory().insertEmploymentAction(city, employeeEmail, companyNumber, employmentDate, wageValue, contractContent, contractedHours));
+                    runAction(actionFactory().insertEmploymentAction(dbOperation, city, employeeEmail, companyNumber, employmentDate, wageValue, contractContent, contractedHours));
                 });
                 if (allocated) {
                     dbOperation.save();

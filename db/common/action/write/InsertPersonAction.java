@@ -1,13 +1,13 @@
 package grakn.simulation.db.common.action.write;
 
 import grakn.simulation.db.common.action.Action;
-import grakn.simulation.db.common.operation.DbOperationController;
+import grakn.simulation.db.common.driver.DbOperation;
 import grakn.simulation.db.common.world.World;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 
-public abstract class InsertPersonAction<DB_OPERATION extends DbOperationController.DbOperation, ACTION_RETURN_TYPE> extends Action<DB_OPERATION, ACTION_RETURN_TYPE> {
+public abstract class InsertPersonAction<DB_OPERATION extends DbOperation, ACTION_RETURN_TYPE> extends Action<DB_OPERATION, ACTION_RETURN_TYPE> {
     protected final World.City worldCity;
     protected final LocalDateTime today;
     protected final String email;

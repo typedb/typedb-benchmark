@@ -1,8 +1,7 @@
 package grakn.simulation.db.neo4j.driver;
 
 import grabl.tracing.client.GrablTracingThreadStatic;
-import grakn.simulation.db.common.operation.DbOperationController;
-import grakn.simulation.db.common.operation.LogWrapper;
+import grakn.simulation.db.common.driver.DbOperationFactory;
 import grakn.simulation.db.common.driver.TransactionalDbDriver;
 import grakn.simulation.db.common.world.Region;
 import org.neo4j.driver.AuthTokens;
@@ -58,8 +57,8 @@ public class Neo4jDriver extends TransactionalDbDriver<Neo4jTransaction, org.neo
     }
 
     @Override
-    public DbOperationController getDbOpController(Region region, Logger logger) {
-        return new Neo4jDbOperationController(new Neo4jDriver.Neo4jSession(session(region.continent().name())), logger);
+    public DbOperationFactory<DB_OPERATION> getDbOperationFactory(Region region, Logger logger) {
+        return new Neo4jOperationFactory(new Neo4jDriver.Neo4jSession(session(region.continent().name())), logger);
     }
 
     public class Neo4jSession extends Session {
@@ -70,9 +69,9 @@ public class Neo4jDriver extends TransactionalDbDriver<Neo4jTransaction, org.neo
         }
 
         @Override
-        public Neo4jTransaction tx(LogWrapper log, String tracker) {
+        public Neo4jTransaction tx() {
             try (GrablTracingThreadStatic.ThreadTrace trace = traceOnThread(OPEN_TRANSACTION.getName())) {
-                return new Neo4jTransaction(session, log, tracker);
+                return new Neo4jTransaction(session, null, null);
             }
         }
     }

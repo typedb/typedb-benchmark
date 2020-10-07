@@ -1,10 +1,9 @@
 package grakn.simulation.db.grakn.action.read;
 
 import grakn.simulation.db.common.action.read.CompaniesInContinentAction;
-import grakn.simulation.db.common.operation.TransactionDbOperationController;
+import grakn.simulation.db.common.driver.TransactionalDbOperation;
 import grakn.simulation.db.common.world.World;
-import grakn.simulation.db.grakn.driver.GraknDbOperationController;
-import grakn.simulation.db.grakn.driver.GraknTransaction;
+import grakn.simulation.db.grakn.driver.GraknOperation;
 import graql.lang.Graql;
 import graql.lang.query.GraqlGet;
 
@@ -20,8 +19,8 @@ import static grakn.simulation.db.grakn.schema.Schema.INCORPORATION_INCORPORATIN
 import static grakn.simulation.db.grakn.schema.Schema.LOCATION_HIERARCHY;
 import static grakn.simulation.db.grakn.schema.Schema.LOCATION_NAME;
 
-public class GraknCompaniesInContinentAction extends CompaniesInContinentAction<GraknDbOperationController.TransactionalDbOperation> {
-    public GraknCompaniesInContinentAction(TransactionDbOperationController<GraknTransaction>.TransactionalDbOperation dbOperation, World.Continent continent) {
+public class GraknCompaniesInContinentAction extends CompaniesInContinentAction<GraknOperation> {
+    public GraknCompaniesInContinentAction(GraknOperation dbOperation, World.Continent continent) {
         super(dbOperation, continent);
     }
 
@@ -38,6 +37,6 @@ public class GraknCompaniesInContinentAction extends CompaniesInContinentAction<
                         .rel(INCORPORATION_INCORPORATED, Graql.var(COMPANY))
                         .rel(INCORPORATION_INCORPORATING, Graql.var(COUNTRY))
         ).get();
-        return dbOperation.tx().getOrderedAttribute(query, COMPANY_NUMBER, null);
+        return dbOperation.getOrderedAttribute(query, COMPANY_NUMBER, null);
     }
 }

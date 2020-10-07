@@ -3,10 +3,9 @@ package grakn.simulation.db.grakn.action.write;
 import grakn.client.answer.ConceptMap;
 import grakn.simulation.db.common.action.Action;
 import grakn.simulation.db.common.action.write.InsertPersonAction;
-import grakn.simulation.db.common.operation.TransactionDbOperationController;
+import grakn.simulation.db.common.driver.GraknOperation;
 import grakn.simulation.db.common.world.World;
-import grakn.simulation.db.grakn.driver.GraknDbOperationController;
-import grakn.simulation.db.grakn.driver.GraknTransaction;
+import grakn.simulation.db.grakn.driver.GraknOperation;
 import graql.lang.Graql;
 import graql.lang.query.GraqlInsert;
 import graql.lang.statement.Statement;
@@ -26,8 +25,8 @@ import static grakn.simulation.db.grakn.schema.Schema.LOCATION_NAME;
 import static grakn.simulation.db.grakn.schema.Schema.PERSON;
 import static grakn.simulation.db.grakn.schema.Schema.SURNAME;
 
-public class GraknInsertPersonAction extends InsertPersonAction<GraknDbOperationController.TransactionalDbOperation, ConceptMap> {
-    public GraknInsertPersonAction(TransactionDbOperationController<GraknTransaction>.TransactionalDbOperation dbOperation, World.City city, LocalDateTime today, String email, String gender, String forename, String surname) {
+public class GraknInsertPersonAction extends InsertPersonAction<GraknOperation, ConceptMap> {
+    public GraknInsertPersonAction(GraknOperation dbOperation, World.City city, LocalDateTime today, String email, String gender, String forename, String surname) {
         super(dbOperation, city, today, email, gender, forename, surname);
     }
 
@@ -63,18 +62,18 @@ public class GraknInsertPersonAction extends InsertPersonAction<GraknDbOperation
                                 surnameVar.val(surname),
                                 dobVar.val(today)
                         );
-        return Action.singleResult(dbOperation.tx().execute(query));
+        return Action.singleResult(dbOperation.execute(query));
     }
 
     @Override
     protected HashMap<ComparableField, Object> outputForReport(ConceptMap answer) {
         return new HashMap<ComparableField, Object>(){
             {
-                put(InsertPersonActionField.EMAIL, dbOperation.tx().getOnlyAttributeOfThing(answer, PERSON, EMAIL));
-                put(InsertPersonActionField.DATE_OF_BIRTH, dbOperation.tx().getOnlyAttributeOfThing(answer, PERSON, DATE_OF_BIRTH));
-                put(InsertPersonActionField.GENDER, dbOperation.tx().getOnlyAttributeOfThing(answer, PERSON, GENDER));
-                put(InsertPersonActionField.FORENAME, dbOperation.tx().getOnlyAttributeOfThing(answer, PERSON, FORENAME));
-                put(InsertPersonActionField.SURNAME, dbOperation.tx().getOnlyAttributeOfThing(answer, PERSON, SURNAME));
+                put(InsertPersonActionField.EMAIL, dbOperation.getOnlyAttributeOfThing(answer, PERSON, EMAIL));
+                put(InsertPersonActionField.DATE_OF_BIRTH, dbOperation.getOnlyAttributeOfThing(answer, PERSON, DATE_OF_BIRTH));
+                put(InsertPersonActionField.GENDER, dbOperation.getOnlyAttributeOfThing(answer, PERSON, GENDER));
+                put(InsertPersonActionField.FORENAME, dbOperation.getOnlyAttributeOfThing(answer, PERSON, FORENAME));
+                put(InsertPersonActionField.SURNAME, dbOperation.getOnlyAttributeOfThing(answer, PERSON, SURNAME));
             }};
     }
 }

@@ -1,9 +1,12 @@
 package grakn.simulation.db.common;
 
 import grakn.simulation.config.Config;
+import grakn.simulation.db.common.action.ActionFactory;
 import grakn.simulation.db.common.agent.base.Agent;
+import grakn.simulation.db.common.agent.base.SimulationContext;
 import grakn.simulation.db.common.agent.interaction.AgentFactory;
 import grakn.simulation.db.common.driver.DbDriver;
+import grakn.simulation.db.common.driver.DbOperation;
 import grakn.simulation.db.common.world.World;
 import grakn.simulation.utils.RandomSource;
 import org.slf4j.Logger;
@@ -20,10 +23,10 @@ import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
-public abstract class Simulation<DB_DRIVER extends DbDriver> implements SimulationContext {
+public abstract class Simulation<DB_DRIVER extends DbDriver<DB_OPERATION>, DB_OPERATION extends DbOperation> implements SimulationContext {
 
     final static Logger LOG = LoggerFactory.getLogger(Simulation.class);
-    private final List<Agent<?, DB_DRIVER>> agentList;
+    private final List<Agent<?, DB_DRIVER, DB_OPERATION>> agentList;
     protected final DB_DRIVER driver;
     private final Random random;
     private final List<Config.Agent> agentConfigs;
@@ -44,11 +47,11 @@ public abstract class Simulation<DB_DRIVER extends DbDriver> implements Simulati
         this.agentList = agentListFromConfigs();
     }
 
-    protected List<Agent<?, DB_DRIVER>> agentListFromConfigs() {
-        List<Agent<?, DB_DRIVER>> agents = new ArrayList<>();
+    protected List<Agent<?, DB_DRIVER, DB_OPERATION>> agentListFromConfigs() {
+        List<Agent<?, DB_DRIVER, DB_OPERATION>> agents = new ArrayList<>();
         for (Config.Agent agentConfig : agentConfigs) {
             if (agentConfig.getAgentMode().getRun()) {
-                Agent<?, DB_DRIVER> agent = new AgentFactory<>(driver).get(agentConfig.getName());
+                Agent<?, DB_DRIVER, DB_OPERATION> agent = new AgentFactory<>(driver, actionFactory()).get(agentConfig.getName());
                 agent.setTrace(agentConfig.getAgentMode().getTrace());
                 agents.add(agent);
             }
@@ -56,13 +59,15 @@ public abstract class Simulation<DB_DRIVER extends DbDriver> implements Simulati
         return agents;
     }
 
+    protected abstract ActionFactory<DB_OPERATION, ?> actionFactory();
+
     protected abstract void initialise(Map<String, Path> initialisationDataPaths);
 
     public Report iterate() {
 
         LOG.info("Simulation step: {}", simulationStep);
         report.clean();
-        for (Agent<?, DB_DRIVER> agent : agentList) {
+        for (Agent<?, DB_DRIVER, DB_OPERATION> agent : agentList) {
             this.report.addAgentResult(agent.getClass().getName(), agent.iterate(this, RandomSource.nextSource(random)));
         }
         closeIteration();  // We want to test opening new sessions each iteration.
@@ -97,7 +102,6 @@ public abstract class Simulation<DB_DRIVER extends DbDriver> implements Simulati
         return test;
     }
 
-    @Override
     public Report getReport() {
         return report;
     }
@@ -106,16 +110,16 @@ public abstract class Simulation<DB_DRIVER extends DbDriver> implements Simulati
 
     public class Report {
 
-        private ConcurrentHashMap<String, Agent<?, DB_DRIVER>.Report> agentReports = new ConcurrentHashMap<>();
+        private ConcurrentHashMap<String, Agent<?, DB_DRIVER, ?>.Report> agentReports = new ConcurrentHashMap<>();
 
-        public void addAgentResult(String agentName, Agent<?, DB_DRIVER>.Report agentReport) {
+        public void addAgentResult(String agentName, Agent<?, DB_DRIVER, ?>.Report agentReport) {
             if (agentReport == null) {
                 throw new NullPointerException(String.format("The result returned from a %s agent was null", agentName));
             }
             agentReports.put(agentName, agentReport);
         }
 
-        public Agent<?, DB_DRIVER>.Report getAgentReport(String agentName) {
+        public Agent<?, DB_DRIVER, ?>.Report getAgentReport(String agentName) {
             return agentReports.get(agentName);
         }
 

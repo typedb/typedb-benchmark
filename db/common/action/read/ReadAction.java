@@ -1,11 +1,11 @@
 package grakn.simulation.db.common.action.read;
 
 import grakn.simulation.db.common.action.Action;
-import grakn.simulation.db.common.operation.DbOperationController;
+import grakn.simulation.db.common.driver.DbOperation;
 
 import java.util.HashMap;
 
-public abstract class ReadAction<DB_OPERATION extends DbOperationController.DbOperation, ACTION_RETURN_TYPE> extends Action<DB_OPERATION, ACTION_RETURN_TYPE> {
+public abstract class ReadAction<DB_OPERATION extends DbOperation, ACTION_RETURN_TYPE> extends Action<DB_OPERATION, ACTION_RETURN_TYPE> {
     public ReadAction(DB_OPERATION dbOperation) {
         super(dbOperation);
     }

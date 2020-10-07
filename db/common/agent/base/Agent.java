@@ -1,11 +1,12 @@
 package grakn.simulation.db.common.agent.base;
 
 import grabl.tracing.client.GrablTracingThreadStatic;
-import grakn.simulation.db.common.SimulationContext;
 import grakn.simulation.db.common.action.Action;
-import grakn.simulation.db.common.agent.utils.Pair;
+import grakn.simulation.db.common.action.ActionFactory;
+import grakn.simulation.db.common.driver.DbOperation;
+import grakn.simulation.db.common.utils.Pair;
 import grakn.simulation.db.common.driver.DbDriver;
-import grakn.simulation.db.common.operation.DbOperationController;
+import grakn.simulation.db.common.driver.DbOperationFactory;
 import grakn.simulation.db.common.world.Region;
 import grakn.simulation.db.common.world.World;
 import grakn.simulation.utils.RandomSource;
@@ -33,16 +34,22 @@ import static grabl.tracing.client.GrablTracingThreadStatic.traceOnThread;
  * @param <REGION> The type of region used by the agent.
  * @param <DB_DRIVER> The database context used by the agent.
  */
-public abstract class Agent<REGION extends Region, DB_DRIVER extends DbDriver> {
+public abstract class Agent<REGION extends Region, DB_DRIVER extends DbDriver<DB_OPERATION>, DB_OPERATION extends DbOperation> {
 
     private final Logger logger;
     private boolean traceAgent = true;
     private final DB_DRIVER dbDriver;
+    private final ActionFactory<DB_OPERATION, ?> actionFactory;
     private final Report report = new Report();
 
-    protected Agent(DB_DRIVER dbDriver) {
+    protected Agent(DB_DRIVER dbDriver, ActionFactory<DB_OPERATION, ?> actionFactory) {
         this.dbDriver = dbDriver;
+        this.actionFactory = actionFactory;
         logger = LoggerFactory.getLogger(this.getClass());
+    }
+
+    protected ActionFactory<DB_OPERATION, ?> actionFactory() {
+        return actionFactory;
     }
 
     public void setTrace(boolean trace) {
@@ -68,9 +75,9 @@ public abstract class Agent<REGION extends Region, DB_DRIVER extends DbDriver> {
         Random agentRandom = RandomSource.nextSource(random).startNewRandom();
 
         RegionalAgent regionalAgent = getRegionalAgent(simulationContext.simulationStep(), region.tracker(), agentRandom, simulationContext.test());
-        DbOperationController dbOpController = dbDriver.getDbOpController(region, logger);
+        DbOperationFactory<DB_OPERATION> dbOperationFactory = dbDriver.getDbOperationFactory(region, logger);
 
-        RegionalAgent.Report report = regionalAgent.runWithReport(dbOpController, region, simulationContext);
+        RegionalAgent.Report report = regionalAgent.runWithReport(dbOperationFactory, region, simulationContext);
         this.report.addRegionalAgentReport(region.tracker(), report);
     }
 
@@ -116,18 +123,18 @@ public abstract class Agent<REGION extends Region, DB_DRIVER extends DbDriver> {
             return tracker;
         }
 
-        protected Report runWithReport(DbOperationController dbOperationController, REGION region, SimulationContext simulationContext) {
-            run(dbOperationController, region, simulationContext);
+        protected Report runWithReport(DbOperationFactory<DB_OPERATION> dbOperationFactory, REGION region, SimulationContext simulationContext) {
+            run(dbOperationFactory, region, simulationContext);
             return report;
         }
 
-        protected abstract void run(DbOperationController dbOperationController, REGION region, SimulationContext simulationContext);
+        protected abstract void run(DbOperationFactory<DB_OPERATION> dbOperationFactory, REGION region, SimulationContext simulationContext);
 
-        void runWithTracing(DbOperationController dbOperationController, REGION region, SimulationContext simulationContext) {
+        void runWithTracing(DbOperationFactory<DB_OPERATION> dbOperationFactory, REGION region, SimulationContext simulationContext) {
             String name = this.getClass().getSimpleName();
             try (GrablTracingThreadStatic.ThreadTrace trace = traceOnThread(name)) {
                 System.out.println(name);
-                runWithReport(dbOperationController, region, simulationContext);
+                runWithReport(dbOperationFactory, region, simulationContext);
             }
         }
 

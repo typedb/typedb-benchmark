@@ -2,10 +2,9 @@ package grakn.simulation.db.grakn.action.write;
 
 import grakn.client.answer.ConceptMap;
 import grakn.simulation.db.common.action.write.InsertProductAction;
-import grakn.simulation.db.common.operation.TransactionDbOperationController;
+import grakn.simulation.db.common.driver.GraknOperation;
 import grakn.simulation.db.common.world.World;
-import grakn.simulation.db.grakn.driver.GraknDbOperationController;
-import grakn.simulation.db.grakn.driver.GraknTransaction;
+import grakn.simulation.db.grakn.driver.GraknOperation;
 import graql.lang.Graql;
 import graql.lang.query.GraqlInsert;
 
@@ -21,8 +20,8 @@ import static grakn.simulation.db.grakn.schema.Schema.PRODUCT_BARCODE;
 import static grakn.simulation.db.grakn.schema.Schema.PRODUCT_DESCRIPTION;
 import static grakn.simulation.db.grakn.schema.Schema.PRODUCT_NAME;
 
-public class GraknInsertProductAction extends InsertProductAction<GraknDbOperationController.TransactionalDbOperation, ConceptMap> {
-    public GraknInsertProductAction(TransactionDbOperationController<GraknTransaction>.TransactionalDbOperation dbOperation, World.Continent continent, Double barcode, String productName, String productDescription) {
+public class GraknInsertProductAction extends InsertProductAction<GraknOperation, ConceptMap> {
+    public GraknInsertProductAction(GraknOperation dbOperation, World.Continent continent, Double barcode, String productName, String productDescription) {
         super(dbOperation, continent, barcode, productName, productDescription);
     }
 
@@ -43,7 +42,7 @@ public class GraknInsertProductAction extends InsertProductAction<GraknDbOperati
                         .rel(PRODUCED_IN_PRODUCT, Graql.var(PRODUCT))
                         .rel(PRODUCED_IN_CONTINENT, Graql.var(CONTINENT))
         );
-        return singleResult(dbOperation.tx().execute(insertProductQuery));
+        return singleResult(dbOperation.execute(insertProductQuery));
     }
 
     @Override

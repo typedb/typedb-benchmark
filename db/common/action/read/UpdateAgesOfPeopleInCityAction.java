@@ -1,13 +1,13 @@
 package grakn.simulation.db.common.action.read;
 
-import grakn.simulation.db.common.operation.DbOperationController;
+import grakn.simulation.db.common.driver.DbOperation;
 import grakn.simulation.db.common.world.World;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public abstract class UpdateAgesOfPeopleInCityAction<DB_OPERATION extends DbOperationController.DbOperation> extends ReadAction<DB_OPERATION, Integer> {
+public abstract class UpdateAgesOfPeopleInCityAction<DB_OPERATION extends DbOperation> extends ReadAction<DB_OPERATION, Integer> {
     protected final LocalDateTime today;
     protected final World.City city;
 

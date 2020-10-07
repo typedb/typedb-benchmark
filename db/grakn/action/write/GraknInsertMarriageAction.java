@@ -3,10 +3,9 @@ package grakn.simulation.db.grakn.action.write;
 import grakn.client.answer.ConceptMap;
 import grakn.simulation.db.common.action.Action;
 import grakn.simulation.db.common.action.write.InsertMarriageAction;
-import grakn.simulation.db.common.operation.TransactionDbOperationController;
+import grakn.simulation.db.common.driver.GraknOperation;
 import grakn.simulation.db.common.world.World;
-import grakn.simulation.db.grakn.driver.GraknDbOperationController;
-import grakn.simulation.db.grakn.driver.GraknTransaction;
+import grakn.simulation.db.grakn.driver.GraknOperation;
 import graql.lang.Graql;
 import graql.lang.query.GraqlInsert;
 import graql.lang.statement.Statement;
@@ -26,9 +25,9 @@ import static grakn.simulation.db.grakn.schema.Schema.MARRIAGE_ID;
 import static grakn.simulation.db.grakn.schema.Schema.MARRIAGE_WIFE;
 import static grakn.simulation.db.grakn.schema.Schema.PERSON;
 
-public class GraknInsertMarriageAction extends InsertMarriageAction<GraknDbOperationController.TransactionalDbOperation, ConceptMap> {
+public class GraknInsertMarriageAction extends InsertMarriageAction<GraknOperation, ConceptMap> {
 
-    public GraknInsertMarriageAction(TransactionDbOperationController<GraknTransaction>.TransactionalDbOperation dbOperation, World.City city, int marriageIdentifier, String wifeEmail, String husbandEmail) {
+    public GraknInsertMarriageAction(GraknOperation dbOperation, World.City city, int marriageIdentifier, String wifeEmail, String husbandEmail) {
         super(dbOperation, city, marriageIdentifier, wifeEmail, husbandEmail);
     }
 
@@ -55,16 +54,16 @@ public class GraknInsertMarriageAction extends InsertMarriageAction<GraknDbOpera
                         .has(MARRIAGE_ID, marriageIdentifierVar),
                 Graql.var().isa(LOCATES).rel(LOCATES_LOCATED, marriage).rel(LOCATES_LOCATION, city)
         );
-        return Action.singleResult(dbOperation.tx().execute(marriageQuery));
+        return Action.singleResult(dbOperation.execute(marriageQuery));
     }
 
     @Override
     protected HashMap<ComparableField, Object> outputForReport(ConceptMap answer) {
         return new HashMap<ComparableField, Object>(){{
-            put(InsertMarriageActionField.MARRIAGE_IDENTIFIER, dbOperation.tx().getOnlyAttributeOfThing(answer, "marriage", MARRIAGE_ID));
-            put(InsertMarriageActionField.WIFE_EMAIL, dbOperation.tx().getOnlyAttributeOfThing(answer, "wife", EMAIL));
-            put(InsertMarriageActionField.HUSBAND_EMAIL, dbOperation.tx().getOnlyAttributeOfThing(answer, "husband", EMAIL));
-            put(InsertMarriageActionField.CITY_NAME, dbOperation.tx().getOnlyAttributeOfThing(answer, CITY, LOCATION_NAME));
+            put(InsertMarriageActionField.MARRIAGE_IDENTIFIER, dbOperation.getOnlyAttributeOfThing(answer, "marriage", MARRIAGE_ID));
+            put(InsertMarriageActionField.WIFE_EMAIL, dbOperation.getOnlyAttributeOfThing(answer, "wife", EMAIL));
+            put(InsertMarriageActionField.HUSBAND_EMAIL, dbOperation.getOnlyAttributeOfThing(answer, "husband", EMAIL));
+            put(InsertMarriageActionField.CITY_NAME, dbOperation.getOnlyAttributeOfThing(answer, CITY, LOCATION_NAME));
         }};
 
     }

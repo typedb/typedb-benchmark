@@ -1,8 +1,8 @@
 package grakn.simulation.db.common.action.read;
 
 import grakn.simulation.db.common.action.Action;
-import grakn.simulation.db.common.operation.DbOperationController;
-import grakn.simulation.db.common.agent.interaction.ParentshipAgent;
+import grakn.simulation.db.common.action.SpouseType;
+import grakn.simulation.db.common.driver.DbOperation;
 import grakn.simulation.db.common.world.World;
 
 import java.time.LocalDateTime;
@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public abstract class MarriedCoupleAction<DB_OPERATION extends DbOperationController.DbOperation> extends ReadAction<DB_OPERATION, List<HashMap<ParentshipAgent.SpouseType, String>>> {
+public abstract class MarriedCoupleAction<DB_OPERATION extends DbOperation> extends ReadAction<DB_OPERATION, List<HashMap<SpouseType, String>>> {
     protected final World.City city;
     protected final LocalDateTime today;
 

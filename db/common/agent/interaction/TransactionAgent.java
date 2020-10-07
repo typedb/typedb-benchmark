@@ -1,23 +1,25 @@
 package grakn.simulation.db.common.agent.interaction;
 
+import grakn.simulation.db.common.agent.base.SimulationContext;
+import grakn.simulation.db.common.action.ActionFactory;
 import grakn.simulation.db.common.action.read.CompaniesInContinentAction;
 import grakn.simulation.db.common.action.read.ProductsInContinentAction;
-import grakn.simulation.db.common.operation.DbOperationController;
-import grakn.simulation.db.common.SimulationContext;
 import grakn.simulation.db.common.agent.region.ContinentAgent;
 import grakn.simulation.db.common.agent.utils.Allocation;
-import grakn.simulation.db.common.agent.utils.Pair;
+import grakn.simulation.db.common.driver.DbOperation;
+import grakn.simulation.db.common.utils.Pair;
 import grakn.simulation.db.common.driver.DbDriver;
+import grakn.simulation.db.common.driver.DbOperationFactory;
 import grakn.simulation.db.common.world.World;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public class TransactionAgent<DB_DRIVER extends DbDriver> extends ContinentAgent<DB_DRIVER> {
+public class TransactionAgent<DB_DRIVER extends DbDriver<DB_OPERATION>, DB_OPERATION extends DbOperation> extends ContinentAgent<DB_DRIVER, DB_OPERATION> {
 
-    public TransactionAgent(DB_DRIVER dbDriver) {
-        super(dbDriver);
+    public TransactionAgent(DB_DRIVER dbDriver, ActionFactory<DB_OPERATION, ?> actionFactory) {
+        super(dbDriver, actionFactory);
     }
 
     @Override
@@ -31,18 +33,18 @@ public class TransactionAgent<DB_DRIVER extends DbDriver> extends ContinentAgent
         }
 
         @Override
-        protected void run(DbOperationController dbOperationController, World.Continent continent, SimulationContext simulationContext) {
+        protected void run(DbOperationFactory<DB_OPERATION> dbOperationFactory, World.Continent continent, SimulationContext simulationContext) {
             List<Long> companyNumbers;
 
-            CompaniesInContinentAction<?> companiesInContinentAction = dbOperationController.actionFactory().companiesInContinentAction(continent);
-            try (DbOperationController.DbOperation dbOperation = dbOperationController.newDbOperation(companiesInContinentAction, tracker())) {
+            try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker())) {
+                CompaniesInContinentAction<?> companiesInContinentAction = actionFactory().companiesInContinentAction(dbOperation, continent);
                 companyNumbers = runAction(companiesInContinentAction);
             }
             shuffle(companyNumbers);
 
             List<Double> productBarcodes;
-            ProductsInContinentAction<?> productsInContinentAction = dbOperationController.actionFactory().productsInContinentAction(continent);
-            try (DbOperationController.DbOperation dbOperation = dbOperationController.newDbOperation(productsInContinentAction, tracker())) {
+            try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker())) {
+                ProductsInContinentAction<?> productsInContinentAction = actionFactory().productsInContinentAction(dbOperation, continent);
                 productBarcodes = runAction(productsInContinentAction);
             }
 
@@ -59,12 +61,12 @@ public class TransactionAgent<DB_DRIVER extends DbDriver> extends ContinentAgent
                 Pair<Long, Double> buyerAndProduct = new Pair(companyNumber, productBarcode);
                 transactions.add(buyerAndProduct);
             }
-            try (DbOperationController.DbOperation dbOperation = dbOperationController.newDbOperation("InsertTransaction", tracker())) {
+            try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker())) {
                 Allocation.allocate(transactions, companyNumbers, (transaction, sellerCompanyNumber) -> {
                     double value = randomAttributeGenerator().boundRandomDouble(0.01, 10000.00);
                     int productQuantity = randomAttributeGenerator().boundRandomInt(1, 1000);
                     boolean isTaxable = randomAttributeGenerator().bool();
-                    runAction(dbOperationController.actionFactory().insertTransactionAction(continent, transaction, sellerCompanyNumber, value, productQuantity, isTaxable));
+                    runAction(actionFactory().insertTransactionAction(dbOperation, continent, transaction, sellerCompanyNumber, value, productQuantity, isTaxable));
                 });
                 dbOperation.save();
             }

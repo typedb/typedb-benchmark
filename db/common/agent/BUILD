@@ -8,8 +8,10 @@ java_library(
     ]),
     visibility = ["//visibility:public"],
     deps = [
+        "//db/common/action",
         "//db/common/driver",
         "//db/common/world",
+        "//db/common/utils",
         "//utils",
         "@graknlabs_grabl_tracing//client",
         "@maven//:commons_cli_commons_cli",

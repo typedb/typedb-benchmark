@@ -2,7 +2,7 @@ package grakn.simulation.db.neo4j.driver;
 
 import grabl.tracing.client.GrablTracingThreadStatic;
 import grakn.simulation.db.common.driver.DbTransaction;
-import grakn.simulation.db.common.operation.LogWrapper;
+import grakn.simulation.db.common.driver.LogWrapper;
 import org.neo4j.driver.Query;
 import org.neo4j.driver.Record;
 import org.neo4j.driver.Session;

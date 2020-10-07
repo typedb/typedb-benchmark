@@ -2,7 +2,7 @@ package grakn.simulation.db.neo4j.agents.interaction;
 
 import grakn.simulation.db.common.agent.base.ActionResult;
 import grakn.simulation.db.common.agent.interaction.TransactionAgentBase;
-import grakn.simulation.db.common.agent.utils.Pair;
+import grakn.simulation.db.common.utils.Pair;
 import grakn.simulation.db.common.world.World;
 import org.neo4j.driver.Query;
 import org.neo4j.driver.Record;

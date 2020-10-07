@@ -4,11 +4,13 @@ import grakn.client.GraknClient;
 import grakn.client.GraknClient.Session;
 import grakn.simulation.config.Config;
 import grakn.simulation.db.common.TransactionalSimulation;
+import grakn.simulation.db.common.action.ActionFactory;
 import grakn.simulation.db.common.world.World;
 import grakn.simulation.db.common.yaml_tool.YAMLException;
 import grakn.simulation.db.common.yaml_tool.YAMLLoader;
+import grakn.simulation.db.grakn.action.GraknActionFactory;
 import grakn.simulation.db.grakn.driver.GraknDriver;
-import grakn.simulation.db.grakn.driver.GraknTransaction;
+import grakn.simulation.db.grakn.driver.GraknOperation;
 import grakn.simulation.db.grakn.yaml_tool.GraknYAMLLoader;
 import grakn.simulation.utils.RandomSource;
 import graql.lang.Graql;
@@ -22,10 +24,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
-public class GraknSimulation extends TransactionalSimulation<GraknDriver, GraknTransaction, Session> {
+public class GraknSimulation extends TransactionalSimulation<GraknDriver, GraknOperation, Session> {
 
     public GraknSimulation(GraknDriver driver, Map<String, Path> initialisationDataPaths, RandomSource randomSource, World world, List<Config.Agent> agentConfigs, Function<Integer, Boolean> iterationSamplingFunction, boolean test) {
         super(driver, initialisationDataPaths, randomSource, world, agentConfigs, iterationSamplingFunction, test);
+    }
+
+    @Override
+    protected ActionFactory<?, ?> actionFactory() {
+        return new GraknActionFactory(null);
     }
 
     @Override

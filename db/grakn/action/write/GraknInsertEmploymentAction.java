@@ -2,8 +2,9 @@ package grakn.simulation.db.grakn.action.write;
 
 import grakn.client.answer.ConceptMap;
 import grakn.simulation.db.common.action.write.InsertEmploymentAction;
+import grakn.simulation.db.common.driver.GraknOperation;
 import grakn.simulation.db.common.world.World;
-import grakn.simulation.db.grakn.driver.GraknDbOperationController;
+import grakn.simulation.db.grakn.driver.GraknOperation;
 import graql.lang.Graql;
 import graql.lang.query.GraqlInsert;
 import graql.lang.statement.Statement;
@@ -35,8 +36,8 @@ import static grakn.simulation.db.grakn.schema.Schema.START_DATE;
 import static grakn.simulation.db.grakn.schema.Schema.WAGE;
 import static grakn.simulation.db.grakn.schema.Schema.WAGE_VALUE;
 
-public class GraknInsertEmploymentAction extends InsertEmploymentAction<GraknDbOperationController.TransactionalDbOperation, ConceptMap> {
-    public GraknInsertEmploymentAction(GraknDbOperationController.TransactionalDbOperation dbOperation, World.City worldCity, String employeeEmail, long companyNumber, LocalDateTime employmentDate, double wageValue, String contractContent, double contractedHours) {
+public class GraknInsertEmploymentAction extends InsertEmploymentAction<GraknOperation, ConceptMap> {
+    public GraknInsertEmploymentAction(GraknOperation dbOperation, World.City worldCity, String employeeEmail, long companyNumber, LocalDateTime employmentDate, double wageValue, String contractContent, double contractedHours) {
         super(dbOperation, worldCity, employeeEmail, companyNumber, employmentDate, wageValue, contractContent, contractedHours);
     }
 
@@ -91,20 +92,20 @@ public class GraknInsertEmploymentAction extends InsertEmploymentAction<GraknDbO
                         .has(CONTRACT_CONTENT, contractContent)
                         .has(CONTRACTED_HOURS, contractedHours)
         );
-        return singleResult(dbOperation.tx().execute(insertEmploymentQuery));
+        return singleResult(dbOperation.execute(insertEmploymentQuery));
     }
 
     @Override
     public HashMap<ComparableField, Object> outputForReport(ConceptMap answer) {
         return new HashMap<ComparableField, Object>() {{
-                put(InsertEmploymentActionField.CITY_NAME, dbOperation.tx().getOnlyAttributeOfThing(answer, CITY, LOCATION_NAME));
-                put(InsertEmploymentActionField.PERSON_EMAIL, dbOperation.tx().getOnlyAttributeOfThing(answer, PERSON, EMAIL));
-                put(InsertEmploymentActionField.COMPANY_NUMBER, dbOperation.tx().getOnlyAttributeOfThing(answer, COMPANY, COMPANY_NUMBER));
-                put(InsertEmploymentActionField.START_DATE, dbOperation.tx().getOnlyAttributeOfThing(answer, EMPLOYMENT, START_DATE));
-                put(InsertEmploymentActionField.WAGE, dbOperation.tx().getOnlyAttributeOfThing(answer, WAGE, WAGE_VALUE));
-                put(InsertEmploymentActionField.CURRENCY, dbOperation.tx().getOnlyAttributeOfThing(answer, WAGE, CURRENCY));
-                put(InsertEmploymentActionField.CONTRACT_CONTENT, dbOperation.tx().getOnlyAttributeOfThing(answer, CONTRACT, CONTRACT_CONTENT));
-                put(InsertEmploymentActionField.CONTRACTED_HOURS, dbOperation.tx().getOnlyAttributeOfThing(answer, CONTRACT, CONTRACTED_HOURS));
+                put(InsertEmploymentActionField.CITY_NAME, dbOperation.getOnlyAttributeOfThing(answer, CITY, LOCATION_NAME));
+                put(InsertEmploymentActionField.PERSON_EMAIL, dbOperation.getOnlyAttributeOfThing(answer, PERSON, EMAIL));
+                put(InsertEmploymentActionField.COMPANY_NUMBER, dbOperation.getOnlyAttributeOfThing(answer, COMPANY, COMPANY_NUMBER));
+                put(InsertEmploymentActionField.START_DATE, dbOperation.getOnlyAttributeOfThing(answer, EMPLOYMENT, START_DATE));
+                put(InsertEmploymentActionField.WAGE, dbOperation.getOnlyAttributeOfThing(answer, WAGE, WAGE_VALUE));
+                put(InsertEmploymentActionField.CURRENCY, dbOperation.getOnlyAttributeOfThing(answer, WAGE, CURRENCY));
+                put(InsertEmploymentActionField.CONTRACT_CONTENT, dbOperation.getOnlyAttributeOfThing(answer, CONTRACT, CONTRACT_CONTENT));
+                put(InsertEmploymentActionField.CONTRACTED_HOURS, dbOperation.getOnlyAttributeOfThing(answer, CONTRACT, CONTRACTED_HOURS));
             }};
     }
 }

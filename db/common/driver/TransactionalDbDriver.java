@@ -1,8 +1,6 @@
 package grakn.simulation.db.common.driver;
 
-import grakn.simulation.db.common.operation.LogWrapper;
-
-public abstract class TransactionalDbDriver<TRANSACTION extends DbTransaction, SESSION> extends DbDriver {
+public abstract class TransactionalDbDriver<TRANSACTION, SESSION, DB_OPERATION extends TransactionalDbOperation> extends DbDriver<DB_OPERATION> {
     public enum TracingLabel {
         OPEN_CLIENT("openClient"),
         CLOSE_CLIENT("closeClient"),
@@ -32,6 +30,6 @@ public abstract class TransactionalDbDriver<TRANSACTION extends DbTransaction, S
     public abstract void close();
 
     public abstract class Session {
-        public abstract TRANSACTION tx(LogWrapper log, String tracker);
+        public abstract TRANSACTION tx();
     }
 }

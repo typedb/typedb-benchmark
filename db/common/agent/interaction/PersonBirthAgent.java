@@ -1,17 +1,19 @@
 package grakn.simulation.db.common.agent.interaction;
 
-import grakn.simulation.db.common.operation.DbOperationController;
-import grakn.simulation.db.common.SimulationContext;
+import grakn.simulation.db.common.agent.base.SimulationContext;
+import grakn.simulation.db.common.action.ActionFactory;
 import grakn.simulation.db.common.agent.region.CityAgent;
 import grakn.simulation.db.common.driver.DbDriver;
+import grakn.simulation.db.common.driver.DbOperation;
+import grakn.simulation.db.common.driver.DbOperationFactory;
 import grakn.simulation.db.common.world.World;
 
 import java.util.Random;
 
-public class PersonBirthAgent<DB_DRIVER extends DbDriver> extends CityAgent<DB_DRIVER> {
+public class PersonBirthAgent<DB_DRIVER extends DbDriver<DB_OPERATION>, DB_OPERATION extends DbOperation> extends CityAgent<DB_DRIVER, DB_OPERATION> {
 
-    public PersonBirthAgent(DB_DRIVER dbDriver) {
-        super(dbDriver);
+    public PersonBirthAgent(DB_DRIVER dbDriver, ActionFactory<DB_OPERATION, ?> actionFactory) {
+        super(dbDriver, actionFactory);
     }
 
     @Override
@@ -25,10 +27,10 @@ public class PersonBirthAgent<DB_DRIVER extends DbDriver> extends CityAgent<DB_D
         }
 
         @Override
-        protected void run(DbOperationController dbOperationController, World.City city, SimulationContext simulationContext) {
+        protected void run(DbOperationFactory<DB_OPERATION> dbOperationFactory, World.City city, SimulationContext simulationContext) {
             // Find bachelors and bachelorettes who are considered adults and who are not in a marriage and pair them off randomly
             int numBirths = simulationContext.world().getScaleFactor();
-            try (DbOperationController.DbOperation dbOperation = dbOperationController.newDbOperation("insertPerson", tracker())) {
+            try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker())) {
                 for (int i = 0; i < numBirths; i++) {
                     String gender;
                     String forename;
@@ -52,7 +54,7 @@ public class PersonBirthAgent<DB_DRIVER extends DbDriver> extends CityAgent<DB_D
                             + city.country() + "_"
                             + city.country().continent()
                             + "@gmail.com";
-                    runAction(dbOperationController.actionFactory().insertPerson(city, simulationContext.today(), email, gender, forename, surname));
+                    runAction(actionFactory().insertPersonAction(city, simulationContext.today(), email, gender, forename, surname));
                 }
                 dbOperation.save();
             }

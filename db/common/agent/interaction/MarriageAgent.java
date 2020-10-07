@@ -1,20 +1,22 @@
 package grakn.simulation.db.common.agent.interaction;
 
+import grakn.simulation.db.common.agent.base.SimulationContext;
+import grakn.simulation.db.common.action.ActionFactory;
 import grakn.simulation.db.common.action.read.UnmarriedPeopleInCityAction;
-import grakn.simulation.db.common.operation.DbOperationController;
-import grakn.simulation.db.common.SimulationContext;
 import grakn.simulation.db.common.agent.region.CityAgent;
 import grakn.simulation.db.common.driver.DbDriver;
+import grakn.simulation.db.common.driver.DbOperation;
+import grakn.simulation.db.common.driver.DbOperationFactory;
 import grakn.simulation.db.common.world.World;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Random;
 
-public class MarriageAgent<DB_DRIVER extends DbDriver> extends CityAgent<DB_DRIVER> {
+public class MarriageAgent<DB_DRIVER extends DbDriver<DB_OPERATION>, DB_OPERATION extends DbOperation> extends CityAgent<DB_DRIVER, DB_OPERATION> {
 
-    public MarriageAgent(DB_DRIVER dbDriver) {
-        super(dbDriver);
+    public MarriageAgent(DB_DRIVER dbDriver, ActionFactory<DB_OPERATION, ?> actionFactory) {
+        super(dbDriver, actionFactory);
     }
 
     @Override
@@ -28,32 +30,32 @@ public class MarriageAgent<DB_DRIVER extends DbDriver> extends CityAgent<DB_DRIV
         }
 
         @Override
-        protected void run(DbOperationController dbOperationController, World.City city, SimulationContext simulationContext) {
+        protected void run(DbOperationFactory<DB_OPERATION> dbOperationFactory, World.City city, SimulationContext simulationContext) {
 
             // Find bachelors and bachelorettes who are considered adults and who are not in a marriage and pair them off randomly
             LocalDateTime dobOfAdults = simulationContext.today().minusYears(simulationContext.world().AGE_OF_ADULTHOOD);
             List<String> womenEmails;
-            UnmarriedPeopleInCityAction<?> unmarriedWomenInCityAction = dbOperationController.actionFactory().unmarriedPeopleInCityAction(city, "female", dobOfAdults);
-            try (DbOperationController.DbOperation dbOperation = dbOperationController.newDbOperation(unmarriedWomenInCityAction, tracker())) {
+            try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker())) {
+                UnmarriedPeopleInCityAction<?> unmarriedWomenInCityAction = actionFactory().unmarriedPeopleInCityAction(dbOperation, city, "female", dobOfAdults);
                 womenEmails = runAction(unmarriedWomenInCityAction);
             }
             shuffle(womenEmails);
 
             List<String> menEmails;
-            UnmarriedPeopleInCityAction<?> unmarriedMenInCityAction = dbOperationController.actionFactory().unmarriedPeopleInCityAction(city, "male", dobOfAdults);
-            try (DbOperationController.DbOperation dbOperation = dbOperationController.newDbOperation(unmarriedMenInCityAction, tracker())) {
+            try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker())) {
+                UnmarriedPeopleInCityAction<?> unmarriedMenInCityAction = actionFactory().unmarriedPeopleInCityAction(dbOperation, city, "male", dobOfAdults);
                 menEmails = runAction(unmarriedMenInCityAction);
             }
             shuffle(menEmails);
 
             int numMarriagesPossible = Math.min(simulationContext.world().getScaleFactor(), Math.min(womenEmails.size(), menEmails.size()));
-            try (DbOperationController.DbOperation dbOperation = dbOperationController.newDbOperation("InsertMarriage", tracker())) {
+            try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker())) {
                 if (numMarriagesPossible > 0) {
                     for (int i = 0; i < numMarriagesPossible; i++) {
                         String wifeEmail = womenEmails.get(i);
                         String husbandEmail = menEmails.get(i);
                         int marriageIdentifier = (wifeEmail + husbandEmail).hashCode();
-                        runAction(dbOperationController.actionFactory().insertMarriageAction(city, marriageIdentifier, wifeEmail, husbandEmail));
+                        runAction(actionFactory().insertMarriageAction(dbOperation, city, marriageIdentifier, wifeEmail, husbandEmail));
                     }
                     dbOperation.save();
                 }

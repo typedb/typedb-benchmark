@@ -1,4 +1,4 @@
-package grakn.simulation.db.common.operation;
+package grakn.simulation.db.common.driver;
 
 import org.slf4j.Logger;
 

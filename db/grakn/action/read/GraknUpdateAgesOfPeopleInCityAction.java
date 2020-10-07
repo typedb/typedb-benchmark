@@ -2,10 +2,9 @@ package grakn.simulation.db.grakn.action.read;
 
 import grabl.tracing.client.GrablTracingThreadStatic;
 import grakn.simulation.db.common.action.read.UpdateAgesOfPeopleInCityAction;
-import grakn.simulation.db.common.operation.TransactionDbOperationController;
+import grakn.simulation.db.common.driver.TransactionalDbOperation;
 import grakn.simulation.db.common.world.World;
-import grakn.simulation.db.grakn.driver.GraknDbOperationController;
-import grakn.simulation.db.grakn.driver.GraknTransaction;
+import grakn.simulation.db.grakn.driver.GraknOperation;
 import graql.lang.Graql;
 import graql.lang.query.GraqlDelete;
 import graql.lang.query.GraqlGet;
@@ -27,8 +26,8 @@ import static grakn.simulation.db.grakn.schema.Schema.EMAIL;
 import static grakn.simulation.db.grakn.schema.Schema.LOCATION_NAME;
 import static grakn.simulation.db.grakn.schema.Schema.PERSON;
 
-public class GraknUpdateAgesOfPeopleInCityAction extends UpdateAgesOfPeopleInCityAction<GraknDbOperationController.TransactionalDbOperation> {
-    public GraknUpdateAgesOfPeopleInCityAction(TransactionDbOperationController<GraknTransaction>.TransactionalDbOperation dbOperation, LocalDateTime today, World.City city) {
+public class GraknUpdateAgesOfPeopleInCityAction extends UpdateAgesOfPeopleInCityAction<GraknOperation> {
+    public GraknUpdateAgesOfPeopleInCityAction(GraknOperation dbOperation, LocalDateTime today, World.City city) {
         super(dbOperation, today, city);
     }
 
@@ -63,7 +62,7 @@ public class GraknUpdateAgesOfPeopleInCityAction extends UpdateAgesOfPeopleInCit
                         .has(AGE, age
                         )
         );
-        dbOperation.tx().execute(deleteImplicitQuery);
+        dbOperation.execute(deleteImplicitQuery);
 
         GraqlInsert insertNewAgeQuery = Graql.match(
                 person
@@ -73,7 +72,7 @@ public class GraknUpdateAgesOfPeopleInCityAction extends UpdateAgesOfPeopleInCit
                 person
                         .has(AGE, newAge)
         );
-        dbOperation.tx().execute(insertNewAgeQuery);
+        dbOperation.execute(insertNewAgeQuery);
     }
 
     private HashMap<String, LocalDateTime> getPeopleBornInCity(World.City worldCity) {
@@ -95,7 +94,7 @@ public class GraknUpdateAgesOfPeopleInCityAction extends UpdateAgesOfPeopleInCit
         ).get().sort(EMAIL);
 
         HashMap<String, LocalDateTime> peopleDobs = new HashMap<>();
-        dbOperation.tx().execute(peopleQuery).forEach(personAnswer -> {
+        dbOperation.execute(peopleQuery).forEach(personAnswer -> {
             LocalDateTime dob = (LocalDateTime) personAnswer.get(DATE_OF_BIRTH).asAttribute().value();
             String email = personAnswer.get(EMAIL).asAttribute().value().toString();
             peopleDobs.put(email, dob);

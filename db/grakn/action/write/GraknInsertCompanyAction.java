@@ -3,10 +3,9 @@ package grakn.simulation.db.grakn.action.write;
 import grakn.client.answer.ConceptMap;
 import grakn.simulation.db.common.action.Action;
 import grakn.simulation.db.common.action.write.InsertCompanyAction;
-import grakn.simulation.db.common.operation.TransactionDbOperationController;
+import grakn.simulation.db.common.driver.GraknOperation;
 import grakn.simulation.db.common.world.World;
-import grakn.simulation.db.grakn.driver.GraknDbOperationController;
-import grakn.simulation.db.grakn.driver.GraknTransaction;
+import grakn.simulation.db.grakn.driver.GraknOperation;
 import graql.lang.Graql;
 import graql.lang.query.GraqlInsert;
 
@@ -23,9 +22,9 @@ import static grakn.simulation.db.grakn.schema.Schema.INCORPORATION_INCORPORATED
 import static grakn.simulation.db.grakn.schema.Schema.INCORPORATION_INCORPORATING;
 import static grakn.simulation.db.grakn.schema.Schema.LOCATION_NAME;
 
-public class GraknInsertCompanyAction extends InsertCompanyAction<GraknDbOperationController.TransactionalDbOperation, ConceptMap> {
+public class GraknInsertCompanyAction extends InsertCompanyAction<GraknOperation, ConceptMap> {
 
-    public GraknInsertCompanyAction(TransactionDbOperationController<GraknTransaction>.TransactionalDbOperation dbOperation, World.Country country, LocalDateTime today, int companyNumber, String companyName) {
+    public GraknInsertCompanyAction(GraknOperation dbOperation, World.Country country, LocalDateTime today, int companyNumber, String companyName) {
         super(dbOperation, country, today, companyNumber, companyName);
     }
 
@@ -43,17 +42,17 @@ public class GraknInsertCompanyAction extends InsertCompanyAction<GraknDbOperati
                                         .rel(INCORPORATION_INCORPORATING, Graql.var(COUNTRY))
                                         .has(DATE_OF_INCORPORATION, today)
                         );
-        return Action.singleResult(dbOperation.tx().execute(query));
+        return Action.singleResult(dbOperation.execute(query));
     }
 
     @Override
     protected HashMap<ComparableField, Object> outputForReport(ConceptMap answer) {
         return new HashMap<ComparableField, Object>() {
             {
-                put(InsertCompanyActionField.COMPANY_NAME, dbOperation.tx().getOnlyAttributeOfThing(answer, COMPANY, COMPANY_NAME));
-                put(InsertCompanyActionField.COMPANY_NUMBER, dbOperation.tx().getOnlyAttributeOfThing(answer, COMPANY, COMPANY_NUMBER));
-                put(InsertCompanyActionField.COUNTRY, dbOperation.tx().getOnlyAttributeOfThing(answer, COUNTRY, LOCATION_NAME));
-                put(InsertCompanyActionField.DATE_OF_INCORPORATION, dbOperation.tx().getOnlyAttributeOfThing(answer, INCORPORATION, DATE_OF_INCORPORATION));
+                put(InsertCompanyActionField.COMPANY_NAME, dbOperation.getOnlyAttributeOfThing(answer, COMPANY, COMPANY_NAME));
+                put(InsertCompanyActionField.COMPANY_NUMBER, dbOperation.getOnlyAttributeOfThing(answer, COMPANY, COMPANY_NUMBER));
+                put(InsertCompanyActionField.COUNTRY, dbOperation.getOnlyAttributeOfThing(answer, COUNTRY, LOCATION_NAME));
+                put(InsertCompanyActionField.DATE_OF_INCORPORATION, dbOperation.getOnlyAttributeOfThing(answer, INCORPORATION, DATE_OF_INCORPORATION));
             }
         };
     }

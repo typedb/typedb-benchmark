@@ -2,9 +2,8 @@ package grakn.simulation.db.grakn.driver;
 
 import grabl.tracing.client.GrablTracingThreadStatic;
 import grakn.client.GraknClient;
-import grakn.simulation.db.common.operation.LogWrapper;
 import grakn.simulation.db.common.driver.TransactionalDbDriver;
-import grakn.simulation.db.common.operation.DbOperationController;
+import grakn.simulation.db.common.driver.DbOperationFactory;
 import grakn.simulation.db.common.world.Region;
 import org.slf4j.Logger;
 
@@ -15,9 +14,8 @@ import static grakn.simulation.db.common.driver.TransactionalDbDriver.TracingLab
 import static grakn.simulation.db.common.driver.TransactionalDbDriver.TracingLabel.CLOSE_SESSION;
 import static grakn.simulation.db.common.driver.TransactionalDbDriver.TracingLabel.OPEN_CLIENT;
 import static grakn.simulation.db.common.driver.TransactionalDbDriver.TracingLabel.OPEN_SESSION;
-import static grakn.simulation.db.common.driver.TransactionalDbDriver.TracingLabel.OPEN_TRANSACTION;
 
-public class GraknDriver extends TransactionalDbDriver<GraknTransaction, GraknClient.Session> {
+public class GraknDriver extends TransactionalDbDriver<GraknClient.Transaction, GraknClient.Session, GraknOperation> {
 
     private final GraknClient client;
     private final String database;
@@ -58,23 +56,23 @@ public class GraknDriver extends TransactionalDbDriver<GraknTransaction, GraknCl
     }
 
     @Override
-    public DbOperationController getDbOpController(Region region, Logger logger) {
-        return new GraknDbOperationController(new GraknSession(session(region.continent().name())), logger);
+    public DbOperationFactory<DB_OPERATION> getDbOperationFactory(Region region, Logger logger) {
+        return new GraknOperationFactory(session(region.continent().name()), logger);
     }
 
-    public class GraknSession extends Session {
-
-        private final GraknClient.Session session;
-
-        public GraknSession(GraknClient.Session session) {
-            this.session = session;
-        }
-
-        @Override
-        public GraknTransaction tx(LogWrapper log, String tracker) {
-            try (GrablTracingThreadStatic.ThreadTrace trace = traceOnThread(OPEN_TRANSACTION.getName())) {
-                return new GraknTransaction(session.transaction(GraknClient.Transaction.Type.WRITE), log, tracker);
-            }
-        }
-    }
+//    public class GraknSession extends Session {
+//
+//        private final GraknClient.Session session;
+//
+//        public GraknSession(GraknClient.Session session) {
+//            this.session = session;
+//        }
+//
+//        @Override
+//        public GraknClient.Transaction tx() {
+//            try (GrablTracingThreadStatic.ThreadTrace trace = traceOnThread(OPEN_TRANSACTION.getName())) {
+//                return session.transaction(GraknClient.Transaction.Type.WRITE);
+//            }
+//        }
+//    }
 }

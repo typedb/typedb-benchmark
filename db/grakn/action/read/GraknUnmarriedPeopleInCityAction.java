@@ -1,10 +1,9 @@
 package grakn.simulation.db.grakn.action.read;
 
 import grakn.simulation.db.common.action.read.UnmarriedPeopleInCityAction;
-import grakn.simulation.db.common.operation.TransactionDbOperationController;
+import grakn.simulation.db.common.driver.TransactionalDbOperation;
 import grakn.simulation.db.common.world.World;
-import grakn.simulation.db.grakn.driver.GraknDbOperationController;
-import grakn.simulation.db.grakn.driver.GraknTransaction;
+import grakn.simulation.db.grakn.driver.GraknOperation;
 import graql.lang.Graql;
 import graql.lang.query.GraqlGet;
 import graql.lang.statement.Statement;
@@ -26,8 +25,8 @@ import static grakn.simulation.db.grakn.schema.Schema.RESIDENCY;
 import static grakn.simulation.db.grakn.schema.Schema.RESIDENCY_LOCATION;
 import static grakn.simulation.db.grakn.schema.Schema.RESIDENCY_RESIDENT;
 
-public class GraknUnmarriedPeopleInCityAction extends UnmarriedPeopleInCityAction<GraknDbOperationController.TransactionalDbOperation> {
-    public GraknUnmarriedPeopleInCityAction(TransactionDbOperationController<GraknTransaction>.TransactionalDbOperation dbOperation, World.City city, String gender, LocalDateTime dobOfAdults) {
+public class GraknUnmarriedPeopleInCityAction extends UnmarriedPeopleInCityAction<GraknOperation> {
+    public GraknUnmarriedPeopleInCityAction(GraknOperation dbOperation, World.City city, String gender, LocalDateTime dobOfAdults) {
         super(dbOperation, city, gender, dobOfAdults);
     }
 
@@ -51,6 +50,6 @@ public class GraknUnmarriedPeopleInCityAction extends UnmarriedPeopleInCityActio
                 Graql.not(Graql.var("r").has(END_DATE, Graql.var(END_DATE))),
                 cityVar.isa(CITY).has(LOCATION_NAME, city.name())
         ).get(EMAIL);
-        return dbOperation.tx().getOrderedAttribute(query, EMAIL, null);
+        return dbOperation.getOrderedAttribute(query, EMAIL, null);
     }
 }

@@ -2,11 +2,9 @@ package grakn.simulation.db.grakn.action.write;
 
 import grakn.client.answer.ConceptMap;
 import grakn.simulation.db.common.action.Action;
+import grakn.simulation.db.common.action.SpouseType;
 import grakn.simulation.db.common.action.write.InsertParentShipAction;
-import grakn.simulation.db.common.agent.interaction.ParentshipAgent;
-import grakn.simulation.db.common.operation.TransactionDbOperationController;
-import grakn.simulation.db.grakn.driver.GraknDbOperationController;
-import grakn.simulation.db.grakn.driver.GraknTransaction;
+import grakn.simulation.db.common.driver.GraknOperation;
 import graql.lang.Graql;
 import graql.lang.query.GraqlInsert;
 import graql.lang.statement.Statement;
@@ -19,8 +17,8 @@ import static grakn.simulation.db.grakn.schema.Schema.PARENTSHIP_CHILD;
 import static grakn.simulation.db.grakn.schema.Schema.PARENTSHIP_PARENT;
 import static grakn.simulation.db.grakn.schema.Schema.PERSON;
 
-public class GraknInsertParentShipAction extends InsertParentShipAction<GraknDbOperationController.TransactionalDbOperation, ConceptMap> {
-    public GraknInsertParentShipAction(TransactionDbOperationController<GraknTransaction>.TransactionalDbOperation dbOperation, HashMap<ParentshipAgent.SpouseType, String> marriage, String childEmail) {
+public class GraknInsertParentShipAction extends InsertParentShipAction<GraknOperation, ConceptMap> {
+    public GraknInsertParentShipAction(GraknOperation dbOperation, HashMap<SpouseType, String> marriage, String childEmail) {
         super(dbOperation, marriage, childEmail);
     }
 
@@ -34,8 +32,8 @@ public class GraknInsertParentShipAction extends InsertParentShipAction<GraknDbO
         Statement father = Graql.var("father");
 
         GraqlInsert parentshipQuery = Graql.match(
-                mother.isa(PERSON).has(EMAIL, marriage.get(ParentshipAgent.SpouseType.WIFE)),
-                father.isa(PERSON).has(EMAIL, marriage.get(ParentshipAgent.SpouseType.HUSBAND)),
+                mother.isa(PERSON).has(EMAIL, marriage.get(SpouseType.WIFE)),
+                father.isa(PERSON).has(EMAIL, marriage.get(SpouseType.HUSBAND)),
                 child.isa(PERSON).has(EMAIL, childEmail)
         ).insert(
                 parentship.isa(PARENTSHIP)
@@ -43,7 +41,7 @@ public class GraknInsertParentShipAction extends InsertParentShipAction<GraknDbO
                         .rel(PARENTSHIP_PARENT, mother)
                         .rel(PARENTSHIP_CHILD, child)
         );
-        return Action.singleResult(dbOperation.tx().execute(parentshipQuery));
+        return Action.singleResult(dbOperation.execute(parentshipQuery));
 
     }
 
@@ -51,9 +49,9 @@ public class GraknInsertParentShipAction extends InsertParentShipAction<GraknDbO
     protected HashMap<ComparableField, Object> outputForReport(ConceptMap answer) {
         return new HashMap<ComparableField, Object> () {
             {
-                put(InsertParentShipActionField.WIFE_EMAIL, dbOperation.tx().getOnlyAttributeOfThing(answer, "mother", EMAIL));
-                put(InsertParentShipActionField.HUSBAND_EMAIL, dbOperation.tx().getOnlyAttributeOfThing(answer, "father", EMAIL));
-                put(InsertParentShipActionField.CHILD_EMAIL, dbOperation.tx().getOnlyAttributeOfThing(answer, "child", EMAIL));
+                put(InsertParentShipActionField.WIFE_EMAIL, dbOperation.getOnlyAttributeOfThing(answer, "mother", EMAIL));
+                put(InsertParentShipActionField.HUSBAND_EMAIL, dbOperation.getOnlyAttributeOfThing(answer, "father", EMAIL));
+                put(InsertParentShipActionField.CHILD_EMAIL, dbOperation.getOnlyAttributeOfThing(answer, "child", EMAIL));
             }
         };
     }

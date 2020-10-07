@@ -1,10 +1,8 @@
 package grakn.simulation.db.grakn.driver;
 
 import grabl.tracing.client.GrablTracingThreadStatic;
-import grakn.client.GraknClient;
-import grakn.client.answer.ConceptMap;
-import grakn.simulation.db.common.driver.DbTransaction;
-import grakn.simulation.db.common.operation.LogWrapper;
+import grakn.simulation.db.common.driver.LogWrapper;
+import grakn.simulation.db.common.driver.TransactionalDbOperation;
 import graql.lang.query.GraqlDelete;
 import graql.lang.query.GraqlGet;
 import graql.lang.query.GraqlInsert;
@@ -18,27 +16,28 @@ import static grabl.tracing.client.GrablTracingThreadStatic.traceOnThread;
 import static grakn.simulation.db.common.driver.TransactionalDbDriver.TracingLabel.EXECUTE;
 import static grakn.simulation.db.common.driver.TransactionalDbDriver.TracingLabel.STREAM_AND_SORT;
 
-public class GraknTransaction implements DbTransaction {
-
+public class GraknOperation extends TransactionalDbOperation {
+    // This class wraps a grakn transaction
     boolean closed = false;
 
-    private GraknClient.Transaction transaction;
+    private final GraknClient.Transaction transaction;
     private final LogWrapper log;
-    private final String tracker;
 
-    public GraknTransaction(GraknClient.Transaction transaction, LogWrapper log, String tracker) {
-        this.transaction = transaction;
+    public GraknOperation(GraknClient.Session session, LogWrapper log, String tracker) {
+        super(tracker);
+        this.transaction = session.transaction();
         this.log = log;
-        this.tracker = tracker;
     }
 
+    @Override
     public void close() {
         throwIfClosed();
         transaction.close();
         closed = true;
     }
 
-    public void commit() {
+    @Override
+    public void save() {
         throwIfClosed();
         transaction.commit();
         closed = true;

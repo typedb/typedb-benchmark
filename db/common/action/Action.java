@@ -1,6 +1,6 @@
 package grakn.simulation.db.common.action;
 
-import grakn.simulation.db.common.operation.DbOperationController;
+import grakn.simulation.db.common.driver.DbOperation;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -9,7 +9,7 @@ import java.util.List;
 
 import static com.google.common.collect.Iterables.getOnlyElement;
 
-public abstract class Action<DB_OPERATION extends DbOperationController.DbOperation, ACTION_RETURN_TYPE> {
+public abstract class Action<DB_OPERATION extends DbOperation, ACTION_RETURN_TYPE> {
 
     protected DB_OPERATION dbOperation;
 

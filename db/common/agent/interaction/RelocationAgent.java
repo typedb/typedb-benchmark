@@ -1,22 +1,24 @@
 package grakn.simulation.db.common.agent.interaction;
 
+import grakn.simulation.db.common.agent.base.SimulationContext;
+import grakn.simulation.db.common.action.ActionFactory;
 import grakn.simulation.db.common.action.read.CitiesInContinentAction;
 import grakn.simulation.db.common.action.read.ResidentsInCityAction;
-import grakn.simulation.db.common.operation.DbOperationController;
-import grakn.simulation.db.common.SimulationContext;
 import grakn.simulation.db.common.agent.region.CityAgent;
 import grakn.simulation.db.common.agent.utils.Allocation;
 import grakn.simulation.db.common.driver.DbDriver;
+import grakn.simulation.db.common.driver.DbOperation;
+import grakn.simulation.db.common.driver.DbOperationFactory;
 import grakn.simulation.db.common.world.World;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Random;
 
-public class RelocationAgent<DB_DRIVER extends DbDriver> extends CityAgent<DB_DRIVER> {
+public class RelocationAgent<DB_DRIVER extends DbDriver<DB_OPERATION>, DB_OPERATION extends DbOperation> extends CityAgent<DB_DRIVER, DB_OPERATION> {
 
-    public RelocationAgent(DB_DRIVER dbDriver) {
-        super(dbDriver);
+    public RelocationAgent(DB_DRIVER dbDriver, ActionFactory<DB_OPERATION, ?> actionFactory) {
+        super(dbDriver, actionFactory);
     }
 
     @Override
@@ -30,7 +32,7 @@ public class RelocationAgent<DB_DRIVER extends DbDriver> extends CityAgent<DB_DR
         }
 
         @Override
-        protected void run(DbOperationController dbOperationController, World.City city, SimulationContext simulationContext) {
+        protected void run(DbOperationFactory<DB_OPERATION> dbOperationFactory, World.City city, SimulationContext simulationContext) {
         /*
         Find people currently resident the city
         Find other cities in the continent
@@ -43,20 +45,20 @@ public class RelocationAgent<DB_DRIVER extends DbDriver> extends CityAgent<DB_DR
             List<String> residentEmails;
             List<String> relocationCityNames;
 
-            ResidentsInCityAction<?> residentsInCityAction = dbOperationController.actionFactory().residentsInCityAction(city, simulationContext.world().getScaleFactor(), earliestDateOfResidencyToRelocate);
-            try (DbOperationController.DbOperation dbOperation = dbOperationController.newDbOperation(residentsInCityAction, tracker())) {
+            try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker())) {
+                ResidentsInCityAction<?> residentsInCityAction = actionFactory().residentsInCityAction(dbOperation, city, simulationContext.world().getScaleFactor(), earliestDateOfResidencyToRelocate);
                 residentEmails = runAction(residentsInCityAction);
             }
             shuffle(residentEmails);
 
-            CitiesInContinentAction<?> citiesInContinentAction = dbOperationController.actionFactory().citiesInContinentAction(city);
-            try (DbOperationController.DbOperation dbOperation = dbOperationController.newDbOperation(citiesInContinentAction, tracker())) {
+            try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker())) {
+                CitiesInContinentAction<?> citiesInContinentAction = actionFactory().citiesInContinentAction(dbOperation, city);
                 relocationCityNames = runAction(citiesInContinentAction);
             }
 
-            try (DbOperationController.DbOperation dbOperation = dbOperationController.newDbOperation("InsertRelocation", tracker())) {
+            try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker())) {
                 Allocation.allocate(residentEmails, relocationCityNames, (residentEmail, relocationCityName) -> {
-                    runAction(dbOperationController.actionFactory().insertRelocationAction(city, simulationContext.today(), residentEmail, relocationCityName));
+                    runAction(actionFactory().insertRelocationAction(dbOperation, city, simulationContext.today(), residentEmail, relocationCityName));
                 });
                 dbOperation.save();
             }
