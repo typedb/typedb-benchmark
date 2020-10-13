@@ -9,12 +9,12 @@ import org.junit.runner.RunWith;
 
 import java.util.ArrayList;
 
-import static grakn.simulation.test.SimulationsUnderTest.graknSimulation;
-import static grakn.simulation.test.SimulationsUnderTest.neo4jSimulation;
+import static grakn.simulation.test.SimulationsForComparison.graknSimulation;
+import static grakn.simulation.test.SimulationsForComparison.neo4jSimulation;
 import static org.junit.Assert.assertEquals;
 
-@RunWith(SimulationTestSuite.class)
-public class SimulationTest {
+@RunWith(ComparisonTestSuite.class)
+public class ComparisonTest {
 
     private void compareReports(String agentName) {
 

@@ -29,7 +29,7 @@ import java.util.function.Function;
 import static grakn.simulation.config.Config.Agent.ConstructAgentConfig;
 import static grakn.simulation.db.common.world.World.initialise;
 
-public class SimulationsUnderTest {
+public class SimulationsForComparison {
     static final Neo4jSimulation neo4jSimulation;
     static final GraknSimulation graknSimulation;
     static final int numIterations = 5;

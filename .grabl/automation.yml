@@ -171,7 +171,7 @@ build:
       timeout: "18000"
       dependencies: [test-comparison-grakn-background, test-comparison-neo4j-background]
       script: |
-        bazel test //test:simulation-test \
+        bazel test //test:comparison-test \
           --test_output=all \
           --test_arg=--grakn-uri=$GRABL_EXPORT_TEST_COMPARISON_GRAKN_URI \
           --test_arg=--neo4j-uri=$GRABL_EXPORT_TEST_COMPARISON_NEO4J_URI

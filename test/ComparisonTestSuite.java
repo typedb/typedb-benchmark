@@ -10,16 +10,16 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static grakn.simulation.test.SimulationsUnderTest.graknSimulation;
-import static grakn.simulation.test.SimulationsUnderTest.neo4jSimulation;
+import static grakn.simulation.test.SimulationsForComparison.graknSimulation;
+import static grakn.simulation.test.SimulationsForComparison.neo4jSimulation;
 
-public class SimulationTestSuite extends Suite {
+public class ComparisonTestSuite extends Suite {
     private static final List<Runner> NO_RUNNERS = Collections.emptyList();
     private final List<Runner> runners;
     private final Class<?> klass;
     private static int iteration = 1;
 
-    public SimulationTestSuite(Class<?> klass) throws Throwable {
+    public ComparisonTestSuite(Class<?> klass) throws Throwable {
         super(klass, NO_RUNNERS);
         this.klass = klass;
         this.runners = Collections.unmodifiableList(createRunnersForIterations());
@@ -27,9 +27,9 @@ public class SimulationTestSuite extends Suite {
 
     private List<Runner> createRunnersForIterations() {
         List<Runner> runners = new ArrayList<>();
-        for (int i = 1; i <= SimulationsUnderTest.numIterations; i++) {
+        for (int i = 1; i <= SimulationsForComparison.numIterations; i++) {
             try {
-                BlockJUnit4ClassRunner runner = new SimulationRunner(klass, i);
+                BlockJUnit4ClassRunner runner = new ComparisonTestRunner(klass, i);
                 runners.add(runner);
             } catch (InitializationError initializationError) {
                 initializationError.printStackTrace();
@@ -43,7 +43,7 @@ public class SimulationTestSuite extends Suite {
         neo4jSimulation.iterate();
         graknSimulation.iterate();
         super.runChild(runner, notifier);
-        if (iteration == SimulationsUnderTest.numIterations + 1) {
+        if (iteration == SimulationsForComparison.numIterations + 1) {
             graknSimulation.close();
             neo4jSimulation.close();
         }

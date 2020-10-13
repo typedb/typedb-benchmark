@@ -25,12 +25,12 @@ artifact_extractor(
 )
 
 java_test(
-    name = "simulation-test",
+    name = "comparison-test",
     srcs = [
-        "SimulationTest.java",
-        "SimulationTestSuite.java",
-        "SimulationRunner.java",
-        "SimulationsUnderTest.java",
+        "ComparisonTest.java",
+        "ComparisonTestSuite.java",
+        "ComparisonTestRunner.java",
+        "SimulationsForComparison.java",
     ],
     data = [
         "//db/common/data",
@@ -38,7 +38,7 @@ java_test(
         "//db/grakn/schema:graql-schema",
         "//db/neo4j/data",
     ],
-    test_class = "grakn.simulation.test.SimulationTest",
+    test_class = "grakn.simulation.test.ComparisonTest",
     deps = [
         "//:simulation-lib",
         "//config",
