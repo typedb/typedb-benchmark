@@ -85,7 +85,7 @@ public class SimulationsUnderTest {
         agentNames.add("marriage");
         agentNames.add("personBirth");
         agentNames.add("ageUpdate");
-        agentNames.add("parentship");
+//        agentNames.add("parentship");
 //        agentNames.add("relocation");
         agentNames.add("company");
         agentNames.add("employment");

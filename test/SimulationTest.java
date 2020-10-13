@@ -53,10 +53,10 @@ public class SimulationTest {
 //    which doesn't scale well. So this is skipped in favour of spot-testing
 //    }
 
-    @Test
-    public void testParentshipAgent() {
-        compareReports("ParentshipAgent");
-    }
+//    @Test
+//    public void testParentshipAgent() {
+//        compareReports("ParentshipAgent");
+//    }
 
 //    @Test
 //    public void testRelocationAgent() {
