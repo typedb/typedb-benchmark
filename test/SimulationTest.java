@@ -1,13 +1,13 @@
 package grakn.simulation.test;
 
+import grakn.simulation.db.common.action.Action;
 import grakn.simulation.db.common.agent.base.Agent;
 import grakn.simulation.db.grakn.driver.GraknDriver;
 import grakn.simulation.db.neo4j.driver.Neo4jDriver;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import java.util.Collection;
-import java.util.HashMap;
+import java.util.ArrayList;
 
 import static grakn.simulation.test.SimulationsUnderTest.graknSimulation;
 import static grakn.simulation.test.SimulationsUnderTest.neo4jSimulation;
@@ -16,32 +16,35 @@ import static org.junit.Assert.assertEquals;
 @RunWith(SimulationTestSuite.class)
 public class SimulationTest {
 
-    private void compareFields(String agentName) {
+    private void compareReports(String agentName) {
 
-        Agent<?, GraknDriver>.Report graknReport = graknSimulation.getReport().getAgentReport(agentName);
-        Agent<?, Neo4jDriver>.Report neo4jReport = neo4jSimulation.getReport().getAgentReport(agentName);
+        Agent<?, GraknDriver, ?>.Report graknAgentReport = graknSimulation.getReport().getAgentReport(agentName);
+        Agent<?, Neo4jDriver, ?>.Report neo4jAgentReport = neo4jSimulation.getReport().getAgentReport(agentName);
 
-        // Check both have the same trackers present
-        assertEquals(graknReport.trackers(), neo4jReport.trackers());
+        if (!graknAgentReport.equals(neo4jAgentReport)) {
+            graknAgentReport.trackers().forEach(tracker -> {
+                Agent<?, GraknDriver, ?>.RegionalAgent.Report graknRegionReport = graknAgentReport.getRegionalAgentReport(tracker);
+                Agent<?, Neo4jDriver, ?>.RegionalAgent.Report neo4jRegionReport = neo4jAgentReport.getRegionalAgentReport(tracker);
 
-        // Iterate over the trackers comparing the values
-//        TODO bring in a count check, as below
-//        graknResult.keySet().forEach(tracker -> assertEquals(graknResult.get(tracker), neo4jResult.get(tracker)));
-        graknReport.trackers().forEach(tracker -> {
-            Collection<HashMap<ComparableField, Object>> graknFields = graknReport.getRegionalAgentReport(tracker);
-            Collection<HashMap<ComparableField, Object>> neo4jFields = neo4jReport.getRegionalAgentReport(tracker);
-            assertEquals(graknFields, neo4jFields);
-        });
+                if (!graknRegionReport.equals(neo4jRegionReport)) {
+                    graknRegionReport.actionNames().forEach(actionName -> {
+                        ArrayList<Action<?, ?>.Report> graknActionReport = graknRegionReport.getActionReport(actionName);
+                        ArrayList<Action<?, ?>.Report> neo4jActionReport = neo4jRegionReport.getActionReport(actionName);
+                        assertEquals(graknActionReport, neo4jActionReport);
+                    });
+                }
+            });
+        }
     }
 
     @Test
     public void testMarriageAgent() {
-        compareFields("MarriageAgent");
+        compareReports("MarriageAgent");
     }
 
     @Test
     public void testPersonBirthAgent() {
-        compareFields("PersonBirthAgent");
+        compareReports("PersonBirthAgent");
     }
 
 //    @Test
@@ -52,7 +55,7 @@ public class SimulationTest {
 
     @Test
     public void testParentshipAgent() {
-        compareFields("ParentshipAgent");
+        compareReports("ParentshipAgent");
     }
 
 //    @Test
@@ -62,12 +65,12 @@ public class SimulationTest {
 
     @Test
     public void testCompanyAgent() {
-        compareFields("CompanyAgent");
+        compareReports("CompanyAgent");
     }
 
     @Test
     public void testEmploymentAgent() {
-        compareFields("EmploymentAgent");
+        compareReports("EmploymentAgent");
     }
 
 //    @Test

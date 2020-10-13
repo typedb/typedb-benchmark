@@ -68,7 +68,7 @@ public abstract class Simulation<DB_DRIVER extends DbDriver<DB_OPERATION>, DB_OP
         LOG.info("Simulation step: {}", simulationStep);
         report.clean();
         for (Agent<?, DB_DRIVER, DB_OPERATION> agent : agentList) {
-            this.report.addAgentResult(agent.getClass().getName(), agent.iterate(this, RandomSource.nextSource(random)));
+            this.report.addAgentResult(agent.name(), agent.iterate(this, RandomSource.nextSource(random)));
         }
         closeIteration();  // We want to test opening new sessions each iteration.
         simulationStep++;

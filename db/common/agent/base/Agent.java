@@ -81,6 +81,10 @@ public abstract class Agent<REGION extends Region, DB_DRIVER extends DbDriver<DB
         this.report.addRegionalAgentReport(region.tracker(), report);
     }
 
+    public String name() {
+        return getClass().getSimpleName();
+    }
+
     public class Report {
         ConcurrentHashMap<String, RegionalAgent.Report> regionalAgentReports = new ConcurrentHashMap<>();
 
@@ -131,11 +135,13 @@ public abstract class Agent<REGION extends Region, DB_DRIVER extends DbDriver<DB
         protected abstract void run(DbOperationFactory<DB_OPERATION> dbOperationFactory, REGION region, SimulationContext simulationContext);
 
         void runWithTracing(DbOperationFactory<DB_OPERATION> dbOperationFactory, REGION region, SimulationContext simulationContext) {
-            String name = this.getClass().getSimpleName();
-            try (GrablTracingThreadStatic.ThreadTrace trace = traceOnThread(name)) {
-                System.out.println(name);
+            try (GrablTracingThreadStatic.ThreadTrace trace = traceOnThread(this.name())) {
                 runWithReport(dbOperationFactory, region, simulationContext);
             }
+        }
+
+        public String name() {
+            return this.getClass().getSimpleName();
         }
 
         public <U> U pickOne(List<U> list) { // TODO can be a util
@@ -164,21 +170,13 @@ public abstract class Agent<REGION extends Region, DB_DRIVER extends DbDriver<DB
             return new RandomValueGenerator(random);
         }
 
-        public Action<?, ?> action() {
-            return action;
-        }
-
-        public <ACTION_RETURN_TYPE> void setAction(Action<?, ACTION_RETURN_TYPE> action) {
-            this.action = action;
-        }
-
         public <ACTION_RETURN_TYPE> ACTION_RETURN_TYPE runAction(Action<?, ACTION_RETURN_TYPE> action) {
             ACTION_RETURN_TYPE actionAnswer;
             try (GrablTracingThreadStatic.ThreadTrace trace = traceOnThread(action.name())) {
                 actionAnswer = action.run();
             }
             if (testing) {
-                report.addActionReport(action.report(actionAnswer));
+                report.addActionReport(action.name(), action.report(actionAnswer));
             }
             return actionAnswer;
         }
@@ -186,8 +184,16 @@ public abstract class Agent<REGION extends Region, DB_DRIVER extends DbDriver<DB
         public class Report {
             HashMap<String, ArrayList<Action<?, ?>.Report>> actionReports = new HashMap<>();
 
-            public void addActionReport(Action<?, ?>.Report actionReport) {
-                actionReports.computeIfAbsent(action.name(), x -> new ArrayList<>()).add(actionReport);
+            public void addActionReport(String actionName, Action<?, ?>.Report actionReport) {
+                actionReports.computeIfAbsent(actionName, x -> new ArrayList<>()).add(actionReport);
+            }
+
+            public Set<String> actionNames() {
+                return actionReports.keySet();
+            }
+
+            public ArrayList<Action<?, ?>.Report> getActionReport(String actionName) {
+                return actionReports.get(actionName);
             }
         }
 

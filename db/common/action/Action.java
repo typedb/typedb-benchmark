@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
 import static com.google.common.collect.Iterables.getOnlyElement;
 
@@ -30,7 +31,8 @@ public abstract class Action<DB_OPERATION extends DbOperation, ACTION_RETURN_TYP
     }
 
     public String name() {
-        return this.getClass().getSimpleName();
+        // We want the name of the abstract action that each backend implements
+        return this.getClass().getSuperclass().getSimpleName();
     }
 
     public abstract ACTION_RETURN_TYPE run();
@@ -54,6 +56,29 @@ public abstract class Action<DB_OPERATION extends DbOperation, ACTION_RETURN_TYP
         public Report(ACTION_RETURN_TYPE answer) {
             this.input = inputForReport();
             this.output = outputForReport(answer);
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            Report report = (Report) o;
+            return input.equals(report.input) &&
+                    output.equals(report.output);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(input, output);
+        }
+
+        @Override
+        public String toString() {
+            return "Report " + name() +
+                    " {" +
+                    "input=" + input +
+                    ", output=" + output +
+                    "}";
         }
     }
 

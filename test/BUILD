@@ -42,7 +42,8 @@ java_test(
     deps = [
         "//:simulation-lib",
         "//config",
-        "//db/common/agents",
+        "//db/common/agent",
+        "//db/common/action",
         "//db/common/world",
         "//db/grakn",
         "//db/neo4j",
@@ -51,5 +52,7 @@ java_test(
         "@maven//:commons_cli_commons_cli",
         "@maven//:org_slf4j_slf4j_api",
         "@maven//:junit_junit",
+        "@maven//:javax_annotation_javax_annotation_api",
+        "@maven//:javax_annotation_javax_annotation_api_1_3_2",
     ],
 )
