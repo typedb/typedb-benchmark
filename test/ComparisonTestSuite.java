@@ -10,8 +10,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static grakn.simulation.test.SimulationsForComparison.graknSimulation;
-import static grakn.simulation.test.SimulationsForComparison.neo4jSimulation;
+import static grakn.simulation.test.SimulationsForComparison.grakn;
+import static grakn.simulation.test.SimulationsForComparison.neo4j;
 
 public class ComparisonTestSuite extends Suite {
     private static final List<Runner> NO_RUNNERS = Collections.emptyList();
@@ -40,12 +40,12 @@ public class ComparisonTestSuite extends Suite {
 
     protected void runChild(Runner runner, final RunNotifier notifier) {
         iteration++;
-        neo4jSimulation.iterate();
-        graknSimulation.iterate();
+        neo4j.iterate();
+        grakn.iterate();
         super.runChild(runner, notifier);
         if (iteration == SimulationsForComparison.numIterations + 1) {
-            graknSimulation.close();
-            neo4jSimulation.close();
+            grakn.close();
+            neo4j.close();
         }
     }
 

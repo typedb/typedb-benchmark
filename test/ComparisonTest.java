@@ -9,8 +9,8 @@ import org.junit.runner.RunWith;
 
 import java.util.ArrayList;
 
-import static grakn.simulation.test.SimulationsForComparison.graknSimulation;
-import static grakn.simulation.test.SimulationsForComparison.neo4jSimulation;
+import static grakn.simulation.test.SimulationsForComparison.grakn;
+import static grakn.simulation.test.SimulationsForComparison.neo4j;
 import static org.junit.Assert.assertEquals;
 
 @RunWith(ComparisonTestSuite.class)
@@ -18,8 +18,8 @@ public class ComparisonTest {
 
     private void compareReports(String agentName) {
 
-        Agent<?, GraknDriver, ?>.Report graknAgentReport = graknSimulation.getReport().getAgentReport(agentName);
-        Agent<?, Neo4jDriver, ?>.Report neo4jAgentReport = neo4jSimulation.getReport().getAgentReport(agentName);
+        Agent<?, GraknDriver, ?>.Report graknAgentReport = grakn.getReport().getAgentReport(agentName);
+        Agent<?, Neo4jDriver, ?>.Report neo4jAgentReport = neo4j.getReport().getAgentReport(agentName);
 
         if (!graknAgentReport.equals(neo4jAgentReport)) {
             graknAgentReport.trackers().forEach(tracker -> {

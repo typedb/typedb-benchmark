@@ -30,8 +30,8 @@ import static grakn.simulation.config.Config.Agent.ConstructAgentConfig;
 import static grakn.simulation.db.common.world.World.initialise;
 
 public class SimulationsForComparison {
-    static final Neo4jSimulation neo4jSimulation;
-    static final GraknSimulation graknSimulation;
+    static final Neo4jSimulation neo4j;
+    static final GraknSimulation grakn;
     static final int numIterations = 5;
 
     static {
@@ -103,7 +103,7 @@ public class SimulationsForComparison {
         // Grakn setup //
         /////////////////
 
-        graknSimulation = new GraknSimulation(
+        grakn = new GraknSimulation(
                 new GraknDriver(graknUri,"world"),
                 files,
                 new RandomSource(randomSeed),
@@ -116,7 +116,7 @@ public class SimulationsForComparison {
         // Neo4j setup //
         /////////////////
 
-        neo4jSimulation = new Neo4jSimulation(
+        neo4j = new Neo4jSimulation(
                 new Neo4jDriver(neo4jUri),
                 files,
                 new RandomSource(randomSeed),
