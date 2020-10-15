@@ -11,10 +11,7 @@ java_library(
     deps = [
         "//config",
         "//db/common:simulation-common",
-        "//db/common/agents",
-        "//db/common/initialise",
         "//db/common/world",
-        "//db/common/yaml_tool",
         "//db/grakn",
         "//db/neo4j",
         "//utils",

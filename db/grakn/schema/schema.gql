@@ -282,23 +282,6 @@ when {
     $old-residency has end-date $rel-date;
 };
 
-person-membership-of-organisation-means-relocation sub rule,
-when {
-    (membership_member: $person, membership_group: $group) isa membership;
-    (locates_located: $group, locates_location: $location) isa locates;
-}, then {
-    (relocation_relocated-person: $person, relocation_previous-location: $location) isa relocation;
-};
-
-person-membership-of-organisation-means-relocation-date sub rule,
-when {
-    (membership_member: $person, membership_group: $group) isa membership, has start-date $membership-start-date;
-    (locates_located: $group, locates_location: $location) isa locates;
-    $rel(relocation_relocated-person: $person, relocation_previous-location: $location) isa relocation;
-}, then {
-    $rel has relocation-date $membership-start-date;
-};
-
 residency-without-end-date-is-current sub rule,
 when {
     $res(residency_resident: $person, residency_location: $location) isa residency;

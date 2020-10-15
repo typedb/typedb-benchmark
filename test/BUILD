@@ -25,12 +25,12 @@ artifact_extractor(
 )
 
 java_test(
-    name = "simulation-test",
+    name = "comparison-test",
     srcs = [
-        "SimulationTest.java",
-        "SimulationTestSuite.java",
-        "SimulationRunner.java",
-        "SimulationsUnderTest.java",
+        "ComparisonTest.java",
+        "ComparisonTestSuite.java",
+        "ComparisonTestRunner.java",
+        "SimulationsForComparison.java",
     ],
     data = [
         "//db/common/data",
@@ -38,12 +38,12 @@ java_test(
         "//db/grakn/schema:graql-schema",
         "//db/neo4j/data",
     ],
-    test_class = "grakn.simulation.test.SimulationTest",
+    test_class = "grakn.simulation.test.ComparisonTest",
     deps = [
         "//:simulation-lib",
         "//config",
-        "//db/common/agents",
-        "//db/common/initialise",
+        "//db/common/agent",
+        "//db/common/action",
         "//db/common/world",
         "//db/grakn",
         "//db/neo4j",
@@ -52,5 +52,7 @@ java_test(
         "@maven//:commons_cli_commons_cli",
         "@maven//:org_slf4j_slf4j_api",
         "@maven//:junit_junit",
+        "@maven//:javax_annotation_javax_annotation_api",
+        "@maven//:javax_annotation_javax_annotation_api_1_3_2",
     ],
 )

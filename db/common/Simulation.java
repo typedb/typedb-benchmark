@@ -1,11 +1,12 @@
 package grakn.simulation.db.common;
 
 import grakn.simulation.config.Config;
-import grakn.simulation.db.common.agents.base.AgentRunner;
-import grakn.simulation.db.common.agents.base.IterationContext;
-import grakn.simulation.db.common.agents.base.ResultHandler;
-import grakn.simulation.db.common.context.DatabaseContext;
-import grakn.simulation.db.common.initialise.AgentPicker;
+import grakn.simulation.db.common.action.ActionFactory;
+import grakn.simulation.db.common.agent.base.Agent;
+import grakn.simulation.db.common.agent.base.SimulationContext;
+import grakn.simulation.db.common.agent.interaction.AgentFactory;
+import grakn.simulation.db.common.driver.DbDriver;
+import grakn.simulation.db.common.driver.DbOperation;
 import grakn.simulation.db.common.world.World;
 import grakn.simulation.utils.RandomSource;
 import org.slf4j.Logger;
@@ -19,61 +20,59 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
-public abstract class Simulation<CONTEXT extends DatabaseContext> implements IterationContext {
+public abstract class Simulation<DB_DRIVER extends DbDriver<DB_OPERATION>, DB_OPERATION extends DbOperation> implements SimulationContext {
 
     final static Logger LOG = LoggerFactory.getLogger(Simulation.class);
-    private final List<AgentRunner<?, CONTEXT>> agentRunnerList;
+    private final List<Agent<?, DB_DRIVER, DB_OPERATION>> agentList;
+    protected final DB_DRIVER driver;
     private final Random random;
     private final List<Config.Agent> agentConfigs;
     private final Function<Integer, Boolean> iterationSamplingFunction;
-    private final ResultHandler resultHandler;
+    private final Report report = new Report();
     private final World world;
+    private final boolean test;
     private int simulationStep = 1;
 
-    public Simulation(String hostUri, String database, Map<String, Path> initialisationDataPaths, RandomSource randomSource, World world, List<Config.Agent> agentConfigs, Function<Integer, Boolean> iterationSamplingFunction, ResultHandler resultHandler) {
+    public Simulation(DB_DRIVER driver, Map<String, Path> initialisationDataPaths, RandomSource randomSource, World world, List<Config.Agent> agentConfigs, Function<Integer, Boolean> iterationSamplingFunction, boolean test) {
+        this.driver = driver;
         this.random = randomSource.startNewRandom();
         this.agentConfigs = agentConfigs;
         this.iterationSamplingFunction = iterationSamplingFunction;
-        this.resultHandler = resultHandler;
         this.world = world;
-        setBackendContext(hostUri, database);
+        this.test = test;
         initialise(initialisationDataPaths);
-        this.agentRunnerList = agentRunnerListFromConfigs();
+        this.agentList = agentListFromConfigs();
     }
 
-    protected abstract void setBackendContext(String hostUri, String database);
-
-    protected abstract AgentPicker<CONTEXT> getAgentPicker();
-
-    protected List<AgentRunner<?, CONTEXT>> agentRunnerListFromConfigs() {
-        // Get the agents with their runners
-        List<AgentRunner<?, CONTEXT>> agentRunners = new ArrayList<>();
-        for (Config.Agent agent : agentConfigs) {
-            if (agent.getAgentMode().getRun()) {
-                AgentRunner<?, CONTEXT> runner = getAgentPicker().get(agent.getName());
-                runner.setTrace(agent.getAgentMode().getTrace());
-                agentRunners.add(runner);
+    protected List<Agent<?, DB_DRIVER, DB_OPERATION>> agentListFromConfigs() {
+        List<Agent<?, DB_DRIVER, DB_OPERATION>> agents = new ArrayList<>();
+        for (Config.Agent agentConfig : agentConfigs) {
+            if (agentConfig.getAgentMode().getRun()) {
+                Agent<?, DB_DRIVER, DB_OPERATION> agent = new AgentFactory<>(driver, actionFactory()).get(agentConfig.getName());
+                agent.setTrace(agentConfig.getAgentMode().getTrace());
+                agents.add(agent);
             }
         }
-        return agentRunners;
+        return agents;
     }
+
+    protected abstract ActionFactory<DB_OPERATION, ?> actionFactory();
 
     protected abstract void initialise(Map<String, Path> initialisationDataPaths);
 
-    public ResultHandler iterate() {
+    public Report iterate() {
 
         LOG.info("Simulation step: {}", simulationStep);
-        resultHandler.clean();
-        for (AgentRunner<?, CONTEXT> agentRunner : agentRunnerList) {
-            agentRunner.iterate(this, RandomSource.nextSource(random));
+        report.clean();
+        for (Agent<?, DB_DRIVER, DB_OPERATION> agent : agentList) {
+            this.report.addAgentResult(agent.name(), agent.iterate(this, RandomSource.nextSource(random)));
         }
-
         closeIteration();  // We want to test opening new sessions each iteration.
-
         simulationStep++;
-        return resultHandler;
+        return report;
     }
 
     protected abstract void closeIteration();
@@ -94,14 +93,38 @@ public abstract class Simulation<CONTEXT extends DatabaseContext> implements Ite
     }
 
     @Override
-    public boolean shouldTrace() {
+    public boolean trace() {
         return iterationSamplingFunction.apply(simulationStep());
     }
 
     @Override
-    public ResultHandler getResultHandler() {
-        return resultHandler;
+    public boolean test() {
+        return test;
+    }
+
+    public Report getReport() {
+        return report;
     }
 
     public abstract void close();
+
+    public class Report {
+
+        private ConcurrentHashMap<String, Agent<?, DB_DRIVER, ?>.Report> agentReports = new ConcurrentHashMap<>();
+
+        public void addAgentResult(String agentName, Agent<?, DB_DRIVER, ?>.Report agentReport) {
+            if (agentReport == null) {
+                throw new NullPointerException(String.format("The result returned from a %s agent was null", agentName));
+            }
+            agentReports.put(agentName, agentReport);
+        }
+
+        public Agent<?, DB_DRIVER, ?>.Report getAgentReport(String agentName) {
+            return agentReports.get(agentName);
+        }
+
+        public void clean() {
+            agentReports = new ConcurrentHashMap<>();
+        }
+    }
 }

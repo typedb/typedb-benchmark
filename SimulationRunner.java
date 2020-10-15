@@ -5,10 +5,11 @@ import grabl.tracing.client.GrablTracingThreadStatic;
 import grakn.simulation.config.Config;
 import grakn.simulation.config.ConfigLoader;
 import grakn.simulation.db.common.Simulation;
-import grakn.simulation.db.common.agents.base.ResultHandler;
 import grakn.simulation.db.common.world.World;
 import grakn.simulation.db.grakn.GraknSimulation;
+import grakn.simulation.db.grakn.driver.GraknDriver;
 import grakn.simulation.db.neo4j.Neo4jSimulation;
+import grakn.simulation.db.neo4j.driver.Neo4jDriver;
 import grakn.simulation.utils.RandomSource;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -89,7 +90,7 @@ public class SimulationRunner {
 
         try {
             try (GrablTracing tracingIgnored = grablTracing(grablTracingUri, grablTracingOrganisation, grablTracingRepository, grablTracingCommit, grablTracingUsername, grablTracingToken, disableTracing)) {
-
+                boolean test = false;
                 Simulation simulation;
                 switch (dbName) {
                     case "grakn":
@@ -97,15 +98,13 @@ public class SimulationRunner {
                         if (hostUri == null) hostUri = defaultUri;
 
                         simulation = new GraknSimulation(
-                                hostUri,
-                                config.getDatabaseName(),
+                                new GraknDriver(hostUri, "world"),
                                 initialisationDataFiles,
                                 new RandomSource(config.getRandomSeed()),
                                 world,
                                 config.getAgents(),
                                 config.getTraceSampling().getSamplingFunction(),
-                                new ResultHandler()
-                        );
+                                test);
                         break;
 
                     case "neo4j":
@@ -113,14 +112,13 @@ public class SimulationRunner {
                         if (hostUri == null) hostUri = defaultUri;
 
                         simulation = new Neo4jSimulation(
-                                hostUri,
+                                new Neo4jDriver(hostUri),
                                 initialisationDataFiles,
                                 new RandomSource(config.getRandomSeed()),
                                 world,
                                 config.getAgents(),
                                 config.getTraceSampling().getSamplingFunction(),
-                                new ResultHandler()
-                        );
+                                test);
                         break;
 
                     default:

@@ -147,6 +147,7 @@ public class World {
             return continentName;
         }
 
+        @Override
         public String name() {
             return continentName;
         }
@@ -158,6 +159,11 @@ public class World {
         @Override
         public String tracker() {
             return Tracker.of(this);
+        }
+
+        @Override
+        public Continent continent() {
+            return this;
         }
     }
 
@@ -178,6 +184,7 @@ public class World {
             return countryName;
         }
 
+        @Override
         public String name() {
             return countryName;
         }
@@ -212,6 +219,7 @@ public class World {
             return cityName;
         }
 
+        @Override
         public String name() {
             return cityName;
         }
@@ -223,6 +231,11 @@ public class World {
         @Override
         public String tracker() {
             return Tracker.of(country().continent(), country(), this);
+        }
+
+        @Override
+        public Continent continent() {
+            return this.country.continent;
         }
     }
 
