@@ -381,18 +381,6 @@ employment-contract sub legal-document,
     has contract-content,
     has contracted-hours;
 
-unemployed-person sub person;
-
-person-with-no-active-employment-is-unemployed sub rule,
-when {
-    $p isa person;
-    not {
-        $e(employment_employee: $p) isa employment;
-    };
-}, then {
-    $p isa unemployed-person;
-};
-
 # --------------------------------------------------------
 # Organisational Trade
 # --------------------------------------------------------
