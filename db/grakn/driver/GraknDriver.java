@@ -57,10 +57,6 @@ public class GraknDriver extends TransactionalDbDriver<GraknClient.Transaction, 
 
     @Override
     public DbOperationFactory<GraknOperation> getDbOperationFactory(Region region, Logger logger) {
-        String regionName = region.continent().name();
-        if (regionName == null) {
-            regionName = region.name(); // For the case that the region is the world
-        }
-        return new GraknOperationFactory(session(regionName), logger);
+        return new GraknOperationFactory(session(region.topLevelName()), logger);
     }
 }

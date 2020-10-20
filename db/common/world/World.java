@@ -143,8 +143,8 @@ public class World implements Region {
     }
 
     @Override
-    public Continent continent() {
-        return null;
+    public String topLevelName() {
+        return name();
     }
 
     public class Continent implements Region {
@@ -177,8 +177,8 @@ public class World implements Region {
         }
 
         @Override
-        public Continent continent() {
-            return this;
+        public String topLevelName() {
+            return this.name();
         }
     }
 
@@ -206,6 +206,10 @@ public class World implements Region {
 
         public Continent continent() {
             return continent;
+        }
+
+        public String topLevelName() {
+            return continent.name();
         }
 
         public Stream<City> cities() {
@@ -249,8 +253,8 @@ public class World implements Region {
         }
 
         @Override
-        public Continent continent() {
-            return this.country.continent;
+        public String topLevelName() {
+            return this.country.continent.name();
         }
     }
 
