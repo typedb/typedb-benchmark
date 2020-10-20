@@ -1,4 +1,4 @@
-package grakn.simulation.db.common.agent.interaction;
+package grakn.simulation.db.common.agent.interaction.read;
 
 import grakn.simulation.db.common.action.ActionFactory;
 import grakn.simulation.db.common.action.read.MeanWageOfPeopleInWorldAction;
@@ -31,8 +31,8 @@ public class MeanWageAgent<DB_DRIVER extends DbDriver<DB_OPERATION>, DB_OPERATIO
         protected void run(DbOperationFactory<DB_OPERATION> dbOperationFactory, World world, SimulationContext simulationContext) {
             for (int i = 0; i <= simulationContext.world().getScaleFactor(); i++) {
                 try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker())) {
-                    MeanWageOfPeopleInWorldAction<DB_OPERATION> meanWageOfPeopleInCityAction = actionFactory().meanWageOfPeopleInWorldAction(dbOperation);
-                    runAction(meanWageOfPeopleInCityAction);
+                    MeanWageOfPeopleInWorldAction<DB_OPERATION> action = actionFactory().meanWageOfPeopleInWorldAction(dbOperation);
+                    runAction(action);
                 }
             }
         }

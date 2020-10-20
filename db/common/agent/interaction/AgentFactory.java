@@ -2,6 +2,17 @@ package grakn.simulation.db.common.agent.interaction;
 
 import grakn.simulation.db.common.action.ActionFactory;
 import grakn.simulation.db.common.agent.base.Agent;
+import grakn.simulation.db.common.agent.interaction.read.MeanWageAgent;
+import grakn.simulation.db.common.agent.interaction.write.AgeUpdateAgent;
+import grakn.simulation.db.common.agent.interaction.write.CompanyAgent;
+import grakn.simulation.db.common.agent.interaction.write.EmploymentAgent;
+import grakn.simulation.db.common.agent.interaction.write.FriendshipAgent;
+import grakn.simulation.db.common.agent.interaction.write.MarriageAgent;
+import grakn.simulation.db.common.agent.interaction.write.ParentshipAgent;
+import grakn.simulation.db.common.agent.interaction.write.PersonBirthAgent;
+import grakn.simulation.db.common.agent.interaction.write.ProductAgent;
+import grakn.simulation.db.common.agent.interaction.write.RelocationAgent;
+import grakn.simulation.db.common.agent.interaction.write.TransactionAgent;
 import grakn.simulation.db.common.driver.DbDriver;
 import grakn.simulation.db.common.driver.DbOperation;
 
