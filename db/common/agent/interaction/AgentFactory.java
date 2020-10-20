@@ -55,6 +55,10 @@ public class AgentFactory<DB_DRIVER extends DbDriver<DB_OPERATION>, DB_OPERATION
         return new FriendshipAgent<>(dbDriver, actionFactory);
     }
 
+    public MeanWageAgent<DB_DRIVER, DB_OPERATION> meanWage() {
+        return new MeanWageAgent<>(dbDriver, actionFactory);
+    }
+
     public Agent<?, DB_DRIVER, DB_OPERATION> get(String agentName) {
         switch (agentName) {
             case "marriage":
@@ -77,6 +81,8 @@ public class AgentFactory<DB_DRIVER extends DbDriver<DB_OPERATION>, DB_OPERATION
                 return transaction();
             case "friendship":
                 return friendship();
+            case "meanWage":
+                return meanWage();
             default:
                 throw new IllegalArgumentException("Unrecognised agent name: " + agentName);
         }

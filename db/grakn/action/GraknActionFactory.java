@@ -7,6 +7,7 @@ import grakn.simulation.db.common.action.read.BirthsInCityAction;
 import grakn.simulation.db.common.action.read.CitiesInContinentAction;
 import grakn.simulation.db.common.action.read.CompaniesInContinentAction;
 import grakn.simulation.db.common.action.read.MarriedCoupleAction;
+import grakn.simulation.db.common.action.read.MeanWageOfPeopleInWorldAction;
 import grakn.simulation.db.common.action.read.ProductsInContinentAction;
 import grakn.simulation.db.common.action.read.UnmarriedPeopleInCityAction;
 import grakn.simulation.db.common.action.read.UpdateAgesOfPeopleInCityAction;
@@ -26,6 +27,7 @@ import grakn.simulation.db.grakn.action.read.GraknCitiesInContinentAction;
 import grakn.simulation.db.grakn.action.read.GraknCompaniesInContinentAction;
 import grakn.simulation.db.grakn.action.read.GraknCompaniesInCountryAction;
 import grakn.simulation.db.grakn.action.read.GraknMarriedCoupleAction;
+import grakn.simulation.db.grakn.action.read.GraknMeanWageOfPeopleInWorld;
 import grakn.simulation.db.grakn.action.read.GraknProductsInContinentAction;
 import grakn.simulation.db.grakn.action.read.GraknResidentsInCityAction;
 import grakn.simulation.db.grakn.action.read.GraknUnmarriedPeopleInCityAction;
@@ -133,6 +135,10 @@ public class GraknActionFactory extends ActionFactory<GraknOperation, ConceptMap
 
     @Override
     public UpdateAgesOfPeopleInCityAction<GraknOperation> updateAgesOfPeopleInCityAction(GraknOperation dbOperation, LocalDateTime today, World.City city) {
-            return new GraknUpdateAgesOfPeopleInCityAction(dbOperation, today, city);
+        return new GraknUpdateAgesOfPeopleInCityAction(dbOperation, today, city);
+    }
+
+    public MeanWageOfPeopleInWorldAction<GraknOperation> meanWageOfPeopleInWorldAction(GraknOperation dbOperation) {
+        return new GraknMeanWageOfPeopleInWorld(dbOperation);
     }
 }

@@ -6,20 +6,22 @@ agents:
     mode: TRACE
   - name: "ageUpdate"
     mode: TRACE
-#  - name: "parentship"
-#    mode: RUN
-#  - name: "relocation"
-#    mode: RUN
-#  - name: "company"
-#    mode: RUN
-#  - name: "employment"
-#    mode: RUN
+  - name: "parentship"
+    mode: RUN
+  - name: "relocation"
+    mode: RUN
+  - name: "company"
+    mode: RUN
+  - name: "employment"
+    mode: RUN
 #  - name: "product"
 #    mode: RUN
 #  - name: "transaction"
 #    mode: RUN
 #  - name: "friendship"
 #    mode: RUN
+  - name: "meanWage"
+    mode: TRACE
 
 traceSampling:
   # Options: `"every"` for every K traces; `"log"` for logarithm with base N
@@ -27,6 +29,6 @@ traceSampling:
   arg: 3
 
 randomSeed: 1
-iterations: 30
+iterations: 12
 scaleFactor: 3
 databaseName: "world"

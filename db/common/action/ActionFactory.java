@@ -5,6 +5,7 @@ import grakn.simulation.db.common.action.read.CitiesInContinentAction;
 import grakn.simulation.db.common.action.read.CompaniesInContinentAction;
 import grakn.simulation.db.common.action.read.CompanyNumbersAction;
 import grakn.simulation.db.common.action.read.MarriedCoupleAction;
+import grakn.simulation.db.common.action.read.MeanWageOfPeopleInWorldAction;
 import grakn.simulation.db.common.action.read.ProductsInContinentAction;
 import grakn.simulation.db.common.action.read.ResidentsInCityAction;
 import grakn.simulation.db.common.action.read.UnmarriedPeopleInCityAction;
@@ -62,4 +63,6 @@ public abstract class ActionFactory<DB_OPERATION extends DbOperation, DB_RETURN_
     public abstract ProductsInContinentAction<DB_OPERATION> productsInContinentAction(DB_OPERATION dbOperation, World.Continent continent);
 
     public abstract InsertTransactionAction<DB_OPERATION, DB_RETURN_TYPE> insertTransactionAction(DB_OPERATION dbOperation, World.Continent continent, Pair<Long, Double> transaction, Long sellerCompanyNumber, double value, int productQuantity, boolean isTaxable);
+
+    public abstract MeanWageOfPeopleInWorldAction<DB_OPERATION> meanWageOfPeopleInWorldAction(DB_OPERATION dbOperation);
 }

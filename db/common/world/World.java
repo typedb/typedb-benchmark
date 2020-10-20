@@ -17,7 +17,7 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class World {
+public class World implements Region {
 
     public final int AGE_OF_ADULTHOOD = 2;
     private final int scaleFactor;
@@ -130,6 +130,21 @@ public class World {
 
     public int getScaleFactor() {
         return scaleFactor;
+    }
+
+    @Override
+    public String name() {
+        return "world";
+    }
+
+    @Override
+    public String tracker() {
+        return "world";
+    }
+
+    @Override
+    public Continent continent() {
+        return null;
     }
 
     public class Continent implements Region {

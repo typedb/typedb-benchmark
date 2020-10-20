@@ -64,6 +64,5 @@ public class GraknInsertMarriageAction extends InsertMarriageAction<GraknOperati
             put(InsertMarriageActionField.HUSBAND_EMAIL, dbOperation.getOnlyAttributeOfThing(answer, "husband", EMAIL));
             put(InsertMarriageActionField.CITY_NAME, dbOperation.getOnlyAttributeOfThing(answer, CITY, LOCATION_NAME));
         }};
-
     }
 }

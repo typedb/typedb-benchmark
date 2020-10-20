@@ -6,6 +6,7 @@ import grakn.simulation.db.common.action.read.BirthsInCityAction;
 import grakn.simulation.db.common.action.read.CitiesInContinentAction;
 import grakn.simulation.db.common.action.read.CompaniesInContinentAction;
 import grakn.simulation.db.common.action.read.MarriedCoupleAction;
+import grakn.simulation.db.common.action.read.MeanWageOfPeopleInWorldAction;
 import grakn.simulation.db.common.action.read.ProductsInContinentAction;
 import grakn.simulation.db.common.action.read.UnmarriedPeopleInCityAction;
 import grakn.simulation.db.common.action.read.UpdateAgesOfPeopleInCityAction;
@@ -25,6 +26,7 @@ import grakn.simulation.db.neo4j.action.read.Neo4jCitiesInContinentAction;
 import grakn.simulation.db.neo4j.action.read.Neo4jCompaniesInContinentAction;
 import grakn.simulation.db.neo4j.action.read.Neo4jCompaniesInCountryAction;
 import grakn.simulation.db.neo4j.action.read.Neo4jMarriedCoupleAction;
+import grakn.simulation.db.neo4j.action.read.Neo4jMeanWageOfPeopleInWorldAction;
 import grakn.simulation.db.neo4j.action.read.Neo4jProductsInContinentAction;
 import grakn.simulation.db.neo4j.action.read.Neo4jResidentsInCityAction;
 import grakn.simulation.db.neo4j.action.read.Neo4jUnmarriedPeopleInCityAction;
@@ -129,6 +131,11 @@ public class Neo4jActionFactory extends ActionFactory<Neo4jOperation, Record> {
     @Override
     public InsertTransactionAction<Neo4jOperation, Record> insertTransactionAction(Neo4jOperation dbOperation, World.Continent continent, Pair<Long, Double> transaction, Long sellerCompanyNumber, double value, int productQuantity, boolean isTaxable) {
         return new Neo4jInsertTransactionAction(dbOperation, continent, transaction, sellerCompanyNumber, value, productQuantity, isTaxable);
+    }
+
+    @Override
+    public MeanWageOfPeopleInWorldAction<Neo4jOperation> meanWageOfPeopleInWorldAction(Neo4jOperation dbOperation) {
+        return new Neo4jMeanWageOfPeopleInWorldAction(dbOperation);
     }
 
     @Override

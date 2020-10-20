@@ -2,11 +2,11 @@ define
 
 employment sub membership,
     relates employment_contract,
-    relates employment_profession,
+#    relates employment_profession,
     relates employment_wage;
 
-occupation sub entity,
-   plays employment_profession;
+#occupation sub entity,
+#   plays employment_profession;
 
 employment-contract sub legal-document,
     plays employment_contract;

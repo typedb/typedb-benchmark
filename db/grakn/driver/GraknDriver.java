@@ -57,22 +57,10 @@ public class GraknDriver extends TransactionalDbDriver<GraknClient.Transaction, 
 
     @Override
     public DbOperationFactory<GraknOperation> getDbOperationFactory(Region region, Logger logger) {
-        return new GraknOperationFactory(session(region.continent().name()), logger);
+        String regionName = region.continent().name();
+        if (regionName == null) {
+            regionName = region.name(); // For the case that the region is the world
+        }
+        return new GraknOperationFactory(session(regionName), logger);
     }
-
-//    public class GraknSession extends Session {
-//
-//        private final GraknClient.Session session;
-//
-//        public GraknSession(GraknClient.Session session) {
-//            this.session = session;
-//        }
-//
-//        @Override
-//        public GraknClient.Transaction tx() {
-//            try (GrablTracingThreadStatic.ThreadTrace trace = traceOnThread(OPEN_TRANSACTION.getName())) {
-//                return session.transaction(GraknClient.Transaction.Type.WRITE);
-//            }
-//        }
-//    }
 }
