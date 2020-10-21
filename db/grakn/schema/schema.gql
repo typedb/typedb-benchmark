@@ -88,10 +88,11 @@ date-signed sub attribute,
 email sub attribute,
     value string;
 
+marriage-id sub attribute,
+    value string;
+
 identifier sub attribute,
     value long;
-
-marriage-id sub identifier;
 
 identifier-double sub attribute, 
     value double;

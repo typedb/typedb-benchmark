@@ -31,7 +31,7 @@ public class GraknFindCurrentResidentsOfSpecificCityAction extends FindCurrentRe
                         .rel(RESIDENCY_LOCATION, Graql.var(CITY))
                         .rel(RESIDENCY_RESIDENT, Graql.var(PERSON))
                         .has(IS_CURRENT, true),
-                Graql.var(PERSON).isa(PERSON)
+                Graql.var(PERSON).isa(PERSON).has(EMAIL, Graql.var(EMAIL))
         ).get();
         return dbOperation.getOrderedAttribute(query, EMAIL, null);
     }

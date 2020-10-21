@@ -28,7 +28,7 @@ public class GraknFindResidentsOfSpecificCityAction extends FindResidentsOfSpeci
                 Graql.var(RESIDENCY).isa(RESIDENCY)
                         .rel(RESIDENCY_LOCATION, Graql.var(CITY))
                         .rel(RESIDENCY_RESIDENT, Graql.var(PERSON)),
-                Graql.var(PERSON).isa(PERSON)
+                Graql.var(PERSON).isa(PERSON).has(EMAIL, Graql.var(EMAIL))
         ).get();
         return dbOperation.getOrderedAttribute(query, EMAIL, null);
     }

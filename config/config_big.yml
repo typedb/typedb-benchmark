@@ -14,12 +14,12 @@ agents:
     mode: RUN
   - name: "employment"
     mode: RUN
-#  - name: "product"
-#    mode: RUN
-#  - name: "transaction"
-#    mode: RUN
-#  - name: "friendship"
-#    mode: RUN
+  - name: "product"
+    mode: RUN
+  - name: "transaction"
+    mode: RUN
+  - name: "friendship"
+    mode: RUN
   - name: "meanWage"
     mode: TRACE
   - name: "findResidentsOfSpecificCity"
