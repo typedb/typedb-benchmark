@@ -14,7 +14,7 @@ public class Neo4jFindResidentsOfSpecificCityAction extends FindResidentsOfSpeci
     @Override
     public List<String> run() {
         String query = "" +
-                "MATCH (person:Person)-[residentOf:RESIDENT_OF]->(city:City {locationName: \"Berlin\")\n" +
+                "MATCH (person:Person)-[residentOf:RESIDENT_OF]->(city:City {locationName: \"Berlin\"})\n" +
                 "RETURN person.email\n";
         return dbOperation.getOrderedAttribute(new Query(query), "person.email", null);
     }

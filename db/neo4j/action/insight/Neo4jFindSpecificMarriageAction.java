@@ -5,6 +5,8 @@ import grakn.simulation.db.neo4j.driver.Neo4jOperation;
 import org.neo4j.driver.Query;
 import org.neo4j.driver.Record;
 
+import java.util.stream.Collectors;
+
 public class Neo4jFindSpecificMarriageAction extends FindSpecificMarriageAction<Neo4jOperation> {
     public Neo4jFindSpecificMarriageAction(Neo4jOperation dbOperation) {
         super(dbOperation);
@@ -13,9 +15,8 @@ public class Neo4jFindSpecificMarriageAction extends FindSpecificMarriageAction<
     @Override
     public String run() {
         String query = "" +
-                "MATCH [marriedTo:MARRIED_TO {marriageId: " + MARRIAGE_ID_FOR_QUERY + "}]" +
+                "MATCH ()-[marriedTo:MARRIED_TO {marriageId: \"" + MARRIAGE_ID_FOR_QUERY + "\"}]-()" +
                 "RETURN marriedTo.marriageId";
-        Record result = singleResult(dbOperation.execute(new Query(query)));
-        return result.get("marriedTo.marriageId").asString();
+        return optionalSingleResult(dbOperation.execute(new Query(query)).stream().map(ans -> ans.get("marriedTo.marriageId").asString()).collect(Collectors.toList()));
     }
 }

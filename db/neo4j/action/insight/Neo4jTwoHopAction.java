@@ -14,7 +14,7 @@ public class Neo4jTwoHopAction extends TwoHopAction<Neo4jOperation> {
     @Override
     public List<String> run() {
         String query = "" +
-                "MATCH (city:City {locationName: \"London\")<-[:BORN_IN]-(child:Person)-[:CHILD_OF]->(parent:Person)\n" +
+                "MATCH (city:City {locationName: \"London\"})<-[:BORN_IN]-(child:Person)-[:CHILD_OF]->(parent:Person)\n" +
                 "RETURN parent.email";
         return dbOperation.getOrderedAttribute(new Query(query), "parent.email", null);
     }
