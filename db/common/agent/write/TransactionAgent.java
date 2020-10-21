@@ -5,7 +5,7 @@ import grakn.simulation.db.common.action.ActionFactory;
 import grakn.simulation.db.common.action.read.CompaniesInContinentAction;
 import grakn.simulation.db.common.action.read.ProductsInContinentAction;
 import grakn.simulation.db.common.agent.region.ContinentAgent;
-import grakn.simulation.db.common.agent.utils.Allocation;
+import grakn.simulation.db.common.agent.base.Allocation;
 import grakn.simulation.db.common.driver.DbOperation;
 import grakn.simulation.db.common.utils.Pair;
 import grakn.simulation.db.common.driver.DbDriver;

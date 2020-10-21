@@ -5,7 +5,6 @@ java_library(
         "*.java",
         "read/*.java",
         "write/*.java",
-        "utils/*.java",
         "region/*.java",
     ]),
     visibility = ["//visibility:public"],

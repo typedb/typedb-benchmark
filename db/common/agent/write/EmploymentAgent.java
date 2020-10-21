@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Random;
 
-import static grakn.simulation.db.common.agent.utils.Allocation.allocate;
+import static grakn.simulation.db.common.agent.base.Allocation.allocate;
 
 public class EmploymentAgent<DB_DRIVER extends DbDriver<DB_OPERATION>, DB_OPERATION extends DbOperation> extends CityAgent<DB_DRIVER, DB_OPERATION> {
 
