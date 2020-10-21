@@ -1,4 +1,4 @@
-package grakn.simulation.db.common.agent.interaction.read;
+package grakn.simulation.db.common.agent.read;
 
 import grakn.simulation.db.common.action.ActionFactory;
 import grakn.simulation.db.common.action.read.MeanWageOfPeopleInWorldAction;

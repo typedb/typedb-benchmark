@@ -4,7 +4,7 @@ import grakn.simulation.config.Config;
 import grakn.simulation.db.common.action.ActionFactory;
 import grakn.simulation.db.common.agent.base.Agent;
 import grakn.simulation.db.common.agent.base.SimulationContext;
-import grakn.simulation.db.common.agent.interaction.AgentFactory;
+import grakn.simulation.db.common.agent.AgentFactory;
 import grakn.simulation.db.common.driver.DbDriver;
 import grakn.simulation.db.common.driver.DbOperation;
 import grakn.simulation.db.common.world.World;
@@ -63,7 +63,7 @@ public abstract class Simulation<DB_DRIVER extends DbDriver<DB_OPERATION>, DB_OP
 
     protected abstract void initialise(Map<String, Path> initialisationDataPaths);
 
-    public Report iterate() {
+    public void iterate() {
 
         LOG.info("Simulation step: {}", simulationStep);
         report.clean();
@@ -72,7 +72,6 @@ public abstract class Simulation<DB_DRIVER extends DbDriver<DB_OPERATION>, DB_OP
         }
         closeIteration();  // We want to test opening new sessions each iteration.
         simulationStep++;
-        return report;
     }
 
     protected abstract void closeIteration();

@@ -1,18 +1,18 @@
-package grakn.simulation.db.common.agent.interaction;
+package grakn.simulation.db.common.agent;
 
 import grakn.simulation.db.common.action.ActionFactory;
 import grakn.simulation.db.common.agent.base.Agent;
-import grakn.simulation.db.common.agent.interaction.read.MeanWageAgent;
-import grakn.simulation.db.common.agent.interaction.write.AgeUpdateAgent;
-import grakn.simulation.db.common.agent.interaction.write.CompanyAgent;
-import grakn.simulation.db.common.agent.interaction.write.EmploymentAgent;
-import grakn.simulation.db.common.agent.interaction.write.FriendshipAgent;
-import grakn.simulation.db.common.agent.interaction.write.MarriageAgent;
-import grakn.simulation.db.common.agent.interaction.write.ParentshipAgent;
-import grakn.simulation.db.common.agent.interaction.write.PersonBirthAgent;
-import grakn.simulation.db.common.agent.interaction.write.ProductAgent;
-import grakn.simulation.db.common.agent.interaction.write.RelocationAgent;
-import grakn.simulation.db.common.agent.interaction.write.TransactionAgent;
+import grakn.simulation.db.common.agent.read.MeanWageAgent;
+import grakn.simulation.db.common.agent.write.AgeUpdateAgent;
+import grakn.simulation.db.common.agent.write.CompanyAgent;
+import grakn.simulation.db.common.agent.write.EmploymentAgent;
+import grakn.simulation.db.common.agent.write.FriendshipAgent;
+import grakn.simulation.db.common.agent.write.MarriageAgent;
+import grakn.simulation.db.common.agent.write.ParentshipAgent;
+import grakn.simulation.db.common.agent.write.PersonBirthAgent;
+import grakn.simulation.db.common.agent.write.ProductAgent;
+import grakn.simulation.db.common.agent.write.RelocationAgent;
+import grakn.simulation.db.common.agent.write.TransactionAgent;
 import grakn.simulation.db.common.driver.DbDriver;
 import grakn.simulation.db.common.driver.DbOperation;
 

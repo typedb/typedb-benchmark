@@ -1,4 +1,4 @@
-package grakn.simulation.db.common.agent.interaction.write;
+package grakn.simulation.db.common.agent.write;
 
 import grakn.simulation.db.common.agent.base.SimulationContext;
 import grakn.simulation.db.common.action.ActionFactory;

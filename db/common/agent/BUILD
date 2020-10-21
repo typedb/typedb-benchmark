@@ -2,9 +2,9 @@ java_library(
     name = "agent",
     srcs = glob([
         "base/*.java",
-        "interaction/*.java",
-        "interaction/read/*.java",
-        "interaction/write/*.java",
+        "*.java",
+        "read/*.java",
+        "write/*.java",
         "utils/*.java",
         "region/*.java",
     ]),
