@@ -3,7 +3,7 @@ java_library(
     srcs = glob([
         "base/*.java",
         "*.java",
-        "read/*.java",
+        "insight/*.java",
         "write/*.java",
         "region/*.java",
     ]),

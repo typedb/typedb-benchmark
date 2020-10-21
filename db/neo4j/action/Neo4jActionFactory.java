@@ -2,12 +2,21 @@ package grakn.simulation.db.neo4j.action;
 
 import grakn.simulation.db.common.action.ActionFactory;
 import grakn.simulation.db.common.action.SpouseType;
+import grakn.simulation.db.common.action.insight.ArbitraryOneHopAction;
 import grakn.simulation.db.common.action.read.BirthsInCityAction;
 import grakn.simulation.db.common.action.read.CitiesInContinentAction;
 import grakn.simulation.db.common.action.read.CompaniesInContinentAction;
+import grakn.simulation.db.common.action.insight.FindCurrentResidentsOfSpecificCityAction;
+import grakn.simulation.db.common.action.insight.FindResidentsOfSpecificCityAction;
+import grakn.simulation.db.common.action.insight.FindSpecificMarriageAction;
+import grakn.simulation.db.common.action.insight.FindSpecificPersonAction;
+import grakn.simulation.db.common.action.insight.FindTransactionCurrencyAction;
+import grakn.simulation.db.common.action.insight.FourHopAction;
 import grakn.simulation.db.common.action.read.MarriedCoupleAction;
-import grakn.simulation.db.common.action.read.MeanWageOfPeopleInWorldAction;
+import grakn.simulation.db.common.action.insight.MeanWageOfPeopleInWorldAction;
 import grakn.simulation.db.common.action.read.ProductsInContinentAction;
+import grakn.simulation.db.common.action.insight.ThreeHopAction;
+import grakn.simulation.db.common.action.insight.TwoHopAction;
 import grakn.simulation.db.common.action.read.UnmarriedPeopleInCityAction;
 import grakn.simulation.db.common.action.read.UpdateAgesOfPeopleInCityAction;
 import grakn.simulation.db.common.action.write.InsertCompanyAction;
@@ -21,14 +30,23 @@ import grakn.simulation.db.common.action.write.InsertRelocationAction;
 import grakn.simulation.db.common.action.write.InsertTransactionAction;
 import grakn.simulation.db.common.utils.Pair;
 import grakn.simulation.db.common.world.World;
+import grakn.simulation.db.neo4j.action.insight.Neo4jArbitraryOneHopAction;
 import grakn.simulation.db.neo4j.action.read.Neo4jBirthsInCityAction;
 import grakn.simulation.db.neo4j.action.read.Neo4jCitiesInContinentAction;
 import grakn.simulation.db.neo4j.action.read.Neo4jCompaniesInContinentAction;
 import grakn.simulation.db.neo4j.action.read.Neo4jCompaniesInCountryAction;
+import grakn.simulation.db.neo4j.action.insight.Neo4jFindCurrentResidentsOfSpecificCityAction;
+import grakn.simulation.db.neo4j.action.insight.Neo4jFindResidentsOfSpecificCityAction;
+import grakn.simulation.db.neo4j.action.insight.Neo4jFindSpecificMarriageAction;
+import grakn.simulation.db.neo4j.action.insight.Neo4jFindSpecificPersonAction;
+import grakn.simulation.db.neo4j.action.insight.Neo4jFindTransactionCurrencyAction;
+import grakn.simulation.db.neo4j.action.insight.Neo4jFourHopAction;
 import grakn.simulation.db.neo4j.action.read.Neo4jMarriedCoupleAction;
-import grakn.simulation.db.neo4j.action.read.Neo4jMeanWageOfPeopleInWorldAction;
+import grakn.simulation.db.neo4j.action.insight.Neo4jMeanWageOfPeopleInWorldAction;
 import grakn.simulation.db.neo4j.action.read.Neo4jProductsInContinentAction;
 import grakn.simulation.db.neo4j.action.read.Neo4jResidentsInCityAction;
+import grakn.simulation.db.neo4j.action.insight.Neo4jThreeHopAction;
+import grakn.simulation.db.neo4j.action.insight.Neo4jTwoHopAction;
 import grakn.simulation.db.neo4j.action.read.Neo4jUnmarriedPeopleInCityAction;
 import grakn.simulation.db.neo4j.action.read.Neo4jUpdateAgesOfPeopleInCityAction;
 import grakn.simulation.db.neo4j.action.write.Neo4jInsertCompanyAction;
@@ -54,7 +72,7 @@ public class Neo4jActionFactory extends ActionFactory<Neo4jOperation, Record> {
     }
 
     @Override
-    public Neo4jCompaniesInCountryAction companyNumbersInCountryAction(Neo4jOperation dbOperation, World.Country country, int numCompanies) {
+    public Neo4jCompaniesInCountryAction companiesInCountryAction(Neo4jOperation dbOperation, World.Country country, int numCompanies) {
         return new Neo4jCompaniesInCountryAction(dbOperation, country, numCompanies);
     }
 
@@ -134,12 +152,57 @@ public class Neo4jActionFactory extends ActionFactory<Neo4jOperation, Record> {
     }
 
     @Override
+    public UpdateAgesOfPeopleInCityAction<Neo4jOperation> updateAgesOfPeopleInCityAction(Neo4jOperation dbOperation, LocalDateTime today, World.City city) {
+            return new Neo4jUpdateAgesOfPeopleInCityAction(dbOperation, today, city);
+    }
+
+    @Override
     public MeanWageOfPeopleInWorldAction<Neo4jOperation> meanWageOfPeopleInWorldAction(Neo4jOperation dbOperation) {
         return new Neo4jMeanWageOfPeopleInWorldAction(dbOperation);
     }
 
     @Override
-    public UpdateAgesOfPeopleInCityAction<Neo4jOperation> updateAgesOfPeopleInCityAction(Neo4jOperation dbOperation, LocalDateTime today, World.City city) {
-            return new Neo4jUpdateAgesOfPeopleInCityAction(dbOperation, today, city);
+    public FindResidentsOfSpecificCityAction<Neo4jOperation> findResidentsOfSpecificCityAction(Neo4jOperation dbOperation) {
+        return new Neo4jFindResidentsOfSpecificCityAction(dbOperation);
+    }
+
+    @Override
+    public FindCurrentResidentsOfSpecificCityAction<Neo4jOperation> findCurrentResidentsOfSpecificCityAction(Neo4jOperation dbOperation) {
+        return new Neo4jFindCurrentResidentsOfSpecificCityAction(dbOperation);
+    }
+
+    @Override
+    public FindTransactionCurrencyAction<Neo4jOperation> findTransactionCurrencyAction(Neo4jOperation dbOperation) {
+        return new Neo4jFindTransactionCurrencyAction(dbOperation);
+    }
+
+    @Override
+    public ArbitraryOneHopAction<Neo4jOperation> arbitraryOneHopAction(Neo4jOperation dbOperation) {
+        return new Neo4jArbitraryOneHopAction(dbOperation);
+    }
+
+    @Override
+    public TwoHopAction<Neo4jOperation> twoHopAction(Neo4jOperation dbOperation) {
+        return new Neo4jTwoHopAction(dbOperation);
+    }
+
+    @Override
+    public ThreeHopAction<Neo4jOperation> threeHopAction(Neo4jOperation dbOperation) {
+        return new Neo4jThreeHopAction(dbOperation);
+    }
+
+    @Override
+    public FourHopAction<Neo4jOperation> fourHopAction(Neo4jOperation dbOperation) {
+        return new Neo4jFourHopAction(dbOperation);
+    }
+
+    @Override
+    public FindSpecificMarriageAction<Neo4jOperation> findSpecificMarriageAction(Neo4jOperation dbOperation) {
+        return new Neo4jFindSpecificMarriageAction(dbOperation);
+    }
+
+    @Override
+    public FindSpecificPersonAction<Neo4jOperation> findSpecificPersonAction(Neo4jOperation dbOperation) {
+        return new Neo4jFindSpecificPersonAction(dbOperation);
     }
 }

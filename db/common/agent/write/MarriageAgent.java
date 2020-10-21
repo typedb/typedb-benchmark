@@ -54,7 +54,7 @@ public class MarriageAgent<DB_DRIVER extends DbDriver<DB_OPERATION>, DB_OPERATIO
                     for (int i = 0; i < numMarriagesPossible; i++) {
                         String wifeEmail = womenEmails.get(i);
                         String husbandEmail = menEmails.get(i);
-                        int marriageIdentifier = (wifeEmail + husbandEmail).hashCode();
+                        int marriageIdentifier = uniqueId(simulationContext, i).hashCode();
                         runAction(actionFactory().insertMarriageAction(dbOperation, city, marriageIdentifier, wifeEmail, husbandEmail));
                     }
                     dbOperation.save();

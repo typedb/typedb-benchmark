@@ -110,7 +110,6 @@ public abstract class Agent<REGION extends Region, DB_DRIVER extends DbDriver<DB
         private final Random random;
         private final Boolean testing;
         private final Report report = new Report();
-        protected Action<?, ?> action;
         private final String tracker;
         private GrablTracingThreadStatic.ThreadContext context;
 
@@ -161,9 +160,8 @@ public abstract class Agent<REGION extends Region, DB_DRIVER extends DbDriver<DB
          * @param iterationScopeId An id that uniquely identifies a concept within the scope of the agent at a particular iteration
          * @return
          */
-        public int uniqueId(SimulationContext simulationContext, int iterationScopeId) {
-            String id = simulationContext.simulationStep() + tracker() + iterationScopeId;
-            return id.hashCode();
+        public String uniqueId(SimulationContext simulationContext, int iterationScopeId) {
+            return simulationContext.simulationStep() + "/" + tracker() + "/" + iterationScopeId;
         }
 
         public RandomValueGenerator randomAttributeGenerator() {

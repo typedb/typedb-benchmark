@@ -2,7 +2,16 @@ package grakn.simulation.db.common.agent;
 
 import grakn.simulation.db.common.action.ActionFactory;
 import grakn.simulation.db.common.agent.base.Agent;
-import grakn.simulation.db.common.agent.read.MeanWageAgent;
+import grakn.simulation.db.common.agent.insight.ArbitraryOneHopAgent;
+import grakn.simulation.db.common.agent.insight.FindCurrentResidentsOfSpecificCityAgent;
+import grakn.simulation.db.common.agent.insight.FindResidentsOfSpecificCityAgent;
+import grakn.simulation.db.common.agent.insight.FindSpecificMarriageAgent;
+import grakn.simulation.db.common.agent.insight.FindSpecificPersonAgent;
+import grakn.simulation.db.common.agent.insight.FindTransactionCurrencyAgent;
+import grakn.simulation.db.common.agent.insight.FourHopAgent;
+import grakn.simulation.db.common.agent.insight.MeanWageAgent;
+import grakn.simulation.db.common.agent.insight.ThreeHopAgent;
+import grakn.simulation.db.common.agent.insight.TwoHopAgent;
 import grakn.simulation.db.common.agent.write.AgeUpdateAgent;
 import grakn.simulation.db.common.agent.write.CompanyAgent;
 import grakn.simulation.db.common.agent.write.EmploymentAgent;
@@ -70,6 +79,42 @@ public class AgentFactory<DB_DRIVER extends DbDriver<DB_OPERATION>, DB_OPERATION
         return new MeanWageAgent<>(dbDriver, actionFactory);
     }
 
+    public FindResidentsOfSpecificCityAgent<DB_DRIVER, DB_OPERATION> findResidentsOfSpecificCity() {
+        return new FindResidentsOfSpecificCityAgent<>(dbDriver, actionFactory);
+    }
+
+    public FindCurrentResidentsOfSpecificCityAgent<DB_DRIVER, DB_OPERATION> findCurrentResidentsOfSpecificCity() {
+        return new FindCurrentResidentsOfSpecificCityAgent<>(dbDriver, actionFactory);
+    }
+
+    public FindTransactionCurrencyAgent<DB_DRIVER, DB_OPERATION> findTransactionCurrency() {
+        return new FindTransactionCurrencyAgent<>(dbDriver, actionFactory);
+    }
+
+    public ArbitraryOneHopAgent<DB_DRIVER, DB_OPERATION> arbitraryOneHop() {
+        return new ArbitraryOneHopAgent<>(dbDriver, actionFactory);
+    }
+
+    public TwoHopAgent<DB_DRIVER, DB_OPERATION> twoHop() {
+        return new TwoHopAgent<>(dbDriver, actionFactory);
+    }
+
+    public ThreeHopAgent<DB_DRIVER, DB_OPERATION> threeHop() {
+        return new ThreeHopAgent<>(dbDriver, actionFactory);
+    }
+
+    public FourHopAgent<DB_DRIVER, DB_OPERATION> fourHop() {
+        return new FourHopAgent<>(dbDriver, actionFactory);
+    }
+
+    public FindSpecificMarriageAgent<DB_DRIVER, DB_OPERATION> findSpecificMarriage() {
+        return new FindSpecificMarriageAgent<>(dbDriver, actionFactory);
+    }
+
+    public FindSpecificPersonAgent<DB_DRIVER, DB_OPERATION> findSpecificPerson() {
+        return new FindSpecificPersonAgent<>(dbDriver, actionFactory);
+    }
+
     public Agent<?, DB_DRIVER, DB_OPERATION> get(String agentName) {
         switch (agentName) {
             case "marriage":
@@ -94,6 +139,24 @@ public class AgentFactory<DB_DRIVER extends DbDriver<DB_OPERATION>, DB_OPERATION
                 return friendship();
             case "meanWage":
                 return meanWage();
+            case "findResidentsOfSpecificCity":
+                return findResidentsOfSpecificCity();
+            case "findCurrentResidentsOfSpecificCity":
+                return findCurrentResidentsOfSpecificCity();
+            case "findTransactionCurrency":
+                return findTransactionCurrency();
+            case "arbitraryOneHop":
+                return arbitraryOneHop();
+            case "twoHop":
+                return twoHop();
+            case "threeHop":
+                return threeHop();
+            case "fourHop":
+                return fourHop();
+            case "findSpecificMarriage":
+                return findSpecificMarriage();
+            case "findSpecificPerson":
+                return findSpecificPerson();
             default:
                 throw new IllegalArgumentException("Unrecognised agent name: " + agentName);
         }

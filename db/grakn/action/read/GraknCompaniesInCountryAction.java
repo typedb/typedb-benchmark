@@ -1,7 +1,6 @@
 package grakn.simulation.db.grakn.action.read;
 
-import grakn.simulation.db.common.action.read.CompanyNumbersAction;
-import grakn.simulation.db.common.driver.TransactionalDbOperation;
+import grakn.simulation.db.common.action.read.CompaniesInCountryAction;
 import grakn.simulation.db.common.world.World;
 import grakn.simulation.db.grakn.driver.GraknOperation;
 import graql.lang.Graql;
@@ -17,7 +16,7 @@ import static grakn.simulation.db.grakn.schema.Schema.INCORPORATION_INCORPORATED
 import static grakn.simulation.db.grakn.schema.Schema.INCORPORATION_INCORPORATING;
 import static grakn.simulation.db.grakn.schema.Schema.LOCATION_NAME;
 
-public class GraknCompaniesInCountryAction extends CompanyNumbersAction<GraknOperation> {
+public class GraknCompaniesInCountryAction extends CompaniesInCountryAction<GraknOperation> {
     public GraknCompaniesInCountryAction(GraknOperation dbOperation, World.Country country, int numCompanies) {
         super(dbOperation, country, numCompanies);
     }

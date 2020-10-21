@@ -22,6 +22,24 @@ agents:
 #    mode: RUN
   - name: "meanWage"
     mode: TRACE
+  - name: "findResidentsOfSpecificCity"
+    mode: TRACE
+  - name: "findCurrentResidentsOfSpecificCity"
+    mode: TRACE
+  - name: "findTransactionCurrency"
+    mode: TRACE
+  - name: "arbitraryOneHop"
+    mode: TRACE
+  - name: "twoHop"
+    mode: TRACE
+  - name: "threeHop"
+    mode: TRACE
+  - name: "fourHop"
+    mode: TRACE
+  - name: "findSpecificMarriage"
+    mode: TRACE
+  - name: "findSpecificPerson"
+    mode: TRACE
 
 traceSampling:
   # Options: `"every"` for every K traces; `"log"` for logarithm with base N

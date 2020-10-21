@@ -2,7 +2,7 @@ package grakn.simulation.db.common.agent.write;
 
 import grakn.simulation.db.common.agent.base.SimulationContext;
 import grakn.simulation.db.common.action.ActionFactory;
-import grakn.simulation.db.common.action.read.CompanyNumbersAction;
+import grakn.simulation.db.common.action.read.CompaniesInCountryAction;
 import grakn.simulation.db.common.action.read.ResidentsInCityAction;
 import grakn.simulation.db.common.agent.region.CityAgent;
 import grakn.simulation.db.common.driver.DbDriver;
@@ -51,7 +51,7 @@ public class EmploymentAgent<DB_DRIVER extends DbDriver<DB_OPERATION>, DB_OPERAT
             }
 
             try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker())) {
-                CompanyNumbersAction<DB_OPERATION> companyNumbersAction = actionFactory().companyNumbersInCountryAction(dbOperation, city.country(), simulationContext.world().getScaleFactor());
+                CompaniesInCountryAction<DB_OPERATION> companyNumbersAction = actionFactory().companiesInCountryAction(dbOperation, city.country(), simulationContext.world().getScaleFactor());
                 companyNumbers = runAction(companyNumbersAction);
             }
 

@@ -1,7 +1,6 @@
-package grakn.simulation.db.grakn.action.read;
+package grakn.simulation.db.grakn.action.insight;
 
-import grakn.simulation.db.common.action.read.MeanWageOfPeopleInWorldAction;
-import grakn.simulation.db.common.world.World;
+import grakn.simulation.db.common.action.insight.MeanWageOfPeopleInWorldAction;
 import grakn.simulation.db.grakn.driver.GraknOperation;
 import graql.lang.Graql;
 import graql.lang.query.GraqlGet;
