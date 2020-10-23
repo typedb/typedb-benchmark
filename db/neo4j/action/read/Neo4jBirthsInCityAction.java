@@ -16,14 +16,16 @@ public class Neo4jBirthsInCityAction extends BirthsInCityAction<Neo4jOperation> 
 
     @Override
     public List<String> run() {
-        String template = "" +
-                "MATCH (city:City {locationName: $locationName}),\n" +
-                "(child:Person {dateOfBirth: $dateOfBirth})-[:BORN_IN]->(city)\n" +
-                "RETURN child.email";
         HashMap<String, Object> parameters = new HashMap<String, Object>(){{
             put("dateOfBirth", today);
             put("locationName", worldCity.name());
         }};
-        return dbOperation.getOrderedAttribute(new Query(template, parameters), "child.email", null);
+        return dbOperation.getOrderedAttribute(new Query(query(), parameters), "child.email", null);
+    }
+
+    public static String query() {
+        return "MATCH (city:City {locationName: $locationName}),\n" +
+                "(child:Person {dateOfBirth: $dateOfBirth})-[:BORN_IN]->(city)\n" +
+                "RETURN child.email";
     }
 }

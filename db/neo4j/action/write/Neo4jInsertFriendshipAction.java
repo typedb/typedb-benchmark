@@ -20,20 +20,21 @@ public class Neo4jInsertFriendshipAction extends InsertFriendshipAction<Neo4jOpe
 
     @Override
     public Record run() {
-        String template = "" +
-                "MATCH " +
-                "(p1:Person),\n" +
-                "(p2:Person)\n" +
-                "WHERE p1.email = $p1Email AND p2.email = $p2Email AND NOT (p1)-[:FRIEND_OF]-(p2)\n" +
-                "CREATE (p1)-[friendOf:FRIEND_OF {startDate: $startDate}]->(p2)\n" +
-                "RETURN p1.email, p2.email, friendOf.startDate";
-
         HashMap<String, Object> parameters = new HashMap<String, Object>(){{
             put("p1Email", friend1Email);
             put("p2Email", friend2Email);
             put("startDate", today);
         }};
-        return Action.optionalSingleResult(dbOperation.execute(new Query(template, parameters)));
+        return Action.optionalSingleResult(dbOperation.execute(new Query(query(), parameters)));
+    }
+
+    public static String query() {
+        return "MATCH " +
+                "(p1:Person),\n" +
+                "(p2:Person)\n" +
+                "WHERE p1.email = $p1Email AND p2.email = $p2Email AND NOT (p1)-[:FRIEND_OF]-(p2)\n" +
+                "CREATE (p1)-[friendOf:FRIEND_OF {startDate: $startDate}]->(p2)\n" +
+                "RETURN p1.email, p2.email, friendOf.startDate";
     }
 
     @Override

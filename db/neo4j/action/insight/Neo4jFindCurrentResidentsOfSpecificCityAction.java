@@ -15,9 +15,11 @@ public class Neo4jFindCurrentResidentsOfSpecificCityAction extends FindCurrentRe
 
     @Override
     public List<String> run() {
-        String query = "" +
-                "MATCH (person:Person)-[residentOf:RESIDENT_OF {isCurrent:true}]->(city:City {locationName: \"Berlin\"})\n" +
+        return dbOperation.getOrderedAttribute(new Query(query()), "person.email", null);
+    }
+
+    public static String query() {
+        return "MATCH (person:Person)-[residentOf:RESIDENT_OF {isCurrent:true}]->(city:City {locationName: \"Berlin\"})\n" +
                 "RETURN person.email\n";
-        return dbOperation.getOrderedAttribute(new Query(query), "person.email", null);
     }
 }

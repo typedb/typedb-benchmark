@@ -16,16 +16,17 @@ public class Neo4jUpdateAgesOfPeopleInCityAction extends UpdateAgesOfPeopleInCit
 
     @Override
     public Integer run() {
-        String template = "" +
-                "MATCH (person:Person)-[:BORN_IN]->(city:City {locationName: $locationName})\n" +
-                "SET person.age = duration.between(person.dateOfBirth, localdatetime($dateToday)).years\n" +
-                "RETURN person.age";
-
         HashMap<String, Object> parameters = new HashMap<String, Object>(){{
             put(Schema.LOCATION_NAME, city.name());
             put("dateToday", today);
         }};
-        dbOperation.execute(new Query(template, parameters));
+        dbOperation.execute(new Query(query(), parameters));
         return null;
+    }
+
+    public static String query() {
+        return "MATCH (person:Person)-[:BORN_IN]->(city:City {locationName: $locationName})\n" +
+                "SET person.age = duration.between(person.dateOfBirth, localdatetime($dateToday)).years\n" +
+                "RETURN person.age";
     }
 }

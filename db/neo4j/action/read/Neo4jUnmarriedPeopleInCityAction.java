@@ -20,17 +20,19 @@ public class Neo4jUnmarriedPeopleInCityAction extends UnmarriedPeopleInCityActio
 
     @Override
     public List<String> run() {
-        String template = "" +
-                "MATCH (person:Person {gender: $gender})-[residentOf:RESIDENT_OF]->(city:City {locationName: $locationName})\n" +
-                "WHERE datetime(person.dateOfBirth) <= datetime(\"" + dobOfAdults + "\")\n" +
-                "AND NOT (person)-[:MARRIED_TO]-()\n" +
-                "AND NOT EXISTS (residentOf.endDate)\n" +
-                "RETURN person.email";
-
         HashMap<String, Object> parameters = new HashMap<String, Object>(){{
             put(LOCATION_NAME, city.name());
             put(GENDER, gender);
+            put("dobOfAdults", dobOfAdults);
         }};
-        return dbOperation.getOrderedAttribute(new Query(template, parameters), "person." + EMAIL, null);
+        return dbOperation.getOrderedAttribute(new Query(query(), parameters), "person." + EMAIL, null);
+    }
+
+    public static String query() {
+        return "MATCH (person:Person {gender: $gender})-[residentOf:RESIDENT_OF]->(city:City {locationName: $locationName})\n" +
+                "WHERE datetime(person.dateOfBirth) <= datetime($dobOfAdults)\n" +
+                "AND NOT (person)-[:MARRIED_TO]-()\n" +
+                "AND NOT EXISTS (residentOf.endDate)\n" +
+                "RETURN person.email";
     }
 }

@@ -14,9 +14,12 @@ public class Neo4jFindTransactionCurrencyAction extends FindTransactionCurrencyA
 
     @Override
     public List<String> run() {
-        String query = "" +
-                "MATCH (transaction:Transaction)" +
-                "RETURN transaction.currency";
-        return dbOperation.execute(new Query(query)).stream().map(ans -> ans.get("transaction.currency").asString()).collect(Collectors.toList());
+        return dbOperation.execute(new Query(query())).stream().map(ans -> ans.get("transaction.currency").asString()).collect(Collectors.toList());
+    }
+
+    public static String query() {
+        return "" +
+                    "MATCH (transaction:Transaction)" +
+                    "RETURN transaction.currency";
     }
 }

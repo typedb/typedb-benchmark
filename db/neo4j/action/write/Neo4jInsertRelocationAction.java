@@ -28,33 +28,34 @@ public class Neo4jInsertRelocationAction extends InsertRelocationAction<Neo4jOpe
         // alongside this relation
 
         endPastResidencies(dbOperation, relocateeEmail, today);
-
-        // As it is, not making this ternary is losing the information of where the person if relocating from
-        String template = "" +
-                "MATCH (person:Person {email: $email}), (newCity:City {locationName: $newCityName})\n" +
-                "CREATE (person)-[relocatedTo:RELOCATED_TO {relocationDate:$relocationDate}]->(newCity), " +
-                "(person)-[:RESIDENT_OF {startDate: $relocationDate, isCurrent: TRUE}]->(newCity)" +
-                "RETURN person.email, newCity.locationName, relocatedTo.relocationDate";
-
         HashMap<String, Object> parameters = new HashMap<String, Object>(){{
             put("email", relocateeEmail);
             put("newCityName", relocationCityName);
             put("relocationDate", today);
         }};
-        return Action.singleResult(dbOperation.execute(new Query(template, parameters)));
+        return Action.singleResult(dbOperation.execute(new Query(createRelocationQuery(), parameters)));
+    }
+
+    public static String createRelocationQuery() {
+        // Not making this ternary is losing the information of where the person if relocating from
+        return "MATCH (person:Person {email: $email}), (newCity:City {locationName: $newCityName})\n" +
+                "CREATE (person)-[relocatedTo:RELOCATED_TO {relocationDate:$relocationDate}]->(newCity), " +
+                "(person)-[:RESIDENT_OF {startDate: $relocationDate, isCurrent: TRUE}]->(newCity)" +
+                "RETURN person.email, newCity.locationName, relocatedTo.relocationDate";
     }
 
     public static void endPastResidencies(Neo4jOperation dbOperation, String email, LocalDateTime today){
-        String template = "" +
-                "MATCH (person:Person {email: $email})-[residentOf:RESIDENT_OF]->(oldCity:City)\n" +
-                "WHERE NOT EXISTS (residentOf.endDate)\n" +
-                "SET residentOf.isCurrent = FALSE, residentOf.endDate = $endDate";
-
         HashMap<String, Object> parameters = new HashMap<String, Object>(){{
             put("email", email);
             put("endDate", today);
         }};
-        dbOperation.execute(new Query(template, parameters));
+        dbOperation.execute(new Query(endPastResidenciesQuery(), parameters));
+    }
+
+    public static String endPastResidenciesQuery() {
+        return "MATCH (person:Person {email: $email})-[residentOf:RESIDENT_OF]->(oldCity:City)\n" +
+                "WHERE NOT EXISTS (residentOf.endDate)\n" +
+                "SET residentOf.isCurrent = FALSE, residentOf.endDate = $endDate";
     }
 
     @Override

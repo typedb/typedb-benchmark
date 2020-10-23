@@ -17,14 +17,17 @@ public class Neo4jResidentsInCityAction extends ResidentsInCityAction<Neo4jOpera
 
     @Override
     public List<String> run() {
-        String template = "" +
-                "MATCH (resident:Person)-[residentOf:RESIDENT_OF]->(city:City {locationName: $locationName})" +
-                "WHERE datetime(residentOf.startDate) <= datetime($earliestDate) AND NOT EXISTS (residentOf.endDate)\n" +
-                "RETURN resident.email";
+        String template = query();
         HashMap<String, Object> parameters = new HashMap<String, Object>(){{
             put("locationName", city.name());
             put("earliestDate", earliestDate);
         }};
         return dbOperation.getOrderedAttribute(new Query(template, parameters), "resident.email", numResidents);
+    }
+
+    public static String query() {
+        return "MATCH (resident:Person)-[residentOf:RESIDENT_OF]->(city:City {locationName: $locationName})" +
+                "WHERE datetime(residentOf.startDate) <= datetime($earliestDate) AND NOT EXISTS (residentOf.endDate)\n" +
+                "RETURN resident.email";
     }
 }

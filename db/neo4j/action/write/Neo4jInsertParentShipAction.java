@@ -18,17 +18,19 @@ public class Neo4jInsertParentShipAction extends InsertParentShipAction<Neo4jOpe
 
     @Override
     public Record run() {
-        String template = "" +
-                "MATCH (mother:Person {email: $motherEmail}), (father:Person {email: $fatherEmail}),\n" +
-                "(child:Person {email: $childEmail})\n" +
-                "CREATE (father)<-[:CHILD_OF]-(child)-[:CHILD_OF]->(mother)\n" +
-                "RETURN mother.email, father.email, child.email";
         HashMap<String, Object> parameters = new HashMap<String, Object>(){{
             put("motherEmail", marriage.get(SpouseType.WIFE));
             put("fatherEmail", marriage.get(SpouseType.HUSBAND));
             put("childEmail", childEmail);
         }};
-        return Action.singleResult(dbOperation.execute(new Query(template, parameters)));
+        return Action.singleResult(dbOperation.execute(new Query(query(), parameters)));
+    }
+
+    public static String query() {
+        return "MATCH (mother:Person {email: $motherEmail}), (father:Person {email: $fatherEmail}),\n" +
+                "(child:Person {email: $childEmail})\n" +
+                "CREATE (father)<-[:CHILD_OF]-(child)-[:CHILD_OF]->(mother)\n" +
+                "RETURN mother.email, father.email, child.email";
     }
 
     @Override

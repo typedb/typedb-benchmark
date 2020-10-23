@@ -17,10 +17,13 @@ public class Neo4jMeanWageOfPeopleInWorldAction extends MeanWageOfPeopleInWorldA
 
     @Override
     public Double run() {
-        String template = "" +
-                "MATCH ()-[employs:EMPLOYS]->()\n" +
-                "RETURN avg(employs.wage)\n";
+        String template = query();
         List<Record> records = dbOperation.execute(new Query(template));
         return (Double) getOnlyElement(records).asMap().get("avg(employs.wage)");
+    }
+
+    public static String query() {
+        return "MATCH ()-[employs:EMPLOYS]->()\n" +
+                "RETURN avg(employs.wage)";
     }
 }

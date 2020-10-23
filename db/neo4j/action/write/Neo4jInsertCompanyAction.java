@@ -23,18 +23,19 @@ public class Neo4jInsertCompanyAction extends InsertCompanyAction<Neo4jOperation
 
     @Override
     public Record run() {
-        String template = "" +
-                "MATCH (country:Country {locationName: $countryName})\n" +
-                "CREATE (company:Company {companyNumber: $companyNumber, companyName: $companyName})-[incorporation:INCORPORATED_IN {dateOfIncorporation: $dateOfIncorporation}]->(country)" +
-                "RETURN company.companyName, company.companyNumber, country.locationName, incorporation.dateOfIncorporation";
-
         HashMap<String, Object> parameters = new HashMap<String, Object>(){{
             put("countryName", country.name());
             put("companyNumber", companyNumber);
             put("companyName", companyName);
             put("dateOfIncorporation", today);
         }};
-        return Action.singleResult(dbOperation.execute(new Query(template, parameters)));
+        return Action.singleResult(dbOperation.execute(new Query(query(), parameters)));
+    }
+
+    public static String query() {
+        return "MATCH (country:Country {locationName: $countryName})\n" +
+                "CREATE (company:Company {companyNumber: $companyNumber, companyName: $companyName})-[incorporation:INCORPORATED_IN {dateOfIncorporation: $dateOfIncorporation}]->(country)" +
+                "RETURN company.companyName, company.companyNumber, country.locationName, incorporation.dateOfIncorporation";
     }
 
     @Override

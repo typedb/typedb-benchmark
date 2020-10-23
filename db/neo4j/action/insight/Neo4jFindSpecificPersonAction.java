@@ -12,10 +12,12 @@ public class Neo4jFindSpecificPersonAction extends FindSpecificPersonAction<Neo4
 
     @Override
     public String run() {
-        String query = "" +
-                "MATCH (person:Person {email: \"" + PERSON_EMAIL_FOR_QUERY + "\"})" +
-                "RETURN person.email";
-        Record result = singleResult(dbOperation.execute(new Query(query)));
+        Record result = singleResult(dbOperation.execute(new Query(query())));
         return result.get("person.email").asString();
+    }
+
+    public static String query() {
+        return "MATCH (person:Person {email: \"" + PERSON_EMAIL_FOR_QUERY + "\"})" +
+                "RETURN person.email";
     }
 }

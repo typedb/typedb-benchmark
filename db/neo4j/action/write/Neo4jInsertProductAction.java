@@ -20,14 +20,7 @@ public class Neo4jInsertProductAction extends InsertProductAction<Neo4jOperation
 
     @Override
     public Record run() {
-        String template = "" +
-                "MATCH (continent:Continent {locationName: $continentName})\n" +
-                "CREATE (product:Product {\n" +
-                "   barcode: $barcode,\n" +
-                "   name: $productName,\n" +
-                "   description: $description\n" +
-                "})-[:PRODUCED_IN]->(continent)\n" +
-                "RETURN product.barcode, product.name, product.description, continent.locationName";
+        String template = query();
         HashMap<String, Object> parameters = new HashMap<String, Object>(){{
             put("continentName", continent.name());
             put("barcode", barcode);
@@ -35,6 +28,16 @@ public class Neo4jInsertProductAction extends InsertProductAction<Neo4jOperation
             put("description", productDescription);
         }};
         return singleResult(dbOperation.execute(new Query(template, parameters)));
+    }
+
+    public static String query() {
+        return "MATCH (continent:Continent {locationName: $continentName})\n" +
+                "CREATE (product:Product {\n" +
+                "   barcode: $barcode,\n" +
+                "   name: $productName,\n" +
+                "   description: $description\n" +
+                "})-[:PRODUCED_IN]->(continent)\n" +
+                "RETURN product.barcode, product.name, product.description, continent.locationName";
     }
 
     @Override
