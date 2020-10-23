@@ -17,10 +17,14 @@ public class GraknFindSpecificMarriageAction extends FindSpecificMarriageAction<
 
     @Override
     public String run() {
-        GraqlGet.Unfiltered query = Graql.match(
-                Graql.var(MARRIAGE).isa(MARRIAGE).has(MARRIAGE_ID, Graql.var(MARRIAGE_ID)),
-                Graql.var(MARRIAGE_ID).isa(MARRIAGE_ID).val(MARRIAGE_ID_FOR_QUERY)
-        ).get();
+        GraqlGet.Unfiltered query = query();
         return optionalSingleResult(dbOperation.execute(query).stream().map(ans -> ans.get(MARRIAGE_ID).asAttribute().value().toString()).collect(Collectors.toList()));
+    }
+
+    public static GraqlGet.Unfiltered query() {
+        return Graql.match(
+                    Graql.var(MARRIAGE).isa(MARRIAGE).has(MARRIAGE_ID, Graql.var(MARRIAGE_ID)),
+                    Graql.var(MARRIAGE_ID).isa(MARRIAGE_ID).val(MARRIAGE_ID_FOR_QUERY)
+            ).get();
     }
 }

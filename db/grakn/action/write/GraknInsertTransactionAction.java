@@ -35,32 +35,36 @@ public class GraknInsertTransactionAction extends InsertTransactionAction<GraknO
 
     @Override
     public ConceptMap run() {
-        GraqlInsert insertTransactionQuery = Graql.match(
-                Graql.var(PRODUCT)
-                        .isa(PRODUCT)
-                        .has(PRODUCT_BARCODE, transaction.getSecond()),
-                Graql.var("c-buyer").isa(COMPANY)
-                        .has(COMPANY_NUMBER, transaction.getFirst()),
-                Graql.var("c-seller").isa(COMPANY)
-                        .has(COMPANY_NUMBER, sellerCompanyNumber),
-                Graql.var(CONTINENT).isa(CONTINENT)
-                        .has(LOCATION_NAME, continent.name()))
-                .insert(
-                        Graql.var(TRANSACTION)
-                                .isa(TRANSACTION)
-                                .rel(TRANSACTION_SELLER, Graql.var("c-seller"))
-                                .rel(TRANSACTION_BUYER, Graql.var("c-buyer"))
-                                .rel(TRANSACTION_MERCHANDISE, Graql.var(PRODUCT))
-//                                .has(CURRENCY)  // TODO Add currency https://github.com/graknlabs/simulation/issues/31
-                                .has(VALUE, value)
-                                .has(PRODUCT_QUANTITY, productQuantity)
-                                .has(IS_TAXABLE, isTaxable),
-                        Graql.var(LOCATES)
-                                .isa(LOCATES)
-                                .rel(LOCATES_LOCATION, Graql.var(CONTINENT))
-                                .rel(LOCATES_LOCATED, Graql.var(TRANSACTION))
-                );
+        GraqlInsert insertTransactionQuery = query(transaction, sellerCompanyNumber, continent.name(), value, productQuantity, isTaxable);
         return singleResult(dbOperation.execute(insertTransactionQuery));
+    }
+
+    public static GraqlInsert query(Pair<Long, Double> transaction, Long sellerCompanyNumber, String continentName, double value, int productQuantity, boolean isTaxable) {
+        return Graql.match(
+                    Graql.var(PRODUCT)
+                            .isa(PRODUCT)
+                            .has(PRODUCT_BARCODE, transaction.getSecond()),
+                    Graql.var("c-buyer").isa(COMPANY)
+                            .has(COMPANY_NUMBER, transaction.getFirst()),
+                    Graql.var("c-seller").isa(COMPANY)
+                            .has(COMPANY_NUMBER, sellerCompanyNumber),
+                    Graql.var(CONTINENT).isa(CONTINENT)
+                            .has(LOCATION_NAME, continentName))
+                    .insert(
+                            Graql.var(TRANSACTION)
+                                    .isa(TRANSACTION)
+                                    .rel(TRANSACTION_SELLER, Graql.var("c-seller"))
+                                    .rel(TRANSACTION_BUYER, Graql.var("c-buyer"))
+                                    .rel(TRANSACTION_MERCHANDISE, Graql.var(PRODUCT))
+    //                                .has(CURRENCY)  // TODO Add currency https://github.com/graknlabs/simulation/issues/31
+                                    .has(VALUE, value)
+                                    .has(PRODUCT_QUANTITY, productQuantity)
+                                    .has(IS_TAXABLE, isTaxable),
+                            Graql.var(LOCATES)
+                                    .isa(LOCATES)
+                                    .rel(LOCATES_LOCATION, Graql.var(CONTINENT))
+                                    .rel(LOCATES_LOCATED, Graql.var(TRANSACTION))
+                    );
     }
 
     @Override

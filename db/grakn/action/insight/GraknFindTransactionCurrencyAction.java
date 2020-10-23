@@ -18,9 +18,12 @@ public class GraknFindTransactionCurrencyAction extends FindTransactionCurrencyA
 
     @Override
     public List<String> run() {
-        GraqlGet.Unfiltered query = Graql.match(
-                Graql.var(TRANSACTION).isa(TRANSACTION).has(CURRENCY, Graql.var(CURRENCY))
-                ).get();
-        return dbOperation.execute(query).stream().map(ans -> ans.get(CURRENCY).asAttribute().value().toString()).collect(Collectors.toList());
+        return dbOperation.execute(query()).stream().map(ans -> ans.get(CURRENCY).asAttribute().value().toString()).collect(Collectors.toList());
+    }
+
+    public static GraqlGet.Unfiltered query() {
+        return Graql.match(
+                    Graql.var(TRANSACTION).isa(TRANSACTION).has(CURRENCY, Graql.var(CURRENCY))
+                    ).get();
     }
 }

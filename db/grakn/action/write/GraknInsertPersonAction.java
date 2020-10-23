@@ -31,6 +31,11 @@ public class GraknInsertPersonAction extends InsertPersonAction<GraknOperation, 
 
     @Override
     public ConceptMap run() {
+        GraqlInsert query = query(worldCity.name(), email, gender, forename, surname, today);
+        return Action.singleResult(dbOperation.execute(query));
+    }
+
+    public static GraqlInsert query(String worldCityName, String email, String gender, String forename, String surname, LocalDateTime today) {
         Statement city = Graql.var(CITY);
         Statement person = Graql.var(PERSON);
         Statement bornIn = Graql.var(BORN_IN);
@@ -40,28 +45,26 @@ public class GraknInsertPersonAction extends InsertPersonAction<GraknOperation, 
         Statement surnameVar = Graql.var(SURNAME);
         Statement dobVar = Graql.var(DATE_OF_BIRTH);
 
-        GraqlInsert query =
-                Graql.match(
-                        city.isa(CITY)
-                                .has(LOCATION_NAME, worldCity.name()))
-                        .insert(
-                                person.isa(PERSON)
-                                        .has(EMAIL, emailVar)
-                                        .has(DATE_OF_BIRTH, dobVar)
-                                        .has(GENDER, genderVar)
-                                        .has(FORENAME, forenameVar)
-                                        .has(SURNAME, surnameVar),
-                                bornIn
-                                        .isa(BORN_IN)
-                                        .rel(BORN_IN_CHILD, person)
-                                        .rel(BORN_IN_PLACE_OF_BIRTH, city),
-                                emailVar.val(email),
-                                genderVar.val(gender),
-                                forenameVar.val(forename),
-                                surnameVar.val(surname),
-                                dobVar.val(today)
-                        );
-        return Action.singleResult(dbOperation.execute(query));
+        return Graql.match(
+                city.isa(CITY)
+                        .has(LOCATION_NAME, worldCityName))
+                .insert(
+                        person.isa(PERSON)
+                                .has(EMAIL, emailVar)
+                                .has(DATE_OF_BIRTH, dobVar)
+                                .has(GENDER, genderVar)
+                                .has(FORENAME, forenameVar)
+                                .has(SURNAME, surnameVar),
+                        bornIn
+                                .isa(BORN_IN)
+                                .rel(BORN_IN_CHILD, person)
+                                .rel(BORN_IN_PLACE_OF_BIRTH, city),
+                        emailVar.val(email),
+                        genderVar.val(gender),
+                        forenameVar.val(forename),
+                        surnameVar.val(surname),
+                        dobVar.val(today)
+                );
     }
 
     @Override

@@ -1,8 +1,7 @@
-package grakn.simulation.db.grakn.action.read;
+package grakn.simulation.db.grakn.action.write;
 
 import grabl.tracing.client.GrablTracingThreadStatic;
-import grakn.simulation.db.common.action.read.UpdateAgesOfPeopleInCityAction;
-import grakn.simulation.db.common.driver.TransactionalDbOperation;
+import grakn.simulation.db.common.action.write.UpdateAgesOfPeopleInCityAction;
 import grakn.simulation.db.common.world.World;
 import grakn.simulation.db.grakn.driver.GraknOperation;
 import graql.lang.Graql;
@@ -49,42 +48,16 @@ public class GraknUpdateAgesOfPeopleInCityAction extends UpdateAgesOfPeopleInCit
         return null;
     }
 
-    private void updatePersonAge(String personEmail, long newAge) {
-        Statement person = Graql.var(PERSON);
-        Statement age = Graql.var(AGE);
-        GraqlDelete deleteImplicitQuery = Graql.match(
-                person
-                        .isa(PERSON)
-                        .has(EMAIL, personEmail)
-                        .has(AGE, age)
-        ).delete(
-                person
-                        .has(AGE, age
-                        )
-        );
-        dbOperation.execute(deleteImplicitQuery);
-
-        GraqlInsert insertNewAgeQuery = Graql.match(
-                person
-                        .isa(PERSON)
-                        .has(EMAIL, personEmail)
-        ).insert(
-                person
-                        .has(AGE, newAge)
-        );
-        dbOperation.execute(insertNewAgeQuery);
-    }
-
-    private HashMap<String, LocalDateTime> getPeopleBornInCity(World.City worldCity) {
+    public static GraqlGet.Sorted getPeopleBornInCityQuery(String worldCityName) {
         Statement city = Graql.var(CITY);
         Statement person = Graql.var(PERSON);
         Statement bornIn = Graql.var(BORN_IN);
         Statement dobVar = Graql.var(DATE_OF_BIRTH);
         Statement emailVar = Graql.var(EMAIL);
 
-        GraqlGet.Sorted peopleQuery = Graql.match(
+        return Graql.match(
                 city.isa(CITY)
-                        .has(LOCATION_NAME, worldCity.toString()),
+                        .has(LOCATION_NAME, worldCityName),
                 person.isa(PERSON)
                         .has(EMAIL, emailVar)
                         .has(DATE_OF_BIRTH, dobVar),
@@ -92,6 +65,10 @@ public class GraknUpdateAgesOfPeopleInCityAction extends UpdateAgesOfPeopleInCit
                         .rel(BORN_IN_CHILD, person)
                         .rel(BORN_IN_PLACE_OF_BIRTH, city)
         ).get().sort(EMAIL);
+    }
+
+    private HashMap<String, LocalDateTime> getPeopleBornInCity(World.City worldCity) {
+        GraqlGet.Sorted peopleQuery = getPeopleBornInCityQuery(worldCity.name());
 
         HashMap<String, LocalDateTime> peopleDobs = new HashMap<>();
         dbOperation.execute(peopleQuery).forEach(personAnswer -> {
@@ -100,5 +77,37 @@ public class GraknUpdateAgesOfPeopleInCityAction extends UpdateAgesOfPeopleInCit
             peopleDobs.put(email, dob);
         });
         return peopleDobs;
+    }
+
+    private void updatePersonAge(String personEmail, long newAge) {
+        dbOperation.execute(deleteHasQuery(personEmail));
+        dbOperation.execute(insertNewAgeQuery(personEmail, newAge));
+    }
+
+    public static GraqlInsert insertNewAgeQuery(String personEmail, long newAge) {
+        Statement person = Graql.var(PERSON);
+        return Graql.match(
+                person
+                        .isa(PERSON)
+                        .has(EMAIL, personEmail)
+        ).insert(
+                person
+                        .has(AGE, newAge)
+        );
+    }
+
+    public static GraqlDelete deleteHasQuery(String personEmail) {
+        Statement person = Graql.var(PERSON);
+        Statement age = Graql.var(AGE);
+        return Graql.match(
+                    person
+                            .isa(PERSON)
+                            .has(EMAIL, personEmail)
+                            .has(AGE, age)
+            ).delete(
+                    person
+                            .has(AGE, age
+                            )
+            );
     }
 }

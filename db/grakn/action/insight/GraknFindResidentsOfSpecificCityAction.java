@@ -22,14 +22,17 @@ public class GraknFindResidentsOfSpecificCityAction extends FindResidentsOfSpeci
 
     @Override
     public List<String> run() {
-        GraqlGet.Unfiltered query = Graql.match(
-                Graql.var(CITY).isa(CITY)
-                        .has(LOCATION_NAME, "Berlin"),
-                Graql.var(RESIDENCY).isa(RESIDENCY)
-                        .rel(RESIDENCY_LOCATION, Graql.var(CITY))
-                        .rel(RESIDENCY_RESIDENT, Graql.var(PERSON)),
-                Graql.var(PERSON).isa(PERSON).has(EMAIL, Graql.var(EMAIL))
-        ).get();
-        return dbOperation.getOrderedAttribute(query, EMAIL, null);
+        return dbOperation.getOrderedAttribute(query(), EMAIL, null);
+    }
+
+    public static GraqlGet.Unfiltered query() {
+        return Graql.match(
+                    Graql.var(CITY).isa(CITY)
+                            .has(LOCATION_NAME, "Berlin"),
+                    Graql.var(RESIDENCY).isa(RESIDENCY)
+                            .rel(RESIDENCY_LOCATION, Graql.var(CITY))
+                            .rel(RESIDENCY_RESIDENT, Graql.var(PERSON)),
+                    Graql.var(PERSON).isa(PERSON).has(EMAIL, Graql.var(EMAIL))
+            ).get();
     }
 }

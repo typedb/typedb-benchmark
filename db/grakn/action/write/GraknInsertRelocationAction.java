@@ -28,18 +28,22 @@ public class GraknInsertRelocationAction extends InsertRelocationAction<GraknOpe
 
     @Override
     public ConceptMap run() {
-        GraqlInsert relocatePersonQuery = Graql.match(
-                Graql.var(PERSON).isa(PERSON).has(EMAIL, relocateeEmail),
-                Graql.var("new-city").isa(CITY).has(LOCATION_NAME, relocationCityName),
-                Graql.var("old-city").isa(CITY).has(LOCATION_NAME, city.name())
-        ).insert(
-                Graql.var(RELOCATION).isa(RELOCATION)
-                        .rel(RELOCATION_PREVIOUS_LOCATION, "old-city")
-                        .rel(RELOCATION_NEW_LOCATION, "new-city")
-                        .rel(RELOCATION_RELOCATED_PERSON, PERSON)
-                        .has(RELOCATION_DATE, today)
-        );
+        GraqlInsert relocatePersonQuery = query(relocateeEmail, relocationCityName, city.name(), today);
         return Action.singleResult(dbOperation.execute(relocatePersonQuery));
+    }
+
+    public static GraqlInsert query(String relocateeEmail, String relocationCityName, String cityName, LocalDateTime today) {
+        return Graql.match(
+                    Graql.var(PERSON).isa(PERSON).has(EMAIL, relocateeEmail),
+                    Graql.var("new-city").isa(CITY).has(LOCATION_NAME, relocationCityName),
+                    Graql.var("old-city").isa(CITY).has(LOCATION_NAME, cityName)
+            ).insert(
+                    Graql.var(RELOCATION).isa(RELOCATION)
+                            .rel(RELOCATION_PREVIOUS_LOCATION, "old-city")
+                            .rel(RELOCATION_NEW_LOCATION, "new-city")
+                            .rel(RELOCATION_RELOCATED_PERSON, PERSON)
+                            .has(RELOCATION_DATE, today)
+            );
     }
 
     @Override

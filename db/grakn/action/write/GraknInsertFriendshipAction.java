@@ -26,6 +26,10 @@ public class GraknInsertFriendshipAction extends InsertFriendshipAction<GraknOpe
 
     @Override
     public ConceptMap run() {
+        return Action.optionalSingleResult(dbOperation.execute(query(today, friend1Email, friend2Email)));
+    }
+
+    public static GraqlInsert query(LocalDateTime today, String friend1Email, String friend2Email) {
         Statement person1 = Graql.var("p1");
         Statement person2 = Graql.var("p2");
         Statement friendship = Graql.var();
@@ -34,7 +38,7 @@ public class GraknInsertFriendshipAction extends InsertFriendshipAction<GraknOpe
         StatementAttribute friend2EmailVar = Graql.var().val(friend2Email);
         StatementAttribute startDate = Graql.var().val(today);
 
-        GraqlInsert insertFriendshipQuery = Graql.match(
+        return Graql.match(
                 person1
                         .isa(PERSON).has(EMAIL, friend1EmailVar),
                 person2
@@ -52,7 +56,6 @@ public class GraknInsertFriendshipAction extends InsertFriendshipAction<GraknOpe
                         .rel(FRIENDSHIP_FRIEND, person2)
                         .has(START_DATE, startDate)
         );
-        return Action.optionalSingleResult(dbOperation.execute(insertFriendshipQuery));
     }
 
     @Override

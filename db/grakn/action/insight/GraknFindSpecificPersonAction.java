@@ -17,10 +17,13 @@ public class GraknFindSpecificPersonAction extends FindSpecificPersonAction<Grak
 
     @Override
     public String run() {
-        GraqlGet.Unfiltered query = Graql.match(
-                Graql.var(PERSON).isa(PERSON).has(EMAIL, Graql.var(EMAIL)),
-                Graql.var(EMAIL).isa(EMAIL).val(PERSON_EMAIL_FOR_QUERY)
-        ).get();
-        return optionalSingleResult(dbOperation.execute(query).stream().map(ans -> ans.get(EMAIL).asAttribute().value().toString()).collect(Collectors.toList()));
+        return optionalSingleResult(dbOperation.execute(query()).stream().map(ans -> ans.get(EMAIL).asAttribute().value().toString()).collect(Collectors.toList()));
+    }
+
+    public static GraqlGet.Unfiltered query() {
+        return Graql.match(
+                    Graql.var(PERSON).isa(PERSON).has(EMAIL, Graql.var(EMAIL)),
+                    Graql.var(EMAIL).isa(EMAIL).val(PERSON_EMAIL_FOR_QUERY)
+            ).get();
     }
 }

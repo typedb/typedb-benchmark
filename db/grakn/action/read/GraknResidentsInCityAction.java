@@ -28,16 +28,20 @@ public class GraknResidentsInCityAction extends ResidentsInCityAction<GraknOpera
 
     @Override
     public List<String> run() {
+        return dbOperation.getOrderedAttribute(query(city.name(), earliestDate), EMAIL, numResidents);
+    }
+
+    public static GraqlGet.Unfiltered query(String cityName, LocalDateTime earliestDate) {
         Statement person = Graql.var(PERSON);
         Statement cityVar = Graql.var(CITY);
         Statement residency = Graql.var("r");
         Statement startDate = Graql.var(START_DATE);
         Statement endDate = Graql.var(END_DATE);
-        GraqlGet.Unfiltered cityResidentsQuery = Graql.match(
+        return Graql.match(
                 person.isa(PERSON)
                         .has(EMAIL, Graql.var(EMAIL)),
                 cityVar
-                        .isa(CITY).has(LOCATION_NAME, city.name()),
+                        .isa(CITY).has(LOCATION_NAME, cityName),
                 residency
                         .isa(RESIDENCY)
                         .rel(RESIDENCY_RESIDENT, PERSON)
@@ -49,7 +53,5 @@ public class GraknResidentsInCityAction extends ResidentsInCityAction<GraknOpera
                 ),
                 startDate.lte(earliestDate)
         ).get();
-
-        return dbOperation.getOrderedAttribute(cityResidentsQuery, EMAIL, numResidents);
     }
 }

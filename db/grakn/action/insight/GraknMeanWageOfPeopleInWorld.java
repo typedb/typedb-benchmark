@@ -16,11 +16,14 @@ public class GraknMeanWageOfPeopleInWorld extends MeanWageOfPeopleInWorldAction<
 
     @Override
     public Double run() {
+        return dbOperation.execute(query()).doubleValue();
+    }
+
+    public static GraqlGet.Aggregate query() {
         Statement wageValue = Graql.var(WAGE_VALUE);
-        GraqlGet.Aggregate query = Graql.match(
+        return Graql.match(
                 Graql.var(WAGE).isa(WAGE)
                         .has(WAGE_VALUE, wageValue)
         ).get(wageValue.var()).mean(wageValue.var());
-        return dbOperation.execute(query).doubleValue();
     }
 }

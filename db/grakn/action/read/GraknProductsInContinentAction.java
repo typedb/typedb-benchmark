@@ -25,19 +25,23 @@ public class GraknProductsInContinentAction extends ProductsInContinentAction<Gr
 
     @Override
     public List<Double> run() {
-        GraqlGet.Unfiltered query = Graql.match(
-                Graql.var(CONTINENT)
-                        .isa(CONTINENT)
-                        .has(LOCATION_NAME, continent.name()),
-                Graql.var(PRODUCT)
-                        .isa(PRODUCT)
-                        .has(PRODUCT_BARCODE, Graql.var(PRODUCT_BARCODE)),
-                Graql.var(PRODUCED_IN)
-                        .isa(PRODUCED_IN)
-                        .rel(PRODUCED_IN_PRODUCT, Graql.var(PRODUCT))
-                        .rel(PRODUCED_IN_CONTINENT, Graql.var(CONTINENT))
-
-        ).get();
+        GraqlGet.Unfiltered query = query(continent.name());
         return dbOperation.getOrderedAttribute(query, PRODUCT_BARCODE, null);
+    }
+
+    public static GraqlGet.Unfiltered query(String continentName) {
+        return Graql.match(
+                    Graql.var(CONTINENT)
+                            .isa(CONTINENT)
+                            .has(LOCATION_NAME, continentName),
+                    Graql.var(PRODUCT)
+                            .isa(PRODUCT)
+                            .has(PRODUCT_BARCODE, Graql.var(PRODUCT_BARCODE)),
+                    Graql.var(PRODUCED_IN)
+                            .isa(PRODUCED_IN)
+                            .rel(PRODUCED_IN_PRODUCT, Graql.var(PRODUCT))
+                            .rel(PRODUCED_IN_CONTINENT, Graql.var(CONTINENT))
+
+            ).get();
     }
 }

@@ -26,16 +26,20 @@ public class GraknBirthsInCityAction extends BirthsInCityAction<GraknOperation> 
 
     @Override
     public List<String> run() {
-        GraqlGet.Unfiltered childrenQuery = Graql.match(
-                Graql.var("c").isa(CITY)
-                        .has(LOCATION_NAME, worldCity.name()),
-                Graql.var("child").isa(PERSON)
-                        .has(EMAIL, Graql.var(EMAIL))
-                        .has(DATE_OF_BIRTH, today),
-                Graql.var("bi").isa(BORN_IN)
-                        .rel(BORN_IN_PLACE_OF_BIRTH, "c")
-                        .rel(BORN_IN_CHILD, "child")
-        ).get();
+        GraqlGet.Unfiltered childrenQuery = query(worldCity.name(), today);
         return dbOperation.getOrderedAttribute(childrenQuery, EMAIL, null);
+    }
+
+    public static GraqlGet.Unfiltered query(String worldCityName, LocalDateTime today) {
+        return Graql.match(
+                    Graql.var("c").isa(CITY)
+                            .has(LOCATION_NAME, worldCityName),
+                    Graql.var("child").isa(PERSON)
+                            .has(EMAIL, Graql.var(EMAIL))
+                            .has(DATE_OF_BIRTH, today),
+                    Graql.var("bi").isa(BORN_IN)
+                            .rel(BORN_IN_PLACE_OF_BIRTH, "c")
+                            .rel(BORN_IN_CHILD, "child")
+            ).get();
     }
 }

@@ -26,12 +26,18 @@ public class GraknInsertParentShipAction extends InsertParentShipAction<GraknOpe
     public ConceptMap run() {
         // Parentship where parents have multiple children is represented as multiple ternary relations, each with
         // both parents and one child. They had these children at the same time, and will not have any subsequently.
+        GraqlInsert parentshipQuery = query(marriage, childEmail);
+        return Action.singleResult(dbOperation.execute(parentshipQuery));
+
+    }
+
+    public static GraqlInsert query(HashMap<SpouseType, String> marriage, String childEmail) {
         Statement parentship = Graql.var(PARENTSHIP);
         Statement child = Graql.var("child");
         Statement mother = Graql.var("mother");
         Statement father = Graql.var("father");
 
-        GraqlInsert parentshipQuery = Graql.match(
+        return Graql.match(
                 mother.isa(PERSON).has(EMAIL, marriage.get(SpouseType.WIFE)),
                 father.isa(PERSON).has(EMAIL, marriage.get(SpouseType.HUSBAND)),
                 child.isa(PERSON).has(EMAIL, childEmail)
@@ -41,8 +47,6 @@ public class GraknInsertParentShipAction extends InsertParentShipAction<GraknOpe
                         .rel(PARENTSHIP_PARENT, mother)
                         .rel(PARENTSHIP_CHILD, child)
         );
-        return Action.singleResult(dbOperation.execute(parentshipQuery));
-
     }
 
     @Override

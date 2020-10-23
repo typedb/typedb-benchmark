@@ -18,7 +18,7 @@ import grakn.simulation.db.common.action.read.ResidentsInCityAction;
 import grakn.simulation.db.common.action.insight.ThreeHopAction;
 import grakn.simulation.db.common.action.insight.TwoHopAction;
 import grakn.simulation.db.common.action.read.UnmarriedPeopleInCityAction;
-import grakn.simulation.db.common.action.read.UpdateAgesOfPeopleInCityAction;
+import grakn.simulation.db.common.action.write.UpdateAgesOfPeopleInCityAction;
 import grakn.simulation.db.common.action.write.InsertCompanyAction;
 import grakn.simulation.db.common.action.write.InsertEmploymentAction;
 import grakn.simulation.db.common.action.write.InsertFriendshipAction;

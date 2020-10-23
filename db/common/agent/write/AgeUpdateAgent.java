@@ -2,7 +2,7 @@ package grakn.simulation.db.common.agent.write;
 
 import grakn.simulation.db.common.agent.base.SimulationContext;
 import grakn.simulation.db.common.action.ActionFactory;
-import grakn.simulation.db.common.action.read.UpdateAgesOfPeopleInCityAction;
+import grakn.simulation.db.common.action.write.UpdateAgesOfPeopleInCityAction;
 import grakn.simulation.db.common.agent.region.CityAgent;
 import grakn.simulation.db.common.driver.DbDriver;
 import grakn.simulation.db.common.driver.DbOperation;

@@ -1,6 +1,6 @@
-package grakn.simulation.db.neo4j.action.read;
+package grakn.simulation.db.neo4j.action.write;
 
-import grakn.simulation.db.common.action.read.UpdateAgesOfPeopleInCityAction;
+import grakn.simulation.db.common.action.write.UpdateAgesOfPeopleInCityAction;
 import grakn.simulation.db.common.world.World;
 import grakn.simulation.db.neo4j.driver.Neo4jOperation;
 import grakn.simulation.db.neo4j.schema.Schema;
