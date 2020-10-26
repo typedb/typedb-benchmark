@@ -43,7 +43,7 @@ import grakn.simulation.db.grakn.action.insight.GraknFindTransactionCurrencyActi
 import grakn.simulation.db.grakn.action.insight.GraknFourHopAction;
 import grakn.simulation.db.grakn.action.insight.GraknArbitraryOneHopAction;
 import grakn.simulation.db.grakn.action.read.GraknMarriedCoupleAction;
-import grakn.simulation.db.grakn.action.insight.GraknMeanWageOfPeopleInWorld;
+import grakn.simulation.db.grakn.action.insight.GraknMeanWageOfPeopleInWorldAction;
 import grakn.simulation.db.grakn.action.read.GraknProductsInContinentAction;
 import grakn.simulation.db.grakn.action.read.GraknResidentsInCityAction;
 import grakn.simulation.db.grakn.action.insight.GraknThreeHopAction;
@@ -158,7 +158,7 @@ public class GraknActionFactory extends ActionFactory<GraknOperation, ConceptMap
 
     @Override
     public MeanWageOfPeopleInWorldAction<GraknOperation> meanWageOfPeopleInWorldAction(GraknOperation dbOperation) {
-        return new GraknMeanWageOfPeopleInWorld(dbOperation);
+        return new GraknMeanWageOfPeopleInWorldAction(dbOperation);
     }
 
     @Override

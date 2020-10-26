@@ -102,9 +102,6 @@ public abstract class Agent<REGION extends Region, DB_DRIVER extends DbDriver<DB
         }
     }
 
-    ///////////////////
-    // RegionalAgent //
-    ///////////////////
 
     // TODO: Rename this to Regional, as well as the other Regional agents
     public abstract class RegionalAgent implements AutoCloseable {

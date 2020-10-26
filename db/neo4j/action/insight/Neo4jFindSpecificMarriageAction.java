@@ -17,7 +17,7 @@ public class Neo4jFindSpecificMarriageAction extends FindSpecificMarriageAction<
         return optionalSingleResult(dbOperation.execute(new Query(query())).stream().map(ans -> ans.get("marriedTo.marriageId").asString()).collect(Collectors.toList()));
     }
 
-    public String query() {
+    public static String query() {
         return "MATCH ()-[marriedTo:MARRIED_TO {marriageId: \"" + MARRIAGE_ID_FOR_QUERY + "\"}]-()\n" +
                 "RETURN marriedTo.marriageId";
     }
