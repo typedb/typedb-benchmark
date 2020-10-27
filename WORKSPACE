@@ -204,5 +204,36 @@ http_archive(
     sha256 = "21c7172786623f280402d3b3a2fc92f36568afad5a4f6f5ea38fd1c6897aecf8",
     strip_prefix = "rules_groovy-0.0.6",
 )
-load("@io_bazel_rules_groovy//groovy:repositories.bzl", "rules_groovy_dependencies")
-rules_groovy_dependencies()
+#Rather than use these recommended lines, we use the below such that we have access to the groovy library in our groovy scripts
+#load("@io_bazel_rules_groovy//groovy:repositories.bzl", "rules_groovy_dependencies")
+#rules_groovy_dependencies()
+
+http_archive(
+    name = "groovy_sdk_artifact",
+    urls = [
+        "https://mirror.bazel.build/dl.bintray.com/groovy/maven/apache-groovy-binary-3.0.6.zip",
+        "https://dl.bintray.com/groovy/maven/apache-groovy-binary-3.0.6.zip",
+    ],
+    build_file_content = """
+filegroup(
+    name = "sdk",
+    srcs = glob(["groovy-3.0.6/**"]),
+    visibility = ["//visibility:public"],
+)
+java_import(
+    name = "groovy",
+    jars = ["groovy-3.0.6/lib/groovy-3.0.6.jar", "groovy-3.0.6/lib/groovy-templates-3.0.6.jar"],
+    visibility = ["//visibility:public"],
+)
+java_import
+"""
+)
+
+bind(
+    name = "groovy-sdk",
+    actual = "@groovy_sdk_artifact//:sdk",
+)
+bind(
+    name = "groovy",
+    actual = "@groovy_sdk_artifact//:groovy",
+)

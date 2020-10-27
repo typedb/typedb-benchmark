@@ -23,6 +23,18 @@ import java.time.LocalDateTime
 
 class Report {
 
+    static LinkedHashMap<String, String> agentDescriptions() {
+        LinkedHashMap<String, String> desc = [:]
+
+        desc."PersonBirth" = """
+Adds people to the world simulation. This involves adding a single entity with a large number of attributes attached.
+"""
+        desc."Employment" = """
+Finds existing people and makes them employees of companies.
+"""
+        return desc
+    }
+
     static String outputFile = "/Users/jamesfletcher/programming/simulation/benchmark/report.tex"
     def engine
 
@@ -52,7 +64,7 @@ class Report {
         DbAgentSection(String name, List<String> queries) {
             this.queries = queries
             this.name = name.startsWith('Agent') ? name - 'Agent' : name
-            this.description = agent_descriptions.descriptions().get(name)
+            this.description = agentDescriptions().get(name)
         }
 
         @Override
