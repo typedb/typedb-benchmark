@@ -133,13 +133,9 @@ public abstract class Agent<REGION extends Region, DB_DRIVER extends DbDriver<DB
         protected abstract void run(DbOperationFactory<DB_OPERATION> dbOperationFactory, REGION region, SimulationContext simulationContext);
 
         Report runWithTracingAndReport(DbOperationFactory<DB_OPERATION> dbOperationFactory, REGION region, SimulationContext simulationContext) {
-            try (GrablTracingThreadStatic.ThreadTrace trace = traceOnThread(this.name())) {
+            try (GrablTracingThreadStatic.ThreadTrace trace = traceOnThread(name())) {
                 return runWithReport(dbOperationFactory, region, simulationContext);
             }
-        }
-
-        public String name() {
-            return this.getClass().getSimpleName();
         }
 
         public <U> U pickOne(List<U> list) { // TODO can be a util
