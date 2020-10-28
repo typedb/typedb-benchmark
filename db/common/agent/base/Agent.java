@@ -78,7 +78,7 @@ public abstract class Agent<REGION extends Region, DB_DRIVER extends DbDriver<DB
         RegionalAgent regionalAgent = getRegionalAgent(simulationContext.simulationStep(), region.tracker(), agentRandom, simulationContext.test());
         DbOperationFactory<DB_OPERATION> dbOperationFactory = dbDriver.getDbOperationFactory(region, logger);
 
-        RegionalAgent.Report report = regionalAgent.runWithTracingAndReport(dbOperationFactory, region, simulationContext);
+        RegionalAgent.Report report = regionalAgent.runWithReport(dbOperationFactory, region, simulationContext);
         this.report.addRegionalAgentReport(region.tracker(), report);
     }
 
@@ -126,17 +126,17 @@ public abstract class Agent<REGION extends Region, DB_DRIVER extends DbDriver<DB
         }
 
         protected Report runWithReport(DbOperationFactory<DB_OPERATION> dbOperationFactory, REGION region, SimulationContext simulationContext) {
-            run(dbOperationFactory, region, simulationContext);
+            if (traceAgent) {
+                try (GrablTracingThreadStatic.ThreadTrace trace = traceOnThread(name())) {
+                    run(dbOperationFactory, region, simulationContext);
+                }
+            } else {
+                run(dbOperationFactory, region, simulationContext);
+            }
             return report;
         }
 
         protected abstract void run(DbOperationFactory<DB_OPERATION> dbOperationFactory, REGION region, SimulationContext simulationContext);
-
-        Report runWithTracingAndReport(DbOperationFactory<DB_OPERATION> dbOperationFactory, REGION region, SimulationContext simulationContext) {
-            try (GrablTracingThreadStatic.ThreadTrace trace = traceOnThread(name())) {
-                return runWithReport(dbOperationFactory, region, simulationContext);
-            }
-        }
 
         public <U> U pickOne(List<U> list) { // TODO can be a util
             return list.get(random().nextInt(list.size()));
