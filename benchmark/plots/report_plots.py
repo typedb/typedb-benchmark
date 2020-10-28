@@ -36,9 +36,8 @@ if __name__ == "__main__":
     image_extension = "png"
 
     # Overview charts
-    overview_chart(1, agents, x, width, capsize, bar_edgecolor, grakn_overviews, neo4j_overviews, grakn_color, neo4j_color, image_extension)
-    overview_chart(3, agents, x, width, capsize, bar_edgecolor, grakn_overviews, neo4j_overviews, grakn_color, neo4j_color, image_extension)
-    overview_chart(5, agents, x, width, capsize, bar_edgecolor, grakn_overviews, neo4j_overviews, grakn_color, neo4j_color, image_extension)
+    overview_iterations_to_plot = [1, 3, 5]
+    overview_chart(overview_iterations_to_plot, agents, x, width, capsize, bar_edgecolor, grakn_overviews, neo4j_overviews, grakn_color, neo4j_color, image_extension)
 
     # Line charts
     for agent in agents:
