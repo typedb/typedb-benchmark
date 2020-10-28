@@ -21,14 +21,16 @@ def get_trace_overviews(json_data):
 
 
 if __name__ == "__main__":
-    neo4j_overviews = get_trace_overviews(get_json(f"https://grabl.io/api/data/jmsfltchr/simulation/a3ac46dd615e256a8935ba47ae6fea79a0ba2f82/analysis/performance-analysis?q=%7B%22id%22%3A%7B%22selected%22%3A%22819791133617188864%22%7D,%22trace%22%3A%7B%22path%22%3A%5B%7B%22optional%22%3Atrue%7D%5D,%22tracker%22%3A%7B%22optional%22%3Atrue%7D,%22labels%22%3A%7B%22names%22%3A%5B%5D%7D,%22iteration%22%3A%7B%7D%7D%7D"))
-    grakn_overviews = get_trace_overviews(get_json(f"https://grabl.io/api/data/jmsfltchr/simulation/a3ac46dd615e256a8935ba47ae6fea79a0ba2f82/analysis/performance-analysis?q=%7B%22id%22%3A%7B%22selected%22%3A%223651461777878837248%22%7D,%22trace%22%3A%7B%22path%22%3A%5B%7B%22optional%22%3Atrue%7D%5D,%22tracker%22%3A%7B%22optional%22%3Atrue%7D,%22labels%22%3A%7B%22names%22%3A%5B%5D%7D,%22iteration%22%3A%7B%7D%7D%7D"))
+    neo4j_overviews = get_trace_overviews(get_json(f"https://grabl.io/api/data/jmsfltchr/simulation/08e880eadbc415c5d6a493bd701d839822aad80d/analysis/performance-analysis?q=%7B%22id%22%3A%7B%22selected%22%3A%228974055841285676032%22%7D,%22trace%22%3A%7B%22path%22%3A%5B%7B%22optional%22%3Atrue%7D%5D,%22tracker%22%3A%7B%22optional%22%3Atrue%7D,%22labels%22%3A%7B%22names%22%3A%5B%5D%7D,%22iteration%22%3A%7B%7D%7D%7D"))
+    grakn_overviews = get_trace_overviews(get_json(f"https://grabl.io/api/data/jmsfltchr/simulation/08e880eadbc415c5d6a493bd701d839822aad80d/analysis/performance-analysis?q=%7B%22id%22%3A%7B%22selected%22%3A%227918343126455386112%22%7D,%22trace%22%3A%7B%22path%22%3A%5B%7B%22optional%22%3Atrue%7D%5D,%22tracker%22%3A%7B%22optional%22%3Atrue%7D,%22labels%22%3A%7B%22names%22%3A%5B%5D%7D,%22iteration%22%3A%7B%7D%7D%7D"))
 
     neo4j_color = [24/256, 127/256, 183/256]
     grakn_color = [113/256, 87/256, 202/256]
     bar_edgecolor = "#000"
 
-    agents = ['InsertPersonAction', 'closeSession', 'openSession']
+    agents = list(set(grakn_overviews.keys()).intersection(set(neo4j_overviews.keys())))
+    agents.remove("closeClient")
+
     x = np.arange(len(agents))  # the label locations
     width = 0.2  # the width of the bars
     capsize = 3  # width of the errorbar caps
@@ -36,7 +38,7 @@ if __name__ == "__main__":
     image_extension = "png"
 
     # Overview charts
-    overview_iterations_to_plot = [1, 3, 5]
+    overview_iterations_to_plot = [4, 8, 12]
     overview_chart(overview_iterations_to_plot, agents, x, width, capsize, bar_edgecolor, grakn_overviews, neo4j_overviews, grakn_color, neo4j_color, image_extension)
 
     # Line charts

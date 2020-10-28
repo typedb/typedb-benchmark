@@ -63,7 +63,7 @@ Finds existing people and makes them employees of companies.
 
         DbAgentSection(String name, List<String> queries) {
             this.queries = queries
-            this.name = name.startsWith('Agent') ? name - 'Agent' : name
+            this.name = name
             this.description = agentDescriptions().get(name)
         }
 
@@ -80,24 +80,30 @@ Finds existing people and makes them employees of companies.
 
     class AgentSection extends Section {
         private final Class<?> agentClass
-        private HashMap<String, List<String>> dbQueries = new HashMap<>()
         private List<DbAgentSection> dbAgents = new ArrayList<>()
+        private String title
+        private String agentName
 
         AgentSection(Class<?> agentClass, List<String> graknQueries, List<String> neo4jQueries) {
             this.agentClass = agentClass
+            this.agentName = agentClass.getSimpleName()
+            this.title = this.agentName
+
+            String suffix = "Agent"
+            if (this.title.endsWith(suffix)) {
+                this.title = this.title.substring(0, this.title.length() - suffix.length())
+            }
             dbAgents.add(new DbAgentSection("Grakn", graknQueries))
             dbAgents.add(new DbAgentSection("Neo4j", neo4jQueries))
         }
 
         AgentSection(Class<?> agentClass, String graknQueries, String neo4jQueries) {
-            this.agentClass = agentClass
-            dbAgents.add(new DbAgentSection("Grakn", Arrays.asList(graknQueries)))
-            dbAgents.add(new DbAgentSection("Neo4j", Arrays.asList(neo4jQueries)))
+            this(agentClass, Arrays.asList(graknQueries), Arrays.asList(neo4jQueries))
         }
 
         @Override
         String title() {
-            return agentClass.getSimpleName()
+            return this.title
         }
 
         @Override
@@ -106,7 +112,7 @@ Finds existing people and makes them employees of companies.
             for (dbAgent in dbAgents) {
                 renderedDbAgents.add(dbAgent.render())
             }
-            return engine.createTemplate(new File("benchmark/templates/agent_section.tex")).make([agentName: title(), renderedDbAgents: renderedDbAgents])
+            return engine.createTemplate(new File("benchmark/templates/agent_section.tex")).make([agentSectionTitle: title(), agentName: this.agentName, renderedDbAgents: renderedDbAgents])
         }
     }
 
@@ -118,15 +124,15 @@ Finds existing people and makes them employees of companies.
         return output
     }
 
-    String renderIntroduction() {
+    static String renderIntroduction() {
         return new File("benchmark/templates/introduction.tex").readLines().join("\n")
     }
 
-    String renderAgentSectionIntroduction() {
+    static String renderAgentSectionIntroduction() {
         return new File("benchmark/templates/agent_intro.tex").readLines().join("\n")
     }
 
-    String renderEnd() {
+    static String renderEnd() {
         return '\\end{document}'
     }
 

@@ -9,7 +9,7 @@ load("@io_bazel_rules_groovy//groovy:groovy.bzl", "groovy_and_java_library")
 load("@io_bazel_rules_groovy//groovy:groovy.bzl", "groovy_binary")
 
 groovy_and_java_library(
-    name = "benchmark-groovylib",
+    name = "benchmarklib",
     srcs = glob([
         "*.groovy",
     ]),
@@ -28,8 +28,8 @@ groovy_and_java_library(
 )
 
 groovy_binary(
-    name = "benchmark-groovy",
+    name = "benchmark",
     srcs = glob(["*.groovy"]),
     main_class = "grakn.simulation.benchmark.Report",
-    deps = [":benchmark-groovylib"],
+    deps = [":benchmarklib"],
 )
