@@ -1,7 +1,7 @@
 from matplotlib import pyplot as plt
 
 
-def line_chart(agent_name, grakn_overviews, neo4j_overviews, grakn_color, neo4j_color, capsize):
+def line_chart(agent_name, grakn_overviews, neo4j_overviews, grakn_color, neo4j_color, capsize, image_extension):
 
     iterations = list(grakn_overviews.get(agent_name)['average'].keys())
 
@@ -20,7 +20,7 @@ def line_chart(agent_name, grakn_overviews, neo4j_overviews, grakn_color, neo4j_
     ax.set_title('Time Taken to Execute Agent per Iteration')
     ax.set_xticks(iterations)
     plt.legend(loc='upper left')
-    plt.savefig(f'agent_{agent_name}.svg')
+    plt.savefig(f'agent_{agent_name}.{image_extension}')
 
 
 def unwrap_overviews_for_lines(overview_name, overviews, key):

@@ -35,7 +35,7 @@ Finds existing people and makes them employees of companies.
         return desc
     }
 
-    static String outputFile = "/Users/jamesfletcher/programming/simulation/benchmark/report.tex"
+    static String outputFile = "/Users/jamesfletcher/programming/simulation/benchmark/tmp/report.tex"
     def engine
 
     static void main(String[] args) {

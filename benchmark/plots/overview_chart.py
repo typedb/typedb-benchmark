@@ -1,7 +1,7 @@
 from matplotlib import pyplot as plt
 
 
-def overview_chart(iteration, labels, x, width, capsize, bar_edgecolor, grakn_overviews, neo4j_overviews, grakn_color, neo4j_color):
+def overview_chart(iteration, labels, x, width, capsize, bar_edgecolor, grakn_overviews, neo4j_overviews, grakn_color, neo4j_color, image_extension):
     neo4j_average = unwrap_overviews(neo4j_overviews, "average", labels, iteration)
     neo4j_error = unwrap_overviews(neo4j_overviews, "standard-deviation", labels, iteration)
     grakn_average = unwrap_overviews(grakn_overviews, "average", labels, iteration)
@@ -46,7 +46,7 @@ def overview_chart(iteration, labels, x, width, capsize, bar_edgecolor, grakn_ov
     # Add some text for labels, title and custom x-axis tick labels, etc.
     ax.set_ylabel('Time (ms)')
     ax.set_xlabel('Agent')
-    ax.set_title('Time taken to execute agent')
+    ax.set_title(f'Time Taken to Execute Agent for Iteration {iteration}')
     ax.set_xticks(x)
     ax.set_xticklabels(labels)
     ax.legend()
@@ -54,7 +54,7 @@ def overview_chart(iteration, labels, x, width, capsize, bar_edgecolor, grakn_ov
     # rotate x-axis labels
     # plt.xticks(rotation=15, ha='right')
 
-    plt.savefig(f'overview_iteration_{iteration}.svg')
+    plt.savefig(f'overview_iteration_{iteration}.{image_extension}')
 
 
 def unwrap_overviews(overviews, metric, overviews_to_plot, iteration):

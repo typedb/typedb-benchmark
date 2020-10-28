@@ -1,5 +1,7 @@
 \documentclass{article}
 \usepackage{listings}
+\usepackage{graphicx}
+\graphicspath{ {./plots/} }
 \lstset{
 basicstyle=\small\ttfamily,
 columns=flexible,
@@ -24,12 +26,6 @@ Here we'll talk about how we went about benchmarking Grakn, and how we drew comp
 \section{Overview}
 Comparison of db query performance
 
-\subsection{Overview at scale 1}
-
-Expect a chart
-
-\subsection{Overview at scale 50}
-
-Expect a chart
-
-\subsection{Overview at scale 200}
+\includegraphics{overview_iteration_1}
+\includegraphics{overview_iteration_3}
+\includegraphics{overview_iteration_5}
