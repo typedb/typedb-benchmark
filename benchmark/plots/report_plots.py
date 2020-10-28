@@ -21,11 +21,11 @@ def get_trace_overviews(json_data):
 
 
 if __name__ == "__main__":
-    neo4j_overviews = get_trace_overviews(get_json(f"https://grabl.io/api/data/jmsfltchr/simulation/08e880eadbc415c5d6a493bd701d839822aad80d/analysis/performance-analysis?q=%7B%22id%22%3A%7B%22selected%22%3A%228974055841285676032%22%7D,%22trace%22%3A%7B%22path%22%3A%5B%7B%22optional%22%3Atrue%7D%5D,%22tracker%22%3A%7B%22optional%22%3Atrue%7D,%22labels%22%3A%7B%22names%22%3A%5B%5D%7D,%22iteration%22%3A%7B%7D%7D%7D"))
-    grakn_overviews = get_trace_overviews(get_json(f"https://grabl.io/api/data/jmsfltchr/simulation/08e880eadbc415c5d6a493bd701d839822aad80d/analysis/performance-analysis?q=%7B%22id%22%3A%7B%22selected%22%3A%227918343126455386112%22%7D,%22trace%22%3A%7B%22path%22%3A%5B%7B%22optional%22%3Atrue%7D%5D,%22tracker%22%3A%7B%22optional%22%3Atrue%7D,%22labels%22%3A%7B%22names%22%3A%5B%5D%7D,%22iteration%22%3A%7B%7D%7D%7D"))
+    grakn_overviews = get_trace_overviews(get_json(f"https://grabl.io/api/data/jmsfltchr/simulation/5746e2f9bc1eeddb72d141a9d2cfdc03ad711434/analysis/performance-analysis?q=%7B%22id%22%3A%7B%22selected%22%3A%223446303449814313984%22%7D,%22trace%22%3A%7B%22path%22%3A%5B%7B%22optional%22%3Atrue%7D%5D,%22tracker%22%3A%7B%22optional%22%3Atrue%7D,%22labels%22%3A%7B%22names%22%3A%5B%5D%7D,%22iteration%22%3A%7B%7D%7D%7D"))
+    neo4j_overviews = get_trace_overviews(get_json(f"https://grabl.io/api/data/jmsfltchr/simulation/5746e2f9bc1eeddb72d141a9d2cfdc03ad711434/analysis/performance-analysis?q=%7B%22id%22%3A%7B%22selected%22%3A%222720107685381760000%22%7D,%22trace%22%3A%7B%22path%22%3A%5B%7B%22optional%22%3Atrue%7D%5D,%22tracker%22%3A%7B%22optional%22%3Atrue%7D,%22labels%22%3A%7B%22names%22%3A%5B%5D%7D,%22iteration%22%3A%7B%7D%7D%7D"))
 
-    neo4j_color = [24/256, 127/256, 183/256]
     grakn_color = [113/256, 87/256, 202/256]
+    neo4j_color = [24/256, 127/256, 183/256]
     bar_edgecolor = "#000"
 
     agents = list(set(grakn_overviews.keys()).intersection(set(neo4j_overviews.keys())))

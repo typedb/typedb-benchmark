@@ -1,13 +1,13 @@
 package grakn.simulation.db.neo4j.action.insight;
 
-import grakn.simulation.db.common.action.insight.FindResidentsOfSpecificCityAction;
+import grakn.simulation.db.common.action.insight.FindResidentsAction;
 import grakn.simulation.db.neo4j.driver.Neo4jOperation;
 import org.neo4j.driver.Query;
 
 import java.util.List;
 
-public class Neo4jFindResidentsOfSpecificCityAction extends FindResidentsOfSpecificCityAction<Neo4jOperation> {
-    public Neo4jFindResidentsOfSpecificCityAction(Neo4jOperation dbOperation) {
+public class Neo4jFindResidentsAction extends FindResidentsAction<Neo4jOperation> {
+    public Neo4jFindResidentsAction(Neo4jOperation dbOperation) {
         super(dbOperation);
     }
 

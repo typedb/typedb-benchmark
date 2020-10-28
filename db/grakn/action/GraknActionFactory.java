@@ -6,8 +6,8 @@ import grakn.simulation.db.common.action.SpouseType;
 import grakn.simulation.db.common.action.read.BirthsInCityAction;
 import grakn.simulation.db.common.action.read.CitiesInContinentAction;
 import grakn.simulation.db.common.action.read.CompaniesInContinentAction;
-import grakn.simulation.db.common.action.insight.FindCurrentResidentsOfSpecificCityAction;
-import grakn.simulation.db.common.action.insight.FindResidentsOfSpecificCityAction;
+import grakn.simulation.db.common.action.insight.FindCurrentResidentsAction;
+import grakn.simulation.db.common.action.insight.FindResidentsAction;
 import grakn.simulation.db.common.action.insight.FindSpecificMarriageAction;
 import grakn.simulation.db.common.action.insight.FindSpecificPersonAction;
 import grakn.simulation.db.common.action.insight.FindTransactionCurrencyAction;
@@ -35,8 +35,8 @@ import grakn.simulation.db.grakn.action.read.GraknBirthsInCityAction;
 import grakn.simulation.db.grakn.action.read.GraknCitiesInContinentAction;
 import grakn.simulation.db.grakn.action.read.GraknCompaniesInContinentAction;
 import grakn.simulation.db.grakn.action.read.GraknCompaniesInCountryAction;
-import grakn.simulation.db.grakn.action.insight.GraknFindCurrentResidentsOfSpecificCityAction;
-import grakn.simulation.db.grakn.action.insight.GraknFindResidentsOfSpecificCityAction;
+import grakn.simulation.db.grakn.action.insight.GraknFindCurrentResidentsAction;
+import grakn.simulation.db.grakn.action.insight.GraknFindResidentsAction;
 import grakn.simulation.db.grakn.action.insight.GraknFindSpecificMarriageAction;
 import grakn.simulation.db.grakn.action.insight.GraknFindSpecificPersonAction;
 import grakn.simulation.db.grakn.action.insight.GraknFindTransactionCurrencyAction;
@@ -162,13 +162,13 @@ public class GraknActionFactory extends ActionFactory<GraknOperation, ConceptMap
     }
 
     @Override
-    public FindResidentsOfSpecificCityAction<GraknOperation> findResidentsOfSpecificCityAction(GraknOperation dbOperation) {
-        return new GraknFindResidentsOfSpecificCityAction(dbOperation);
+    public FindResidentsAction<GraknOperation> findResidentsAction(GraknOperation dbOperation) {
+        return new GraknFindResidentsAction(dbOperation);
     }
 
     @Override
-    public FindCurrentResidentsOfSpecificCityAction<GraknOperation> findCurrentResidentsOfSpecificCityAction(GraknOperation dbOperation) {
-        return new GraknFindCurrentResidentsOfSpecificCityAction(dbOperation);
+    public FindCurrentResidentsAction<GraknOperation> findCurrentResidentsAction(GraknOperation dbOperation) {
+        return new GraknFindCurrentResidentsAction(dbOperation);
     }
 
     @Override

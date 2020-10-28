@@ -164,14 +164,14 @@ Finds existing people and makes them employees of companies.
                         Neo4jArbitraryOneHopAction.query()
                 ),
                 new AgentSection(
-                        FindCurrentResidentsOfSpecificCityAgent.class,
-                        GraknFindCurrentResidentsOfSpecificCityAction.query().toString(),
-                        Neo4jFindCurrentResidentsOfSpecificCityAction.query()
+                        FindCurrentResidentsAgent.class,
+                        GraknFindCurrentResidentsAction.query().toString(),
+                        Neo4jFindCurrentResidentsAction.query()
                 ),
                 new AgentSection(
-                        FindResidentsOfSpecificCityAgent.class,
-                        GraknFindResidentsOfSpecificCityAction.query().toString(),
-                        Neo4jFindResidentsOfSpecificCityAction.query()
+                        FindResidentsAgent.class,
+                        GraknFindResidentsAction.query().toString(),
+                        Neo4jFindResidentsAction.query()
                 ),
                 new AgentSection(
                         FindSpecificMarriageAgent.class,
