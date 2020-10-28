@@ -78,7 +78,7 @@ public abstract class Agent<REGION extends Region, DB_DRIVER extends DbDriver<DB
         RegionalAgent regionalAgent = getRegionalAgent(simulationContext.simulationStep(), region.tracker(), agentRandom, simulationContext.test());
         DbOperationFactory<DB_OPERATION> dbOperationFactory = dbDriver.getDbOperationFactory(region, logger);
 
-        RegionalAgent.Report report = regionalAgent.runWithReport(dbOperationFactory, region, simulationContext);
+        RegionalAgent.Report report = regionalAgent.runWithTracingAndReport(dbOperationFactory, region, simulationContext);
         this.report.addRegionalAgentReport(region.tracker(), report);
     }
 
@@ -132,9 +132,9 @@ public abstract class Agent<REGION extends Region, DB_DRIVER extends DbDriver<DB
 
         protected abstract void run(DbOperationFactory<DB_OPERATION> dbOperationFactory, REGION region, SimulationContext simulationContext);
 
-        void runWithTracing(DbOperationFactory<DB_OPERATION> dbOperationFactory, REGION region, SimulationContext simulationContext) {
+        Report runWithTracingAndReport(DbOperationFactory<DB_OPERATION> dbOperationFactory, REGION region, SimulationContext simulationContext) {
             try (GrablTracingThreadStatic.ThreadTrace trace = traceOnThread(this.name())) {
-                runWithReport(dbOperationFactory, region, simulationContext);
+                return runWithReport(dbOperationFactory, region, simulationContext);
             }
         }
 
