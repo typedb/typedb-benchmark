@@ -77,6 +77,7 @@ public class World implements Region {
     public static World initialise(int scaleFactor, Map<String, Path> files) {
         World world;
         try {
+            // TODO: create WorldBuilder to reduce the number of constructor parameters
             world = new World(
                     scaleFactor,
                     files.get("continents.csv"),

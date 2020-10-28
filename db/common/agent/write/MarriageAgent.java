@@ -36,17 +36,15 @@ public class MarriageAgent<DB_DRIVER extends DbDriver<DB_OPERATION>, DB_OPERATIO
             LocalDateTime dobOfAdults = simulationContext.today().minusYears(simulationContext.world().AGE_OF_ADULTHOOD);
             List<String> womenEmails;
             try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker())) {
-                UnmarriedPeopleInCityAction<?> unmarriedWomenInCityAction = actionFactory().unmarriedPeopleInCityAction(dbOperation, city, "female", dobOfAdults);
-                womenEmails = runAction(unmarriedWomenInCityAction);
+                womenEmails = runAction(actionFactory().unmarriedPeopleInCityAction(dbOperation, city, "female", dobOfAdults));
+                shuffle(womenEmails);
             }
-            shuffle(womenEmails);
 
             List<String> menEmails;
             try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker())) {
-                UnmarriedPeopleInCityAction<?> unmarriedMenInCityAction = actionFactory().unmarriedPeopleInCityAction(dbOperation, city, "male", dobOfAdults);
-                menEmails = runAction(unmarriedMenInCityAction);
+                menEmails = runAction(actionFactory().unmarriedPeopleInCityAction(dbOperation, city, "male", dobOfAdults));
+                shuffle(menEmails);
             }
-            shuffle(menEmails);
 
             int numMarriagesPossible = Math.min(simulationContext.world().getScaleFactor(), Math.min(womenEmails.size(), menEmails.size()));
             try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker())) {

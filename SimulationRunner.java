@@ -90,8 +90,7 @@ public class SimulationRunner {
 
         try {
             try (GrablTracing tracingIgnored = grablTracing(grablTracingUri, grablTracingOrganisation, grablTracingRepository, grablTracingCommit, grablTracingUsername, grablTracingToken, disableTracing)) {
-                boolean test = false;
-                Simulation simulation;
+                Simulation<?, ?> simulation;
                 switch (dbName) {
                     case "grakn":
                         defaultUri = "localhost:48555";
@@ -104,7 +103,7 @@ public class SimulationRunner {
                                 world,
                                 config.getAgents(),
                                 config.getTraceSampling().getSamplingFunction(),
-                                test);
+                                false);
                         break;
 
                     case "neo4j":
@@ -118,7 +117,7 @@ public class SimulationRunner {
                                 world,
                                 config.getAgents(),
                                 config.getTraceSampling().getSamplingFunction(),
-                                test);
+                                false);
                         break;
 
                     default:
@@ -128,7 +127,7 @@ public class SimulationRunner {
                 ///////////////
                 // MAIN LOOP //
                 ///////////////
-                for (int i = 0; i < config.getIterations(); ++i) {
+                for (int i = 0; i < config.getIterations(); i++) {
                     simulation.iterate();
                 }
                 simulation.close();

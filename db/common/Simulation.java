@@ -31,9 +31,10 @@ public abstract class Simulation<DB_DRIVER extends DbDriver<DB_OPERATION>, DB_OP
     private final Random random;
     private final List<Config.Agent> agentConfigs;
     private final Function<Integer, Boolean> iterationSamplingFunction;
-    private final Report report = new Report();
+    private final Report report;
     private final World world;
     private final boolean test;
+
     private int simulationStep = 1;
 
     public Simulation(DB_DRIVER driver, Map<String, Path> initialisationDataPaths, RandomSource randomSource, World world, List<Config.Agent> agentConfigs, Function<Integer, Boolean> iterationSamplingFunction, boolean test) {
@@ -45,6 +46,7 @@ public abstract class Simulation<DB_DRIVER extends DbDriver<DB_OPERATION>, DB_OP
         this.test = test;
         initialise(initialisationDataPaths);
         this.agentList = agentListFromConfigs();
+        this.report = new Report();
     }
 
     protected List<Agent<?, DB_DRIVER, DB_OPERATION>> agentListFromConfigs() {
