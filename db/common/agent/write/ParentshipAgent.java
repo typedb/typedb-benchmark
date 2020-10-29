@@ -1,4 +1,4 @@
-package grakn.simulation.db.common.agent.interaction;
+package grakn.simulation.db.common.agent.write;
 
 import grakn.simulation.db.common.action.SpouseType;
 import grakn.simulation.db.common.agent.base.SimulationContext;
@@ -6,7 +6,7 @@ import grakn.simulation.db.common.action.ActionFactory;
 import grakn.simulation.db.common.action.read.BirthsInCityAction;
 import grakn.simulation.db.common.action.read.MarriedCoupleAction;
 import grakn.simulation.db.common.agent.region.CityAgent;
-import grakn.simulation.db.common.agent.utils.Allocation;
+import grakn.simulation.db.common.agent.base.Allocation;
 import grakn.simulation.db.common.driver.DbDriver;
 import grakn.simulation.db.common.driver.DbOperation;
 import grakn.simulation.db.common.driver.DbOperationFactory;

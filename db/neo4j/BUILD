@@ -5,6 +5,7 @@ java_library(
         "action/*.java",
         "action/read/*.java",
         "action/write/*.java",
+        "action/insight/*.java",
         "driver/*.java",
         "yaml_tool/*.java",
     ]),

@@ -34,6 +34,7 @@ import static grabl.tracing.client.GrablTracingThreadStatic.traceOnThread;
  * @param <REGION> The type of region used by the agent.
  * @param <DB_DRIVER> The database context used by the agent.
  */
+// TODO: refactor out DB_DRIVER, replace with DbDriver<DB_OPERATION>
 public abstract class Agent<REGION extends Region, DB_DRIVER extends DbDriver<DB_OPERATION>, DB_OPERATION extends DbOperation> {
 
     private final Logger logger;
@@ -105,19 +106,19 @@ public abstract class Agent<REGION extends Region, DB_DRIVER extends DbDriver<DB
     // RegionalAgent //
     ///////////////////
 
+    // TODO: Rename this to Regional, as well as the other Regional agents
     public abstract class RegionalAgent implements AutoCloseable {
 
         private final Random random;
-        private final Boolean testing;
+        private final boolean test;
         private final Report report = new Report();
-        protected Action<?, ?> action;
         private final String tracker;
         private GrablTracingThreadStatic.ThreadContext context;
 
         public RegionalAgent(int simulationStep, String tracker, Random random, boolean test) {
             this.tracker = tracker;
             this.random = random;
-            this.testing = test;
+            this.test = test;
             if (traceAgent) {
                 context = contextOnThread(tracker(), simulationStep);
             }
@@ -161,9 +162,8 @@ public abstract class Agent<REGION extends Region, DB_DRIVER extends DbDriver<DB
          * @param iterationScopeId An id that uniquely identifies a concept within the scope of the agent at a particular iteration
          * @return
          */
-        public int uniqueId(SimulationContext simulationContext, int iterationScopeId) {
-            String id = simulationContext.simulationStep() + tracker() + iterationScopeId;
-            return id.hashCode();
+        public String uniqueId(SimulationContext simulationContext, int iterationScopeId) {
+            return simulationContext.simulationStep() + "/" + tracker() + "/" + iterationScopeId;
         }
 
         public RandomValueGenerator randomAttributeGenerator() {
@@ -175,7 +175,7 @@ public abstract class Agent<REGION extends Region, DB_DRIVER extends DbDriver<DB
             try (GrablTracingThreadStatic.ThreadTrace trace = traceOnThread(action.name())) {
                 actionAnswer = action.run();
             }
-            if (testing) {
+            if (test) {
                 report.addActionReport(action.name(), action.report(actionAnswer));
             }
             return actionAnswer;

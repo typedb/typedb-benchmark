@@ -4,7 +4,7 @@ import grakn.simulation.config.Config;
 import grakn.simulation.db.common.action.ActionFactory;
 import grakn.simulation.db.common.agent.base.Agent;
 import grakn.simulation.db.common.agent.base.SimulationContext;
-import grakn.simulation.db.common.agent.interaction.AgentFactory;
+import grakn.simulation.db.common.agent.AgentFactory;
 import grakn.simulation.db.common.driver.DbDriver;
 import grakn.simulation.db.common.driver.DbOperation;
 import grakn.simulation.db.common.world.World;
@@ -31,9 +31,10 @@ public abstract class Simulation<DB_DRIVER extends DbDriver<DB_OPERATION>, DB_OP
     private final Random random;
     private final List<Config.Agent> agentConfigs;
     private final Function<Integer, Boolean> iterationSamplingFunction;
-    private final Report report = new Report();
+    private final Report report;
     private final World world;
     private final boolean test;
+
     private int simulationStep = 1;
 
     public Simulation(DB_DRIVER driver, Map<String, Path> initialisationDataPaths, RandomSource randomSource, World world, List<Config.Agent> agentConfigs, Function<Integer, Boolean> iterationSamplingFunction, boolean test) {
@@ -45,6 +46,7 @@ public abstract class Simulation<DB_DRIVER extends DbDriver<DB_OPERATION>, DB_OP
         this.test = test;
         initialise(initialisationDataPaths);
         this.agentList = agentListFromConfigs();
+        this.report = new Report();
     }
 
     protected List<Agent<?, DB_DRIVER, DB_OPERATION>> agentListFromConfigs() {
@@ -63,7 +65,7 @@ public abstract class Simulation<DB_DRIVER extends DbDriver<DB_OPERATION>, DB_OP
 
     protected abstract void initialise(Map<String, Path> initialisationDataPaths);
 
-    public Report iterate() {
+    public void iterate() {
 
         LOG.info("Simulation step: {}", simulationStep);
         report.clean();
@@ -72,7 +74,6 @@ public abstract class Simulation<DB_DRIVER extends DbDriver<DB_OPERATION>, DB_OP
         }
         closeIteration();  // We want to test opening new sessions each iteration.
         simulationStep++;
-        return report;
     }
 
     protected abstract void closeIteration();

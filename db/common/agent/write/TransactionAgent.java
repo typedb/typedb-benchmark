@@ -1,11 +1,11 @@
-package grakn.simulation.db.common.agent.interaction;
+package grakn.simulation.db.common.agent.write;
 
 import grakn.simulation.db.common.agent.base.SimulationContext;
 import grakn.simulation.db.common.action.ActionFactory;
 import grakn.simulation.db.common.action.read.CompaniesInContinentAction;
 import grakn.simulation.db.common.action.read.ProductsInContinentAction;
 import grakn.simulation.db.common.agent.region.ContinentAgent;
-import grakn.simulation.db.common.agent.utils.Allocation;
+import grakn.simulation.db.common.agent.base.Allocation;
 import grakn.simulation.db.common.driver.DbOperation;
 import grakn.simulation.db.common.utils.Pair;
 import grakn.simulation.db.common.driver.DbDriver;
@@ -58,7 +58,7 @@ public class TransactionAgent<DB_DRIVER extends DbDriver<DB_OPERATION>, DB_OPERA
             for (int i = 0; i < numTransactions; i++) {
                 Long companyNumber = pickOne(companyNumbers);
                 Double productBarcode = pickOne(productBarcodes);
-                Pair<Long, Double> buyerAndProduct = new Pair(companyNumber, productBarcode);
+                Pair<Long, Double> buyerAndProduct = new Pair<>(companyNumber, productBarcode);
                 transactions.add(buyerAndProduct);
             }
             try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker())) {

@@ -1,4 +1,4 @@
-package grakn.simulation.db.common.agent.utils;
+package grakn.simulation.db.common.agent.base;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;

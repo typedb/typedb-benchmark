@@ -14,7 +14,7 @@ mkdir logs
 ```
 Pipe the output of simulation to logsplit:
 ```shell script
-bazel run //:simulation -- -d grakn -n | python3 logsplit.py
+bazel run //:simulation-big -- -d grakn -n | python3 logsplit.py
 ```
 The separated logs can then be found in the `logs/` directory.
 

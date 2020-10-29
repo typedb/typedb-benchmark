@@ -2,8 +2,9 @@ java_library(
     name = "agent",
     srcs = glob([
         "base/*.java",
-        "interaction/*.java",
-        "utils/*.java",
+        "*.java",
+        "insight/*.java",
+        "write/*.java",
         "region/*.java",
     ]),
     visibility = ["//visibility:public"],

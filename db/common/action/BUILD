@@ -4,6 +4,7 @@ java_library(
         "*.java",
         "read/*.java",
         "write/*.java",
+        "insight/*.java",
     ]),
     visibility = ["//visibility:public"],
     deps = [

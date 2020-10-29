@@ -17,7 +17,7 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class World {
+public class World implements Region {
 
     public final int AGE_OF_ADULTHOOD = 2;
     private final int scaleFactor;
@@ -77,6 +77,7 @@ public class World {
     public static World initialise(int scaleFactor, Map<String, Path> files) {
         World world;
         try {
+            // TODO: create WorldBuilder to reduce the number of constructor parameters
             world = new World(
                     scaleFactor,
                     files.get("continents.csv"),
@@ -132,6 +133,21 @@ public class World {
         return scaleFactor;
     }
 
+    @Override
+    public String name() {
+        return "world";
+    }
+
+    @Override
+    public String tracker() {
+        return "world";
+    }
+
+    @Override
+    public String topLevelName() {
+        return name();
+    }
+
     public class Continent implements Region {
         private String continentName;
         private List<Country> countries = new ArrayList<>();
@@ -162,8 +178,8 @@ public class World {
         }
 
         @Override
-        public Continent continent() {
-            return this;
+        public String topLevelName() {
+            return this.name();
         }
     }
 
@@ -191,6 +207,10 @@ public class World {
 
         public Continent continent() {
             return continent;
+        }
+
+        public String topLevelName() {
+            return continent.name();
         }
 
         public Stream<City> cities() {
@@ -234,8 +254,8 @@ public class World {
         }
 
         @Override
-        public Continent continent() {
-            return this.country.continent;
+        public String topLevelName() {
+            return this.country.continent.name();
         }
     }
 

@@ -1,4 +1,4 @@
-package grakn.simulation.db.common.agent.interaction;
+package grakn.simulation.db.common.agent.write;
 
 import grakn.simulation.db.common.agent.base.SimulationContext;
 import grakn.simulation.db.common.action.ActionFactory;
@@ -37,7 +37,7 @@ public class CompanyAgent<DB_DRIVER extends DbDriver<DB_OPERATION>, DB_OPERATION
                     String adjective = pickOne(simulationContext.world().getAdjectives());
                     String noun = pickOne(simulationContext.world().getNouns());
 
-                    int companyNumber = uniqueId(simulationContext, i);
+                    int companyNumber = uniqueId(simulationContext, i).hashCode();
                     String companyName = StringUtils.capitalize(adjective) + StringUtils.capitalize(noun) + "-" + companyNumber;
                     runAction(actionFactory().insertCompanyAction(dbOperation, country, simulationContext.today(), companyNumber, companyName));
                 }

@@ -3,10 +3,20 @@ package grakn.simulation.db.common.action;
 import grakn.simulation.db.common.action.read.BirthsInCityAction;
 import grakn.simulation.db.common.action.read.CitiesInContinentAction;
 import grakn.simulation.db.common.action.read.CompaniesInContinentAction;
-import grakn.simulation.db.common.action.read.CompanyNumbersAction;
+import grakn.simulation.db.common.action.read.CompaniesInCountryAction;
+import grakn.simulation.db.common.action.insight.FindCurrentResidentsOfSpecificCityAction;
+import grakn.simulation.db.common.action.insight.FindResidentsOfSpecificCityAction;
+import grakn.simulation.db.common.action.insight.FindSpecificMarriageAction;
+import grakn.simulation.db.common.action.insight.FindSpecificPersonAction;
+import grakn.simulation.db.common.action.insight.FindTransactionCurrencyAction;
+import grakn.simulation.db.common.action.insight.FourHopAction;
+import grakn.simulation.db.common.action.insight.ArbitraryOneHopAction;
 import grakn.simulation.db.common.action.read.MarriedCoupleAction;
+import grakn.simulation.db.common.action.insight.MeanWageOfPeopleInWorldAction;
 import grakn.simulation.db.common.action.read.ProductsInContinentAction;
 import grakn.simulation.db.common.action.read.ResidentsInCityAction;
+import grakn.simulation.db.common.action.insight.ThreeHopAction;
+import grakn.simulation.db.common.action.insight.TwoHopAction;
 import grakn.simulation.db.common.action.read.UnmarriedPeopleInCityAction;
 import grakn.simulation.db.common.action.read.UpdateAgesOfPeopleInCityAction;
 import grakn.simulation.db.common.action.write.InsertCompanyAction;
@@ -31,7 +41,7 @@ public abstract class ActionFactory<DB_OPERATION extends DbOperation, DB_RETURN_
 
     public abstract ResidentsInCityAction<DB_OPERATION> residentsInCityAction(DB_OPERATION dbOperation, World.City city, int numEmployments, LocalDateTime earliestDate);
 
-    public abstract CompanyNumbersAction<DB_OPERATION> companyNumbersInCountryAction(DB_OPERATION dbOperation, World.Country country, int numCompanies);
+    public abstract CompaniesInCountryAction<DB_OPERATION> companiesInCountryAction(DB_OPERATION dbOperation, World.Country country, int numCompanies);
 
     public abstract InsertEmploymentAction<DB_OPERATION, DB_RETURN_TYPE> insertEmploymentAction(DB_OPERATION dbOperation, World.City city, String employeeEmail, long companyNumber, LocalDateTime employmentDate, double wageValue, String contractContent, double contractedHours);
 
@@ -62,4 +72,24 @@ public abstract class ActionFactory<DB_OPERATION extends DbOperation, DB_RETURN_
     public abstract ProductsInContinentAction<DB_OPERATION> productsInContinentAction(DB_OPERATION dbOperation, World.Continent continent);
 
     public abstract InsertTransactionAction<DB_OPERATION, DB_RETURN_TYPE> insertTransactionAction(DB_OPERATION dbOperation, World.Continent continent, Pair<Long, Double> transaction, Long sellerCompanyNumber, double value, int productQuantity, boolean isTaxable);
+
+    public abstract MeanWageOfPeopleInWorldAction<DB_OPERATION> meanWageOfPeopleInWorldAction(DB_OPERATION dbOperation);
+
+    public abstract FindResidentsOfSpecificCityAction<DB_OPERATION> findResidentsOfSpecificCityAction(DB_OPERATION dbOperation);
+
+    public abstract FindCurrentResidentsOfSpecificCityAction<DB_OPERATION> findCurrentResidentsOfSpecificCityAction(DB_OPERATION dbOperation);
+
+    public abstract FindTransactionCurrencyAction<DB_OPERATION> findTransactionCurrencyAction(DB_OPERATION dbOperation);
+
+    public abstract ArbitraryOneHopAction<DB_OPERATION> arbitraryOneHopAction(DB_OPERATION dbOperation);
+
+    public abstract TwoHopAction<DB_OPERATION> twoHopAction(DB_OPERATION dbOperation);
+
+    public abstract ThreeHopAction<DB_OPERATION> threeHopAction(DB_OPERATION dbOperation);
+
+    public abstract FourHopAction<DB_OPERATION> fourHopAction(DB_OPERATION dbOperation);
+
+    public abstract FindSpecificMarriageAction<DB_OPERATION> findSpecificMarriageAction(DB_OPERATION dbOperation);
+
+    public abstract FindSpecificPersonAction<DB_OPERATION> findSpecificPersonAction(DB_OPERATION dbOperation);
 }

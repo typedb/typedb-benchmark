@@ -93,6 +93,13 @@ public class GraknOperation extends TransactionalDbOperation {
         }
     }
 
+    public Number execute(GraqlGet.Aggregate query) {
+        log.query(tracker, query);
+        try (GrablTracingThreadStatic.ThreadTrace trace = traceOnThread(EXECUTE.getName())) {
+            return getOnlyElement(transaction.execute(query).get()).number();
+        }
+    }
+
     public Object getOnlyAttributeOfThing(ConceptMap answer, String varName, String attributeType) {
         return getOnlyElement(answer.get(varName).asThing().asRemote(transaction).attributes(transaction.getAttributeType(attributeType)).collect(Collectors.toList())).value();
     }

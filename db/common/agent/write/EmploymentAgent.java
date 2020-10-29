@@ -1,8 +1,8 @@
-package grakn.simulation.db.common.agent.interaction;
+package grakn.simulation.db.common.agent.write;
 
 import grakn.simulation.db.common.agent.base.SimulationContext;
 import grakn.simulation.db.common.action.ActionFactory;
-import grakn.simulation.db.common.action.read.CompanyNumbersAction;
+import grakn.simulation.db.common.action.read.CompaniesInCountryAction;
 import grakn.simulation.db.common.action.read.ResidentsInCityAction;
 import grakn.simulation.db.common.agent.region.CityAgent;
 import grakn.simulation.db.common.driver.DbDriver;
@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Random;
 
-import static grakn.simulation.db.common.agent.utils.Allocation.allocate;
+import static grakn.simulation.db.common.agent.base.Allocation.allocate;
 
 public class EmploymentAgent<DB_DRIVER extends DbDriver<DB_OPERATION>, DB_OPERATION extends DbOperation> extends CityAgent<DB_DRIVER, DB_OPERATION> {
 
@@ -51,7 +51,7 @@ public class EmploymentAgent<DB_DRIVER extends DbDriver<DB_OPERATION>, DB_OPERAT
             }
 
             try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker())) {
-                CompanyNumbersAction<DB_OPERATION> companyNumbersAction = actionFactory().companyNumbersInCountryAction(dbOperation, city.country(), simulationContext.world().getScaleFactor());
+                CompaniesInCountryAction<DB_OPERATION> companyNumbersAction = actionFactory().companiesInCountryAction(dbOperation, city.country(), simulationContext.world().getScaleFactor());
                 companyNumbers = runAction(companyNumbersAction);
             }
 

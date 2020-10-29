@@ -1,4 +1,4 @@
-package grakn.simulation.db.common.agent.interaction;
+package grakn.simulation.db.common.agent.write;
 
 import grakn.simulation.db.common.agent.base.SimulationContext;
 import grakn.simulation.db.common.action.ActionFactory;
@@ -36,17 +36,15 @@ public class MarriageAgent<DB_DRIVER extends DbDriver<DB_OPERATION>, DB_OPERATIO
             LocalDateTime dobOfAdults = simulationContext.today().minusYears(simulationContext.world().AGE_OF_ADULTHOOD);
             List<String> womenEmails;
             try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker())) {
-                UnmarriedPeopleInCityAction<?> unmarriedWomenInCityAction = actionFactory().unmarriedPeopleInCityAction(dbOperation, city, "female", dobOfAdults);
-                womenEmails = runAction(unmarriedWomenInCityAction);
+                womenEmails = runAction(actionFactory().unmarriedPeopleInCityAction(dbOperation, city, "female", dobOfAdults));
+                shuffle(womenEmails);
             }
-            shuffle(womenEmails);
 
             List<String> menEmails;
             try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker())) {
-                UnmarriedPeopleInCityAction<?> unmarriedMenInCityAction = actionFactory().unmarriedPeopleInCityAction(dbOperation, city, "male", dobOfAdults);
-                menEmails = runAction(unmarriedMenInCityAction);
+                menEmails = runAction(actionFactory().unmarriedPeopleInCityAction(dbOperation, city, "male", dobOfAdults));
+                shuffle(menEmails);
             }
-            shuffle(menEmails);
 
             int numMarriagesPossible = Math.min(simulationContext.world().getScaleFactor(), Math.min(womenEmails.size(), menEmails.size()));
             try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker())) {
@@ -54,7 +52,7 @@ public class MarriageAgent<DB_DRIVER extends DbDriver<DB_OPERATION>, DB_OPERATIO
                     for (int i = 0; i < numMarriagesPossible; i++) {
                         String wifeEmail = womenEmails.get(i);
                         String husbandEmail = menEmails.get(i);
-                        int marriageIdentifier = (wifeEmail + husbandEmail).hashCode();
+                        int marriageIdentifier = uniqueId(simulationContext, i).hashCode();
                         runAction(actionFactory().insertMarriageAction(dbOperation, city, marriageIdentifier, wifeEmail, husbandEmail));
                     }
                     dbOperation.save();

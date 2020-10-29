@@ -1,4 +1,4 @@
-package grakn.simulation.db.common.agent.interaction;
+package grakn.simulation.db.common.agent.write;
 
 import grakn.simulation.db.common.agent.base.SimulationContext;
 import grakn.simulation.db.common.action.ActionFactory;
@@ -33,7 +33,7 @@ public class ProductAgent<DB_DRIVER extends DbDriver<DB_OPERATION>, DB_OPERATION
                 for (int i = 0; i < numProducts; i++) {
                     String productName = randomAttributeGenerator().boundRandomLengthRandomString(5, 20);
                     String productDescription = randomAttributeGenerator().boundRandomLengthRandomString(75, 100);
-                    Double barcode = (double) uniqueId(simulationContext, i);
+                    Double barcode = (double) uniqueId(simulationContext, i).hashCode();
                     runAction(actionFactory().insertProductAction(dbOperation, continent, barcode, productName, productDescription));
                 }
                 dbOperation.save();
