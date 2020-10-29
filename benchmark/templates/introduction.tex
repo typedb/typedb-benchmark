@@ -1,6 +1,7 @@
 \documentclass{article}
 \usepackage{listings}
 \usepackage{graphicx}
+\usepackage{float}
 \graphicspath{ {./plots/} }
 \lstset{
 basicstyle=\small\ttfamily,
@@ -26,4 +27,7 @@ Here we'll talk about how we went about benchmarking Grakn, and how we drew comp
 \section{Overview}
 Comparison of db query performance
 
-\includegraphics{overview}
+\begin{figure}[H]
+\centering
+\includegraphics[width=1.0\textwidth]{overview}
+\end{figure}

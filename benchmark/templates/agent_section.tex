@@ -1,10 +1,14 @@
 \\subsection{${agentSectionTitle}}
 This is the description for an agent
 
-\\includegraphics{agent_${agentName}}
+\\begin{figure}[H]
+\\centering
+\\includegraphics[width=1.0\\textwidth]{agent_${agentName}}
+\\end{figure}
 
 <% renderedDbAgents.each { out <<
 """
 ${it}
 """
 } %>
+\\pagebreak
