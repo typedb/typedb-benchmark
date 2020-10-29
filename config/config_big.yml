@@ -22,9 +22,9 @@ agents:
     mode: RUN
   - name: "meanWage"
     mode: TRACE
-  - name: "findResidentsOfSpecificCity"
+  - name: "findResidents"
     mode: TRACE
-  - name: "findCurrentResidentsOfSpecificCity"
+  - name: "findCurrentResidents"
     mode: TRACE
 #  - name: "findTransactionCurrency"
 #    mode: TRACE

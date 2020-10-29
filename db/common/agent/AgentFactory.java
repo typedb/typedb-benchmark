@@ -139,9 +139,9 @@ public class AgentFactory<DB_DRIVER extends DbDriver<DB_OPERATION>, DB_OPERATION
                 return friendship();
             case "meanWage":
                 return meanWage();
-            case "findResidentsOfSpecificCity":
+            case "findResidents":
                 return findResidents();
-            case "findCurrentResidentsOfSpecificCity":
+            case "findCurrentResidents":
                 return findCurrentResidents();
             case "findTransactionCurrency":
                 return findTransactionCurrency();

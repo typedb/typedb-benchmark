@@ -3,23 +3,15 @@ package grakn.simulation.benchmark
 import grakn.simulation.db.common.agent.insight.*
 import grakn.simulation.db.common.agent.write.AgeUpdateAgent
 import grakn.simulation.db.common.agent.write.PersonBirthAgent
-import grakn.simulation.db.common.agent.write.RelocationAgent
 import grakn.simulation.db.grakn.action.insight.*
 import grakn.simulation.db.grakn.action.read.GraknBirthsInCityAction
-import grakn.simulation.db.grakn.action.read.GraknCitiesInContinentAction
-import grakn.simulation.db.grakn.action.read.GraknResidentsInCityAction
-import grakn.simulation.db.grakn.action.write.GraknInsertRelocationAction
 import grakn.simulation.db.grakn.action.write.GraknUpdateAgesOfPeopleInCityAction
 import grakn.simulation.db.neo4j.action.insight.*
 import grakn.simulation.db.neo4j.action.read.Neo4jBirthsInCityAction
-import grakn.simulation.db.neo4j.action.read.Neo4jCitiesInContinentAction
-import grakn.simulation.db.neo4j.action.read.Neo4jResidentsInCityAction
-import grakn.simulation.db.neo4j.action.write.Neo4jInsertRelocationAction
 import grakn.simulation.db.neo4j.action.write.Neo4jUpdateAgesOfPeopleInCityAction
 import groovy.text.GStringTemplateEngine
 
 import java.time.LocalDateTime
-
 
 class Report {
 
@@ -183,11 +175,12 @@ Finds existing people and makes them employees of companies.
                         GraknFindSpecificPersonAction.query().toString(),
                         Neo4jFindSpecificPersonAction.query()
                 ),
-                new AgentSection(
-                        FindTransactionCurrencyAgent.class,
-                        GraknFindTransactionCurrencyAction.query().toString(),
-                        Neo4jFindTransactionCurrencyAction.query()
-                ),
+//                Disabled due to long runtimes
+//                new AgentSection(
+//                        FindTransactionCurrencyAgent.class,
+//                        GraknFindTransactionCurrencyAction.query().toString(),
+//                        Neo4jFindTransactionCurrencyAction.query()
+//                ),
                 new AgentSection(
                         FourHopAgent.class,
                         GraknFourHopAction.query().toString(),
@@ -224,20 +217,20 @@ Finds existing people and makes them employees of companies.
                                 Neo4jUpdateAgesOfPeopleInCityAction.query()
                         )
                 ),
-                new AgentSection(
-                        RelocationAgent.class,
-                        Arrays.asList(
-                                GraknResidentsInCityAction.query(cityName, earliestDate).toString(),
-                                GraknCitiesInContinentAction.query(cityName, continentName).toString(),
-                                GraknInsertRelocationAction.query(email, cityName, destinationCity, relocationDate).toString()
-                        ),
-                        Arrays.asList(
-                                Neo4jResidentsInCityAction.query(),
-                                Neo4jCitiesInContinentAction.query(),
-                                Neo4jInsertRelocationAction.endPastResidenciesQuery(),
-                                Neo4jInsertRelocationAction.createRelocationQuery()
-                        )
-                )
+//                new AgentSection(
+//                        RelocationAgent.class,
+//                        Arrays.asList(
+//                                GraknResidentsInCityAction.query(cityName, earliestDate).toString(),
+//                                GraknCitiesInContinentAction.query(cityName, continentName).toString(),
+//                                GraknInsertRelocationAction.query(email, cityName, destinationCity, relocationDate).toString()
+//                        ),
+//                        Arrays.asList(
+//                                Neo4jResidentsInCityAction.query(),
+//                                Neo4jCitiesInContinentAction.query(),
+//                                Neo4jInsertRelocationAction.endPastResidenciesQuery(),
+//                                Neo4jInsertRelocationAction.createRelocationQuery()
+//                        )
+//                )
         )
         return agentSections
     }
