@@ -45,18 +45,18 @@ public class RelocationAgent<DB_DRIVER extends DbDriver<DB_OPERATION>, DB_OPERAT
             List<String> residentEmails;
             List<String> relocationCityNames;
 
-            try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker())) {
+            try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker(), trace())) {
                 ResidentsInCityAction<?> residentsInCityAction = actionFactory().residentsInCityAction(dbOperation, city, simulationContext.world().getScaleFactor(), earliestDateOfResidencyToRelocate);
                 residentEmails = runAction(residentsInCityAction);
             }
             shuffle(residentEmails);
 
-            try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker())) {
+            try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker(), trace())) {
                 CitiesInContinentAction<?> citiesInContinentAction = actionFactory().citiesInContinentAction(dbOperation, city);
                 relocationCityNames = runAction(citiesInContinentAction);
             }
 
-            try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker())) {
+            try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker(), trace())) {
                 Allocation.allocate(residentEmails, relocationCityNames, (residentEmail, relocationCityName) -> {
                     runAction(actionFactory().insertRelocationAction(dbOperation, city, simulationContext.today(), residentEmail, relocationCityName));
                 });

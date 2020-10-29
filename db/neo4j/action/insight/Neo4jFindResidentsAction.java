@@ -13,7 +13,7 @@ public class Neo4jFindResidentsAction extends FindResidentsAction<Neo4jOperation
 
     @Override
     public List<String> run() {
-        return dbOperation.getOrderedAttribute(new Query(query()), "person.email", null);
+        return dbOperation.sortedExecute(new Query(query()), "person.email", null);
     }
 
     public static String query() {

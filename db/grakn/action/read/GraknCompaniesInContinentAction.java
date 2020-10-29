@@ -1,7 +1,6 @@
 package grakn.simulation.db.grakn.action.read;
 
 import grakn.simulation.db.common.action.read.CompaniesInContinentAction;
-import grakn.simulation.db.common.driver.TransactionalDbOperation;
 import grakn.simulation.db.common.world.World;
 import grakn.simulation.db.grakn.driver.GraknOperation;
 import graql.lang.Graql;
@@ -27,7 +26,7 @@ public class GraknCompaniesInContinentAction extends CompaniesInContinentAction<
     @Override
     public List<Long> run() {
         GraqlGet.Unfiltered query = query(continent.name());
-        return dbOperation.getOrderedAttribute(query, COMPANY_NUMBER, null);
+        return dbOperation.sortedExecute(query, COMPANY_NUMBER, null);
     }
 
     public static GraqlGet.Unfiltered query(String continentName) {

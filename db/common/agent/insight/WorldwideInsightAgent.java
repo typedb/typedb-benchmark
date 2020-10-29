@@ -37,7 +37,7 @@ public abstract class WorldwideInsightAgent<DB_DRIVER extends DbDriver<DB_OPERAT
         @Override
         protected void run(DbOperationFactory<DB_OPERATION> dbOperationFactory, World world, SimulationContext simulationContext) {
             for (int i = 0; i <= simulationContext.world().getScaleFactor(); i++) {
-                try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker())) {
+                try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker(), trace())) {
                     runAction(getAction(dbOperation));
                 }
             }

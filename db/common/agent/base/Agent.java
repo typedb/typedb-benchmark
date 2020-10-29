@@ -57,6 +57,10 @@ public abstract class Agent<REGION extends Region, DB_DRIVER extends DbDriver<DB
         this.trace = trace;
     }
 
+    public boolean trace() {
+        return trace;
+    }
+
     abstract protected List<REGION> getRegions(World world);
 
     public Report iterate(SimulationContext simulationContext, RandomSource randomSource) {

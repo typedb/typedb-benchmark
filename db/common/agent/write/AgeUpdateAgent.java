@@ -29,7 +29,7 @@ public class AgeUpdateAgent<DB_DRIVER extends DbDriver<DB_OPERATION>, DB_OPERATI
 
         @Override
         protected void run(DbOperationFactory<DB_OPERATION> dbOperationFactory, World.City city, SimulationContext simulationContext) {
-            try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker())) {
+            try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker(), trace())) {
                 UpdateAgesOfPeopleInCityAction<DB_OPERATION> updateAgesOfAllPeopleInCityAction = actionFactory().updateAgesOfPeopleInCityAction(dbOperation, simulationContext.today(), city);
                 runAction(updateAgesOfAllPeopleInCityAction);
                 dbOperation.save();

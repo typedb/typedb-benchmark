@@ -21,7 +21,7 @@ public class GraknCitiesInContinentAction extends CitiesInContinentAction<GraknO
     @Override
     public List<String> run() {
         GraqlGet.Unfiltered relocationCitiesQuery = query(city.name(), city.country().continent().name());
-        return dbOperation.getOrderedAttribute(relocationCitiesQuery, "city-name", null);
+        return dbOperation.sortedExecute(relocationCitiesQuery, "city-name", null);
     }
 
     public static GraqlGet.Unfiltered query(String cityName, String continentName) {

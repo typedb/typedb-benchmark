@@ -13,7 +13,7 @@ public class Neo4jThreeHopAction extends ThreeHopAction<Neo4jOperation> {
 
     @Override
     public List<String> run() {
-        return dbOperation.getOrderedAttribute(new Query(query()), "company.companyName", null);
+        return dbOperation.sortedExecute(new Query(query()), "company.companyName", null);
     }
 
     public static String query() {

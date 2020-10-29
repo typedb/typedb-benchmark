@@ -36,14 +36,14 @@ public class TransactionAgent<DB_DRIVER extends DbDriver<DB_OPERATION>, DB_OPERA
         protected void run(DbOperationFactory<DB_OPERATION> dbOperationFactory, World.Continent continent, SimulationContext simulationContext) {
             List<Long> companyNumbers;
 
-            try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker())) {
+            try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker(), trace())) {
                 CompaniesInContinentAction<?> companiesInContinentAction = actionFactory().companiesInContinentAction(dbOperation, continent);
                 companyNumbers = runAction(companiesInContinentAction);
             }
             shuffle(companyNumbers);
 
             List<Double> productBarcodes;
-            try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker())) {
+            try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker(), trace())) {
                 ProductsInContinentAction<?> productsInContinentAction = actionFactory().productsInContinentAction(dbOperation, continent);
                 productBarcodes = runAction(productsInContinentAction);
             }
@@ -61,7 +61,7 @@ public class TransactionAgent<DB_DRIVER extends DbDriver<DB_OPERATION>, DB_OPERA
                 Pair<Long, Double> buyerAndProduct = new Pair<>(companyNumber, productBarcode);
                 transactions.add(buyerAndProduct);
             }
-            try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker())) {
+            try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker(), trace())) {
                 Allocation.allocate(transactions, companyNumbers, (transaction, sellerCompanyNumber) -> {
                     double value = randomAttributeGenerator().boundRandomDouble(0.01, 10000.00);
                     int productQuantity = randomAttributeGenerator().boundRandomInt(1, 1000);

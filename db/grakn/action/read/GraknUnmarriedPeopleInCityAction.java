@@ -41,7 +41,7 @@ public class GraknUnmarriedPeopleInCityAction extends UnmarriedPeopleInCityActio
             throw new IllegalArgumentException("Gender must be male or female");
         }
         GraqlGet query = query(marriageRole, gender, dobOfAdults, city.name());
-        return dbOperation.getOrderedAttribute(query, EMAIL, null);
+        return dbOperation.sortedExecute(query, EMAIL, null);
     }
 
     public static GraqlGet query(String marriageRole, String gender, LocalDateTime dobOfAdults, String cityName) {

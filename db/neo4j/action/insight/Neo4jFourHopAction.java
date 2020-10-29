@@ -13,7 +13,7 @@ public class Neo4jFourHopAction extends FourHopAction<Neo4jOperation> {
 
     @Override
     public List<String> run() {
-        return dbOperation.getOrderedAttribute(new Query(query()), "seller.companyName", null);
+        return dbOperation.sortedExecute(new Query(query()), "seller.companyName", null);
     }
 
     public static String query() {

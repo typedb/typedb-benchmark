@@ -20,7 +20,7 @@ public class Neo4jBirthsInCityAction extends BirthsInCityAction<Neo4jOperation> 
             put("dateOfBirth", today);
             put("locationName", worldCity.name());
         }};
-        return dbOperation.getOrderedAttribute(new Query(query(), parameters), "child.email", null);
+        return dbOperation.sortedExecute(new Query(query(), parameters), "child.email", null);
     }
 
     public static String query() {

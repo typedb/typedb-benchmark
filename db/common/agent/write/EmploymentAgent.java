@@ -45,17 +45,17 @@ public class EmploymentAgent<DB_DRIVER extends DbDriver<DB_OPERATION>, DB_OPERAT
             List<String> employeeEmails;
             List<Long> companyNumbers;
 
-            try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker())) {
+            try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker(), trace())) {
                 ResidentsInCityAction<DB_OPERATION> employeeEmailsAction = actionFactory().residentsInCityAction(dbOperation, city, simulationContext.world().getScaleFactor(), employmentDate);
                 employeeEmails = runAction(employeeEmailsAction);
             }
 
-            try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker())) {
+            try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker(), trace())) {
                 CompaniesInCountryAction<DB_OPERATION> companyNumbersAction = actionFactory().companiesInCountryAction(dbOperation, city.country(), simulationContext.world().getScaleFactor());
                 companyNumbers = runAction(companyNumbersAction);
             }
 
-            try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker())) {
+            try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker(), trace())) {
                 // A second transaction is being used to circumvent graknlabs/grakn issue #5585
                 boolean allocated = allocate(employeeEmails, companyNumbers, (employeeEmail, companyNumber) -> {
                     double wageValue = randomAttributeGenerator().boundRandomDouble(MIN_ANNUAL_WAGE, MAX_ANNUAL_WAGE);

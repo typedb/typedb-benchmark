@@ -13,7 +13,7 @@ public class Neo4jTwoHopAction extends TwoHopAction<Neo4jOperation> {
 
     @Override
     public List<String> run() {
-        return dbOperation.getOrderedAttribute(new Query(query()), "parent.email", null);
+        return dbOperation.sortedExecute(new Query(query()), "parent.email", null);
     }
 
     public static String query() {

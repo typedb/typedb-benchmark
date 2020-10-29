@@ -16,8 +16,8 @@ public class GraknOperationFactory extends TransactionalDbOperationFactory<Grakn
     }
 
     @Override
-    public GraknOperation newDbOperation(String tracker) {
-        return new GraknOperation(session, logger(), tracker);
+    public GraknOperation newDbOperation(String tracker, boolean trace) {
+        return new GraknOperation(session, logger(), tracker, trace);
     }
 
 }

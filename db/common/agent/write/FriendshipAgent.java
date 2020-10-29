@@ -31,12 +31,12 @@ public class FriendshipAgent<DB_DRIVER extends DbDriver<DB_OPERATION>, DB_OPERAT
         @Override
         protected void run(DbOperationFactory<DB_OPERATION> dbOperationFactory, World.City city, SimulationContext simulationContext) {
             List<String> residentEmails;
-            try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker())) {
+            try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker(), trace())) {
                 ResidentsInCityAction<?> residentEmailsAction = actionFactory().residentsInCityAction(dbOperation, city, simulationContext.world().getScaleFactor(), simulationContext.today());
                 residentEmails = runAction(residentEmailsAction);
             } // TODO Closing and reopening the transaction here is a workaround for https://github.com/graknlabs/grakn/issues/5585
 
-            try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker())) {
+            try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker(), trace())) {
                 if (residentEmails.size() > 0) {
                     shuffle(residentEmails);
                     int numFriendships = simulationContext.world().getScaleFactor();

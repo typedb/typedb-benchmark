@@ -22,7 +22,7 @@ public class Neo4jResidentsInCityAction extends ResidentsInCityAction<Neo4jOpera
             put("locationName", city.name());
             put("earliestDate", earliestDate);
         }};
-        return dbOperation.getOrderedAttribute(new Query(template, parameters), "resident.email", numResidents);
+        return dbOperation.sortedExecute(new Query(template, parameters), "resident.email", numResidents);
     }
 
     public static String query() {

@@ -39,20 +39,20 @@ public class ParentshipAgent<DB_DRIVER extends DbDriver<DB_OPERATION>, DB_OPERAT
             // Query for married couples in the city who are not already in a parentship relation together
             List<String> childrenEmails;
 
-            try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker())) {
+            try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker(), trace())) {
                 BirthsInCityAction<?> birthsInCityAction = actionFactory().birthsInCityAction(dbOperation, city, simulationContext.today());
                 childrenEmails = runAction(birthsInCityAction);
             }
 
             List<HashMap<SpouseType, String>> marriedCouple;
 
-            try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker())) {
+            try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker(), trace())) {
                 MarriedCoupleAction<?> marriedCoupleAction = actionFactory().marriedCoupleAction(dbOperation, city, simulationContext.today());
                 marriedCouple = runAction(marriedCoupleAction);
             }
 
             if (marriedCouple.size() > 0 && childrenEmails.size() > 0) {
-                try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker())) {
+                try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker(), trace())) {
                     LinkedHashMap<Integer, List<Integer>> childrenPerMarriage = Allocation.allocateEvenlyToMap(childrenEmails.size(), marriedCouple.size());
                     for (Map.Entry<Integer, List<Integer>> childrenForMarriage : childrenPerMarriage.entrySet()) {
                         Integer marriageIndex = childrenForMarriage.getKey();

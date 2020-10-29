@@ -24,7 +24,7 @@ public class GraknCompaniesInCountryAction extends CompaniesInCountryAction<Grak
     @Override
     public List<Long> run() {
         GraqlGet.Unfiltered companyNumbersQuery = query(country.name());
-        return dbOperation.getOrderedAttribute(companyNumbersQuery, COMPANY_NUMBER, numCompanies);
+        return dbOperation.sortedExecute(companyNumbersQuery, COMPANY_NUMBER, numCompanies);
     }
 
     public static GraqlGet.Unfiltered query(String countryName) {

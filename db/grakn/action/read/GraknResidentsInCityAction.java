@@ -28,7 +28,7 @@ public class GraknResidentsInCityAction extends ResidentsInCityAction<GraknOpera
 
     @Override
     public List<String> run() {
-        return dbOperation.getOrderedAttribute(query(city.name(), earliestDate), EMAIL, numResidents);
+        return dbOperation.sortedExecute(query(city.name(), earliestDate), EMAIL, numResidents);
     }
 
     public static GraqlGet.Unfiltered query(String cityName, LocalDateTime earliestDate) {

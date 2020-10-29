@@ -22,7 +22,7 @@ public class GraknFindResidentsAction extends FindResidentsAction<GraknOperation
 
     @Override
     public List<String> run() {
-        return dbOperation.getOrderedAttribute(query(), EMAIL, null);
+        return dbOperation.sortedExecute(query(), EMAIL, null);
     }
 
     public static GraqlGet.Unfiltered query() {

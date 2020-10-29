@@ -25,7 +25,7 @@ public class Neo4jUnmarriedPeopleInCityAction extends UnmarriedPeopleInCityActio
             put(GENDER, gender);
             put("dobOfAdults", dobOfAdults);
         }};
-        return dbOperation.getOrderedAttribute(new Query(query(), parameters), "person." + EMAIL, null);
+        return dbOperation.sortedExecute(new Query(query(), parameters), "person." + EMAIL, null);
     }
 
     public static String query() {

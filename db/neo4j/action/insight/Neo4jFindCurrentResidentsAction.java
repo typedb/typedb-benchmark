@@ -15,7 +15,7 @@ public class Neo4jFindCurrentResidentsAction extends FindCurrentResidentsAction<
 
     @Override
     public List<String> run() {
-        return dbOperation.getOrderedAttribute(new Query(query()), "person.email", null);
+        return dbOperation.sortedExecute(new Query(query()), "person.email", null);
     }
 
     public static String query() {

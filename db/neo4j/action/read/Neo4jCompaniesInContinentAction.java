@@ -18,7 +18,7 @@ public class Neo4jCompaniesInContinentAction extends CompaniesInContinentAction<
         HashMap<String, Object> parameters = new HashMap<String, Object>(){{
             put("continentName", continent.name());
         }};
-        return dbOperation.getOrderedAttribute(new Query(query(), parameters), "company.companyNumber", null);
+        return dbOperation.sortedExecute(new Query(query(), parameters), "company.companyNumber", null);
     }
 
     public static String query() {

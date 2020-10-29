@@ -19,7 +19,7 @@ public class Neo4jProductsInContinentAction extends ProductsInContinentAction<Ne
         HashMap<String, Object> parameters = new HashMap<String, Object>(){{
             put("continentName", continent.name());
         }};
-        return dbOperation.getOrderedAttribute(new Query(query(), parameters), "product.barcode", null);
+        return dbOperation.sortedExecute(new Query(query(), parameters), "product.barcode", null);
     }
 
     public static String query() {

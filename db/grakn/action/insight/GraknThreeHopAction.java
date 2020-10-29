@@ -29,7 +29,7 @@ public class GraknThreeHopAction extends ThreeHopAction<GraknOperation> {
 
     @Override
     public List<String> run() {
-        return dbOperation.getOrderedAttribute(query(), COMPANY_NAME, null);
+        return dbOperation.sortedExecute(query(), COMPANY_NAME, null);
     }
 
     public static GraqlGet.Unfiltered query() {

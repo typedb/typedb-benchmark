@@ -19,7 +19,7 @@ public class Neo4jCitiesInContinentAction extends CitiesInContinentAction<Neo4jO
             put("continentName", city.country().continent().name());
             put("cityName", city.name());
         }};
-        return dbOperation.getOrderedAttribute(new Query(query(), parameters), "city.locationName", null);
+        return dbOperation.sortedExecute(new Query(query(), parameters), "city.locationName", null);
     }
 
     public static String query() {

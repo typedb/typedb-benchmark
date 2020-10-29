@@ -1,7 +1,6 @@
 package grakn.simulation.db.grakn.action.read;
 
 import grakn.simulation.db.common.action.read.ProductsInContinentAction;
-import grakn.simulation.db.common.driver.TransactionalDbOperation;
 import grakn.simulation.db.common.world.World;
 import grakn.simulation.db.grakn.driver.GraknOperation;
 import graql.lang.Graql;
@@ -26,7 +25,7 @@ public class GraknProductsInContinentAction extends ProductsInContinentAction<Gr
     @Override
     public List<Double> run() {
         GraqlGet.Unfiltered query = query(continent.name());
-        return dbOperation.getOrderedAttribute(query, PRODUCT_BARCODE, null);
+        return dbOperation.sortedExecute(query, PRODUCT_BARCODE, null);
     }
 
     public static GraqlGet.Unfiltered query(String continentName) {
