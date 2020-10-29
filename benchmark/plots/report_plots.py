@@ -20,9 +20,16 @@ def get_trace_overviews(json_data):
     return trace_overviews
 
 
+def get_json_url(commit_sha, analysis_id):
+    return f"https://grabl.io/api/data/jmsfltchr/simulation/{commit_sha}/analysis/performance-analysis?q=%7B%22id%22%3A%7B%22selected%22%3A%22{analysis_id}%22%7D,%22trace%22%3A%7B%22path%22%3A%5B%7B%22optional%22%3Atrue%7D%5D,%22tracker%22%3A%7B%22optional%22%3Atrue%7D,%22labels%22%3A%7B%22names%22%3A%5B%5D%7D,%22iteration%22%3A%7B%7D%7D%7D"
+
+
 if __name__ == "__main__":
-    grakn_overviews = get_trace_overviews(get_json(f"https://grabl.io/api/data/jmsfltchr/simulation/f5d088a5a3f5f993f5edef009e62b2da9ca57fca/analysis/performance-analysis?q=%7B%22id%22%3A%7B%22selected%22%3A%22389987581477393408%22%7D,%22trace%22%3A%7B%22path%22%3A%5B%7B%22optional%22%3Atrue%7D%5D,%22tracker%22%3A%7B%22optional%22%3Atrue%7D,%22labels%22%3A%7B%22names%22%3A%5B%5D%7D,%22iteration%22%3A%7B%7D%7D%7D"))
-    neo4j_overviews = get_trace_overviews(get_json(f"https://grabl.io/api/data/jmsfltchr/simulation/f5d088a5a3f5f993f5edef009e62b2da9ca57fca/analysis/performance-analysis?q=%7B%22id%22%3A%7B%22selected%22%3A%227339689722720291840%22%7D,%22trace%22%3A%7B%22path%22%3A%5B%7B%22optional%22%3Atrue%7D%5D,%22tracker%22%3A%7B%22optional%22%3Atrue%7D,%22labels%22%3A%7B%22names%22%3A%5B%5D%7D,%22iteration%22%3A%7B%7D%7D%7D"))
+    commit_sha = "c7692b8a98cb9c6b7f5048e36b6cabfd03b3433d"
+    neo4j_anaylsis_id = "2929622178614665216"
+    grakn_analysis_id = "5027489464949336064"
+    neo4j_overviews = get_trace_overviews(get_json(get_json_url(commit_sha, neo4j_anaylsis_id)))
+    grakn_overviews = get_trace_overviews(get_json(get_json_url(commit_sha, grakn_analysis_id)))
 
     grakn_color = [113/256, 87/256, 202/256]
     neo4j_color = [24/256, 127/256, 183/256]
