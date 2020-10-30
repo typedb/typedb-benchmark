@@ -1,3 +1,5 @@
+import collections
+
 from matplotlib import pyplot as plt
 from matplotlib.pyplot import tight_layout
 
@@ -9,6 +11,9 @@ def overview_chart(iterations, labels, x, width, capsize, bar_edgecolor, grakn_o
 
     SMALL_SIZE = 14
     MEDIUM_SIZE = 18
+
+    neo4j_overviews = sort_overviews(neo4j_overviews)
+    grakn_overviews = sort_overviews(grakn_overviews)
 
     for iteration, ax in zip(iterations, axs):
         neo4j_average = unwrap_overviews(neo4j_overviews, "average", labels, iteration)
@@ -50,10 +55,14 @@ def overview_chart(iterations, labels, x, width, capsize, bar_edgecolor, grakn_o
     plt.savefig(f'overview.{image_extension}')
 
 
+def sort_overviews(overviews):
+    return collections.OrderedDict(sorted(overviews.items()))
+
+
 def unwrap_overviews(overviews, metric, overviews_to_plot, iteration):
     values = []
     for overview_name in overviews_to_plot:
-        values.append(overviews.get(overview_name)[metric].get(str(iteration)))
+        values.append(overviews.get(overview_name)[metric].get(iteration))
     return values
 
 

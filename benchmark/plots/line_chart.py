@@ -3,7 +3,7 @@ from matplotlib import pyplot as plt
 
 def line_chart(agent_name, grakn_overviews, neo4j_overviews, grakn_color, neo4j_color, capsize, image_extension):
 
-    iterations = list(grakn_overviews.get(agent_name)['average'].keys())
+    iterations = list(int(iteration) for iteration in grakn_overviews.get(agent_name)['average'].keys())
 
     grakn_averages = unwrap_overviews_for_lines(agent_name, grakn_overviews, "average")
     grakn_error = unwrap_overviews_for_lines(agent_name, grakn_overviews, "standard-deviation")
