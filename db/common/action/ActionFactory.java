@@ -5,7 +5,7 @@ import grakn.simulation.db.common.action.read.CitiesInContinentAction;
 import grakn.simulation.db.common.action.read.CompaniesInContinentAction;
 import grakn.simulation.db.common.action.read.CompaniesInCountryAction;
 import grakn.simulation.db.common.action.insight.FindCurrentResidentsAction;
-import grakn.simulation.db.common.action.insight.FindResidentsAction;
+import grakn.simulation.db.common.action.insight.FindLivedInAction;
 import grakn.simulation.db.common.action.insight.FindSpecificMarriageAction;
 import grakn.simulation.db.common.action.insight.FindSpecificPersonAction;
 import grakn.simulation.db.common.action.insight.FindTransactionCurrencyAction;
@@ -75,7 +75,7 @@ public abstract class ActionFactory<DB_OPERATION extends DbOperation, DB_RETURN_
 
     public abstract MeanWageOfPeopleInWorldAction<DB_OPERATION> meanWageOfPeopleInWorldAction(DB_OPERATION dbOperation);
 
-    public abstract FindResidentsAction<DB_OPERATION> findResidentsAction(DB_OPERATION dbOperation);
+    public abstract FindLivedInAction<DB_OPERATION> findlivedInAction(DB_OPERATION dbOperation);
 
     public abstract FindCurrentResidentsAction<DB_OPERATION> findCurrentResidentsAction(DB_OPERATION dbOperation);
 

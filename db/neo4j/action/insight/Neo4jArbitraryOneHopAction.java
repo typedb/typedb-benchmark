@@ -19,6 +19,7 @@ public class Neo4jArbitraryOneHopAction extends ArbitraryOneHopAction<Neo4jOpera
     }
 
     public static String query() {
+//        TODO Needs to do inference to be equivalent to Grakn
         return "MATCH (person:Person {email: \"" + PERSON_EMAIL_FOR_QUERY + "\"})--(x)\n" +
                 "RETURN x";
     }

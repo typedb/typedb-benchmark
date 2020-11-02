@@ -22,7 +22,7 @@ agents:
     mode: RUN
   - name: "meanWage"
     mode: TRACE
-  - name: "findResidents"
+  - name: "findLivedIn"
     mode: TRACE
   - name: "findCurrentResidents"
     mode: TRACE

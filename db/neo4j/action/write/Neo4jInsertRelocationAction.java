@@ -27,7 +27,6 @@ public class Neo4jInsertRelocationAction extends InsertRelocationAction<Neo4jOpe
         // In either case, their old ResidentOf should be given an `endDate`, and they should have a new ResidentOf
         // alongside this relation
 
-        endPastResidencies(dbOperation, relocateeEmail, today);
         HashMap<String, Object> parameters = new HashMap<String, Object>(){{
             put("email", relocateeEmail);
             put("newCityName", relocationCityName);
@@ -39,23 +38,8 @@ public class Neo4jInsertRelocationAction extends InsertRelocationAction<Neo4jOpe
     public static String createRelocationQuery() {
         // Not making this ternary is losing the information of where the person if relocating from
         return "MATCH (person:Person {email: $email}), (newCity:City {locationName: $newCityName})\n" +
-                "CREATE (person)-[relocatedTo:RELOCATED_TO {relocationDate:$relocationDate}]->(newCity), " +
-                "(person)-[:RESIDENT_OF {startDate: $relocationDate, isCurrent: TRUE}]->(newCity)" +
+                "CREATE (person)-[relocatedTo:RELOCATED_TO {relocationDate:$relocationDate}]->(newCity)" +
                 "RETURN person.email, newCity.locationName, relocatedTo.relocationDate";
-    }
-
-    public static void endPastResidencies(Neo4jOperation dbOperation, String email, LocalDateTime today){
-        HashMap<String, Object> parameters = new HashMap<String, Object>(){{
-            put("email", email);
-            put("endDate", today);
-        }};
-        dbOperation.execute(new Query(endPastResidenciesQuery(), parameters));
-    }
-
-    public static String endPastResidenciesQuery() {
-        return "MATCH (person:Person {email: $email})-[residentOf:RESIDENT_OF]->(oldCity:City)\n" +
-                "WHERE NOT EXISTS (residentOf.endDate)\n" +
-                "SET residentOf.isCurrent = FALSE, residentOf.endDate = $endDate";
     }
 
     @Override

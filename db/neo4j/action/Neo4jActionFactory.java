@@ -7,7 +7,7 @@ import grakn.simulation.db.common.action.read.BirthsInCityAction;
 import grakn.simulation.db.common.action.read.CitiesInContinentAction;
 import grakn.simulation.db.common.action.read.CompaniesInContinentAction;
 import grakn.simulation.db.common.action.insight.FindCurrentResidentsAction;
-import grakn.simulation.db.common.action.insight.FindResidentsAction;
+import grakn.simulation.db.common.action.insight.FindLivedInAction;
 import grakn.simulation.db.common.action.insight.FindSpecificMarriageAction;
 import grakn.simulation.db.common.action.insight.FindSpecificPersonAction;
 import grakn.simulation.db.common.action.insight.FindTransactionCurrencyAction;
@@ -36,7 +36,7 @@ import grakn.simulation.db.neo4j.action.read.Neo4jCitiesInContinentAction;
 import grakn.simulation.db.neo4j.action.read.Neo4jCompaniesInContinentAction;
 import grakn.simulation.db.neo4j.action.read.Neo4jCompaniesInCountryAction;
 import grakn.simulation.db.neo4j.action.insight.Neo4jFindCurrentResidentsAction;
-import grakn.simulation.db.neo4j.action.insight.Neo4jFindResidentsAction;
+import grakn.simulation.db.neo4j.action.insight.Neo4jFindLivedInAction;
 import grakn.simulation.db.neo4j.action.insight.Neo4jFindSpecificMarriageAction;
 import grakn.simulation.db.neo4j.action.insight.Neo4jFindSpecificPersonAction;
 import grakn.simulation.db.neo4j.action.insight.Neo4jFindTransactionCurrencyAction;
@@ -162,8 +162,8 @@ public class Neo4jActionFactory extends ActionFactory<Neo4jOperation, Record> {
     }
 
     @Override
-    public FindResidentsAction<Neo4jOperation> findResidentsAction(Neo4jOperation dbOperation) {
-        return new Neo4jFindResidentsAction(dbOperation);
+    public FindLivedInAction<Neo4jOperation> findlivedInAction(Neo4jOperation dbOperation) {
+        return new Neo4jFindLivedInAction(dbOperation);
     }
 
     @Override

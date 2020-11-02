@@ -32,7 +32,6 @@ public class Neo4jInsertPersonAction extends InsertPersonAction<Neo4jOperation, 
             put(GENDER, gender);
             put(FORENAME, forename);
             put(SURNAME, surname);
-            put(IS_CURRENT, true);
         }};
         return Action.singleResult(dbOperation.execute(new Query(query(), parameters)));
 //        TODO Key constraints are possible with Neo4j Enterprise, and some constraints are supported in Community
@@ -47,8 +46,7 @@ public class Neo4jInsertPersonAction extends InsertPersonAction<Neo4jOperation, 
                 "gender: $gender, " +
                 "forename: $forename, " +
                 "surname: $surname" +
-                "})-[:BORN_IN]->(c)," +
-                "(person)-[:RESIDENT_OF {startDate: $dateOfBirth, isCurrent: $isCurrent}]->(c)" +
+                "})-[:BORN_IN]->(c)" +
                 "RETURN person.email, person.dateOfBirth, person.gender, person.forename, person.surname";
     }
 
