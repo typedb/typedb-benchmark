@@ -137,18 +137,13 @@ public class Neo4jActionFactory extends ActionFactory<Neo4jOperation, Record> {
     }
 
     @Override
-    public CompaniesInContinentAction<Neo4jOperation> companiesInContinentAction(Neo4jOperation dbOperation, World.Continent continent) {
-        return new Neo4jCompaniesInContinentAction(dbOperation, continent);
-    }
-
-    @Override
     public ProductsInContinentAction<Neo4jOperation> productsInContinentAction(Neo4jOperation dbOperation, World.Continent continent) {
         return new Neo4jProductsInContinentAction(dbOperation, continent);
     }
 
     @Override
-    public InsertTransactionAction<Neo4jOperation, Record> insertTransactionAction(Neo4jOperation dbOperation, World.Continent continent, Pair<Long, Double> transaction, Long sellerCompanyNumber, double value, int productQuantity, boolean isTaxable) {
-        return new Neo4jInsertTransactionAction(dbOperation, continent, transaction, sellerCompanyNumber, value, productQuantity, isTaxable);
+    public InsertTransactionAction<Neo4jOperation, Record> insertTransactionAction(Neo4jOperation dbOperation, World.Country country, Pair<Long, Double> transaction, Long sellerCompanyNumber, double value, int productQuantity, boolean isTaxable) {
+        return new Neo4jInsertTransactionAction(dbOperation, country, transaction, sellerCompanyNumber, value, productQuantity, isTaxable);
     }
 
     @Override

@@ -13,6 +13,7 @@ import java.util.HashMap;
 import static grakn.simulation.db.grakn.schema.Schema.COMPANY;
 import static grakn.simulation.db.grakn.schema.Schema.COMPANY_NUMBER;
 import static grakn.simulation.db.grakn.schema.Schema.CONTINENT;
+import static grakn.simulation.db.grakn.schema.Schema.COUNTRY;
 import static grakn.simulation.db.grakn.schema.Schema.IS_TAXABLE;
 import static grakn.simulation.db.grakn.schema.Schema.LOCATES;
 import static grakn.simulation.db.grakn.schema.Schema.LOCATES_LOCATED;
@@ -29,17 +30,17 @@ import static grakn.simulation.db.grakn.schema.Schema.VALUE;
 
 public class GraknInsertTransactionAction extends InsertTransactionAction<GraknOperation, ConceptMap> {
 
-    public GraknInsertTransactionAction(GraknOperation dbOperation, World.Continent continent, Pair<Long, Double> transaction, Long sellerCompanyNumber, double value, int productQuantity, boolean isTaxable) {
-        super(dbOperation, continent, transaction, sellerCompanyNumber, value, productQuantity, isTaxable);
+    public GraknInsertTransactionAction(GraknOperation dbOperation, World.Country country, Pair<Long, Double> transaction, Long sellerCompanyNumber, double value, int productQuantity, boolean isTaxable) {
+        super(dbOperation, country, transaction, sellerCompanyNumber, value, productQuantity, isTaxable);
     }
 
     @Override
     public ConceptMap run() {
-        GraqlInsert insertTransactionQuery = query(transaction, sellerCompanyNumber, continent.name(), value, productQuantity, isTaxable);
+        GraqlInsert insertTransactionQuery = query(transaction, sellerCompanyNumber, country.name(), value, productQuantity, isTaxable);
         return singleResult(dbOperation.execute(insertTransactionQuery));
     }
 
-    public static GraqlInsert query(Pair<Long, Double> transaction, Long sellerCompanyNumber, String continentName, double value, int productQuantity, boolean isTaxable) {
+    public static GraqlInsert query(Pair<Long, Double> transaction, Long sellerCompanyNumber, String countryName, double value, int productQuantity, boolean isTaxable) {
         return Graql.match(
                     Graql.var(PRODUCT)
                             .isa(PRODUCT)
@@ -48,8 +49,8 @@ public class GraknInsertTransactionAction extends InsertTransactionAction<GraknO
                             .has(COMPANY_NUMBER, transaction.getFirst()),
                     Graql.var("c-seller").isa(COMPANY)
                             .has(COMPANY_NUMBER, sellerCompanyNumber),
-                    Graql.var(CONTINENT).isa(CONTINENT)
-                            .has(LOCATION_NAME, continentName))
+                    Graql.var(COUNTRY).isa(COUNTRY)
+                            .has(LOCATION_NAME, countryName))
                     .insert(
                             Graql.var(TRANSACTION)
                                     .isa(TRANSACTION)
@@ -62,7 +63,7 @@ public class GraknInsertTransactionAction extends InsertTransactionAction<GraknO
                                     .has(IS_TAXABLE, isTaxable),
                             Graql.var(LOCATES)
                                     .isa(LOCATES)
-                                    .rel(LOCATES_LOCATION, Graql.var(CONTINENT))
+                                    .rel(LOCATES_LOCATION, Graql.var(COUNTRY))
                                     .rel(LOCATES_LOCATED, Graql.var(TRANSACTION))
                     );
     }
@@ -76,7 +77,7 @@ public class GraknInsertTransactionAction extends InsertTransactionAction<GraknO
             put(InsertTransactionActionField.VALUE, dbOperation.getOnlyAttributeOfThing(answer, TRANSACTION, VALUE));
             put(InsertTransactionActionField.PRODUCT_QUANTITY, dbOperation.getOnlyAttributeOfThing(answer, TRANSACTION, PRODUCT_QUANTITY));
             put(InsertTransactionActionField.IS_TAXABLE, dbOperation.getOnlyAttributeOfThing(answer, TRANSACTION, IS_TAXABLE));
-            put(InsertTransactionActionField.CONTINENT, dbOperation.getOnlyAttributeOfThing(answer, CONTINENT, LOCATION_NAME));
+            put(InsertTransactionActionField.COUNTRY, dbOperation.getOnlyAttributeOfThing(answer, COUNTRY, LOCATION_NAME));
         }};
     }
 }

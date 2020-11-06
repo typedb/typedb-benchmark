@@ -135,20 +135,15 @@ public class GraknActionFactory extends ActionFactory<GraknOperation, ConceptMap
     public InsertRelocationAction<GraknOperation, ConceptMap> insertRelocationAction(GraknOperation dbOperation, World.City city, LocalDateTime today, String residentEmail, String relocationCityName) {
         return new GraknInsertRelocationAction(dbOperation, city, today, residentEmail, relocationCityName);
     }
-
-    @Override
-    public CompaniesInContinentAction<GraknOperation> companiesInContinentAction(GraknOperation dbOperation, World.Continent continent) {
-        return new GraknCompaniesInContinentAction(dbOperation, continent);
-    }
-
+    
     @Override
     public ProductsInContinentAction<GraknOperation> productsInContinentAction(GraknOperation dbOperation, World.Continent continent) {
         return new GraknProductsInContinentAction(dbOperation, continent);
     }
 
     @Override
-    public InsertTransactionAction<GraknOperation, ConceptMap> insertTransactionAction(GraknOperation dbOperation, World.Continent continent, Pair<Long, Double> transaction, Long sellerCompanyNumber, double value, int productQuantity, boolean isTaxable) {
-        return new GraknInsertTransactionAction(dbOperation, continent, transaction, sellerCompanyNumber, value, productQuantity, isTaxable);
+    public InsertTransactionAction<GraknOperation, ConceptMap> insertTransactionAction(GraknOperation dbOperation, World.Country country, Pair<Long, Double> transaction, Long sellerCompanyNumber, double value, int productQuantity, boolean isTaxable) {
+        return new GraknInsertTransactionAction(dbOperation, country, transaction, sellerCompanyNumber, value, productQuantity, isTaxable);
     }
 
     @Override
