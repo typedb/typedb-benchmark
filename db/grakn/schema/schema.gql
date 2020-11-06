@@ -176,15 +176,14 @@ when {
 # Currency
 # --------------------------------------------------------
 
-#TODO This rule no longer works now that transactions are tied to continents not countries
-#transaction-currency-is-that-of-the-country sub rule,
-#when {
-#    $transaction isa transaction;
-#    $l(locates_located: $t, locates_location: $transaction-location) isa locates;
-#    $transaction-country isa country, has currency $currency;
-#}, then {
-#    $transaction has currency $currency;
-#};
+transaction-currency-is-that-of-the-country sub rule,
+when {
+    $transaction isa transaction;
+    $l(locates_located: $t, locates_location: $transaction-location) isa locates;
+    $transaction-country isa country, has currency $currency;
+}, then {
+    $transaction has currency $currency;
+};
 
 # --------------------------------------------------------
 # Friends and Family

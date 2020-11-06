@@ -18,9 +18,8 @@ public class Neo4jFindTransactionCurrencyAction extends FindTransactionCurrencyA
     }
 
     public static String query() {
-//        TODO Needs to do inference to be equivalent to Grakn
         return "" +
-                    "MATCH (transaction:Transaction)" +
-                    "RETURN transaction.currency";
+                "MATCH (transaction:Transaction), (country:Country {locationName: transaction.locationName})" +
+                "RETURN transaction.currency";
     }
 }
