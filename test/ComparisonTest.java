@@ -7,7 +7,7 @@ import grakn.simulation.db.neo4j.driver.Neo4jDriver;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import java.util.ArrayList;
+import java.util.Iterator;
 
 import static grakn.simulation.test.SimulationsForComparison.grakn;
 import static grakn.simulation.test.SimulationsForComparison.neo4j;
@@ -27,11 +27,13 @@ public class ComparisonTest {
                 Agent<?, Neo4jDriver, ?>.RegionalAgent.Report neo4jRegionReport = neo4jAgentReport.getRegionalAgentReport(tracker);
 
                 if (!graknRegionReport.equals(neo4jRegionReport)) {
-                    graknRegionReport.actionNames().forEach(actionName -> {
-                        ArrayList<Action<?, ?>.Report> graknActionReport = graknRegionReport.getActionReport(actionName);
-                        ArrayList<Action<?, ?>.Report> neo4jActionReport = neo4jRegionReport.getActionReport(actionName);
+                    Iterator<Action<?, ?>.Report> graknIter = graknRegionReport.getActionReportIterator();
+                    Iterator<Action<?, ?>.Report> neo4jIter = neo4jRegionReport.getActionReportIterator();
+                    while (graknIter.hasNext() && neo4jIter.hasNext()) {
+                        Action<?, ?>.Report graknActionReport = graknIter.next();
+                        Action<?, ?>.Report neo4jActionReport = neo4jIter.next();
                         assertEquals(graknActionReport, neo4jActionReport);
-                    });
+                    }
                 }
             });
         }

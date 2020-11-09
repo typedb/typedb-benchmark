@@ -16,14 +16,13 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static grabl.tracing.client.GrablTracingThreadStatic.contextOnThread;
-import static grabl.tracing.client.GrablTracingThreadStatic.traceOnThread;
 
 /**
  * Agent constructs regional agents of a given class and runs them in parallel, providing them with the appropriate
@@ -169,24 +168,20 @@ public abstract class Agent<REGION extends Region, DB_DRIVER extends DbDriver<DB
             ACTION_RETURN_TYPE actionAnswer;
             actionAnswer = Trace.trace(action::run, action.name(), trace);
             if (test) {
-                report.addActionReport(action.name(), action.report(actionAnswer));
+                report.addActionReport(action.report(actionAnswer));
             }
             return actionAnswer;
         }
 
         public class Report {
-            HashMap<String, ArrayList<Action<?, ?>.Report>> actionReports = new HashMap<>();
+            List<Action<?, ?>.Report> actionReports = new ArrayList<>();
 
-            public void addActionReport(String actionName, Action<?, ?>.Report actionReport) {
-                actionReports.computeIfAbsent(actionName, x -> new ArrayList<>()).add(actionReport);
+            public void addActionReport(Action<?, ?>.Report actionReport) {
+                actionReports.add(actionReport);
             }
 
-            public Set<String> actionNames() {
-                return actionReports.keySet();
-            }
-
-            public ArrayList<Action<?, ?>.Report> getActionReport(String actionName) {
-                return actionReports.get(actionName);
+            public Iterator<Action<?, ?>.Report> getActionReportIterator() {
+                return actionReports.iterator();
             }
         }
 
