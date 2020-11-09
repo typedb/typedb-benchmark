@@ -7,6 +7,7 @@ import grakn.simulation.db.common.driver.DbOperation;
 import grakn.simulation.db.common.utils.Pair;
 import grakn.simulation.db.common.driver.DbDriver;
 import grakn.simulation.db.common.driver.DbOperationFactory;
+import grakn.simulation.db.common.utils.Trace;
 import grakn.simulation.db.common.world.Region;
 import grakn.simulation.db.common.world.World;
 import grakn.simulation.utils.RandomSource;
@@ -130,13 +131,10 @@ public abstract class Agent<REGION extends Region, DB_DRIVER extends DbDriver<DB
         }
 
         protected Report runWithReport(DbOperationFactory<DB_OPERATION> dbOperationFactory, REGION region, SimulationContext simulationContext) {
-            if (trace) {
-                try (GrablTracingThreadStatic.ThreadTrace trace = traceOnThread(name())) {
-                    run(dbOperationFactory, region, simulationContext);
-                }
-            } else {
+            Trace.trace(() -> {
                 run(dbOperationFactory, region, simulationContext);
-            }
+                return null;
+            }, name(), trace);
             return report;
         }
 
@@ -169,13 +167,7 @@ public abstract class Agent<REGION extends Region, DB_DRIVER extends DbDriver<DB
 
         public <ACTION_RETURN_TYPE> ACTION_RETURN_TYPE runAction(Action<?, ACTION_RETURN_TYPE> action) {
             ACTION_RETURN_TYPE actionAnswer;
-            if (trace) {
-                try (GrablTracingThreadStatic.ThreadTrace trace = traceOnThread(action.name())) {
-                    actionAnswer = action.run();
-                }
-            } else {
-                actionAnswer = action.run();
-            }
+            actionAnswer = Trace.trace(action::run, action.name(), trace);
             if (test) {
                 report.addActionReport(action.name(), action.report(actionAnswer));
             }
