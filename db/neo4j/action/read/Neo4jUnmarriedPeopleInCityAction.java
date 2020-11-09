@@ -25,14 +25,21 @@ public class Neo4jUnmarriedPeopleInCityAction extends UnmarriedPeopleInCityActio
             put(GENDER, gender);
             put("dobOfAdults", dobOfAdults);
         }};
-        return dbOperation.sortedExecute(new Query(query(), parameters), "person." + EMAIL, null);
+        return dbOperation.sortedExecute(new Query(query(), parameters), "email", null);
     }
 
     public static String query() {
-        return "MATCH (person:Person {gender: $gender})-[residentOf:RESIDENT_OF]->(city:City {locationName: $locationName})\n" +
-                "WHERE datetime(person.dateOfBirth) <= datetime($dobOfAdults)\n" +
+        return "MATCH (person:Person {gender: $gender})-[:BORN_IN]->(city:City {locationName: $locationName})\n" +
+                "WHERE NOT (person)-[:RELOCATED_TO]->()\n" +
+                "AND datetime(person.dateOfBirth) <= datetime($dobOfAdults)\n" +
                 "AND NOT (person)-[:MARRIED_TO]-()\n" +
-                "AND NOT EXISTS (residentOf.endDate)\n" +
-                "RETURN person.email";
+                "RETURN person.email AS email\n" +
+                "UNION\n" +
+                "MATCH (person:Person)-[relocatedTo:RELOCATED_TO]->(city:City)\n" +
+                "WITH person, city, relocatedTo.relocationDate AS relocDate\n" +
+                "ORDER BY relocDate DESC\n" +
+                "WITH person.email AS email, collect(relocDate)[0] AS lastRelocDate, collect(city)[0] as lastCity\n" +
+                "WHERE lastCity.locationName = $locationName\n" +
+                "RETURN email;";
     }
 }
