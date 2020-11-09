@@ -2,9 +2,11 @@ import collections
 
 from matplotlib import pyplot as plt
 from matplotlib.pyplot import tight_layout
+import numpy as np
 
 
-def overview_chart(iterations, labels, x, width, capsize, bar_edgecolor, grakn_overviews, neo4j_overviews, grakn_color, neo4j_color, image_extension):
+def overview_chart(iterations, agents, capsize, bar_edgecolor, grakn_overviews, neo4j_overviews, grakn_color,
+                   neo4j_color, image_extension):
 
     fig, axs = plt.subplots(len(iterations), 1, sharex=True, figsize=(20, 10))
     first = True
@@ -12,27 +14,30 @@ def overview_chart(iterations, labels, x, width, capsize, bar_edgecolor, grakn_o
     SMALL_SIZE = 14
     MEDIUM_SIZE = 18
 
+    label_locations = np.arange(len(agents))
+    bar_width = 0.3  # the width of the bars
+
     neo4j_overviews = sort_overviews(neo4j_overviews)
     grakn_overviews = sort_overviews(grakn_overviews)
 
     for iteration, ax in zip(iterations, axs):
-        neo4j_average = unwrap_overviews(neo4j_overviews, "average", labels, iteration)
-        neo4j_error = unwrap_overviews(neo4j_overviews, "standard-deviation", labels, iteration)
-        grakn_average = unwrap_overviews(grakn_overviews, "average", labels, iteration)
-        grakn_error = unwrap_overviews(grakn_overviews, "standard-deviation", labels, iteration)
+        neo4j_average = unwrap_overviews(neo4j_overviews, "average", agents, iteration)
+        neo4j_error = unwrap_overviews(neo4j_overviews, "standard-deviation", agents, iteration)
+        grakn_average = unwrap_overviews(grakn_overviews, "average", agents, iteration)
+        grakn_error = unwrap_overviews(grakn_overviews, "standard-deviation", agents, iteration)
 
-        bars1 = ax.bar(x - width / 2,
+        bars1 = ax.bar(label_locations - bar_width / 2,
                        neo4j_average,
-                       width,
+                       bar_width,
                        yerr=neo4j_error,
                        capsize=capsize,
                        label='Neo4j',
                        color=neo4j_color,
                        edgecolor=bar_edgecolor)
 
-        bars2 = ax.bar(x + width / 2,
+        bars2 = ax.bar(label_locations + bar_width / 2,
                        grakn_average,
-                       width,
+                       bar_width,
                        yerr=grakn_error,
                        capsize=capsize,
                        label='Grakn',
@@ -40,11 +45,10 @@ def overview_chart(iterations, labels, x, width, capsize, bar_edgecolor, grakn_o
                        edgecolor=bar_edgecolor)
 
         # Add some text for labels, title and custom x-axis tick labels, etc.
-        # ax.set_ylabel('Time (ms)')
         ax.set_ylabel('Time (ms)', fontsize=MEDIUM_SIZE)
         ax.set_title(f'Time Taken to Execute Agents during Iteration {iteration}')
-        ax.set_xticks(x)
-        ax.set_xticklabels(strip_labels(labels), rotation=45, ha='right')
+        ax.set_xticks(label_locations)
+        ax.set_xticklabels(strip_labels(agents), rotation=45, ha='right')
         if first:
             ax.legend(loc='upper right')
             first = False
