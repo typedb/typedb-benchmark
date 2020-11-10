@@ -2,7 +2,6 @@ package grakn.simulation.db.grakn;
 
 import grakn.client.GraknClient;
 import grakn.client.GraknClient.Session;
-import grakn.client.GraknClient.Transaction;
 import grakn.simulation.config.Config;
 import grakn.simulation.db.common.TransactionalSimulation;
 import grakn.simulation.db.common.action.ActionFactory;
@@ -25,7 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
-public class GraknSimulation extends TransactionalSimulation<GraknOperation, Transaction, Session> {
+public class GraknSimulation extends TransactionalSimulation<GraknDriver, GraknOperation> {
 
     public GraknSimulation(GraknDriver driver, Map<String, Path> initialisationDataPaths, RandomSource randomSource, World world, List<Config.Agent> agentConfigs, Function<Integer, Boolean> iterationSamplingFunction, boolean test) {
         super(driver, initialisationDataPaths, randomSource, world, agentConfigs, iterationSamplingFunction, test);

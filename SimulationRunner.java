@@ -90,7 +90,7 @@ public class SimulationRunner {
 
         try {
             try (GrablTracing tracingIgnored = grablTracing(grablTracingUri, grablTracingOrganisation, grablTracingRepository, grablTracingCommit, grablTracingUsername, grablTracingToken, disableTracing)) {
-                Simulation<?> simulation;
+                Simulation<?, ?> simulation;
                 switch (dbName) {
                     case "grakn":
                         defaultUri = "localhost:48555";

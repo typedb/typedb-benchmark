@@ -25,6 +25,8 @@ public abstract class TransactionalDbDriver<TRANSACTION, SESSION, DB_OPERATION e
 
     public abstract SESSION session(String sessionKey);
 
+    public abstract void closeSessions();
+
     public abstract class Session {
         public abstract TRANSACTION tx();
     }

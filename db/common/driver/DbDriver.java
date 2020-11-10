@@ -23,8 +23,6 @@ public abstract class DbDriver<DB_OPERATION extends DbOperation> {
         }
     }
 
-    public abstract void closeConnections();
-
     public abstract void close();
 
     public abstract DbOperationFactory<DB_OPERATION> getDbOperationFactory(Region region, Logger logger);

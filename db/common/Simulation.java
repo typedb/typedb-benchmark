@@ -2,9 +2,9 @@ package grakn.simulation.db.common;
 
 import grakn.simulation.config.Config;
 import grakn.simulation.db.common.action.ActionFactory;
+import grakn.simulation.db.common.agent.AgentFactory;
 import grakn.simulation.db.common.agent.base.Agent;
 import grakn.simulation.db.common.agent.base.SimulationContext;
-import grakn.simulation.db.common.agent.AgentFactory;
 import grakn.simulation.db.common.driver.DbDriver;
 import grakn.simulation.db.common.driver.DbOperation;
 import grakn.simulation.db.common.world.World;
@@ -23,11 +23,11 @@ import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
-public abstract class Simulation<DB_OPERATION extends DbOperation> implements SimulationContext {
+public abstract class Simulation<DB_DRIVER extends DbDriver<DB_OPERATION>, DB_OPERATION extends DbOperation> implements SimulationContext {
 
     final static Logger LOG = LoggerFactory.getLogger(Simulation.class);
     private final List<Agent<?, DB_OPERATION>> agentList;
-    protected final DbDriver<DB_OPERATION> driver;
+    protected final DB_DRIVER driver;
     private final Random random;
     private final List<Config.Agent> agentConfigs;
     private final Function<Integer, Boolean> iterationSamplingFunction;
@@ -37,7 +37,7 @@ public abstract class Simulation<DB_OPERATION extends DbOperation> implements Si
 
     private int simulationStep = 1;
 
-    public Simulation(DbDriver<DB_OPERATION> driver, Map<String, Path> initialisationDataPaths, RandomSource randomSource, World world, List<Config.Agent> agentConfigs, Function<Integer, Boolean> iterationSamplingFunction, boolean test) {
+    public Simulation(DB_DRIVER driver, Map<String, Path> initialisationDataPaths, RandomSource randomSource, World world, List<Config.Agent> agentConfigs, Function<Integer, Boolean> iterationSamplingFunction, boolean test) {
         this.driver = driver;
         this.random = randomSource.startNewRandom();
         this.agentConfigs = agentConfigs;
@@ -51,9 +51,12 @@ public abstract class Simulation<DB_OPERATION extends DbOperation> implements Si
 
     protected List<Agent<?, DB_OPERATION>> agentListFromConfigs() {
         List<Agent<?, DB_OPERATION>> agents = new ArrayList<>();
+        ActionFactory<DB_OPERATION, ?> actionFactory = actionFactory();
+        AgentFactory<DB_OPERATION, ?> agentFactory = new AgentFactory<>(driver, actionFactory);
+
         for (Config.Agent agentConfig : agentConfigs) {
             if (agentConfig.getAgentMode().getRun()) {
-                Agent<?, DB_OPERATION> agent = new AgentFactory<>(driver, actionFactory()).get(agentConfig.getName());
+                Agent<?, DB_OPERATION> agent = agentFactory.get(agentConfig.getName());
                 agent.setTrace(agentConfig.getAgentMode().getTrace());
                 agents.add(agent);
             }
@@ -69,7 +72,7 @@ public abstract class Simulation<DB_OPERATION extends DbOperation> implements Si
 
         LOG.info("Simulation step: {}", simulationStep);
         report.clean();
-        for (Agent<?, DB_OPERATION> agent : agentList) {
+        for (Agent<?, ?> agent : agentList) {
             this.report.addAgentResult(agent.name(), agent.iterate(this, RandomSource.nextSource(random)));
         }
         closeIteration();  // We want to test opening new sessions each iteration.

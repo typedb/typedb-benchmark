@@ -38,7 +38,7 @@ public class GraknDriver extends TransactionalDbDriver<GraknClient.Transaction, 
     }
 
     @Override
-    public void closeConnections() {
+    public void closeSessions() {
         for (GraknClient.Session session : sessionMap.values()) {
             try (GrablTracingThreadStatic.ThreadTrace trace = traceOnThread(CLOSE_SESSION.getName())) {
                 session.close();
@@ -49,7 +49,7 @@ public class GraknDriver extends TransactionalDbDriver<GraknClient.Transaction, 
 
     @Override
     public void close() {
-        closeConnections();
+        closeSessions();
         try (GrablTracingThreadStatic.ThreadTrace trace = traceOnThread(CLOSE_CLIENT.getName())) {
             client.close();
         }

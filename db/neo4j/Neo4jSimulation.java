@@ -11,7 +11,6 @@ import grakn.simulation.db.neo4j.driver.Neo4jDriver;
 import grakn.simulation.db.neo4j.driver.Neo4jOperation;
 import grakn.simulation.db.neo4j.yaml_tool.Neo4jYAMLLoader;
 import grakn.simulation.utils.RandomSource;
-import org.neo4j.driver.Transaction;
 import org.neo4j.driver.Session;
 
 import java.io.FileNotFoundException;
@@ -20,7 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
-public class Neo4jSimulation extends TransactionalSimulation<Neo4jOperation, Transaction, Session> {
+public class Neo4jSimulation extends TransactionalSimulation<Neo4jDriver, Neo4jOperation> {
 
     public Neo4jSimulation(Neo4jDriver driver, Map<String, Path> initialisationDataPaths, RandomSource randomSource, World world, List<Config.Agent> agentConfigs, Function<Integer, Boolean> iterationSamplingFunction, boolean test) {
         super(driver, initialisationDataPaths, randomSource, world, agentConfigs, iterationSamplingFunction, test);
