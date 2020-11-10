@@ -18,7 +18,7 @@ import java.util.Random;
 
 public class TransactionAgent<DB_OPERATION extends DbOperation> extends CountryAgent<DB_OPERATION> {
 
-    public TransactionAgent(DbDriver dbDriver, ActionFactory<DB_OPERATION, ?> actionFactory) {
+    public TransactionAgent(DbDriver<DB_OPERATION> dbDriver, ActionFactory<DB_OPERATION, ?> actionFactory) {
         super(dbDriver, actionFactory);
     }
 

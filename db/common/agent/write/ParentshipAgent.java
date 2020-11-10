@@ -20,7 +20,7 @@ import java.util.Random;
 
 public class ParentshipAgent<DB_OPERATION extends DbOperation> extends CityAgent<DB_OPERATION> {
 
-    public ParentshipAgent(DbDriver dbDriver, ActionFactory<DB_OPERATION, ?> actionFactory) {
+    public ParentshipAgent(DbDriver<DB_OPERATION> dbDriver, ActionFactory<DB_OPERATION, ?> actionFactory) {
         super(dbDriver, actionFactory);
     }
 

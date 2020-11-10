@@ -18,7 +18,7 @@ import static grakn.simulation.db.common.agent.base.Allocation.allocate;
 
 public class EmploymentAgent<DB_OPERATION extends DbOperation> extends CityAgent<DB_OPERATION> {
 
-    public EmploymentAgent(DbDriver dbDriver, ActionFactory<DB_OPERATION, ?> actionFactory) {
+    public EmploymentAgent(DbDriver<DB_OPERATION> dbDriver, ActionFactory<DB_OPERATION, ?> actionFactory) {
         super(dbDriver, actionFactory);
     }
 

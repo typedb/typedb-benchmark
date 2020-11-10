@@ -13,7 +13,7 @@ import java.util.Random;
 
 public class CompanyAgent<DB_OPERATION extends DbOperation> extends CountryAgent<DB_OPERATION> {
 
-    public CompanyAgent(DbDriver dbDriver, ActionFactory<DB_OPERATION, ?> actionFactory) {
+    public CompanyAgent(DbDriver<DB_OPERATION> dbDriver, ActionFactory<DB_OPERATION, ?> actionFactory) {
         super(dbDriver, actionFactory);
     }
 

@@ -6,7 +6,7 @@ import grakn.simulation.db.common.driver.DbDriver;
 import grakn.simulation.db.common.driver.DbOperation;
 
 public class MeanWageAgent<DB_OPERATION extends DbOperation> extends WorldwideInsightAgent<DB_OPERATION> {
-    public MeanWageAgent(DbDriver dbDriver, ActionFactory<DB_OPERATION, ?> actionFactory) {
+    public MeanWageAgent(DbDriver<DB_OPERATION> dbDriver, ActionFactory<DB_OPERATION, ?> actionFactory) {
         super(dbDriver, actionFactory);
     }
 

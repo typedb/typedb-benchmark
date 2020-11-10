@@ -14,7 +14,7 @@ import java.util.Random;
 
 public class MarriageAgent<DB_OPERATION extends DbOperation> extends CityAgent<DB_OPERATION> {
 
-    public MarriageAgent(DbDriver dbDriver, ActionFactory<DB_OPERATION, ?> actionFactory) {
+    public MarriageAgent(DbDriver<DB_OPERATION> dbDriver, ActionFactory<DB_OPERATION, ?> actionFactory) {
         super(dbDriver, actionFactory);
     }
 

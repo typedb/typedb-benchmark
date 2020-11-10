@@ -17,7 +17,7 @@ import java.util.Random;
 
 public class RelocationAgent<DB_OPERATION extends DbOperation> extends CityAgent<DB_OPERATION> {
 
-    public RelocationAgent(DbDriver dbDriver, ActionFactory<DB_OPERATION, ?> actionFactory) {
+    public RelocationAgent(DbDriver<DB_OPERATION> dbDriver, ActionFactory<DB_OPERATION, ?> actionFactory) {
         super(dbDriver, actionFactory);
     }
 

@@ -8,7 +8,7 @@ import grakn.simulation.db.common.driver.DbOperation;
 public class FindCurrentResidentsAgent<DB_OPERATION extends DbOperation> extends WorldwideInsightAgent<DB_OPERATION> {
 
 
-    public FindCurrentResidentsAgent(DbDriver dbDriver, ActionFactory<DB_OPERATION, ?> actionFactory) {
+    public FindCurrentResidentsAgent(DbDriver<DB_OPERATION> dbDriver, ActionFactory<DB_OPERATION, ?> actionFactory) {
         super(dbDriver, actionFactory);
     }
 
