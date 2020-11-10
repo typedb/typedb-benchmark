@@ -32,18 +32,17 @@ import static grabl.tracing.client.GrablTracingThreadStatic.contextOnThread;
  * tracker from them.
  *
  * @param <REGION> The type of region used by the agent.
- * @param <DB_DRIVER> The database context used by the agent.
+ * @param <DB_OPERATION> The abstraction of database operations used by the agent.
  */
-// TODO: refactor out DB_DRIVER, replace with DbDriver<DB_OPERATION>
-public abstract class Agent<REGION extends Region, DB_DRIVER extends DbDriver<DB_OPERATION>, DB_OPERATION extends DbOperation> {
+public abstract class Agent<REGION extends Region, DB_OPERATION extends DbOperation> {
 
     private final Logger logger;
     private boolean trace = true;
-    private final DB_DRIVER dbDriver;
+    private final DbDriver<DB_OPERATION> dbDriver;
     private final ActionFactory<DB_OPERATION, ?> actionFactory;
     private final Report report = new Report();
 
-    protected Agent(DB_DRIVER dbDriver, ActionFactory<DB_OPERATION, ?> actionFactory) {
+    protected Agent(DbDriver<DB_OPERATION> dbDriver, ActionFactory<DB_OPERATION, ?> actionFactory) {
         this.dbDriver = dbDriver;
         this.actionFactory = actionFactory;
         logger = LoggerFactory.getLogger(this.getClass());

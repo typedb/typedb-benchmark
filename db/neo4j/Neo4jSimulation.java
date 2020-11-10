@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
-public class Neo4jSimulation extends TransactionalSimulation<Neo4jDriver, Neo4jOperation, Transaction, Session> {
+public class Neo4jSimulation extends TransactionalSimulation<Neo4jOperation, Transaction, Session> {
 
     public Neo4jSimulation(Neo4jDriver driver, Map<String, Path> initialisationDataPaths, RandomSource randomSource, World world, List<Config.Agent> agentConfigs, Function<Integer, Boolean> iterationSamplingFunction, boolean test) {
         super(driver, initialisationDataPaths, randomSource, world, agentConfigs, iterationSamplingFunction, test);

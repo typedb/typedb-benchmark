@@ -38,7 +38,7 @@ public class Neo4jDriver extends TransactionalDbDriver<org.neo4j.driver.Transact
     }
 
     @Override
-    public void closeSessions() {
+    public void closeConnections() {
         for (org.neo4j.driver.Session session : sessionMap.values()) {
             try (GrablTracingThreadStatic.ThreadTrace trace = traceOnThread(CLOSE_SESSION.getName())) {
                 session.close();
@@ -49,7 +49,7 @@ public class Neo4jDriver extends TransactionalDbDriver<org.neo4j.driver.Transact
 
     @Override
     public void close() {
-        closeSessions();
+        closeConnections();
         try (GrablTracingThreadStatic.ThreadTrace trace = traceOnThread(CLOSE_CLIENT.getName())) {
             driver.close();
         }

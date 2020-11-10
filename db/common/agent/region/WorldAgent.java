@@ -9,11 +9,9 @@ import grakn.simulation.db.common.world.World;
 import java.util.Collections;
 import java.util.List;
 
-import static java.util.stream.Collectors.toList;
+public abstract class WorldAgent<DB_OPERATION extends DbOperation> extends Agent<World, DB_OPERATION> {
 
-public abstract class WorldAgent<DB_DRIVER extends DbDriver<DB_OPERATION>, DB_OPERATION extends DbOperation> extends Agent<World, DB_DRIVER, DB_OPERATION> {
-
-    public WorldAgent(DB_DRIVER dbDriver, ActionFactory<DB_OPERATION, ?> actionFactory) {
+    public WorldAgent(DbDriver<DB_OPERATION> dbDriver, ActionFactory<DB_OPERATION, ?> actionFactory) {
         super(dbDriver, actionFactory);
     }
 

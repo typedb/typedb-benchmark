@@ -2,7 +2,6 @@ package grakn.simulation.db.common.agent.write;
 
 import grakn.simulation.db.common.agent.base.SimulationContext;
 import grakn.simulation.db.common.action.ActionFactory;
-import grakn.simulation.db.common.action.read.UnmarriedPeopleInCityAction;
 import grakn.simulation.db.common.agent.region.CityAgent;
 import grakn.simulation.db.common.driver.DbDriver;
 import grakn.simulation.db.common.driver.DbOperation;
@@ -13,9 +12,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Random;
 
-public class MarriageAgent<DB_DRIVER extends DbDriver<DB_OPERATION>, DB_OPERATION extends DbOperation> extends CityAgent<DB_DRIVER, DB_OPERATION> {
+public class MarriageAgent<DB_OPERATION extends DbOperation> extends CityAgent<DB_OPERATION> {
 
-    public MarriageAgent(DB_DRIVER dbDriver, ActionFactory<DB_OPERATION, ?> actionFactory) {
+    public MarriageAgent(DbDriver dbDriver, ActionFactory<DB_OPERATION, ?> actionFactory) {
         super(dbDriver, actionFactory);
     }
 

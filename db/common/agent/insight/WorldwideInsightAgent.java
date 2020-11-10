@@ -13,11 +13,10 @@ import java.util.Random;
 
 /**
  * Agent to perform a single action, where that action requires no parameters
- * @param <DB_DRIVER>
  * @param <DB_OPERATION>
  */
-public abstract class WorldwideInsightAgent<DB_DRIVER extends DbDriver<DB_OPERATION>, DB_OPERATION extends DbOperation> extends WorldAgent<DB_DRIVER, DB_OPERATION> {
-    public WorldwideInsightAgent(DB_DRIVER dbDriver, ActionFactory<DB_OPERATION, ?> actionFactory) {
+public abstract class WorldwideInsightAgent<DB_OPERATION extends DbOperation> extends WorldAgent<DB_OPERATION> {
+    public WorldwideInsightAgent(DbDriver<DB_OPERATION> dbDriver, ActionFactory<DB_OPERATION, ?> actionFactory) {
         super(dbDriver, actionFactory);
     }
 

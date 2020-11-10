@@ -10,9 +10,9 @@ import java.util.List;
 
 import static java.util.stream.Collectors.toList;
 
-public abstract class ContinentAgent<DB_DRIVER extends DbDriver<DB_OPERATION>, DB_OPERATION extends DbOperation> extends Agent<World.Continent, DB_DRIVER, DB_OPERATION> {
+public abstract class ContinentAgent<DB_OPERATION extends DbOperation> extends Agent<World.Continent, DB_OPERATION> {
 
-    public ContinentAgent(DB_DRIVER dbDriver, ActionFactory<DB_OPERATION, ?> actionFactory) {
+    public ContinentAgent(DbDriver<DB_OPERATION> dbDriver, ActionFactory<DB_OPERATION, ?> actionFactory) {
         super(dbDriver, actionFactory);
     }
 

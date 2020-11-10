@@ -10,9 +10,9 @@ import grakn.simulation.db.common.world.World;
 
 import java.util.Random;
 
-public class PersonBirthAgent<DB_DRIVER extends DbDriver<DB_OPERATION>, DB_OPERATION extends DbOperation> extends CityAgent<DB_DRIVER, DB_OPERATION> {
+public class PersonBirthAgent<DB_OPERATION extends DbOperation> extends CityAgent<DB_OPERATION> {
 
-    public PersonBirthAgent(DB_DRIVER dbDriver, ActionFactory<DB_OPERATION, ?> actionFactory) {
+    public PersonBirthAgent(DbDriver dbDriver, ActionFactory<DB_OPERATION, ?> actionFactory) {
         super(dbDriver, actionFactory);
     }
 

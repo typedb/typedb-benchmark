@@ -11,9 +11,9 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.Random;
 
-public class CompanyAgent<DB_DRIVER extends DbDriver<DB_OPERATION>, DB_OPERATION extends DbOperation> extends CountryAgent<DB_DRIVER, DB_OPERATION> {
+public class CompanyAgent<DB_OPERATION extends DbOperation> extends CountryAgent<DB_OPERATION> {
 
-    public CompanyAgent(DB_DRIVER dbDriver, ActionFactory<DB_OPERATION, ?> actionFactory) {
+    public CompanyAgent(DbDriver dbDriver, ActionFactory<DB_OPERATION, ?> actionFactory) {
         super(dbDriver, actionFactory);
     }
 

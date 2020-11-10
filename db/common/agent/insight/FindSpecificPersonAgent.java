@@ -5,8 +5,8 @@ import grakn.simulation.db.common.action.read.ReadAction;
 import grakn.simulation.db.common.driver.DbDriver;
 import grakn.simulation.db.common.driver.DbOperation;
 
-public class FindSpecificPersonAgent<DB_DRIVER extends DbDriver<DB_OPERATION>, DB_OPERATION extends DbOperation> extends WorldwideInsightAgent<DB_DRIVER, DB_OPERATION> {
-    public FindSpecificPersonAgent(DB_DRIVER dbDriver, ActionFactory<DB_OPERATION, ?> actionFactory) {
+public class FindSpecificPersonAgent<DB_OPERATION extends DbOperation> extends WorldwideInsightAgent<DB_OPERATION> {
+    public FindSpecificPersonAgent(DbDriver dbDriver, ActionFactory<DB_OPERATION, ?> actionFactory) {
         super(dbDriver, actionFactory);
     }
 

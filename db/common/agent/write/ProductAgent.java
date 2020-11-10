@@ -10,9 +10,9 @@ import grakn.simulation.db.common.world.World;
 
 import java.util.Random;
 
-public class ProductAgent<DB_DRIVER extends DbDriver<DB_OPERATION>, DB_OPERATION extends DbOperation> extends ContinentAgent<DB_DRIVER, DB_OPERATION> {
+public class ProductAgent<DB_OPERATION extends DbOperation> extends ContinentAgent<DB_OPERATION> {
 
-    public ProductAgent(DB_DRIVER dbDriver, ActionFactory<DB_OPERATION, ?> actionFactory) {
+    public ProductAgent(DbDriver dbDriver, ActionFactory<DB_OPERATION, ?> actionFactory) {
         super(dbDriver, actionFactory);
     }
 

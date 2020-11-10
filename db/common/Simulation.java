@@ -23,11 +23,11 @@ import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
-public abstract class Simulation<DB_DRIVER extends DbDriver<DB_OPERATION>, DB_OPERATION extends DbOperation> implements SimulationContext {
+public abstract class Simulation<DB_OPERATION extends DbOperation> implements SimulationContext {
 
     final static Logger LOG = LoggerFactory.getLogger(Simulation.class);
-    private final List<Agent<?, DB_DRIVER, DB_OPERATION>> agentList;
-    protected final DB_DRIVER driver;
+    private final List<Agent<?, DB_OPERATION>> agentList;
+    protected final DbDriver<DB_OPERATION> driver;
     private final Random random;
     private final List<Config.Agent> agentConfigs;
     private final Function<Integer, Boolean> iterationSamplingFunction;
@@ -37,7 +37,7 @@ public abstract class Simulation<DB_DRIVER extends DbDriver<DB_OPERATION>, DB_OP
 
     private int simulationStep = 1;
 
-    public Simulation(DB_DRIVER driver, Map<String, Path> initialisationDataPaths, RandomSource randomSource, World world, List<Config.Agent> agentConfigs, Function<Integer, Boolean> iterationSamplingFunction, boolean test) {
+    public Simulation(DbDriver<DB_OPERATION> driver, Map<String, Path> initialisationDataPaths, RandomSource randomSource, World world, List<Config.Agent> agentConfigs, Function<Integer, Boolean> iterationSamplingFunction, boolean test) {
         this.driver = driver;
         this.random = randomSource.startNewRandom();
         this.agentConfigs = agentConfigs;
@@ -49,11 +49,11 @@ public abstract class Simulation<DB_DRIVER extends DbDriver<DB_OPERATION>, DB_OP
         this.report = new Report();
     }
 
-    protected List<Agent<?, DB_DRIVER, DB_OPERATION>> agentListFromConfigs() {
-        List<Agent<?, DB_DRIVER, DB_OPERATION>> agents = new ArrayList<>();
+    protected List<Agent<?, DB_OPERATION>> agentListFromConfigs() {
+        List<Agent<?, DB_OPERATION>> agents = new ArrayList<>();
         for (Config.Agent agentConfig : agentConfigs) {
             if (agentConfig.getAgentMode().getRun()) {
-                Agent<?, DB_DRIVER, DB_OPERATION> agent = new AgentFactory<>(driver, actionFactory()).get(agentConfig.getName());
+                Agent<?, DB_OPERATION> agent = new AgentFactory<>(driver, actionFactory()).get(agentConfig.getName());
                 agent.setTrace(agentConfig.getAgentMode().getTrace());
                 agents.add(agent);
             }
@@ -69,7 +69,7 @@ public abstract class Simulation<DB_DRIVER extends DbDriver<DB_OPERATION>, DB_OP
 
         LOG.info("Simulation step: {}", simulationStep);
         report.clean();
-        for (Agent<?, DB_DRIVER, DB_OPERATION> agent : agentList) {
+        for (Agent<?, DB_OPERATION> agent : agentList) {
             this.report.addAgentResult(agent.name(), agent.iterate(this, RandomSource.nextSource(random)));
         }
         closeIteration();  // We want to test opening new sessions each iteration.
@@ -111,16 +111,16 @@ public abstract class Simulation<DB_DRIVER extends DbDriver<DB_OPERATION>, DB_OP
 
     public class Report {
 
-        private ConcurrentHashMap<String, Agent<?, DB_DRIVER, ?>.Report> agentReports = new ConcurrentHashMap<>();
+        private ConcurrentHashMap<String, Agent<?, ?>.Report> agentReports = new ConcurrentHashMap<>();
 
-        public void addAgentResult(String agentName, Agent<?, DB_DRIVER, ?>.Report agentReport) {
+        public void addAgentResult(String agentName, Agent<?, ?>.Report agentReport) {
             if (agentReport == null) {
                 throw new NullPointerException(String.format("The result returned from a %s agent was null", agentName));
             }
             agentReports.put(agentName, agentReport);
         }
 
-        public Agent<?, DB_DRIVER, ?>.Report getAgentReport(String agentName) {
+        public Agent<?, ?>.Report getAgentReport(String agentName) {
             return agentReports.get(agentName);
         }
 

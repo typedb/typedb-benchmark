@@ -15,9 +15,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Random;
 
-public class RelocationAgent<DB_DRIVER extends DbDriver<DB_OPERATION>, DB_OPERATION extends DbOperation> extends CityAgent<DB_DRIVER, DB_OPERATION> {
+public class RelocationAgent<DB_OPERATION extends DbOperation> extends CityAgent<DB_OPERATION> {
 
-    public RelocationAgent(DB_DRIVER dbDriver, ActionFactory<DB_OPERATION, ?> actionFactory) {
+    public RelocationAgent(DbDriver dbDriver, ActionFactory<DB_OPERATION, ?> actionFactory) {
         super(dbDriver, actionFactory);
     }
 

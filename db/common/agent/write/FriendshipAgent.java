@@ -12,9 +12,9 @@ import grakn.simulation.db.common.world.World;
 import java.util.List;
 import java.util.Random;
 
-public class FriendshipAgent<DB_DRIVER extends DbDriver<DB_OPERATION>, DB_OPERATION extends DbOperation> extends CityAgent<DB_DRIVER, DB_OPERATION> {
+public class FriendshipAgent<DB_OPERATION extends DbOperation> extends CityAgent<DB_OPERATION> {
 
-    public FriendshipAgent(DB_DRIVER dbDriver, ActionFactory<DB_OPERATION, ?> actionFactory) {
+    public FriendshipAgent(DbDriver dbDriver, ActionFactory<DB_OPERATION, ?> actionFactory) {
         super(dbDriver, actionFactory);
     }
 

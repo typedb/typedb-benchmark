@@ -11,9 +11,9 @@ import grakn.simulation.db.common.world.World;
 
 import java.util.Random;
 
-public class AgeUpdateAgent<DB_DRIVER extends DbDriver<DB_OPERATION>, DB_OPERATION extends DbOperation> extends CityAgent<DB_DRIVER, DB_OPERATION> {
+public class AgeUpdateAgent<DB_OPERATION extends DbOperation> extends CityAgent<DB_OPERATION> {
 
-    public AgeUpdateAgent(DB_DRIVER dbDriver, ActionFactory<DB_OPERATION, ?> actionFactory) {
+    public AgeUpdateAgent(DbDriver dbDriver, ActionFactory<DB_OPERATION, ?> actionFactory) {
         super(dbDriver, actionFactory);
     }
 

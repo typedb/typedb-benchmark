@@ -10,9 +10,9 @@ import java.util.List;
 
 import static java.util.stream.Collectors.toList;
 
-public abstract class CityAgent<DB_DRIVER extends DbDriver<DB_OPERATION>, DB_OPERATION extends DbOperation> extends Agent<World.City, DB_DRIVER, DB_OPERATION> {
+public abstract class CityAgent<DB_OPERATION extends DbOperation> extends Agent<World.City, DB_OPERATION> {
 
-    public CityAgent(DB_DRIVER dbDriver, ActionFactory<DB_OPERATION, ?> actionFactory) {
+    public CityAgent(DbDriver<DB_OPERATION> dbDriver, ActionFactory<DB_OPERATION, ?> actionFactory) {
         super(dbDriver, actionFactory);
     }
 
