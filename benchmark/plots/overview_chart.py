@@ -8,7 +8,7 @@ import numpy as np
 def overview_chart(iterations, agents, capsize, bar_edgecolor, grakn_overviews, neo4j_overviews, grakn_color,
                    neo4j_color, image_extension):
 
-    fig, axs = plt.subplots(len(iterations), 1, sharex=True, figsize=(20, 10))
+    fig, axs = plt.subplots(len(iterations), 1, sharex=True, figsize=(20, 20))
     first = True
 
     SMALL_SIZE = 14
