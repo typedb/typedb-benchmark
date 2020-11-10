@@ -137,17 +137,10 @@ Finds existing people and makes them employees of companies.
     }
 
     List<AgentSection> agentSections() {
-        String dummyString = "{}"
-        long dummyLong = 12345
-        double dummyDouble = 1.0
         String cityName = "{}"
-        String destinationCity = "{}"
-        String continentName = "{}"
         String email = "{}"
         long age = 5
         LocalDateTime dummyDate = LocalDateTime.of(0, 1, 1, 0, 0)
-        LocalDateTime earliestDate = LocalDateTime.of(0, 1, 1, 0, 0)
-        LocalDateTime relocationDate = LocalDateTime.of(0, 1, 1, 0, 0)
 
         List<AgentSection> agentSections = Arrays.asList(
                 new AgentSection(
@@ -217,20 +210,6 @@ Finds existing people and makes them employees of companies.
                                 Neo4jUpdateAgesOfPeopleInCityAction.query()
                         )
                 ),
-//                new AgentSection(
-//                        RelocationAgent.class,
-//                        Arrays.asList(
-//                                GraknResidentsInCityAction.query(cityName, earliestDate).toString(),
-//                                GraknCitiesInContinentAction.query(cityName, continentName).toString(),
-//                                GraknInsertRelocationAction.query(email, cityName, destinationCity, relocationDate).toString()
-//                        ),
-//                        Arrays.asList(
-//                                Neo4jResidentsInCityAction.query(),
-//                                Neo4jCitiesInContinentAction.query(),
-//                                Neo4jInsertRelocationAction.endPastResidenciesQuery(),
-//                                Neo4jInsertRelocationAction.createRelocationQuery()
-//                        )
-//                )
         )
         return agentSections
     }
