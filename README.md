@@ -69,7 +69,7 @@ Navigate to the `benchmark` package
 
 Requirements:
 - Python 3.6+
-- Those listed in `requirements.txt`
+- `pip install requirements.txt`
 
 Usage:
 ```
