@@ -10,7 +10,7 @@ import grakn.simulation.db.common.driver.DbOperationFactory;
 import grakn.simulation.db.common.utils.Trace;
 import grakn.simulation.db.common.world.Region;
 import grakn.simulation.db.common.world.World;
-import grakn.simulation.utils.RandomSource;
+import grakn.simulation.db.common.utils.RandomSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

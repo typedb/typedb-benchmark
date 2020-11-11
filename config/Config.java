@@ -4,14 +4,14 @@ import java.util.List;
 import java.util.function.Function;
 
 public class Config {
-    private final static long DEFAULT_RANDOM_SEED = 1;
+    private final static int DEFAULT_RANDOM_SEED = 1;
     private final static int DEFAULT_NUM_ITERATIONS = 10;
     private final static int DEFAULT_SCALE_FACTOR = 5;
     private final static String DEFAULT_DATABASE_NAME = "world";
 
     private List<Agent> agents;
     private TraceSampling traceSampling;
-    private long randomSeed = DEFAULT_RANDOM_SEED;
+    private int randomSeed = DEFAULT_RANDOM_SEED;
     private int iterations = DEFAULT_NUM_ITERATIONS;
     private int scaleFactor = DEFAULT_SCALE_FACTOR;
     private String databaseName = DEFAULT_DATABASE_NAME;
@@ -32,11 +32,11 @@ public class Config {
         this.traceSampling = traceSampling;
     }
 
-    public long getRandomSeed() {
+    public int getRandomSeed() {
         return randomSeed;
     }
 
-    public void setRandomSeed(long randomSeed) {
+    public void setRandomSeed(int randomSeed) {
         this.randomSeed = randomSeed;
     }
 

@@ -12,7 +12,6 @@ import grakn.simulation.db.grakn.action.GraknActionFactory;
 import grakn.simulation.db.grakn.driver.GraknDriver;
 import grakn.simulation.db.grakn.driver.GraknOperation;
 import grakn.simulation.db.grakn.yaml_tool.GraknYAMLLoader;
-import grakn.simulation.utils.RandomSource;
 import graql.lang.Graql;
 import graql.lang.query.GraqlDefine;
 
@@ -26,8 +25,8 @@ import java.util.function.Function;
 
 public class GraknSimulation extends TransactionalSimulation<GraknDriver, GraknOperation> {
 
-    public GraknSimulation(GraknDriver driver, Map<String, Path> initialisationDataPaths, RandomSource randomSource, World world, List<Config.Agent> agentConfigs, Function<Integer, Boolean> iterationSamplingFunction, boolean test) {
-        super(driver, initialisationDataPaths, randomSource, world, agentConfigs, iterationSamplingFunction, test);
+    public GraknSimulation(GraknDriver driver, Map<String, Path> initialisationDataPaths, int randomSeed, World world, List<Config.Agent> agentConfigs, Function<Integer, Boolean> iterationSamplingFunction, boolean test) {
+        super(driver, initialisationDataPaths, randomSeed, world, agentConfigs, iterationSamplingFunction, test);
     }
 
     @Override

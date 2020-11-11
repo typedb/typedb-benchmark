@@ -47,7 +47,6 @@ java_test(
         "//db/common/world",
         "//db/grakn",
         "//db/neo4j",
-        "//utils",
         "@maven//:ch_qos_logback_logback_classic",
         "@maven//:commons_cli_commons_cli",
         "@maven//:org_slf4j_slf4j_api",

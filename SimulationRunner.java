@@ -10,7 +10,6 @@ import grakn.simulation.db.grakn.GraknSimulation;
 import grakn.simulation.db.grakn.driver.GraknDriver;
 import grakn.simulation.db.neo4j.Neo4jSimulation;
 import grakn.simulation.db.neo4j.driver.Neo4jDriver;
-import grakn.simulation.utils.RandomSource;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
@@ -99,7 +98,7 @@ public class SimulationRunner {
                         simulation = new GraknSimulation(
                                 new GraknDriver(hostUri, "world"),
                                 initialisationDataFiles,
-                                new RandomSource(config.getRandomSeed()),
+                                config.getRandomSeed(),
                                 world,
                                 config.getAgents(),
                                 config.getTraceSampling().getSamplingFunction(),
@@ -113,7 +112,7 @@ public class SimulationRunner {
                         simulation = new Neo4jSimulation(
                                 new Neo4jDriver(hostUri),
                                 initialisationDataFiles,
-                                new RandomSource(config.getRandomSeed()),
+                                config.getRandomSeed(),
                                 world,
                                 config.getAgents(),
                                 config.getTraceSampling().getSamplingFunction(),

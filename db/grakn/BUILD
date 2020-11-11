@@ -20,7 +20,6 @@ java_library(
         "//db/common/world",
         "//db/common/yaml_tool",
         "//config:config",
-        "//utils",
         "@maven//:org_apache_commons_commons_csv",
         "@maven//:com_google_guava_guava",
         "@maven//:org_slf4j_slf4j_api",

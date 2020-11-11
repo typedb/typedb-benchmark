@@ -14,7 +14,6 @@ java_library(
         "//db/common/world",
         "//db/grakn",
         "//db/neo4j",
-        "//utils",
         "@graknlabs_grabl_tracing//client",
         "@maven//:ch_qos_logback_logback_classic",
         "@maven//:commons_cli_commons_cli",

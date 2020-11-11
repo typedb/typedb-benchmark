@@ -8,7 +8,7 @@ import grakn.simulation.db.common.agent.base.SimulationContext;
 import grakn.simulation.db.common.driver.DbDriver;
 import grakn.simulation.db.common.driver.DbOperation;
 import grakn.simulation.db.common.world.World;
-import grakn.simulation.utils.RandomSource;
+import grakn.simulation.db.common.utils.RandomSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,9 +37,9 @@ public abstract class Simulation<DB_DRIVER extends DbDriver<DB_OPERATION>, DB_OP
 
     private int simulationStep = 1;
 
-    public Simulation(DB_DRIVER driver, Map<String, Path> initialisationDataPaths, RandomSource randomSource, World world, List<Config.Agent> agentConfigs, Function<Integer, Boolean> iterationSamplingFunction, boolean test) {
+    public Simulation(DB_DRIVER driver, Map<String, Path> initialisationDataPaths, int randomSeed, World world, List<Config.Agent> agentConfigs, Function<Integer, Boolean> iterationSamplingFunction, boolean test) {
         this.driver = driver;
-        this.random = randomSource.startNewRandom();
+        this.random = new Random(randomSeed);
         this.agentConfigs = agentConfigs;
         this.iterationSamplingFunction = iterationSamplingFunction;
         this.world = world;

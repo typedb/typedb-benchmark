@@ -8,7 +8,6 @@ import grakn.simulation.db.grakn.GraknSimulation;
 import grakn.simulation.db.grakn.driver.GraknDriver;
 import grakn.simulation.db.neo4j.Neo4jSimulation;
 import grakn.simulation.db.neo4j.driver.Neo4jDriver;
-import grakn.simulation.utils.RandomSource;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
@@ -106,7 +105,7 @@ public class SimulationsForComparison {
         grakn = new GraknSimulation(
                 new GraknDriver(graknUri,"world"),
                 files,
-                new RandomSource(randomSeed),
+                randomSeed,
                 world,
                 agentConfigs,
                 samplingFunction,
@@ -119,7 +118,7 @@ public class SimulationsForComparison {
         neo4j = new Neo4jSimulation(
                 new Neo4jDriver(neo4jUri),
                 files,
-                new RandomSource(randomSeed),
+                randomSeed,
                 world,
                 agentConfigs,
                 samplingFunction,

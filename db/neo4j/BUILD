@@ -20,7 +20,6 @@ java_library(
         "//db/common/yaml_tool",
         "//db/common/utils",
         "//config:config",
-        "//utils",
         "@maven//:org_apache_commons_commons_csv",
         "@maven//:org_apache_commons_commons_lang3",
         "@neo4j//:org_neo4j_driver_neo4j_java_driver",
