@@ -33,7 +33,7 @@ java_test(
         "SimulationsForComparison.java",
     ],
     data = [
-        "//db/common/data",
+        "//common/data",
         "//db/grakn/data",
         "//db/grakn/schema:graql-schema",
         "//db/neo4j/data",
@@ -42,9 +42,9 @@ java_test(
     deps = [
         "//:simulation-lib",
         "//config",
-        "//db/common/agent",
-        "//db/common/action",
-        "//db/common/world",
+        "//common/agent",
+        "//common/action",
+        "//common/world",
         "//db/grakn",
         "//db/neo4j",
         "@maven//:ch_qos_logback_logback_classic",

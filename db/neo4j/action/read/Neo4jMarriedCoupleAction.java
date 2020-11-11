@@ -1,8 +1,8 @@
 package grakn.simulation.db.neo4j.action.read;
 
-import grakn.simulation.db.common.action.SpouseType;
-import grakn.simulation.db.common.action.read.MarriedCoupleAction;
-import grakn.simulation.db.common.world.World;
+import grakn.simulation.common.action.SpouseType;
+import grakn.simulation.common.action.read.MarriedCoupleAction;
+import grakn.simulation.common.world.World;
 import grakn.simulation.db.neo4j.driver.Neo4jOperation;
 import org.neo4j.driver.Query;
 import org.neo4j.driver.Record;

@@ -1,0 +1,67 @@
+package grakn.simulation.common.agent.write;
+
+import grakn.simulation.common.agent.base.SimulationContext;
+import grakn.simulation.common.action.ActionFactory;
+import grakn.simulation.common.action.read.CitiesInContinentAction;
+import grakn.simulation.common.action.read.ResidentsInCityAction;
+import grakn.simulation.common.agent.region.CityAgent;
+import grakn.simulation.common.agent.base.Allocation;
+import grakn.simulation.common.driver.DbDriver;
+import grakn.simulation.common.driver.DbOperation;
+import grakn.simulation.common.driver.DbOperationFactory;
+import grakn.simulation.common.world.World;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Random;
+
+public class RelocationAgent<DB_OPERATION extends DbOperation> extends CityAgent<DB_OPERATION> {
+
+    public RelocationAgent(DbDriver<DB_OPERATION> dbDriver, ActionFactory<DB_OPERATION, ?> actionFactory) {
+        super(dbDriver, actionFactory);
+    }
+
+    @Override
+    protected RegionalRelocationAgent getRegionalAgent(int simulationStep, String tracker, Random random, boolean test) {
+        return new RegionalRelocationAgent(simulationStep, tracker, random, test);
+    }
+
+    public class RegionalRelocationAgent extends RegionalAgent {
+        public RegionalRelocationAgent(int simulationStep, String tracker, Random random, boolean test) {
+            super(simulationStep, tracker, random, test);
+        }
+
+        @Override
+        protected void run(DbOperationFactory<DB_OPERATION> dbOperationFactory, World.City city, SimulationContext simulationContext) {
+        /*
+        Find people currently resident the city
+        Find other cities in the continent
+        Distribute the people among those cities via a relocation
+         */
+
+            LocalDateTime earliestDateOfResidencyToRelocate;
+            earliestDateOfResidencyToRelocate = simulationContext.today().minusYears(2);
+
+            List<String> residentEmails;
+            List<String> relocationCityNames;
+
+            try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker(), trace())) {
+                ResidentsInCityAction<?> residentsInCityAction = actionFactory().residentsInCityAction(dbOperation, city, simulationContext.world().getScaleFactor(), earliestDateOfResidencyToRelocate);
+                residentEmails = runAction(residentsInCityAction);
+            }
+            shuffle(residentEmails);
+
+            try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker(), trace())) {
+                CitiesInContinentAction<?> citiesInContinentAction = actionFactory().citiesInContinentAction(dbOperation, city);
+                relocationCityNames = runAction(citiesInContinentAction);
+            }
+
+            try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker(), trace())) {
+                Allocation.allocate(residentEmails, relocationCityNames, (residentEmail, relocationCityName) -> {
+                    runAction(actionFactory().insertRelocationAction(dbOperation, city, simulationContext.today(), residentEmail, relocationCityName));
+                });
+                dbOperation.save();
+            }
+        }
+    }
+}

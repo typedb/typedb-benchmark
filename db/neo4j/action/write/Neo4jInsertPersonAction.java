@@ -1,8 +1,8 @@
 package grakn.simulation.db.neo4j.action.write;
 
-import grakn.simulation.db.common.action.Action;
-import grakn.simulation.db.common.action.write.InsertPersonAction;
-import grakn.simulation.db.common.world.World;
+import grakn.simulation.common.action.Action;
+import grakn.simulation.common.action.write.InsertPersonAction;
+import grakn.simulation.common.world.World;
 import grakn.simulation.db.neo4j.driver.Neo4jOperation;
 import org.neo4j.driver.Query;
 import org.neo4j.driver.Record;
@@ -14,7 +14,6 @@ import static grakn.simulation.db.neo4j.schema.Schema.DATE_OF_BIRTH;
 import static grakn.simulation.db.neo4j.schema.Schema.EMAIL;
 import static grakn.simulation.db.neo4j.schema.Schema.FORENAME;
 import static grakn.simulation.db.neo4j.schema.Schema.GENDER;
-import static grakn.simulation.db.neo4j.schema.Schema.IS_CURRENT;
 import static grakn.simulation.db.neo4j.schema.Schema.LOCATION_NAME;
 import static grakn.simulation.db.neo4j.schema.Schema.SURNAME;
 

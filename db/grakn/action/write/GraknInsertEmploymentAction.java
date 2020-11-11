@@ -1,8 +1,8 @@
 package grakn.simulation.db.grakn.action.write;
 
 import grakn.client.answer.ConceptMap;
-import grakn.simulation.db.common.action.write.InsertEmploymentAction;
-import grakn.simulation.db.common.world.World;
+import grakn.simulation.common.action.write.InsertEmploymentAction;
+import grakn.simulation.common.world.World;
 import grakn.simulation.db.grakn.driver.GraknOperation;
 import graql.lang.Graql;
 import graql.lang.query.GraqlInsert;

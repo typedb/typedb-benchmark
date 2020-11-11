@@ -1,6 +1,6 @@
 package grakn.simulation.db.neo4j.action.insight;
 
-import grakn.simulation.db.common.action.insight.TwoHopAction;
+import grakn.simulation.common.action.insight.TwoHopAction;
 import grakn.simulation.db.neo4j.driver.Neo4jOperation;
 import org.neo4j.driver.Query;
 

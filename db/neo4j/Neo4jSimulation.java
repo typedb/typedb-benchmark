@@ -1,11 +1,11 @@
 package grakn.simulation.db.neo4j;
 
 import grakn.simulation.config.Config;
-import grakn.simulation.db.common.TransactionalSimulation;
-import grakn.simulation.db.common.action.ActionFactory;
-import grakn.simulation.db.common.world.World;
-import grakn.simulation.db.common.yaml_tool.YAMLException;
-import grakn.simulation.db.common.yaml_tool.YAMLLoader;
+import grakn.simulation.common.TransactionalSimulation;
+import grakn.simulation.common.action.ActionFactory;
+import grakn.simulation.common.world.World;
+import grakn.simulation.common.yaml_tool.YAMLException;
+import grakn.simulation.common.yaml_tool.YAMLLoader;
 import grakn.simulation.db.neo4j.action.Neo4jActionFactory;
 import grakn.simulation.db.neo4j.driver.Neo4jDriver;
 import grakn.simulation.db.neo4j.driver.Neo4jOperation;

@@ -1,7 +1,7 @@
 package grakn.simulation.db.neo4j.action.write;
 
-import grakn.simulation.db.common.action.write.InsertEmploymentAction;
-import grakn.simulation.db.common.world.World;
+import grakn.simulation.common.action.write.InsertEmploymentAction;
+import grakn.simulation.common.world.World;
 import grakn.simulation.db.neo4j.driver.Neo4jOperation;
 import org.neo4j.driver.Query;
 import org.neo4j.driver.Record;

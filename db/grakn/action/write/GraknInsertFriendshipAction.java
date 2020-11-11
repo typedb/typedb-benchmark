@@ -1,8 +1,8 @@
 package grakn.simulation.db.grakn.action.write;
 
 import grakn.client.answer.ConceptMap;
-import grakn.simulation.db.common.action.Action;
-import grakn.simulation.db.common.action.write.InsertFriendshipAction;
+import grakn.simulation.common.action.Action;
+import grakn.simulation.common.action.write.InsertFriendshipAction;
 import grakn.simulation.db.grakn.driver.GraknOperation;
 import graql.lang.Graql;
 import graql.lang.query.GraqlInsert;

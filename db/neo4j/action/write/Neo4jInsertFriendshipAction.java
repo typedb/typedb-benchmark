@@ -1,7 +1,7 @@
 package grakn.simulation.db.neo4j.action.write;
 
-import grakn.simulation.db.common.action.Action;
-import grakn.simulation.db.common.action.write.InsertFriendshipAction;
+import grakn.simulation.common.action.Action;
+import grakn.simulation.common.action.write.InsertFriendshipAction;
 import grakn.simulation.db.neo4j.driver.Neo4jOperation;
 import org.neo4j.driver.Query;
 import org.neo4j.driver.Record;

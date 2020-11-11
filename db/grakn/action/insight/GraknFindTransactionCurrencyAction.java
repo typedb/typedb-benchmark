@@ -1,6 +1,6 @@
 package grakn.simulation.db.grakn.action.insight;
 
-import grakn.simulation.db.common.action.insight.FindTransactionCurrencyAction;
+import grakn.simulation.common.action.insight.FindTransactionCurrencyAction;
 import grakn.simulation.db.grakn.driver.GraknOperation;
 import graql.lang.Graql;
 import graql.lang.query.GraqlGet;

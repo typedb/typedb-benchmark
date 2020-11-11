@@ -1,8 +1,8 @@
 package grakn.simulation.db.grakn.yaml_tool;
 
 import grakn.client.GraknClient;
-import grakn.simulation.db.common.yaml_tool.QueryTemplate;
-import grakn.simulation.db.common.yaml_tool.YAMLLoader;
+import grakn.simulation.common.yaml_tool.QueryTemplate;
+import grakn.simulation.common.yaml_tool.YAMLLoader;
 import graql.lang.Graql;
 import graql.lang.query.GraqlInsert;
 import org.apache.commons.csv.CSVParser;

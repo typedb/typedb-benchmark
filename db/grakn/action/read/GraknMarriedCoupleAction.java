@@ -1,9 +1,8 @@
 package grakn.simulation.db.grakn.action.read;
 
-import grakn.simulation.db.common.action.SpouseType;
-import grakn.simulation.db.common.action.read.MarriedCoupleAction;
-import grakn.simulation.db.common.driver.TransactionalDbOperation;
-import grakn.simulation.db.common.world.World;
+import grakn.simulation.common.action.SpouseType;
+import grakn.simulation.common.action.read.MarriedCoupleAction;
+import grakn.simulation.common.world.World;
 import grakn.simulation.db.grakn.driver.GraknOperation;
 import graql.lang.Graql;
 import graql.lang.query.GraqlGet;

@@ -1,7 +1,7 @@
 package grakn.simulation.db.neo4j.driver;
 
-import grakn.simulation.db.common.driver.LogWrapper;
-import grakn.simulation.db.common.driver.TransactionalDbOperation;
+import grakn.simulation.common.driver.LogWrapper;
+import grakn.simulation.common.driver.TransactionalDbOperation;
 import org.neo4j.driver.Query;
 import org.neo4j.driver.Record;
 import org.neo4j.driver.Result;
@@ -11,8 +11,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static grakn.simulation.db.common.driver.TransactionalDbDriver.TracingLabel.EXECUTE;
-import static grakn.simulation.db.common.driver.TransactionalDbDriver.TracingLabel.SORTED_EXECUTE;
+import static grakn.simulation.common.driver.TransactionalDbDriver.TracingLabel.EXECUTE;
+import static grakn.simulation.common.driver.TransactionalDbDriver.TracingLabel.SORTED_EXECUTE;
 
 public class Neo4jOperation extends TransactionalDbOperation {
 

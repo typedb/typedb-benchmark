@@ -1,6 +1,6 @@
 package grakn.simulation.db.neo4j.driver;
 
-import grakn.simulation.db.common.driver.TransactionalDbOperationFactory;
+import grakn.simulation.common.driver.TransactionalDbOperationFactory;
 import org.neo4j.driver.Session;
 import org.slf4j.Logger;
 

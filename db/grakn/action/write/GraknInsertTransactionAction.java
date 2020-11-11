@@ -1,9 +1,9 @@
 package grakn.simulation.db.grakn.action.write;
 
 import grakn.client.answer.ConceptMap;
-import grakn.simulation.db.common.action.write.InsertTransactionAction;
-import grakn.simulation.db.common.utils.Pair;
-import grakn.simulation.db.common.world.World;
+import grakn.simulation.common.action.write.InsertTransactionAction;
+import grakn.simulation.common.utils.Pair;
+import grakn.simulation.common.world.World;
 import grakn.simulation.db.grakn.driver.GraknOperation;
 import graql.lang.Graql;
 import graql.lang.query.GraqlInsert;
@@ -12,7 +12,6 @@ import java.util.HashMap;
 
 import static grakn.simulation.db.grakn.schema.Schema.COMPANY;
 import static grakn.simulation.db.grakn.schema.Schema.COMPANY_NUMBER;
-import static grakn.simulation.db.grakn.schema.Schema.CONTINENT;
 import static grakn.simulation.db.grakn.schema.Schema.COUNTRY;
 import static grakn.simulation.db.grakn.schema.Schema.IS_TAXABLE;
 import static grakn.simulation.db.grakn.schema.Schema.LOCATES;

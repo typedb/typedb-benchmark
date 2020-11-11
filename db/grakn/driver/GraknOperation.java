@@ -3,8 +3,8 @@ package grakn.simulation.db.grakn.driver;
 import grabl.tracing.client.GrablTracingThreadStatic;
 import grakn.client.GraknClient;
 import grakn.client.answer.ConceptMap;
-import grakn.simulation.db.common.driver.LogWrapper;
-import grakn.simulation.db.common.driver.TransactionalDbOperation;
+import grakn.simulation.common.driver.LogWrapper;
+import grakn.simulation.common.driver.TransactionalDbOperation;
 import graql.lang.query.GraqlDelete;
 import graql.lang.query.GraqlGet;
 import graql.lang.query.GraqlInsert;
@@ -15,8 +15,8 @@ import java.util.stream.Stream;
 
 import static com.google.common.collect.Iterables.getOnlyElement;
 import static grabl.tracing.client.GrablTracingThreadStatic.traceOnThread;
-import static grakn.simulation.db.common.driver.TransactionalDbDriver.TracingLabel.EXECUTE;
-import static grakn.simulation.db.common.driver.TransactionalDbDriver.TracingLabel.SORTED_EXECUTE;
+import static grakn.simulation.common.driver.TransactionalDbDriver.TracingLabel.EXECUTE;
+import static grakn.simulation.common.driver.TransactionalDbDriver.TracingLabel.SORTED_EXECUTE;
 
 public class GraknOperation extends TransactionalDbOperation {
 

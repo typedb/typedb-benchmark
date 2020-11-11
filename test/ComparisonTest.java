@@ -1,7 +1,7 @@
 package grakn.simulation.test;
 
-import grakn.simulation.db.common.action.Action;
-import grakn.simulation.db.common.agent.base.Agent;
+import grakn.simulation.common.action.Action;
+import grakn.simulation.common.agent.base.Agent;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 

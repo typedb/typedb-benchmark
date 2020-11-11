@@ -1,7 +1,7 @@
 package grakn.simulation.db.neo4j.yaml_tool;
 
-import grakn.simulation.db.common.yaml_tool.QueryTemplate;
-import grakn.simulation.db.common.yaml_tool.YAMLLoader;
+import grakn.simulation.common.yaml_tool.QueryTemplate;
+import grakn.simulation.common.yaml_tool.YAMLLoader;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import org.neo4j.driver.Query;

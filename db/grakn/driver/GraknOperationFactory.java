@@ -1,7 +1,7 @@
 package grakn.simulation.db.grakn.driver;
 
 import grakn.client.GraknClient;
-import grakn.simulation.db.common.driver.TransactionalDbOperationFactory;
+import grakn.simulation.common.driver.TransactionalDbOperationFactory;
 import org.slf4j.Logger;
 
 import static com.google.common.collect.Iterables.getOnlyElement;

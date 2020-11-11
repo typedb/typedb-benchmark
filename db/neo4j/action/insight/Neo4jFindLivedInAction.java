@@ -1,6 +1,6 @@
 package grakn.simulation.db.neo4j.action.insight;
 
-import grakn.simulation.db.common.action.insight.FindLivedInAction;
+import grakn.simulation.common.action.insight.FindLivedInAction;
 import grakn.simulation.db.neo4j.driver.Neo4jOperation;
 import org.neo4j.driver.Query;
 

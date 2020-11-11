@@ -4,8 +4,8 @@ import grabl.tracing.client.GrablTracing;
 import grabl.tracing.client.GrablTracingThreadStatic;
 import grakn.simulation.config.Config;
 import grakn.simulation.config.ConfigLoader;
-import grakn.simulation.db.common.Simulation;
-import grakn.simulation.db.common.world.World;
+import grakn.simulation.common.Simulation;
+import grakn.simulation.common.world.World;
 import grakn.simulation.db.grakn.GraknSimulation;
 import grakn.simulation.db.grakn.driver.GraknDriver;
 import grakn.simulation.db.neo4j.Neo4jSimulation;
@@ -28,7 +28,7 @@ import java.util.Optional;
 import static grabl.tracing.client.GrablTracing.tracing;
 import static grabl.tracing.client.GrablTracing.tracingNoOp;
 import static grabl.tracing.client.GrablTracing.withLogging;
-import static grakn.simulation.db.common.world.World.initialise;
+import static grakn.simulation.common.world.World.initialise;
 
 public class SimulationRunner {
 

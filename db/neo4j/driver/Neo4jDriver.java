@@ -1,9 +1,9 @@
 package grakn.simulation.db.neo4j.driver;
 
 import grabl.tracing.client.GrablTracingThreadStatic;
-import grakn.simulation.db.common.driver.DbOperationFactory;
-import grakn.simulation.db.common.driver.TransactionalDbDriver;
-import grakn.simulation.db.common.world.Region;
+import grakn.simulation.common.driver.DbOperationFactory;
+import grakn.simulation.common.driver.TransactionalDbDriver;
+import grakn.simulation.common.world.Region;
 import org.neo4j.driver.AuthTokens;
 import org.neo4j.driver.Driver;
 import org.neo4j.driver.GraphDatabase;
@@ -12,10 +12,10 @@ import org.slf4j.Logger;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static grabl.tracing.client.GrablTracingThreadStatic.traceOnThread;
-import static grakn.simulation.db.common.driver.TransactionalDbDriver.TracingLabel.CLOSE_CLIENT;
-import static grakn.simulation.db.common.driver.TransactionalDbDriver.TracingLabel.CLOSE_SESSION;
-import static grakn.simulation.db.common.driver.TransactionalDbDriver.TracingLabel.OPEN_CLIENT;
-import static grakn.simulation.db.common.driver.TransactionalDbDriver.TracingLabel.OPEN_SESSION;
+import static grakn.simulation.common.driver.TransactionalDbDriver.TracingLabel.CLOSE_CLIENT;
+import static grakn.simulation.common.driver.TransactionalDbDriver.TracingLabel.CLOSE_SESSION;
+import static grakn.simulation.common.driver.TransactionalDbDriver.TracingLabel.OPEN_CLIENT;
+import static grakn.simulation.common.driver.TransactionalDbDriver.TracingLabel.OPEN_SESSION;
 
 public class Neo4jDriver extends TransactionalDbDriver<org.neo4j.driver.Transaction, org.neo4j.driver.Session, Neo4jOperation> {
 

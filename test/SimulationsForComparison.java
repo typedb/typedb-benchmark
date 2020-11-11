@@ -3,7 +3,7 @@ package grakn.simulation.test;
 import grakn.simulation.config.AgentMode;
 import grakn.simulation.config.Config;
 import grakn.simulation.config.SamplingFunction;
-import grakn.simulation.db.common.world.World;
+import grakn.simulation.common.world.World;
 import grakn.simulation.db.grakn.GraknSimulation;
 import grakn.simulation.db.grakn.driver.GraknDriver;
 import grakn.simulation.db.neo4j.Neo4jSimulation;
@@ -26,7 +26,7 @@ import java.util.Objects;
 import java.util.function.Function;
 
 import static grakn.simulation.config.Config.Agent.ConstructAgentConfig;
-import static grakn.simulation.db.common.world.World.initialise;
+import static grakn.simulation.common.world.World.initialise;
 
 public class SimulationsForComparison {
     static final Neo4jSimulation neo4j;
@@ -67,7 +67,7 @@ public class SimulationsForComparison {
 
         List<String> dirPaths = new ArrayList<>();
         dirPaths.add("db/grakn/schema");
-        dirPaths.add("db/common/data");
+        dirPaths.add("common/data");
         dirPaths.add("db/grakn/schema");
         dirPaths.add("db/grakn/data");
         dirPaths.add("db/neo4j/data");

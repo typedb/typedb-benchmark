@@ -17,7 +17,7 @@ groovy_and_java_library(
     deps = [
         "//db/grakn",
         "//db/neo4j",
-        "//db/common/agent",
+        "//common/agent",
     ],
     data = [
         "templates/agent_section.tex",
