@@ -3,9 +3,9 @@ java_library(
     srcs = [
         "SimulationRunner.java",
     ],
-    resource_strip_prefix = "config/",
+    resource_strip_prefix = "conf/",
     resources = [
-        "config/logback.xml",
+        "conf/logback.xml",
     ],
     visibility = ["//visibility:public"],
     deps = [
