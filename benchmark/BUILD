@@ -16,7 +16,7 @@ groovy_and_java_library(
     visibility = ["//visibility:public"],
     deps = [
         "//grakn",
-        "//db/neo4j",
+        "//neo4j",
         "//common/agent",
     ],
     data = [

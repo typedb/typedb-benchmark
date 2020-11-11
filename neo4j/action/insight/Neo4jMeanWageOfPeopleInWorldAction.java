@@ -1,0 +1,29 @@
+package grakn.simulation.neo4j.action.insight;
+
+import grakn.simulation.common.action.insight.MeanWageOfPeopleInWorldAction;
+import grakn.simulation.neo4j.driver.Neo4jOperation;
+import org.neo4j.driver.Query;
+import org.neo4j.driver.Record;
+
+import java.util.List;
+
+import static com.google.common.collect.Iterables.getOnlyElement;
+
+public class Neo4jMeanWageOfPeopleInWorldAction extends MeanWageOfPeopleInWorldAction<Neo4jOperation> {
+
+    public Neo4jMeanWageOfPeopleInWorldAction(Neo4jOperation dbOperation) {
+        super(dbOperation);
+    }
+
+    @Override
+    public Double run() {
+        String template = query();
+        List<Record> records = dbOperation.execute(new Query(template));
+        return (Double) getOnlyElement(records).asMap().get("avg(employs.wage)");
+    }
+
+    public static String query() {
+        return "MATCH ()-[employs:EMPLOYS]->()\n" +
+                "RETURN avg(employs.wage)";
+    }
+}

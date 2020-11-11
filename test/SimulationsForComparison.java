@@ -6,8 +6,8 @@ import grakn.simulation.config.SamplingFunction;
 import grakn.simulation.common.world.World;
 import grakn.simulation.grakn.GraknSimulation;
 import grakn.simulation.grakn.driver.GraknDriver;
-import grakn.simulation.db.neo4j.Neo4jSimulation;
-import grakn.simulation.db.neo4j.driver.Neo4jDriver;
+import grakn.simulation.neo4j.Neo4jSimulation;
+import grakn.simulation.neo4j.driver.Neo4jDriver;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
@@ -70,7 +70,7 @@ public class SimulationsForComparison {
         dirPaths.add("common/data");
         dirPaths.add("grakn/schema");
         dirPaths.add("grakn/data");
-        dirPaths.add("db/neo4j/data");
+        dirPaths.add("neo4j/data");
 
         dirPaths.forEach(dirPath -> {
             Arrays.asList(Objects.requireNonNull(Paths.get(dirPath).toFile().listFiles())).forEach(file -> {

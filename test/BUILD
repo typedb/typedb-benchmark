@@ -36,7 +36,7 @@ java_test(
         "//common/data",
         "//grakn/data",
         "//grakn/schema:graql-schema",
-        "//db/neo4j/data",
+        "//neo4j/data",
     ],
     test_class = "grakn.simulation.test.ComparisonTest",
     deps = [
@@ -46,7 +46,7 @@ java_test(
         "//common/action",
         "//common/world",
         "//grakn",
-        "//db/neo4j",
+        "//neo4j",
         "@maven//:ch_qos_logback_logback_classic",
         "@maven//:commons_cli_commons_cli",
         "@maven//:org_slf4j_slf4j_api",
