@@ -5,7 +5,7 @@ java_library(
     ],
     resource_strip_prefix = "config/",
     resources = [
-        "config/logback.xml",
+        "//config:logback.xml",
     ],
     visibility = ["//visibility:public"],
     deps = [

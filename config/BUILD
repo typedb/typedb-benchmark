@@ -1,6 +1,7 @@
 exports_files([
     "config_big.yml",
     "config_small.yml",
+    "logback.xml",
 ])
 
 java_library(
