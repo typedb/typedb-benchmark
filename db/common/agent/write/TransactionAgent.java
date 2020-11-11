@@ -1,22 +1,22 @@
 package grakn.simulation.db.common.agent.write;
 
-import grakn.simulation.db.common.agent.base.SimulationContext;
 import grakn.simulation.db.common.action.ActionFactory;
-import grakn.simulation.db.common.action.read.CompaniesInContinentAction;
+import grakn.simulation.db.common.action.read.CompaniesInCountryAction;
 import grakn.simulation.db.common.action.read.ProductsInContinentAction;
-import grakn.simulation.db.common.agent.region.ContinentAgent;
 import grakn.simulation.db.common.agent.base.Allocation;
-import grakn.simulation.db.common.driver.DbOperation;
-import grakn.simulation.db.common.utils.Pair;
+import grakn.simulation.db.common.agent.base.SimulationContext;
+import grakn.simulation.db.common.agent.region.CountryAgent;
 import grakn.simulation.db.common.driver.DbDriver;
+import grakn.simulation.db.common.driver.DbOperation;
 import grakn.simulation.db.common.driver.DbOperationFactory;
+import grakn.simulation.db.common.utils.Pair;
 import grakn.simulation.db.common.world.World;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public class TransactionAgent<DB_DRIVER extends DbDriver<DB_OPERATION>, DB_OPERATION extends DbOperation> extends ContinentAgent<DB_DRIVER, DB_OPERATION> {
+public class TransactionAgent<DB_DRIVER extends DbDriver<DB_OPERATION>, DB_OPERATION extends DbOperation> extends CountryAgent<DB_DRIVER, DB_OPERATION> {
 
     public TransactionAgent(DB_DRIVER dbDriver, ActionFactory<DB_OPERATION, ?> actionFactory) {
         super(dbDriver, actionFactory);
@@ -33,18 +33,18 @@ public class TransactionAgent<DB_DRIVER extends DbDriver<DB_OPERATION>, DB_OPERA
         }
 
         @Override
-        protected void run(DbOperationFactory<DB_OPERATION> dbOperationFactory, World.Continent continent, SimulationContext simulationContext) {
+        protected void run(DbOperationFactory<DB_OPERATION> dbOperationFactory, World.Country country, SimulationContext simulationContext) {
             List<Long> companyNumbers;
 
             try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker(), trace())) {
-                CompaniesInContinentAction<?> companiesInContinentAction = actionFactory().companiesInContinentAction(dbOperation, continent);
+                CompaniesInCountryAction<DB_OPERATION> companiesInContinentAction = actionFactory().companiesInCountryAction(dbOperation, country, 100);
                 companyNumbers = runAction(companiesInContinentAction);
             }
             shuffle(companyNumbers);
 
             List<Double> productBarcodes;
             try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker(), trace())) {
-                ProductsInContinentAction<?> productsInContinentAction = actionFactory().productsInContinentAction(dbOperation, continent);
+                ProductsInContinentAction<?> productsInContinentAction = actionFactory().productsInContinentAction(dbOperation, country.continent());
                 productBarcodes = runAction(productsInContinentAction);
             }
 
@@ -66,7 +66,7 @@ public class TransactionAgent<DB_DRIVER extends DbDriver<DB_OPERATION>, DB_OPERA
                     double value = randomAttributeGenerator().boundRandomDouble(0.01, 10000.00);
                     int productQuantity = randomAttributeGenerator().boundRandomInt(1, 1000);
                     boolean isTaxable = randomAttributeGenerator().bool();
-                    runAction(actionFactory().insertTransactionAction(dbOperation, continent, transaction, sellerCompanyNumber, value, productQuantity, isTaxable));
+                    runAction(actionFactory().insertTransactionAction(dbOperation, country, transaction, sellerCompanyNumber, value, productQuantity, isTaxable));
                 });
                 dbOperation.save();
             }

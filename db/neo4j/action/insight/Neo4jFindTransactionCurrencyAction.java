@@ -19,7 +19,7 @@ public class Neo4jFindTransactionCurrencyAction extends FindTransactionCurrencyA
 
     public static String query() {
         return "" +
-                    "MATCH (transaction:Transaction)" +
-                    "RETURN transaction.currency";
+                "MATCH (transaction:Transaction), (country:Country {locationName: transaction.locationName})" +
+                "RETURN transaction.currency";
     }
 }

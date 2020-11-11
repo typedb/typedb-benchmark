@@ -4,7 +4,7 @@ import grakn.simulation.db.common.action.ActionFactory;
 import grakn.simulation.db.common.agent.base.Agent;
 import grakn.simulation.db.common.agent.insight.ArbitraryOneHopAgent;
 import grakn.simulation.db.common.agent.insight.FindCurrentResidentsAgent;
-import grakn.simulation.db.common.agent.insight.FindResidentsAgent;
+import grakn.simulation.db.common.agent.insight.FindLivedInAgent;
 import grakn.simulation.db.common.agent.insight.FindSpecificMarriageAgent;
 import grakn.simulation.db.common.agent.insight.FindSpecificPersonAgent;
 import grakn.simulation.db.common.agent.insight.FindTransactionCurrencyAgent;
@@ -79,8 +79,8 @@ public class AgentFactory<DB_DRIVER extends DbDriver<DB_OPERATION>, DB_OPERATION
         return new MeanWageAgent<>(dbDriver, actionFactory);
     }
 
-    public FindResidentsAgent<DB_DRIVER, DB_OPERATION> findResidents() {
-        return new FindResidentsAgent<>(dbDriver, actionFactory);
+    public FindLivedInAgent<DB_DRIVER, DB_OPERATION> findLivedIn() {
+        return new FindLivedInAgent<>(dbDriver, actionFactory);
     }
 
     public FindCurrentResidentsAgent<DB_DRIVER, DB_OPERATION> findCurrentResidents() {
@@ -139,8 +139,8 @@ public class AgentFactory<DB_DRIVER extends DbDriver<DB_OPERATION>, DB_OPERATION
                 return friendship();
             case "meanWage":
                 return meanWage();
-            case "findResidents":
-                return findResidents();
+            case "findLivedIn":
+                return findLivedIn();
             case "findCurrentResidents":
                 return findCurrentResidents();
             case "findTransactionCurrency":

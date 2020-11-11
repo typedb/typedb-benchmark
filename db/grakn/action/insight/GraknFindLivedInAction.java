@@ -1,6 +1,6 @@
 package grakn.simulation.db.grakn.action.insight;
 
-import grakn.simulation.db.common.action.insight.FindResidentsAction;
+import grakn.simulation.db.common.action.insight.FindLivedInAction;
 import grakn.simulation.db.grakn.driver.GraknOperation;
 import graql.lang.Graql;
 import graql.lang.query.GraqlGet;
@@ -15,8 +15,8 @@ import static grakn.simulation.db.grakn.schema.Schema.RESIDENCY;
 import static grakn.simulation.db.grakn.schema.Schema.RESIDENCY_LOCATION;
 import static grakn.simulation.db.grakn.schema.Schema.RESIDENCY_RESIDENT;
 
-public class GraknFindResidentsAction extends FindResidentsAction<GraknOperation> {
-    public GraknFindResidentsAction(GraknOperation dbOperation) {
+public class GraknFindLivedInAction extends FindLivedInAction<GraknOperation> {
+    public GraknFindLivedInAction(GraknOperation dbOperation) {
         super(dbOperation);
     }
 

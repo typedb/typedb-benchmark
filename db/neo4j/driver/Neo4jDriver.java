@@ -16,7 +16,6 @@ import static grakn.simulation.db.common.driver.TransactionalDbDriver.TracingLab
 import static grakn.simulation.db.common.driver.TransactionalDbDriver.TracingLabel.CLOSE_SESSION;
 import static grakn.simulation.db.common.driver.TransactionalDbDriver.TracingLabel.OPEN_CLIENT;
 import static grakn.simulation.db.common.driver.TransactionalDbDriver.TracingLabel.OPEN_SESSION;
-import static grakn.simulation.db.common.driver.TransactionalDbDriver.TracingLabel.OPEN_TRANSACTION;
 
 public class Neo4jDriver extends TransactionalDbDriver<org.neo4j.driver.Transaction, org.neo4j.driver.Session, Neo4jOperation> {
 

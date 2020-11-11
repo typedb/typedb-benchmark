@@ -4,4 +4,7 @@ java_library(
         "*.java",
     ]),
     visibility = ["//visibility:public"],
+    deps = [
+        "@graknlabs_grabl_tracing//client",
+    ],
 )

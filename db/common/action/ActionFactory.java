@@ -5,7 +5,7 @@ import grakn.simulation.db.common.action.read.CitiesInContinentAction;
 import grakn.simulation.db.common.action.read.CompaniesInContinentAction;
 import grakn.simulation.db.common.action.read.CompaniesInCountryAction;
 import grakn.simulation.db.common.action.insight.FindCurrentResidentsAction;
-import grakn.simulation.db.common.action.insight.FindResidentsAction;
+import grakn.simulation.db.common.action.insight.FindLivedInAction;
 import grakn.simulation.db.common.action.insight.FindSpecificMarriageAction;
 import grakn.simulation.db.common.action.insight.FindSpecificPersonAction;
 import grakn.simulation.db.common.action.insight.FindTransactionCurrencyAction;
@@ -67,15 +67,13 @@ public abstract class ActionFactory<DB_OPERATION extends DbOperation, DB_RETURN_
 
     public abstract InsertRelocationAction<DB_OPERATION, DB_RETURN_TYPE> insertRelocationAction(DB_OPERATION dbOperation, World.City city, LocalDateTime today, String residentEmail, String relocationCityName);
 
-    public abstract CompaniesInContinentAction<DB_OPERATION> companiesInContinentAction(DB_OPERATION dbOperation, World.Continent continent);
-
     public abstract ProductsInContinentAction<DB_OPERATION> productsInContinentAction(DB_OPERATION dbOperation, World.Continent continent);
 
-    public abstract InsertTransactionAction<DB_OPERATION, DB_RETURN_TYPE> insertTransactionAction(DB_OPERATION dbOperation, World.Continent continent, Pair<Long, Double> transaction, Long sellerCompanyNumber, double value, int productQuantity, boolean isTaxable);
+    public abstract InsertTransactionAction<DB_OPERATION, DB_RETURN_TYPE> insertTransactionAction(DB_OPERATION dbOperation, World.Country country, Pair<Long, Double> transaction, Long sellerCompanyNumber, double value, int productQuantity, boolean isTaxable);
 
     public abstract MeanWageOfPeopleInWorldAction<DB_OPERATION> meanWageOfPeopleInWorldAction(DB_OPERATION dbOperation);
 
-    public abstract FindResidentsAction<DB_OPERATION> findResidentsAction(DB_OPERATION dbOperation);
+    public abstract FindLivedInAction<DB_OPERATION> findlivedInAction(DB_OPERATION dbOperation);
 
     public abstract FindCurrentResidentsAction<DB_OPERATION> findCurrentResidentsAction(DB_OPERATION dbOperation);
 

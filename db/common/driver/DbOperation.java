@@ -1,10 +1,8 @@
 package grakn.simulation.db.common.driver;
 
-import grabl.tracing.client.GrablTracingThreadStatic;
+import grakn.simulation.db.common.utils.Trace;
 
 import java.util.function.Supplier;
-
-import static grabl.tracing.client.GrablTracingThreadStatic.traceOnThread;
 
 public abstract class DbOperation implements AutoCloseable {
 
@@ -20,12 +18,6 @@ public abstract class DbOperation implements AutoCloseable {
     public abstract void save();
 
     protected <T> T trace(Supplier<T> method, String traceName) {
-        if (trace) {
-            try (GrablTracingThreadStatic.ThreadTrace trace = traceOnThread(traceName)) {
-                return method.get();
-            }
-        } else {
-            return method.get();
-        }
+        return Trace.trace(method, traceName, trace);
     }
 }

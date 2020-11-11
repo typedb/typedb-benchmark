@@ -12,8 +12,8 @@ import java.util.HashMap;
 
 public class Neo4jInsertTransactionAction extends InsertTransactionAction<Neo4jOperation, Record> {
 
-    public Neo4jInsertTransactionAction(Neo4jOperation dbOperation, World.Continent continent, Pair<Long, Double> transaction, Long sellerCompanyNumber, double value, int productQuantity, boolean isTaxable) {
-        super(dbOperation, continent, transaction, sellerCompanyNumber, value, productQuantity, isTaxable);
+    public Neo4jInsertTransactionAction(Neo4jOperation dbOperation, World.Country country, Pair<Long, Double> transaction, Long sellerCompanyNumber, double value, int productQuantity, boolean isTaxable) {
+        super(dbOperation, country, transaction, sellerCompanyNumber, value, productQuantity, isTaxable);
     }
 
     @Override
@@ -22,7 +22,7 @@ public class Neo4jInsertTransactionAction extends InsertTransactionAction<Neo4jO
             put("barcode", transaction.getSecond());
             put("buyerNumber", transaction.getFirst());
             put("sellerNumber", sellerCompanyNumber);
-            put("continentName", continent.name());
+            put("countryName", country.name());
             put("value", value);
             put("productQuantity", productQuantity);
             put("isTaxable", isTaxable);
@@ -34,17 +34,17 @@ public class Neo4jInsertTransactionAction extends InsertTransactionAction<Neo4jO
         return "MATCH (product:Product {barcode: $barcode}),\n" +
                 "(buyer:Company {companyNumber: $buyerNumber}),\n" +
                 "(seller:Company {companyNumber: $sellerNumber}),\n" +
-                "(continent:Continent {locationName: $continentName})\n" +
+                "(country:Country {locationName: $countryName})\n" +
                 "CREATE (transaction:Transaction{\n" +
                 "   value: $value,\n" +
                 "   productQuantity: $productQuantity,\n" +
                 "   isTaxable: $isTaxable,\n" +
-                "   locationName: continent.locationName\n" + // This could be a relation, but would be inconsistent with how location is represented elsewhere
+                "   locationName: country.locationName\n" + // This could be a relation, but would be inconsistent with how location is represented elsewhere
                 "}),\n" +
                 "(transaction)-[:SELLER]->(seller)," +
                 "(transaction)-[:BUYER]->(buyer)," +
                 "(transaction)-[:MERCHANDISE]->(product)\n" +
-                "RETURN seller.companyNumber, buyer.companyNumber, product.barcode, transaction.value, transaction.productQuantity, transaction.isTaxable, continent.locationName";
+                "RETURN seller.companyNumber, buyer.companyNumber, product.barcode, transaction.value, transaction.productQuantity, transaction.isTaxable, country.locationName";
     }
 
     @Override
@@ -56,7 +56,7 @@ public class Neo4jInsertTransactionAction extends InsertTransactionAction<Neo4jO
             put(InsertTransactionActionField.VALUE, answer.asMap().get("transaction." + Schema.VALUE));
             put(InsertTransactionActionField.PRODUCT_QUANTITY, answer.asMap().get("transaction." + Schema.PRODUCT_QUANTITY));
             put(InsertTransactionActionField.IS_TAXABLE, answer.asMap().get("transaction." + Schema.IS_TAXABLE));
-            put(InsertTransactionActionField.CONTINENT, answer.asMap().get("continent." + Schema.LOCATION_NAME));
+            put(InsertTransactionActionField.COUNTRY, answer.asMap().get("country." + Schema.LOCATION_NAME));
 
         }};
     }

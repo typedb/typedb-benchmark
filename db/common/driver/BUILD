@@ -6,6 +6,7 @@ java_library(
     visibility = ["//visibility:public"],
     deps = [
         "//db/common/world",
+        "//db/common/utils",
         "@graknlabs_grabl_tracing//client",
         "@maven//:commons_cli_commons_cli",
         "@maven//:org_apache_commons_commons_csv",

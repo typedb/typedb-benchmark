@@ -22,12 +22,21 @@ public class Neo4jResidentsInCityAction extends ResidentsInCityAction<Neo4jOpera
             put("locationName", city.name());
             put("earliestDate", earliestDate);
         }};
-        return dbOperation.sortedExecute(new Query(template, parameters), "resident.email", numResidents);
+        return dbOperation.sortedExecute(new Query(template, parameters), "email", numResidents);
     }
 
     public static String query() {
-        return "MATCH (resident:Person)-[residentOf:RESIDENT_OF]->(city:City {locationName: $locationName})" +
-                "WHERE datetime(residentOf.startDate) <= datetime($earliestDate) AND NOT EXISTS (residentOf.endDate)\n" +
-                "RETURN resident.email";
+        return "MATCH (person:Person)-[:BORN_IN]->(city:City {locationName: $locationName})\n" +
+                "WHERE NOT (person)-[:RELOCATED_TO]->()\n" +
+                "AND datetime(person.dateOfBirth) <= datetime($earliestDate)\n" +
+                "RETURN person.email AS email\n" +
+                "UNION\n" +
+                "MATCH (person:Person)-[relocatedTo:RELOCATED_TO]->(city:City)\n" +
+                "WHERE datetime(relocatedTo.relocationDate) <= datetime($earliestDate)\n" +
+                "WITH person, city, relocatedTo.relocationDate AS relocDate\n" +
+                "ORDER BY relocDate DESC\n" +
+                "WITH person.email AS email, collect(relocDate)[0] AS lastRelocDate, collect(city)[0] as lastCity\n" +
+                "WHERE lastCity.locationName = $locationName\n" +
+                "RETURN email;";
     }
 }

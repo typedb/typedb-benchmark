@@ -154,9 +154,9 @@ Finds existing people and makes them employees of companies.
                         Neo4jFindCurrentResidentsAction.query()
                 ),
                 new AgentSection(
-                        FindResidentsAgent.class,
-                        GraknFindResidentsAction.query().toString(),
-                        Neo4jFindResidentsAction.query()
+                        FindLivedInAgent.class,
+                        GraknFindLivedInAction.query().toString(),
+                        Neo4jFindLivedInAction.query()
                 ),
                 new AgentSection(
                         FindSpecificMarriageAgent.class,

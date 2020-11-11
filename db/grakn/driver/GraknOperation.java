@@ -64,12 +64,6 @@ public class GraknOperation extends TransactionalDbOperation {
         }, SORTED_EXECUTE.getName());
     }
 
-    public int count(GraqlGet.Aggregate countQuery) {
-        throwIfClosed();
-        log.query(tracker, countQuery);
-        return getOnlyElement(transaction.execute(countQuery).get()).number().intValue();
-    }
-
     public void execute(GraqlDelete query) {
         log.query(tracker, query);
         trace(() -> transaction.execute(query).get(), EXECUTE.getName());
