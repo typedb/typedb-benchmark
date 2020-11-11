@@ -23,15 +23,19 @@ public class GraknCompaniesInCountryAction extends CompaniesInCountryAction<Grak
 
     @Override
     public List<Long> run() {
-        GraqlGet.Unfiltered companyNumbersQuery = Graql.match(
-                Graql.var(COUNTRY).isa(COUNTRY)
-                        .has(LOCATION_NAME, country.name()),
-                Graql.var(COMPANY).isa(COMPANY)
-                        .has(COMPANY_NUMBER, Graql.var(COMPANY_NUMBER)),
-                Graql.var(INCORPORATION).isa(INCORPORATION)
-                        .rel(INCORPORATION_INCORPORATED, Graql.var(COMPANY))
-                        .rel(INCORPORATION_INCORPORATING, Graql.var(COUNTRY))
-        ).get();
-        return dbOperation.getOrderedAttribute(companyNumbersQuery, COMPANY_NUMBER, numCompanies);
+        GraqlGet.Unfiltered companyNumbersQuery = query(country.name());
+        return dbOperation.sortedExecute(companyNumbersQuery, COMPANY_NUMBER, numCompanies);
+    }
+
+    public static GraqlGet.Unfiltered query(String countryName) {
+        return Graql.match(
+                    Graql.var(COUNTRY).isa(COUNTRY)
+                            .has(LOCATION_NAME, countryName),
+                    Graql.var(COMPANY).isa(COMPANY)
+                            .has(COMPANY_NUMBER, Graql.var(COMPANY_NUMBER)),
+                    Graql.var(INCORPORATION).isa(INCORPORATION)
+                            .rel(INCORPORATION_INCORPORATED, Graql.var(COMPANY))
+                            .rel(INCORPORATION_INCORPORATING, Graql.var(COUNTRY))
+            ).get();
     }
 }

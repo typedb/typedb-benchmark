@@ -26,22 +26,26 @@ public class GraknInsertProductAction extends InsertProductAction<GraknOperation
 
     @Override
     public ConceptMap run() {
-        GraqlInsert insertProductQuery = Graql.match(
-                Graql.var(CONTINENT)
-                        .isa(CONTINENT)
-                        .has(LOCATION_NAME, continent.name())
-        ).insert(
-                Graql.var(PRODUCT)
-                        .isa(PRODUCT)
-                        .has(PRODUCT_BARCODE, barcode)
-                        .has(PRODUCT_NAME, productName)
-                        .has(PRODUCT_DESCRIPTION, productDescription),
-                Graql.var(PRODUCED_IN)
-                        .isa(PRODUCED_IN)
-                        .rel(PRODUCED_IN_PRODUCT, Graql.var(PRODUCT))
-                        .rel(PRODUCED_IN_CONTINENT, Graql.var(CONTINENT))
-        );
+        GraqlInsert insertProductQuery = query(continent.name(), barcode, productName, productDescription);
         return singleResult(dbOperation.execute(insertProductQuery));
+    }
+
+    public static GraqlInsert query(String continentName, Double barcode, String productName, String productDescription) {
+        return Graql.match(
+                    Graql.var(CONTINENT)
+                            .isa(CONTINENT)
+                            .has(LOCATION_NAME, continentName)
+            ).insert(
+                    Graql.var(PRODUCT)
+                            .isa(PRODUCT)
+                            .has(PRODUCT_BARCODE, barcode)
+                            .has(PRODUCT_NAME, productName)
+                            .has(PRODUCT_DESCRIPTION, productDescription),
+                    Graql.var(PRODUCED_IN)
+                            .isa(PRODUCED_IN)
+                            .rel(PRODUCED_IN_PRODUCT, Graql.var(PRODUCT))
+                            .rel(PRODUCED_IN_CONTINENT, Graql.var(CONTINENT))
+            );
     }
 
     @Override

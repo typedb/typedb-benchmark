@@ -15,13 +15,14 @@ public class Neo4jCompaniesInContinentAction extends CompaniesInContinentAction<
 
     @Override
     public List<Long> run() {
-        String template = "" +
-                "MATCH (company:Company)-[:INCORPORATED_IN]->(country:Country)-[:LOCATED_IN]->(continent:Continent {locationName: $continentName})\n" +
-                "RETURN company.companyNumber";
-
         HashMap<String, Object> parameters = new HashMap<String, Object>(){{
             put("continentName", continent.name());
         }};
-        return dbOperation.getOrderedAttribute(new Query(template, parameters), "company.companyNumber", null);
+        return dbOperation.sortedExecute(new Query(query(), parameters), "company.companyNumber", null);
+    }
+
+    public static String query() {
+        return "MATCH (company:Company)-[:INCORPORATED_IN]->(country:Country)-[:LOCATED_IN]->(continent:Continent {locationName: $continentName})\n" +
+                "RETURN company.companyNumber";
     }
 }

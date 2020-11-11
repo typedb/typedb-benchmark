@@ -1,7 +1,6 @@
 package grakn.simulation.db.grakn.action.read;
 
 import grakn.simulation.db.common.action.read.BirthsInCityAction;
-import grakn.simulation.db.common.driver.TransactionalDbOperation;
 import grakn.simulation.db.common.world.World;
 import grakn.simulation.db.grakn.driver.GraknOperation;
 import graql.lang.Graql;
@@ -26,16 +25,20 @@ public class GraknBirthsInCityAction extends BirthsInCityAction<GraknOperation> 
 
     @Override
     public List<String> run() {
-        GraqlGet.Unfiltered childrenQuery = Graql.match(
-                Graql.var("c").isa(CITY)
-                        .has(LOCATION_NAME, worldCity.name()),
-                Graql.var("child").isa(PERSON)
-                        .has(EMAIL, Graql.var(EMAIL))
-                        .has(DATE_OF_BIRTH, today),
-                Graql.var("bi").isa(BORN_IN)
-                        .rel(BORN_IN_PLACE_OF_BIRTH, "c")
-                        .rel(BORN_IN_CHILD, "child")
-        ).get();
-        return dbOperation.getOrderedAttribute(childrenQuery, EMAIL, null);
+        GraqlGet.Unfiltered childrenQuery = query(worldCity.name(), today);
+        return dbOperation.sortedExecute(childrenQuery, EMAIL, null);
+    }
+
+    public static GraqlGet.Unfiltered query(String worldCityName, LocalDateTime today) {
+        return Graql.match(
+                    Graql.var("c").isa(CITY)
+                            .has(LOCATION_NAME, worldCityName),
+                    Graql.var("child").isa(PERSON)
+                            .has(EMAIL, Graql.var(EMAIL))
+                            .has(DATE_OF_BIRTH, today),
+                    Graql.var("bi").isa(BORN_IN)
+                            .rel(BORN_IN_PLACE_OF_BIRTH, "c")
+                            .rel(BORN_IN_CHILD, "child")
+            ).get();
     }
 }

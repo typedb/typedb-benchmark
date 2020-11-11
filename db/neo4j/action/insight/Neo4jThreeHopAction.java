@@ -13,10 +13,12 @@ public class Neo4jThreeHopAction extends ThreeHopAction<Neo4jOperation> {
 
     @Override
     public List<String> run() {
-        String query = "" +
-                "MATCH (city:City {locationName: \"London\"})<-[:BORN_IN]-(child:Person)-[:CHILD_OF]->(parent:Person)\n" +
-                "<-[:EMPLOYS]-(company:Company)" +
+        return dbOperation.sortedExecute(new Query(query()), "company.companyName", null);
+    }
+
+    public static String query() {
+        return "MATCH (city:City {locationName: \"London\"})<-[:BORN_IN]-(child:Person)-[:CHILD_OF]->(parent:Person)" +
+                "<-[:EMPLOYS]-(company:Company)\n" +
                 "RETURN company.companyName";
-        return dbOperation.getOrderedAttribute(new Query(query), "company.companyName", null);
     }
 }

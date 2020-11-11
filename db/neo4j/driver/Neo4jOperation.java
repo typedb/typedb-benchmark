@@ -1,7 +1,5 @@
 package grakn.simulation.db.neo4j.driver;
 
-import grabl.tracing.client.GrablTracingThreadStatic;
-import grakn.simulation.db.common.driver.DbOperation;
 import grakn.simulation.db.common.driver.LogWrapper;
 import grakn.simulation.db.common.driver.TransactionalDbOperation;
 import org.neo4j.driver.Query;
@@ -15,29 +13,27 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static grabl.tracing.client.GrablTracingThreadStatic.traceOnThread;
 import static grakn.simulation.db.common.driver.TransactionalDbDriver.TracingLabel.EXECUTE;
 import static grakn.simulation.db.common.driver.TransactionalDbDriver.TracingLabel.OPEN_TRANSACTION;
-import static grakn.simulation.db.common.driver.TransactionalDbDriver.TracingLabel.STREAM_AND_SORT;
+import static grakn.simulation.db.common.driver.TransactionalDbDriver.TracingLabel.SORTED_EXECUTE;
 
 public class Neo4jOperation extends TransactionalDbOperation {
 
     private final Session session;
     private final LogWrapper log;
-    private org.neo4j.driver.Transaction tx;
-    private final List<Query> queries = new ArrayList<Query>();
+    private final List<Query> queries = new ArrayList<>();
 
-    public Neo4jOperation(Session session, LogWrapper log, String tracker) {
-        super(tracker);
+    private org.neo4j.driver.Transaction tx;
+
+    public Neo4jOperation(Session session, LogWrapper log, String tracker, boolean trace) {
+        super(tracker, trace);
         this.session = session;
         this.log = log;
         this.tx = newTransaction();
     }
 
     private org.neo4j.driver.Transaction newTransaction() {
-        try (GrablTracingThreadStatic.ThreadTrace trace = traceOnThread(OPEN_TRANSACTION.getName())) {
-            return session.beginTransaction();
-        }
+        return trace(session::beginTransaction, OPEN_TRANSACTION.getName());
     }
 
     @Override
@@ -90,24 +86,21 @@ public class Neo4jOperation extends TransactionalDbOperation {
     public List<Record> execute(Query query) {
         addQuery(query);
         log.query(tracker, query);
-        try (GrablTracingThreadStatic.ThreadTrace trace = traceOnThread(EXECUTE.getName())) {
-            return tx.run(query).list();
-        }
+        return trace(() -> tx.run(query).list(), EXECUTE.getName());
     }
 
-    public <T> List<T> getOrderedAttribute(Query query, String attributeName, Integer limit) {
+    public <T> List<T> sortedExecute(Query query, String attributeName, Integer limit) {
         List<T> result;
         log.query(tracker, query);
-        try (GrablTracingThreadStatic.ThreadTrace trace = traceOnThread(STREAM_AND_SORT.getName())) {
+        return trace(() -> {
             Stream<T> answerStream = execute(query).stream()
                     .map(record -> (T) record.asMap().get(attributeName))
                     .sorted();
             if (limit != null) {
                 answerStream = answerStream.limit(limit);
             }
-            result = answerStream.collect(Collectors.toList());
-        }
-        return result;
+            return answerStream.collect(Collectors.toList());
+        }, SORTED_EXECUTE.getName());
     }
 
     public int count(Query countQuery) {

@@ -1,5 +1,6 @@
-package grakn.simulation.db.common.action.read;
+package grakn.simulation.db.common.action.write;
 
+import grakn.simulation.db.common.action.read.ReadAction;
 import grakn.simulation.db.common.driver.DbOperation;
 import grakn.simulation.db.common.world.World;
 

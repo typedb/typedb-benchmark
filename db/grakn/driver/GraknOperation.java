@@ -16,17 +16,17 @@ import java.util.stream.Stream;
 import static com.google.common.collect.Iterables.getOnlyElement;
 import static grabl.tracing.client.GrablTracingThreadStatic.traceOnThread;
 import static grakn.simulation.db.common.driver.TransactionalDbDriver.TracingLabel.EXECUTE;
-import static grakn.simulation.db.common.driver.TransactionalDbDriver.TracingLabel.STREAM_AND_SORT;
+import static grakn.simulation.db.common.driver.TransactionalDbDriver.TracingLabel.SORTED_EXECUTE;
 
 public class GraknOperation extends TransactionalDbOperation {
-    // This class wraps a grakn transaction
-    boolean closed = false;
 
     private final GraknClient.Transaction transaction;
     private final LogWrapper log;
 
-    public GraknOperation(GraknClient.Session session, LogWrapper log, String tracker) {
-        super(tracker);
+    boolean closed = false;
+
+    public GraknOperation(GraknClient.Session session, LogWrapper log, String tracker, boolean trace) {
+        super(tracker, trace);
         this.transaction = session.transaction(GraknClient.Transaction.Type.WRITE);
         this.log = log;
     }
@@ -50,20 +50,18 @@ public class GraknOperation extends TransactionalDbOperation {
         }
     }
 
-    public <T> List<T> getOrderedAttribute(GraqlGet query, String attributeName, Integer limit){
+    public <T> List<T> sortedExecute(GraqlGet query, String attributeName, Integer limit){
         throwIfClosed();
-        List<T> result;
         log.query(tracker, query);
-        try (GrablTracingThreadStatic.ThreadTrace trace = traceOnThread(STREAM_AND_SORT.getName())) {
+        return trace(() -> {
             Stream<T> answerStream = transaction.stream(query).get()
                     .map(conceptMap -> (T) conceptMap.get(attributeName).asAttribute().value())
                     .sorted();
             if (limit != null) {
                 answerStream = answerStream.limit(limit);
             }
-            result = answerStream.collect(Collectors.toList());
-        }
-        return result;
+            return answerStream.collect(Collectors.toList());
+        }, SORTED_EXECUTE.getName());
     }
 
     public int count(GraqlGet.Aggregate countQuery) {
@@ -74,9 +72,7 @@ public class GraknOperation extends TransactionalDbOperation {
 
     public void execute(GraqlDelete query) {
         log.query(tracker, query);
-        try (GrablTracingThreadStatic.ThreadTrace trace = traceOnThread(EXECUTE.getName())) {
-            transaction.execute(query).get();
-        }
+        trace(() -> transaction.execute(query).get(), EXECUTE.getName());
     }
 
     public List<ConceptMap> execute(GraqlInsert query) {

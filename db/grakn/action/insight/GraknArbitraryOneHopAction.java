@@ -18,11 +18,14 @@ public class GraknArbitraryOneHopAction extends ArbitraryOneHopAction<GraknOpera
 
     @Override
     public Integer run() {
-        GraqlGet.Unfiltered query = Graql.match(
-                Graql.var(PERSON).isa(PERSON).has(EMAIL, PERSON_EMAIL_FOR_QUERY),
-                Graql.var().rel(Graql.var(PERSON), Graql.var("x"))
-        ).get("x");
-        List<ConceptMap> results = dbOperation.execute(query);
+        List<ConceptMap> results = dbOperation.execute(query());
         return null;
+    }
+
+    public static GraqlGet.Unfiltered query() {
+        return Graql.match(
+                    Graql.var(PERSON).isa(PERSON).has(EMAIL, PERSON_EMAIL_FOR_QUERY),
+                    Graql.var().rel(Graql.var(PERSON), Graql.var("x"))
+            ).get("x");
     }
 }

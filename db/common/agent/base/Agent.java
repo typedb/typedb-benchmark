@@ -38,7 +38,7 @@ import static grabl.tracing.client.GrablTracingThreadStatic.traceOnThread;
 public abstract class Agent<REGION extends Region, DB_DRIVER extends DbDriver<DB_OPERATION>, DB_OPERATION extends DbOperation> {
 
     private final Logger logger;
-    private boolean traceAgent = true;
+    private boolean trace = true;
     private final DB_DRIVER dbDriver;
     private final ActionFactory<DB_OPERATION, ?> actionFactory;
     private final Report report = new Report();
@@ -54,7 +54,11 @@ public abstract class Agent<REGION extends Region, DB_DRIVER extends DbDriver<DB
     }
 
     public void setTrace(boolean trace) {
-        traceAgent = trace;
+        this.trace = trace;
+    }
+
+    public boolean trace() {
+        return trace;
     }
 
     abstract protected List<REGION> getRegions(World world);
@@ -102,9 +106,6 @@ public abstract class Agent<REGION extends Region, DB_DRIVER extends DbDriver<DB
         }
     }
 
-    ///////////////////
-    // RegionalAgent //
-    ///////////////////
 
     // TODO: Rename this to Regional, as well as the other Regional agents
     public abstract class RegionalAgent implements AutoCloseable {
@@ -119,7 +120,7 @@ public abstract class Agent<REGION extends Region, DB_DRIVER extends DbDriver<DB
             this.tracker = tracker;
             this.random = random;
             this.test = test;
-            if (traceAgent) {
+            if (trace) {
                 context = contextOnThread(tracker(), simulationStep);
             }
         }
@@ -129,21 +130,17 @@ public abstract class Agent<REGION extends Region, DB_DRIVER extends DbDriver<DB
         }
 
         protected Report runWithReport(DbOperationFactory<DB_OPERATION> dbOperationFactory, REGION region, SimulationContext simulationContext) {
-            run(dbOperationFactory, region, simulationContext);
+            if (trace) {
+                try (GrablTracingThreadStatic.ThreadTrace trace = traceOnThread(name())) {
+                    run(dbOperationFactory, region, simulationContext);
+                }
+            } else {
+                run(dbOperationFactory, region, simulationContext);
+            }
             return report;
         }
 
         protected abstract void run(DbOperationFactory<DB_OPERATION> dbOperationFactory, REGION region, SimulationContext simulationContext);
-
-        void runWithTracing(DbOperationFactory<DB_OPERATION> dbOperationFactory, REGION region, SimulationContext simulationContext) {
-            try (GrablTracingThreadStatic.ThreadTrace trace = traceOnThread(this.name())) {
-                runWithReport(dbOperationFactory, region, simulationContext);
-            }
-        }
-
-        public String name() {
-            return this.getClass().getSimpleName();
-        }
 
         public <U> U pickOne(List<U> list) { // TODO can be a util
             return list.get(random().nextInt(list.size()));
@@ -172,7 +169,11 @@ public abstract class Agent<REGION extends Region, DB_DRIVER extends DbDriver<DB
 
         public <ACTION_RETURN_TYPE> ACTION_RETURN_TYPE runAction(Action<?, ACTION_RETURN_TYPE> action) {
             ACTION_RETURN_TYPE actionAnswer;
-            try (GrablTracingThreadStatic.ThreadTrace trace = traceOnThread(action.name())) {
+            if (trace) {
+                try (GrablTracingThreadStatic.ThreadTrace trace = traceOnThread(action.name())) {
+                    actionAnswer = action.run();
+                }
+            } else {
                 actionAnswer = action.run();
             }
             if (test) {

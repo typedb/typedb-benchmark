@@ -18,8 +18,20 @@ public class Neo4jInsertTransactionAction extends InsertTransactionAction<Neo4jO
 
     @Override
     public Record run() {
-        String template = "" +
-                "MATCH (product:Product {barcode: $barcode}),\n" +
+        HashMap<String, Object> parameters = new HashMap<String, Object>(){{
+            put("barcode", transaction.getSecond());
+            put("buyerNumber", transaction.getFirst());
+            put("sellerNumber", sellerCompanyNumber);
+            put("continentName", continent.name());
+            put("value", value);
+            put("productQuantity", productQuantity);
+            put("isTaxable", isTaxable);
+        }};
+        return singleResult(dbOperation.execute(new Query(query(), parameters)));
+    }
+
+    public static String query() {
+        return "MATCH (product:Product {barcode: $barcode}),\n" +
                 "(buyer:Company {companyNumber: $buyerNumber}),\n" +
                 "(seller:Company {companyNumber: $sellerNumber}),\n" +
                 "(continent:Continent {locationName: $continentName})\n" +
@@ -33,16 +45,6 @@ public class Neo4jInsertTransactionAction extends InsertTransactionAction<Neo4jO
                 "(transaction)-[:BUYER]->(buyer)," +
                 "(transaction)-[:MERCHANDISE]->(product)\n" +
                 "RETURN seller.companyNumber, buyer.companyNumber, product.barcode, transaction.value, transaction.productQuantity, transaction.isTaxable, continent.locationName";
-        HashMap<String, Object> parameters = new HashMap<String, Object>(){{
-            put("barcode", transaction.getSecond());
-            put("buyerNumber", transaction.getFirst());
-            put("sellerNumber", sellerCompanyNumber);
-            put("continentName", continent.name());
-            put("value", value);
-            put("productQuantity", productQuantity);
-            put("isTaxable", isTaxable);
-        }};
-        return singleResult(dbOperation.execute(new Query(template, parameters)));
     }
 
     @Override

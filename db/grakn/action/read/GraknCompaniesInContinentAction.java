@@ -1,7 +1,6 @@
 package grakn.simulation.db.grakn.action.read;
 
 import grakn.simulation.db.common.action.read.CompaniesInContinentAction;
-import grakn.simulation.db.common.driver.TransactionalDbOperation;
 import grakn.simulation.db.common.world.World;
 import grakn.simulation.db.grakn.driver.GraknOperation;
 import graql.lang.Graql;
@@ -26,17 +25,21 @@ public class GraknCompaniesInContinentAction extends CompaniesInContinentAction<
 
     @Override
     public List<Long> run() {
-        GraqlGet.Unfiltered query = Graql.match(
-                Graql.var(CONTINENT).isa(CONTINENT)
-                        .has(LOCATION_NAME, continent.name()),
-                Graql.var(LOCATION_HIERARCHY).isa(LOCATION_HIERARCHY).rel(COUNTRY).rel(CONTINENT),
-                Graql.var(COUNTRY).isa(COUNTRY),
-                Graql.var(COMPANY).isa(COMPANY)
-                        .has(COMPANY_NUMBER, Graql.var(COMPANY_NUMBER)),
-                Graql.var(INCORPORATION).isa(INCORPORATION)
-                        .rel(INCORPORATION_INCORPORATED, Graql.var(COMPANY))
-                        .rel(INCORPORATION_INCORPORATING, Graql.var(COUNTRY))
-        ).get();
-        return dbOperation.getOrderedAttribute(query, COMPANY_NUMBER, null);
+        GraqlGet.Unfiltered query = query(continent.name());
+        return dbOperation.sortedExecute(query, COMPANY_NUMBER, null);
+    }
+
+    public static GraqlGet.Unfiltered query(String continentName) {
+        return Graql.match(
+                    Graql.var(CONTINENT).isa(CONTINENT)
+                            .has(LOCATION_NAME, continentName),
+                    Graql.var(LOCATION_HIERARCHY).isa(LOCATION_HIERARCHY).rel(COUNTRY).rel(CONTINENT),
+                    Graql.var(COUNTRY).isa(COUNTRY),
+                    Graql.var(COMPANY).isa(COMPANY)
+                            .has(COMPANY_NUMBER, Graql.var(COMPANY_NUMBER)),
+                    Graql.var(INCORPORATION).isa(INCORPORATION)
+                            .rel(INCORPORATION_INCORPORATED, Graql.var(COMPANY))
+                            .rel(INCORPORATION_INCORPORATING, Graql.var(COUNTRY))
+            ).get();
     }
 }

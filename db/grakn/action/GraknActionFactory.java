@@ -6,8 +6,8 @@ import grakn.simulation.db.common.action.SpouseType;
 import grakn.simulation.db.common.action.read.BirthsInCityAction;
 import grakn.simulation.db.common.action.read.CitiesInContinentAction;
 import grakn.simulation.db.common.action.read.CompaniesInContinentAction;
-import grakn.simulation.db.common.action.insight.FindCurrentResidentsOfSpecificCityAction;
-import grakn.simulation.db.common.action.insight.FindResidentsOfSpecificCityAction;
+import grakn.simulation.db.common.action.insight.FindCurrentResidentsAction;
+import grakn.simulation.db.common.action.insight.FindResidentsAction;
 import grakn.simulation.db.common.action.insight.FindSpecificMarriageAction;
 import grakn.simulation.db.common.action.insight.FindSpecificPersonAction;
 import grakn.simulation.db.common.action.insight.FindTransactionCurrencyAction;
@@ -19,7 +19,7 @@ import grakn.simulation.db.common.action.read.ProductsInContinentAction;
 import grakn.simulation.db.common.action.insight.ThreeHopAction;
 import grakn.simulation.db.common.action.insight.TwoHopAction;
 import grakn.simulation.db.common.action.read.UnmarriedPeopleInCityAction;
-import grakn.simulation.db.common.action.read.UpdateAgesOfPeopleInCityAction;
+import grakn.simulation.db.common.action.write.UpdateAgesOfPeopleInCityAction;
 import grakn.simulation.db.common.action.write.InsertCompanyAction;
 import grakn.simulation.db.common.action.write.InsertEmploymentAction;
 import grakn.simulation.db.common.action.write.InsertFriendshipAction;
@@ -35,21 +35,21 @@ import grakn.simulation.db.grakn.action.read.GraknBirthsInCityAction;
 import grakn.simulation.db.grakn.action.read.GraknCitiesInContinentAction;
 import grakn.simulation.db.grakn.action.read.GraknCompaniesInContinentAction;
 import grakn.simulation.db.grakn.action.read.GraknCompaniesInCountryAction;
-import grakn.simulation.db.grakn.action.insight.GraknFindCurrentResidentsOfSpecificCityAction;
-import grakn.simulation.db.grakn.action.insight.GraknFindResidentsOfSpecificCityAction;
+import grakn.simulation.db.grakn.action.insight.GraknFindCurrentResidentsAction;
+import grakn.simulation.db.grakn.action.insight.GraknFindResidentsAction;
 import grakn.simulation.db.grakn.action.insight.GraknFindSpecificMarriageAction;
 import grakn.simulation.db.grakn.action.insight.GraknFindSpecificPersonAction;
 import grakn.simulation.db.grakn.action.insight.GraknFindTransactionCurrencyAction;
 import grakn.simulation.db.grakn.action.insight.GraknFourHopAction;
 import grakn.simulation.db.grakn.action.insight.GraknArbitraryOneHopAction;
 import grakn.simulation.db.grakn.action.read.GraknMarriedCoupleAction;
-import grakn.simulation.db.grakn.action.insight.GraknMeanWageOfPeopleInWorld;
+import grakn.simulation.db.grakn.action.insight.GraknMeanWageOfPeopleInWorldAction;
 import grakn.simulation.db.grakn.action.read.GraknProductsInContinentAction;
 import grakn.simulation.db.grakn.action.read.GraknResidentsInCityAction;
 import grakn.simulation.db.grakn.action.insight.GraknThreeHopAction;
 import grakn.simulation.db.grakn.action.insight.GraknTwoHopAction;
 import grakn.simulation.db.grakn.action.read.GraknUnmarriedPeopleInCityAction;
-import grakn.simulation.db.grakn.action.read.GraknUpdateAgesOfPeopleInCityAction;
+import grakn.simulation.db.grakn.action.write.GraknUpdateAgesOfPeopleInCityAction;
 import grakn.simulation.db.grakn.action.write.GraknInsertCompanyAction;
 import grakn.simulation.db.grakn.action.write.GraknInsertEmploymentAction;
 import grakn.simulation.db.grakn.action.write.GraknInsertFriendshipAction;
@@ -158,17 +158,17 @@ public class GraknActionFactory extends ActionFactory<GraknOperation, ConceptMap
 
     @Override
     public MeanWageOfPeopleInWorldAction<GraknOperation> meanWageOfPeopleInWorldAction(GraknOperation dbOperation) {
-        return new GraknMeanWageOfPeopleInWorld(dbOperation);
+        return new GraknMeanWageOfPeopleInWorldAction(dbOperation);
     }
 
     @Override
-    public FindResidentsOfSpecificCityAction<GraknOperation> findResidentsOfSpecificCityAction(GraknOperation dbOperation) {
-        return new GraknFindResidentsOfSpecificCityAction(dbOperation);
+    public FindResidentsAction<GraknOperation> findResidentsAction(GraknOperation dbOperation) {
+        return new GraknFindResidentsAction(dbOperation);
     }
 
     @Override
-    public FindCurrentResidentsOfSpecificCityAction<GraknOperation> findCurrentResidentsOfSpecificCityAction(GraknOperation dbOperation) {
-        return new GraknFindCurrentResidentsOfSpecificCityAction(dbOperation);
+    public FindCurrentResidentsAction<GraknOperation> findCurrentResidentsAction(GraknOperation dbOperation) {
+        return new GraknFindCurrentResidentsAction(dbOperation);
     }
 
     @Override

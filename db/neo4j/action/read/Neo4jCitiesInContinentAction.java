@@ -15,15 +15,16 @@ public class Neo4jCitiesInContinentAction extends CitiesInContinentAction<Neo4jO
 
     @Override
     public List<String> run() {
-        String template = "" +
-                "MATCH (city:City)-[:LOCATED_IN*2]->(continent:Continent {locationName: $continentName})\n" +
-                "WHERE NOT city.locationName = $cityName\n" +
-                "RETURN city.locationName";
-
         HashMap<String, Object> parameters = new HashMap<String, Object>(){{
             put("continentName", city.country().continent().name());
             put("cityName", city.name());
         }};
-        return dbOperation.getOrderedAttribute(new Query(template, parameters), "city.locationName", null);
+        return dbOperation.sortedExecute(new Query(query(), parameters), "city.locationName", null);
+    }
+
+    public static String query() {
+        return "MATCH (city:City)-[:LOCATED_IN*2]->(continent:Continent {locationName: $continentName})\n" +
+                "WHERE NOT city.locationName = $cityName\n" +
+                "RETURN city.locationName";
     }
 }

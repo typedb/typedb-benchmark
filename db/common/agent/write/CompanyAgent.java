@@ -31,7 +31,7 @@ public class CompanyAgent<DB_DRIVER extends DbDriver<DB_OPERATION>, DB_OPERATION
         protected void run(DbOperationFactory<DB_OPERATION> dbOperationFactory, World.Country country, SimulationContext simulationContext) {
             int numCompanies = simulationContext.world().getScaleFactor();
 
-            try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker())) {
+            try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker(), trace())) {
 
                 for (int i = 0; i < numCompanies; i++) {
                     String adjective = pickOne(simulationContext.world().getAdjectives());

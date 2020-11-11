@@ -34,26 +34,7 @@ public class GraknMarriedCoupleAction extends MarriedCoupleAction<GraknOperation
 
     @Override
     public List<HashMap<SpouseType, String>> run() {
-        GraqlGet.Sorted marriageQuery = Graql.match(
-                Graql.var(CITY).isa(CITY)
-                        .has(LOCATION_NAME, city.name()),
-                Graql.var("m").isa(MARRIAGE)
-                        .rel(MARRIAGE_HUSBAND, Graql.var("husband"))
-                        .rel(MARRIAGE_WIFE, Graql.var("wife"))
-                        .has(MARRIAGE_ID, Graql.var(MARRIAGE_ID)),
-                Graql.not(
-                        Graql.var("par").isa(PARENTSHIP)
-                                .rel(PARENTSHIP_PARENT, "husband")
-                                .rel(PARENTSHIP_PARENT, "wife")
-                ),
-                Graql.var("husband").isa(PERSON)
-                        .has(EMAIL, Graql.var("husband-email")),
-                Graql.var("wife").isa(PERSON)
-                        .has(EMAIL, Graql.var("wife-email")),
-                Graql.var().isa(LOCATES)
-                        .rel(LOCATES_LOCATED, Graql.var("m"))
-                        .rel(LOCATES_LOCATION, Graql.var(CITY))
-        ).get().sort(MARRIAGE_ID);
+        GraqlGet.Sorted marriageQuery = query(city.name());
         return dbOperation.execute(marriageQuery)
                 .stream()
                 .map(a -> new HashMap<SpouseType, String>() {{
@@ -61,6 +42,29 @@ public class GraknMarriedCoupleAction extends MarriedCoupleAction<GraknOperation
                     put(SpouseType.HUSBAND, a.get("husband-email").asAttribute().value().toString());
                 }})
                 .collect(toList());
+    }
+
+    public static GraqlGet.Sorted query(String cityName) {
+        return Graql.match(
+                    Graql.var(CITY).isa(CITY)
+                            .has(LOCATION_NAME, cityName),
+                    Graql.var("m").isa(MARRIAGE)
+                            .rel(MARRIAGE_HUSBAND, Graql.var("husband"))
+                            .rel(MARRIAGE_WIFE, Graql.var("wife"))
+                            .has(MARRIAGE_ID, Graql.var(MARRIAGE_ID)),
+                    Graql.not(
+                            Graql.var("par").isa(PARENTSHIP)
+                                    .rel(PARENTSHIP_PARENT, "husband")
+                                    .rel(PARENTSHIP_PARENT, "wife")
+                    ),
+                    Graql.var("husband").isa(PERSON)
+                            .has(EMAIL, Graql.var("husband-email")),
+                    Graql.var("wife").isa(PERSON)
+                            .has(EMAIL, Graql.var("wife-email")),
+                    Graql.var().isa(LOCATES)
+                            .rel(LOCATES_LOCATED, Graql.var("m"))
+                            .rel(LOCATES_LOCATION, Graql.var(CITY))
+            ).get().sort(MARRIAGE_ID);
     }
 
 

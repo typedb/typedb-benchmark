@@ -29,19 +29,21 @@ public class GraknInsertCompanyAction extends InsertCompanyAction<GraknOperation
 
     @Override
     public ConceptMap run() {
-        GraqlInsert query =
-                Graql.match(
-                        Graql.var(COUNTRY).isa(COUNTRY)
-                                .has(LOCATION_NAME, country.name()))
-                        .insert(Graql.var(COMPANY).isa(COMPANY)
-                                        .has(COMPANY_NAME, companyName)
-                                        .has(COMPANY_NUMBER, companyNumber),
-                                Graql.var(INCORPORATION).isa(INCORPORATION)
-                                        .rel(INCORPORATION_INCORPORATED, Graql.var(COMPANY))
-                                        .rel(INCORPORATION_INCORPORATING, Graql.var(COUNTRY))
-                                        .has(DATE_OF_INCORPORATION, today)
-                        );
-        return Action.singleResult(dbOperation.execute(query));
+        return Action.singleResult(dbOperation.execute(query(country.name(), today, companyNumber, companyName)));
+    }
+
+    public static GraqlInsert query(String countryName, LocalDateTime today, int companyNumber, String companyName) {
+        return Graql.match(
+                Graql.var(COUNTRY).isa(COUNTRY)
+                        .has(LOCATION_NAME, countryName))
+                .insert(Graql.var(COMPANY).isa(COMPANY)
+                                .has(COMPANY_NAME, companyName)
+                                .has(COMPANY_NUMBER, companyNumber),
+                        Graql.var(INCORPORATION).isa(INCORPORATION)
+                                .rel(INCORPORATION_INCORPORATED, Graql.var(COMPANY))
+                                .rel(INCORPORATION_INCORPORATING, Graql.var(COUNTRY))
+                                .has(DATE_OF_INCORPORATION, today)
+                );
     }
 
     @Override

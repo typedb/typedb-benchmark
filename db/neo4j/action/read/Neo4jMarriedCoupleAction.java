@@ -20,12 +20,7 @@ public class Neo4jMarriedCoupleAction extends MarriedCoupleAction<Neo4jOperation
 
     @Override
     public List<HashMap<SpouseType, String>> run() {
-        String template = "" +
-                "MATCH (city:City {locationName: $locationName}),\n" +
-                "(husband:Person)-[marriage:MARRIED_TO {locationName: city.locationName}]->(wife:Person)\n" +
-                "WHERE NOT (wife)<-[:CHILD_OF]-(:Person)-[:CHILD_OF]->(husband)\n" +
-                "RETURN husband.email, wife.email\n" +
-                "ORDER BY marriage.id ASC\n";
+        String template = query();
         HashMap<String, Object> parameters = new HashMap<String, Object>(){{
             put("locationName", city.name());
         }};
@@ -34,5 +29,13 @@ public class Neo4jMarriedCoupleAction extends MarriedCoupleAction<Neo4jOperation
             put(SpouseType.WIFE, r.get("wife.email").toString());
             put(SpouseType.HUSBAND, r.get("husband.email").toString());
         }}).collect(toList());
+    }
+
+    public static String query() {
+        return "MATCH (city:City {locationName: $locationName}),\n" +
+                "(husband:Person)-[marriage:MARRIED_TO {locationName: city.locationName}]->(wife:Person)\n" +
+                "WHERE NOT (wife)<-[:CHILD_OF]-(:Person)-[:CHILD_OF]->(husband)\n" +
+                "RETURN husband.email, wife.email\n" +
+                "ORDER BY marriage.id ASC\n";
     }
 }

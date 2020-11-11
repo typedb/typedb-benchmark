@@ -13,7 +13,7 @@ public class Neo4jOperationFactory extends TransactionalDbOperationFactory<Neo4j
     }
 
     @Override
-    public Neo4jOperation newDbOperation(String tracker) {
-        return new Neo4jOperation(session, logger(), tracker);
+    public Neo4jOperation newDbOperation(String tracker, boolean trace) {
+        return new Neo4jOperation(session, logger(), tracker, trace);
     }
 }

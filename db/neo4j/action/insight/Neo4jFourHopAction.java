@@ -13,10 +13,13 @@ public class Neo4jFourHopAction extends FourHopAction<Neo4jOperation> {
 
     @Override
     public List<String> run() {
-        String query = "" +
-                "MATCH (city:City {locationName: \"London\"})<-[:BORN_IN]-(child:Person)-[:CHILD_OF]->(parent:Person)\n" +
-                "<-[:EMPLOYS]-(buyer:Company)<-[:BUYER]-(seller:Company)" +
-                "RETURN seller.companyName";
-        return dbOperation.getOrderedAttribute(new Query(query), "seller.companyName", null);
+        return dbOperation.sortedExecute(new Query(query()), "seller.companyName", null);
+    }
+
+    public static String query() {
+        return "" +
+                    "MATCH (city:City {locationName: \"London\"})<-[:BORN_IN]-(child:Person)-[:CHILD_OF]->(parent:Person)\n" +
+                    "<-[:EMPLOYS]-(buyer:Company)<-[:BUYER]-(seller:Company)" +
+                    "RETURN seller.companyName";
     }
 }

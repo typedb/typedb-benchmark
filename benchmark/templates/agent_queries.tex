@@ -1,0 +1,8 @@
+\\subsubsection{$databaseName Queries}
+<% queries.each { out <<
+"""
+\\begin{lstlisting}
+${it}
+\\end{lstlisting}
+"""
+} %>

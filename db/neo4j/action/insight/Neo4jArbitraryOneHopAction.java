@@ -14,10 +14,12 @@ public class Neo4jArbitraryOneHopAction extends ArbitraryOneHopAction<Neo4jOpera
 
     @Override
     public Integer run() {
-        String query = "" +
-                "MATCH (person:Person {email: \"" + PERSON_EMAIL_FOR_QUERY + "\"})--(x)" +
-                "RETURN x";
-        List<Record> results = dbOperation.execute(new Query(query));
+        List<Record> results = dbOperation.execute(new Query(query()));
         return null;
+    }
+
+    public static String query() {
+        return "MATCH (person:Person {email: \"" + PERSON_EMAIL_FOR_QUERY + "\"})--(x)\n" +
+                "RETURN x";
     }
 }

@@ -25,8 +25,20 @@ public class Neo4jInsertEmploymentAction extends InsertEmploymentAction<Neo4jOpe
 
     @Override
     public Record run() {
-        String template = "" +
-                "MATCH (city:City {locationName: $locationName})-[:LOCATED_IN]->(country:Country),\n" +
+        HashMap<String, Object> parameters = new HashMap<String, Object>() {{
+            put("locationName", worldCity.name());
+            put("email", employeeEmail);
+            put("companyNumber", companyNumber);
+            put("startDate", employmentDate);
+            put("wage", wageValue);
+            put("contractContent", contractContent);
+            put("contractedHours", contractedHours);
+        }};
+        return singleResult(dbOperation.execute(new Query(query(), parameters)));
+    }
+
+    public static String query() {
+        return "MATCH (city:City {locationName: $locationName})-[:LOCATED_IN]->(country:Country),\n" +
                 "(person:Person {email: $email}),\n" +
                 "(company:Company {companyNumber: $companyNumber})\n" +
                 "CREATE (company)-[employs:EMPLOYS {\n" +
@@ -39,17 +51,6 @@ public class Neo4jInsertEmploymentAction extends InsertEmploymentAction<Neo4jOpe
                 "]->(person)\n" +
                 "RETURN city.locationName, person.email, company.companyNumber, country.locationName, \n" +
                 "employs.startDate, employs.wage, employs.currency, employs.contractContent, employs.contractedHours";
-
-        HashMap<String, Object> parameters = new HashMap<String, Object>() {{
-            put("locationName", worldCity.name());
-            put("email", employeeEmail);
-            put("companyNumber", companyNumber);
-            put("startDate", employmentDate);
-            put("wage", wageValue);
-            put("contractContent", contractContent);
-            put("contractedHours", contractedHours);
-        }};
-        return singleResult(dbOperation.execute(new Query(template, parameters)));
     }
 
     @Override

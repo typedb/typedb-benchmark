@@ -3,8 +3,8 @@ package grakn.simulation.db.common.agent;
 import grakn.simulation.db.common.action.ActionFactory;
 import grakn.simulation.db.common.agent.base.Agent;
 import grakn.simulation.db.common.agent.insight.ArbitraryOneHopAgent;
-import grakn.simulation.db.common.agent.insight.FindCurrentResidentsOfSpecificCityAgent;
-import grakn.simulation.db.common.agent.insight.FindResidentsOfSpecificCityAgent;
+import grakn.simulation.db.common.agent.insight.FindCurrentResidentsAgent;
+import grakn.simulation.db.common.agent.insight.FindResidentsAgent;
 import grakn.simulation.db.common.agent.insight.FindSpecificMarriageAgent;
 import grakn.simulation.db.common.agent.insight.FindSpecificPersonAgent;
 import grakn.simulation.db.common.agent.insight.FindTransactionCurrencyAgent;
@@ -79,12 +79,12 @@ public class AgentFactory<DB_DRIVER extends DbDriver<DB_OPERATION>, DB_OPERATION
         return new MeanWageAgent<>(dbDriver, actionFactory);
     }
 
-    public FindResidentsOfSpecificCityAgent<DB_DRIVER, DB_OPERATION> findResidentsOfSpecificCity() {
-        return new FindResidentsOfSpecificCityAgent<>(dbDriver, actionFactory);
+    public FindResidentsAgent<DB_DRIVER, DB_OPERATION> findResidents() {
+        return new FindResidentsAgent<>(dbDriver, actionFactory);
     }
 
-    public FindCurrentResidentsOfSpecificCityAgent<DB_DRIVER, DB_OPERATION> findCurrentResidentsOfSpecificCity() {
-        return new FindCurrentResidentsOfSpecificCityAgent<>(dbDriver, actionFactory);
+    public FindCurrentResidentsAgent<DB_DRIVER, DB_OPERATION> findCurrentResidents() {
+        return new FindCurrentResidentsAgent<>(dbDriver, actionFactory);
     }
 
     public FindTransactionCurrencyAgent<DB_DRIVER, DB_OPERATION> findTransactionCurrency() {
@@ -139,10 +139,10 @@ public class AgentFactory<DB_DRIVER extends DbDriver<DB_OPERATION>, DB_OPERATION
                 return friendship();
             case "meanWage":
                 return meanWage();
-            case "findResidentsOfSpecificCity":
-                return findResidentsOfSpecificCity();
-            case "findCurrentResidentsOfSpecificCity":
-                return findCurrentResidentsOfSpecificCity();
+            case "findResidents":
+                return findResidents();
+            case "findCurrentResidents":
+                return findCurrentResidents();
             case "findTransactionCurrency":
                 return findTransactionCurrency();
             case "arbitraryOneHop":

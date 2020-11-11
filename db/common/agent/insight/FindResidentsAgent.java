@@ -5,13 +5,13 @@ import grakn.simulation.db.common.action.read.ReadAction;
 import grakn.simulation.db.common.driver.DbDriver;
 import grakn.simulation.db.common.driver.DbOperation;
 
-public class FindResidentsOfSpecificCityAgent<DB_DRIVER extends DbDriver<DB_OPERATION>, DB_OPERATION extends DbOperation> extends WorldwideInsightAgent<DB_DRIVER, DB_OPERATION> {
-    public FindResidentsOfSpecificCityAgent(DB_DRIVER dbDriver, ActionFactory<DB_OPERATION, ?> actionFactory) {
+public class FindResidentsAgent<DB_DRIVER extends DbDriver<DB_OPERATION>, DB_OPERATION extends DbOperation> extends WorldwideInsightAgent<DB_DRIVER, DB_OPERATION> {
+    public FindResidentsAgent(DB_DRIVER dbDriver, ActionFactory<DB_OPERATION, ?> actionFactory) {
         super(dbDriver, actionFactory);
     }
 
     @Override
     protected ReadAction<DB_OPERATION, ?> getAction(DB_OPERATION dbOperation) {
-        return actionFactory().findResidentsOfSpecificCityAction(dbOperation);
+        return actionFactory().findResidentsAction(dbOperation);
     }
 }

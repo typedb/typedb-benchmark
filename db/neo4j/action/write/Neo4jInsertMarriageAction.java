@@ -21,18 +21,19 @@ public class Neo4jInsertMarriageAction extends InsertMarriageAction<Neo4jOperati
 
     @Override
     public Record run() {
-        String template = "" +
-                "MATCH (wife:Person {email: $wifeEmail}), (husband:Person {email: $husbandEmail}), (city:City {locationName: $locationName})\n" +
-                "CREATE (husband)-[marriage:MARRIED_TO {marriageId: $marriageId, locationName: city.locationName}]->(wife)" +
-                "RETURN marriage.marriageId, husband.email, wife.email, city.locationName";
-
         HashMap<String, Object> parameters = new HashMap<String, Object>(){{
             put(MARRIAGE_ID, marriageIdentifier);
             put("wifeEmail", wifeEmail);
             put("husbandEmail", husbandEmail);
             put(LOCATION_NAME, worldCity.name());
         }};
-        return Action.singleResult(dbOperation.execute(new Query(template, parameters)));
+        return Action.singleResult(dbOperation.execute(new Query(query(), parameters)));
+    }
+
+    public static String query() {
+        return "MATCH (wife:Person {email: $wifeEmail}), (husband:Person {email: $husbandEmail}), (city:City {locationName: $locationName})\n" +
+                "CREATE (husband)-[marriage:MARRIED_TO {marriageId: $marriageId, locationName: city.locationName}]->(wife)" +
+                "RETURN marriage.marriageId, husband.email, wife.email, city.locationName";
     }
 
     @Override

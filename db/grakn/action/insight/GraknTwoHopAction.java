@@ -25,13 +25,16 @@ public class GraknTwoHopAction extends TwoHopAction<GraknOperation> {
 
     @Override
     public List<String> run() {
-        GraqlGet.Unfiltered query = Graql.match(
-                Graql.var(CITY).isa(CITY).has(LOCATION_NAME, "London"),
-                Graql.var().isa(BORN_IN).rel(BORN_IN_PLACE_OF_BIRTH, Graql.var(CITY)).rel(BORN_IN_CHILD, Graql.var("child")),
-                Graql.var("child").isa(PERSON),
-                Graql.var().isa(PARENTSHIP).rel(PARENTSHIP_PARENT, Graql.var("parent")).rel(PARENTSHIP_CHILD, Graql.var("child")),
-                Graql.var("parent").isa(PERSON).has(EMAIL, Graql.var(EMAIL))
-        ).get();
-        return dbOperation.getOrderedAttribute(query, EMAIL, null);
+        return dbOperation.sortedExecute(query(), EMAIL, null);
+    }
+
+    public static GraqlGet.Unfiltered query() {
+        return Graql.match(
+                    Graql.var(CITY).isa(CITY).has(LOCATION_NAME, "London"),
+                    Graql.var().isa(BORN_IN).rel(BORN_IN_PLACE_OF_BIRTH, Graql.var(CITY)).rel(BORN_IN_CHILD, Graql.var("child")),
+                    Graql.var("child").isa(PERSON),
+                    Graql.var().isa(PARENTSHIP).rel(PARENTSHIP_PARENT, Graql.var("parent")).rel(PARENTSHIP_CHILD, Graql.var("child")),
+                    Graql.var("parent").isa(PERSON).has(EMAIL, Graql.var(EMAIL))
+            ).get();
     }
 }

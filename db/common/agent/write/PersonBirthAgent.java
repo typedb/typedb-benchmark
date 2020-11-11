@@ -30,7 +30,7 @@ public class PersonBirthAgent<DB_DRIVER extends DbDriver<DB_OPERATION>, DB_OPERA
         protected void run(DbOperationFactory<DB_OPERATION> dbOperationFactory, World.City city, SimulationContext simulationContext) {
             // Find bachelors and bachelorettes who are considered adults and who are not in a marriage and pair them off randomly
             int numBirths = simulationContext.world().getScaleFactor();
-            try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker())) {
+            try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker(), trace())) {
                 for (int i = 0; i < numBirths; i++) {
                     String gender;
                     String forename;

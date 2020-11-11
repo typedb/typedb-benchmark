@@ -4,8 +4,8 @@ import grakn.simulation.db.common.action.read.BirthsInCityAction;
 import grakn.simulation.db.common.action.read.CitiesInContinentAction;
 import grakn.simulation.db.common.action.read.CompaniesInContinentAction;
 import grakn.simulation.db.common.action.read.CompaniesInCountryAction;
-import grakn.simulation.db.common.action.insight.FindCurrentResidentsOfSpecificCityAction;
-import grakn.simulation.db.common.action.insight.FindResidentsOfSpecificCityAction;
+import grakn.simulation.db.common.action.insight.FindCurrentResidentsAction;
+import grakn.simulation.db.common.action.insight.FindResidentsAction;
 import grakn.simulation.db.common.action.insight.FindSpecificMarriageAction;
 import grakn.simulation.db.common.action.insight.FindSpecificPersonAction;
 import grakn.simulation.db.common.action.insight.FindTransactionCurrencyAction;
@@ -18,7 +18,7 @@ import grakn.simulation.db.common.action.read.ResidentsInCityAction;
 import grakn.simulation.db.common.action.insight.ThreeHopAction;
 import grakn.simulation.db.common.action.insight.TwoHopAction;
 import grakn.simulation.db.common.action.read.UnmarriedPeopleInCityAction;
-import grakn.simulation.db.common.action.read.UpdateAgesOfPeopleInCityAction;
+import grakn.simulation.db.common.action.write.UpdateAgesOfPeopleInCityAction;
 import grakn.simulation.db.common.action.write.InsertCompanyAction;
 import grakn.simulation.db.common.action.write.InsertEmploymentAction;
 import grakn.simulation.db.common.action.write.InsertFriendshipAction;
@@ -75,9 +75,9 @@ public abstract class ActionFactory<DB_OPERATION extends DbOperation, DB_RETURN_
 
     public abstract MeanWageOfPeopleInWorldAction<DB_OPERATION> meanWageOfPeopleInWorldAction(DB_OPERATION dbOperation);
 
-    public abstract FindResidentsOfSpecificCityAction<DB_OPERATION> findResidentsOfSpecificCityAction(DB_OPERATION dbOperation);
+    public abstract FindResidentsAction<DB_OPERATION> findResidentsAction(DB_OPERATION dbOperation);
 
-    public abstract FindCurrentResidentsOfSpecificCityAction<DB_OPERATION> findCurrentResidentsOfSpecificCityAction(DB_OPERATION dbOperation);
+    public abstract FindCurrentResidentsAction<DB_OPERATION> findCurrentResidentsAction(DB_OPERATION dbOperation);
 
     public abstract FindTransactionCurrencyAction<DB_OPERATION> findTransactionCurrencyAction(DB_OPERATION dbOperation);
 

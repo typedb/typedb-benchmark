@@ -32,17 +32,22 @@ public class GraknInsertMarriageAction extends InsertMarriageAction<GraknOperati
 
     @Override
     public ConceptMap run() {
+        GraqlInsert marriageQuery = query(worldCity.name(), marriageIdentifier, wifeEmail, husbandEmail);
+        return Action.singleResult(dbOperation.execute(marriageQuery));
+    }
+
+    private GraqlInsert query(String worldCityName, int marriageIdentifier, String wifeEmail, String husbandEmail) {
         Statement husband = Graql.var("husband");
         Statement wife = Graql.var("wife");
         Statement city = Graql.var(CITY);
         Statement marriage = Graql.var("marriage");
 
-        StatementAttribute cityNameVar = Graql.var().val(worldCity.name());
+        StatementAttribute cityNameVar = Graql.var().val(worldCityName);
         StatementAttribute marriageIdentifierVar = Graql.var().val(marriageIdentifier);
         StatementAttribute husbandEmailVar = Graql.var().val(husbandEmail);
         StatementAttribute wifeEmailVar = Graql.var().val(wifeEmail);
 
-        GraqlInsert marriageQuery = Graql.match(
+        return Graql.match(
                 husband.isa(PERSON).has(EMAIL, husbandEmailVar),
                 wife.isa(PERSON).has(EMAIL, wifeEmailVar),
                 city.isa(CITY).has(LOCATION_NAME, cityNameVar)
@@ -53,7 +58,6 @@ public class GraknInsertMarriageAction extends InsertMarriageAction<GraknOperati
                         .has(MARRIAGE_ID, marriageIdentifierVar),
                 Graql.var().isa(LOCATES).rel(LOCATES_LOCATED, marriage).rel(LOCATES_LOCATION, city)
         );
-        return Action.singleResult(dbOperation.execute(marriageQuery));
     }
 
     @Override

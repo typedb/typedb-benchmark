@@ -1,6 +1,6 @@
-package grakn.simulation.db.neo4j.action.read;
+package grakn.simulation.db.neo4j.action.write;
 
-import grakn.simulation.db.common.action.read.UpdateAgesOfPeopleInCityAction;
+import grakn.simulation.db.common.action.write.UpdateAgesOfPeopleInCityAction;
 import grakn.simulation.db.common.world.World;
 import grakn.simulation.db.neo4j.driver.Neo4jOperation;
 import grakn.simulation.db.neo4j.schema.Schema;
@@ -16,16 +16,17 @@ public class Neo4jUpdateAgesOfPeopleInCityAction extends UpdateAgesOfPeopleInCit
 
     @Override
     public Integer run() {
-        String template = "" +
-                "MATCH (person:Person)-[:BORN_IN]->(city:City {locationName: $locationName})\n" +
-                "SET person.age = duration.between(person.dateOfBirth, localdatetime($dateToday)).years\n" +
-                "RETURN person.age";
-
         HashMap<String, Object> parameters = new HashMap<String, Object>(){{
             put(Schema.LOCATION_NAME, city.name());
             put("dateToday", today);
         }};
-        dbOperation.execute(new Query(template, parameters));
+        dbOperation.execute(new Query(query(), parameters));
         return null;
+    }
+
+    public static String query() {
+        return "MATCH (person:Person)-[:BORN_IN]->(city:City {locationName: $locationName})\n" +
+                "SET person.age = duration.between(person.dateOfBirth, localdatetime($dateToday)).years\n" +
+                "RETURN person.age";
     }
 }

@@ -42,6 +42,10 @@ public class GraknInsertEmploymentAction extends InsertEmploymentAction<GraknOpe
 
     @Override
     public ConceptMap run() {
+        return singleResult(dbOperation.execute(query(worldCity.name(), employeeEmail, companyNumber, employmentDate, wageValue, contractContent, contractedHours)));
+    }
+
+    public static GraqlInsert query(String worldCityName, String employeeEmail, long companyNumber, LocalDateTime employmentDate, double wageValue, String contractContent, double contractedHours) {
         Statement city = Graql.var(CITY);
         Statement person = Graql.var(PERSON);
         Statement company = Graql.var(COMPANY);
@@ -53,10 +57,10 @@ public class GraknInsertEmploymentAction extends InsertEmploymentAction<GraknOpe
         Statement contract = Graql.var(CONTRACT);
         Statement currency = Graql.var(CURRENCY);
 
-        GraqlInsert insertEmploymentQuery = Graql.match(
+        return Graql.match(
                 city
                         .isa(CITY)
-                        .has(LOCATION_NAME, worldCity.name()),
+                        .has(LOCATION_NAME, worldCityName),
                 person
                         .isa(PERSON)
                         .has(EMAIL, employeeEmail),
@@ -91,7 +95,6 @@ public class GraknInsertEmploymentAction extends InsertEmploymentAction<GraknOpe
                         .has(CONTRACT_CONTENT, contractContent)
                         .has(CONTRACTED_HOURS, contractedHours)
         );
-        return singleResult(dbOperation.execute(insertEmploymentQuery));
     }
 
     @Override

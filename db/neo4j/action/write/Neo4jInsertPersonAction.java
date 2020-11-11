@@ -25,17 +25,6 @@ public class Neo4jInsertPersonAction extends InsertPersonAction<Neo4jOperation, 
 
     @Override
     public Record run() {
-        String template = "MATCH (c:City {locationName: $locationName})" +
-                "CREATE (person:Person {" +
-                "email: $email, " +
-                "dateOfBirth: $dateOfBirth, " +
-                "gender: $gender, " +
-                "forename: $forename, " +
-                "surname: $surname" +
-                "})-[:BORN_IN]->(c)," +
-                "(person)-[:RESIDENT_OF {startDate: $dateOfBirth, isCurrent: $isCurrent}]->(c)" +
-                "RETURN person.email, person.dateOfBirth, person.gender, person.forename, person.surname";
-
         HashMap<String, Object> parameters = new HashMap<String, Object>(){{
             put(LOCATION_NAME, worldCity.name());
             put(EMAIL, email);
@@ -45,9 +34,22 @@ public class Neo4jInsertPersonAction extends InsertPersonAction<Neo4jOperation, 
             put(SURNAME, surname);
             put(IS_CURRENT, true);
         }};
-        return Action.singleResult(dbOperation.execute(new Query(template, parameters)));
+        return Action.singleResult(dbOperation.execute(new Query(query(), parameters)));
 //        TODO Key constraints are possible with Neo4j Enterprise, and some constraints are supported in Community
 //        https://neo4j.com/developer/kb/how-to-implement-a-primary-key-property-for-a-label/
+    }
+
+    public static String query() {
+        return "MATCH (c:City {locationName: $locationName})" +
+                "CREATE (person:Person {" +
+                "email: $email, " +
+                "dateOfBirth: $dateOfBirth, " +
+                "gender: $gender, " +
+                "forename: $forename, " +
+                "surname: $surname" +
+                "})-[:BORN_IN]->(c)," +
+                "(person)-[:RESIDENT_OF {startDate: $dateOfBirth, isCurrent: $isCurrent}]->(c)" +
+                "RETURN person.email, person.dateOfBirth, person.gender, person.forename, person.surname";
     }
 
     @Override
