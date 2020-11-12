@@ -25,7 +25,6 @@ import grakn.simulation.common.utils.Pair;
 import grakn.simulation.common.driver.DbDriver;
 import grakn.simulation.common.driver.DbOperationFactory;
 import grakn.simulation.common.utils.Trace;
-import grakn.simulation.common.world.Region;
 import grakn.simulation.common.world.World;
 import grakn.simulation.common.utils.RandomSource;
 import org.slf4j.Logger;
@@ -51,7 +50,7 @@ import static grabl.tracing.client.GrablTracingThreadStatic.contextOnThread;
  * @param <REGION> The type of region used by the agent.
  * @param <DB_OPERATION> The abstraction of database operations used by the agent.
  */
-public abstract class Agent<REGION extends Region, DB_OPERATION extends DbOperation> {
+public abstract class Agent<REGION extends grakn.simulation.common.world.Region, DB_OPERATION extends DbOperation> {
 
     private final Logger logger;
     private boolean trace = true;
@@ -89,16 +88,16 @@ public abstract class Agent<REGION extends Region, DB_OPERATION extends DbOperat
         return report;
     }
 
-    protected abstract RegionalAgent getRegionalAgent(int simulationStep, String tracker, Random random, boolean test);
+    protected abstract Region getRegionalAgent(int simulationStep, String tracker, Random random, boolean test);
 
     private void iterateRegionalAgent(SimulationContext simulationContext, RandomSource source, REGION region) {
         Random random = source.startNewRandom();
         Random agentRandom = RandomSource.nextSource(random).startNewRandom();
 
-        RegionalAgent regionalAgent = getRegionalAgent(simulationContext.simulationStep(), region.tracker(), agentRandom, simulationContext.test());
+        Region regionalAgent = getRegionalAgent(simulationContext.simulationStep(), region.tracker(), agentRandom, simulationContext.test());
         DbOperationFactory<DB_OPERATION> dbOperationFactory = dbDriver.getDbOperationFactory(region, logger);
 
-        RegionalAgent.Report report = regionalAgent.runWithReport(dbOperationFactory, region, simulationContext);
+        Region.Report report = regionalAgent.runWithReport(dbOperationFactory, region, simulationContext);
         this.report.addRegionalAgentReport(region.tracker(), report);
     }
 
@@ -107,9 +106,9 @@ public abstract class Agent<REGION extends Region, DB_OPERATION extends DbOperat
     }
 
     public class Report {
-        ConcurrentHashMap<String, RegionalAgent.Report> regionalAgentReports = new ConcurrentHashMap<>();
+        ConcurrentHashMap<String, Region.Report> regionalAgentReports = new ConcurrentHashMap<>();
 
-        public void addRegionalAgentReport(String tracker, RegionalAgent.Report regionalAgentReport) {
+        public void addRegionalAgentReport(String tracker, Region.Report regionalAgentReport) {
             regionalAgentReports.put(tracker, regionalAgentReport);
         }
 
@@ -117,14 +116,12 @@ public abstract class Agent<REGION extends Region, DB_OPERATION extends DbOperat
             return regionalAgentReports.keySet();
         }
 
-        public RegionalAgent.Report getRegionalAgentReport(String tracker) {
+        public Region.Report getRegionalAgentReport(String tracker) {
             return regionalAgentReports.get(tracker);
         }
     }
 
-
-    // TODO: Rename this to Regional, as well as the other Regional agents
-    public abstract class RegionalAgent implements AutoCloseable {
+    public abstract class Region implements AutoCloseable {
 
         private final Random random;
         private final boolean test;
@@ -132,7 +129,7 @@ public abstract class Agent<REGION extends Region, DB_OPERATION extends DbOperat
         private final String tracker;
         private GrablTracingThreadStatic.ThreadContext context;
 
-        public RegionalAgent(int simulationStep, String tracker, Random random, boolean test) {
+        public Region(int simulationStep, String tracker, Random random, boolean test) {
             this.tracker = tracker;
             this.random = random;
             this.test = test;

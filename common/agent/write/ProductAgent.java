@@ -38,7 +38,7 @@ public class ProductAgent<DB_OPERATION extends DbOperation> extends ContinentAge
         return new RegionalProductAgent(simulationStep, tracker, random, test);
     }
 
-    public class RegionalProductAgent extends RegionalAgent {
+    public class RegionalProductAgent extends ContinentRegion {
         public RegionalProductAgent(int simulationStep, String tracker, Random random, boolean test) {
             super(simulationStep, tracker, random, test);
         }

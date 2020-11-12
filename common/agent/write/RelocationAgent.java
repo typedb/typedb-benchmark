@@ -39,12 +39,12 @@ public class RelocationAgent<DB_OPERATION extends DbOperation> extends CityAgent
     }
 
     @Override
-    protected RegionalRelocationAgent getRegionalAgent(int simulationStep, String tracker, Random random, boolean test) {
-        return new RegionalRelocationAgent(simulationStep, tracker, random, test);
+    protected City getRegionalAgent(int simulationStep, String tracker, Random random, boolean test) {
+        return new City(simulationStep, tracker, random, test);
     }
 
-    public class RegionalRelocationAgent extends RegionalAgent {
-        public RegionalRelocationAgent(int simulationStep, String tracker, Random random, boolean test) {
+    public class City extends CityRegion {
+        public City(int simulationStep, String tracker, Random random, boolean test) {
             super(simulationStep, tracker, random, test);
         }
 

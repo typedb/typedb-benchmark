@@ -24,6 +24,7 @@ import grakn.simulation.common.driver.DbOperation;
 import grakn.simulation.common.world.World;
 
 import java.util.List;
+import java.util.Random;
 
 import static java.util.stream.Collectors.toList;
 
@@ -36,5 +37,12 @@ public abstract class ContinentAgent<DB_OPERATION extends DbOperation> extends A
     @Override
     protected List<World.Continent> getRegions(World world) {
         return world.getContinents().collect(toList());
+    }
+
+    protected abstract class ContinentRegion extends Region {
+
+        public ContinentRegion(int simulationStep, String tracker, Random random, boolean test) {
+            super(simulationStep, tracker, random, test);
+        }
     }
 }

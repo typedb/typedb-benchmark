@@ -36,12 +36,12 @@ public class MarriageAgent<DB_OPERATION extends DbOperation> extends CityAgent<D
     }
 
     @Override
-    protected RegionalMarriageAgent getRegionalAgent(int simulationStep, String tracker, Random random, boolean test) {
-        return new RegionalMarriageAgent(simulationStep, tracker, random, test);
+    protected City2 getRegionalAgent(int simulationStep, String tracker, Random random, boolean test) {
+        return new City2(simulationStep, tracker, random, test);
     }
 
-    public class RegionalMarriageAgent extends RegionalAgent {
-        public RegionalMarriageAgent(int simulationStep, String tracker, Random random, boolean test) {
+    public class City2 extends CityRegion {
+        public City2(int simulationStep, String tracker, Random random, boolean test) {
             super(simulationStep, tracker, random, test);
         }
 

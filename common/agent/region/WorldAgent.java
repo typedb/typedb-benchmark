@@ -25,6 +25,7 @@ import grakn.simulation.common.world.World;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 
 public abstract class WorldAgent<DB_OPERATION extends DbOperation> extends Agent<World, DB_OPERATION> {
 
@@ -35,5 +36,12 @@ public abstract class WorldAgent<DB_OPERATION extends DbOperation> extends Agent
     @Override
     protected List<World> getRegions(World world) {
         return Collections.singletonList(world);
+    }
+
+    protected abstract class WorldRegion extends Region {
+
+        public WorldRegion(int simulationStep, String tracker, Random random, boolean test) {
+            super(simulationStep, tracker, random, test);
+        }
     }
 }

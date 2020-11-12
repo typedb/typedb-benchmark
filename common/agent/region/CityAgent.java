@@ -19,11 +19,14 @@ package grakn.simulation.common.agent.region;
 
 import grakn.simulation.common.action.ActionFactory;
 import grakn.simulation.common.agent.base.Agent;
+import grakn.simulation.common.agent.base.SimulationContext;
 import grakn.simulation.common.driver.DbDriver;
 import grakn.simulation.common.driver.DbOperation;
+import grakn.simulation.common.driver.DbOperationFactory;
 import grakn.simulation.common.world.World;
 
 import java.util.List;
+import java.util.Random;
 
 import static java.util.stream.Collectors.toList;
 
@@ -36,5 +39,12 @@ public abstract class CityAgent<DB_OPERATION extends DbOperation> extends Agent<
     @Override
     protected List<World.City> getRegions(World world) {
         return world.getCities().collect(toList());
+    }
+
+    protected abstract class CityRegion extends Region {
+
+        public CityRegion(int simulationStep, String tracker, Random random, boolean test) {
+            super(simulationStep, tracker, random, test);
+        }
     }
 }

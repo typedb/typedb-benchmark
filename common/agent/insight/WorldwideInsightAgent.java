@@ -38,13 +38,13 @@ public abstract class WorldwideInsightAgent<DB_OPERATION extends DbOperation> ex
     }
 
     @Override
-    protected RegionalAgent getRegionalAgent(int simulationStep, String tracker, Random random, boolean test) {
+    protected Region getRegionalAgent(int simulationStep, String tracker, Random random, boolean test) {
         return new WorldWideWorker(simulationStep, tracker, random, test);
     }
 
     protected abstract ReadAction<DB_OPERATION, ?> getAction(DB_OPERATION dbOperation);
 
-    public class WorldWideWorker extends RegionalAgent {
+    public class WorldWideWorker extends WorldRegion {
 
         public WorldWideWorker(int simulationStep, String tracker, Random random, boolean test) {
             super(simulationStep, tracker, random, test);

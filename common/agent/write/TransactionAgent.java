@@ -40,12 +40,12 @@ public class TransactionAgent<DB_OPERATION extends DbOperation> extends CountryA
     }
 
     @Override
-    protected RegionalTransactionAgent getRegionalAgent(int simulationStep, String tracker, Random random, boolean test) {
-        return new RegionalTransactionAgent(simulationStep, tracker, random, test);
+    protected Country getRegionalAgent(int simulationStep, String tracker, Random random, boolean test) {
+        return new Country(simulationStep, tracker, random, test);
     }
 
-    public class RegionalTransactionAgent extends RegionalAgent {
-        public RegionalTransactionAgent(int simulationStep, String tracker, Random random, boolean test) {
+    public class Country extends CountryRegion {
+        public Country(int simulationStep, String tracker, Random random, boolean test) {
             super(simulationStep, tracker, random, test);
         }
 

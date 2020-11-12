@@ -40,11 +40,11 @@ public class EmploymentAgent<DB_OPERATION extends DbOperation> extends CityAgent
     }
 
     @Override
-    protected RegionalEmploymentAgent getRegionalAgent(int simulationStep, String tracker, Random random, boolean test) {
-        return new RegionalEmploymentAgent(simulationStep, tracker, random, test);
+    protected City getRegionalAgent(int simulationStep, String tracker, Random random, boolean test) {
+        return new City(simulationStep, tracker, random, test);
     }
 
-    public class RegionalEmploymentAgent extends RegionalAgent {
+    public class City extends CityRegion {
         double MIN_ANNUAL_WAGE = 18000.00;
         double MAX_ANNUAL_WAGE = 80000.00;
         double MIN_CONTRACTED_HOURS = 30.0;
@@ -52,7 +52,7 @@ public class EmploymentAgent<DB_OPERATION extends DbOperation> extends CityAgent
         int MIN_CONTRACT_CHARACTER_LENGTH = 200;
         int MAX_CONTRACT_CHARACTER_LENGTH = 600;
 
-        public RegionalEmploymentAgent(int simulationStep, String tracker, Random random, boolean test) {
+        public City(int simulationStep, String tracker, Random random, boolean test) {
             super(simulationStep, tracker, random, test);
         }
 
