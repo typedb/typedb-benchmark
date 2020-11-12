@@ -7,8 +7,8 @@ import graql.lang.query.GraqlGet;
 
 import java.util.stream.Collectors;
 
-import static grakn.simulation.grakn.schema.Schema.EMAIL;
-import static grakn.simulation.grakn.schema.Schema.PERSON;
+import static grakn.simulation.grakn.action.Model.EMAIL;
+import static grakn.simulation.grakn.action.Model.PERSON;
 
 public class GraknFindSpecificPersonAction extends FindSpecificPersonAction<GraknOperation> {
     public GraknFindSpecificPersonAction(GraknOperation dbOperation) {

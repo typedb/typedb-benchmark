@@ -7,8 +7,8 @@ import graql.lang.query.GraqlGet;
 
 import java.util.stream.Collectors;
 
-import static grakn.simulation.grakn.schema.Schema.MARRIAGE;
-import static grakn.simulation.grakn.schema.Schema.MARRIAGE_ID;
+import static grakn.simulation.grakn.action.Model.MARRIAGE;
+import static grakn.simulation.grakn.action.Model.MARRIAGE_ID;
 
 public class GraknFindSpecificMarriageAction extends FindSpecificMarriageAction<GraknOperation> {
     public GraknFindSpecificMarriageAction(GraknOperation dbOperation) {

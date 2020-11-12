@@ -10,9 +10,9 @@ import org.neo4j.driver.Record;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 
-import static grakn.simulation.neo4j.schema.Schema.EMAIL;
-import static grakn.simulation.neo4j.schema.Schema.LOCATION_NAME;
-import static grakn.simulation.neo4j.schema.Schema.RELOCATION_DATE;
+import static grakn.simulation.neo4j.action.Model.EMAIL;
+import static grakn.simulation.neo4j.action.Model.LOCATION_NAME;
+import static grakn.simulation.neo4j.action.Model.RELOCATION_DATE;
 
 public class Neo4jInsertRelocationAction extends InsertRelocationAction<Neo4jOperation, Record> {
     public Neo4jInsertRelocationAction(Neo4jOperation dbOperation, World.City city, LocalDateTime today, String relocateeEmail, String relocationCityName) {

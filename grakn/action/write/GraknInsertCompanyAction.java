@@ -11,15 +11,15 @@ import graql.lang.query.GraqlInsert;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 
-import static grakn.simulation.grakn.schema.Schema.COMPANY;
-import static grakn.simulation.grakn.schema.Schema.COMPANY_NAME;
-import static grakn.simulation.grakn.schema.Schema.COMPANY_NUMBER;
-import static grakn.simulation.grakn.schema.Schema.COUNTRY;
-import static grakn.simulation.grakn.schema.Schema.DATE_OF_INCORPORATION;
-import static grakn.simulation.grakn.schema.Schema.INCORPORATION;
-import static grakn.simulation.grakn.schema.Schema.INCORPORATION_INCORPORATED;
-import static grakn.simulation.grakn.schema.Schema.INCORPORATION_INCORPORATING;
-import static grakn.simulation.grakn.schema.Schema.LOCATION_NAME;
+import static grakn.simulation.grakn.action.Model.COMPANY;
+import static grakn.simulation.grakn.action.Model.COMPANY_NAME;
+import static grakn.simulation.grakn.action.Model.COMPANY_NUMBER;
+import static grakn.simulation.grakn.action.Model.COUNTRY;
+import static grakn.simulation.grakn.action.Model.DATE_OF_INCORPORATION;
+import static grakn.simulation.grakn.action.Model.INCORPORATION;
+import static grakn.simulation.grakn.action.Model.INCORPORATION_INCORPORATED;
+import static grakn.simulation.grakn.action.Model.INCORPORATION_INCORPORATING;
+import static grakn.simulation.grakn.action.Model.LOCATION_NAME;
 
 public class GraknInsertCompanyAction extends InsertCompanyAction<GraknOperation, ConceptMap> {
 

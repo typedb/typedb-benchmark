@@ -9,7 +9,7 @@ import org.neo4j.driver.Record;
 
 import java.util.HashMap;
 
-import static grakn.simulation.neo4j.schema.Schema.EMAIL;
+import static grakn.simulation.neo4j.action.Model.EMAIL;
 
 public class Neo4jInsertParentShipAction extends InsertParentShipAction<Neo4jOperation, Record> {
     public Neo4jInsertParentShipAction(Neo4jOperation dbOperation, HashMap<SpouseType, String> marriage, String childEmail) {

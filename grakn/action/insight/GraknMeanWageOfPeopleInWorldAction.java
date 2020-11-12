@@ -6,8 +6,8 @@ import graql.lang.Graql;
 import graql.lang.query.GraqlGet;
 import graql.lang.statement.Statement;
 
-import static grakn.simulation.grakn.schema.Schema.WAGE;
-import static grakn.simulation.grakn.schema.Schema.WAGE_VALUE;
+import static grakn.simulation.grakn.action.Model.WAGE;
+import static grakn.simulation.grakn.action.Model.WAGE_VALUE;
 
 public class GraknMeanWageOfPeopleInWorldAction extends MeanWageOfPeopleInWorldAction<GraknOperation> {
     public GraknMeanWageOfPeopleInWorldAction(GraknOperation dbOperation) {

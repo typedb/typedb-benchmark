@@ -9,14 +9,14 @@ import org.neo4j.driver.Record;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 
-import static grakn.simulation.neo4j.schema.Schema.COMPANY_NUMBER;
-import static grakn.simulation.neo4j.schema.Schema.CONTRACTED_HOURS;
-import static grakn.simulation.neo4j.schema.Schema.CONTRACT_CONTENT;
-import static grakn.simulation.neo4j.schema.Schema.CURRENCY;
-import static grakn.simulation.neo4j.schema.Schema.EMAIL;
-import static grakn.simulation.neo4j.schema.Schema.LOCATION_NAME;
-import static grakn.simulation.neo4j.schema.Schema.START_DATE;
-import static grakn.simulation.neo4j.schema.Schema.WAGE;
+import static grakn.simulation.neo4j.action.Model.COMPANY_NUMBER;
+import static grakn.simulation.neo4j.action.Model.CONTRACTED_HOURS;
+import static grakn.simulation.neo4j.action.Model.CONTRACT_CONTENT;
+import static grakn.simulation.neo4j.action.Model.CURRENCY;
+import static grakn.simulation.neo4j.action.Model.EMAIL;
+import static grakn.simulation.neo4j.action.Model.LOCATION_NAME;
+import static grakn.simulation.neo4j.action.Model.START_DATE;
+import static grakn.simulation.neo4j.action.Model.WAGE;
 
 public class Neo4jInsertEmploymentAction extends InsertEmploymentAction<Neo4jOperation, Record> {
     public Neo4jInsertEmploymentAction(Neo4jOperation dbOperation, World.City worldCity, String employeeEmail, long companyNumber, LocalDateTime employmentDate, double wageValue, String contractContent, double contractedHours) {

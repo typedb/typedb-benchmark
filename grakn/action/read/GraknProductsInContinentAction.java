@@ -8,13 +8,13 @@ import graql.lang.query.GraqlGet;
 
 import java.util.List;
 
-import static grakn.simulation.grakn.schema.Schema.CONTINENT;
-import static grakn.simulation.grakn.schema.Schema.LOCATION_NAME;
-import static grakn.simulation.grakn.schema.Schema.PRODUCED_IN;
-import static grakn.simulation.grakn.schema.Schema.PRODUCED_IN_CONTINENT;
-import static grakn.simulation.grakn.schema.Schema.PRODUCED_IN_PRODUCT;
-import static grakn.simulation.grakn.schema.Schema.PRODUCT;
-import static grakn.simulation.grakn.schema.Schema.PRODUCT_BARCODE;
+import static grakn.simulation.grakn.action.Model.CONTINENT;
+import static grakn.simulation.grakn.action.Model.LOCATION_NAME;
+import static grakn.simulation.grakn.action.Model.PRODUCED_IN;
+import static grakn.simulation.grakn.action.Model.PRODUCED_IN_CONTINENT;
+import static grakn.simulation.grakn.action.Model.PRODUCED_IN_PRODUCT;
+import static grakn.simulation.grakn.action.Model.PRODUCT;
+import static grakn.simulation.grakn.action.Model.PRODUCT_BARCODE;
 
 public class GraknProductsInContinentAction extends ProductsInContinentAction<GraknOperation> {
 

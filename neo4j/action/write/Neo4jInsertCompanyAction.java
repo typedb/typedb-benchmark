@@ -10,10 +10,10 @@ import org.neo4j.driver.Record;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 
-import static grakn.simulation.neo4j.schema.Schema.COMPANY_NAME;
-import static grakn.simulation.neo4j.schema.Schema.COMPANY_NUMBER;
-import static grakn.simulation.neo4j.schema.Schema.DATE_OF_INCORPORATION;
-import static grakn.simulation.neo4j.schema.Schema.LOCATION_NAME;
+import static grakn.simulation.neo4j.action.Model.COMPANY_NAME;
+import static grakn.simulation.neo4j.action.Model.COMPANY_NUMBER;
+import static grakn.simulation.neo4j.action.Model.DATE_OF_INCORPORATION;
+import static grakn.simulation.neo4j.action.Model.LOCATION_NAME;
 
 public class Neo4jInsertCompanyAction extends InsertCompanyAction<Neo4jOperation, Record> {
 

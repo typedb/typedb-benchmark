@@ -11,7 +11,6 @@ java_library(
     ]),
     visibility = ["//visibility:public"],
     deps = [
-        "//grakn/schema",
         "//common:simulation-common",
         "//common/driver",
         "//common/agent",

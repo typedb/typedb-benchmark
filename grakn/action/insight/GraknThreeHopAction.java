@@ -7,20 +7,20 @@ import graql.lang.query.GraqlGet;
 
 import java.util.List;
 
-import static grakn.simulation.grakn.schema.Schema.BORN_IN;
-import static grakn.simulation.grakn.schema.Schema.BORN_IN_CHILD;
-import static grakn.simulation.grakn.schema.Schema.BORN_IN_PLACE_OF_BIRTH;
-import static grakn.simulation.grakn.schema.Schema.CITY;
-import static grakn.simulation.grakn.schema.Schema.COMPANY;
-import static grakn.simulation.grakn.schema.Schema.COMPANY_NAME;
-import static grakn.simulation.grakn.schema.Schema.EMPLOYMENT;
-import static grakn.simulation.grakn.schema.Schema.EMPLOYMENT_EMPLOYEE;
-import static grakn.simulation.grakn.schema.Schema.EMPLOYMENT_EMPLOYER;
-import static grakn.simulation.grakn.schema.Schema.LOCATION_NAME;
-import static grakn.simulation.grakn.schema.Schema.PARENTSHIP;
-import static grakn.simulation.grakn.schema.Schema.PARENTSHIP_CHILD;
-import static grakn.simulation.grakn.schema.Schema.PARENTSHIP_PARENT;
-import static grakn.simulation.grakn.schema.Schema.PERSON;
+import static grakn.simulation.grakn.action.Model.BORN_IN;
+import static grakn.simulation.grakn.action.Model.BORN_IN_CHILD;
+import static grakn.simulation.grakn.action.Model.BORN_IN_PLACE_OF_BIRTH;
+import static grakn.simulation.grakn.action.Model.CITY;
+import static grakn.simulation.grakn.action.Model.COMPANY;
+import static grakn.simulation.grakn.action.Model.COMPANY_NAME;
+import static grakn.simulation.grakn.action.Model.EMPLOYMENT;
+import static grakn.simulation.grakn.action.Model.EMPLOYMENT_EMPLOYEE;
+import static grakn.simulation.grakn.action.Model.EMPLOYMENT_EMPLOYER;
+import static grakn.simulation.grakn.action.Model.LOCATION_NAME;
+import static grakn.simulation.grakn.action.Model.PARENTSHIP;
+import static grakn.simulation.grakn.action.Model.PARENTSHIP_CHILD;
+import static grakn.simulation.grakn.action.Model.PARENTSHIP_PARENT;
+import static grakn.simulation.grakn.action.Model.PERSON;
 
 public class GraknThreeHopAction extends ThreeHopAction<GraknOperation> {
     public GraknThreeHopAction(GraknOperation dbOperation) {

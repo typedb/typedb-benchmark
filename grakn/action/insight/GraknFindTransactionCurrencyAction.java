@@ -8,8 +8,8 @@ import graql.lang.query.GraqlGet;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static grakn.simulation.grakn.schema.Schema.CURRENCY;
-import static grakn.simulation.grakn.schema.Schema.TRANSACTION;
+import static grakn.simulation.grakn.action.Model.CURRENCY;
+import static grakn.simulation.grakn.action.Model.TRANSACTION;
 
 public class GraknFindTransactionCurrencyAction extends FindTransactionCurrencyAction<GraknOperation> {
     public GraknFindTransactionCurrencyAction(GraknOperation dbOperation) {

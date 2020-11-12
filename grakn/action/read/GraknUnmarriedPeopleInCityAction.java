@@ -10,19 +10,19 @@ import graql.lang.statement.Statement;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static grakn.simulation.grakn.schema.Schema.CITY;
-import static grakn.simulation.grakn.schema.Schema.DATE_OF_BIRTH;
-import static grakn.simulation.grakn.schema.Schema.EMAIL;
-import static grakn.simulation.grakn.schema.Schema.END_DATE;
-import static grakn.simulation.grakn.schema.Schema.GENDER;
-import static grakn.simulation.grakn.schema.Schema.LOCATION_NAME;
-import static grakn.simulation.grakn.schema.Schema.MARRIAGE;
-import static grakn.simulation.grakn.schema.Schema.MARRIAGE_HUSBAND;
-import static grakn.simulation.grakn.schema.Schema.MARRIAGE_WIFE;
-import static grakn.simulation.grakn.schema.Schema.PERSON;
-import static grakn.simulation.grakn.schema.Schema.RESIDENCY;
-import static grakn.simulation.grakn.schema.Schema.RESIDENCY_LOCATION;
-import static grakn.simulation.grakn.schema.Schema.RESIDENCY_RESIDENT;
+import static grakn.simulation.grakn.action.Model.CITY;
+import static grakn.simulation.grakn.action.Model.DATE_OF_BIRTH;
+import static grakn.simulation.grakn.action.Model.EMAIL;
+import static grakn.simulation.grakn.action.Model.END_DATE;
+import static grakn.simulation.grakn.action.Model.GENDER;
+import static grakn.simulation.grakn.action.Model.LOCATION_NAME;
+import static grakn.simulation.grakn.action.Model.MARRIAGE;
+import static grakn.simulation.grakn.action.Model.MARRIAGE_HUSBAND;
+import static grakn.simulation.grakn.action.Model.MARRIAGE_WIFE;
+import static grakn.simulation.grakn.action.Model.PERSON;
+import static grakn.simulation.grakn.action.Model.RESIDENCY;
+import static grakn.simulation.grakn.action.Model.RESIDENCY_LOCATION;
+import static grakn.simulation.grakn.action.Model.RESIDENCY_RESIDENT;
 
 public class GraknUnmarriedPeopleInCityAction extends UnmarriedPeopleInCityAction<GraknOperation> {
     public GraknUnmarriedPeopleInCityAction(GraknOperation dbOperation, World.City city, String gender, LocalDateTime dobOfAdults) {

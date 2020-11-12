@@ -11,19 +11,19 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 
-import static grakn.simulation.grakn.schema.Schema.CITY;
-import static grakn.simulation.grakn.schema.Schema.EMAIL;
-import static grakn.simulation.grakn.schema.Schema.LOCATES;
-import static grakn.simulation.grakn.schema.Schema.LOCATES_LOCATED;
-import static grakn.simulation.grakn.schema.Schema.LOCATES_LOCATION;
-import static grakn.simulation.grakn.schema.Schema.LOCATION_NAME;
-import static grakn.simulation.grakn.schema.Schema.MARRIAGE;
-import static grakn.simulation.grakn.schema.Schema.MARRIAGE_HUSBAND;
-import static grakn.simulation.grakn.schema.Schema.MARRIAGE_ID;
-import static grakn.simulation.grakn.schema.Schema.MARRIAGE_WIFE;
-import static grakn.simulation.grakn.schema.Schema.PARENTSHIP;
-import static grakn.simulation.grakn.schema.Schema.PARENTSHIP_PARENT;
-import static grakn.simulation.grakn.schema.Schema.PERSON;
+import static grakn.simulation.grakn.action.Model.CITY;
+import static grakn.simulation.grakn.action.Model.EMAIL;
+import static grakn.simulation.grakn.action.Model.LOCATES;
+import static grakn.simulation.grakn.action.Model.LOCATES_LOCATED;
+import static grakn.simulation.grakn.action.Model.LOCATES_LOCATION;
+import static grakn.simulation.grakn.action.Model.LOCATION_NAME;
+import static grakn.simulation.grakn.action.Model.MARRIAGE;
+import static grakn.simulation.grakn.action.Model.MARRIAGE_HUSBAND;
+import static grakn.simulation.grakn.action.Model.MARRIAGE_ID;
+import static grakn.simulation.grakn.action.Model.MARRIAGE_WIFE;
+import static grakn.simulation.grakn.action.Model.PARENTSHIP;
+import static grakn.simulation.grakn.action.Model.PARENTSHIP_PARENT;
+import static grakn.simulation.grakn.action.Model.PERSON;
 import static java.util.stream.Collectors.toList;
 
 public class GraknMarriedCoupleAction extends MarriedCoupleAction<GraknOperation> {

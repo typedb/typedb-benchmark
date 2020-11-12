@@ -9,8 +9,8 @@ import org.neo4j.driver.Record;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 
-import static grakn.simulation.neo4j.schema.Schema.EMAIL;
-import static grakn.simulation.neo4j.schema.Schema.START_DATE;
+import static grakn.simulation.neo4j.action.Model.EMAIL;
+import static grakn.simulation.neo4j.action.Model.START_DATE;
 
 public class Neo4jInsertFriendshipAction extends InsertFriendshipAction<Neo4jOperation, Record> {
 

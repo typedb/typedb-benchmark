@@ -9,8 +9,8 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 
-import static grakn.simulation.neo4j.schema.Schema.GENDER;
-import static grakn.simulation.neo4j.schema.Schema.LOCATION_NAME;
+import static grakn.simulation.neo4j.action.Model.GENDER;
+import static grakn.simulation.neo4j.action.Model.LOCATION_NAME;
 
 public class Neo4jUnmarriedPeopleInCityAction extends UnmarriedPeopleInCityAction<Neo4jOperation> {
     public Neo4jUnmarriedPeopleInCityAction(Neo4jOperation dbOperation, World.City city, String gender, LocalDateTime dobOfAdults) {

@@ -11,11 +11,11 @@ import graql.lang.statement.Statement;
 
 import java.util.HashMap;
 
-import static grakn.simulation.grakn.schema.Schema.EMAIL;
-import static grakn.simulation.grakn.schema.Schema.PARENTSHIP;
-import static grakn.simulation.grakn.schema.Schema.PARENTSHIP_CHILD;
-import static grakn.simulation.grakn.schema.Schema.PARENTSHIP_PARENT;
-import static grakn.simulation.grakn.schema.Schema.PERSON;
+import static grakn.simulation.grakn.action.Model.EMAIL;
+import static grakn.simulation.grakn.action.Model.PARENTSHIP;
+import static grakn.simulation.grakn.action.Model.PARENTSHIP_CHILD;
+import static grakn.simulation.grakn.action.Model.PARENTSHIP_PARENT;
+import static grakn.simulation.grakn.action.Model.PERSON;
 
 public class GraknInsertParentShipAction extends InsertParentShipAction<GraknOperation, ConceptMap> {
     public GraknInsertParentShipAction(GraknOperation dbOperation, HashMap<SpouseType, String> marriage, String childEmail) {

@@ -1,6 +1,6 @@
-package grakn.simulation.grakn.schema;
+package grakn.simulation.grakn.action;
 
-public class Schema {
+public class Model {
     public static final String CITY = "city";
     public static final String COUNTRY = "country";
     public static final String CONTINENT = "continent";
@@ -93,7 +93,7 @@ public class Schema {
 
     private String name;
 
-    Schema(String name) {
+    Model(String name) {
         this.name = name;
     }
 

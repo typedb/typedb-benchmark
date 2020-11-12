@@ -7,13 +7,13 @@ import graql.lang.query.GraqlGet;
 
 import java.util.List;
 
-import static grakn.simulation.grakn.schema.Schema.CITY;
-import static grakn.simulation.grakn.schema.Schema.EMAIL;
-import static grakn.simulation.grakn.schema.Schema.LOCATION_NAME;
-import static grakn.simulation.grakn.schema.Schema.PERSON;
-import static grakn.simulation.grakn.schema.Schema.RESIDENCY;
-import static grakn.simulation.grakn.schema.Schema.RESIDENCY_LOCATION;
-import static grakn.simulation.grakn.schema.Schema.RESIDENCY_RESIDENT;
+import static grakn.simulation.grakn.action.Model.CITY;
+import static grakn.simulation.grakn.action.Model.EMAIL;
+import static grakn.simulation.grakn.action.Model.LOCATION_NAME;
+import static grakn.simulation.grakn.action.Model.PERSON;
+import static grakn.simulation.grakn.action.Model.RESIDENCY;
+import static grakn.simulation.grakn.action.Model.RESIDENCY_LOCATION;
+import static grakn.simulation.grakn.action.Model.RESIDENCY_RESIDENT;
 
 public class GraknFindLivedInAction extends FindLivedInAction<GraknOperation> {
     public GraknFindLivedInAction(GraknOperation dbOperation) {

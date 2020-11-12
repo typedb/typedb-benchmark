@@ -8,8 +8,8 @@ import graql.lang.query.GraqlGet;
 
 import java.util.List;
 
-import static grakn.simulation.grakn.schema.Schema.EMAIL;
-import static grakn.simulation.grakn.schema.Schema.PERSON;
+import static grakn.simulation.grakn.action.Model.EMAIL;
+import static grakn.simulation.grakn.action.Model.PERSON;
 
 public class GraknArbitraryOneHopAction extends ArbitraryOneHopAction<GraknOperation> {
     public GraknArbitraryOneHopAction(GraknOperation dbOperation) {

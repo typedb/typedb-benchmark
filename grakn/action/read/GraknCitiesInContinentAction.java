@@ -8,10 +8,10 @@ import graql.lang.query.GraqlGet;
 
 import java.util.List;
 
-import static grakn.simulation.grakn.schema.Schema.CITY;
-import static grakn.simulation.grakn.schema.Schema.CONTINENT;
-import static grakn.simulation.grakn.schema.Schema.LOCATION_HIERARCHY;
-import static grakn.simulation.grakn.schema.Schema.LOCATION_NAME;
+import static grakn.simulation.grakn.action.Model.CITY;
+import static grakn.simulation.grakn.action.Model.CONTINENT;
+import static grakn.simulation.grakn.action.Model.LOCATION_HIERARCHY;
+import static grakn.simulation.grakn.action.Model.LOCATION_NAME;
 
 public class GraknCitiesInContinentAction extends CitiesInContinentAction<GraknOperation> {
     public GraknCitiesInContinentAction(GraknOperation dbOperation, World.City city) {

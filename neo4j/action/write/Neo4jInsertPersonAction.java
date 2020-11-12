@@ -10,12 +10,12 @@ import org.neo4j.driver.Record;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 
-import static grakn.simulation.neo4j.schema.Schema.DATE_OF_BIRTH;
-import static grakn.simulation.neo4j.schema.Schema.EMAIL;
-import static grakn.simulation.neo4j.schema.Schema.FORENAME;
-import static grakn.simulation.neo4j.schema.Schema.GENDER;
-import static grakn.simulation.neo4j.schema.Schema.LOCATION_NAME;
-import static grakn.simulation.neo4j.schema.Schema.SURNAME;
+import static grakn.simulation.neo4j.action.Model.DATE_OF_BIRTH;
+import static grakn.simulation.neo4j.action.Model.EMAIL;
+import static grakn.simulation.neo4j.action.Model.FORENAME;
+import static grakn.simulation.neo4j.action.Model.GENDER;
+import static grakn.simulation.neo4j.action.Model.LOCATION_NAME;
+import static grakn.simulation.neo4j.action.Model.SURNAME;
 
 public class Neo4jInsertPersonAction extends InsertPersonAction<Neo4jOperation, Record> {
     public Neo4jInsertPersonAction(Neo4jOperation dbOperation, World.City city, LocalDateTime today, String email, String gender, String forename, String surname) {

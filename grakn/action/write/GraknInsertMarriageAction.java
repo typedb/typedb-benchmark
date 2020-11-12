@@ -12,17 +12,17 @@ import graql.lang.statement.StatementAttribute;
 
 import java.util.HashMap;
 
-import static grakn.simulation.grakn.schema.Schema.CITY;
-import static grakn.simulation.grakn.schema.Schema.EMAIL;
-import static grakn.simulation.grakn.schema.Schema.LOCATES;
-import static grakn.simulation.grakn.schema.Schema.LOCATES_LOCATED;
-import static grakn.simulation.grakn.schema.Schema.LOCATES_LOCATION;
-import static grakn.simulation.grakn.schema.Schema.LOCATION_NAME;
-import static grakn.simulation.grakn.schema.Schema.MARRIAGE;
-import static grakn.simulation.grakn.schema.Schema.MARRIAGE_HUSBAND;
-import static grakn.simulation.grakn.schema.Schema.MARRIAGE_ID;
-import static grakn.simulation.grakn.schema.Schema.MARRIAGE_WIFE;
-import static grakn.simulation.grakn.schema.Schema.PERSON;
+import static grakn.simulation.grakn.action.Model.CITY;
+import static grakn.simulation.grakn.action.Model.EMAIL;
+import static grakn.simulation.grakn.action.Model.LOCATES;
+import static grakn.simulation.grakn.action.Model.LOCATES_LOCATED;
+import static grakn.simulation.grakn.action.Model.LOCATES_LOCATION;
+import static grakn.simulation.grakn.action.Model.LOCATION_NAME;
+import static grakn.simulation.grakn.action.Model.MARRIAGE;
+import static grakn.simulation.grakn.action.Model.MARRIAGE_HUSBAND;
+import static grakn.simulation.grakn.action.Model.MARRIAGE_ID;
+import static grakn.simulation.grakn.action.Model.MARRIAGE_WIFE;
+import static grakn.simulation.grakn.action.Model.PERSON;
 
 public class GraknInsertMarriageAction extends InsertMarriageAction<GraknOperation, ConceptMap> {
 

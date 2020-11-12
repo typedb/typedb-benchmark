@@ -10,15 +10,15 @@ import graql.lang.statement.Statement;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static grakn.simulation.grakn.schema.Schema.CITY;
-import static grakn.simulation.grakn.schema.Schema.EMAIL;
-import static grakn.simulation.grakn.schema.Schema.END_DATE;
-import static grakn.simulation.grakn.schema.Schema.LOCATION_NAME;
-import static grakn.simulation.grakn.schema.Schema.PERSON;
-import static grakn.simulation.grakn.schema.Schema.RESIDENCY;
-import static grakn.simulation.grakn.schema.Schema.RESIDENCY_LOCATION;
-import static grakn.simulation.grakn.schema.Schema.RESIDENCY_RESIDENT;
-import static grakn.simulation.grakn.schema.Schema.START_DATE;
+import static grakn.simulation.grakn.action.Model.CITY;
+import static grakn.simulation.grakn.action.Model.EMAIL;
+import static grakn.simulation.grakn.action.Model.END_DATE;
+import static grakn.simulation.grakn.action.Model.LOCATION_NAME;
+import static grakn.simulation.grakn.action.Model.PERSON;
+import static grakn.simulation.grakn.action.Model.RESIDENCY;
+import static grakn.simulation.grakn.action.Model.RESIDENCY_LOCATION;
+import static grakn.simulation.grakn.action.Model.RESIDENCY_RESIDENT;
+import static grakn.simulation.grakn.action.Model.START_DATE;
 
 public class GraknResidentsInCityAction extends ResidentsInCityAction<GraknOperation> {
 

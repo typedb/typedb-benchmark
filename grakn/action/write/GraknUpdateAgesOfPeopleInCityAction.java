@@ -15,15 +15,15 @@ import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 
 import static grabl.tracing.client.GrablTracingThreadStatic.traceOnThread;
-import static grakn.simulation.grakn.schema.Schema.AGE;
-import static grakn.simulation.grakn.schema.Schema.BORN_IN;
-import static grakn.simulation.grakn.schema.Schema.BORN_IN_CHILD;
-import static grakn.simulation.grakn.schema.Schema.BORN_IN_PLACE_OF_BIRTH;
-import static grakn.simulation.grakn.schema.Schema.CITY;
-import static grakn.simulation.grakn.schema.Schema.DATE_OF_BIRTH;
-import static grakn.simulation.grakn.schema.Schema.EMAIL;
-import static grakn.simulation.grakn.schema.Schema.LOCATION_NAME;
-import static grakn.simulation.grakn.schema.Schema.PERSON;
+import static grakn.simulation.grakn.action.Model.AGE;
+import static grakn.simulation.grakn.action.Model.BORN_IN;
+import static grakn.simulation.grakn.action.Model.BORN_IN_CHILD;
+import static grakn.simulation.grakn.action.Model.BORN_IN_PLACE_OF_BIRTH;
+import static grakn.simulation.grakn.action.Model.CITY;
+import static grakn.simulation.grakn.action.Model.DATE_OF_BIRTH;
+import static grakn.simulation.grakn.action.Model.EMAIL;
+import static grakn.simulation.grakn.action.Model.LOCATION_NAME;
+import static grakn.simulation.grakn.action.Model.PERSON;
 
 public class GraknUpdateAgesOfPeopleInCityAction extends UpdateAgesOfPeopleInCityAction<GraknOperation> {
     public GraknUpdateAgesOfPeopleInCityAction(GraknOperation dbOperation, LocalDateTime today, World.City city) {

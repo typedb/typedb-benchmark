@@ -10,22 +10,22 @@ import graql.lang.query.GraqlInsert;
 
 import java.util.HashMap;
 
-import static grakn.simulation.grakn.schema.Schema.COMPANY;
-import static grakn.simulation.grakn.schema.Schema.COMPANY_NUMBER;
-import static grakn.simulation.grakn.schema.Schema.COUNTRY;
-import static grakn.simulation.grakn.schema.Schema.IS_TAXABLE;
-import static grakn.simulation.grakn.schema.Schema.LOCATES;
-import static grakn.simulation.grakn.schema.Schema.LOCATES_LOCATED;
-import static grakn.simulation.grakn.schema.Schema.LOCATES_LOCATION;
-import static grakn.simulation.grakn.schema.Schema.LOCATION_NAME;
-import static grakn.simulation.grakn.schema.Schema.PRODUCT;
-import static grakn.simulation.grakn.schema.Schema.PRODUCT_BARCODE;
-import static grakn.simulation.grakn.schema.Schema.PRODUCT_QUANTITY;
-import static grakn.simulation.grakn.schema.Schema.TRANSACTION;
-import static grakn.simulation.grakn.schema.Schema.TRANSACTION_BUYER;
-import static grakn.simulation.grakn.schema.Schema.TRANSACTION_MERCHANDISE;
-import static grakn.simulation.grakn.schema.Schema.TRANSACTION_SELLER;
-import static grakn.simulation.grakn.schema.Schema.VALUE;
+import static grakn.simulation.grakn.action.Model.COMPANY;
+import static grakn.simulation.grakn.action.Model.COMPANY_NUMBER;
+import static grakn.simulation.grakn.action.Model.COUNTRY;
+import static grakn.simulation.grakn.action.Model.IS_TAXABLE;
+import static grakn.simulation.grakn.action.Model.LOCATES;
+import static grakn.simulation.grakn.action.Model.LOCATES_LOCATED;
+import static grakn.simulation.grakn.action.Model.LOCATES_LOCATION;
+import static grakn.simulation.grakn.action.Model.LOCATION_NAME;
+import static grakn.simulation.grakn.action.Model.PRODUCT;
+import static grakn.simulation.grakn.action.Model.PRODUCT_BARCODE;
+import static grakn.simulation.grakn.action.Model.PRODUCT_QUANTITY;
+import static grakn.simulation.grakn.action.Model.TRANSACTION;
+import static grakn.simulation.grakn.action.Model.TRANSACTION_BUYER;
+import static grakn.simulation.grakn.action.Model.TRANSACTION_MERCHANDISE;
+import static grakn.simulation.grakn.action.Model.TRANSACTION_SELLER;
+import static grakn.simulation.grakn.action.Model.VALUE;
 
 public class GraknInsertTransactionAction extends InsertTransactionAction<GraknOperation, ConceptMap> {
 

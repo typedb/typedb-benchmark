@@ -7,16 +7,16 @@ import graql.lang.query.GraqlGet;
 
 import java.util.List;
 
-import static grakn.simulation.grakn.schema.Schema.BORN_IN;
-import static grakn.simulation.grakn.schema.Schema.BORN_IN_CHILD;
-import static grakn.simulation.grakn.schema.Schema.BORN_IN_PLACE_OF_BIRTH;
-import static grakn.simulation.grakn.schema.Schema.CITY;
-import static grakn.simulation.grakn.schema.Schema.EMAIL;
-import static grakn.simulation.grakn.schema.Schema.LOCATION_NAME;
-import static grakn.simulation.grakn.schema.Schema.PARENTSHIP;
-import static grakn.simulation.grakn.schema.Schema.PARENTSHIP_CHILD;
-import static grakn.simulation.grakn.schema.Schema.PARENTSHIP_PARENT;
-import static grakn.simulation.grakn.schema.Schema.PERSON;
+import static grakn.simulation.grakn.action.Model.BORN_IN;
+import static grakn.simulation.grakn.action.Model.BORN_IN_CHILD;
+import static grakn.simulation.grakn.action.Model.BORN_IN_PLACE_OF_BIRTH;
+import static grakn.simulation.grakn.action.Model.CITY;
+import static grakn.simulation.grakn.action.Model.EMAIL;
+import static grakn.simulation.grakn.action.Model.LOCATION_NAME;
+import static grakn.simulation.grakn.action.Model.PARENTSHIP;
+import static grakn.simulation.grakn.action.Model.PARENTSHIP_CHILD;
+import static grakn.simulation.grakn.action.Model.PARENTSHIP_PARENT;
+import static grakn.simulation.grakn.action.Model.PERSON;
 
 public class GraknTwoHopAction extends TwoHopAction<GraknOperation> {
     public GraknTwoHopAction(GraknOperation dbOperation) {

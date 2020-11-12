@@ -8,10 +8,10 @@ import org.neo4j.driver.Record;
 
 import java.util.HashMap;
 
-import static grakn.simulation.neo4j.schema.Schema.LOCATION_NAME;
-import static grakn.simulation.neo4j.schema.Schema.PRODUCT_BARCODE;
-import static grakn.simulation.neo4j.schema.Schema.PRODUCT_DESCRIPTION;
-import static grakn.simulation.neo4j.schema.Schema.PRODUCT_NAME;
+import static grakn.simulation.neo4j.action.Model.LOCATION_NAME;
+import static grakn.simulation.neo4j.action.Model.PRODUCT_BARCODE;
+import static grakn.simulation.neo4j.action.Model.PRODUCT_DESCRIPTION;
+import static grakn.simulation.neo4j.action.Model.PRODUCT_NAME;
 
 public class Neo4jInsertProductAction extends InsertProductAction<Neo4jOperation, Record> {
     public Neo4jInsertProductAction(Neo4jOperation dbOperation, World.Continent continent, Double barcode, String productName, String productDescription) {

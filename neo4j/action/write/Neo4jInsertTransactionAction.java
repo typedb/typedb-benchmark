@@ -4,7 +4,7 @@ import grakn.simulation.common.action.write.InsertTransactionAction;
 import grakn.simulation.common.utils.Pair;
 import grakn.simulation.common.world.World;
 import grakn.simulation.neo4j.driver.Neo4jOperation;
-import grakn.simulation.neo4j.schema.Schema;
+import grakn.simulation.neo4j.action.Model;
 import org.neo4j.driver.Query;
 import org.neo4j.driver.Record;
 
@@ -50,13 +50,13 @@ public class Neo4jInsertTransactionAction extends InsertTransactionAction<Neo4jO
     @Override
     protected HashMap<ComparableField, Object> outputForReport(Record answer) {
         return new HashMap<ComparableField, Object>() {{
-            put(InsertTransactionActionField.SELLER, answer.asMap().get("seller" + Schema.COMPANY_NUMBER));
-            put(InsertTransactionActionField.BUYER, answer.asMap().get("buyer" + Schema.COMPANY_NUMBER));
-            put(InsertTransactionActionField.MERCHANDISE, answer.asMap().get("product." + Schema.PRODUCT_BARCODE));
-            put(InsertTransactionActionField.VALUE, answer.asMap().get("transaction." + Schema.VALUE));
-            put(InsertTransactionActionField.PRODUCT_QUANTITY, answer.asMap().get("transaction." + Schema.PRODUCT_QUANTITY));
-            put(InsertTransactionActionField.IS_TAXABLE, answer.asMap().get("transaction." + Schema.IS_TAXABLE));
-            put(InsertTransactionActionField.COUNTRY, answer.asMap().get("country." + Schema.LOCATION_NAME));
+            put(InsertTransactionActionField.SELLER, answer.asMap().get("seller" + Model.COMPANY_NUMBER));
+            put(InsertTransactionActionField.BUYER, answer.asMap().get("buyer" + Model.COMPANY_NUMBER));
+            put(InsertTransactionActionField.MERCHANDISE, answer.asMap().get("product." + Model.PRODUCT_BARCODE));
+            put(InsertTransactionActionField.VALUE, answer.asMap().get("transaction." + Model.VALUE));
+            put(InsertTransactionActionField.PRODUCT_QUANTITY, answer.asMap().get("transaction." + Model.PRODUCT_QUANTITY));
+            put(InsertTransactionActionField.IS_TAXABLE, answer.asMap().get("transaction." + Model.IS_TAXABLE));
+            put(InsertTransactionActionField.COUNTRY, answer.asMap().get("country." + Model.LOCATION_NAME));
 
         }};
     }

@@ -9,9 +9,9 @@ import org.neo4j.driver.Record;
 
 import java.util.HashMap;
 
-import static grakn.simulation.neo4j.schema.Schema.EMAIL;
-import static grakn.simulation.neo4j.schema.Schema.LOCATION_NAME;
-import static grakn.simulation.neo4j.schema.Schema.MARRIAGE_ID;
+import static grakn.simulation.neo4j.action.Model.EMAIL;
+import static grakn.simulation.neo4j.action.Model.LOCATION_NAME;
+import static grakn.simulation.neo4j.action.Model.MARRIAGE_ID;
 
 public class Neo4jInsertMarriageAction extends InsertMarriageAction<Neo4jOperation, Record> {
 

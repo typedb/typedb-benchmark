@@ -12,11 +12,11 @@ import graql.lang.statement.StatementAttribute;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 
-import static grakn.simulation.grakn.schema.Schema.EMAIL;
-import static grakn.simulation.grakn.schema.Schema.FRIENDSHIP;
-import static grakn.simulation.grakn.schema.Schema.FRIENDSHIP_FRIEND;
-import static grakn.simulation.grakn.schema.Schema.PERSON;
-import static grakn.simulation.grakn.schema.Schema.START_DATE;
+import static grakn.simulation.grakn.action.Model.EMAIL;
+import static grakn.simulation.grakn.action.Model.FRIENDSHIP;
+import static grakn.simulation.grakn.action.Model.FRIENDSHIP_FRIEND;
+import static grakn.simulation.grakn.action.Model.PERSON;
+import static grakn.simulation.grakn.action.Model.START_DATE;
 
 public class GraknInsertFriendshipAction extends InsertFriendshipAction<GraknOperation, ConceptMap> {
 

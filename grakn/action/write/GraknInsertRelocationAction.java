@@ -11,15 +11,15 @@ import graql.lang.query.GraqlInsert;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 
-import static grakn.simulation.grakn.schema.Schema.CITY;
-import static grakn.simulation.grakn.schema.Schema.EMAIL;
-import static grakn.simulation.grakn.schema.Schema.LOCATION_NAME;
-import static grakn.simulation.grakn.schema.Schema.PERSON;
-import static grakn.simulation.grakn.schema.Schema.RELOCATION;
-import static grakn.simulation.grakn.schema.Schema.RELOCATION_DATE;
-import static grakn.simulation.grakn.schema.Schema.RELOCATION_NEW_LOCATION;
-import static grakn.simulation.grakn.schema.Schema.RELOCATION_PREVIOUS_LOCATION;
-import static grakn.simulation.grakn.schema.Schema.RELOCATION_RELOCATED_PERSON;
+import static grakn.simulation.grakn.action.Model.CITY;
+import static grakn.simulation.grakn.action.Model.EMAIL;
+import static grakn.simulation.grakn.action.Model.LOCATION_NAME;
+import static grakn.simulation.grakn.action.Model.PERSON;
+import static grakn.simulation.grakn.action.Model.RELOCATION;
+import static grakn.simulation.grakn.action.Model.RELOCATION_DATE;
+import static grakn.simulation.grakn.action.Model.RELOCATION_NEW_LOCATION;
+import static grakn.simulation.grakn.action.Model.RELOCATION_PREVIOUS_LOCATION;
+import static grakn.simulation.grakn.action.Model.RELOCATION_RELOCATED_PERSON;
 
 public class GraknInsertRelocationAction extends InsertRelocationAction<GraknOperation, ConceptMap> {
     public GraknInsertRelocationAction(GraknOperation dbOperation, World.City city, LocalDateTime today, String relocateeEmail, String relocationCityName) {
