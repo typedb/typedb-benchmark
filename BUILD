@@ -1,3 +1,5 @@
+load("@graknlabs_dependencies//tool/checkstyle:rules.bzl", "checkstyle_test")
+
 java_library(
     name = "simulation-lib",
     srcs = [
@@ -65,4 +67,10 @@ java_binary(
     ],
     main_class = "grakn.simulation.Simulation",
     runtime_deps = [":simulation-lib"],
+)
+
+checkstyle_test(
+    name = "checkstyle",
+    targets = [":simulation-lib"],
+    license_type = "agpl"
 )

@@ -1,3 +1,5 @@
+load("@graknlabs_dependencies//tool/checkstyle:rules.bzl", "checkstyle_test")
+
 exports_files([
     "templates/agent_section.tex",
     "templates/agent_queries.tex",

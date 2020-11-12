@@ -1,3 +1,5 @@
+load("@graknlabs_dependencies//tool/checkstyle:rules.bzl", "checkstyle_test")
+
 java_library(
     name = "grakn",
     srcs = glob([
@@ -26,3 +28,10 @@ java_library(
         "@maven//:org_slf4j_slf4j_api",
     ],
 )
+
+checkstyle_test(
+    name = "checkstyle",
+    targets = [":grakn"],
+    license_type = "agpl"
+)
+

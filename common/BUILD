@@ -1,3 +1,5 @@
+load("@graknlabs_dependencies//tool/checkstyle:rules.bzl", "checkstyle_test")
+
 java_library(
     name = "simulation-common",
     srcs = glob([
@@ -15,4 +17,10 @@ java_library(
         "@maven//:commons_cli_commons_cli",
         "@maven//:org_slf4j_slf4j_api",
     ],
+)
+
+checkstyle_test(
+    name = "checkstyle",
+    targets = [":simulation-common"],
+    license_type = "agpl"
 )

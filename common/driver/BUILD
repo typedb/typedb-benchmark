@@ -1,3 +1,5 @@
+load("@graknlabs_dependencies//tool/checkstyle:rules.bzl", "checkstyle_test")
+
 java_library(
     name = "driver",
     srcs = glob([
@@ -12,4 +14,10 @@ java_library(
         "@maven//:org_apache_commons_commons_lang3",
         "@maven//:org_slf4j_slf4j_api",
     ],
+)
+
+checkstyle_test(
+    name = "checkstyle",
+    targets = [":driver"],
+    license_type = "agpl"
 )

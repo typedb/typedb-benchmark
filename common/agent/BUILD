@@ -1,3 +1,5 @@
+load("@graknlabs_dependencies//tool/checkstyle:rules.bzl", "checkstyle_test")
+
 java_library(
     name = "agent",
     srcs = glob([
@@ -20,4 +22,10 @@ java_library(
         "@maven//:org_slf4j_slf4j_api",
         "@maven//:com_google_guava_guava",
     ],
+)
+
+checkstyle_test(
+    name = "checkstyle",
+    targets = [":agent"],
+    license_type = "agpl"
 )

@@ -1,3 +1,5 @@
+load("@graknlabs_dependencies//tool/checkstyle:rules.bzl", "checkstyle_test")
+
 java_library(
     name = "neo4j",
     srcs = glob([
@@ -25,4 +27,10 @@ java_library(
         "@maven//:org_slf4j_slf4j_api",
         "@neo4j//:org_neo4j_driver_neo4j_java_driver",
     ],
+)
+
+checkstyle_test(
+    name = "checkstyle",
+    targets = [":neo4j"],
+    license_type = "agpl",
 )

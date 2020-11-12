@@ -17,6 +17,7 @@
 # under the License.
 #
 
+load("@graknlabs_dependencies//tool/checkstyle:rules.bzl", "checkstyle_test")
 load("@graknlabs_dependencies//distribution/artifact:rules.bzl", "artifact_extractor")
 
 artifact_extractor(
@@ -52,4 +53,10 @@ java_test(
         "@maven//:junit_junit",
         "@maven//:org_slf4j_slf4j_api",
     ],
+)
+
+checkstyle_test(
+    name = "checkstyle",
+    targets = [":comparison-test"],
+    license_type = "agpl"
 )
