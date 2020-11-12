@@ -3,7 +3,7 @@ load("@graknlabs_dependencies//tool/checkstyle:rules.bzl", "checkstyle_test")
 filegroup(
     name = "data",
     srcs = [
-        "query_templates.yml",
+        "cypher_templates.yml",
     ],
     visibility = ["//visibility:public"],
 )
