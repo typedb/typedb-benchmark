@@ -1,16 +1,16 @@
 ---
 template: |
-  CREATE (x:Continent {locationName: <0>})
+  CREATE (x:Continent:Location {locationName: <0>})
 data_file: continents.csv
 ---
 template: |
   MATCH (c:Continent {locationName: <1>})
-  CREATE (x:Country {locationName: <0>})-[:LOCATED_IN]->(c)
+  CREATE (x:Country:Location {locationName: <0>})-[:LOCATED_IN]->(c)
 data_file: countries.csv
 ---
 template: |
   MATCH (c:Country {locationName: <1>})
-  CREATE (x:City {locationName: <0>})-[:LOCATED_IN]->(c)
+  CREATE (x:City:Location {locationName: <0>})-[:LOCATED_IN]->(c)
 data_file: cities.csv
 ---
 template: |

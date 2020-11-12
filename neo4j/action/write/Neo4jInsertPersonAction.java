@@ -50,8 +50,6 @@ public class Neo4jInsertPersonAction extends InsertPersonAction<Neo4jOperation, 
             put(SURNAME, surname);
         }};
         return Action.singleResult(dbOperation.execute(new Query(query(), parameters)));
-//        TODO Key constraints are possible with Neo4j Enterprise, and some constraints are supported in Community
-//        https://neo4j.com/developer/kb/how-to-implement-a-primary-key-property-for-a-label/
     }
 
     public static String query() {

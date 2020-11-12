@@ -57,7 +57,7 @@ public class Neo4jInsertMarriageAction extends InsertMarriageAction<Neo4jOperati
     protected HashMap<ComparableField, Object> outputForReport(Record answer) {
         return new HashMap<ComparableField, Object>(){{
             put(InsertMarriageActionField.MARRIAGE_IDENTIFIER, answer.asMap().get("marriage." + MARRIAGE_ID));
-            put(InsertMarriageActionField.WIFE_EMAIL, answer.asMap().get("wife." + EMAIL));  // TODO we get back the variables matched for in an insert?
+            put(InsertMarriageActionField.WIFE_EMAIL, answer.asMap().get("wife." + EMAIL));
             put(InsertMarriageActionField.HUSBAND_EMAIL, answer.asMap().get("husband." + EMAIL));
             put(InsertMarriageActionField.CITY_NAME, answer.asMap().get("city." + LOCATION_NAME));
         }};
