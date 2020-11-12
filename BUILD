@@ -26,7 +26,6 @@ java_binary(
     args = [
         "config/config_big.yml",
         "$(locations //common/data)",
-        "$(locations //grakn/schema:graql-schema)",
         "$(locations //grakn/data)",
         "$(locations //neo4j/data)",
     ],
@@ -34,7 +33,6 @@ java_binary(
         "//config:config_big.yml",
         "//common/data",
         "//grakn/data",
-        "//grakn/schema:graql-schema",
         "//neo4j/data",
     ],
     main_class = "grakn.simulation.SimulationRunner",
@@ -46,7 +44,6 @@ java_binary(
     args = [
         "config/config_small.yml",
         "$(locations //common/data)",
-        "$(locations //grakn/schema:graql-schema)",
         "$(locations //grakn/data)",
         "$(locations //neo4j/data)",
     ],
@@ -54,7 +51,6 @@ java_binary(
         "//config:config_small.yml",
         "//common/data",
         "//grakn/data",
-        "//grakn/schema:graql-schema",
         "//neo4j/data",
     ],
     main_class = "grakn.simulation.SimulationRunner",

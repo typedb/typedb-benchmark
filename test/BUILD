@@ -35,7 +35,6 @@ java_test(
     data = [
         "//common/data",
         "//grakn/data",
-        "//grakn/schema:graql-schema",
         "//neo4j/data",
     ],
     test_class = "grakn.simulation.test.ComparisonTest",

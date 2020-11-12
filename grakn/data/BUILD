@@ -1,7 +1,9 @@
 filegroup(
     name = "data",
-    srcs = glob([
-        "*.yml",
-    ]),
+    srcs = [
+        "schema.gql",
+        "schema-pt2.gql",
+        "query_templates.yml",
+    ],
     visibility = ["//visibility:public"],
 )

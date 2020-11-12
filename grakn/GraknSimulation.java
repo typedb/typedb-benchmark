@@ -72,6 +72,6 @@ public class GraknSimulation extends TransactionalSimulation<GraknDriver, GraknO
 
     private static void initialiseData(GraknClient.Session session, Map<String, Path> initialisationDataPaths) throws IOException, YAMLException {
         YAMLLoader loader = new GraknYAMLLoader(session, initialisationDataPaths);
-        loader.loadFile(initialisationDataPaths.get("grakn_data.yml").toFile());
+        loader.loadFile(initialisationDataPaths.get("query_templates.yml").toFile());
     }
 }

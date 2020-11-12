@@ -66,9 +66,7 @@ public class SimulationsForComparison {
         Map<String, Path> files = new HashMap<>();
 
         List<String> dirPaths = new ArrayList<>();
-        dirPaths.add("grakn/schema");
         dirPaths.add("common/data");
-        dirPaths.add("grakn/schema");
         dirPaths.add("grakn/data");
         dirPaths.add("neo4j/data");
 
