@@ -50,6 +50,7 @@ public class ComparisonTestSuite extends Suite {
                 runners.add(runner);
             } catch (InitializationError initializationError) {
                 initializationError.printStackTrace();
+                throw new RuntimeException("Failed to initialise test");
             }
         }
         return runners;

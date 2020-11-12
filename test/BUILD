@@ -53,6 +53,7 @@ java_test(
         "@maven//:junit_junit",
         "@maven//:org_slf4j_slf4j_api",
     ],
+    size = "enormous"
 )
 
 checkstyle_test(
