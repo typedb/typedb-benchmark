@@ -9,13 +9,12 @@ java_library(
     visibility = ["//visibility:public"],
     deps = [
         "//common/driver",
-        "//common/world",
         "//common/utils",
-        "@graknlabs_grabl_tracing//client",
+        "//common/world",
+        "@maven//:com_google_guava_guava",
         "@maven//:commons_cli_commons_cli",
         "@maven//:org_apache_commons_commons_csv",
         "@maven//:org_apache_commons_commons_lang3",
         "@maven//:org_slf4j_slf4j_api",
-        "@maven//:com_google_guava_guava",
     ],
 )

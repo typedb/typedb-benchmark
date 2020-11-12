@@ -28,8 +28,8 @@ java_test(
     name = "comparison-test",
     srcs = [
         "ComparisonTest.java",
-        "ComparisonTestSuite.java",
         "ComparisonTestRunner.java",
+        "ComparisonTestSuite.java",
         "SimulationsForComparison.java",
     ],
     data = [
@@ -39,18 +39,17 @@ java_test(
     ],
     test_class = "grakn.simulation.test.ComparisonTest",
     deps = [
-        "//:simulation-lib",
-        "//config",
-        "//common/agent",
         "//common/action",
+        "//common/agent",
         "//common/world",
+        "//config",
         "//grakn",
         "//neo4j",
         "@maven//:ch_qos_logback_logback_classic",
         "@maven//:commons_cli_commons_cli",
-        "@maven//:org_slf4j_slf4j_api",
-        "@maven//:junit_junit",
         "@maven//:javax_annotation_javax_annotation_api",
         "@maven//:javax_annotation_javax_annotation_api_1_3_2",
+        "@maven//:junit_junit",
+        "@maven//:org_slf4j_slf4j_api",
     ],
 )
