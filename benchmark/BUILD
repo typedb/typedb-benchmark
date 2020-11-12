@@ -1,3 +1,5 @@
+load("@graknlabs_dependencies//tool/checkstyle:rules.bzl", "checkstyle_test")
+
 exports_files([
     "templates/agent_section.tex",
     "templates/agent_queries.tex",
@@ -15,9 +17,9 @@ groovy_and_java_library(
     ]),
     visibility = ["//visibility:public"],
     deps = [
-        "//db/grakn",
-        "//db/neo4j",
-        "//db/common/agent",
+        "//grakn",
+        "//neo4j",
+        "//common/agent",
     ],
     data = [
         "templates/agent_section.tex",

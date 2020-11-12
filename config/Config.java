@@ -1,17 +1,34 @@
+/*
+ * Copyright (C) 2020 Grakn Labs
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package grakn.simulation.config;
 
 import java.util.List;
 import java.util.function.Function;
 
 public class Config {
-    private final static long DEFAULT_RANDOM_SEED = 1;
+    private final static int DEFAULT_RANDOM_SEED = 1;
     private final static int DEFAULT_NUM_ITERATIONS = 10;
     private final static int DEFAULT_SCALE_FACTOR = 5;
     private final static String DEFAULT_DATABASE_NAME = "world";
 
     private List<Agent> agents;
     private TraceSampling traceSampling;
-    private long randomSeed = DEFAULT_RANDOM_SEED;
+    private int randomSeed = DEFAULT_RANDOM_SEED;
     private int iterations = DEFAULT_NUM_ITERATIONS;
     private int scaleFactor = DEFAULT_SCALE_FACTOR;
     private String databaseName = DEFAULT_DATABASE_NAME;
@@ -32,11 +49,11 @@ public class Config {
         this.traceSampling = traceSampling;
     }
 
-    public long getRandomSeed() {
+    public int getRandomSeed() {
         return randomSeed;
     }
 
-    public void setRandomSeed(long randomSeed) {
+    public void setRandomSeed(int randomSeed) {
         this.randomSeed = randomSeed;
     }
 

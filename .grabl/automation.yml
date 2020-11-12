@@ -135,6 +135,16 @@ build:
           --api-token $GRABL_TOKEN \
           --config-file /home/grabl/simulation/config/config_big.yml
   correctness:
+    build:
+      machine: graknlabs-ubuntu-20.04
+      script: |
+        bazel build //...
+        bazel run @graknlabs_dependencies//tool/checkstyle:test-coverage
+        bazel test $(bazel query 'kind(checkstyle_test, //...)') --test_output=errors
+    build-dependency:
+      machine: graknlabs-ubuntu-20.04
+      script: |
+        bazel run @graknlabs_dependencies//tool/unuseddeps:unused-deps -- list
     test-comparison-grakn-background:
       machine: graknlabs-ubuntu-20.04-long
       type: background

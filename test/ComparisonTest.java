@@ -1,9 +1,24 @@
+/*
+ * Copyright (C) 2020 Grakn Labs
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package grakn.simulation.test;
 
-import grakn.simulation.db.common.action.Action;
-import grakn.simulation.db.common.agent.base.Agent;
-import grakn.simulation.db.grakn.driver.GraknDriver;
-import grakn.simulation.db.neo4j.driver.Neo4jDriver;
+import grakn.simulation.common.action.Action;
+import grakn.simulation.common.agent.base.Agent;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -18,13 +33,13 @@ public class ComparisonTest {
 
     private void compareReports(String agentName) {
 
-        Agent<?, GraknDriver, ?>.Report graknAgentReport = grakn.getReport().getAgentReport(agentName);
-        Agent<?, Neo4jDriver, ?>.Report neo4jAgentReport = neo4j.getReport().getAgentReport(agentName);
+        Agent<?, ?>.Report graknAgentReport = grakn.getReport().getAgentReport(agentName);
+        Agent<?, ?>.Report neo4jAgentReport = neo4j.getReport().getAgentReport(agentName);
 
         if (!graknAgentReport.equals(neo4jAgentReport)) {
             graknAgentReport.trackers().forEach(tracker -> {
-                Agent<?, GraknDriver, ?>.RegionalAgent.Report graknRegionReport = graknAgentReport.getRegionalAgentReport(tracker);
-                Agent<?, Neo4jDriver, ?>.RegionalAgent.Report neo4jRegionReport = neo4jAgentReport.getRegionalAgentReport(tracker);
+                Agent.Region.Report graknRegionReport = graknAgentReport.getRegionalAgentReport(tracker);
+                Agent.Region.Report neo4jRegionReport = neo4jAgentReport.getRegionalAgentReport(tracker);
 
                 if (!graknRegionReport.equals(neo4jRegionReport)) {
                     Iterator<Action<?, ?>.Report> graknIter = graknRegionReport.getActionReportIterator();

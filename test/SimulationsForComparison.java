@@ -1,14 +1,30 @@
+/*
+ * Copyright (C) 2020 Grakn Labs
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package grakn.simulation.test;
 
 import grakn.simulation.config.AgentMode;
 import grakn.simulation.config.Config;
 import grakn.simulation.config.SamplingFunction;
-import grakn.simulation.db.common.world.World;
-import grakn.simulation.db.grakn.GraknSimulation;
-import grakn.simulation.db.grakn.driver.GraknDriver;
-import grakn.simulation.db.neo4j.Neo4jSimulation;
-import grakn.simulation.db.neo4j.driver.Neo4jDriver;
-import grakn.simulation.utils.RandomSource;
+import grakn.simulation.common.world.World;
+import grakn.simulation.grakn.GraknSimulation;
+import grakn.simulation.grakn.driver.GraknDriver;
+import grakn.simulation.neo4j.Neo4jSimulation;
+import grakn.simulation.neo4j.driver.Neo4jDriver;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
@@ -27,7 +43,7 @@ import java.util.Objects;
 import java.util.function.Function;
 
 import static grakn.simulation.config.Config.Agent.ConstructAgentConfig;
-import static grakn.simulation.db.common.world.World.initialise;
+import static grakn.simulation.common.world.World.initialise;
 
 public class SimulationsForComparison {
     static final Neo4jSimulation neo4j;
@@ -56,7 +72,6 @@ public class SimulationsForComparison {
             neo4jUri = commandLine.getOptionValue("n");
         } catch (ParseException e) {
             System.err.println(e.getMessage());
-            System.exit(1);
         }
 
         int scaleFactor = 5;
@@ -67,11 +82,9 @@ public class SimulationsForComparison {
         Map<String, Path> files = new HashMap<>();
 
         List<String> dirPaths = new ArrayList<>();
-        dirPaths.add("db/grakn/schema");
-        dirPaths.add("db/common/data");
-        dirPaths.add("db/grakn/schema");
-        dirPaths.add("db/grakn/data");
-        dirPaths.add("db/neo4j/data");
+        dirPaths.add("common/data");
+        dirPaths.add("grakn/data");
+        dirPaths.add("neo4j/data");
 
         dirPaths.forEach(dirPath -> {
             Arrays.asList(Objects.requireNonNull(Paths.get(dirPath).toFile().listFiles())).forEach(file -> {
@@ -106,7 +119,7 @@ public class SimulationsForComparison {
         grakn = new GraknSimulation(
                 new GraknDriver(graknUri,"world"),
                 files,
-                new RandomSource(randomSeed),
+                randomSeed,
                 world,
                 agentConfigs,
                 samplingFunction,
@@ -119,7 +132,7 @@ public class SimulationsForComparison {
         neo4j = new Neo4jSimulation(
                 new Neo4jDriver(neo4jUri),
                 files,
-                new RandomSource(randomSeed),
+                randomSeed,
                 world,
                 agentConfigs,
                 samplingFunction,

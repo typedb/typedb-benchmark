@@ -1,14 +1,31 @@
+/*
+ * Copyright (C) 2020 Grakn Labs
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package grakn.simulation.benchmark
 
-import grakn.simulation.db.common.agent.insight.*
-import grakn.simulation.db.common.agent.write.AgeUpdateAgent
-import grakn.simulation.db.common.agent.write.PersonBirthAgent
-import grakn.simulation.db.grakn.action.insight.*
-import grakn.simulation.db.grakn.action.read.GraknBirthsInCityAction
-import grakn.simulation.db.grakn.action.write.GraknUpdateAgesOfPeopleInCityAction
-import grakn.simulation.db.neo4j.action.insight.*
-import grakn.simulation.db.neo4j.action.read.Neo4jBirthsInCityAction
-import grakn.simulation.db.neo4j.action.write.Neo4jUpdateAgesOfPeopleInCityAction
+import grakn.simulation.common.agent.insight.*
+import grakn.simulation.common.agent.write.AgeUpdateAgent
+import grakn.simulation.common.agent.write.PersonBirthAgent
+import grakn.simulation.grakn.action.insight.*
+import grakn.simulation.grakn.action.read.GraknBirthsInCityAction
+import grakn.simulation.grakn.action.write.GraknUpdateAgesOfPeopleInCityAction
+import grakn.simulation.neo4j.action.insight.*
+import grakn.simulation.neo4j.action.read.Neo4jBirthsInCityAction
+import grakn.simulation.neo4j.action.write.Neo4jUpdateAgesOfPeopleInCityAction
 import groovy.text.GStringTemplateEngine
 
 import java.time.LocalDateTime
