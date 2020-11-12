@@ -1,14 +1,14 @@
 package grakn.simulation.benchmark
 
-import grakn.simulation.db.common.agent.insight.*
-import grakn.simulation.db.common.agent.write.AgeUpdateAgent
-import grakn.simulation.db.common.agent.write.PersonBirthAgent
-import grakn.simulation.db.grakn.action.insight.*
-import grakn.simulation.db.grakn.action.read.GraknBirthsInCityAction
-import grakn.simulation.db.grakn.action.write.GraknUpdateAgesOfPeopleInCityAction
-import grakn.simulation.db.neo4j.action.insight.*
-import grakn.simulation.db.neo4j.action.read.Neo4jBirthsInCityAction
-import grakn.simulation.db.neo4j.action.write.Neo4jUpdateAgesOfPeopleInCityAction
+import grakn.simulation.common.agent.insight.*
+import grakn.simulation.common.agent.write.AgeUpdateAgent
+import grakn.simulation.common.agent.write.PersonBirthAgent
+import grakn.simulation.grakn.action.insight.*
+import grakn.simulation.grakn.action.read.GraknBirthsInCityAction
+import grakn.simulation.grakn.action.write.GraknUpdateAgesOfPeopleInCityAction
+import grakn.simulation.neo4j.action.insight.*
+import grakn.simulation.neo4j.action.read.Neo4jBirthsInCityAction
+import grakn.simulation.neo4j.action.write.Neo4jUpdateAgesOfPeopleInCityAction
 import groovy.text.GStringTemplateEngine
 
 import java.time.LocalDateTime
