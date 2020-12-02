@@ -9,7 +9,7 @@ To make an empty commit use the following command:
 
 ====================================================================================================
 
-*main* - commit to this branch to trigger the job that will make commits to 3 other repos - *job-execution*, *simulation* and *dependency-analysis*, and combine all the results into one.
+*main* - commit to this branch to trigger the job that will make commits to 3 other branches - *job-execution*, *simulation* and *dependency-analysis*, and combine all the results into one.
 Should be used to test overall functionality of grabl in 1 commit.
 
 ====================================================================================================
