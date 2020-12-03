@@ -10,6 +10,19 @@ To make an empty commit use the following command:
 ==================================================================================
 
 *main* - commit to this branch to trigger the job that will make commits to 3 other branches - *job-execution*, *simulation* and *dependency-analysis*, and combine all the results into one.
+
+**Structure**: 
+6 workflows: *quality*, *correctness*, *performance*, *validation*, *deployment*, *broadcast*
+**quality** contains filter and 3 job: 
+  ![#3cede0](https://via.placeholder.com/15/c5f015/000000?text=+) **quality-1** with a filter
+  **quality-2** filtered out by the owner filter
+  **quality-3** filtered out by the branch filter
+**correctness** contains 1 job: **quality-1** with a filter
+**quality** contains 1 job: **quality-1** with a filter
+**quality** contains 1 job: **quality-1** with a filter
+**quality** contains 1 job: **quality-1** with a filter
+**quality** contains 1 job: **quality-1** with a filter
+
 Should be used to test overall functionality of grabl in 1 commit.
 
 ==================================================================================
