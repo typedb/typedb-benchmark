@@ -42,9 +42,14 @@ The job set will contain: job with large log file, failed jobs, jobs run in parr
   **performance-analysis** wich does NOT contain performance analysis itself, but a dummy job that produces 10 000 line 
   
   
-**validation** contains 1 job: **validation-1**
-**deployment** contains 1 job: **deployment-1**
-**broadcast** contains 1 job: **broadcast-1**
+**validation** contains 1 job: 
+ **validation-1**
+**deployment** contains 3 jobs: 
+ **deployment-1**
+ **deployment-2** should fail
+ **deployment-3** should fail
+**broadcast** contains 1 job: 
+ **broadcast-1** should fail
 
 Should be used to test overall functionality of job execution, Grabl UI and release functionality.
 
