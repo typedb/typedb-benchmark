@@ -29,47 +29,86 @@ build:
         branch: main
       machine: graknlabs-ubuntu-20.04-java11
       script: |
-        quality-1
+        echo quality-1
     quality-2:
       filter:
         owner: graknlabs-test-123
         branch: main
       machine: graknlabs-ubuntu-20.04-java11
       script: |
-        quality-2
+        echo quality-2
     quality-3:
       filter:
         owner: graknlabs-test
         branch: main-123
       machine: graknlabs-ubuntu-20.04-java11
       script: |
-        quality-3
+        echo quality-3
   correctness:
     correctness-1-a:
       type: background
       machine: graknlabs-ubuntu-20.04-java11
       script: |
-        correctness-1-a
+        echo correctness-1-a
     correctness-1-b:
       type: foreground
       machine: graknlabs-ubuntu-20.04-java11
       script: |
-        correctness-1-b
+        echo correctness-1-b
     correctness-2:
       machine: graknlabs-ubuntu-20.04-java11
       dependencies: [correctness-1-a, correctness-1-b]
       script: |
-        correctness-2
+        echo correctness-2
     correctness-3:
       machine: graknlabs-ubuntu-20.04-java11
       dependencies: [correctness-2]
       script: |
-        correctness-3
+        echo correctness-3
   performance:
     performance-1:
       machine: graknlabs-ubuntu-20.04-java11
       script: |
-        echo "line\nline\nline\nline\nline\nline\nline\nline\nline\nline\nline\nline\nline\nline\nline\nline\n"
+        for VARIABLE in 1 2 3 .. 1000
+        do
+        	echo 1 - 1000   -> $VARIABLE
+        done
+        for VARIABLE in 1 2 3 .. 1000
+        do
+            echo 1001 - 2000   -> $VARIABLE
+        done
+        for VARIABLE in 1 2 3 .. 1000
+        do
+            echo 2001 - 3000   -> $VARIABLE
+        done
+        for VARIABLE in 1 2 3 .. 1000
+        do
+            echo 3001 - 4000   -> $VARIABLE
+        done
+        for VARIABLE in 1 2 3 .. 1000
+        do
+            echo 4001 - 5000   -> $VARIABLE
+        done
+        for VARIABLE in 1 2 3 .. 1000
+        do
+            echo 5001 - 6000   -> $VARIABLE
+        done
+        for VARIABLE in 1 2 3 .. 1000
+        do
+            echo 6001 - 7000   -> $VARIABLE
+        done
+        for VARIABLE in 1 2 3 .. 1000
+        do
+            echo 7001 - 8000   -> $VARIABLE
+        done
+        for VARIABLE in 1 2 3 .. 1000
+        do
+            echo 8001 - 9000   -> $VARIABLE
+        done
+        for VARIABLE in 1 2 3 .. 1000
+        do
+            echo 9001 - 10000   -> $VARIABLE
+        done
 release:
   validation:
     validation-1:
@@ -85,14 +124,15 @@ release:
       machine: graknlabs-ubuntu-20.04-java11
       dependencies: [deployment-1]
       script: |
-        echo 14
+        test
     deployment-3:
       machine: graknlabs-ubuntu-20.04-java11
       dependencies: [deployment-2]
       script: |
-        echo 15
+        test
   broadcast:
-    bump-version:
+    broadcast-1:
       machine: graknlabs-ubuntu-20.04-java11
       type: foreground
-      script: echo bump-version
+      script: |
+        test
