@@ -14,7 +14,8 @@ To make an empty commit use the following command:
 **Structure**: 
 6 workflows: *quality*, *correctness*, *performance*, *validation*, *deployment*, *broadcast*
 **quality** contains filter and 3 job: 
-  ![#3cede0](https://via.placeholder.com/15/c5f015/000000?text=+) **quality-1** with a filter
+
+  `#ffffff`**quality-1** with a filter
   **quality-2** filtered out by the owner filter
   **quality-3** filtered out by the branch filter
 **correctness** contains 1 job: **quality-1** with a filter
