@@ -23,70 +23,72 @@ build:
     filter:
       owner: graknlabs-test
       branch: main
-    build-analysis:
+    quality-1:
+      filter:
+        owner: graknlabs-test
+        branch: main
       machine: graknlabs-ubuntu-20.04-java11
       script: |
-        echo 1
+        quality-1
+    quality-2:
+      filter:
+        owner: graknlabs-test-123
+        branch: main
+      machine: graknlabs-ubuntu-20.04-java11
+      script: |
+        quality-2
+    quality-3:
+      filter:
+        owner: graknlabs-test
+        branch: main-123
+      machine: graknlabs-ubuntu-20.04-java11
+      script: |
+        quality-3
   correctness:
-    build:
+    correctness-1-a:
+      type: background
       machine: graknlabs-ubuntu-20.04-java11
       script: |
-        echo 2
-    build-dependency:
+        correctness-1-a
+    correctness-1-b:
+      type: foreground
       machine: graknlabs-ubuntu-20.04-java11
       script: |
-        echo 3
-    test-assembly-linux-targz:
+        correctness-1-b
+    correctness-2:
       machine: graknlabs-ubuntu-20.04-java11
-      filter:
-        owner: graknlabs-test
-        branch: main
-      dependencies: [build, build-dependency]
+      dependencies: [correctness-1-a, correctness-1-b]
       script: |
-        echo 6
-    deploy-artifact-snapshot:
+        correctness-2
+    correctness-3:
       machine: graknlabs-ubuntu-20.04-java11
-      filter:
-        owner: graknlabs-test
-        branch: main
-      dependencies: [test-assembly-linux-targz]
+      dependencies: [correctness-2]
       script: |
-        echo 8
+        correctness-3
   performance:
-    performance-analysis:
+    performance-1:
       machine: graknlabs-ubuntu-20.04-java11
       script: |
-        echo performance analysis
+        echo "line\nline\nline\nline\nline\nline\nline\nline\nline\nline\nline\nline\nline\nline\nline\nline\n"
 release:
-  filter:
-    owner: graknlabs-test
-    branch: main
   validation:
-    validate-dependencies:
+    validation-1:
       machine: graknlabs-ubuntu-20.04-java11
-      script: echo 12
+      script: |
+        echo 12
   deployment:
-    deploy-github:
+    deployment-1:
       machine: graknlabs-ubuntu-20.04-java11
-      filter:
-        owner: graknlabs-test
-        branch: main
       script: |
         echo 13
-    deploy-brew:
+    deployment-2:
       machine: graknlabs-ubuntu-20.04-java11
-      dependencies: [deploy-github]
-      filter:
-        owner: graknlabs-test
-        branch: main
+      dependencies: [deployment-1]
       script: |
         echo 14
-    deploy-apt-release:
+    deployment-3:
       machine: graknlabs-ubuntu-20.04-java11
-      filter:
-        owner: graknlabs-test
-        branch: main
-      dependencies: [deploy-brew]
+      dependencies: [deployment-2]
       script: |
         echo 15
   broadcast:
