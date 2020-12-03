@@ -69,43 +69,43 @@ build:
     performance-1:
       machine: graknlabs-ubuntu-20.04-java11
       script: |
-        for VARIABLE in 1 2 3 .. 1000
+        for VARIABLE in {1 2 3 .. 1000}
         do
         	echo 1 - 1000   -> $VARIABLE
         done
-        for VARIABLE in 1 2 3 .. 1000
+        for VARIABLE in {1 2 3 .. 1000}
         do
             echo 1001 - 2000   -> $VARIABLE
         done
-        for VARIABLE in 1 2 3 .. 1000
+        for VARIABLE in {1 2 3 .. 1000}
         do
             echo 2001 - 3000   -> $VARIABLE
         done
-        for VARIABLE in 1 2 3 .. 1000
+        for VARIABLE in {1 2 3 .. 1000}
         do
             echo 3001 - 4000   -> $VARIABLE
         done
-        for VARIABLE in 1 2 3 .. 1000
+        for VARIABLE in {1 2 3 .. 1000}
         do
             echo 4001 - 5000   -> $VARIABLE
         done
-        for VARIABLE in 1 2 3 .. 1000
+        for VARIABLE in {1 2 3 .. 1000}
         do
             echo 5001 - 6000   -> $VARIABLE
         done
-        for VARIABLE in 1 2 3 .. 1000
+        for VARIABLE in {1 2 3 .. 1000}
         do
             echo 6001 - 7000   -> $VARIABLE
         done
-        for VARIABLE in 1 2 3 .. 1000
+        for VARIABLE in {1 2 3 .. 1000}
         do
             echo 7001 - 8000   -> $VARIABLE
         done
-        for VARIABLE in 1 2 3 .. 1000
+        for VARIABLE in {1 2 3 .. 1000}
         do
             echo 8001 - 9000   -> $VARIABLE
         done
-        for VARIABLE in 1 2 3 .. 1000
+        for VARIABLE in {1 2 3 .. 1000}
         do
             echo 9001 - 10000   -> $VARIABLE
         done
