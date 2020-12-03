@@ -21,7 +21,7 @@ config:
 build:
   quality:
     filter:
-      owner: graknlabs
+      owner: graknlabs-test
       branch: main
     build-analysis:
       machine: graknlabs-ubuntu-20.04-java11
@@ -47,63 +47,63 @@ build:
     test-assembly-linux-targz:
       machine: graknlabs-ubuntu-20.04-java11
       filter:
-        owner: graknlabs
-        branch: master
+        owner: graknlabs-test
+        branch: main
       dependencies: [build, build-dependency, test-integration, test-behaviour]
       script: |
         echo 6
     test-assembly-docker:
       machine: graknlabs-ubuntu-20.04-java11
       filter:
-        owner: graknlabs
-        branch: master
+        owner: graknlabs-test
+        branch: main
       dependencies: [build, build-dependency, test-integration, test-behaviour]
       script: |
         echo 7
     deploy-artifact-snapshot:
       machine: graknlabs-ubuntu-20.04-java11
       filter:
-        owner: graknlabs
-        branch: master
+        owner: graknlabs-test
+        branch: main
       dependencies: [test-assembly-linux-targz]
       script: |
         echo 8
     deploy-apt-snapshot:
       machine: graknlabs-ubuntu-20.04-java11
       filter:
-        owner: graknlabs
-        branch: master
+        owner: graknlabs-test
+        branch: main
       dependencies: [test-assembly-linux-targz]
       script: |
         echo 9
     deploy-rpm-snapshot:
       machine: graknlabs-ubuntu-20.04-java11
       filter:
-        owner: graknlabs
-        branch: master
+        owner: graknlabs-test
+        branch: main
       dependencies: [test-assembly-linux-targz]
       script: |
         echo 10
     test-deployment-apt:
       machine: graknlabs-ubuntu-20.04-java11
       filter:
-        owner: graknlabs
-        branch: master
+        owner: graknlabs-test
+        branch: main
       dependencies: [deploy-apt-snapshot]
       script: |
         echo 11
     test-deployment-rpm:
       machine: graknlabs-centos-8.2
       filter:
-        owner: graknlabs
-        branch: master
+        owner: graknlabs-test
+        branch: main
       dependencies: [deploy-rpm-snapshot]
       script: |
         echo 12
 release:
   filter:
-    owner: graknlabs
-    branch: master
+    owner: graknlabs-test
+    branch: main
   validation:
     validate-dependencies:
       machine: graknlabs-ubuntu-20.04-java11
@@ -112,47 +112,47 @@ release:
     deploy-github:
       machine: graknlabs-ubuntu-20.04-java11
       filter:
-        owner: graknlabs
-        branch: master
+        owner: graknlabs-test
+        branch: main
       script: |
         echo 13
     deploy-brew:
       machine: graknlabs-ubuntu-20.04-java11
       dependencies: [deploy-github]
       filter:
-        owner: graknlabs
-        branch: master
+        owner: graknlabs-test
+        branch: main
       script: |
         echo 14
     deploy-apt-release:
       machine: graknlabs-ubuntu-20.04-java11
       filter:
-        owner: graknlabs
-        branch: master
+        owner: graknlabs-test
+        branch: main
       dependencies: [deploy-github]
       script: |
         echo 15
     deploy-rpm-release:
       machine: graknlabs-ubuntu-20.04-java11
       filter:
-        owner: graknlabs
-        branch: master
+        owner: graknlabs-test
+        branch: main
       dependencies: [deploy-github]
       script: |
         echo 16
     deploy-docker:
       machine: graknlabs-ubuntu-20.04-java11
       filter:
-        owner: graknlabs
-        branch: master
+        owner: graknlabs-test
+        branch: main
       dependencies: [deploy-github]
       script: |
         echo 17
     deploy-artifact-release:
       machine: graknlabs-ubuntu-20.04-java11
       filter:
-        owner: graknlabs
-        branch: master
+        owner: graknlabs-test
+        branch: main
       dependencies: [deploy-github]
       script: |
         echo 18
