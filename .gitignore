@@ -1,8 +1,31 @@
-# OSX files
+# Misc
 .DS_Store
+*.log
 
-# IDE folders
+# Temporary source files
+tmp/
+
+# IDE files
+.idea/
+.ijwb/
+*.iml
 .vscode
-.idea
-.ijwb
+.settings
+.project
+.classpath
+.factorypath
+.grok*
 
+# Compiled files
+target/
+bin/
+dist/
+
+# NPM
+node_modules/
+
+# Python
+__pycache__
+
+# Bazel
+bazel-*
