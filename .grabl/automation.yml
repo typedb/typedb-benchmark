@@ -26,7 +26,7 @@ build:
           --commit $GRABL_COMMIT \
           --username $GRABL_OWNER \
           --api-token $GRABL_TOKEN \
-          --config-file /home/grabl/simulation/config/config_small.yml
+          --config-file /home/grabl/grabl-test/config/config_small.yml
     test-performance-small-neo4j-background:
       machine: graknlabs-ubuntu-20.04-long
       type: background
@@ -60,4 +60,4 @@ build:
           --commit $GRABL_COMMIT \
           --username $GRABL_OWNER \
           --api-token $GRABL_TOKEN \
-          --config-file /home/grabl/simulation/config/config_small.yml
+          --config-file /home/grabl/grabl-test/config/config_small.yml
