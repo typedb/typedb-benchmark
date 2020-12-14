@@ -53,7 +53,8 @@ build:
       dependencies: [test-performance-small-neo4j-background]
       timeout: "18000"
       script: |
-        bazel run //:simulation-small -- \
+        sudo wget -O /tmp/rootCA.jks "https://storage.googleapis.com/grabl-dev-secrets/rootCA.jks"
+        bazel run --jvmopt "-Djavax.net.ssl.trustStore=/tmp/rootCA.jks -Djavax.net.ssl.trustStorePassword=changeit" //:simulation-small -- \
           --database neo4j \
           --database-uri $GRABL_EXPORT_PERFORMANCE_SMALL_NEO4J_URI \
           --tracing-uri $GRABL_TRACING_URI \
