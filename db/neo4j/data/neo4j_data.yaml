@@ -1,0 +1,25 @@
+---
+template: |
+  CREATE (x:Continent {locationName: <0>})
+data_file: continents.csv
+---
+template: |
+  MATCH (c:Continent {locationName: <1>})
+  CREATE (x:Country {locationName: <0>})-[:LOCATED_IN]->(c)
+data_file: countries.csv
+---
+template: |
+  MATCH (c:Country {locationName: <1>})
+  CREATE (x:City {locationName: <0>})-[:LOCATED_IN]->(c)
+data_file: cities.csv
+---
+template: |
+  MATCH (country:Country {locationName: <0>})
+  SET country.currency = <1>
+data_file: country_currencies.csv
+---
+template: |
+  MATCH (country:Country {locationName: <0>})
+  SET country.language = <1>
+data_file: country_languages.csv
+...
