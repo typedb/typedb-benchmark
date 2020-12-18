@@ -13,6 +13,7 @@ java_library(
 
 checkstyle_test(
     name = "checkstyle",
-    targets = [":world"],
-    license_type = "agpl"
+    include = [":world"],
+    license_type = "agpl",
+    size = "small",
 )
