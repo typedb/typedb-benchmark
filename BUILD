@@ -1,23 +1,21 @@
+load("@graknlabs_dependencies//tool/checkstyle:rules.bzl", "checkstyle_test")
+
 java_library(
     name = "simulation-lib",
     srcs = [
-        "Simulation.java",
+        "SimulationRunner.java",
     ],
-    resource_strip_prefix = "conf/",
+    resource_strip_prefix = "config/",
     resources = [
-        "conf/logback.xml",
+        "//config:logback.xml",
     ],
     visibility = ["//visibility:public"],
     deps = [
-        "//utils",
         "//config",
-        "//db/grakn",
-        "//db/neo4j",
-        "//db/common/agents",
-        "//db/common/driver",
-        "//db/common/initialise",
-        "//db/common/world",
-        "@graknlabs_client_java//:client-java",
+        "//common:simulation-common",
+        "//common/world",
+        "//grakn",
+        "//neo4j",
         "@graknlabs_grabl_tracing//client",
         "@maven//:ch_qos_logback_logback_classic",
         "@maven//:commons_cli_commons_cli",
@@ -26,21 +24,38 @@ java_library(
 )
 
 java_binary(
-    name = "simulation",
+    name = "simulation-big",
     args = [
-        "$(locations //db/common/data)",
-        "$(locations //db/grakn/schema)",
-        "$(locations //db/grakn/data)",
-        "$(locations //db/neo4j/data)",
+        "config/config_big.yml",
+        "$(locations //common/data)",
+        "$(locations //grakn/data)",
+        "$(locations //neo4j/data)",
     ],
     data = [
-        "//config:config.yaml",
-        "//db/common/data",
-        "//db/grakn/schema",
-        "//db/grakn/data",
-        "//db/neo4j/data",
+        "//config:config_big.yml",
+        "//common/data",
+        "//grakn/data",
+        "//neo4j/data",
     ],
-    main_class = "grakn.simulation.Simulation",
+    main_class = "grakn.simulation.SimulationRunner",
+    runtime_deps = [":simulation-lib"],
+)
+
+java_binary(
+    name = "simulation-small",
+    args = [
+        "config/config_small.yml",
+        "$(locations //common/data)",
+        "$(locations //grakn/data)",
+        "$(locations //neo4j/data)",
+    ],
+    data = [
+        "//config:config_small.yml",
+        "//common/data",
+        "//grakn/data",
+        "//neo4j/data",
+    ],
+    main_class = "grakn.simulation.SimulationRunner",
     runtime_deps = [":simulation-lib"],
 )
 
@@ -54,12 +69,8 @@ java_binary(
     runtime_deps = [":simulation-lib"],
 )
 
-# CI targets that are not declared in any BUILD file, but are called externally
-filegroup(
-    name = "ci",
-    data = [
-        "@graknlabs_dependencies//tool/bazelrun:rbe",
-        "@graknlabs_dependencies//distribution/artifact:create-netrc",
-        "@graknlabs_dependencies//tool/unuseddeps:unused-deps",
-    ],
+checkstyle_test(
+    name = "checkstyle",
+    targets = [":simulation-lib"],
+    license_type = "agpl"
 )

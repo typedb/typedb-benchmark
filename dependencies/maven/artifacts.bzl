@@ -7,4 +7,5 @@ artifacts = [
   "org.hamcrest:hamcrest",
   "org.slf4j:slf4j-api",
   "org.yaml:snakeyaml",
+  "junit:junit",
 ]

@@ -17,9 +17,47 @@
 # under the License.
 #
 
-load("@graknlabs_bazel_distribution//artifact:rules.bzl", "artifact_extractor")
+load("@graknlabs_dependencies//tool/checkstyle:rules.bzl", "checkstyle_test")
+load("@graknlabs_dependencies//distribution/artifact:rules.bzl", "artifact_extractor")
 
 artifact_extractor(
     name = "grakn-extractor",
     artifact = "@graknlabs_grakn_core_artifact//file",
+)
+
+java_test(
+    name = "comparison-test",
+    srcs = [
+        "ComparisonTest.java",
+        "ComparisonTestRunner.java",
+        "ComparisonTestSuite.java",
+        "SimulationsForComparison.java",
+    ],
+    data = [
+        "//common/data",
+        "//grakn/data",
+        "//neo4j/data",
+    ],
+    test_class = "grakn.simulation.test.ComparisonTest",
+    deps = [
+        "//common/action",
+        "//common/agent",
+        "//common/world",
+        "//config",
+        "//grakn",
+        "//neo4j",
+        "@maven//:ch_qos_logback_logback_classic",
+        "@maven//:commons_cli_commons_cli",
+        "@maven//:javax_annotation_javax_annotation_api",
+        "@maven//:javax_annotation_javax_annotation_api_1_3_2",
+        "@maven//:junit_junit",
+        "@maven//:org_slf4j_slf4j_api",
+    ],
+    size = "enormous"
+)
+
+checkstyle_test(
+    name = "checkstyle",
+    targets = [":comparison-test"],
+    license_type = "agpl"
 )

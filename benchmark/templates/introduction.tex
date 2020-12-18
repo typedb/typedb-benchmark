@@ -1,0 +1,57 @@
+\documentclass{article}
+\usepackage{listings}
+\usepackage{graphicx}
+\usepackage{float}
+\graphicspath{ {./plots/} }
+\lstset{
+basicstyle=\small\ttfamily,
+columns=flexible,
+breaklines=true
+}
+
+\begin{document}
+
+\title{Grakn Benchmark}
+\date{23rd October 2020}
+\author{Grakn Labs Limited}
+
+\maketitle
+
+\begin{abstract}
+Here we introduce the benchmarking report and all of the stuff in it.
+\end{abstract}
+
+\section{Introduction}
+Here we'll talk about how we went about benchmarking Grakn, and how we drew comparisons with property graph databases.
+
+Our objectives:
+1. Profile Grakn query latency and throughput as scale increases, with parallelism
+    - This is for internal use at Grakn Labs, to ensure that Grakn Core and Grakn Cluster only improve in performance across all queries without any regression
+    - Therefore this is integrated into our CI system, Grabl
+2. Use the same infrastructure to profile other databases against the same synthetically generated data
+    - This creates like-for-like data models stored in different database softwares.
+    - Emulate units of work that resemble a real application
+
+- Machine specs
+
+\subsubsection{Application Simulation}
+
+We have built a synthetic data generator that grows the data over each iteration. The generator grows and reads the data using predefined queries, with randomisation introduced in:
+- which graph nodes are connected together
+- the literal values of properties/attributes inserted
+- the number of nodes introduced each iteration
+
+This has been achieved
+
+- With queries that we can profile
+- With queries that utilise all of the knowledge representation constructs that Graql offers
+- With queries that require conclusions from Graql rules
+
+
+\section{Overview}
+Comparison of db query performance
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=1.0\textwidth]{overview}
+\end{figure}
