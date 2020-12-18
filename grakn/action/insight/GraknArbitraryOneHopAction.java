@@ -42,7 +42,7 @@ public class GraknArbitraryOneHopAction extends ArbitraryOneHopAction<GraknOpera
     public static GraqlMatch.Filtered query() {
         return Graql.match(
                     Graql.var(PERSON).isa(PERSON).has(EMAIL, PERSON_EMAIL_FOR_QUERY),
-                    Graql.var().rel(Graql.var(PERSON), Graql.var("x"))
+                    Graql.var().rel(Graql.var(PERSON)).rel(Graql.var("x"))
             ).get("x");
     }
 }
