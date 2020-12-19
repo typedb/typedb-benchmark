@@ -36,7 +36,7 @@ import java.util.stream.Stream;
 
 public class World implements Region {
 
-    public final int AGE_OF_ADULTHOOD = 2;
+    public final int AGE_OF_ADULTHOOD = 1;
     private final int scaleFactor;
     private Path logDirPath;
 
