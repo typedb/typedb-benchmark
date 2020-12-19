@@ -4,12 +4,12 @@ define
 # Attributes
 #######################################################################
 
-name sub attribute,
+name sub attribute, abstract,
     value string;
 
 location-name sub name;
 
-organisation-name sub name;
+organisation-name sub name, abstract;
 company-name sub organisation-name;
 #university-name sub organisation-name;
 #charity-name sub organisation-name;
@@ -57,10 +57,10 @@ language sub attribute,
 #num-characters sub attribute,
 #    value long;
 
-text-content sub attribute,
+text-content sub attribute, abstract,
     value string;
-#    has content-language, # Seems to break grakn when querying for this
-#    has num-characters;
+#    owns content-language, # Seems to break grakn when querying for this
+#    owns num-characters;
 
 contract-content sub text-content;
 
@@ -77,7 +77,7 @@ currency-code sub attribute,
 currency sub attribute,
     value string,
     regex "^(American Dollar|Great British Pound|Euro|Brazilian Real|South African Rand|Renminbi|Australian Dollar)$",
-    has currency-code;
+    owns currency-code;
 
 value sub attribute,
     value double;
@@ -88,19 +88,16 @@ date-signed sub attribute,
 email sub attribute,
     value string;
 
-identifier sub attribute,
+identifier sub attribute, abstract,
     value long;
-
-identifier-double sub attribute,
-    value double;
 
 marriage-id sub identifier;
 
-#service-id sub identifier-double;
+#service-id sub identifier;
 
-product-barcode sub identifier-double;
+product-barcode sub identifier;
 
-description sub attribute,
+description sub attribute, abstract,
     value string;
 
 product-description sub description;
@@ -126,63 +123,63 @@ is-current sub attribute,
 
 location sub entity,
     abstract,
-    key location-name,
-    plays location-hierarchy_superior,
-    plays location-hierarchy_subordinate,
-    plays relocation_previous-location,
-    plays relocation_new-location,
-    plays locates_location,
-    plays born-in_place-of-birth;  # TODO Can we avoid using this but also avoid validation errors?
+    owns location-name @key,
+    plays location-hierarchy:superior,
+    plays location-hierarchy:subordinate,
+    plays relocation:previous-location,
+    plays relocation:new-location,
+    plays locates:location,
+    plays born-in:place-of-birth;  # TODO Can we avoid using this but also avoid validation errors?
 
 city sub location,
-    plays residency_location;
+    plays residency:location;
 
 country sub location,
-    has currency,
-    has language,
-    plays incorporation_incorporating;
+    owns currency,
+    owns language,
+    plays incorporation:incorporating;
 
 continent sub location,
-    plays produced-in_continent;
+    plays produced-in:continent;
 
 location-hierarchy sub relation,
-    relates location-hierarchy_superior,
-    relates location-hierarchy_subordinate;
+    relates superior,
+    relates subordinate;
 
 locates sub relation,
-    relates locates_location,
-    relates locates_located;
+    relates location,
+    relates located;
 
-location-hierarchy-transitivity sub rule,
+rule location-hierarchy-transitivity:
 when {
-    $lh1(location-hierarchy_superior: $a, location-hierarchy_subordinate: $b) isa location-hierarchy;
-    $lh2(location-hierarchy_superior: $b, location-hierarchy_subordinate: $c) isa location-hierarchy;
-}, then {
-    (location-hierarchy_superior: $a, location-hierarchy_subordinate: $c) isa location-hierarchy;
+    $lh1(superior: $a, subordinate: $b) isa location-hierarchy;
+    $lh2(superior: $b, subordinate: $c) isa location-hierarchy;
+} then {
+    (superior: $a, subordinate: $c) isa location-hierarchy;
 };
 
-# Transitive group membership
+# Transitive group2 membership
 # Here we realise that it's common to say that when something takes place in a location it also takes place in the superior places.
 # This will lead to many rules of this kind. Can this be generified, and should it be?
-locates-transitive-with-location-hierarchy sub rule,
+rule locates-transitive-with-location-hierarchy:
 when {
-    $loc(locates_located: $thing, locates_location: $a) isa locates;
-    $lh2(location-hierarchy_superior: $b, location-hierarchy_subordinate: $a) isa location-hierarchy;
-}, then {
-    (locates_located: $thing, locates_location: $b) isa locates;
+    $loc(located: $thing, location: $a) isa locates;
+    $lh2(superior: $b, subordinate: $a) isa location-hierarchy;
+} then {
+    (located: $thing, location: $b) isa locates;
 };
 
 # --------------------------------------------------------
 # Currency
 # --------------------------------------------------------
 
-transaction-currency-is-that-of-the-country sub rule,
+rule transaction-currency-is-that-of-the-country:
 when {
     $transaction isa transaction;
-    $l(locates_located: $t, locates_location: $transaction-location) isa locates;
-    $transaction-country isa country, has currency $currency;
-}, then {
-    $transaction has currency $currency;
+    $l(located: $transaction, location: $transaction-location) isa locates;
+    $transaction-location isa country, has currency $currency;
+} then {
+    $transaction has $currency;
 };
 
 # --------------------------------------------------------
@@ -190,112 +187,112 @@ when {
 # --------------------------------------------------------
 
 person sub entity,
-    key email,
-    has forename,
-    has surname,
-    has gender,
-    has date-of-birth,
-    has age,
-    plays employment_employee,
-#    plays volunteering_volunteer,
-#    plays studentship_student,
-    plays parentship_parent,
-    plays parentship_child,
-    plays marriage_husband,
-    plays marriage_wife,
-    plays friendship_friend,
-    plays born-in_child,
-    plays residency_resident,
-    plays relocation_relocated-person;
+    owns email @key,
+    owns forename,
+    owns surname,
+    owns gender,
+    owns date-of-birth,
+    owns age,
+    plays employment:employee,
+#    plays volunteering:volunteer,
+#    plays studentship:student,
+    plays parentship:parent,
+    plays parentship:child,
+    plays marriage:husband,
+    plays marriage:wife,
+    plays friendship:friend,
+    plays born-in:child,
+    plays residency:resident,
+    plays relocation:relocated-person;
 
 parentship sub relation,
-    relates parentship_parent,  # Could have two parents playing parent in a single parentship for interesting cardinality
-    relates parentship_child;
+    relates parent,  # Could have two parents playing parent in a single parentship for interesting cardinality
+    relates child;
 
 friendship sub relation,
-    has start-date,
-    has end-date,
-    relates friendship_friend; # Could be N-ary, though in a real-world context this is imperfect
+    owns start-date,
+    owns end-date,
+    relates friend; # Could be N-ary, though in a real-world context this is imperfect
 
 marriage sub relation,
-    key marriage-id,
-    has date-of-marriage,  # TODO unused
-    relates marriage_husband,
-    relates marriage_wife,
-    plays locates_located;
+    owns marriage-id @key,
+    owns date-of-marriage,  # TODO unused
+    relates husband,
+    relates wife,
+    plays locates:located;
 
 # --------------------------------------------------------
 # Individuals
 # --------------------------------------------------------
 
 born-in sub locates,
-    relates born-in_place-of-birth as locates_location,
-    relates born-in_child as locates_located;
+    relates place-of-birth as location,
+    relates child as located;
 
 residency sub relation,
-    has start-date,
-    has end-date,
-    has is-current,
-    relates residency_resident,
-    relates residency_location;
+    owns start-date,
+    owns end-date,
+    owns is-current,
+    relates resident,
+    relates location;
 
 relocation sub relation,
-    has relocation-date,
-    relates relocation_previous-location,
-    relates relocation_new-location,
-    relates relocation_relocated-person;
+    owns relocation-date,
+    relates previous-location,
+    relates new-location,
+    relates relocated-person;
 
 # Causes of residency
 # - born in a location
 # - move to a location
 # - can be inferred from where someone works or studies at school or university
 
-born-in-location-implies-residency sub rule,
+rule born-in-location-implies-residency:
 when {
-    $bi(born-in_place-of-birth: $location, born-in_child: $person) isa born-in;
-}, then {
-    (residency_resident: $person, residency_location: $location) isa residency;
+    $bi(place-of-birth: $location, child: $person) isa born-in;
+} then {
+    (resident: $person, location: $location) isa residency;
 };
 
 # This rule can be triggered by a person moving back to their hometown having moved away, and add an incorrect start-date
-born-in-location-implies-residency-date sub rule,
+rule born-in-location-implies-residency-date:
 when {
-    $bi(born-in_place-of-birth: $location, born-in_child: $person) isa born-in;
+    $bi(place-of-birth: $location, child: $person) isa born-in;
     $person isa person, has date-of-birth $dob;
-    $r(residency_resident: $person, residency_location: $location) isa residency;
-}, then {
-    $r has start-date $dob;
+    $r(resident: $person, location: $location) isa residency;
+} then {
+    $r has $dob;
 };
 
-person-relocating-adds-new-residency sub rule,
+rule person-relocating-adds-new-residency:
 when {
-    $rel(relocation_relocated-person: $person, relocation_new-location: $location) isa relocation;
-}, then {
-    (residency_resident: $person, residency_location: $location) isa residency;
+    $rel(relocated-person: $person, new-location: $location) isa relocation;
+} then {
+    (resident: $person, location: $location) isa residency;
 };
 
-person-relocating-ends-old-residency sub rule,
+rule person-relocating-ends-old-residency:
 when {
-    $rel(relocation_relocated-person: $person, relocation_previous-location: $location) isa relocation, has relocation-date $rel-date;
-    $old-residency(residency_resident: $person, residency_location: $location) isa residency;
-}, then {
-    $old-residency has end-date $rel-date;
+    $rel(relocated-person: $person, previous-location: $location) isa relocation, has relocation-date $rel-date;
+    $old-residency(resident: $person, location: $location) isa residency;
+} then {
+    $old-residency has $rel-date;
 };
 
-residency-without-end-date-is-current sub rule,
+rule residency-without-end-date-is-current:
 when {
-    $res(residency_resident: $person, residency_location: $location) isa residency;
+    $res(resident: $person, location: $location) isa residency;
     not {
         $res has end-date $rel-date;
     };
-}, then {
+} then {
     $res has is-current true;
 };
 
-label-non-current-residency sub rule,
+rule label-non-current-residency:
 when {
     $res isa residency, has end-date $end-date;
-}, then {
+} then {
     $res has is-current false;
 };
 
@@ -306,108 +303,145 @@ when {
 organisation sub entity;
 
 company sub organisation,
-    # We may want to say `has company-name as organisation-name;`
-    key company-name,
-    key company-number,
-    plays employment_employer,
-    plays transaction_seller,
-    plays transaction_buyer,
-    plays incorporation_incorporated;
+    # We may want to say `owns company-name as organisation-name;`
+    owns company-name @key,
+    owns company-number @key,
+    plays employment:employer,
+    plays transaction:seller,
+    plays transaction:buyer,
+    plays incorporation:incorporated;
 
 incorporation sub relation,
-    has date-of-incorporation,
-    relates incorporation_incorporated,
-    relates incorporation_incorporating;
+    owns date-of-incorporation,
+    relates incorporated,
+    relates incorporating;
 
 #university sub organisation,
-#    has university-name,
-#    plays employment_employer,
-#    plays studentship_school,
-#    plays transaction_seller,
-#    plays transaction_buyer;
+#    owns university-name,
+#    plays employment:employer,
+#    plays studentship:school,
+#    plays transaction:seller,
+#    plays transaction:buyer;
 
 #charity sub organisation,
-#    has charity-name,
-#    plays volunteering_cause,
-#    plays transaction_buyer;
+#    owns charity-name,
+#    plays volunteering:cause,
+#    plays transaction:buyer;
 
 membership sub relation,
-#    key identifier,
-    has start-date,
-    has end-date,
-    relates membership_member,
-    relates membership_group;
+#    owns identifier @key,
+    owns start-date,
+    owns end-date,
+    relates member,
+    relates group2;
 
 employment sub membership,
-    # key employment-id as membership-id, # We might want to say this?
-    relates employment_employee as membership_member,
-    relates employment_employer as membership_group,
-    # relates employment_contract,
-    # relates employment_profession,
-    # relates employment_wage,  # https://github.com/graknlabs/grakn/issues/5553
+    # owns employment-id as membership-id @key, # We might want to say this?
+    relates employee as member,
+    relates employer as group2,
+    # relates contract,
+    # relates profession,
+    # relates wage,  # https://github.com/graknlabs/grakn/issues/5553
     # For wages in different currencies, either:
     # - subtype for the different currencies,
     # - add currency as attribute to implicit relation,
-    # - model the wage as an entity,
+    # - model the wage as an entity,
     # The attribute on an implicit relation is a pattern we would like to stress-test
 
-    has contracted-hours,
+    owns contracted-hours,
     # Nested relation
-    plays locates_located;
+    plays locates:located;
 
 wage sub entity,
-#    plays employment_wage,
-    has wage-value,
-    has currency;
+#    plays employment:wage,
+    owns wage-value,
+    owns currency;
 
 #studentship sub membership,
-#    relates studentship_student as membership_member,
-#    relates studentship_school as membership_group;
+#    relates student as member,
+#    relates school as group2;
 
 #volunteering sub membership,
-#    relates volunteering_volunteer as membership_member,
-#    relates volunteering_cause as membership_group;
+#    relates volunteer as member,
+#    relates cause as group2;
 
 #occupation sub entity,
-#    key name;
-#    plays employment_profession;
+#    owns name @key;
+#    plays employment:profession;
 
-legal-document sub entity,
-    has date-signed,  # TODO unused
-    has text-content;
+legal-document sub entity, abstract,
+    owns date-signed,  # TODO unused
+    owns text-content;
 
-employment-contract sub legal-document,
-    # plays employment_contract,
-    has contract-content,
-    has contracted-hours;
+employment-contract sub legal-document, abstract,
+    # plays employment:contract,
+    owns contract-content,
+    owns contracted-hours;
 
 # --------------------------------------------------------
 # Organisational Trade
 # --------------------------------------------------------
 
 transaction sub relation,
-    relates transaction_buyer,
-    relates transaction_seller,
-    relates transaction_merchandise,
-    has currency,
-    has value,
-    has product-quantity,
-    has is-taxable,
-    plays locates_located;
+    relates buyer,
+    relates seller,
+    relates merchandise,
+    owns currency,
+    owns value,
+    owns product-quantity,
+    owns is-taxable,
+    plays locates:located;
 
 product sub entity,
-    key product-barcode,
-    has product-name,
-    has product-description,
-    plays transaction_merchandise,
-    plays produced-in_product;
+    owns product-barcode @key,
+    owns product-name,
+    owns product-description,
+    plays transaction:merchandise,
+    plays produced-in:product;
 
 produced-in sub relation,
-    relates produced-in_product,
-    relates produced-in_continent;
+    relates product,
+    relates continent;
 
 #service sub entity,
-#    key service-id,
-#    has service-name,
-#    has service-description,
-#    plays transaction_merchandise;
+#    owns service-id @key,
+#    owns service-name,
+#    owns service-description,
+#    plays transaction:merchandise;
+
+employment sub membership,
+    relates contract,
+#    relates employment_profession,
+    relates wage;
+
+#occupation sub entity,
+#   plays employment_profession;
+
+employment-contract sub legal-document,
+    plays employment:contract;
+
+wage sub entity,
+    plays employment:wage;
+
+#contract-has-language-of-location-is-there-is-only-one-language sub rule,
+#when {
+#    $emp(employment_contract: $contract) isa employment;
+#    $contract isa employment-contract, has contract-content $content;
+#    ($emp, $location1) isa locates;
+#    $location1 has language $lang1;
+#    not {
+#        ($emp, $location2) isa locates;
+#        $location2 has language $lang2;
+#        $lang1 !== $lang2;
+#    };
+#}, then {
+#    $content has content-language $lang1;
+#};
+
+rule contracted-hours-apply-to-employment:
+when {
+    $emp(contract: $c) isa employment;
+    $c isa employment-contract, has contracted-hours $hours;
+} then {
+    $emp has $hours;
+};
