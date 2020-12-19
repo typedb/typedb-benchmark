@@ -18,8 +18,8 @@
 package grakn.simulation.grakn.action.write;
 
 import grakn.client.concept.answer.ConceptMap;
+import grakn.common.collection.Pair;
 import grakn.simulation.common.action.write.InsertTransactionAction;
-import grakn.simulation.common.utils.Pair;
 import grakn.simulation.common.world.World;
 import grakn.simulation.grakn.driver.GraknOperation;
 import graql.lang.Graql;
@@ -60,9 +60,9 @@ public class GraknInsertTransactionAction extends InsertTransactionAction<GraknO
         return Graql.match(
                     Graql.var(PRODUCT)
                             .isa(PRODUCT)
-                            .has(PRODUCT_BARCODE, transaction.getSecond()),
+                            .has(PRODUCT_BARCODE, transaction.second()),
                     Graql.var("c-buyer").isa(COMPANY)
-                            .has(COMPANY_NUMBER, transaction.getFirst()),
+                            .has(COMPANY_NUMBER, transaction.first()),
                     Graql.var("c-seller").isa(COMPANY)
                             .has(COMPANY_NUMBER, sellerCompanyNumber),
                     Graql.var(COUNTRY).isa(COUNTRY)

@@ -17,9 +17,9 @@
 
 package grakn.simulation.common.action.write;
 
+import grakn.common.collection.Pair;
 import grakn.simulation.common.action.Action;
 import grakn.simulation.common.driver.DbOperation;
-import grakn.simulation.common.utils.Pair;
 import grakn.simulation.common.world.World;
 
 import java.util.ArrayList;

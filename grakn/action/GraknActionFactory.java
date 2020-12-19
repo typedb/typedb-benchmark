@@ -18,6 +18,7 @@
 package grakn.simulation.grakn.action;
 
 import grakn.client.concept.answer.ConceptMap;
+import grakn.common.collection.Pair;
 import grakn.simulation.common.action.ActionFactory;
 import grakn.simulation.common.action.SpouseType;
 import grakn.simulation.common.action.read.BirthsInCityAction;
@@ -45,7 +46,6 @@ import grakn.simulation.common.action.write.InsertPersonAction;
 import grakn.simulation.common.action.write.InsertProductAction;
 import grakn.simulation.common.action.write.InsertRelocationAction;
 import grakn.simulation.common.action.write.InsertTransactionAction;
-import grakn.simulation.common.utils.Pair;
 import grakn.simulation.common.world.World;
 import grakn.simulation.grakn.action.read.GraknBirthsInCityAction;
 import grakn.simulation.grakn.action.read.GraknCitiesInContinentAction;

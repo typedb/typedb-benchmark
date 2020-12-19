@@ -27,7 +27,8 @@ public abstract class TransactionalDbDriver<TRANSACTION, SESSION, DB_OPERATION e
         CLOSE_TRANSACTION("closeTx"),
         COMMIT_TRANSACTION("commitTx"),
         EXECUTE("execute"),
-        SORTED_EXECUTE("sortedExecute");
+        SORTED_EXECUTE("sortedExecute"),
+        EXECUTE_ASYNC("executeAsync");
 
         private String name;
 

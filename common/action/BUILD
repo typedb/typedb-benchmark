@@ -13,6 +13,7 @@ java_library(
         "//common/driver",
         "//common/utils",
         "//common/world",
+        "@graknlabs_common//:common",
         "@maven//:com_google_guava_guava",
         "@maven//:commons_cli_commons_cli",
         "@maven//:org_apache_commons_commons_csv",

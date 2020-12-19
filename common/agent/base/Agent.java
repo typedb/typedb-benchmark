@@ -21,10 +21,10 @@ import grabl.tracing.client.GrablTracingThreadStatic;
 import grakn.simulation.common.action.Action;
 import grakn.simulation.common.action.ActionFactory;
 import grakn.simulation.common.driver.DbOperation;
-import grakn.simulation.common.utils.Pair;
 import grakn.simulation.common.driver.DbDriver;
 import grakn.simulation.common.driver.DbOperationFactory;
 import grakn.simulation.common.utils.Trace;
+import grakn.simulation.common.utils.Utils;
 import grakn.simulation.common.world.World;
 import grakn.simulation.common.utils.RandomSource;
 import org.slf4j.Logger;
@@ -82,8 +82,8 @@ public abstract class Agent<REGION extends grakn.simulation.common.world.Region,
         List<REGION> regions = getRegions(simulationContext.world());
         List<RandomSource> randomSources = randomSource.split(regions.size());
 
-        Pair.zip(randomSources, regions).parallelStream().forEach(
-                pair -> iterateRegionalAgent(simulationContext, pair.getFirst(), pair.getSecond())
+        Utils.zip(randomSources, regions).parallelStream().forEach(
+                pair -> iterateRegionalAgent(simulationContext, pair.first(), pair.second())
         );
         return report;
     }

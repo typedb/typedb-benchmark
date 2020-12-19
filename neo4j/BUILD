@@ -21,6 +21,7 @@ java_library(
         "//common/yaml_tool",
         "//config",
         "@graknlabs_grabl_tracing//client",
+        "@graknlabs_common//:common",
         "@maven//:com_google_guava_guava",
         "@maven//:org_apache_commons_commons_csv",
         "@maven//:org_apache_commons_commons_lang3",

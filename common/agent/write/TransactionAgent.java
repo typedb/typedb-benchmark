@@ -17,6 +17,7 @@
 
 package grakn.simulation.common.agent.write;
 
+import grakn.common.collection.Pair;
 import grakn.simulation.common.action.ActionFactory;
 import grakn.simulation.common.action.read.CompaniesInCountryAction;
 import grakn.simulation.common.action.read.ProductsInContinentAction;
@@ -26,12 +27,13 @@ import grakn.simulation.common.agent.region.CountryAgent;
 import grakn.simulation.common.driver.DbDriver;
 import grakn.simulation.common.driver.DbOperation;
 import grakn.simulation.common.driver.DbOperationFactory;
-import grakn.simulation.common.utils.Pair;
 import grakn.simulation.common.world.World;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+
+import static grakn.common.collection.Collections.pair;
 
 public class TransactionAgent<DB_OPERATION extends DbOperation> extends CountryAgent<DB_OPERATION> {
 
@@ -75,7 +77,7 @@ public class TransactionAgent<DB_OPERATION extends DbOperation> extends CountryA
             for (int i = 0; i < numTransactions; i++) {
                 Long companyNumber = pickOne(companyNumbers);
                 Long productBarcode = pickOne(productBarcodes);
-                Pair<Long, Long> buyerAndProduct = new Pair<>(companyNumber, productBarcode);
+                Pair<Long, Long> buyerAndProduct = pair(companyNumber, productBarcode);
                 transactions.add(buyerAndProduct);
             }
             try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker(), trace())) {

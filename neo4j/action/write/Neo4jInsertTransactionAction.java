@@ -17,8 +17,8 @@
 
 package grakn.simulation.neo4j.action.write;
 
+import grakn.common.collection.Pair;
 import grakn.simulation.common.action.write.InsertTransactionAction;
-import grakn.simulation.common.utils.Pair;
 import grakn.simulation.common.world.World;
 import grakn.simulation.neo4j.driver.Neo4jOperation;
 import grakn.simulation.neo4j.action.Model;
@@ -36,8 +36,8 @@ public class Neo4jInsertTransactionAction extends InsertTransactionAction<Neo4jO
     @Override
     public Record run() {
         HashMap<String, Object> parameters = new HashMap<String, Object>(){{
-            put("barcode", transaction.getSecond());
-            put("buyerNumber", transaction.getFirst());
+            put("barcode", transaction.second());
+            put("buyerNumber", transaction.first());
             put("sellerNumber", sellerCompanyNumber);
             put("countryName", country.name());
             put("value", value);

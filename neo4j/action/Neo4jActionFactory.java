@@ -17,6 +17,7 @@
 
 package grakn.simulation.neo4j.action;
 
+import grakn.common.collection.Pair;
 import grakn.simulation.common.action.ActionFactory;
 import grakn.simulation.common.action.SpouseType;
 import grakn.simulation.common.action.insight.ArbitraryOneHopAction;
@@ -44,7 +45,6 @@ import grakn.simulation.common.action.write.InsertPersonAction;
 import grakn.simulation.common.action.write.InsertProductAction;
 import grakn.simulation.common.action.write.InsertRelocationAction;
 import grakn.simulation.common.action.write.InsertTransactionAction;
-import grakn.simulation.common.utils.Pair;
 import grakn.simulation.common.world.World;
 import grakn.simulation.neo4j.action.insight.Neo4jArbitraryOneHopAction;
 import grakn.simulation.neo4j.action.read.Neo4jBirthsInCityAction;
