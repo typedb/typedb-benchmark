@@ -11,11 +11,11 @@ agents:
   - name: "relocation"
     mode: OFF # no
   - name: "company"
-    mode: TRACE  # yes
+    mode: OFF  # yes
   - name: "employment"
     mode: OFF  # no
   - name: "product"
-    mode: TRACE # yes
+    mode: OFF # yes
   - name: "transaction"
     mode: OFF # yes
   - name: "friendship"
@@ -29,17 +29,17 @@ agents:
   #  - name: "findTransactionCurrency" # no, already disabled as it times out
   #    mode: TRACE
   - name: "arbitraryOneHop"
-    mode: TRACE # yes
+    mode: OFF # yes
   - name: "twoHop"
-    mode: TRACE # yes, contingent on parentship
+    mode: OFF # yes, contingent on parentship
   - name: "threeHop"
     mode: OFF # no because of employment
   - name: "fourHop"
     mode: OFF # no because of employment
   - name: "findSpecificMarriage"
-    mode: TRACE # yes
+    mode: OFF # yes
   - name: "findSpecificPerson"
-    mode: TRACE # yes
+    mode: OFF # yes
 
 traceSampling:
   # Options: `"every"` for every K traces; `"log"` for logarithm with base N
