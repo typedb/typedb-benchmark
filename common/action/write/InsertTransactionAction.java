@@ -26,13 +26,13 @@ import java.util.ArrayList;
 
 public abstract class InsertTransactionAction<DB_OPERATION extends DbOperation, ACTION_RETURN_TYPE> extends Action<DB_OPERATION, ACTION_RETURN_TYPE> {
     protected final World.Country country;
-    protected final Pair<Long, Double> transaction;
+    protected final Pair<Long, Long> transaction;
     protected final Long sellerCompanyNumber;
     protected final double value;
     protected final int productQuantity;
     protected final boolean isTaxable;
 
-    public InsertTransactionAction(DB_OPERATION dbOperation, World.Country country, Pair<Long, Double> transaction, Long sellerCompanyNumber, double value, int productQuantity, boolean isTaxable) {
+    public InsertTransactionAction(DB_OPERATION dbOperation, World.Country country, Pair<Long, Long> transaction, Long sellerCompanyNumber, double value, int productQuantity, boolean isTaxable) {
         super(dbOperation);
         this.country = country;
         this.transaction = transaction;

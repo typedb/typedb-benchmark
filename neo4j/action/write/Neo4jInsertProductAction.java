@@ -31,7 +31,7 @@ import static grakn.simulation.neo4j.action.Model.PRODUCT_DESCRIPTION;
 import static grakn.simulation.neo4j.action.Model.PRODUCT_NAME;
 
 public class Neo4jInsertProductAction extends InsertProductAction<Neo4jOperation, Record> {
-    public Neo4jInsertProductAction(Neo4jOperation dbOperation, World.Continent continent, Double barcode, String productName, String productDescription) {
+    public Neo4jInsertProductAction(Neo4jOperation dbOperation, World.Continent continent, Long barcode, String productName, String productDescription) {
         super(dbOperation, continent, barcode, productName, productDescription);
     }
 

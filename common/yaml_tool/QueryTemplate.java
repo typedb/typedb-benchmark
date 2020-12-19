@@ -17,7 +17,7 @@
 
 package grakn.simulation.common.yaml_tool;
 
-import graql.lang.util.StringUtil;
+import graql.lang.common.util.Strings;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -63,7 +63,7 @@ public class QueryTemplate {
         StringBuilder builder = new StringBuilder(templateComponents[0]);
 
         for (int i = 1; i < templateComponents.length; ++i) {
-            builder.append(StringUtil.quoteString(getter.apply(vars.get(i - 1))));
+            builder.append(Strings.quoteString(getter.apply(vars.get(i - 1))));
             builder.append(templateComponents[i]);
         }
 

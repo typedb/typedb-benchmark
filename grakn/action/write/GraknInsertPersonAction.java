@@ -17,14 +17,14 @@
 
 package grakn.simulation.grakn.action.write;
 
-import grakn.client.answer.ConceptMap;
+import grakn.client.concept.answer.ConceptMap;
 import grakn.simulation.common.action.Action;
 import grakn.simulation.common.action.write.InsertPersonAction;
 import grakn.simulation.common.world.World;
 import grakn.simulation.grakn.driver.GraknOperation;
 import graql.lang.Graql;
+import graql.lang.pattern.variable.UnboundVariable;
 import graql.lang.query.GraqlInsert;
-import graql.lang.statement.Statement;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -53,14 +53,14 @@ public class GraknInsertPersonAction extends InsertPersonAction<GraknOperation, 
     }
 
     public static GraqlInsert query(String worldCityName, String email, String gender, String forename, String surname, LocalDateTime today) {
-        Statement city = Graql.var(CITY);
-        Statement person = Graql.var(PERSON);
-        Statement bornIn = Graql.var(BORN_IN);
-        Statement emailVar = Graql.var(EMAIL);
-        Statement genderVar = Graql.var(GENDER);
-        Statement forenameVar = Graql.var(FORENAME);
-        Statement surnameVar = Graql.var(SURNAME);
-        Statement dobVar = Graql.var(DATE_OF_BIRTH);
+        UnboundVariable city = Graql.var(CITY);
+        UnboundVariable person = Graql.var(PERSON);
+        UnboundVariable bornIn = Graql.var(BORN_IN);
+        UnboundVariable emailVar = Graql.var(EMAIL);
+        UnboundVariable genderVar = Graql.var(GENDER);
+        UnboundVariable forenameVar = Graql.var(FORENAME);
+        UnboundVariable surnameVar = Graql.var(SURNAME);
+        UnboundVariable dobVar = Graql.var(DATE_OF_BIRTH);
 
         return Graql.match(
                 city.isa(CITY)
@@ -73,14 +73,14 @@ public class GraknInsertPersonAction extends InsertPersonAction<GraknOperation, 
                                 .has(FORENAME, forenameVar)
                                 .has(SURNAME, surnameVar),
                         bornIn
-                                .isa(BORN_IN)
                                 .rel(BORN_IN_CHILD, person)
-                                .rel(BORN_IN_PLACE_OF_BIRTH, city),
-                        emailVar.val(email),
-                        genderVar.val(gender),
-                        forenameVar.val(forename),
-                        surnameVar.val(surname),
-                        dobVar.val(today)
+                                .rel(BORN_IN_PLACE_OF_BIRTH, city)
+                                .isa(BORN_IN),
+                        emailVar.eq(email),
+                        genderVar.eq(gender),
+                        forenameVar.eq(forename),
+                        surnameVar.eq(surname),
+                        dobVar.eq(today)
                 );
     }
 

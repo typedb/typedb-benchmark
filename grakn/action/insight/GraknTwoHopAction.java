@@ -20,7 +20,7 @@ package grakn.simulation.grakn.action.insight;
 import grakn.simulation.common.action.insight.TwoHopAction;
 import grakn.simulation.grakn.driver.GraknOperation;
 import graql.lang.Graql;
-import graql.lang.query.GraqlGet;
+import graql.lang.query.GraqlMatch;
 
 import java.util.List;
 
@@ -45,13 +45,13 @@ public class GraknTwoHopAction extends TwoHopAction<GraknOperation> {
         return dbOperation.sortedExecute(query(), EMAIL, null);
     }
 
-    public static GraqlGet.Unfiltered query() {
+    public static GraqlMatch.Unfiltered query() {
         return Graql.match(
                     Graql.var(CITY).isa(CITY).has(LOCATION_NAME, "London"),
-                    Graql.var().isa(BORN_IN).rel(BORN_IN_PLACE_OF_BIRTH, Graql.var(CITY)).rel(BORN_IN_CHILD, Graql.var("child")),
+                    Graql.var().rel(BORN_IN_PLACE_OF_BIRTH, Graql.var(CITY)).rel(BORN_IN_CHILD, Graql.var("child")).isa(BORN_IN),
                     Graql.var("child").isa(PERSON),
-                    Graql.var().isa(PARENTSHIP).rel(PARENTSHIP_PARENT, Graql.var("parent")).rel(PARENTSHIP_CHILD, Graql.var("child")),
+                    Graql.var().rel(PARENTSHIP_PARENT, Graql.var("parent")).rel(PARENTSHIP_CHILD, Graql.var("child")).isa(PARENTSHIP),
                     Graql.var("parent").isa(PERSON).has(EMAIL, Graql.var(EMAIL))
-            ).get();
+            );
     }
 }

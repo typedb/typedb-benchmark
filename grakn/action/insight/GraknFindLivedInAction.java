@@ -20,7 +20,7 @@ package grakn.simulation.grakn.action.insight;
 import grakn.simulation.common.action.insight.FindLivedInAction;
 import grakn.simulation.grakn.driver.GraknOperation;
 import graql.lang.Graql;
-import graql.lang.query.GraqlGet;
+import graql.lang.query.GraqlMatch;
 
 import java.util.List;
 
@@ -42,14 +42,15 @@ public class GraknFindLivedInAction extends FindLivedInAction<GraknOperation> {
         return dbOperation.sortedExecute(query(), EMAIL, null);
     }
 
-    public static GraqlGet.Unfiltered query() {
+    public static GraqlMatch.Unfiltered query() {
         return Graql.match(
                     Graql.var(CITY).isa(CITY)
                             .has(LOCATION_NAME, "Berlin"),
-                    Graql.var(RESIDENCY).isa(RESIDENCY)
+                    Graql.var(RESIDENCY)
                             .rel(RESIDENCY_LOCATION, Graql.var(CITY))
-                            .rel(RESIDENCY_RESIDENT, Graql.var(PERSON)),
+                            .rel(RESIDENCY_RESIDENT, Graql.var(PERSON))
+                            .isa(RESIDENCY),
                     Graql.var(PERSON).isa(PERSON).has(EMAIL, Graql.var(EMAIL))
-            ).get();
+            );
     }
 }

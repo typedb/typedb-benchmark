@@ -20,7 +20,7 @@ package grakn.simulation.grakn.action.insight;
 import grakn.simulation.common.action.insight.FindSpecificPersonAction;
 import grakn.simulation.grakn.driver.GraknOperation;
 import graql.lang.Graql;
-import graql.lang.query.GraqlGet;
+import graql.lang.query.GraqlMatch;
 
 import java.util.stream.Collectors;
 
@@ -34,13 +34,13 @@ public class GraknFindSpecificPersonAction extends FindSpecificPersonAction<Grak
 
     @Override
     public String run() {
-        return optionalSingleResult(dbOperation.execute(query()).stream().map(ans -> ans.get(EMAIL).asAttribute().value().toString()).collect(Collectors.toList()));
+        return optionalSingleResult(dbOperation.execute(query()).stream().map(ans -> ans.get(EMAIL).asThing().asAttribute().getValue().toString()).collect(Collectors.toList()));
     }
 
-    public static GraqlGet.Unfiltered query() {
+    public static GraqlMatch.Unfiltered query() {
         return Graql.match(
                     Graql.var(PERSON).isa(PERSON).has(EMAIL, Graql.var(EMAIL)),
-                    Graql.var(EMAIL).isa(EMAIL).val(PERSON_EMAIL_FOR_QUERY)
-            ).get();
+                    Graql.var(EMAIL).eq(PERSON_EMAIL_FOR_QUERY).isa(EMAIL)
+            );
     }
 }

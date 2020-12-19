@@ -25,11 +25,11 @@ import java.util.ArrayList;
 
 public abstract class InsertProductAction<DB_OPERATION extends DbOperation, ACTION_RETURN_TYPE> extends Action<DB_OPERATION, ACTION_RETURN_TYPE> {
     protected final World.Continent continent;
-    protected final Double barcode;
+    protected final Long barcode;
     protected final String productName;
     protected final String productDescription;
 
-    public InsertProductAction(DB_OPERATION dbOperation, World.Continent continent, Double barcode, String productName, String productDescription) {
+    public InsertProductAction(DB_OPERATION dbOperation, World.Continent continent, Long barcode, String productName, String productDescription) {
         super(dbOperation);
         this.continent = continent;
         this.barcode = barcode;

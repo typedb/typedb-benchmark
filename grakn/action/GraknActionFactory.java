@@ -17,7 +17,7 @@
 
 package grakn.simulation.grakn.action;
 
-import grakn.client.answer.ConceptMap;
+import grakn.client.concept.answer.ConceptMap;
 import grakn.simulation.common.action.ActionFactory;
 import grakn.simulation.common.action.SpouseType;
 import grakn.simulation.common.action.read.BirthsInCityAction;
@@ -137,7 +137,7 @@ public class GraknActionFactory extends ActionFactory<GraknOperation, ConceptMap
     }
 
     @Override
-    public InsertProductAction<GraknOperation, ConceptMap> insertProductAction(GraknOperation dbOperation, World.Continent continent, Double barcode, String productName, String productDescription) {
+    public InsertProductAction<GraknOperation, ConceptMap> insertProductAction(GraknOperation dbOperation, World.Continent continent, Long barcode, String productName, String productDescription) {
         return new GraknInsertProductAction(dbOperation, continent, barcode, productName, productDescription);
     }
 
@@ -157,7 +157,7 @@ public class GraknActionFactory extends ActionFactory<GraknOperation, ConceptMap
     }
 
     @Override
-    public InsertTransactionAction<GraknOperation, ConceptMap> insertTransactionAction(GraknOperation dbOperation, World.Country country, Pair<Long, Double> transaction, Long sellerCompanyNumber, double value, int productQuantity, boolean isTaxable) {
+    public InsertTransactionAction<GraknOperation, ConceptMap> insertTransactionAction(GraknOperation dbOperation, World.Country country, Pair<Long, Long> transaction, Long sellerCompanyNumber, double value, int productQuantity, boolean isTaxable) {
         return new GraknInsertTransactionAction(dbOperation, country, transaction, sellerCompanyNumber, value, productQuantity, isTaxable);
     }
 

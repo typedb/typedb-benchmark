@@ -17,7 +17,7 @@
 
 package grakn.simulation.grakn.action.write;
 
-import grakn.client.answer.ConceptMap;
+import grakn.client.concept.answer.ConceptMap;
 import grakn.simulation.common.action.write.InsertTransactionAction;
 import grakn.simulation.common.utils.Pair;
 import grakn.simulation.common.world.World;
@@ -46,7 +46,7 @@ import static grakn.simulation.grakn.action.Model.VALUE;
 
 public class GraknInsertTransactionAction extends InsertTransactionAction<GraknOperation, ConceptMap> {
 
-    public GraknInsertTransactionAction(GraknOperation dbOperation, World.Country country, Pair<Long, Double> transaction, Long sellerCompanyNumber, double value, int productQuantity, boolean isTaxable) {
+    public GraknInsertTransactionAction(GraknOperation dbOperation, World.Country country, Pair<Long, Long> transaction, Long sellerCompanyNumber, double value, int productQuantity, boolean isTaxable) {
         super(dbOperation, country, transaction, sellerCompanyNumber, value, productQuantity, isTaxable);
     }
 
@@ -56,7 +56,7 @@ public class GraknInsertTransactionAction extends InsertTransactionAction<GraknO
         return singleResult(dbOperation.execute(insertTransactionQuery));
     }
 
-    public static GraqlInsert query(Pair<Long, Double> transaction, Long sellerCompanyNumber, String countryName, double value, int productQuantity, boolean isTaxable) {
+    public static GraqlInsert query(Pair<Long, Long> transaction, Long sellerCompanyNumber, String countryName, double value, int productQuantity, boolean isTaxable) {
         return Graql.match(
                     Graql.var(PRODUCT)
                             .isa(PRODUCT)
@@ -69,18 +69,18 @@ public class GraknInsertTransactionAction extends InsertTransactionAction<GraknO
                             .has(LOCATION_NAME, countryName))
                     .insert(
                             Graql.var(TRANSACTION)
-                                    .isa(TRANSACTION)
                                     .rel(TRANSACTION_SELLER, Graql.var("c-seller"))
                                     .rel(TRANSACTION_BUYER, Graql.var("c-buyer"))
                                     .rel(TRANSACTION_MERCHANDISE, Graql.var(PRODUCT))
+                                    .isa(TRANSACTION)
     //                                .has(CURRENCY)  // TODO Add currency https://github.com/graknlabs/simulation/issues/31
                                     .has(VALUE, value)
                                     .has(PRODUCT_QUANTITY, productQuantity)
                                     .has(IS_TAXABLE, isTaxable),
                             Graql.var(LOCATES)
-                                    .isa(LOCATES)
                                     .rel(LOCATES_LOCATION, Graql.var(COUNTRY))
                                     .rel(LOCATES_LOCATED, Graql.var(TRANSACTION))
+                                    .isa(LOCATES)
                     );
     }
 

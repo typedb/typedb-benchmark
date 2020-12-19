@@ -17,11 +17,11 @@
 
 package grakn.simulation.grakn.action.insight;
 
-import grakn.client.answer.ConceptMap;
+import grakn.client.concept.answer.ConceptMap;
 import grakn.simulation.common.action.insight.ArbitraryOneHopAction;
 import grakn.simulation.grakn.driver.GraknOperation;
 import graql.lang.Graql;
-import graql.lang.query.GraqlGet;
+import graql.lang.query.GraqlMatch;
 
 import java.util.List;
 
@@ -39,10 +39,10 @@ public class GraknArbitraryOneHopAction extends ArbitraryOneHopAction<GraknOpera
         return null;
     }
 
-    public static GraqlGet.Unfiltered query() {
+    public static GraqlMatch.Filtered query() {
         return Graql.match(
                     Graql.var(PERSON).isa(PERSON).has(EMAIL, PERSON_EMAIL_FOR_QUERY),
-                    Graql.var().rel(Graql.var(PERSON), Graql.var("x"))
+                    Graql.var().rel(Graql.var(PERSON)).rel(Graql.var("x"))
             ).get("x");
     }
 }

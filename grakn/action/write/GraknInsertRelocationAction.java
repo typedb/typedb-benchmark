@@ -17,7 +17,7 @@
 
 package grakn.simulation.grakn.action.write;
 
-import grakn.client.answer.ConceptMap;
+import grakn.client.concept.answer.ConceptMap;
 import grakn.simulation.common.action.Action;
 import grakn.simulation.common.action.write.InsertRelocationAction;
 import grakn.simulation.common.world.World;
@@ -55,10 +55,11 @@ public class GraknInsertRelocationAction extends InsertRelocationAction<GraknOpe
                     Graql.var("new-city").isa(CITY).has(LOCATION_NAME, relocationCityName),
                     Graql.var("old-city").isa(CITY).has(LOCATION_NAME, cityName)
             ).insert(
-                    Graql.var(RELOCATION).isa(RELOCATION)
+                    Graql.var(RELOCATION)
                             .rel(RELOCATION_PREVIOUS_LOCATION, "old-city")
                             .rel(RELOCATION_NEW_LOCATION, "new-city")
                             .rel(RELOCATION_RELOCATED_PERSON, PERSON)
+                            .isa(RELOCATION)
                             .has(RELOCATION_DATE, today)
             );
     }

@@ -17,6 +17,7 @@ java_library(
         "//grakn",
         "//neo4j",
         "@graknlabs_grabl_tracing//client",
+        "@graknlabs_client_java//:client-java",
         "@maven//:ch_qos_logback_logback_classic",
         "@maven//:commons_cli_commons_cli",
         "@maven//:org_slf4j_slf4j_api",
@@ -71,6 +72,17 @@ java_binary(
 
 checkstyle_test(
     name = "checkstyle",
-    targets = [":simulation-lib"],
-    license_type = "agpl"
+    include = [":simulation-lib"],
+    license_type = "agpl",
+    size = "small",
+)
+
+# CI targets that are not declared in any BUILD file, but are called externally
+filegroup(
+    name = "ci",
+    data = [
+        "@graknlabs_dependencies//tool/bazelrun:rbe",
+        "@graknlabs_dependencies//distribution/artifact:create-netrc",
+        "@graknlabs_dependencies//tool/unuseddeps:unused-deps",
+    ],
 )

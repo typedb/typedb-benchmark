@@ -50,7 +50,7 @@ public class ProductAgent<DB_OPERATION extends DbOperation> extends ContinentAge
                 for (int i = 0; i < numProducts; i++) {
                     String productName = randomAttributeGenerator().boundRandomLengthRandomString(5, 20);
                     String productDescription = randomAttributeGenerator().boundRandomLengthRandomString(75, 100);
-                    Double barcode = (double) uniqueId(simulationContext, i).hashCode();
+                    Long barcode = (long) uniqueId(simulationContext, i).hashCode();
                     runAction(actionFactory().insertProductAction(dbOperation, continent, barcode, productName, productDescription));
                 }
                 dbOperation.save();

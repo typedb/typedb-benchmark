@@ -1,19 +1,35 @@
 build:
   performance:
     test-performance-small-grakn-background:
-      machine: graknlabs-ubuntu-20.04-long
+      machine: graknlabs-ubuntu-20.04-java11
       type: background
       timeout: "18000"
       script: |
-        bazel run //test:grakn-extractor -- dist/grakn-core-all-linux
+        cat > grakn.service <<- EOM
+        [Unit]
+        Description=Grakn Core
+
+        [Service]
+        Type=simple
+        ExecStart=/home/grabl/simulation/dist/grakn-core-all-linux/grakn server --no-grabl-trace --grabl-uri=$GRABL_TRACING_URI --grabl-username=$GRABL_OWNER --grabl-token=$GRABL_TOKEN
+        Restart=on-failure
+        RestartSec=10
+        KillMode=process
+
+        [Install]
+        WantedBy=multi-user.target
+        EOM
+
+        sudo mv grakn.service /etc/systemd/system/
+
+        bazel run //test:grakn-extractor-linux -- dist/grakn-core-all-linux
         cd ./dist/grakn-core-all-linux/
-        SERVER_JAVAOPTS="-Djavax.net.ssl.trustStore=/tmp/rootCA.jks -Djavax.net.ssl.trustStorePassword=changeit" ./grakn server start -- \
-          --tracing-uri $GRABL_TRACING_URI \
-          --tracing-username $GRABL_OWNER \
-          --tracing-access-token $GRABL_TOKEN
-        export GRABL_EXPORT_PERFORMANCE_SMALL_GRAKN_URI="${HOSTNAME}:48555"
+
+        sudo systemctl daemon-reload
+        sudo systemctl start grakn
+        export GRABL_EXPORT_PERFORMANCE_SMALL_GRAKN_URI="${HOSTNAME}:1729"
     test-performance-small-grakn:
-      machine: graknlabs-ubuntu-20.04-long
+      machine: graknlabs-ubuntu-20.04-java11
       timeout: "18000"
       dependencies: [test-performance-small-grakn-background]
       script: |
@@ -28,7 +44,7 @@ build:
           --api-token $GRABL_TOKEN \
           --config-file /home/grabl/$GRABL_REPO/config/config_small.yml
     test-performance-small-neo4j-background:
-      machine: graknlabs-ubuntu-20.04-long
+      machine: graknlabs-ubuntu-20.04-java11
       type: background
       timeout: "18000"
       script: |
@@ -47,7 +63,7 @@ build:
         sudo neo4j start
         export GRABL_EXPORT_PERFORMANCE_SMALL_NEO4J_URI="bolt://${HOSTNAME}:7687"
     test-performance-small-neo4j:
-      machine: graknlabs-ubuntu-20.04-long
+      machine: graknlabs-ubuntu-20.04-java11
       dependencies: [test-performance-small-neo4j-background]
       timeout: "18000"
       script: |

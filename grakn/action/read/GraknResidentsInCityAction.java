@@ -21,8 +21,8 @@ import grakn.simulation.common.action.read.ResidentsInCityAction;
 import grakn.simulation.common.world.World;
 import grakn.simulation.grakn.driver.GraknOperation;
 import graql.lang.Graql;
-import graql.lang.query.GraqlGet;
-import graql.lang.statement.Statement;
+import graql.lang.pattern.variable.UnboundVariable;
+import graql.lang.query.GraqlMatch;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -48,27 +48,27 @@ public class GraknResidentsInCityAction extends ResidentsInCityAction<GraknOpera
         return dbOperation.sortedExecute(query(city.name(), earliestDate), EMAIL, numResidents);
     }
 
-    public static GraqlGet.Unfiltered query(String cityName, LocalDateTime earliestDate) {
-        Statement person = Graql.var(PERSON);
-        Statement cityVar = Graql.var(CITY);
-        Statement residency = Graql.var("r");
-        Statement startDate = Graql.var(START_DATE);
-        Statement endDate = Graql.var(END_DATE);
+    public static GraqlMatch.Unfiltered query(String cityName, LocalDateTime earliestDate) {
+        UnboundVariable person = Graql.var(PERSON);
+        UnboundVariable cityVar = Graql.var(CITY);
+        UnboundVariable residency = Graql.var("r");
+        UnboundVariable startDate = Graql.var(START_DATE);
+        UnboundVariable endDate = Graql.var(END_DATE);
         return Graql.match(
                 person.isa(PERSON)
                         .has(EMAIL, Graql.var(EMAIL)),
                 cityVar
                         .isa(CITY).has(LOCATION_NAME, cityName),
                 residency
-                        .isa(RESIDENCY)
                         .rel(RESIDENCY_RESIDENT, PERSON)
                         .rel(RESIDENCY_LOCATION, CITY)
+                        .isa(RESIDENCY)
                         .has(START_DATE, startDate),
                 Graql.not(
                         residency
                                 .has(END_DATE, endDate)
                 ),
                 startDate.lte(earliestDate)
-        ).get();
+        );
     }
 }

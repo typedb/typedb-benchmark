@@ -6,7 +6,7 @@ agents:
 traceSampling:
   # Options: `"every"` for every K traces; `"log"` for logarithm with base N
   function: "every"
-  arg: 1
+  arg: 2
 
 randomSeed: 1
 iterations: 5

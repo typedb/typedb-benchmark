@@ -21,8 +21,8 @@ import grakn.simulation.common.action.read.UnmarriedPeopleInCityAction;
 import grakn.simulation.common.world.World;
 import grakn.simulation.grakn.driver.GraknOperation;
 import graql.lang.Graql;
-import graql.lang.query.GraqlGet;
-import graql.lang.statement.Statement;
+import graql.lang.pattern.variable.UnboundVariable;
+import graql.lang.query.GraqlMatch;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -57,18 +57,18 @@ public class GraknUnmarriedPeopleInCityAction extends UnmarriedPeopleInCityActio
         } else {
             throw new IllegalArgumentException("Gender must be male or female");
         }
-        GraqlGet query = query(marriageRole, gender, dobOfAdults, city.name());
+        GraqlMatch query = query(marriageRole, gender, dobOfAdults, city.name());
         return dbOperation.sortedExecute(query, EMAIL, null);
     }
 
-    public static GraqlGet query(String marriageRole, String gender, LocalDateTime dobOfAdults, String cityName) {
-        Statement personVar = Graql.var(PERSON);
-        Statement cityVar = Graql.var(CITY);
+    public static GraqlMatch query(String marriageRole, String gender, LocalDateTime dobOfAdults, String cityName) {
+        UnboundVariable personVar = Graql.var(PERSON);
+        UnboundVariable cityVar = Graql.var(CITY);
         return Graql.match(
                     personVar.isa(PERSON).has(GENDER, gender).has(EMAIL, Graql.var(EMAIL)).has(DATE_OF_BIRTH, Graql.var(DATE_OF_BIRTH)),
                     Graql.var(DATE_OF_BIRTH).lte(dobOfAdults),
-                    Graql.not(Graql.var("m").isa(MARRIAGE).rel(marriageRole, personVar)),
-                    Graql.var("r").isa(RESIDENCY).rel(RESIDENCY_RESIDENT, personVar).rel(RESIDENCY_LOCATION, cityVar),
+                    Graql.not(Graql.var("m").rel(marriageRole, personVar).isa(MARRIAGE)),
+                    Graql.var("r").rel(RESIDENCY_RESIDENT, personVar).rel(RESIDENCY_LOCATION, cityVar).isa(RESIDENCY),
                     Graql.not(Graql.var("r").has(END_DATE, Graql.var(END_DATE))),
                     cityVar.isa(CITY).has(LOCATION_NAME, cityName)
             ).get(EMAIL);

@@ -59,7 +59,7 @@ public class TransactionAgent<DB_OPERATION extends DbOperation> extends CountryA
             }
             shuffle(companyNumbers);
 
-            List<Double> productBarcodes;
+            List<Long> productBarcodes;
             try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker(), trace())) {
                 ProductsInContinentAction<?> productsInContinentAction = actionFactory().productsInContinentAction(dbOperation, country.continent());
                 productBarcodes = runAction(productsInContinentAction);
@@ -71,11 +71,11 @@ public class TransactionAgent<DB_OPERATION extends DbOperation> extends CountryA
             // Products randomly picked
 
             // See if we can allocate with a Pair, which is the buyer and the product id
-            List<Pair<Long, Double>> transactions = new ArrayList<>();
+            List<Pair<Long, Long>> transactions = new ArrayList<>();
             for (int i = 0; i < numTransactions; i++) {
                 Long companyNumber = pickOne(companyNumbers);
-                Double productBarcode = pickOne(productBarcodes);
-                Pair<Long, Double> buyerAndProduct = new Pair<>(companyNumber, productBarcode);
+                Long productBarcode = pickOne(productBarcodes);
+                Pair<Long, Long> buyerAndProduct = new Pair<>(companyNumber, productBarcode);
                 transactions.add(buyerAndProduct);
             }
             try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker(), trace())) {

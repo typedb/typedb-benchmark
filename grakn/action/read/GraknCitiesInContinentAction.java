@@ -21,7 +21,7 @@ import grakn.simulation.common.action.read.CitiesInContinentAction;
 import grakn.simulation.common.world.World;
 import grakn.simulation.grakn.driver.GraknOperation;
 import graql.lang.Graql;
-import graql.lang.query.GraqlGet;
+import graql.lang.query.GraqlMatch;
 
 import java.util.List;
 
@@ -37,16 +37,16 @@ public class GraknCitiesInContinentAction extends CitiesInContinentAction<GraknO
 
     @Override
     public List<String> run() {
-        GraqlGet.Unfiltered relocationCitiesQuery = query(city.name(), city.country().continent().name());
+        GraqlMatch.Unfiltered relocationCitiesQuery = query(city.name(), city.country().continent().name());
         return dbOperation.sortedExecute(relocationCitiesQuery, "city-name", null);
     }
 
-    public static GraqlGet.Unfiltered query(String cityName, String continentName) {
+    public static GraqlMatch.Unfiltered query(String cityName, String continentName) {
         return Graql.match(
                     Graql.var(CITY).isa(CITY).has(LOCATION_NAME, Graql.var("city-name")),
                     Graql.var(CONTINENT).isa(CONTINENT).has(LOCATION_NAME, continentName),
-                    Graql.var("lh1").isa(LOCATION_HIERARCHY).rel(CITY).rel(CONTINENT),
+                    Graql.var("lh1").rel(CITY).rel(CONTINENT).isa(LOCATION_HIERARCHY),
                     Graql.var("city-name").neq(cityName)
-            ).get();
+            );
     }
 }

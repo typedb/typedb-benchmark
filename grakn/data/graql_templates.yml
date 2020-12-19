@@ -7,7 +7,7 @@ template: |
     $c isa continent, has location-name <1>;
   insert
     $x isa country, has location-name <0>;
-    (location-hierarchy_superior: $c, location-hierarchy_subordinate: $x) isa location-hierarchy;
+    (superior: $c, subordinate: $x) isa location-hierarchy;
 data_file: countries.csv
 ---
 template: |
@@ -15,7 +15,7 @@ template: |
     $c isa country, has location-name <1>;
   insert
     $x isa city, has location-name <0>;
-    (location-hierarchy_superior: $c, location-hierarchy_subordinate: $x) isa location-hierarchy;
+    (superior: $c, subordinate: $x) isa location-hierarchy;
 data_file: cities.csv
 ---
 template: insert $x <0> isa currency, has currency-code <1>;

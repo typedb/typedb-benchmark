@@ -18,11 +18,11 @@
 #
 
 load("@graknlabs_dependencies//tool/checkstyle:rules.bzl", "checkstyle_test")
-load("@graknlabs_dependencies//distribution/artifact:rules.bzl", "artifact_extractor")
+load("@graknlabs_bazel_distribution//artifact:rules.bzl", "artifact_extractor")
 
 artifact_extractor(
-    name = "grakn-extractor",
-    artifact = "@graknlabs_grakn_core_artifact//file",
+    name = "grakn-extractor-linux",
+    artifact = "@graknlabs_grakn_core_artifact_linux//file",
 )
 
 java_test(
@@ -58,6 +58,8 @@ java_test(
 
 checkstyle_test(
     name = "checkstyle",
-    targets = [":comparison-test"],
-    license_type = "agpl"
+    include = [":comparison-test"],
+    license_type = "agpl",
+    size = "small",
 )
+
