@@ -22,7 +22,7 @@ build:
 
         sudo mv grakn.service /etc/systemd/system/
 
-        bazel run //test:grakn-extractor-linux -- dist/grakn-core-all-linux
+        bazel run --config=rbe //test:grakn-extractor-linux -- dist/grakn-core-all-linux
         cd ./dist/grakn-core-all-linux/
 
         sudo systemctl daemon-reload
@@ -33,7 +33,7 @@ build:
       timeout: "18000"
       dependencies: [test-performance-small-grakn-background]
       script: |
-        bazel run //:simulation-small -- \
+        bazel run --config=rbe //:simulation-small -- \
           --database grakn \
           --database-uri $GRABL_EXPORT_PERFORMANCE_SMALL_GRAKN_URI \
           --tracing-uri $GRABL_TRACING_URI \
@@ -67,7 +67,7 @@ build:
       dependencies: [test-performance-small-neo4j-background]
       timeout: "18000"
       script: |
-        bazel run //:simulation-small -- \
+        bazel run --config=rbe //:simulation-small -- \
           --database neo4j \
           --database-uri $GRABL_EXPORT_PERFORMANCE_SMALL_NEO4J_URI \
           --tracing-uri $GRABL_TRACING_URI \
