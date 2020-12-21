@@ -106,7 +106,7 @@ public class SimulationRunner {
         LOG.info(String.format("Connecting to %s...", dbName));
 
         try {
-            try (GrablTracing tracingIgnored = grablTracing(grablTracingUri, grablTracingOrganisation, grablTracingRepository, grablTracingCommit, grablTracingUsername, grablTracingToken, disableTracing)) {
+            try (GrablTracing tracingIgnored = grablTracing(grablTracingUri, grablTracingOrganisation, grablTracingRepository, grablTracingCommit, grablTracingUsername, grablTracingToken, disableTracing, dbName)) {
                 Simulation<?, ?> simulation;
                 switch (dbName) {
                     case "grakn":
@@ -200,7 +200,7 @@ public class SimulationRunner {
         return options;
     }
 
-    public static GrablTracing grablTracing(String grablTracingUri, String grablTracingOrganisation, String grablTracingRepository, String grablTracingCommit, String grablTracingUsername, String grablTracingToken, boolean disableTracing) {
+    public static GrablTracing grablTracing(String grablTracingUri, String grablTracingOrganisation, String grablTracingRepository, String grablTracingCommit, String grablTracingUsername, String grablTracingToken, boolean disableTracing, String name) {
         GrablTracing tracing;
         if (disableTracing) {
             tracing = withLogging(tracingNoOp());
@@ -210,7 +210,7 @@ public class SimulationRunner {
             tracing = withLogging(tracing(grablTracingUri, grablTracingUsername, grablTracingToken));
         }
         GrablTracingThreadStatic.setGlobalTracingClient(tracing);
-        GrablTracingThreadStatic.openGlobalAnalysis(grablTracingOrganisation, grablTracingRepository, grablTracingCommit);
+        GrablTracingThreadStatic.openGlobalAnalysis(grablTracingOrganisation, grablTracingRepository, grablTracingCommit, name);
         return tracing;
     }
 }
