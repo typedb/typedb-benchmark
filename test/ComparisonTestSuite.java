@@ -49,8 +49,7 @@ public class ComparisonTestSuite extends Suite {
                 BlockJUnit4ClassRunner runner = new ComparisonTestRunner(klass, i);
                 runners.add(runner);
             } catch (InitializationError initializationError) {
-                initializationError.printStackTrace();
-                throw new RuntimeException("Failed to initialise test");
+                throw new RuntimeException(initializationError);
             }
         }
         return runners;

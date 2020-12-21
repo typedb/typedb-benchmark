@@ -57,7 +57,8 @@ public class Neo4jSimulation extends TransactionalSimulation<Neo4jDriver, Neo4jO
         try {
             loader.loadFile(initialisationDataPaths.get("cypher_templates.yml").toFile());
         } catch (YAMLException | FileNotFoundException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
+
         }
         driver.closeSessions();
     }

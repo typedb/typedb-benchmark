@@ -56,13 +56,13 @@ public class GraknSimulation extends TransactionalSimulation<GraknDriver, GraknO
         try (Session schemaSession = driver.schemaSession("initialiseSchema")) {
             initialiseSchema(schemaSession, initialisationDataPaths);
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
 
         try (Session dataSession = driver.session("initialiseData")) {
             initialiseData(dataSession, initialisationDataPaths);
         } catch (IOException | YAMLException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 
