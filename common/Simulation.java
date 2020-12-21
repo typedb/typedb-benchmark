@@ -69,7 +69,7 @@ public abstract class Simulation<DB_DRIVER extends DbDriver<DB_OPERATION>, DB_OP
     protected List<Agent<?, DB_OPERATION>> agentListFromConfigs() {
         List<Agent<?, DB_OPERATION>> agents = new ArrayList<>();
         ActionFactory<DB_OPERATION, ?> actionFactory = actionFactory();
-        AgentFactory<DB_OPERATION, ?> agentFactory = new AgentFactory<>(driver, actionFactory);
+        AgentFactory<DB_OPERATION, ?> agentFactory = new AgentFactory<>(driver, actionFactory, this);
 
         for (Config.Agent agentConfig : agentConfigs) {
             if (agentConfig.getAgentMode().getRun()) {
@@ -90,7 +90,7 @@ public abstract class Simulation<DB_DRIVER extends DbDriver<DB_OPERATION>, DB_OP
         LOG.info("Simulation step: {}", simulationStep);
         report.clean();
         for (Agent<?, ?> agent : agentList) {
-            this.report.addAgentResult(agent.name(), agent.iterate(this, RandomSource.nextSource(random)));
+            this.report.addAgentResult(agent.name(), agent.iterate(RandomSource.nextSource(random)));
         }
         closeIteration();  // We want to test opening new sessions each iteration.
         simulationStep++;

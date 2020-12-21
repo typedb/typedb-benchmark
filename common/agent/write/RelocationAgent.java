@@ -34,8 +34,8 @@ import java.util.Random;
 
 public class RelocationAgent<DB_OPERATION extends DbOperation> extends CityAgent<DB_OPERATION> {
 
-    public RelocationAgent(DbDriver<DB_OPERATION> dbDriver, ActionFactory<DB_OPERATION, ?> actionFactory) {
-        super(dbDriver, actionFactory);
+    public RelocationAgent(DbDriver<DB_OPERATION> dbDriver, ActionFactory<DB_OPERATION, ?> actionFactory, SimulationContext simulationContext) {
+        super(dbDriver, actionFactory, simulationContext);
     }
 
     @Override
@@ -49,7 +49,7 @@ public class RelocationAgent<DB_OPERATION extends DbOperation> extends CityAgent
         }
 
         @Override
-        protected void run(DbOperationFactory<DB_OPERATION> dbOperationFactory, World.City city, SimulationContext simulationContext) {
+        protected void run(DbOperationFactory<DB_OPERATION> dbOperationFactory, World.City city) {
         /*
         Find people currently resident the city
         Find other cities in the continent

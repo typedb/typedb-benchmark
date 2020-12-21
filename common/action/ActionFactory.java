@@ -17,6 +17,7 @@
 
 package grakn.simulation.common.action;
 
+import grakn.common.collection.Pair;
 import grakn.simulation.common.action.read.BirthsInCityAction;
 import grakn.simulation.common.action.read.CitiesInContinentAction;
 import grakn.simulation.common.action.read.CompaniesInCountryAction;
@@ -45,7 +46,6 @@ import grakn.simulation.common.action.write.InsertProductAction;
 import grakn.simulation.common.action.write.InsertRelocationAction;
 import grakn.simulation.common.action.write.InsertTransactionAction;
 import grakn.simulation.common.driver.DbOperation;
-import grakn.simulation.common.utils.Pair;
 import grakn.simulation.common.world.World;
 
 import java.time.LocalDateTime;

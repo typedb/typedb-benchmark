@@ -35,8 +35,8 @@ import static grakn.simulation.common.agent.base.Allocation.allocate;
 
 public class EmploymentAgent<DB_OPERATION extends DbOperation> extends CityAgent<DB_OPERATION> {
 
-    public EmploymentAgent(DbDriver<DB_OPERATION> dbDriver, ActionFactory<DB_OPERATION, ?> actionFactory) {
-        super(dbDriver, actionFactory);
+    public EmploymentAgent(DbDriver<DB_OPERATION> dbDriver, ActionFactory<DB_OPERATION, ?> actionFactory, SimulationContext simulationContext) {
+        super(dbDriver, actionFactory, simulationContext);
     }
 
     @Override
@@ -57,7 +57,7 @@ public class EmploymentAgent<DB_OPERATION extends DbOperation> extends CityAgent
         }
 
         @Override
-        protected void run(DbOperationFactory<DB_OPERATION> dbOperationFactory, World.City city, SimulationContext simulationContext) {
+        protected void run(DbOperationFactory<DB_OPERATION> dbOperationFactory, World.City city) {
             LocalDateTime employmentDate = simulationContext.today().minusYears(0);
             List<String> employeeEmails;
             List<Long> companyNumbers;

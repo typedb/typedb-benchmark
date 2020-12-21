@@ -39,6 +39,9 @@ import org.slf4j.LoggerFactory;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.Duration;
+import java.time.Instant;
+import java.time.Period;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -58,6 +61,7 @@ public class SimulationRunner {
         // CONFIGURATION //
         ///////////////////
 
+        Instant start = Instant.now();
         String defaultConfigYaml = args[0];
         Options options = cliOptions();
         CommandLineParser parser = new DefaultParser();
@@ -154,7 +158,8 @@ public class SimulationRunner {
             System.exit(1);
         }
 
-        LOG.info("Simulation complete");
+        Instant end = Instant.now();
+        LOG.info("Simulation completed in " + Duration.between(start, end).toString().substring(2));
     }
 
     private static Optional<String> getOption(CommandLine commandLine, String option) {

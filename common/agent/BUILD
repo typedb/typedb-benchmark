@@ -16,6 +16,7 @@ java_library(
         "//common/world",
         "//common/utils",
         "@graknlabs_grabl_tracing//client",
+        "@graknlabs_common//:common",
         "@maven//:commons_cli_commons_cli",
         "@maven//:org_apache_commons_commons_csv",
         "@maven//:org_apache_commons_commons_lang3",

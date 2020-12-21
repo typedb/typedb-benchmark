@@ -33,6 +33,7 @@ import java.util.stream.Stream;
 import static com.google.common.collect.Iterables.getOnlyElement;
 import static grabl.tracing.client.GrablTracingThreadStatic.traceOnThread;
 import static grakn.simulation.common.driver.TransactionalDbDriver.TracingLabel.EXECUTE;
+import static grakn.simulation.common.driver.TransactionalDbDriver.TracingLabel.EXECUTE_ASYNC;
 import static grakn.simulation.common.driver.TransactionalDbDriver.TracingLabel.SORTED_EXECUTE;
 
 public class GraknOperation extends TransactionalDbOperation {
@@ -86,6 +87,11 @@ public class GraknOperation extends TransactionalDbOperation {
         trace(() -> transaction.query().delete(query).get(), EXECUTE.getName());
     }
 
+    public void executeAsync(GraqlDelete query) {
+        log.query(tracker, query);
+        trace(() -> transaction.query().delete(query), EXECUTE_ASYNC.getName());
+    }
+
     public List<ConceptMap> execute(GraqlInsert query) {
         log.query(tracker, query);
         try (GrablTracingThreadStatic.ThreadTrace trace = traceOnThread(EXECUTE.getName())) {
@@ -93,10 +99,24 @@ public class GraknOperation extends TransactionalDbOperation {
         }
     }
 
+    public Stream<ConceptMap> executeAsync(GraqlInsert query) {
+        log.query(tracker, query);
+        try (GrablTracingThreadStatic.ThreadTrace trace = traceOnThread(EXECUTE_ASYNC.getName())) {
+            return transaction.query().insert(query);
+        }
+    }
+
     public List<ConceptMap> execute(GraqlMatch query) {
         log.query(tracker, query);
         try (GrablTracingThreadStatic.ThreadTrace trace = traceOnThread(EXECUTE.getName())) {
             return transaction.query().match(query).collect(Collectors.toList());
+        }
+    }
+
+    public Stream<ConceptMap> executeAsync(GraqlMatch query) {
+        log.query(tracker, query);
+        try (GrablTracingThreadStatic.ThreadTrace trace = traceOnThread(EXECUTE_ASYNC.getName())) {
+            return transaction.query().match(query);
         }
     }
 

@@ -21,10 +21,10 @@ import grabl.tracing.client.GrablTracingThreadStatic;
 import grakn.simulation.common.action.Action;
 import grakn.simulation.common.action.ActionFactory;
 import grakn.simulation.common.driver.DbOperation;
-import grakn.simulation.common.utils.Pair;
 import grakn.simulation.common.driver.DbDriver;
 import grakn.simulation.common.driver.DbOperationFactory;
 import grakn.simulation.common.utils.Trace;
+import grakn.simulation.common.utils.Utils;
 import grakn.simulation.common.world.World;
 import grakn.simulation.common.utils.RandomSource;
 import org.slf4j.Logger;
@@ -57,10 +57,12 @@ public abstract class Agent<REGION extends grakn.simulation.common.world.Region,
     private final DbDriver<DB_OPERATION> dbDriver;
     private final ActionFactory<DB_OPERATION, ?> actionFactory;
     private final Report report = new Report();
+    protected final SimulationContext simulationContext;
 
-    protected Agent(DbDriver<DB_OPERATION> dbDriver, ActionFactory<DB_OPERATION, ?> actionFactory) {
+    protected Agent(DbDriver<DB_OPERATION> dbDriver, ActionFactory<DB_OPERATION, ?> actionFactory, SimulationContext simulationContext) {
         this.dbDriver = dbDriver;
         this.actionFactory = actionFactory;
+        this.simulationContext = simulationContext;
         logger = LoggerFactory.getLogger(this.getClass());
     }
 
@@ -73,31 +75,31 @@ public abstract class Agent<REGION extends grakn.simulation.common.world.Region,
     }
 
     public boolean trace() {
-        return trace;
+        return simulationContext.trace() && trace;
     }
 
     abstract protected List<REGION> getRegions(World world);
 
-    public Report iterate(SimulationContext simulationContext, RandomSource randomSource) {
+    public Report iterate(RandomSource randomSource) {
         List<REGION> regions = getRegions(simulationContext.world());
         List<RandomSource> randomSources = randomSource.split(regions.size());
 
-        Pair.zip(randomSources, regions).parallelStream().forEach(
-                pair -> iterateRegionalAgent(simulationContext, pair.getFirst(), pair.getSecond())
+        Utils.zip(randomSources, regions).parallelStream().forEach(
+                pair -> iterateRegionalAgent(pair.first(), pair.second())
         );
         return report;
     }
 
     protected abstract Region getRegionalAgent(int simulationStep, String tracker, Random random, boolean test);
 
-    private void iterateRegionalAgent(SimulationContext simulationContext, RandomSource source, REGION region) {
+    private void iterateRegionalAgent(RandomSource source, REGION region) {
         Random random = source.startNewRandom();
         Random agentRandom = RandomSource.nextSource(random).startNewRandom();
 
         Region regionalAgent = getRegionalAgent(simulationContext.simulationStep(), region.tracker(), agentRandom, simulationContext.test());
         DbOperationFactory<DB_OPERATION> dbOperationFactory = dbDriver.getDbOperationFactory(region, logger);
 
-        Region.Report report = regionalAgent.runWithReport(dbOperationFactory, region, simulationContext);
+        Region.Report report = regionalAgent.runWithReport(dbOperationFactory, region);
         this.report.addRegionalAgentReport(region.tracker(), report);
     }
 
@@ -133,7 +135,7 @@ public abstract class Agent<REGION extends grakn.simulation.common.world.Region,
             this.tracker = tracker;
             this.random = random;
             this.test = test;
-            if (trace) {
+            if (trace()) {
                 context = contextOnThread(tracker(), simulationStep);
             }
         }
@@ -142,15 +144,15 @@ public abstract class Agent<REGION extends grakn.simulation.common.world.Region,
             return tracker;
         }
 
-        protected Report runWithReport(DbOperationFactory<DB_OPERATION> dbOperationFactory, REGION region, SimulationContext simulationContext) {
+        protected Report runWithReport(DbOperationFactory<DB_OPERATION> dbOperationFactory, REGION region) {
             Trace.trace(() -> {
-                run(dbOperationFactory, region, simulationContext);
+                run(dbOperationFactory, region);
                 return null;
-            }, name(), trace);
+            }, name(), trace());
             return report;
         }
 
-        protected abstract void run(DbOperationFactory<DB_OPERATION> dbOperationFactory, REGION region, SimulationContext simulationContext);
+        protected abstract void run(DbOperationFactory<DB_OPERATION> dbOperationFactory, REGION region);
 
         public <U> U pickOne(List<U> list) { // TODO can be a util
             return list.get(random().nextInt(list.size()));
@@ -179,7 +181,7 @@ public abstract class Agent<REGION extends grakn.simulation.common.world.Region,
 
         public <ACTION_RETURN_TYPE> ACTION_RETURN_TYPE runAction(Action<?, ACTION_RETURN_TYPE> action) {
             ACTION_RETURN_TYPE actionAnswer;
-            actionAnswer = Trace.trace(action::run, action.name(), trace);
+            actionAnswer = Trace.trace(action::run, action.name(), trace());
             if (test) {
                 report.addActionReport(action.report(actionAnswer));
             }

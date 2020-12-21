@@ -17,7 +17,7 @@
 
 package grakn.simulation.grakn.action.write;
 
-import grabl.tracing.client.GrablTracingThreadStatic;
+import grakn.common.collection.Pair;
 import grakn.simulation.common.action.write.UpdateAgesOfPeopleInCityAction;
 import grakn.simulation.common.world.World;
 import grakn.simulation.grakn.driver.GraknOperation;
@@ -29,9 +29,9 @@ import graql.lang.query.GraqlMatch;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.HashMap;
+import java.util.stream.Stream;
 
-import static grabl.tracing.client.GrablTracingThreadStatic.traceOnThread;
+import static grakn.common.collection.Collections.pair;
 import static grakn.simulation.grakn.action.Model.AGE;
 import static grakn.simulation.grakn.action.Model.BORN_IN;
 import static grakn.simulation.grakn.action.Model.BORN_IN_CHILD;
@@ -49,19 +49,12 @@ public class GraknUpdateAgesOfPeopleInCityAction extends UpdateAgesOfPeopleInCit
 
     @Override
     public Integer run() {
-        // Get all people born in a city
-        HashMap<String, LocalDateTime> peopleAnswers;
-        try (GrablTracingThreadStatic.ThreadTrace trace = traceOnThread("getPeopleBornInCity")) {
-            peopleAnswers = getPeopleBornInCity(city);
-        }
-        // Update their ages
-        peopleAnswers.forEach((personEmail, personDob) -> {
-                    long age = ChronoUnit.YEARS.between(personDob, today);
-                    try (GrablTracingThreadStatic.ThreadTrace trace = traceOnThread("updatePersonAge")) {
-                        updatePersonAge(personEmail, age);
-                    }
-                }
-        );
+        getPeopleBornInCity(city).forEach(person -> {
+            String email = person.first();
+            LocalDateTime dob = person.second();
+            long age = ChronoUnit.YEARS.between(dob, today);
+            updatePersonAge(email, age);
+        });
         return null;
     }
 
@@ -85,21 +78,18 @@ public class GraknUpdateAgesOfPeopleInCityAction extends UpdateAgesOfPeopleInCit
         ).sort(EMAIL);
     }
 
-    private HashMap<String, LocalDateTime> getPeopleBornInCity(World.City worldCity) {
+    private Stream<Pair<String, LocalDateTime>> getPeopleBornInCity(World.City worldCity) {
         GraqlMatch.Sorted peopleQuery = getPeopleBornInCityQuery(worldCity.name());
-
-        HashMap<String, LocalDateTime> peopleDobs = new HashMap<>();
-        dbOperation.execute(peopleQuery).forEach(personAnswer -> {
+        return dbOperation.executeAsync(peopleQuery).map(personAnswer -> {
             LocalDateTime dob = (LocalDateTime) personAnswer.get(DATE_OF_BIRTH).asThing().asAttribute().getValue();
             String email = personAnswer.get(EMAIL).asThing().asAttribute().getValue().toString();
-            peopleDobs.put(email, dob);
+            return pair(email, dob);
         });
-        return peopleDobs;
     }
 
     private void updatePersonAge(String personEmail, long newAge) {
-        dbOperation.execute(deleteHasQuery(personEmail));
-        dbOperation.execute(insertNewAgeQuery(personEmail, newAge));
+        dbOperation.executeAsync(deleteHasQuery(personEmail));
+        dbOperation.executeAsync(insertNewAgeQuery(personEmail, newAge));
     }
 
     public static GraqlInsert insertNewAgeQuery(String personEmail, long newAge) {

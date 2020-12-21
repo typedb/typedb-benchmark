@@ -20,6 +20,7 @@ java_library(
         "//common/world",
         "//common/yaml_tool",
         "//config",
+        "@graknlabs_common//:common",
         "@graknlabs_client_java//:client-java",
         "@graknlabs_grabl_tracing//client",
         "@graknlabs_graql//java:graql",

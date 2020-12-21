@@ -8,6 +8,7 @@ java_library(
     visibility = ["//visibility:public"],
     deps = [
         "@graknlabs_grabl_tracing//client",
+        "@graknlabs_common//:common",
     ],
 )
 

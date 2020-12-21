@@ -31,8 +31,8 @@ import java.util.Random;
 
 public class MarriageAgent<DB_OPERATION extends DbOperation> extends CityAgent<DB_OPERATION> {
 
-    public MarriageAgent(DbDriver<DB_OPERATION> dbDriver, ActionFactory<DB_OPERATION, ?> actionFactory) {
-        super(dbDriver, actionFactory);
+    public MarriageAgent(DbDriver<DB_OPERATION> dbDriver, ActionFactory<DB_OPERATION, ?> actionFactory, SimulationContext simulationContext) {
+        super(dbDriver, actionFactory, simulationContext);
     }
 
     @Override
@@ -46,7 +46,7 @@ public class MarriageAgent<DB_OPERATION extends DbOperation> extends CityAgent<D
         }
 
         @Override
-        protected void run(DbOperationFactory<DB_OPERATION> dbOperationFactory, World.City city, SimulationContext simulationContext) {
+        protected void run(DbOperationFactory<DB_OPERATION> dbOperationFactory, World.City city) {
 
             // Find bachelors and bachelorettes who are considered adults and who are not in a marriage and pair them off randomly
             LocalDateTime dobOfAdults = simulationContext.today().minusYears(simulationContext.world().AGE_OF_ADULTHOOD);
