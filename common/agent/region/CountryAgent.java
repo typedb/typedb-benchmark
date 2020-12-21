@@ -22,7 +22,6 @@ import grakn.simulation.common.agent.base.Agent;
 import grakn.simulation.common.agent.base.SimulationContext;
 import grakn.simulation.common.driver.DbDriver;
 import grakn.simulation.common.driver.DbOperation;
-import grakn.simulation.common.driver.DbOperationFactory;
 import grakn.simulation.common.world.World;
 
 import java.util.List;
@@ -32,8 +31,8 @@ import static java.util.stream.Collectors.toList;
 
 public abstract class CountryAgent<DB_OPERATION extends DbOperation> extends Agent<World.Country, DB_OPERATION> {
 
-    public CountryAgent(DbDriver<DB_OPERATION> dbDriver, ActionFactory<DB_OPERATION, ?> actionFactory) {
-        super(dbDriver, actionFactory);
+    public CountryAgent(DbDriver<DB_OPERATION> dbDriver, ActionFactory<DB_OPERATION, ?> actionFactory, SimulationContext simulationContext) {
+        super(dbDriver, actionFactory, simulationContext);
     }
 
     @Override

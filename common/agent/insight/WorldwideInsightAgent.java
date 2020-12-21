@@ -33,8 +33,8 @@ import java.util.Random;
  * @param <DB_OPERATION>
  */
 public abstract class WorldwideInsightAgent<DB_OPERATION extends DbOperation> extends WorldAgent<DB_OPERATION> {
-    public WorldwideInsightAgent(DbDriver<DB_OPERATION> dbDriver, ActionFactory<DB_OPERATION, ?> actionFactory) {
-        super(dbDriver, actionFactory);
+    public WorldwideInsightAgent(DbDriver<DB_OPERATION> dbDriver, ActionFactory<DB_OPERATION, ?> actionFactory, SimulationContext simulationContext) {
+        super(dbDriver, actionFactory, simulationContext);
     }
 
     @Override
@@ -51,7 +51,7 @@ public abstract class WorldwideInsightAgent<DB_OPERATION extends DbOperation> ex
         }
 
         @Override
-        protected void run(DbOperationFactory<DB_OPERATION> dbOperationFactory, World world, SimulationContext simulationContext) {
+        protected void run(DbOperationFactory<DB_OPERATION> dbOperationFactory, World world) {
             for (int i = 0; i <= simulationContext.world().getScaleFactor(); i++) {
                 try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker(), trace())) {
                     runAction(getAction(dbOperation));

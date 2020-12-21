@@ -19,6 +19,7 @@ package grakn.simulation.common.agent.region;
 
 import grakn.simulation.common.action.ActionFactory;
 import grakn.simulation.common.agent.base.Agent;
+import grakn.simulation.common.agent.base.SimulationContext;
 import grakn.simulation.common.driver.DbDriver;
 import grakn.simulation.common.driver.DbOperation;
 import grakn.simulation.common.world.World;
@@ -30,8 +31,8 @@ import static java.util.stream.Collectors.toList;
 
 public abstract class ContinentAgent<DB_OPERATION extends DbOperation> extends Agent<World.Continent, DB_OPERATION> {
 
-    public ContinentAgent(DbDriver<DB_OPERATION> dbDriver, ActionFactory<DB_OPERATION, ?> actionFactory) {
-        super(dbDriver, actionFactory);
+    public ContinentAgent(DbDriver<DB_OPERATION> dbDriver, ActionFactory<DB_OPERATION, ?> actionFactory, SimulationContext simulationContext) {
+        super(dbDriver, actionFactory, simulationContext);
     }
 
     @Override

@@ -30,8 +30,8 @@ import java.util.Random;
 
 public class CompanyAgent<DB_OPERATION extends DbOperation> extends CountryAgent<DB_OPERATION> {
 
-    public CompanyAgent(DbDriver<DB_OPERATION> dbDriver, ActionFactory<DB_OPERATION, ?> actionFactory) {
-        super(dbDriver, actionFactory);
+    public CompanyAgent(DbDriver<DB_OPERATION> dbDriver, ActionFactory<DB_OPERATION, ?> actionFactory, SimulationContext simulationContext) {
+        super(dbDriver, actionFactory, simulationContext);
     }
 
     @Override
@@ -45,7 +45,7 @@ public class CompanyAgent<DB_OPERATION extends DbOperation> extends CountryAgent
         }
 
         @Override
-        protected void run(DbOperationFactory<DB_OPERATION> dbOperationFactory, World.Country country, SimulationContext simulationContext) {
+        protected void run(DbOperationFactory<DB_OPERATION> dbOperationFactory, World.Country country) {
             int numCompanies = simulationContext.world().getScaleFactor();
 
             try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker(), trace())) {

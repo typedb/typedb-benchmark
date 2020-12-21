@@ -29,8 +29,8 @@ import java.util.Random;
 
 public class ProductAgent<DB_OPERATION extends DbOperation> extends ContinentAgent<DB_OPERATION> {
 
-    public ProductAgent(DbDriver<DB_OPERATION> dbDriver, ActionFactory<DB_OPERATION, ?> actionFactory) {
-        super(dbDriver, actionFactory);
+    public ProductAgent(DbDriver<DB_OPERATION> dbDriver, ActionFactory<DB_OPERATION, ?> actionFactory, SimulationContext simulationContext) {
+        super(dbDriver, actionFactory, simulationContext);
     }
 
     @Override
@@ -44,7 +44,7 @@ public class ProductAgent<DB_OPERATION extends DbOperation> extends ContinentAge
         }
 
         @Override
-        protected void run(DbOperationFactory<DB_OPERATION> dbOperationFactory, World.Continent continent, SimulationContext simulationContext) {
+        protected void run(DbOperationFactory<DB_OPERATION> dbOperationFactory, World.Continent continent) {
             int numProducts = simulationContext.world().getScaleFactor();
             try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker(), trace())) {
                 for (int i = 0; i < numProducts; i++) {

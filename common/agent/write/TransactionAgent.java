@@ -37,8 +37,8 @@ import static grakn.common.collection.Collections.pair;
 
 public class TransactionAgent<DB_OPERATION extends DbOperation> extends CountryAgent<DB_OPERATION> {
 
-    public TransactionAgent(DbDriver<DB_OPERATION> dbDriver, ActionFactory<DB_OPERATION, ?> actionFactory) {
-        super(dbDriver, actionFactory);
+    public TransactionAgent(DbDriver<DB_OPERATION> dbDriver, ActionFactory<DB_OPERATION, ?> actionFactory, SimulationContext simulationContext) {
+        super(dbDriver, actionFactory, simulationContext);
     }
 
     @Override
@@ -52,7 +52,7 @@ public class TransactionAgent<DB_OPERATION extends DbOperation> extends CountryA
         }
 
         @Override
-        protected void run(DbOperationFactory<DB_OPERATION> dbOperationFactory, World.Country country, SimulationContext simulationContext) {
+        protected void run(DbOperationFactory<DB_OPERATION> dbOperationFactory, World.Country country) {
             List<Long> companyNumbers;
 
             try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker(), trace())) {
