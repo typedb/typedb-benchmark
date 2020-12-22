@@ -17,24 +17,19 @@
 
 package grakn.simulation.grakn.driver;
 
-import grabl.tracing.client.GrablTracingThreadStatic;
 import grakn.client.Grakn;
 import grakn.client.concept.answer.ConceptMap;
 import grakn.simulation.common.driver.LogWrapper;
 import grakn.simulation.common.driver.TransactionalDbOperation;
 import graql.lang.query.GraqlDelete;
-import graql.lang.query.GraqlMatch;
 import graql.lang.query.GraqlInsert;
+import graql.lang.query.GraqlMatch;
 
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static com.google.common.collect.Iterables.getOnlyElement;
-import static grabl.tracing.client.GrablTracingThreadStatic.traceOnThread;
-import static grakn.simulation.common.driver.TransactionalDbDriver.TracingLabel.EXECUTE;
-import static grakn.simulation.common.driver.TransactionalDbDriver.TracingLabel.EXECUTE_ASYNC;
-import static grakn.simulation.common.driver.TransactionalDbDriver.TracingLabel.SORTED_EXECUTE;
 
 public class GraknOperation extends TransactionalDbOperation {
 
@@ -68,56 +63,46 @@ public class GraknOperation extends TransactionalDbOperation {
         }
     }
 
-    public <T> List<T> sortedExecute(GraqlMatch query, String attributeName, Integer limit){
+    public <T> List<T> sortedExecute(GraqlMatch query, String attributeName, Integer limit) {
         throwIfClosed();
         log.query(tracker, iteration, query);
-        return trace(() -> {
-            Stream<T> answerStream = transaction.query().match(query)
-                    .map(conceptMap -> (T) conceptMap.get(attributeName).asThing().asAttribute().getValue())
-                    .sorted();
-            if (limit != null) {
-                answerStream = answerStream.limit(limit);
-            }
-            return answerStream.collect(Collectors.toList());
-        }, SORTED_EXECUTE.getName());
+        Stream<T> answerStream = transaction.query().match(query)
+                .map(conceptMap -> (T) conceptMap.get(attributeName).asThing().asAttribute().getValue())
+                .sorted();
+        if (limit != null) {
+            answerStream = answerStream.limit(limit);
+        }
+        return answerStream.collect(Collectors.toList());
     }
 
     public void execute(GraqlDelete query) {
         log.query(tracker, iteration, query);
-        trace(() -> transaction.query().delete(query).get(), EXECUTE.getName());
+        transaction.query().delete(query).get();
     }
 
     public void executeAsync(GraqlDelete query) {
         log.query(tracker, iteration, query);
-        trace(() -> transaction.query().delete(query), EXECUTE_ASYNC.getName());
+        transaction.query().delete(query);
     }
 
     public List<ConceptMap> execute(GraqlInsert query) {
         log.query(tracker, iteration, query);
-        try (GrablTracingThreadStatic.ThreadTrace trace = traceOnThread(EXECUTE.getName())) {
-            return transaction.query().insert(query).collect(Collectors.toList());
-        }
+        return transaction.query().insert(query).collect(Collectors.toList());
     }
 
     public Stream<ConceptMap> executeAsync(GraqlInsert query) {
         log.query(tracker, iteration, query);
-        try (GrablTracingThreadStatic.ThreadTrace trace = traceOnThread(EXECUTE_ASYNC.getName())) {
-            return transaction.query().insert(query);
-        }
+        return transaction.query().insert(query);
     }
 
     public List<ConceptMap> execute(GraqlMatch query) {
         log.query(tracker, iteration, query);
-        try (GrablTracingThreadStatic.ThreadTrace trace = traceOnThread(EXECUTE.getName())) {
-            return transaction.query().match(query).collect(Collectors.toList());
-        }
+        return transaction.query().match(query).collect(Collectors.toList());
     }
 
     public Stream<ConceptMap> executeAsync(GraqlMatch query) {
         log.query(tracker, iteration, query);
-        try (GrablTracingThreadStatic.ThreadTrace trace = traceOnThread(EXECUTE_ASYNC.getName())) {
-            return transaction.query().match(query);
-        }
+        return transaction.query().match(query);
     }
 
     public Number execute(GraqlMatch.Aggregate query) {
