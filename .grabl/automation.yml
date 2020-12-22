@@ -34,8 +34,7 @@ build:
       timeout: "18000"
       dependencies: [test-performance-small-grakn-background]
       script: |
-        wget -O /tmp/rootCA.jks https://storage.googleapis.com/grabl-dev-secrets/rootCA.jks
-        bazel run --config=rbe --jvmopt="-Djavax.net.ssl.trustStore=/tmp/rootCA.jks -Djavax.net.ssl.trustStorePassword=changeit" //:simulation-small -- \
+        bazel run --config=rbe //:simulation-small -- \
           --database grakn \
           --database-uri $GRABL_EXPORT_PERFORMANCE_SMALL_GRAKN_URI \
           --tracing-uri $GRABL_TRACING_URI \
@@ -70,8 +69,7 @@ build:
       dependencies: [test-performance-small-neo4j-background]
       timeout: "18000"
       script: |
-        wget -O /tmp/rootCA.jks https://storage.googleapis.com/grabl-dev-secrets/rootCA.jks
-        bazel run --config=rbe --jvmopt="-Djavax.net.ssl.trustStore=/tmp/rootCA.jks -Djavax.net.ssl.trustStorePassword=changeit" //:simulation-small -- \
+        bazel run --config=rbe //:simulation-small -- \
           --database neo4j \
           --database-uri $GRABL_EXPORT_PERFORMANCE_SMALL_NEO4J_URI \
           --tracing-uri $GRABL_TRACING_URI \
