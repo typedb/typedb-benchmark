@@ -112,37 +112,32 @@ public class SimulationRunner {
         try {
             try (GrablTracing tracingIgnored = grablTracing(grablTracingUri, grablTracingOrganisation, grablTracingRepository, grablTracingCommit, grablTracingUsername, grablTracingToken, disableTracing, dbName)) {
                 Simulation<?, ?> simulation;
-                switch (dbName) {
-                    case "grakn":
-                        defaultUri = GraknClient.DEFAULT_URI;
-                        if (hostUri == null) hostUri = defaultUri;
+                if (dbName.toLowerCase().startsWith("grakn")) {
+                    defaultUri = "localhost:48555";
+                    if (hostUri == null) hostUri = defaultUri;
 
-                        simulation = new GraknSimulation(
-                                new GraknDriver(hostUri, "world"),
-                                initialisationDataFiles,
-                                config.getRandomSeed(),
-                                world,
-                                config.getAgents(),
-                                config.getTraceSampling().getSamplingFunction(),
-                                false);
-                        break;
+                    simulation = new GraknSimulation(
+                            new GraknDriver(hostUri, "world"),
+                            initialisationDataFiles,
+                            config.getRandomSeed(),
+                            world,
+                            config.getAgents(),
+                            config.getTraceSampling().getSamplingFunction(),
+                            false);
+                } else if (dbName.toLowerCase().startsWith("neo4j")) {
+                    defaultUri = "bolt://localhost:7687";
+                    if (hostUri == null) hostUri = defaultUri;
 
-                    case "neo4j":
-                        defaultUri = "bolt://localhost:7687";
-                        if (hostUri == null) hostUri = defaultUri;
-
-                        simulation = new Neo4jSimulation(
-                                new Neo4jDriver(hostUri),
-                                initialisationDataFiles,
-                                config.getRandomSeed(),
-                                world,
-                                config.getAgents(),
-                                config.getTraceSampling().getSamplingFunction(),
-                                false);
-                        break;
-
-                    default:
-                        throw new IllegalArgumentException("Unexpected value: " + dbName);
+                    simulation = new Neo4jSimulation(
+                            new Neo4jDriver(hostUri),
+                            initialisationDataFiles,
+                            config.getRandomSeed(),
+                            world,
+                            config.getAgents(),
+                            config.getTraceSampling().getSamplingFunction(),
+                            false);
+                } else {
+                    throw new IllegalArgumentException("Unexpected value: " + dbName);
                 }
 
                 ///////////////
