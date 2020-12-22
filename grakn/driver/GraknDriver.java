@@ -17,21 +17,14 @@
 
 package grakn.simulation.grakn.driver;
 
-import grabl.tracing.client.GrablTracingThreadStatic;
 import grakn.client.Grakn;
 import grakn.client.rpc.GraknClient;
-import grakn.simulation.common.driver.TransactionalDbDriver;
 import grakn.simulation.common.driver.DbOperationFactory;
+import grakn.simulation.common.driver.TransactionalDbDriver;
 import grakn.simulation.common.world.Region;
 import org.slf4j.Logger;
 
 import java.util.concurrent.ConcurrentHashMap;
-
-import static grabl.tracing.client.GrablTracingThreadStatic.traceOnThread;
-import static grakn.simulation.common.driver.TransactionalDbDriver.TracingLabel.CLOSE_CLIENT;
-import static grakn.simulation.common.driver.TransactionalDbDriver.TracingLabel.CLOSE_SESSION;
-import static grakn.simulation.common.driver.TransactionalDbDriver.TracingLabel.OPEN_CLIENT;
-import static grakn.simulation.common.driver.TransactionalDbDriver.TracingLabel.OPEN_SESSION;
 
 public class GraknDriver extends TransactionalDbDriver<Grakn.Transaction, Grakn.Session, GraknOperation> {
 
@@ -40,10 +33,7 @@ public class GraknDriver extends TransactionalDbDriver<Grakn.Transaction, Grakn.
     private final ConcurrentHashMap<String, Grakn.Session> sessionMap = new ConcurrentHashMap<>();
 
     public GraknDriver(String hostUri, String database) {
-        try (GrablTracingThreadStatic.ThreadTrace trace = traceOnThread(OPEN_CLIENT.getName())) {
-            System.out.println("DEBUG LOGS hostUri" + hostUri + "DEBUG LOGS trace" + trace.toString());
-            this.client = new GraknClient(hostUri);
-        }
+        this.client = new GraknClient(hostUri);
         this.database = database;
     }
 
@@ -55,27 +45,17 @@ public class GraknDriver extends TransactionalDbDriver<Grakn.Transaction, Grakn.
 
     @Override
     public Grakn.Session session(String sessionKey) {
-        return sessionMap.computeIfAbsent(sessionKey, k -> {
-            try (GrablTracingThreadStatic.ThreadTrace trace = traceOnThread(OPEN_SESSION.getName())) {
-                return client.session(database, Grakn.Session.Type.DATA);
-            }
-        });
+        return sessionMap.computeIfAbsent(sessionKey, k -> client.session(database, Grakn.Session.Type.DATA));
     }
 
     public Grakn.Session schemaSession(String sessionKey) {
-        return sessionMap.computeIfAbsent(sessionKey, k -> {
-            try (GrablTracingThreadStatic.ThreadTrace trace = traceOnThread(OPEN_SESSION.getName())) {
-                return client.session(database, Grakn.Session.Type.SCHEMA);
-            }
-        });
+        return sessionMap.computeIfAbsent(sessionKey, k -> client.session(database, Grakn.Session.Type.SCHEMA));
     }
 
     @Override
     public void closeSessions() {
         for (Grakn.Session session : sessionMap.values()) {
-            try (GrablTracingThreadStatic.ThreadTrace trace = traceOnThread(CLOSE_SESSION.getName())) {
-                session.close();
-            }
+            session.close();
         }
         sessionMap.clear();
     }
@@ -83,9 +63,7 @@ public class GraknDriver extends TransactionalDbDriver<Grakn.Transaction, Grakn.
     @Override
     public void close() {
         closeSessions();
-        try (GrablTracingThreadStatic.ThreadTrace trace = traceOnThread(CLOSE_CLIENT.getName())) {
-            client.close();
-        }
+        client.close();
     }
 
     @Override
