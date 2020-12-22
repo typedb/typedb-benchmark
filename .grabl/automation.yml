@@ -1,7 +1,8 @@
 build:
   performance:
     test-performance-small-grakn-background:
-      machine: graknlabs-ubuntu-20.04-java11
+      machine: 16cpus-32gb
+      image: graknlabs-ubuntu-20.04-java11
       type: background
       timeout: "18000"
       script: |
@@ -29,7 +30,7 @@ build:
         sudo systemctl start grakn
         export GRABL_EXPORT_PERFORMANCE_SMALL_GRAKN_URI="${HOSTNAME}:1729"
     test-performance-small-grakn:
-      machine: graknlabs-ubuntu-20.04-java11
+      image: graknlabs-ubuntu-20.04-java11
       timeout: "18000"
       dependencies: [test-performance-small-grakn-background]
       script: |
@@ -44,7 +45,8 @@ build:
           --api-token $GRABL_TOKEN \
           --config-file /home/grabl/$GRABL_REPO/config/config_test.yml
     test-performance-small-neo4j-background:
-      machine: graknlabs-ubuntu-20.04-java11
+      machine: 16cpus-32gb
+      image: graknlabs-ubuntu-20.04-java11
       type: background
       timeout: "18000"
       script: |
@@ -63,7 +65,7 @@ build:
         sudo neo4j start
         export GRABL_EXPORT_PERFORMANCE_SMALL_NEO4J_URI="bolt://${HOSTNAME}:7687"
     test-performance-small-neo4j:
-      machine: graknlabs-ubuntu-20.04-java11
+      image: graknlabs-ubuntu-20.04-java11
       dependencies: [test-performance-small-neo4j-background]
       timeout: "18000"
       script: |
