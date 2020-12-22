@@ -24,9 +24,11 @@ import java.util.function.Supplier;
 public abstract class DbOperation implements AutoCloseable {
 
     protected final String tracker;
+    protected final long iteration;
     private final boolean trace;
 
-    public DbOperation(String tracker, boolean trace) {
+    public DbOperation(String tracker, long iteration, boolean trace) {
+        this.iteration = iteration;
         this.tracker = tracker;
         this.trace = trace;
     }

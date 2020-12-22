@@ -31,5 +31,5 @@ public abstract class TransactionalDbOperationFactory<DB_OPERATION extends Trans
     }
 
     @Override
-    public abstract DB_OPERATION newDbOperation(String tracker, boolean trace);
+    public abstract DB_OPERATION newDbOperation(String tracker, long iteration, boolean trace);
 }

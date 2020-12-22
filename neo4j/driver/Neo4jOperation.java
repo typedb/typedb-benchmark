@@ -36,8 +36,8 @@ public class Neo4jOperation extends TransactionalDbOperation {
     private final Session session;
     private final LogWrapper log;
 
-    public Neo4jOperation(Session session, LogWrapper log, String tracker, boolean trace) {
-        super(tracker, trace);
+    public Neo4jOperation(Session session, LogWrapper log, String tracker, long iteration, boolean trace) {
+        super(tracker, iteration, trace);
         this.session = session;
         this.log = log;
     }
@@ -55,7 +55,7 @@ public class Neo4jOperation extends TransactionalDbOperation {
     public void save() {}
 
     public List<Record> execute(Query query) {
-        log.query(tracker, query);
+        log.query(tracker, iteration, query);
         return trace(() -> session.writeTransaction( tx -> {
             Result result = tx.run(query);
             return result.list();
@@ -63,7 +63,7 @@ public class Neo4jOperation extends TransactionalDbOperation {
     }
 
     public <T> List<T> sortedExecute(Query query, String attributeName, Integer limit) {
-        log.query(tracker, query);
+        log.query(tracker, iteration, query);
         return trace(() -> {
             Stream<T> answerStream = execute(query).stream()
                     .map(record -> (T) record.asMap().get(attributeName))

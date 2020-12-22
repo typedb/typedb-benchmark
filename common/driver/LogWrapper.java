@@ -26,19 +26,7 @@ public class LogWrapper {
         this.logger = logger;
     }
 
-    public void query(String tracker, String action, Object query) {
-        query(tracker, action, query.toString());
-    }
-
-    public void query(String tracker, String action, String query) {
-        logger.info("({}):{}:\n{}", tracker, action, query);
-    }
-
-    public void query(String tracker, Object query) {
-        query(tracker, query.toString());
-    }
-
-    public void query(String tracker, String query) {
-        logger.info("{}:\n{}", tracker, query);
+    public void query(String tracker, long iteration, Object query) {
+        logger.info("{}/{}:\n{}", iteration, tracker, query.toString());
     }
 }

@@ -42,27 +42,27 @@ public class TransactionAgent<DB_OPERATION extends DbOperation> extends CountryA
     }
 
     @Override
-    protected Country getRegionalAgent(int simulationStep, String tracker, Random random, boolean test) {
-        return new Country(simulationStep, tracker, random, test);
+    protected Region getRegionalAgent(int iteration, String tracker, Random random, boolean test) {
+        return new Country(iteration, tracker, random, test);
     }
 
     public class Country extends CountryRegion {
-        public Country(int simulationStep, String tracker, Random random, boolean test) {
-            super(simulationStep, tracker, random, test);
+        public Country(int iteration, String tracker, Random random, boolean test) {
+            super(iteration, tracker, random, test);
         }
 
         @Override
         protected void run(DbOperationFactory<DB_OPERATION> dbOperationFactory, World.Country country) {
             List<Long> companyNumbers;
 
-            try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker(), trace())) {
+            try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker(), iteration(), trace())) {
                 CompaniesInCountryAction<DB_OPERATION> companiesInContinentAction = actionFactory().companiesInCountryAction(dbOperation, country, 100);
                 companyNumbers = runAction(companiesInContinentAction);
             }
             shuffle(companyNumbers);
 
             List<Long> productBarcodes;
-            try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker(), trace())) {
+            try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker(), iteration(), trace())) {
                 ProductsInContinentAction<?> productsInContinentAction = actionFactory().productsInContinentAction(dbOperation, country.continent());
                 productBarcodes = runAction(productsInContinentAction);
             }
@@ -80,7 +80,7 @@ public class TransactionAgent<DB_OPERATION extends DbOperation> extends CountryA
                 Pair<Long, Long> buyerAndProduct = pair(companyNumber, productBarcode);
                 transactions.add(buyerAndProduct);
             }
-            try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker(), trace())) {
+            try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker(), iteration(), trace())) {
                 Allocation.allocate(transactions, companyNumbers, (transaction, sellerCompanyNumber) -> {
                     double value = randomAttributeGenerator().boundRandomDouble(0.01, 10000.00);
                     int productQuantity = randomAttributeGenerator().boundRandomInt(1, 1000);

@@ -22,7 +22,7 @@ import grakn.simulation.common.world.World;
 import java.time.LocalDateTime;
 
 public interface SimulationContext {
-    int simulationStep();
+    int iteration();
     LocalDateTime today();
     World world();
     boolean trace();

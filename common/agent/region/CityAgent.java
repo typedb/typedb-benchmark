@@ -43,8 +43,8 @@ public abstract class CityAgent<DB_OPERATION extends DbOperation> extends Agent<
 
     protected abstract class CityRegion extends Region {
 
-        public CityRegion(int simulationStep, String tracker, Random random, boolean test) {
-            super(simulationStep, tracker, random, test);
+        public CityRegion(int iteration, String tracker, Random random, boolean test) {
+            super(iteration, tracker, random, test);
         }
     }
 }

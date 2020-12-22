@@ -36,13 +36,13 @@ public class MarriageAgent<DB_OPERATION extends DbOperation> extends CityAgent<D
     }
 
     @Override
-    protected City2 getRegionalAgent(int simulationStep, String tracker, Random random, boolean test) {
-        return new City2(simulationStep, tracker, random, test);
+    protected Region getRegionalAgent(int iteration, String tracker, Random random, boolean test) {
+        return new City(iteration, tracker, random, test);
     }
 
-    public class City2 extends CityRegion {
-        public City2(int simulationStep, String tracker, Random random, boolean test) {
-            super(simulationStep, tracker, random, test);
+    public class City extends CityRegion {
+        public City(int iteration, String tracker, Random random, boolean test) {
+            super(iteration, tracker, random, test);
         }
 
         @Override
@@ -51,19 +51,19 @@ public class MarriageAgent<DB_OPERATION extends DbOperation> extends CityAgent<D
             // Find bachelors and bachelorettes who are considered adults and who are not in a marriage and pair them off randomly
             LocalDateTime dobOfAdults = simulationContext.today().minusYears(simulationContext.world().AGE_OF_ADULTHOOD);
             List<String> womenEmails;
-            try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker(), trace())) {
+            try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker(), iteration(), trace())) {
                 womenEmails = runAction(actionFactory().unmarriedPeopleInCityAction(dbOperation, city, "female", dobOfAdults));
                 shuffle(womenEmails);
             }
 
             List<String> menEmails;
-            try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker(), trace())) {
+            try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker(), iteration(), trace())) {
                 menEmails = runAction(actionFactory().unmarriedPeopleInCityAction(dbOperation, city, "male", dobOfAdults));
                 shuffle(menEmails);
             }
 
             int numMarriagesPossible = Math.min(simulationContext.world().getScaleFactor(), Math.min(womenEmails.size(), menEmails.size()));
-            try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker(), trace())) {
+            try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker(), iteration(), trace())) {
                 if (numMarriagesPossible > 0) {
                     for (int i = 0; i < numMarriagesPossible; i++) {
                         String wifeEmail = womenEmails.get(i);

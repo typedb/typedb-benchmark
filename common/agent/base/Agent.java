@@ -90,13 +90,13 @@ public abstract class Agent<REGION extends grakn.simulation.common.world.Region,
         return report;
     }
 
-    protected abstract Region getRegionalAgent(int simulationStep, String tracker, Random random, boolean test);
+    protected abstract Region getRegionalAgent(int iteration, String tracker, Random random, boolean test);
 
     private void iterateRegionalAgent(RandomSource source, REGION region) {
         Random random = source.startNewRandom();
         Random agentRandom = RandomSource.nextSource(random).startNewRandom();
 
-        Region regionalAgent = getRegionalAgent(simulationContext.simulationStep(), region.tracker(), agentRandom, simulationContext.test());
+        Region regionalAgent = getRegionalAgent(simulationContext.iteration(), region.tracker(), agentRandom, simulationContext.test());
         DbOperationFactory<DB_OPERATION> dbOperationFactory = dbDriver.getDbOperationFactory(region, logger);
 
         Region.Report report = regionalAgent.runWithReport(dbOperationFactory, region);
@@ -129,15 +129,21 @@ public abstract class Agent<REGION extends grakn.simulation.common.world.Region,
         private final boolean test;
         private final Report report = new Report();
         private final String tracker;
+        private final int iteration;
         private GrablTracingThreadStatic.ThreadContext context;
 
-        public Region(int simulationStep, String tracker, Random random, boolean test) {
+        public Region(int iteration, String tracker, Random random, boolean test) {
+            this.iteration = iteration;
             this.tracker = tracker;
             this.random = random;
             this.test = test;
             if (trace()) {
-                context = contextOnThread(tracker(), simulationStep);
+                context = contextOnThread(tracker(), iteration());
             }
+        }
+
+        public int iteration() {
+            return iteration;
         }
 
         public String tracker() {
@@ -172,7 +178,7 @@ public abstract class Agent<REGION extends grakn.simulation.common.world.Region,
          * @return
          */
         public String uniqueId(SimulationContext simulationContext, int iterationScopeId) {
-            return simulationContext.simulationStep() + "/" + tracker() + "/" + iterationScopeId;
+            return simulationContext.iteration() + "/" + tracker() + "/" + iterationScopeId;
         }
 
         public RandomValueGenerator randomAttributeGenerator() {

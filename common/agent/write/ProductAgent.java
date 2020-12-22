@@ -34,19 +34,19 @@ public class ProductAgent<DB_OPERATION extends DbOperation> extends ContinentAge
     }
 
     @Override
-    protected RegionalProductAgent getRegionalAgent(int simulationStep, String tracker, Random random, boolean test) {
-        return new RegionalProductAgent(simulationStep, tracker, random, test);
+    protected Region getRegionalAgent(int iteration, String tracker, Random random, boolean test) {
+        return new RegionalProductAgent(iteration, tracker, random, test);
     }
 
     public class RegionalProductAgent extends ContinentRegion {
-        public RegionalProductAgent(int simulationStep, String tracker, Random random, boolean test) {
-            super(simulationStep, tracker, random, test);
+        public RegionalProductAgent(int iteration, String tracker, Random random, boolean test) {
+            super(iteration, tracker, random, test);
         }
 
         @Override
         protected void run(DbOperationFactory<DB_OPERATION> dbOperationFactory, World.Continent continent) {
             int numProducts = simulationContext.world().getScaleFactor();
-            try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker(), trace())) {
+            try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker(), iteration(), trace())) {
                 for (int i = 0; i < numProducts; i++) {
                     String productName = randomAttributeGenerator().boundRandomLengthRandomString(5, 20);
                     String productDescription = randomAttributeGenerator().boundRandomLengthRandomString(75, 100);

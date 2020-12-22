@@ -41,8 +41,8 @@ public abstract class WorldAgent<DB_OPERATION extends DbOperation> extends Agent
 
     protected abstract class WorldRegion extends Region {
 
-        public WorldRegion(int simulationStep, String tracker, Random random, boolean test) {
-            super(simulationStep, tracker, random, test);
+        public WorldRegion(int iteration, String tracker, Random random, boolean test) {
+            super(iteration, tracker, random, test);
         }
     }
 }
