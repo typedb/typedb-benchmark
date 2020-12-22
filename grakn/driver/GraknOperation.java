@@ -43,8 +43,8 @@ public class GraknOperation extends TransactionalDbOperation {
 
     boolean closed = false;
 
-    public GraknOperation(Grakn.Session session, LogWrapper log, String tracker, boolean trace) {
-        super(tracker, trace);
+    public GraknOperation(Grakn.Session session, LogWrapper log, String tracker, long iteration, boolean trace) {
+        super(tracker, iteration, trace);
         this.transaction = session.transaction(Grakn.Transaction.Type.WRITE);
         this.log = log;
     }
@@ -70,7 +70,7 @@ public class GraknOperation extends TransactionalDbOperation {
 
     public <T> List<T> sortedExecute(GraqlMatch query, String attributeName, Integer limit){
         throwIfClosed();
-        log.query(tracker, query);
+        log.query(tracker, iteration, query);
         return trace(() -> {
             Stream<T> answerStream = transaction.query().match(query)
                     .map(conceptMap -> (T) conceptMap.get(attributeName).asThing().asAttribute().getValue())
@@ -83,45 +83,45 @@ public class GraknOperation extends TransactionalDbOperation {
     }
 
     public void execute(GraqlDelete query) {
-        log.query(tracker, query);
+        log.query(tracker, iteration, query);
         trace(() -> transaction.query().delete(query).get(), EXECUTE.getName());
     }
 
     public void executeAsync(GraqlDelete query) {
-        log.query(tracker, query);
+        log.query(tracker, iteration, query);
         trace(() -> transaction.query().delete(query), EXECUTE_ASYNC.getName());
     }
 
     public List<ConceptMap> execute(GraqlInsert query) {
-        log.query(tracker, query);
+        log.query(tracker, iteration, query);
         try (GrablTracingThreadStatic.ThreadTrace trace = traceOnThread(EXECUTE.getName())) {
             return transaction.query().insert(query).collect(Collectors.toList());
         }
     }
 
     public Stream<ConceptMap> executeAsync(GraqlInsert query) {
-        log.query(tracker, query);
+        log.query(tracker, iteration, query);
         try (GrablTracingThreadStatic.ThreadTrace trace = traceOnThread(EXECUTE_ASYNC.getName())) {
             return transaction.query().insert(query);
         }
     }
 
     public List<ConceptMap> execute(GraqlMatch query) {
-        log.query(tracker, query);
+        log.query(tracker, iteration, query);
         try (GrablTracingThreadStatic.ThreadTrace trace = traceOnThread(EXECUTE.getName())) {
             return transaction.query().match(query).collect(Collectors.toList());
         }
     }
 
     public Stream<ConceptMap> executeAsync(GraqlMatch query) {
-        log.query(tracker, query);
+        log.query(tracker, iteration, query);
         try (GrablTracingThreadStatic.ThreadTrace trace = traceOnThread(EXECUTE_ASYNC.getName())) {
             return transaction.query().match(query);
         }
     }
 
     public Number execute(GraqlMatch.Aggregate query) {
-        log.query(tracker, query);
+        log.query(tracker, iteration, query);
 //        try (GrablTracingThreadStatic.ThreadTrace trace = traceOnThread(EXECUTE.getName())) {
 //            return getOnlyElement(transaction.query().match(query).get()).number();
 //        }

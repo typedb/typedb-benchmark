@@ -39,13 +39,13 @@ public class RelocationAgent<DB_OPERATION extends DbOperation> extends CityAgent
     }
 
     @Override
-    protected City getRegionalAgent(int simulationStep, String tracker, Random random, boolean test) {
-        return new City(simulationStep, tracker, random, test);
+    protected Region getRegionalAgent(int iteration, String tracker, Random random, boolean test) {
+        return new City(iteration, tracker, random, test);
     }
 
     public class City extends CityRegion {
-        public City(int simulationStep, String tracker, Random random, boolean test) {
-            super(simulationStep, tracker, random, test);
+        public City(int iteration, String tracker, Random random, boolean test) {
+            super(iteration, tracker, random, test);
         }
 
         @Override
@@ -62,18 +62,18 @@ public class RelocationAgent<DB_OPERATION extends DbOperation> extends CityAgent
             List<String> residentEmails;
             List<String> relocationCityNames;
 
-            try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker(), trace())) {
+            try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker(), iteration(), trace())) {
                 ResidentsInCityAction<?> residentsInCityAction = actionFactory().residentsInCityAction(dbOperation, city, simulationContext.world().getScaleFactor(), earliestDateOfResidencyToRelocate);
                 residentEmails = runAction(residentsInCityAction);
             }
             shuffle(residentEmails);
 
-            try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker(), trace())) {
+            try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker(), iteration(), trace())) {
                 CitiesInContinentAction<?> citiesInContinentAction = actionFactory().citiesInContinentAction(dbOperation, city);
                 relocationCityNames = runAction(citiesInContinentAction);
             }
 
-            try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker(), trace())) {
+            try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker(), iteration(), trace())) {
                 Allocation.allocate(residentEmails, relocationCityNames, (residentEmail, relocationCityName) -> {
                     runAction(actionFactory().insertRelocationAction(dbOperation, city, simulationContext.today(), residentEmail, relocationCityName));
                 });

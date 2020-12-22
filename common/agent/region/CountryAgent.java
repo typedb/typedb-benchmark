@@ -41,8 +41,8 @@ public abstract class CountryAgent<DB_OPERATION extends DbOperation> extends Age
     }
 
     protected abstract class CountryRegion extends Region{
-        public CountryRegion(int simulationStep, String tracker, Random random, boolean test) {
-            super(simulationStep, tracker, random, test);
+        public CountryRegion(int iteration, String tracker, Random random, boolean test) {
+            super(iteration, tracker, random, test);
         }
     }
 }

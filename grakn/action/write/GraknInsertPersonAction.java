@@ -56,31 +56,20 @@ public class GraknInsertPersonAction extends InsertPersonAction<GraknOperation, 
         UnboundVariable city = Graql.var(CITY);
         UnboundVariable person = Graql.var(PERSON);
         UnboundVariable bornIn = Graql.var(BORN_IN);
-        UnboundVariable emailVar = Graql.var(EMAIL);
-        UnboundVariable genderVar = Graql.var(GENDER);
-        UnboundVariable forenameVar = Graql.var(FORENAME);
-        UnboundVariable surnameVar = Graql.var(SURNAME);
-        UnboundVariable dobVar = Graql.var(DATE_OF_BIRTH);
-
         return Graql.match(
                 city.isa(CITY)
                         .has(LOCATION_NAME, worldCityName))
                 .insert(
                         person.isa(PERSON)
-                                .has(EMAIL, emailVar)
-                                .has(DATE_OF_BIRTH, dobVar)
-                                .has(GENDER, genderVar)
-                                .has(FORENAME, forenameVar)
-                                .has(SURNAME, surnameVar),
+                                .has(EMAIL, email)
+                                .has(DATE_OF_BIRTH, today)
+                                .has(GENDER, gender)
+                                .has(FORENAME, forename)
+                                .has(SURNAME, surname),
                         bornIn
                                 .rel(BORN_IN_CHILD, person)
                                 .rel(BORN_IN_PLACE_OF_BIRTH, city)
-                                .isa(BORN_IN),
-                        emailVar.eq(email),
-                        genderVar.eq(gender),
-                        forenameVar.eq(forename),
-                        surnameVar.eq(surname),
-                        dobVar.eq(today)
+                                .isa(BORN_IN)
                 );
     }
 

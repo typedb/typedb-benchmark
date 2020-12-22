@@ -40,8 +40,8 @@ public class EmploymentAgent<DB_OPERATION extends DbOperation> extends CityAgent
     }
 
     @Override
-    protected City getRegionalAgent(int simulationStep, String tracker, Random random, boolean test) {
-        return new City(simulationStep, tracker, random, test);
+    protected Region getRegionalAgent(int iteration, String tracker, Random random, boolean test) {
+        return new City(iteration, tracker, random, test);
     }
 
     public class City extends CityRegion {
@@ -52,8 +52,8 @@ public class EmploymentAgent<DB_OPERATION extends DbOperation> extends CityAgent
         int MIN_CONTRACT_CHARACTER_LENGTH = 200;
         int MAX_CONTRACT_CHARACTER_LENGTH = 600;
 
-        public City(int simulationStep, String tracker, Random random, boolean test) {
-            super(simulationStep, tracker, random, test);
+        public City(int iteration, String tracker, Random random, boolean test) {
+            super(iteration, tracker, random, test);
         }
 
         @Override
@@ -62,17 +62,17 @@ public class EmploymentAgent<DB_OPERATION extends DbOperation> extends CityAgent
             List<String> employeeEmails;
             List<Long> companyNumbers;
 
-            try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker(), trace())) {
+            try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker(), iteration(), trace())) {
                 ResidentsInCityAction<DB_OPERATION> employeeEmailsAction = actionFactory().residentsInCityAction(dbOperation, city, simulationContext.world().getScaleFactor(), employmentDate);
                 employeeEmails = runAction(employeeEmailsAction);
             }
 
-            try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker(), trace())) {
+            try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker(), iteration(), trace())) {
                 CompaniesInCountryAction<DB_OPERATION> companyNumbersAction = actionFactory().companiesInCountryAction(dbOperation, city.country(), simulationContext.world().getScaleFactor());
                 companyNumbers = runAction(companyNumbersAction);
             }
 
-            try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker(), trace())) {
+            try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker(), iteration(), trace())) {
                 // A second transaction is being used to circumvent graknlabs/grakn issue #5585
                 boolean allocated = allocate(employeeEmails, companyNumbers, (employeeEmail, companyNumber) -> {
                     double wageValue = randomAttributeGenerator().boundRandomDouble(MIN_ANNUAL_WAGE, MAX_ANNUAL_WAGE);

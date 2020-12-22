@@ -33,5 +33,5 @@ public abstract class DbOperationFactory<DB_OPERATION extends DbOperation> {
 
     public abstract DB_OPERATION dbOperation();
 
-    public abstract DB_OPERATION newDbOperation(String tracker, boolean trace);
+    public abstract DB_OPERATION newDbOperation(String tracker, long iteration, boolean trace);
 }

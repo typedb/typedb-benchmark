@@ -38,22 +38,22 @@ public abstract class WorldwideInsightAgent<DB_OPERATION extends DbOperation> ex
     }
 
     @Override
-    protected Region getRegionalAgent(int simulationStep, String tracker, Random random, boolean test) {
-        return new WorldWideWorker(simulationStep, tracker, random, test);
+    protected Region getRegionalAgent(int iteration, String tracker, Random random, boolean test) {
+        return new WorldWideWorker(iteration, tracker, random, test);
     }
 
     protected abstract ReadAction<DB_OPERATION, ?> getAction(DB_OPERATION dbOperation);
 
     public class WorldWideWorker extends WorldRegion {
 
-        public WorldWideWorker(int simulationStep, String tracker, Random random, boolean test) {
-            super(simulationStep, tracker, random, test);
+        public WorldWideWorker(int iteration, String tracker, Random random, boolean test) {
+            super(iteration, tracker, random, test);
         }
 
         @Override
         protected void run(DbOperationFactory<DB_OPERATION> dbOperationFactory, World world) {
             for (int i = 0; i <= simulationContext.world().getScaleFactor(); i++) {
-                try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker(), trace())) {
+                try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker(), iteration(), trace())) {
                     runAction(getAction(dbOperation));
                 }
             }

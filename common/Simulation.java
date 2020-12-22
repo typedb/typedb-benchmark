@@ -51,8 +51,7 @@ public abstract class Simulation<DB_DRIVER extends DbDriver<DB_OPERATION>, DB_OP
     private final Report report;
     private final World world;
     private final boolean test;
-
-    private int simulationStep = 1;
+    private int iteration = 1;
 
     public Simulation(DB_DRIVER driver, Map<String, Path> initialisationDataPaths, int randomSeed, World world, List<Config.Agent> agentConfigs, Function<Integer, Boolean> iterationSamplingFunction, boolean test) {
         this.driver = driver;
@@ -87,25 +86,25 @@ public abstract class Simulation<DB_DRIVER extends DbDriver<DB_OPERATION>, DB_OP
 
     public void iterate() {
 
-        LOG.info("Simulation step: {}", simulationStep);
+        LOG.info("Iteration: {}", iteration);
         report.clean();
         for (Agent<?, ?> agent : agentList) {
             this.report.addAgentResult(agent.name(), agent.iterate(RandomSource.nextSource(random)));
         }
         closeIteration();  // We want to test opening new sessions each iteration.
-        simulationStep++;
+        iteration++;
     }
 
     protected abstract void closeIteration();
 
     @Override
-    public int simulationStep() {
-        return simulationStep;
+    public int iteration() {
+        return iteration;
     }
 
     @Override
     public LocalDateTime today() {
-        return LocalDateTime.of(LocalDate.ofYearDay(simulationStep, 1), LocalTime.of(0, 0, 0));
+        return LocalDateTime.of(LocalDate.ofYearDay(iteration, 1), LocalTime.of(0, 0, 0));
     }
 
     @Override
@@ -115,7 +114,7 @@ public abstract class Simulation<DB_DRIVER extends DbDriver<DB_OPERATION>, DB_OP
 
     @Override
     public boolean trace() {
-        return iterationSamplingFunction.apply(simulationStep());
+        return iterationSamplingFunction.apply(iteration());
     }
 
     @Override

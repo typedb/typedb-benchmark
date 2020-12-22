@@ -42,8 +42,8 @@ public abstract class ContinentAgent<DB_OPERATION extends DbOperation> extends A
 
     protected abstract class ContinentRegion extends Region {
 
-        public ContinentRegion(int simulationStep, String tracker, Random random, boolean test) {
-            super(simulationStep, tracker, random, test);
+        public ContinentRegion(int iteration, String tracker, Random random, boolean test) {
+            super(iteration, tracker, random, test);
         }
     }
 }
