@@ -12,7 +12,7 @@ build:
 
         [Service]
         Type=simple
-        ExecStart=/home/grabl/simulation/dist/grakn-core-all-linux/grakn server --no-grabl-trace --grabl-uri=$GRABL_TRACING_URI --grabl-username=$GRABL_OWNER --grabl-token=$GRABL_TOKEN
+        ExecStart=/home/grabl/simulation/dist/grakn-core-all-linux/grakn server
         Restart=on-failure
         RestartSec=10
         KillMode=process

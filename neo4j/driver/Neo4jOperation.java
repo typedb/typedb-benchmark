@@ -28,9 +28,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static grakn.simulation.common.driver.TransactionalDbDriver.TracingLabel.EXECUTE;
-import static grakn.simulation.common.driver.TransactionalDbDriver.TracingLabel.SORTED_EXECUTE;
-
 public class Neo4jOperation extends TransactionalDbOperation {
 
     private final Session session;
@@ -56,22 +53,20 @@ public class Neo4jOperation extends TransactionalDbOperation {
 
     public List<Record> execute(Query query) {
         log.query(tracker, iteration, query);
-        return trace(() -> session.writeTransaction( tx -> {
+        return session.writeTransaction(tx -> {
             Result result = tx.run(query);
             return result.list();
-        }), EXECUTE.getName());
+        });
     }
 
     public <T> List<T> sortedExecute(Query query, String attributeName, Integer limit) {
         log.query(tracker, iteration, query);
-        return trace(() -> {
-            Stream<T> answerStream = execute(query).stream()
-                    .map(record -> (T) record.asMap().get(attributeName))
-                    .sorted();
-            if (limit != null) {
-                answerStream = answerStream.limit(limit);
-            }
-            return answerStream.collect(Collectors.toList());
-        }, SORTED_EXECUTE.getName());
+        Stream<T> answerStream = execute(query).stream()
+                .map(record -> (T) record.asMap().get(attributeName))
+                .sorted();
+        if (limit != null) {
+            answerStream = answerStream.limit(limit);
+        }
+        return answerStream.collect(Collectors.toList());
     }
 }
