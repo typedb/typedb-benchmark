@@ -29,6 +29,9 @@ build:
         sudo systemctl daemon-reload
         sudo systemctl start grakn
         export GRABL_EXPORT_PERFORMANCE_SMALL_GRAKN_URI="${HOSTNAME}:1729"
+      monitor: |
+        sleep 10s
+        tail -f -n +1 /home/grabl/simulation/dist/grakn-core-all-linux/server/logs/grakn.log
     test-performance-small-grakn:
       image: graknlabs-ubuntu-20.04
       timeout: "5h"
