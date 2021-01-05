@@ -5,7 +5,7 @@ build:
       image: graknlabs-ubuntu-20.04
       type: background
       timeout: "5h"
-      script: |
+      command: |
         cat > grakn.service <<- EOM
         [Unit]
         Description=Grakn Core
@@ -33,7 +33,7 @@ build:
       image: graknlabs-ubuntu-20.04
       timeout: "5h"
       dependencies: [test-performance-small-grakn-background]
-      script: |
+      command: |
         bazel run --config=rbe //:simulation-small -- \
           --database "Grakn Core 2.0" \
           --database-uri $GRABL_EXPORT_PERFORMANCE_SMALL_GRAKN_URI \
@@ -49,7 +49,7 @@ build:
       image: graknlabs-ubuntu-20.04
       type: background
       timeout: "5h"
-      script: |
+      command: |
         sudo add-apt-repository -y ppa:openjdk-r/ppa
         curl https://cli-assets.heroku.com/apt/release.key | sudo apt-key add -
         curl https://dl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
@@ -68,7 +68,7 @@ build:
       image: graknlabs-ubuntu-20.04
       dependencies: [test-performance-small-neo4j-background]
       timeout: "5h"
-      script: |
+      command: |
         bazel run --config=rbe //:simulation-small -- \
           --database Neo4j \
           --database-uri $GRABL_EXPORT_PERFORMANCE_SMALL_NEO4J_URI \
