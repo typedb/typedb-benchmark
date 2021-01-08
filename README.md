@@ -1,4 +1,4 @@
-# Grakn Simulation World
+# Grakn Benchmarkng System: A World Simulation
 
 ## Build and run Simulation
 ```shell script
