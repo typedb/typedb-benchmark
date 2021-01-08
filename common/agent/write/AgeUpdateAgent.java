@@ -19,7 +19,6 @@ package grakn.benchmark.common.agent.write;
 
 import grakn.benchmark.common.action.ActionFactory;
 import grakn.benchmark.common.action.write.UpdateAgesOfPeopleInCityAction;
-import grakn.benchmark.common.agent.base.SimulationContext;
 import grakn.benchmark.common.agent.region.CityAgent;
 import grakn.benchmark.common.driver.DbDriver;
 import grakn.benchmark.common.driver.DbOperation;
@@ -30,8 +29,8 @@ import java.util.Random;
 
 public class AgeUpdateAgent<DB_OPERATION extends DbOperation> extends CityAgent<DB_OPERATION> {
 
-    public AgeUpdateAgent(DbDriver<DB_OPERATION> dbDriver, ActionFactory<DB_OPERATION, ?> actionFactory, SimulationContext simulationContext) {
-        super(dbDriver, actionFactory, simulationContext);
+    public AgeUpdateAgent(DbDriver<DB_OPERATION> dbDriver, ActionFactory<DB_OPERATION, ?> actionFactory, grakn.benchmark.common.agent.base.BenchmarkContext benchmarkContext) {
+        super(dbDriver, actionFactory, benchmarkContext);
     }
 
     @Override
@@ -47,7 +46,7 @@ public class AgeUpdateAgent<DB_OPERATION extends DbOperation> extends CityAgent<
         @Override
         protected void run(DbOperationFactory<DB_OPERATION> dbOperationFactory, World.City city) {
             try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker(), iteration(), trace())) {
-                UpdateAgesOfPeopleInCityAction<DB_OPERATION> updateAgesOfAllPeopleInCityAction = actionFactory().updateAgesOfPeopleInCityAction(dbOperation, simulationContext.today(), city);
+                UpdateAgesOfPeopleInCityAction<DB_OPERATION> updateAgesOfAllPeopleInCityAction = actionFactory().updateAgesOfPeopleInCityAction(dbOperation, benchmarkContext.today(), city);
                 runAction(updateAgesOfAllPeopleInCityAction);
                 dbOperation.save();
             }

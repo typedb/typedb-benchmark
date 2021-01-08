@@ -73,7 +73,7 @@ public class GraknInsertTransactionAction extends InsertTransactionAction<GraknO
                                 .rel(TRANSACTION_BUYER, Graql.var("c-buyer"))
                                 .rel(TRANSACTION_MERCHANDISE, Graql.var(PRODUCT))
                                 .isa(TRANSACTION)
-                                //                                .has(CURRENCY)  // TODO Add currency https://github.com/graknlabs/simulation/issues/31
+                                //                                .has(CURRENCY)  // TODO Add currency https://github.com/graknlabs/benchmark/issues/31
                                 .has(VALUE, value)
                                 .has(PRODUCT_QUANTITY, productQuantity)
                                 .has(IS_TAXABLE, isTaxable),

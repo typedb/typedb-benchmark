@@ -24,8 +24,8 @@ import org.junit.runner.RunWith;
 
 import java.util.Iterator;
 
-import static grakn.benchmark.test.SimulationsForComparison.grakn;
-import static grakn.benchmark.test.SimulationsForComparison.neo4j;
+import static grakn.benchmark.test.BenchmarksForComparison.grakn;
+import static grakn.benchmark.test.BenchmarksForComparison.neo4j;
 import static org.junit.Assert.assertEquals;
 
 @RunWith(ComparisonTestSuite.class)

@@ -21,11 +21,8 @@ import grabl.tracing.client.GrablTracing;
 import grabl.tracing.client.GrablTracingThreadStatic;
 import grakn.benchmark.config.Config;
 import grakn.benchmark.config.ConfigLoader;
-import grakn.benchmark.common.Simulation;
 import grakn.benchmark.common.world.World;
-import grakn.benchmark.grakn.GraknSimulation;
 import grakn.benchmark.grakn.driver.GraknDriver;
-import grakn.benchmark.neo4j.Neo4jSimulation;
 import grakn.benchmark.neo4j.driver.Neo4jDriver;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -49,9 +46,9 @@ import static grabl.tracing.client.GrablTracing.tracingNoOp;
 import static grabl.tracing.client.GrablTracing.withLogging;
 import static grakn.benchmark.common.world.World.initialise;
 
-public class SimulationRunner {
+public class BenchmarkRunner {
 
-    final static Logger LOG = LoggerFactory.getLogger(SimulationRunner.class);
+    final static Logger LOG = LoggerFactory.getLogger(grakn.benchmark.BenchmarkRunner.class);
 
     public static void main(String[] args) {
 
@@ -100,7 +97,7 @@ public class SimulationRunner {
         // Components customised based on the DB
         String defaultUri;
 
-        LOG.info("Welcome to the Simulation!");
+        LOG.info("Welcome to the Benchmark!");
         LOG.info("Parsing world data...");
         World world = initialise(config.getScaleFactor(), initialisationDataFiles);
         if (world == null) return;
@@ -109,12 +106,12 @@ public class SimulationRunner {
 
         try {
             try (GrablTracing tracingIgnored = grablTracing(grablTracingUri, grablTracingOrganisation, grablTracingRepository, grablTracingCommit, grablTracingUsername, grablTracingToken, disableTracing, dbName)) {
-                Simulation<?, ?> simulation;
+                grakn.benchmark.common.Benchmark<?, ?> benchmark;
                 if (dbName.toLowerCase().startsWith("grakn")) {
                     defaultUri = "localhost:48555";
                     if (hostUri == null) hostUri = defaultUri;
 
-                    simulation = new GraknSimulation(
+                    benchmark = new grakn.benchmark.grakn.GraknBenchmark(
                             new GraknDriver(hostUri, "world"),
                             initialisationDataFiles,
                             config.getRandomSeed(),
@@ -126,7 +123,7 @@ public class SimulationRunner {
                     defaultUri = "bolt://localhost:7687";
                     if (hostUri == null) hostUri = defaultUri;
 
-                    simulation = new Neo4jSimulation(
+                    benchmark = new grakn.benchmark.neo4j.Neo4JBenchmark(
                             new Neo4jDriver(hostUri),
                             initialisationDataFiles,
                             config.getRandomSeed(),
@@ -142,9 +139,9 @@ public class SimulationRunner {
                 // MAIN LOOP //
                 ///////////////
                 for (int i = 0; i < config.getIterations(); i++) {
-                    simulation.iterate();
+                    benchmark.iterate();
                 }
-                simulation.close();
+                benchmark.close();
             }
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -152,7 +149,7 @@ public class SimulationRunner {
         }
 
         Instant end = Instant.now();
-        LOG.info("Simulation completed in " + Duration.between(start, end).toString().substring(2));
+        LOG.info("Benchmark completed in " + Duration.between(start, end).toString().substring(2));
     }
 
     private static Optional<String> getOption(CommandLine commandLine, String option) {

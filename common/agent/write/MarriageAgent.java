@@ -18,7 +18,6 @@
 package grakn.benchmark.common.agent.write;
 
 import grakn.benchmark.common.action.ActionFactory;
-import grakn.benchmark.common.agent.base.SimulationContext;
 import grakn.benchmark.common.agent.region.CityAgent;
 import grakn.benchmark.common.driver.DbDriver;
 import grakn.benchmark.common.driver.DbOperation;
@@ -31,8 +30,8 @@ import java.util.Random;
 
 public class MarriageAgent<DB_OPERATION extends DbOperation> extends CityAgent<DB_OPERATION> {
 
-    public MarriageAgent(DbDriver<DB_OPERATION> dbDriver, ActionFactory<DB_OPERATION, ?> actionFactory, SimulationContext simulationContext) {
-        super(dbDriver, actionFactory, simulationContext);
+    public MarriageAgent(DbDriver<DB_OPERATION> dbDriver, ActionFactory<DB_OPERATION, ?> actionFactory, grakn.benchmark.common.agent.base.BenchmarkContext benchmarkContext) {
+        super(dbDriver, actionFactory, benchmarkContext);
     }
 
     @Override
@@ -49,7 +48,7 @@ public class MarriageAgent<DB_OPERATION extends DbOperation> extends CityAgent<D
         protected void run(DbOperationFactory<DB_OPERATION> dbOperationFactory, World.City city) {
 
             // Find bachelors and bachelorettes who are considered adults and who are not in a marriage and pair them off randomly
-            LocalDateTime dobOfAdults = simulationContext.today().minusYears(simulationContext.world().AGE_OF_ADULTHOOD);
+            LocalDateTime dobOfAdults = benchmarkContext.today().minusYears(benchmarkContext.world().AGE_OF_ADULTHOOD);
             List<String> womenEmails;
             try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker(), iteration(), trace())) {
                 womenEmails = runAction(actionFactory().unmarriedPeopleInCityAction(dbOperation, city, "female", dobOfAdults));
@@ -62,7 +61,7 @@ public class MarriageAgent<DB_OPERATION extends DbOperation> extends CityAgent<D
                 shuffle(menEmails);
             }
 
-            int numMarriagesPossible = Math.min(simulationContext.world().getScaleFactor(), Math.min(womenEmails.size(), menEmails.size()));
+            int numMarriagesPossible = Math.min(benchmarkContext.world().getScaleFactor(), Math.min(womenEmails.size(), menEmails.size()));
             if (iteration() >= 5) {
                 System.out.println("asdf");
                 assert true;
@@ -72,7 +71,7 @@ public class MarriageAgent<DB_OPERATION extends DbOperation> extends CityAgent<D
                     for (int i = 0; i < numMarriagesPossible; i++) {
                         String wifeEmail = womenEmails.get(i);
                         String husbandEmail = menEmails.get(i);
-                        int marriageIdentifier = uniqueId(simulationContext, i).hashCode();
+                        int marriageIdentifier = uniqueId(benchmarkContext, i).hashCode();
                         runAction(actionFactory().insertMarriageAction(dbOperation, city, marriageIdentifier, wifeEmail, husbandEmail));
                     }
                     dbOperation.save();

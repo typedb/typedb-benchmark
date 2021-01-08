@@ -18,7 +18,6 @@
 package grakn.benchmark.common.agent.write;
 
 import grakn.benchmark.common.action.ActionFactory;
-import grakn.benchmark.common.agent.base.SimulationContext;
 import grakn.benchmark.common.agent.region.CityAgent;
 import grakn.benchmark.common.driver.DbDriver;
 import grakn.benchmark.common.driver.DbOperation;
@@ -29,8 +28,8 @@ import java.util.Random;
 
 public class PersonBirthAgent<DB_OPERATION extends DbOperation> extends CityAgent<DB_OPERATION> {
 
-    public PersonBirthAgent(DbDriver<DB_OPERATION> dbDriver, ActionFactory<DB_OPERATION, ?> actionFactory, SimulationContext simulationContext) {
-        super(dbDriver, actionFactory, simulationContext);
+    public PersonBirthAgent(DbDriver<DB_OPERATION> dbDriver, ActionFactory<DB_OPERATION, ?> actionFactory, grakn.benchmark.common.agent.base.BenchmarkContext benchmarkContext) {
+        super(dbDriver, actionFactory, benchmarkContext);
     }
 
     @Override
@@ -46,23 +45,23 @@ public class PersonBirthAgent<DB_OPERATION extends DbOperation> extends CityAgen
         @Override
         protected void run(DbOperationFactory<DB_OPERATION> dbOperationFactory, World.City city) {
             // Find bachelors and bachelorettes who are considered adults and who are not in a marriage and pair them off randomly
-            int numBirths = simulationContext.world().getScaleFactor();
+            int numBirths = benchmarkContext.world().getScaleFactor();
             try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker(), iteration(), trace())) {
                 for (int i = 0; i < numBirths; i++) {
                     String gender;
                     String forename;
-                    String surname = pickOne(simulationContext.world().getSurnames());
+                    String surname = pickOne(benchmarkContext.world().getSurnames());
 
                     boolean genderBool = random().nextBoolean();
                     if (genderBool) {
                         gender = "male";
-                        forename = pickOne(simulationContext.world().getMaleForenames());
+                        forename = pickOne(benchmarkContext.world().getMaleForenames());
                     } else {
                         gender = "female";
-                        forename = pickOne(simulationContext.world().getFemaleForenames());
+                        forename = pickOne(benchmarkContext.world().getFemaleForenames());
                     }
-                    String email = "email/" + uniqueId(simulationContext, i);
-                    runAction(actionFactory().insertPersonAction(dbOperation, city, simulationContext.today(), email, gender, forename, surname));
+                    String email = "email/" + uniqueId(benchmarkContext, i);
+                    runAction(actionFactory().insertPersonAction(dbOperation, city, benchmarkContext.today(), email, gender, forename, surname));
                 }
                 dbOperation.save();
             }

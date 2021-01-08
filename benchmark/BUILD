@@ -32,6 +32,6 @@ groovy_and_java_library(
 groovy_binary(
     name = "benchmark",
     srcs = glob(["*.groovy"]),
-    main_class = "grakn.simulation.benchmark.Report",
+    main_class = "grakn.benchmark.benchmark.Report",
     deps = [":benchmarklib"],
 )

@@ -12,7 +12,7 @@ build:
 
         [Service]
         Type=simple
-        ExecStart=/home/grabl/simulation/dist/grakn-core-all-linux/grakn server
+        ExecStart=/home/grabl/benchmark/dist/grakn-core-all-linux/grakn server
         Restart=on-failure
         RestartSec=10
         KillMode=process
@@ -31,13 +31,13 @@ build:
         export GRABL_EXPORT_PERFORMANCE_SMALL_GRAKN_URI="${HOSTNAME}:1729"
       monitor: |
         sleep 10s
-        tail -f -n +1 /home/grabl/simulation/dist/grakn-core-all-linux/server/logs/grakn.log
+        tail -f -n +1 /home/grabl/benchmark/dist/grakn-core-all-linux/server/logs/grakn.log
     test-performance-small-grakn:
       image: graknlabs-ubuntu-20.04
       timeout: "5h"
       dependencies: [test-performance-small-grakn-background]
       command: |
-        bazel run --config=rbe //:simulation-small -- \
+        bazel run --config=rbe //:benchmark-small -- \
           --database "Grakn Core 2.0" \
           --database-uri $GRABL_EXPORT_PERFORMANCE_SMALL_GRAKN_URI \
           --tracing-uri $GRABL_TRACING_URI \
@@ -72,7 +72,7 @@ build:
       dependencies: [test-performance-small-neo4j-background]
       timeout: "5h"
       command: |
-        bazel run --config=rbe //:simulation-small -- \
+        bazel run --config=rbe //:benchmark-small -- \
           --database Neo4j \
           --database-uri $GRABL_EXPORT_PERFORMANCE_SMALL_NEO4J_URI \
           --tracing-uri $GRABL_TRACING_URI \

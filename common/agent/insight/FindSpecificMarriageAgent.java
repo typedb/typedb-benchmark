@@ -19,13 +19,12 @@ package grakn.benchmark.common.agent.insight;
 
 import grakn.benchmark.common.action.ActionFactory;
 import grakn.benchmark.common.action.read.ReadAction;
-import grakn.benchmark.common.agent.base.SimulationContext;
 import grakn.benchmark.common.driver.DbDriver;
 import grakn.benchmark.common.driver.DbOperation;
 
 public class FindSpecificMarriageAgent<DB_OPERATION extends DbOperation> extends WorldwideInsightAgent<DB_OPERATION> {
-    public FindSpecificMarriageAgent(DbDriver<DB_OPERATION> dbDriver, ActionFactory<DB_OPERATION, ?> actionFactory, SimulationContext simulationContext) {
-        super(dbDriver, actionFactory, simulationContext);
+    public FindSpecificMarriageAgent(DbDriver<DB_OPERATION> dbDriver, ActionFactory<DB_OPERATION, ?> actionFactory, grakn.benchmark.common.agent.base.BenchmarkContext benchmarkContext) {
+        super(dbDriver, actionFactory, benchmarkContext);
     }
 
     @Override

@@ -19,7 +19,6 @@ package grakn.benchmark.common.agent.region;
 
 import grakn.benchmark.common.action.ActionFactory;
 import grakn.benchmark.common.agent.base.Agent;
-import grakn.benchmark.common.agent.base.SimulationContext;
 import grakn.benchmark.common.driver.DbDriver;
 import grakn.benchmark.common.driver.DbOperation;
 import grakn.benchmark.common.world.World;
@@ -31,8 +30,8 @@ import static java.util.stream.Collectors.toList;
 
 public abstract class CountryAgent<DB_OPERATION extends DbOperation> extends Agent<World.Country, DB_OPERATION> {
 
-    public CountryAgent(DbDriver<DB_OPERATION> dbDriver, ActionFactory<DB_OPERATION, ?> actionFactory, SimulationContext simulationContext) {
-        super(dbDriver, actionFactory, simulationContext);
+    public CountryAgent(DbDriver<DB_OPERATION> dbDriver, ActionFactory<DB_OPERATION, ?> actionFactory, grakn.benchmark.common.agent.base.BenchmarkContext benchmarkContext) {
+        super(dbDriver, actionFactory, benchmarkContext);
     }
 
     @Override

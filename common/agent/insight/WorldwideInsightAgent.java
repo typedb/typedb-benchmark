@@ -19,7 +19,6 @@ package grakn.benchmark.common.agent.insight;
 
 import grakn.benchmark.common.action.ActionFactory;
 import grakn.benchmark.common.action.read.ReadAction;
-import grakn.benchmark.common.agent.base.SimulationContext;
 import grakn.benchmark.common.agent.region.WorldAgent;
 import grakn.benchmark.common.driver.DbDriver;
 import grakn.benchmark.common.driver.DbOperation;
@@ -34,8 +33,8 @@ import java.util.Random;
  * @param <DB_OPERATION>
  */
 public abstract class WorldwideInsightAgent<DB_OPERATION extends DbOperation> extends WorldAgent<DB_OPERATION> {
-    public WorldwideInsightAgent(DbDriver<DB_OPERATION> dbDriver, ActionFactory<DB_OPERATION, ?> actionFactory, SimulationContext simulationContext) {
-        super(dbDriver, actionFactory, simulationContext);
+    public WorldwideInsightAgent(DbDriver<DB_OPERATION> dbDriver, ActionFactory<DB_OPERATION, ?> actionFactory, grakn.benchmark.common.agent.base.BenchmarkContext benchmarkContext) {
+        super(dbDriver, actionFactory, benchmarkContext);
     }
 
     @Override
@@ -53,7 +52,7 @@ public abstract class WorldwideInsightAgent<DB_OPERATION extends DbOperation> ex
 
         @Override
         protected void run(DbOperationFactory<DB_OPERATION> dbOperationFactory, World world) {
-            for (int i = 0; i <= simulationContext.world().getScaleFactor(); i++) {
+            for (int i = 0; i <= benchmarkContext.world().getScaleFactor(); i++) {
                 try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker(), iteration(), trace())) {
                     runAction(getAction(dbOperation));
                 }

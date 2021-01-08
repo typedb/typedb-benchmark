@@ -21,7 +21,6 @@ import grakn.benchmark.common.action.ActionFactory;
 import grakn.benchmark.common.action.read.CitiesInContinentAction;
 import grakn.benchmark.common.action.read.ResidentsInCityAction;
 import grakn.benchmark.common.agent.base.Allocation;
-import grakn.benchmark.common.agent.base.SimulationContext;
 import grakn.benchmark.common.agent.region.CityAgent;
 import grakn.benchmark.common.driver.DbDriver;
 import grakn.benchmark.common.driver.DbOperation;
@@ -34,8 +33,8 @@ import java.util.Random;
 
 public class RelocationAgent<DB_OPERATION extends DbOperation> extends CityAgent<DB_OPERATION> {
 
-    public RelocationAgent(DbDriver<DB_OPERATION> dbDriver, ActionFactory<DB_OPERATION, ?> actionFactory, SimulationContext simulationContext) {
-        super(dbDriver, actionFactory, simulationContext);
+    public RelocationAgent(DbDriver<DB_OPERATION> dbDriver, ActionFactory<DB_OPERATION, ?> actionFactory, grakn.benchmark.common.agent.base.BenchmarkContext benchmarkContext) {
+        super(dbDriver, actionFactory, benchmarkContext);
     }
 
     @Override
@@ -57,13 +56,13 @@ public class RelocationAgent<DB_OPERATION extends DbOperation> extends CityAgent
          */
 
             LocalDateTime earliestDateOfResidencyToRelocate;
-            earliestDateOfResidencyToRelocate = simulationContext.today().minusYears(2);
+            earliestDateOfResidencyToRelocate = benchmarkContext.today().minusYears(2);
 
             List<String> residentEmails;
             List<String> relocationCityNames;
 
             try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker(), iteration(), trace())) {
-                ResidentsInCityAction<?> residentsInCityAction = actionFactory().residentsInCityAction(dbOperation, city, simulationContext.world().getScaleFactor(), earliestDateOfResidencyToRelocate);
+                ResidentsInCityAction<?> residentsInCityAction = actionFactory().residentsInCityAction(dbOperation, city, benchmarkContext.world().getScaleFactor(), earliestDateOfResidencyToRelocate);
                 residentEmails = runAction(residentsInCityAction);
             }
             shuffle(residentEmails);
@@ -75,7 +74,7 @@ public class RelocationAgent<DB_OPERATION extends DbOperation> extends CityAgent
 
             try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker(), iteration(), trace())) {
                 Allocation.allocate(residentEmails, relocationCityNames, (residentEmail, relocationCityName) -> {
-                    runAction(actionFactory().insertRelocationAction(dbOperation, city, simulationContext.today(), residentEmail, relocationCityName));
+                    runAction(actionFactory().insertRelocationAction(dbOperation, city, benchmarkContext.today(), residentEmail, relocationCityName));
                 });
                 dbOperation.save();
             }

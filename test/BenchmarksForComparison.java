@@ -21,9 +21,7 @@ import grakn.benchmark.common.world.World;
 import grakn.benchmark.config.AgentMode;
 import grakn.benchmark.config.Config;
 import grakn.benchmark.config.SamplingFunction;
-import grakn.benchmark.grakn.GraknSimulation;
 import grakn.benchmark.grakn.driver.GraknDriver;
-import grakn.benchmark.neo4j.Neo4jSimulation;
 import grakn.benchmark.neo4j.driver.Neo4jDriver;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -45,9 +43,9 @@ import java.util.function.Function;
 import static grakn.benchmark.common.world.World.initialise;
 import static grakn.benchmark.config.Config.Agent.ConstructAgentConfig;
 
-public class SimulationsForComparison {
-    static final Neo4jSimulation neo4j;
-    static final GraknSimulation grakn;
+public class BenchmarksForComparison {
+    static final grakn.benchmark.neo4j.Neo4JBenchmark neo4j;
+    static final grakn.benchmark.grakn.GraknBenchmark grakn;
     static final int numIterations = 5;
 
     static {
@@ -116,7 +114,7 @@ public class SimulationsForComparison {
         // Grakn setup //
         /////////////////
 
-        grakn = new GraknSimulation(
+        grakn = new grakn.benchmark.grakn.GraknBenchmark(
                 new GraknDriver(graknUri, "world"),
                 files,
                 randomSeed,
@@ -129,7 +127,7 @@ public class SimulationsForComparison {
         // Neo4j setup //
         /////////////////
 
-        neo4j = new Neo4jSimulation(
+        neo4j = new grakn.benchmark.neo4j.Neo4JBenchmark(
                 new Neo4jDriver(neo4jUri),
                 files,
                 randomSeed,

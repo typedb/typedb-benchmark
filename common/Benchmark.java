@@ -20,7 +20,6 @@ package grakn.benchmark.common;
 import grakn.benchmark.common.action.ActionFactory;
 import grakn.benchmark.common.agent.AgentFactory;
 import grakn.benchmark.common.agent.base.Agent;
-import grakn.benchmark.common.agent.base.SimulationContext;
 import grakn.benchmark.common.driver.DbDriver;
 import grakn.benchmark.common.driver.DbOperation;
 import grakn.benchmark.common.utils.RandomSource;
@@ -40,9 +39,9 @@ import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
-public abstract class Simulation<DB_DRIVER extends DbDriver<DB_OPERATION>, DB_OPERATION extends DbOperation> implements SimulationContext {
+public abstract class Benchmark<DB_DRIVER extends DbDriver<DB_OPERATION>, DB_OPERATION extends DbOperation> implements grakn.benchmark.common.agent.base.BenchmarkContext {
 
-    final static Logger LOG = LoggerFactory.getLogger(Simulation.class);
+    final static Logger LOG = LoggerFactory.getLogger(grakn.benchmark.common.Benchmark.class);
     private final List<Agent<?, DB_OPERATION>> agentList;
     protected final DB_DRIVER driver;
     private final Random random;
@@ -53,7 +52,7 @@ public abstract class Simulation<DB_DRIVER extends DbDriver<DB_OPERATION>, DB_OP
     private final boolean test;
     private int iteration = 1;
 
-    public Simulation(DB_DRIVER driver, Map<String, Path> initialisationDataPaths, int randomSeed, World world, List<Config.Agent> agentConfigs, Function<Integer, Boolean> iterationSamplingFunction, boolean test) {
+    public Benchmark(DB_DRIVER driver, Map<String, Path> initialisationDataPaths, int randomSeed, World world, List<Config.Agent> agentConfigs, Function<Integer, Boolean> iterationSamplingFunction, boolean test) {
         this.driver = driver;
         this.random = new Random(randomSeed);
         this.agentConfigs = agentConfigs;

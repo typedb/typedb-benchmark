@@ -21,7 +21,7 @@ import grakn.benchmark.common.world.World;
 
 import java.time.LocalDateTime;
 
-public interface SimulationContext {
+public interface BenchmarkContext {
     int iteration();
 
     LocalDateTime today();

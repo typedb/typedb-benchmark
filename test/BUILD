@@ -31,14 +31,14 @@ java_test(
         "ComparisonTest.java",
         "ComparisonTestRunner.java",
         "ComparisonTestSuite.java",
-        "SimulationsForComparison.java",
+        "BenchmarksForComparison.java",
     ],
     data = [
         "//common/data",
         "//grakn/data",
         "//neo4j/data",
     ],
-    test_class = "grakn.simulation.test.ComparisonTest",
+    test_class = "grakn.benchmark.test.ComparisonTest",
     deps = [
         "//common/action",
         "//common/agent",

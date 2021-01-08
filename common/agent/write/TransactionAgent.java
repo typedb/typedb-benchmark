@@ -21,7 +21,6 @@ import grakn.benchmark.common.action.ActionFactory;
 import grakn.benchmark.common.action.read.CompaniesInCountryAction;
 import grakn.benchmark.common.action.read.ProductsInContinentAction;
 import grakn.benchmark.common.agent.base.Allocation;
-import grakn.benchmark.common.agent.base.SimulationContext;
 import grakn.benchmark.common.agent.region.CountryAgent;
 import grakn.benchmark.common.driver.DbDriver;
 import grakn.benchmark.common.driver.DbOperation;
@@ -37,8 +36,8 @@ import static grakn.common.collection.Collections.pair;
 
 public class TransactionAgent<DB_OPERATION extends DbOperation> extends CountryAgent<DB_OPERATION> {
 
-    public TransactionAgent(DbDriver<DB_OPERATION> dbDriver, ActionFactory<DB_OPERATION, ?> actionFactory, SimulationContext simulationContext) {
-        super(dbDriver, actionFactory, simulationContext);
+    public TransactionAgent(DbDriver<DB_OPERATION> dbDriver, ActionFactory<DB_OPERATION, ?> actionFactory, grakn.benchmark.common.agent.base.BenchmarkContext benchmarkContext) {
+        super(dbDriver, actionFactory, benchmarkContext);
     }
 
     @Override
@@ -67,7 +66,7 @@ public class TransactionAgent<DB_OPERATION extends DbOperation> extends CountryA
                 productBarcodes = runAction(productsInContinentAction);
             }
 
-            int numTransactions = simulationContext.world().getScaleFactor() * companyNumbers.size();
+            int numTransactions = benchmarkContext.world().getScaleFactor() * companyNumbers.size();
             // Company numbers is the list of sellers
             // Company numbers picked randomly is the list of buyers
             // Products randomly picked

@@ -27,8 +27,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static grakn.benchmark.test.SimulationsForComparison.grakn;
-import static grakn.benchmark.test.SimulationsForComparison.neo4j;
+import static grakn.benchmark.test.BenchmarksForComparison.grakn;
+import static grakn.benchmark.test.BenchmarksForComparison.neo4j;
 
 public class ComparisonTestSuite extends Suite {
     private static final List<Runner> NO_RUNNERS = Collections.emptyList();
@@ -44,7 +44,7 @@ public class ComparisonTestSuite extends Suite {
 
     private List<Runner> createRunnersForIterations() {
         List<Runner> runners = new ArrayList<>();
-        for (int i = 1; i <= SimulationsForComparison.numIterations; i++) {
+        for (int i = 1; i <= BenchmarksForComparison.numIterations; i++) {
             try {
                 BlockJUnit4ClassRunner runner = new ComparisonTestRunner(klass, i);
                 runners.add(runner);
@@ -60,7 +60,7 @@ public class ComparisonTestSuite extends Suite {
         neo4j.iterate();
         grakn.iterate();
         super.runChild(runner, notifier);
-        if (iteration == SimulationsForComparison.numIterations + 1) {
+        if (iteration == BenchmarksForComparison.numIterations + 1) {
             grakn.close();
             neo4j.close();
         }

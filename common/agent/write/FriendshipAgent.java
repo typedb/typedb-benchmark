@@ -19,7 +19,6 @@ package grakn.benchmark.common.agent.write;
 
 import grakn.benchmark.common.action.ActionFactory;
 import grakn.benchmark.common.action.read.ResidentsInCityAction;
-import grakn.benchmark.common.agent.base.SimulationContext;
 import grakn.benchmark.common.agent.region.CityAgent;
 import grakn.benchmark.common.driver.DbDriver;
 import grakn.benchmark.common.driver.DbOperation;
@@ -31,8 +30,8 @@ import java.util.Random;
 
 public class FriendshipAgent<DB_OPERATION extends DbOperation> extends CityAgent<DB_OPERATION> {
 
-    public FriendshipAgent(DbDriver<DB_OPERATION> dbDriver, ActionFactory<DB_OPERATION, ?> actionFactory, SimulationContext simulationContext) {
-        super(dbDriver, actionFactory, simulationContext);
+    public FriendshipAgent(DbDriver<DB_OPERATION> dbDriver, ActionFactory<DB_OPERATION, ?> actionFactory, grakn.benchmark.common.agent.base.BenchmarkContext benchmarkContext) {
+        super(dbDriver, actionFactory, benchmarkContext);
     }
 
     @Override
@@ -49,16 +48,16 @@ public class FriendshipAgent<DB_OPERATION extends DbOperation> extends CityAgent
         protected void run(DbOperationFactory<DB_OPERATION> dbOperationFactory, World.City city) {
             List<String> residentEmails;
             try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker(), iteration(), trace())) {
-                ResidentsInCityAction<?> residentEmailsAction = actionFactory().residentsInCityAction(dbOperation, city, simulationContext.world().getScaleFactor(), simulationContext.today());
+                ResidentsInCityAction<?> residentEmailsAction = actionFactory().residentsInCityAction(dbOperation, city, benchmarkContext.world().getScaleFactor(), benchmarkContext.today());
                 residentEmails = runAction(residentEmailsAction);
             } // TODO Closing and reopening the transaction here is a workaround for https://github.com/graknlabs/grakn/issues/5585
 
             try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker(), iteration(), trace())) {
                 if (residentEmails.size() > 0) {
                     shuffle(residentEmails);
-                    int numFriendships = simulationContext.world().getScaleFactor();
+                    int numFriendships = benchmarkContext.world().getScaleFactor();
                     for (int i = 0; i < numFriendships; i++) {
-                        runAction(actionFactory().insertFriendshipAction(dbOperation, simulationContext.today(), pickOne(residentEmails), pickOne(residentEmails)));
+                        runAction(actionFactory().insertFriendshipAction(dbOperation, benchmarkContext.today(), pickOne(residentEmails), pickOne(residentEmails)));
                     }
                     dbOperation.save();
                 }

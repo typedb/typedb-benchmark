@@ -18,7 +18,6 @@
 package grakn.benchmark.common.agent.write;
 
 import grakn.benchmark.common.action.ActionFactory;
-import grakn.benchmark.common.agent.base.SimulationContext;
 import grakn.benchmark.common.agent.region.CountryAgent;
 import grakn.benchmark.common.driver.DbDriver;
 import grakn.benchmark.common.driver.DbOperation;
@@ -30,8 +29,8 @@ import java.util.Random;
 
 public class CompanyAgent<DB_OPERATION extends DbOperation> extends CountryAgent<DB_OPERATION> {
 
-    public CompanyAgent(DbDriver<DB_OPERATION> dbDriver, ActionFactory<DB_OPERATION, ?> actionFactory, SimulationContext simulationContext) {
-        super(dbDriver, actionFactory, simulationContext);
+    public CompanyAgent(DbDriver<DB_OPERATION> dbDriver, ActionFactory<DB_OPERATION, ?> actionFactory, grakn.benchmark.common.agent.base.BenchmarkContext benchmarkContext) {
+        super(dbDriver, actionFactory, benchmarkContext);
     }
 
     @Override
@@ -46,17 +45,17 @@ public class CompanyAgent<DB_OPERATION extends DbOperation> extends CountryAgent
 
         @Override
         protected void run(DbOperationFactory<DB_OPERATION> dbOperationFactory, World.Country country) {
-            int numCompanies = simulationContext.world().getScaleFactor();
+            int numCompanies = benchmarkContext.world().getScaleFactor();
 
             try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker(), iteration(), trace())) {
 
                 for (int i = 0; i < numCompanies; i++) {
-                    String adjective = pickOne(simulationContext.world().getAdjectives());
-                    String noun = pickOne(simulationContext.world().getNouns());
+                    String adjective = pickOne(benchmarkContext.world().getAdjectives());
+                    String noun = pickOne(benchmarkContext.world().getNouns());
 
-                    int companyNumber = uniqueId(simulationContext, i).hashCode();
+                    int companyNumber = uniqueId(benchmarkContext, i).hashCode();
                     String companyName = StringUtils.capitalize(adjective) + StringUtils.capitalize(noun) + "-" + companyNumber;
-                    runAction(actionFactory().insertCompanyAction(dbOperation, country, simulationContext.today(), companyNumber, companyName));
+                    runAction(actionFactory().insertCompanyAction(dbOperation, country, benchmarkContext.today(), companyNumber, companyName));
                 }
                 dbOperation.save();
             }

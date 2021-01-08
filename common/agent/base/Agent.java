@@ -57,12 +57,12 @@ public abstract class Agent<REGION extends grakn.benchmark.common.world.Region, 
     private final DbDriver<DB_OPERATION> dbDriver;
     private final ActionFactory<DB_OPERATION, ?> actionFactory;
     private final Report report = new Report();
-    protected final SimulationContext simulationContext;
+    protected final BenchmarkContext benchmarkContext;
 
-    protected Agent(DbDriver<DB_OPERATION> dbDriver, ActionFactory<DB_OPERATION, ?> actionFactory, SimulationContext simulationContext) {
+    protected Agent(DbDriver<DB_OPERATION> dbDriver, ActionFactory<DB_OPERATION, ?> actionFactory, BenchmarkContext benchmarkContext) {
         this.dbDriver = dbDriver;
         this.actionFactory = actionFactory;
-        this.simulationContext = simulationContext;
+        this.benchmarkContext = benchmarkContext;
         logger = LoggerFactory.getLogger(this.getClass());
     }
 
@@ -75,13 +75,13 @@ public abstract class Agent<REGION extends grakn.benchmark.common.world.Region, 
     }
 
     public boolean trace() {
-        return simulationContext.trace() && trace;
+        return benchmarkContext.trace() && trace;
     }
 
     abstract protected List<REGION> getRegions(World world);
 
     public Report iterate(RandomSource randomSource) {
-        List<REGION> regions = getRegions(simulationContext.world());
+        List<REGION> regions = getRegions(benchmarkContext.world());
         List<RandomSource> randomSources = randomSource.split(regions.size());
 
         Utils.zip(randomSources, regions).parallelStream().forEach(
@@ -96,7 +96,7 @@ public abstract class Agent<REGION extends grakn.benchmark.common.world.Region, 
         Random random = source.startNewRandom();
         Random agentRandom = RandomSource.nextSource(random).startNewRandom();
 
-        Region regionalAgent = getRegionalAgent(simulationContext.iteration(), region.tracker(), agentRandom, simulationContext.test());
+        Region regionalAgent = getRegionalAgent(benchmarkContext.iteration(), region.tracker(), agentRandom, benchmarkContext.test());
         DbOperationFactory<DB_OPERATION> dbOperationFactory = dbDriver.getDbOperationFactory(region, logger);
 
         Region.Report report = regionalAgent.runWithReport(dbOperationFactory, region);
@@ -178,8 +178,8 @@ public abstract class Agent<REGION extends grakn.benchmark.common.world.Region, 
          * @param iterationScopeId An id that uniquely identifies a concept within the scope of the agent at a particular iteration
          * @return
          */
-        public String uniqueId(SimulationContext simulationContext, int iterationScopeId) {
-            return simulationContext.iteration() + "/" + tracker() + "/" + iterationScopeId;
+        public String uniqueId(BenchmarkContext benchmarkContext, int iterationScopeId) {
+            return benchmarkContext.iteration() + "/" + tracker() + "/" + iterationScopeId;
         }
 
         public RandomValueGenerator randomAttributeGenerator() {

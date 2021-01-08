@@ -1,9 +1,9 @@
 load("@graknlabs_dependencies//tool/checkstyle:rules.bzl", "checkstyle_test")
 
 java_library(
-    name = "simulation-lib",
+    name = "benchmark-lib",
     srcs = [
-        "SimulationRunner.java",
+        "BenchmarkRunner.java",
     ],
     resource_strip_prefix = "config/",
     resources = [
@@ -12,7 +12,7 @@ java_library(
     visibility = ["//visibility:public"],
     deps = [
         "//config",
-        "//common:simulation-common",
+        "//common:benchmark-common",
         "//common/world",
         "//grakn",
         "//neo4j",
@@ -25,7 +25,7 @@ java_library(
 )
 
 java_binary(
-    name = "simulation-big",
+    name = "benchmark-big",
     args = [
         "config/config_big.yml",
         "$(locations //common/data)",
@@ -38,12 +38,12 @@ java_binary(
         "//grakn/data",
         "//neo4j/data",
     ],
-    main_class = "grakn.simulation.SimulationRunner",
-    runtime_deps = [":simulation-lib"],
+    main_class = "grakn.benchmark.BenchmarkRunner",
+    runtime_deps = [":benchmark-lib"],
 )
 
 java_binary(
-    name = "simulation-small",
+    name = "benchmark-small",
     args = [
         "config/config_small.yml",
         "$(locations //common/data)",
@@ -56,23 +56,23 @@ java_binary(
         "//grakn/data",
         "//neo4j/data",
     ],
-    main_class = "grakn.simulation.SimulationRunner",
-    runtime_deps = [":simulation-lib"],
+    main_class = "grakn.benchmark.BenchmarkRunner",
+    runtime_deps = [":benchmark-lib"],
 )
 
 java_binary(
-    name = "simulation-debug",
+    name = "benchmark-debug",
     jvm_flags = [
         "-Xdebug",
         "-Xrunjdwp:transport=dt_socket,server=y,address=5005",
     ],
-    main_class = "grakn.simulation.Simulation",
-    runtime_deps = [":simulation-lib"],
+    main_class = "grakn.benchmark.Benchmark",
+    runtime_deps = [":benchmark-lib"],
 )
 
 checkstyle_test(
     name = "checkstyle",
-    include = [":simulation-lib"],
+    include = [":benchmark-lib"],
     license_type = "agpl",
     size = "small",
 )

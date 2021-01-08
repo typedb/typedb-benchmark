@@ -19,7 +19,6 @@ package grakn.benchmark.common.agent.region;
 
 import grakn.benchmark.common.action.ActionFactory;
 import grakn.benchmark.common.agent.base.Agent;
-import grakn.benchmark.common.agent.base.SimulationContext;
 import grakn.benchmark.common.driver.DbDriver;
 import grakn.benchmark.common.driver.DbOperation;
 import grakn.benchmark.common.world.World;
@@ -30,8 +29,8 @@ import java.util.Random;
 
 public abstract class WorldAgent<DB_OPERATION extends DbOperation> extends Agent<World, DB_OPERATION> {
 
-    public WorldAgent(DbDriver<DB_OPERATION> dbDriver, ActionFactory<DB_OPERATION, ?> actionFactory, SimulationContext simulationContext) {
-        super(dbDriver, actionFactory, simulationContext);
+    public WorldAgent(DbDriver<DB_OPERATION> dbDriver, ActionFactory<DB_OPERATION, ?> actionFactory, grakn.benchmark.common.agent.base.BenchmarkContext benchmarkContext) {
+        super(dbDriver, actionFactory, benchmarkContext);
     }
 
     @Override

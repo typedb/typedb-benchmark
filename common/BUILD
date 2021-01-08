@@ -1,7 +1,7 @@
 load("@graknlabs_dependencies//tool/checkstyle:rules.bzl", "checkstyle_test")
 
 java_library(
-    name = "simulation-common",
+    name = "benchmark-common",
     srcs = glob([
         "*.java",
     ]),
@@ -21,7 +21,7 @@ java_library(
 
 checkstyle_test(
     name = "checkstyle",
-    include = [":simulation-common"],
+    include = [":benchmark-common"],
     license_type = "agpl",
     size = "small",
 )

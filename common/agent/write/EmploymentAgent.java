@@ -20,7 +20,6 @@ package grakn.benchmark.common.agent.write;
 import grakn.benchmark.common.action.ActionFactory;
 import grakn.benchmark.common.action.read.CompaniesInCountryAction;
 import grakn.benchmark.common.action.read.ResidentsInCityAction;
-import grakn.benchmark.common.agent.base.SimulationContext;
 import grakn.benchmark.common.agent.region.CityAgent;
 import grakn.benchmark.common.driver.DbDriver;
 import grakn.benchmark.common.driver.DbOperation;
@@ -35,8 +34,8 @@ import static grakn.benchmark.common.agent.base.Allocation.allocate;
 
 public class EmploymentAgent<DB_OPERATION extends DbOperation> extends CityAgent<DB_OPERATION> {
 
-    public EmploymentAgent(DbDriver<DB_OPERATION> dbDriver, ActionFactory<DB_OPERATION, ?> actionFactory, SimulationContext simulationContext) {
-        super(dbDriver, actionFactory, simulationContext);
+    public EmploymentAgent(DbDriver<DB_OPERATION> dbDriver, ActionFactory<DB_OPERATION, ?> actionFactory, grakn.benchmark.common.agent.base.BenchmarkContext benchmarkContext) {
+        super(dbDriver, actionFactory, benchmarkContext);
     }
 
     @Override
@@ -58,17 +57,17 @@ public class EmploymentAgent<DB_OPERATION extends DbOperation> extends CityAgent
 
         @Override
         protected void run(DbOperationFactory<DB_OPERATION> dbOperationFactory, World.City city) {
-            LocalDateTime employmentDate = simulationContext.today().minusYears(0);
+            LocalDateTime employmentDate = benchmarkContext.today().minusYears(0);
             List<String> employeeEmails;
             List<Long> companyNumbers;
 
             try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker(), iteration(), trace())) {
-                ResidentsInCityAction<DB_OPERATION> employeeEmailsAction = actionFactory().residentsInCityAction(dbOperation, city, simulationContext.world().getScaleFactor(), employmentDate);
+                ResidentsInCityAction<DB_OPERATION> employeeEmailsAction = actionFactory().residentsInCityAction(dbOperation, city, benchmarkContext.world().getScaleFactor(), employmentDate);
                 employeeEmails = runAction(employeeEmailsAction);
             }
 
             try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker(), iteration(), trace())) {
-                CompaniesInCountryAction<DB_OPERATION> companyNumbersAction = actionFactory().companiesInCountryAction(dbOperation, city.country(), simulationContext.world().getScaleFactor());
+                CompaniesInCountryAction<DB_OPERATION> companyNumbersAction = actionFactory().companiesInCountryAction(dbOperation, city.country(), benchmarkContext.world().getScaleFactor());
                 companyNumbers = runAction(companyNumbersAction);
             }
 

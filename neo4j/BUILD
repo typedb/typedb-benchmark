@@ -13,7 +13,7 @@ java_library(
     ]),
     visibility = ["//visibility:public"],
     deps = [
-        "//common:simulation-common",
+        "//common:benchmark-common",
         "//common/action",
         "//common/driver",
         "//common/utils",

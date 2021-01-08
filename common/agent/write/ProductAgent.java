@@ -18,7 +18,6 @@
 package grakn.benchmark.common.agent.write;
 
 import grakn.benchmark.common.action.ActionFactory;
-import grakn.benchmark.common.agent.base.SimulationContext;
 import grakn.benchmark.common.agent.region.ContinentAgent;
 import grakn.benchmark.common.driver.DbDriver;
 import grakn.benchmark.common.driver.DbOperation;
@@ -29,8 +28,8 @@ import java.util.Random;
 
 public class ProductAgent<DB_OPERATION extends DbOperation> extends ContinentAgent<DB_OPERATION> {
 
-    public ProductAgent(DbDriver<DB_OPERATION> dbDriver, ActionFactory<DB_OPERATION, ?> actionFactory, SimulationContext simulationContext) {
-        super(dbDriver, actionFactory, simulationContext);
+    public ProductAgent(DbDriver<DB_OPERATION> dbDriver, ActionFactory<DB_OPERATION, ?> actionFactory, grakn.benchmark.common.agent.base.BenchmarkContext benchmarkContext) {
+        super(dbDriver, actionFactory, benchmarkContext);
     }
 
     @Override
@@ -45,12 +44,12 @@ public class ProductAgent<DB_OPERATION extends DbOperation> extends ContinentAge
 
         @Override
         protected void run(DbOperationFactory<DB_OPERATION> dbOperationFactory, World.Continent continent) {
-            int numProducts = simulationContext.world().getScaleFactor();
+            int numProducts = benchmarkContext.world().getScaleFactor();
             try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker(), iteration(), trace())) {
                 for (int i = 0; i < numProducts; i++) {
                     String productName = randomAttributeGenerator().boundRandomLengthRandomString(5, 20);
                     String productDescription = randomAttributeGenerator().boundRandomLengthRandomString(75, 100);
-                    Long barcode = (long) uniqueId(simulationContext, i).hashCode();
+                    Long barcode = (long) uniqueId(benchmarkContext, i).hashCode();
                     runAction(actionFactory().insertProductAction(dbOperation, continent, barcode, productName, productDescription));
                 }
                 dbOperation.save();

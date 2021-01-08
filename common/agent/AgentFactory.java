@@ -19,7 +19,6 @@ package grakn.benchmark.common.agent;
 
 import grakn.benchmark.common.action.ActionFactory;
 import grakn.benchmark.common.agent.base.Agent;
-import grakn.benchmark.common.agent.base.SimulationContext;
 import grakn.benchmark.common.agent.insight.ArbitraryOneHopAgent;
 import grakn.benchmark.common.agent.insight.FindCurrentResidentsAgent;
 import grakn.benchmark.common.agent.insight.FindLivedInAgent;
@@ -47,92 +46,92 @@ public class AgentFactory<DB_OPERATION extends DbOperation, ACTION_FACTORY exten
 
     private final DbDriver<DB_OPERATION> dbDriver;
     private final ACTION_FACTORY actionFactory;
-    private final SimulationContext simulationContext;
+    private final grakn.benchmark.common.agent.base.BenchmarkContext benchmarkContext;
 
-    public AgentFactory(DbDriver<DB_OPERATION> dbDriver, ACTION_FACTORY actionFactory, SimulationContext simulationContext) {
+    public AgentFactory(DbDriver<DB_OPERATION> dbDriver, ACTION_FACTORY actionFactory, grakn.benchmark.common.agent.base.BenchmarkContext benchmarkContext) {
         this.dbDriver = dbDriver;
         this.actionFactory = actionFactory;
-        this.simulationContext = simulationContext;
+        this.benchmarkContext = benchmarkContext;
     }
 
     public MarriageAgent<DB_OPERATION> marriage() {
-        return new MarriageAgent<>(dbDriver, actionFactory, simulationContext);
+        return new MarriageAgent<>(dbDriver, actionFactory, benchmarkContext);
     }
 
     public PersonBirthAgent<DB_OPERATION> personBirth() {
-        return new PersonBirthAgent<>(dbDriver, actionFactory, simulationContext);
+        return new PersonBirthAgent<>(dbDriver, actionFactory, benchmarkContext);
     }
 
     public AgeUpdateAgent<DB_OPERATION> ageUpdate() {
-        return new AgeUpdateAgent<>(dbDriver, actionFactory, simulationContext);
+        return new AgeUpdateAgent<>(dbDriver, actionFactory, benchmarkContext);
     }
 
     public ParentshipAgent<DB_OPERATION> parentship() {
-        return new ParentshipAgent<>(dbDriver, actionFactory, simulationContext);
+        return new ParentshipAgent<>(dbDriver, actionFactory, benchmarkContext);
     }
 
     public RelocationAgent<DB_OPERATION> relocation() {
-        return new RelocationAgent<>(dbDriver, actionFactory, simulationContext);
+        return new RelocationAgent<>(dbDriver, actionFactory, benchmarkContext);
     }
 
     public CompanyAgent<DB_OPERATION> company() {
-        return new CompanyAgent<>(dbDriver, actionFactory, simulationContext);
+        return new CompanyAgent<>(dbDriver, actionFactory, benchmarkContext);
     }
 
     public EmploymentAgent<DB_OPERATION> employment() {
-        return new EmploymentAgent<>(dbDriver, actionFactory, simulationContext);
+        return new EmploymentAgent<>(dbDriver, actionFactory, benchmarkContext);
     }
 
     public ProductAgent<DB_OPERATION> product() {
-        return new ProductAgent<>(dbDriver, actionFactory, simulationContext);
+        return new ProductAgent<>(dbDriver, actionFactory, benchmarkContext);
     }
 
     public TransactionAgent<DB_OPERATION> transaction() {
-        return new TransactionAgent<>(dbDriver, actionFactory, simulationContext);
+        return new TransactionAgent<>(dbDriver, actionFactory, benchmarkContext);
     }
 
     public FriendshipAgent<DB_OPERATION> friendship() {
-        return new FriendshipAgent<>(dbDriver, actionFactory, simulationContext);
+        return new FriendshipAgent<>(dbDriver, actionFactory, benchmarkContext);
     }
 
     public MeanWageAgent<DB_OPERATION> meanWage() {
-        return new MeanWageAgent<>(dbDriver, actionFactory, simulationContext);
+        return new MeanWageAgent<>(dbDriver, actionFactory, benchmarkContext);
     }
 
     public FindLivedInAgent<DB_OPERATION> findLivedIn() {
-        return new FindLivedInAgent<>(dbDriver, actionFactory, simulationContext);
+        return new FindLivedInAgent<>(dbDriver, actionFactory, benchmarkContext);
     }
 
     public FindCurrentResidentsAgent<DB_OPERATION> findCurrentResidents() {
-        return new FindCurrentResidentsAgent<>(dbDriver, actionFactory, simulationContext);
+        return new FindCurrentResidentsAgent<>(dbDriver, actionFactory, benchmarkContext);
     }
 
     public FindTransactionCurrencyAgent<DB_OPERATION> findTransactionCurrency() {
-        return new FindTransactionCurrencyAgent<>(dbDriver, actionFactory, simulationContext);
+        return new FindTransactionCurrencyAgent<>(dbDriver, actionFactory, benchmarkContext);
     }
 
     public ArbitraryOneHopAgent<DB_OPERATION> arbitraryOneHop() {
-        return new ArbitraryOneHopAgent<>(dbDriver, actionFactory, simulationContext);
+        return new ArbitraryOneHopAgent<>(dbDriver, actionFactory, benchmarkContext);
     }
 
     public TwoHopAgent<DB_OPERATION> twoHop() {
-        return new TwoHopAgent<>(dbDriver, actionFactory, simulationContext);
+        return new TwoHopAgent<>(dbDriver, actionFactory, benchmarkContext);
     }
 
     public ThreeHopAgent<DB_OPERATION> threeHop() {
-        return new ThreeHopAgent<>(dbDriver, actionFactory, simulationContext);
+        return new ThreeHopAgent<>(dbDriver, actionFactory, benchmarkContext);
     }
 
     public FourHopAgent<DB_OPERATION> fourHop() {
-        return new FourHopAgent<>(dbDriver, actionFactory, simulationContext);
+        return new FourHopAgent<>(dbDriver, actionFactory, benchmarkContext);
     }
 
     public FindSpecificMarriageAgent<DB_OPERATION> findSpecificMarriage() {
-        return new FindSpecificMarriageAgent<>(dbDriver, actionFactory, simulationContext);
+        return new FindSpecificMarriageAgent<>(dbDriver, actionFactory, benchmarkContext);
     }
 
     public FindSpecificPersonAgent<DB_OPERATION> findSpecificPerson() {
-        return new FindSpecificPersonAgent<>(dbDriver, actionFactory, simulationContext);
+        return new FindSpecificPersonAgent<>(dbDriver, actionFactory, benchmarkContext);
     }
 
     public Agent<?, DB_OPERATION> get(String agentName) {
