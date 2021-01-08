@@ -15,12 +15,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package grakn.simulation.common;
+package grakn.benchmark.common;
 
-import grakn.simulation.config.Config;
-import grakn.simulation.common.driver.TransactionalDbDriver;
-import grakn.simulation.common.driver.TransactionalDbOperation;
-import grakn.simulation.common.world.World;
+import grakn.benchmark.common.driver.TransactionalDbDriver;
+import grakn.benchmark.common.driver.TransactionalDbOperation;
+import grakn.benchmark.common.world.World;
+import grakn.benchmark.config.Config;
 
 import java.nio.file.Path;
 import java.util.List;

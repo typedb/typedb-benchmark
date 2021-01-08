@@ -15,11 +15,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package grakn.simulation.grakn.action.read;
+package grakn.benchmark.grakn.action.read;
 
-import grakn.simulation.common.action.read.UnmarriedPeopleInCityAction;
-import grakn.simulation.common.world.World;
-import grakn.simulation.grakn.driver.GraknOperation;
+import grakn.benchmark.common.action.read.UnmarriedPeopleInCityAction;
+import grakn.benchmark.common.world.World;
+import grakn.benchmark.grakn.driver.GraknOperation;
 import graql.lang.Graql;
 import graql.lang.pattern.variable.UnboundVariable;
 import graql.lang.query.GraqlMatch;
@@ -27,19 +27,19 @@ import graql.lang.query.GraqlMatch;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static grakn.simulation.grakn.action.Model.CITY;
-import static grakn.simulation.grakn.action.Model.DATE_OF_BIRTH;
-import static grakn.simulation.grakn.action.Model.EMAIL;
-import static grakn.simulation.grakn.action.Model.END_DATE;
-import static grakn.simulation.grakn.action.Model.GENDER;
-import static grakn.simulation.grakn.action.Model.LOCATION_NAME;
-import static grakn.simulation.grakn.action.Model.MARRIAGE;
-import static grakn.simulation.grakn.action.Model.MARRIAGE_HUSBAND;
-import static grakn.simulation.grakn.action.Model.MARRIAGE_WIFE;
-import static grakn.simulation.grakn.action.Model.PERSON;
-import static grakn.simulation.grakn.action.Model.RESIDENCY;
-import static grakn.simulation.grakn.action.Model.RESIDENCY_LOCATION;
-import static grakn.simulation.grakn.action.Model.RESIDENCY_RESIDENT;
+import static grakn.benchmark.grakn.action.Model.CITY;
+import static grakn.benchmark.grakn.action.Model.DATE_OF_BIRTH;
+import static grakn.benchmark.grakn.action.Model.EMAIL;
+import static grakn.benchmark.grakn.action.Model.END_DATE;
+import static grakn.benchmark.grakn.action.Model.GENDER;
+import static grakn.benchmark.grakn.action.Model.LOCATION_NAME;
+import static grakn.benchmark.grakn.action.Model.MARRIAGE;
+import static grakn.benchmark.grakn.action.Model.MARRIAGE_HUSBAND;
+import static grakn.benchmark.grakn.action.Model.MARRIAGE_WIFE;
+import static grakn.benchmark.grakn.action.Model.PERSON;
+import static grakn.benchmark.grakn.action.Model.RESIDENCY;
+import static grakn.benchmark.grakn.action.Model.RESIDENCY_LOCATION;
+import static grakn.benchmark.grakn.action.Model.RESIDENCY_RESIDENT;
 
 public class GraknUnmarriedPeopleInCityAction extends UnmarriedPeopleInCityAction<GraknOperation> {
     public GraknUnmarriedPeopleInCityAction(GraknOperation dbOperation, World.City city, String gender, LocalDateTime dobOfAdults) {
@@ -65,12 +65,12 @@ public class GraknUnmarriedPeopleInCityAction extends UnmarriedPeopleInCityActio
         UnboundVariable personVar = Graql.var(PERSON);
         UnboundVariable cityVar = Graql.var(CITY);
         return Graql.match(
-                    personVar.isa(PERSON).has(GENDER, gender).has(EMAIL, Graql.var(EMAIL)).has(DATE_OF_BIRTH, Graql.var(DATE_OF_BIRTH)),
-                    Graql.var(DATE_OF_BIRTH).lte(dobOfAdults),
-                    Graql.not(Graql.var("m").rel(marriageRole, personVar).isa(MARRIAGE)),
-                    Graql.var("r").rel(RESIDENCY_RESIDENT, personVar).rel(RESIDENCY_LOCATION, cityVar).isa(RESIDENCY),
-                    Graql.not(Graql.var("r").has(END_DATE, Graql.var(END_DATE))),
-                    cityVar.isa(CITY).has(LOCATION_NAME, cityName)
-            ).get(EMAIL);
+                personVar.isa(PERSON).has(GENDER, gender).has(EMAIL, Graql.var(EMAIL)).has(DATE_OF_BIRTH, Graql.var(DATE_OF_BIRTH)),
+                Graql.var(DATE_OF_BIRTH).lte(dobOfAdults),
+                Graql.not(Graql.var("m").rel(marriageRole, personVar).isa(MARRIAGE)),
+                Graql.var("r").rel(RESIDENCY_RESIDENT, personVar).rel(RESIDENCY_LOCATION, cityVar).isa(RESIDENCY),
+                Graql.not(Graql.var("r").has(END_DATE, Graql.var(END_DATE))),
+                cityVar.isa(CITY).has(LOCATION_NAME, cityName)
+        ).get(EMAIL);
     }
 }

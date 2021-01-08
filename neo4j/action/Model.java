@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package grakn.simulation.neo4j.action;
+package grakn.benchmark.neo4j.action;
 
 public class Model {
 

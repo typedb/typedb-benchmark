@@ -15,21 +15,21 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package grakn.simulation.neo4j.action.write;
+package grakn.benchmark.neo4j.action.write;
 
-import grakn.simulation.common.action.Action;
-import grakn.simulation.common.action.write.InsertRelocationAction;
-import grakn.simulation.common.world.World;
-import grakn.simulation.neo4j.driver.Neo4jOperation;
+import grakn.benchmark.common.action.Action;
+import grakn.benchmark.common.action.write.InsertRelocationAction;
+import grakn.benchmark.common.world.World;
+import grakn.benchmark.neo4j.driver.Neo4jOperation;
 import org.neo4j.driver.Query;
 import org.neo4j.driver.Record;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
 
-import static grakn.simulation.neo4j.action.Model.EMAIL;
-import static grakn.simulation.neo4j.action.Model.LOCATION_NAME;
-import static grakn.simulation.neo4j.action.Model.RELOCATION_DATE;
+import static grakn.benchmark.neo4j.action.Model.EMAIL;
+import static grakn.benchmark.neo4j.action.Model.LOCATION_NAME;
+import static grakn.benchmark.neo4j.action.Model.RELOCATION_DATE;
 
 public class Neo4jInsertRelocationAction extends InsertRelocationAction<Neo4jOperation, Record> {
     public Neo4jInsertRelocationAction(Neo4jOperation dbOperation, World.City city, LocalDateTime today, String relocateeEmail, String relocationCityName) {
@@ -44,7 +44,7 @@ public class Neo4jInsertRelocationAction extends InsertRelocationAction<Neo4jOpe
         // In either case, their old ResidentOf should be given an `endDate`, and they should have a new ResidentOf
         // alongside this relation
 
-        HashMap<String, Object> parameters = new HashMap<String, Object>(){{
+        HashMap<String, Object> parameters = new HashMap<String, Object>() {{
             put("email", relocateeEmail);
             put("newCityName", relocationCityName);
             put("relocationDate", today);

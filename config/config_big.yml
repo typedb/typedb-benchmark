@@ -26,8 +26,8 @@ agents:
     mode: TRACE
   - name: "findCurrentResidents"
     mode: TRACE
-#  - name: "findTransactionCurrency"
-#    mode: TRACE
+  #  - name: "findTransactionCurrency"
+  #    mode: TRACE
   - name: "arbitraryOneHop"
     mode: TRACE
   - name: "twoHop"

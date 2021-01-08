@@ -15,12 +15,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package grakn.simulation.grakn.action.write;
+package grakn.benchmark.grakn.action.write;
 
+import grakn.benchmark.common.action.write.InsertEmploymentAction;
+import grakn.benchmark.common.world.World;
+import grakn.benchmark.grakn.driver.GraknOperation;
 import grakn.client.concept.answer.ConceptMap;
-import grakn.simulation.common.action.write.InsertEmploymentAction;
-import grakn.simulation.common.world.World;
-import grakn.simulation.grakn.driver.GraknOperation;
 import graql.lang.Graql;
 import graql.lang.pattern.variable.UnboundVariable;
 import graql.lang.query.GraqlInsert;
@@ -28,29 +28,29 @@ import graql.lang.query.GraqlInsert;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 
-import static grakn.simulation.grakn.action.Model.CITY;
-import static grakn.simulation.grakn.action.Model.COMPANY;
-import static grakn.simulation.grakn.action.Model.COMPANY_NUMBER;
-import static grakn.simulation.grakn.action.Model.CONTRACT;
-import static grakn.simulation.grakn.action.Model.CONTRACTED_HOURS;
-import static grakn.simulation.grakn.action.Model.CONTRACT_CONTENT;
-import static grakn.simulation.grakn.action.Model.COUNTRY;
-import static grakn.simulation.grakn.action.Model.CURRENCY;
-import static grakn.simulation.grakn.action.Model.EMAIL;
-import static grakn.simulation.grakn.action.Model.EMPLOYMENT;
-import static grakn.simulation.grakn.action.Model.EMPLOYMENT_CONTRACT;
-import static grakn.simulation.grakn.action.Model.EMPLOYMENT_EMPLOYEE;
-import static grakn.simulation.grakn.action.Model.EMPLOYMENT_EMPLOYER;
-import static grakn.simulation.grakn.action.Model.EMPLOYMENT_WAGE;
-import static grakn.simulation.grakn.action.Model.LOCATES;
-import static grakn.simulation.grakn.action.Model.LOCATES_LOCATED;
-import static grakn.simulation.grakn.action.Model.LOCATES_LOCATION;
-import static grakn.simulation.grakn.action.Model.LOCATION_HIERARCHY;
-import static grakn.simulation.grakn.action.Model.LOCATION_NAME;
-import static grakn.simulation.grakn.action.Model.PERSON;
-import static grakn.simulation.grakn.action.Model.START_DATE;
-import static grakn.simulation.grakn.action.Model.WAGE;
-import static grakn.simulation.grakn.action.Model.WAGE_VALUE;
+import static grakn.benchmark.grakn.action.Model.CITY;
+import static grakn.benchmark.grakn.action.Model.COMPANY;
+import static grakn.benchmark.grakn.action.Model.COMPANY_NUMBER;
+import static grakn.benchmark.grakn.action.Model.CONTRACT;
+import static grakn.benchmark.grakn.action.Model.CONTRACTED_HOURS;
+import static grakn.benchmark.grakn.action.Model.CONTRACT_CONTENT;
+import static grakn.benchmark.grakn.action.Model.COUNTRY;
+import static grakn.benchmark.grakn.action.Model.CURRENCY;
+import static grakn.benchmark.grakn.action.Model.EMAIL;
+import static grakn.benchmark.grakn.action.Model.EMPLOYMENT;
+import static grakn.benchmark.grakn.action.Model.EMPLOYMENT_CONTRACT;
+import static grakn.benchmark.grakn.action.Model.EMPLOYMENT_EMPLOYEE;
+import static grakn.benchmark.grakn.action.Model.EMPLOYMENT_EMPLOYER;
+import static grakn.benchmark.grakn.action.Model.EMPLOYMENT_WAGE;
+import static grakn.benchmark.grakn.action.Model.LOCATES;
+import static grakn.benchmark.grakn.action.Model.LOCATES_LOCATED;
+import static grakn.benchmark.grakn.action.Model.LOCATES_LOCATION;
+import static grakn.benchmark.grakn.action.Model.LOCATION_HIERARCHY;
+import static grakn.benchmark.grakn.action.Model.LOCATION_NAME;
+import static grakn.benchmark.grakn.action.Model.PERSON;
+import static grakn.benchmark.grakn.action.Model.START_DATE;
+import static grakn.benchmark.grakn.action.Model.WAGE;
+import static grakn.benchmark.grakn.action.Model.WAGE_VALUE;
 
 public class GraknInsertEmploymentAction extends InsertEmploymentAction<GraknOperation, ConceptMap> {
     public GraknInsertEmploymentAction(GraknOperation dbOperation, World.City worldCity, String employeeEmail, long companyNumber, LocalDateTime employmentDate, double wageValue, String contractContent, double contractedHours) {
@@ -117,14 +117,14 @@ public class GraknInsertEmploymentAction extends InsertEmploymentAction<GraknOpe
     @Override
     public HashMap<ComparableField, Object> outputForReport(ConceptMap answer) {
         return new HashMap<ComparableField, Object>() {{
-                put(InsertEmploymentActionField.CITY_NAME, dbOperation.getOnlyAttributeOfThing(answer, CITY, LOCATION_NAME));
-                put(InsertEmploymentActionField.PERSON_EMAIL, dbOperation.getOnlyAttributeOfThing(answer, PERSON, EMAIL));
-                put(InsertEmploymentActionField.COMPANY_NUMBER, dbOperation.getOnlyAttributeOfThing(answer, COMPANY, COMPANY_NUMBER));
-                put(InsertEmploymentActionField.START_DATE, dbOperation.getOnlyAttributeOfThing(answer, EMPLOYMENT, START_DATE));
-                put(InsertEmploymentActionField.WAGE, dbOperation.getOnlyAttributeOfThing(answer, WAGE, WAGE_VALUE));
-                put(InsertEmploymentActionField.CURRENCY, dbOperation.getOnlyAttributeOfThing(answer, WAGE, CURRENCY));
-                put(InsertEmploymentActionField.CONTRACT_CONTENT, dbOperation.getOnlyAttributeOfThing(answer, CONTRACT, CONTRACT_CONTENT));
-                put(InsertEmploymentActionField.CONTRACTED_HOURS, dbOperation.getOnlyAttributeOfThing(answer, CONTRACT, CONTRACTED_HOURS));
-            }};
+            put(InsertEmploymentActionField.CITY_NAME, dbOperation.getOnlyAttributeOfThing(answer, CITY, LOCATION_NAME));
+            put(InsertEmploymentActionField.PERSON_EMAIL, dbOperation.getOnlyAttributeOfThing(answer, PERSON, EMAIL));
+            put(InsertEmploymentActionField.COMPANY_NUMBER, dbOperation.getOnlyAttributeOfThing(answer, COMPANY, COMPANY_NUMBER));
+            put(InsertEmploymentActionField.START_DATE, dbOperation.getOnlyAttributeOfThing(answer, EMPLOYMENT, START_DATE));
+            put(InsertEmploymentActionField.WAGE, dbOperation.getOnlyAttributeOfThing(answer, WAGE, WAGE_VALUE));
+            put(InsertEmploymentActionField.CURRENCY, dbOperation.getOnlyAttributeOfThing(answer, WAGE, CURRENCY));
+            put(InsertEmploymentActionField.CONTRACT_CONTENT, dbOperation.getOnlyAttributeOfThing(answer, CONTRACT, CONTRACT_CONTENT));
+            put(InsertEmploymentActionField.CONTRACTED_HOURS, dbOperation.getOnlyAttributeOfThing(answer, CONTRACT, CONTRACTED_HOURS));
+        }};
     }
 }

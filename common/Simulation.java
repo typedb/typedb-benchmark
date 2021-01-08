@@ -15,17 +15,17 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package grakn.simulation.common;
+package grakn.benchmark.common;
 
-import grakn.simulation.config.Config;
-import grakn.simulation.common.action.ActionFactory;
-import grakn.simulation.common.agent.AgentFactory;
-import grakn.simulation.common.agent.base.Agent;
-import grakn.simulation.common.agent.base.SimulationContext;
-import grakn.simulation.common.driver.DbDriver;
-import grakn.simulation.common.driver.DbOperation;
-import grakn.simulation.common.world.World;
-import grakn.simulation.common.utils.RandomSource;
+import grakn.benchmark.common.action.ActionFactory;
+import grakn.benchmark.common.agent.AgentFactory;
+import grakn.benchmark.common.agent.base.Agent;
+import grakn.benchmark.common.agent.base.SimulationContext;
+import grakn.benchmark.common.driver.DbDriver;
+import grakn.benchmark.common.driver.DbOperation;
+import grakn.benchmark.common.utils.RandomSource;
+import grakn.benchmark.common.world.World;
+import grakn.benchmark.config.Config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -15,16 +15,16 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package grakn.simulation.common.agent.write;
+package grakn.benchmark.common.agent.write;
 
-import grakn.simulation.common.agent.base.SimulationContext;
-import grakn.simulation.common.action.ActionFactory;
-import grakn.simulation.common.action.write.UpdateAgesOfPeopleInCityAction;
-import grakn.simulation.common.agent.region.CityAgent;
-import grakn.simulation.common.driver.DbDriver;
-import grakn.simulation.common.driver.DbOperation;
-import grakn.simulation.common.driver.DbOperationFactory;
-import grakn.simulation.common.world.World;
+import grakn.benchmark.common.action.ActionFactory;
+import grakn.benchmark.common.action.write.UpdateAgesOfPeopleInCityAction;
+import grakn.benchmark.common.agent.base.SimulationContext;
+import grakn.benchmark.common.agent.region.CityAgent;
+import grakn.benchmark.common.driver.DbDriver;
+import grakn.benchmark.common.driver.DbOperation;
+import grakn.benchmark.common.driver.DbOperationFactory;
+import grakn.benchmark.common.world.World;
 
 import java.util.Random;
 

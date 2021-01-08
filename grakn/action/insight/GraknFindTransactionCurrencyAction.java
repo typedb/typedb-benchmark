@@ -15,18 +15,18 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package grakn.simulation.grakn.action.insight;
+package grakn.benchmark.grakn.action.insight;
 
-import grakn.simulation.common.action.insight.FindTransactionCurrencyAction;
-import grakn.simulation.grakn.driver.GraknOperation;
+import grakn.benchmark.common.action.insight.FindTransactionCurrencyAction;
+import grakn.benchmark.grakn.driver.GraknOperation;
 import graql.lang.Graql;
 import graql.lang.query.GraqlMatch;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static grakn.simulation.grakn.action.Model.CURRENCY;
-import static grakn.simulation.grakn.action.Model.TRANSACTION;
+import static grakn.benchmark.grakn.action.Model.CURRENCY;
+import static grakn.benchmark.grakn.action.Model.TRANSACTION;
 
 public class GraknFindTransactionCurrencyAction extends FindTransactionCurrencyAction<GraknOperation> {
     public GraknFindTransactionCurrencyAction(GraknOperation dbOperation) {
@@ -40,7 +40,7 @@ public class GraknFindTransactionCurrencyAction extends FindTransactionCurrencyA
 
     public static GraqlMatch.Unfiltered query() {
         return Graql.match(
-                    Graql.var(TRANSACTION).isa(TRANSACTION).has(CURRENCY, Graql.var(CURRENCY))
-                    );
+                Graql.var(TRANSACTION).isa(TRANSACTION).has(CURRENCY, Graql.var(CURRENCY))
+        );
     }
 }

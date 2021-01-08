@@ -15,13 +15,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package grakn.simulation.grakn.action.write;
+package grakn.benchmark.grakn.action.write;
 
+import grakn.benchmark.common.action.Action;
+import grakn.benchmark.common.action.write.InsertPersonAction;
+import grakn.benchmark.common.world.World;
+import grakn.benchmark.grakn.driver.GraknOperation;
 import grakn.client.concept.answer.ConceptMap;
-import grakn.simulation.common.action.Action;
-import grakn.simulation.common.action.write.InsertPersonAction;
-import grakn.simulation.common.world.World;
-import grakn.simulation.grakn.driver.GraknOperation;
 import graql.lang.Graql;
 import graql.lang.pattern.variable.UnboundVariable;
 import graql.lang.query.GraqlInsert;
@@ -29,17 +29,17 @@ import graql.lang.query.GraqlInsert;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 
-import static grakn.simulation.grakn.action.Model.BORN_IN;
-import static grakn.simulation.grakn.action.Model.BORN_IN_CHILD;
-import static grakn.simulation.grakn.action.Model.BORN_IN_PLACE_OF_BIRTH;
-import static grakn.simulation.grakn.action.Model.CITY;
-import static grakn.simulation.grakn.action.Model.DATE_OF_BIRTH;
-import static grakn.simulation.grakn.action.Model.EMAIL;
-import static grakn.simulation.grakn.action.Model.FORENAME;
-import static grakn.simulation.grakn.action.Model.GENDER;
-import static grakn.simulation.grakn.action.Model.LOCATION_NAME;
-import static grakn.simulation.grakn.action.Model.PERSON;
-import static grakn.simulation.grakn.action.Model.SURNAME;
+import static grakn.benchmark.grakn.action.Model.BORN_IN;
+import static grakn.benchmark.grakn.action.Model.BORN_IN_CHILD;
+import static grakn.benchmark.grakn.action.Model.BORN_IN_PLACE_OF_BIRTH;
+import static grakn.benchmark.grakn.action.Model.CITY;
+import static grakn.benchmark.grakn.action.Model.DATE_OF_BIRTH;
+import static grakn.benchmark.grakn.action.Model.EMAIL;
+import static grakn.benchmark.grakn.action.Model.FORENAME;
+import static grakn.benchmark.grakn.action.Model.GENDER;
+import static grakn.benchmark.grakn.action.Model.LOCATION_NAME;
+import static grakn.benchmark.grakn.action.Model.PERSON;
+import static grakn.benchmark.grakn.action.Model.SURNAME;
 
 public class GraknInsertPersonAction extends InsertPersonAction<GraknOperation, ConceptMap> {
     public GraknInsertPersonAction(GraknOperation dbOperation, World.City city, LocalDateTime today, String email, String gender, String forename, String surname) {
@@ -75,13 +75,14 @@ public class GraknInsertPersonAction extends InsertPersonAction<GraknOperation, 
 
     @Override
     protected HashMap<ComparableField, Object> outputForReport(ConceptMap answer) {
-        return new HashMap<ComparableField, Object>(){
+        return new HashMap<ComparableField, Object>() {
             {
                 put(InsertPersonActionField.EMAIL, dbOperation.getOnlyAttributeOfThing(answer, PERSON, EMAIL));
                 put(InsertPersonActionField.DATE_OF_BIRTH, dbOperation.getOnlyAttributeOfThing(answer, PERSON, DATE_OF_BIRTH));
                 put(InsertPersonActionField.GENDER, dbOperation.getOnlyAttributeOfThing(answer, PERSON, GENDER));
                 put(InsertPersonActionField.FORENAME, dbOperation.getOnlyAttributeOfThing(answer, PERSON, FORENAME));
                 put(InsertPersonActionField.SURNAME, dbOperation.getOnlyAttributeOfThing(answer, PERSON, SURNAME));
-            }};
+            }
+        };
     }
 }

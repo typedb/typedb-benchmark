@@ -15,13 +15,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package grakn.simulation.grakn.driver;
+package grakn.benchmark.grakn.driver;
 
+import grakn.benchmark.common.driver.DbOperationFactory;
+import grakn.benchmark.common.driver.TransactionalDbDriver;
+import grakn.benchmark.common.world.Region;
 import grakn.client.Grakn;
 import grakn.client.rpc.GraknClient;
-import grakn.simulation.common.driver.DbOperationFactory;
-import grakn.simulation.common.driver.TransactionalDbDriver;
-import grakn.simulation.common.world.Region;
 import org.slf4j.Logger;
 
 import java.util.concurrent.ConcurrentHashMap;

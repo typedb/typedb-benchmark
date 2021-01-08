@@ -15,65 +15,65 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package grakn.simulation.neo4j.action;
+package grakn.benchmark.neo4j.action;
 
+import grakn.benchmark.common.action.ActionFactory;
+import grakn.benchmark.common.action.SpouseType;
+import grakn.benchmark.common.action.insight.ArbitraryOneHopAction;
+import grakn.benchmark.common.action.insight.FindCurrentResidentsAction;
+import grakn.benchmark.common.action.insight.FindLivedInAction;
+import grakn.benchmark.common.action.insight.FindSpecificMarriageAction;
+import grakn.benchmark.common.action.insight.FindSpecificPersonAction;
+import grakn.benchmark.common.action.insight.FindTransactionCurrencyAction;
+import grakn.benchmark.common.action.insight.FourHopAction;
+import grakn.benchmark.common.action.insight.MeanWageOfPeopleInWorldAction;
+import grakn.benchmark.common.action.insight.ThreeHopAction;
+import grakn.benchmark.common.action.insight.TwoHopAction;
+import grakn.benchmark.common.action.read.BirthsInCityAction;
+import grakn.benchmark.common.action.read.CitiesInContinentAction;
+import grakn.benchmark.common.action.read.MarriedCoupleAction;
+import grakn.benchmark.common.action.read.ProductsInContinentAction;
+import grakn.benchmark.common.action.read.UnmarriedPeopleInCityAction;
+import grakn.benchmark.common.action.write.InsertCompanyAction;
+import grakn.benchmark.common.action.write.InsertEmploymentAction;
+import grakn.benchmark.common.action.write.InsertFriendshipAction;
+import grakn.benchmark.common.action.write.InsertMarriageAction;
+import grakn.benchmark.common.action.write.InsertParentShipAction;
+import grakn.benchmark.common.action.write.InsertPersonAction;
+import grakn.benchmark.common.action.write.InsertProductAction;
+import grakn.benchmark.common.action.write.InsertRelocationAction;
+import grakn.benchmark.common.action.write.InsertTransactionAction;
+import grakn.benchmark.common.action.write.UpdateAgesOfPeopleInCityAction;
+import grakn.benchmark.common.world.World;
+import grakn.benchmark.neo4j.action.insight.Neo4jArbitraryOneHopAction;
+import grakn.benchmark.neo4j.action.insight.Neo4jFindCurrentResidentsAction;
+import grakn.benchmark.neo4j.action.insight.Neo4jFindLivedInAction;
+import grakn.benchmark.neo4j.action.insight.Neo4jFindSpecificMarriageAction;
+import grakn.benchmark.neo4j.action.insight.Neo4jFindSpecificPersonAction;
+import grakn.benchmark.neo4j.action.insight.Neo4jFindTransactionCurrencyAction;
+import grakn.benchmark.neo4j.action.insight.Neo4jFourHopAction;
+import grakn.benchmark.neo4j.action.insight.Neo4jMeanWageOfPeopleInWorldAction;
+import grakn.benchmark.neo4j.action.insight.Neo4jThreeHopAction;
+import grakn.benchmark.neo4j.action.insight.Neo4jTwoHopAction;
+import grakn.benchmark.neo4j.action.read.Neo4jBirthsInCityAction;
+import grakn.benchmark.neo4j.action.read.Neo4jCitiesInContinentAction;
+import grakn.benchmark.neo4j.action.read.Neo4jCompaniesInCountryAction;
+import grakn.benchmark.neo4j.action.read.Neo4jMarriedCoupleAction;
+import grakn.benchmark.neo4j.action.read.Neo4jProductsInContinentAction;
+import grakn.benchmark.neo4j.action.read.Neo4jResidentsInCityAction;
+import grakn.benchmark.neo4j.action.read.Neo4jUnmarriedPeopleInCityAction;
+import grakn.benchmark.neo4j.action.write.Neo4jInsertCompanyAction;
+import grakn.benchmark.neo4j.action.write.Neo4jInsertEmploymentAction;
+import grakn.benchmark.neo4j.action.write.Neo4jInsertFriendshipAction;
+import grakn.benchmark.neo4j.action.write.Neo4jInsertMarriageAction;
+import grakn.benchmark.neo4j.action.write.Neo4jInsertParentShipAction;
+import grakn.benchmark.neo4j.action.write.Neo4jInsertPersonAction;
+import grakn.benchmark.neo4j.action.write.Neo4jInsertProductAction;
+import grakn.benchmark.neo4j.action.write.Neo4jInsertRelocationAction;
+import grakn.benchmark.neo4j.action.write.Neo4jInsertTransactionAction;
+import grakn.benchmark.neo4j.action.write.Neo4jUpdateAgesOfPeopleInCityAction;
+import grakn.benchmark.neo4j.driver.Neo4jOperation;
 import grakn.common.collection.Pair;
-import grakn.simulation.common.action.ActionFactory;
-import grakn.simulation.common.action.SpouseType;
-import grakn.simulation.common.action.insight.ArbitraryOneHopAction;
-import grakn.simulation.common.action.read.BirthsInCityAction;
-import grakn.simulation.common.action.read.CitiesInContinentAction;
-import grakn.simulation.common.action.insight.FindCurrentResidentsAction;
-import grakn.simulation.common.action.insight.FindLivedInAction;
-import grakn.simulation.common.action.insight.FindSpecificMarriageAction;
-import grakn.simulation.common.action.insight.FindSpecificPersonAction;
-import grakn.simulation.common.action.insight.FindTransactionCurrencyAction;
-import grakn.simulation.common.action.insight.FourHopAction;
-import grakn.simulation.common.action.read.MarriedCoupleAction;
-import grakn.simulation.common.action.insight.MeanWageOfPeopleInWorldAction;
-import grakn.simulation.common.action.read.ProductsInContinentAction;
-import grakn.simulation.common.action.insight.ThreeHopAction;
-import grakn.simulation.common.action.insight.TwoHopAction;
-import grakn.simulation.common.action.read.UnmarriedPeopleInCityAction;
-import grakn.simulation.common.action.write.UpdateAgesOfPeopleInCityAction;
-import grakn.simulation.common.action.write.InsertCompanyAction;
-import grakn.simulation.common.action.write.InsertEmploymentAction;
-import grakn.simulation.common.action.write.InsertFriendshipAction;
-import grakn.simulation.common.action.write.InsertMarriageAction;
-import grakn.simulation.common.action.write.InsertParentShipAction;
-import grakn.simulation.common.action.write.InsertPersonAction;
-import grakn.simulation.common.action.write.InsertProductAction;
-import grakn.simulation.common.action.write.InsertRelocationAction;
-import grakn.simulation.common.action.write.InsertTransactionAction;
-import grakn.simulation.common.world.World;
-import grakn.simulation.neo4j.action.insight.Neo4jArbitraryOneHopAction;
-import grakn.simulation.neo4j.action.read.Neo4jBirthsInCityAction;
-import grakn.simulation.neo4j.action.read.Neo4jCitiesInContinentAction;
-import grakn.simulation.neo4j.action.read.Neo4jCompaniesInCountryAction;
-import grakn.simulation.neo4j.action.insight.Neo4jFindCurrentResidentsAction;
-import grakn.simulation.neo4j.action.insight.Neo4jFindLivedInAction;
-import grakn.simulation.neo4j.action.insight.Neo4jFindSpecificMarriageAction;
-import grakn.simulation.neo4j.action.insight.Neo4jFindSpecificPersonAction;
-import grakn.simulation.neo4j.action.insight.Neo4jFindTransactionCurrencyAction;
-import grakn.simulation.neo4j.action.insight.Neo4jFourHopAction;
-import grakn.simulation.neo4j.action.read.Neo4jMarriedCoupleAction;
-import grakn.simulation.neo4j.action.insight.Neo4jMeanWageOfPeopleInWorldAction;
-import grakn.simulation.neo4j.action.read.Neo4jProductsInContinentAction;
-import grakn.simulation.neo4j.action.read.Neo4jResidentsInCityAction;
-import grakn.simulation.neo4j.action.insight.Neo4jThreeHopAction;
-import grakn.simulation.neo4j.action.insight.Neo4jTwoHopAction;
-import grakn.simulation.neo4j.action.read.Neo4jUnmarriedPeopleInCityAction;
-import grakn.simulation.neo4j.action.write.Neo4jUpdateAgesOfPeopleInCityAction;
-import grakn.simulation.neo4j.action.write.Neo4jInsertCompanyAction;
-import grakn.simulation.neo4j.action.write.Neo4jInsertEmploymentAction;
-import grakn.simulation.neo4j.action.write.Neo4jInsertFriendshipAction;
-import grakn.simulation.neo4j.action.write.Neo4jInsertMarriageAction;
-import grakn.simulation.neo4j.action.write.Neo4jInsertParentShipAction;
-import grakn.simulation.neo4j.action.write.Neo4jInsertPersonAction;
-import grakn.simulation.neo4j.action.write.Neo4jInsertProductAction;
-import grakn.simulation.neo4j.action.write.Neo4jInsertRelocationAction;
-import grakn.simulation.neo4j.action.write.Neo4jInsertTransactionAction;
-import grakn.simulation.neo4j.driver.Neo4jOperation;
 import org.neo4j.driver.Record;
 
 import java.time.LocalDateTime;
@@ -163,7 +163,7 @@ public class Neo4jActionFactory extends ActionFactory<Neo4jOperation, Record> {
 
     @Override
     public UpdateAgesOfPeopleInCityAction<Neo4jOperation> updateAgesOfPeopleInCityAction(Neo4jOperation dbOperation, LocalDateTime today, World.City city) {
-            return new Neo4jUpdateAgesOfPeopleInCityAction(dbOperation, today, city);
+        return new Neo4jUpdateAgesOfPeopleInCityAction(dbOperation, today, city);
     }
 
     @Override

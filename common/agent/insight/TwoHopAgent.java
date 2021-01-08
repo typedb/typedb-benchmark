@@ -15,13 +15,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package grakn.simulation.common.agent.insight;
+package grakn.benchmark.common.agent.insight;
 
-import grakn.simulation.common.action.ActionFactory;
-import grakn.simulation.common.action.read.ReadAction;
-import grakn.simulation.common.agent.base.SimulationContext;
-import grakn.simulation.common.driver.DbDriver;
-import grakn.simulation.common.driver.DbOperation;
+import grakn.benchmark.common.action.ActionFactory;
+import grakn.benchmark.common.action.read.ReadAction;
+import grakn.benchmark.common.agent.base.SimulationContext;
+import grakn.benchmark.common.driver.DbDriver;
+import grakn.benchmark.common.driver.DbOperation;
 
 public class TwoHopAgent<DB_OPERATION extends DbOperation> extends WorldwideInsightAgent<DB_OPERATION> {
     public TwoHopAgent(DbDriver<DB_OPERATION> dbDriver, ActionFactory<DB_OPERATION, ?> actionFactory, SimulationContext simulationContext) {

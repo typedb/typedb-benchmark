@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package grakn.simulation.common.yaml_tool;
+package grakn.benchmark.common.yaml_tool;
 
 import graql.lang.common.util.Strings;
 
@@ -43,7 +43,7 @@ public class QueryTemplate {
         columns = new HashSet<>();
         vars = new ArrayList<>();
 
-        while(matcher.find()) {
+        while (matcher.find()) {
             int varNum = Integer.parseInt(matcher.group(1));
             columns.add(varNum);
             vars.add(varNum);

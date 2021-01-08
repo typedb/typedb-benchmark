@@ -15,24 +15,24 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package grakn.simulation.grakn.action.write;
+package grakn.benchmark.grakn.action.write;
 
+import grakn.benchmark.common.action.Action;
+import grakn.benchmark.common.action.SpouseType;
+import grakn.benchmark.common.action.write.InsertParentShipAction;
+import grakn.benchmark.grakn.driver.GraknOperation;
 import grakn.client.concept.answer.ConceptMap;
-import grakn.simulation.common.action.Action;
-import grakn.simulation.common.action.SpouseType;
-import grakn.simulation.common.action.write.InsertParentShipAction;
-import grakn.simulation.grakn.driver.GraknOperation;
 import graql.lang.Graql;
 import graql.lang.pattern.variable.UnboundVariable;
 import graql.lang.query.GraqlInsert;
 
 import java.util.HashMap;
 
-import static grakn.simulation.grakn.action.Model.EMAIL;
-import static grakn.simulation.grakn.action.Model.PARENTSHIP;
-import static grakn.simulation.grakn.action.Model.PARENTSHIP_CHILD;
-import static grakn.simulation.grakn.action.Model.PARENTSHIP_PARENT;
-import static grakn.simulation.grakn.action.Model.PERSON;
+import static grakn.benchmark.grakn.action.Model.EMAIL;
+import static grakn.benchmark.grakn.action.Model.PARENTSHIP;
+import static grakn.benchmark.grakn.action.Model.PARENTSHIP_CHILD;
+import static grakn.benchmark.grakn.action.Model.PARENTSHIP_PARENT;
+import static grakn.benchmark.grakn.action.Model.PERSON;
 
 public class GraknInsertParentShipAction extends InsertParentShipAction<GraknOperation, ConceptMap> {
     public GraknInsertParentShipAction(GraknOperation dbOperation, HashMap<SpouseType, String> marriage, String childEmail) {
@@ -60,16 +60,16 @@ public class GraknInsertParentShipAction extends InsertParentShipAction<GraknOpe
                 child.isa(PERSON).has(EMAIL, childEmail)
         ).insert(
                 parentship
-                    .rel(PARENTSHIP_PARENT, father)
-                    .rel(PARENTSHIP_PARENT, mother)
-                    .rel(PARENTSHIP_CHILD, child)
-                    .isa(PARENTSHIP)
+                        .rel(PARENTSHIP_PARENT, father)
+                        .rel(PARENTSHIP_PARENT, mother)
+                        .rel(PARENTSHIP_CHILD, child)
+                        .isa(PARENTSHIP)
         );
     }
 
     @Override
     protected HashMap<ComparableField, Object> outputForReport(ConceptMap answer) {
-        return new HashMap<ComparableField, Object> () {
+        return new HashMap<ComparableField, Object>() {
             {
                 put(InsertParentShipActionField.WIFE_EMAIL, dbOperation.getOnlyAttributeOfThing(answer, "mother", EMAIL));
                 put(InsertParentShipActionField.HUSBAND_EMAIL, dbOperation.getOnlyAttributeOfThing(answer, "father", EMAIL));

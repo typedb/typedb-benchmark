@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package grakn.simulation.common.yaml_tool;
+package grakn.benchmark.common.yaml_tool;
 
 public class YAMLException extends Exception {
     public YAMLException(String message) {

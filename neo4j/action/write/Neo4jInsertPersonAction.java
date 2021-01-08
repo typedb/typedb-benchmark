@@ -15,24 +15,24 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package grakn.simulation.neo4j.action.write;
+package grakn.benchmark.neo4j.action.write;
 
-import grakn.simulation.common.action.Action;
-import grakn.simulation.common.action.write.InsertPersonAction;
-import grakn.simulation.common.world.World;
-import grakn.simulation.neo4j.driver.Neo4jOperation;
+import grakn.benchmark.common.action.Action;
+import grakn.benchmark.common.action.write.InsertPersonAction;
+import grakn.benchmark.common.world.World;
+import grakn.benchmark.neo4j.driver.Neo4jOperation;
 import org.neo4j.driver.Query;
 import org.neo4j.driver.Record;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
 
-import static grakn.simulation.neo4j.action.Model.DATE_OF_BIRTH;
-import static grakn.simulation.neo4j.action.Model.EMAIL;
-import static grakn.simulation.neo4j.action.Model.FORENAME;
-import static grakn.simulation.neo4j.action.Model.GENDER;
-import static grakn.simulation.neo4j.action.Model.LOCATION_NAME;
-import static grakn.simulation.neo4j.action.Model.SURNAME;
+import static grakn.benchmark.neo4j.action.Model.DATE_OF_BIRTH;
+import static grakn.benchmark.neo4j.action.Model.EMAIL;
+import static grakn.benchmark.neo4j.action.Model.FORENAME;
+import static grakn.benchmark.neo4j.action.Model.GENDER;
+import static grakn.benchmark.neo4j.action.Model.LOCATION_NAME;
+import static grakn.benchmark.neo4j.action.Model.SURNAME;
 
 public class Neo4jInsertPersonAction extends InsertPersonAction<Neo4jOperation, Record> {
     public Neo4jInsertPersonAction(Neo4jOperation dbOperation, World.City city, LocalDateTime today, String email, String gender, String forename, String surname) {
@@ -41,7 +41,7 @@ public class Neo4jInsertPersonAction extends InsertPersonAction<Neo4jOperation, 
 
     @Override
     public Record run() {
-        HashMap<String, Object> parameters = new HashMap<String, Object>(){{
+        HashMap<String, Object> parameters = new HashMap<String, Object>() {{
             put(LOCATION_NAME, worldCity.name());
             put(EMAIL, email);
             put(DATE_OF_BIRTH, today);

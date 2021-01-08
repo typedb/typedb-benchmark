@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package grakn.simulation.config;
+package grakn.benchmark.config;
 
 import java.util.Arrays;
 import java.util.function.Function;
@@ -36,7 +36,7 @@ public enum SamplingFunction {
 
     public static SamplingFunction getByName(String name) {
         for (SamplingFunction samplingFunction : SamplingFunction.values()) {
-            if(samplingFunction.getName().equals(name)) {
+            if (samplingFunction.getName().equals(name)) {
                 return samplingFunction;
             }
         }
@@ -62,7 +62,7 @@ public enum SamplingFunction {
                 return i -> ((int) Math.log(i) / Math.log(arg) % 1) == 0;
             default:
                 throw new IllegalArgumentException(String.format("Function not available, possible functions are %s",
-                        Arrays.stream(SamplingFunction.values()).map(Enum::name).collect(Collectors.toSet())));
+                                                                 Arrays.stream(SamplingFunction.values()).map(Enum::name).collect(Collectors.toSet())));
         }
     }
 }

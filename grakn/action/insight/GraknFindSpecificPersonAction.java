@@ -15,17 +15,17 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package grakn.simulation.grakn.action.insight;
+package grakn.benchmark.grakn.action.insight;
 
-import grakn.simulation.common.action.insight.FindSpecificPersonAction;
-import grakn.simulation.grakn.driver.GraknOperation;
+import grakn.benchmark.common.action.insight.FindSpecificPersonAction;
+import grakn.benchmark.grakn.driver.GraknOperation;
 import graql.lang.Graql;
 import graql.lang.query.GraqlMatch;
 
 import java.util.stream.Collectors;
 
-import static grakn.simulation.grakn.action.Model.EMAIL;
-import static grakn.simulation.grakn.action.Model.PERSON;
+import static grakn.benchmark.grakn.action.Model.EMAIL;
+import static grakn.benchmark.grakn.action.Model.PERSON;
 
 public class GraknFindSpecificPersonAction extends FindSpecificPersonAction<GraknOperation> {
     public GraknFindSpecificPersonAction(GraknOperation dbOperation) {
@@ -39,8 +39,8 @@ public class GraknFindSpecificPersonAction extends FindSpecificPersonAction<Grak
 
     public static GraqlMatch.Unfiltered query() {
         return Graql.match(
-                    Graql.var(PERSON).isa(PERSON).has(EMAIL, Graql.var(EMAIL)),
-                    Graql.var(EMAIL).eq(PERSON_EMAIL_FOR_QUERY).isa(EMAIL)
-            );
+                Graql.var(PERSON).isa(PERSON).has(EMAIL, Graql.var(EMAIL)),
+                Graql.var(EMAIL).eq(PERSON_EMAIL_FOR_QUERY).isa(EMAIL)
+        );
     }
 }

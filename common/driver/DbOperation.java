@@ -15,9 +15,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package grakn.simulation.common.driver;
+package grakn.benchmark.common.driver;
 
-import grakn.simulation.common.utils.Trace;
+import grakn.benchmark.common.utils.Trace;
 
 import java.util.function.Supplier;
 
@@ -34,6 +34,7 @@ public abstract class DbOperation implements AutoCloseable {
     }
 
     public abstract void close();
+
     public abstract void save();
 
     protected <T> T trace(Supplier<T> method, String traceName) {

@@ -15,19 +15,19 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package grakn.simulation.neo4j.action.read;
+package grakn.benchmark.neo4j.action.read;
 
-import grakn.simulation.common.action.read.UnmarriedPeopleInCityAction;
-import grakn.simulation.common.world.World;
-import grakn.simulation.neo4j.driver.Neo4jOperation;
+import grakn.benchmark.common.action.read.UnmarriedPeopleInCityAction;
+import grakn.benchmark.common.world.World;
+import grakn.benchmark.neo4j.driver.Neo4jOperation;
 import org.neo4j.driver.Query;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 
-import static grakn.simulation.neo4j.action.Model.GENDER;
-import static grakn.simulation.neo4j.action.Model.LOCATION_NAME;
+import static grakn.benchmark.neo4j.action.Model.GENDER;
+import static grakn.benchmark.neo4j.action.Model.LOCATION_NAME;
 
 public class Neo4jUnmarriedPeopleInCityAction extends UnmarriedPeopleInCityAction<Neo4jOperation> {
     public Neo4jUnmarriedPeopleInCityAction(Neo4jOperation dbOperation, World.City city, String gender, LocalDateTime dobOfAdults) {
@@ -36,7 +36,7 @@ public class Neo4jUnmarriedPeopleInCityAction extends UnmarriedPeopleInCityActio
 
     @Override
     public List<String> run() {
-        HashMap<String, Object> parameters = new HashMap<String, Object>(){{
+        HashMap<String, Object> parameters = new HashMap<String, Object>() {{
             put(LOCATION_NAME, city.name());
             put(GENDER, gender);
             put("dobOfAdults", dobOfAdults);

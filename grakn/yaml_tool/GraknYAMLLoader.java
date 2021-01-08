@@ -15,11 +15,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package grakn.simulation.grakn.yaml_tool;
+package grakn.benchmark.grakn.yaml_tool;
 
+import grakn.benchmark.common.yaml_tool.QueryTemplate;
+import grakn.benchmark.common.yaml_tool.YAMLLoader;
 import grakn.client.Grakn;
-import grakn.simulation.common.yaml_tool.QueryTemplate;
-import grakn.simulation.common.yaml_tool.YAMLLoader;
 import graql.lang.Graql;
 import graql.lang.query.GraqlInsert;
 import org.apache.commons.csv.CSVParser;

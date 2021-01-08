@@ -15,11 +15,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package grakn.simulation.neo4j.action.read;
+package grakn.benchmark.neo4j.action.read;
 
-import grakn.simulation.common.action.read.ResidentsInCityAction;
-import grakn.simulation.common.world.World;
-import grakn.simulation.neo4j.driver.Neo4jOperation;
+import grakn.benchmark.common.action.read.ResidentsInCityAction;
+import grakn.benchmark.common.world.World;
+import grakn.benchmark.neo4j.driver.Neo4jOperation;
 import org.neo4j.driver.Query;
 
 import java.time.LocalDateTime;
@@ -35,7 +35,7 @@ public class Neo4jResidentsInCityAction extends ResidentsInCityAction<Neo4jOpera
     @Override
     public List<String> run() {
         String template = query();
-        HashMap<String, Object> parameters = new HashMap<String, Object>(){{
+        HashMap<String, Object> parameters = new HashMap<String, Object>() {{
             put("locationName", city.name());
             put("earliestDate", earliestDate);
         }};

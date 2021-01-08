@@ -15,34 +15,34 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package grakn.simulation.grakn.action.write;
+package grakn.benchmark.grakn.action.write;
 
+import grakn.benchmark.common.action.write.InsertTransactionAction;
+import grakn.benchmark.common.world.World;
+import grakn.benchmark.grakn.driver.GraknOperation;
 import grakn.client.concept.answer.ConceptMap;
 import grakn.common.collection.Pair;
-import grakn.simulation.common.action.write.InsertTransactionAction;
-import grakn.simulation.common.world.World;
-import grakn.simulation.grakn.driver.GraknOperation;
 import graql.lang.Graql;
 import graql.lang.query.GraqlInsert;
 
 import java.util.HashMap;
 
-import static grakn.simulation.grakn.action.Model.COMPANY;
-import static grakn.simulation.grakn.action.Model.COMPANY_NUMBER;
-import static grakn.simulation.grakn.action.Model.COUNTRY;
-import static grakn.simulation.grakn.action.Model.IS_TAXABLE;
-import static grakn.simulation.grakn.action.Model.LOCATES;
-import static grakn.simulation.grakn.action.Model.LOCATES_LOCATED;
-import static grakn.simulation.grakn.action.Model.LOCATES_LOCATION;
-import static grakn.simulation.grakn.action.Model.LOCATION_NAME;
-import static grakn.simulation.grakn.action.Model.PRODUCT;
-import static grakn.simulation.grakn.action.Model.PRODUCT_BARCODE;
-import static grakn.simulation.grakn.action.Model.PRODUCT_QUANTITY;
-import static grakn.simulation.grakn.action.Model.TRANSACTION;
-import static grakn.simulation.grakn.action.Model.TRANSACTION_BUYER;
-import static grakn.simulation.grakn.action.Model.TRANSACTION_MERCHANDISE;
-import static grakn.simulation.grakn.action.Model.TRANSACTION_SELLER;
-import static grakn.simulation.grakn.action.Model.VALUE;
+import static grakn.benchmark.grakn.action.Model.COMPANY;
+import static grakn.benchmark.grakn.action.Model.COMPANY_NUMBER;
+import static grakn.benchmark.grakn.action.Model.COUNTRY;
+import static grakn.benchmark.grakn.action.Model.IS_TAXABLE;
+import static grakn.benchmark.grakn.action.Model.LOCATES;
+import static grakn.benchmark.grakn.action.Model.LOCATES_LOCATED;
+import static grakn.benchmark.grakn.action.Model.LOCATES_LOCATION;
+import static grakn.benchmark.grakn.action.Model.LOCATION_NAME;
+import static grakn.benchmark.grakn.action.Model.PRODUCT;
+import static grakn.benchmark.grakn.action.Model.PRODUCT_BARCODE;
+import static grakn.benchmark.grakn.action.Model.PRODUCT_QUANTITY;
+import static grakn.benchmark.grakn.action.Model.TRANSACTION;
+import static grakn.benchmark.grakn.action.Model.TRANSACTION_BUYER;
+import static grakn.benchmark.grakn.action.Model.TRANSACTION_MERCHANDISE;
+import static grakn.benchmark.grakn.action.Model.TRANSACTION_SELLER;
+import static grakn.benchmark.grakn.action.Model.VALUE;
 
 public class GraknInsertTransactionAction extends InsertTransactionAction<GraknOperation, ConceptMap> {
 
@@ -58,30 +58,30 @@ public class GraknInsertTransactionAction extends InsertTransactionAction<GraknO
 
     public static GraqlInsert query(Pair<Long, Long> transaction, Long sellerCompanyNumber, String countryName, double value, int productQuantity, boolean isTaxable) {
         return Graql.match(
-                    Graql.var(PRODUCT)
-                            .isa(PRODUCT)
-                            .has(PRODUCT_BARCODE, transaction.second()),
-                    Graql.var("c-buyer").isa(COMPANY)
-                            .has(COMPANY_NUMBER, transaction.first()),
-                    Graql.var("c-seller").isa(COMPANY)
-                            .has(COMPANY_NUMBER, sellerCompanyNumber),
-                    Graql.var(COUNTRY).isa(COUNTRY)
-                            .has(LOCATION_NAME, countryName))
-                    .insert(
-                            Graql.var(TRANSACTION)
-                                    .rel(TRANSACTION_SELLER, Graql.var("c-seller"))
-                                    .rel(TRANSACTION_BUYER, Graql.var("c-buyer"))
-                                    .rel(TRANSACTION_MERCHANDISE, Graql.var(PRODUCT))
-                                    .isa(TRANSACTION)
-    //                                .has(CURRENCY)  // TODO Add currency https://github.com/graknlabs/simulation/issues/31
-                                    .has(VALUE, value)
-                                    .has(PRODUCT_QUANTITY, productQuantity)
-                                    .has(IS_TAXABLE, isTaxable),
-                            Graql.var(LOCATES)
-                                    .rel(LOCATES_LOCATION, Graql.var(COUNTRY))
-                                    .rel(LOCATES_LOCATED, Graql.var(TRANSACTION))
-                                    .isa(LOCATES)
-                    );
+                Graql.var(PRODUCT)
+                        .isa(PRODUCT)
+                        .has(PRODUCT_BARCODE, transaction.second()),
+                Graql.var("c-buyer").isa(COMPANY)
+                        .has(COMPANY_NUMBER, transaction.first()),
+                Graql.var("c-seller").isa(COMPANY)
+                        .has(COMPANY_NUMBER, sellerCompanyNumber),
+                Graql.var(COUNTRY).isa(COUNTRY)
+                        .has(LOCATION_NAME, countryName))
+                .insert(
+                        Graql.var(TRANSACTION)
+                                .rel(TRANSACTION_SELLER, Graql.var("c-seller"))
+                                .rel(TRANSACTION_BUYER, Graql.var("c-buyer"))
+                                .rel(TRANSACTION_MERCHANDISE, Graql.var(PRODUCT))
+                                .isa(TRANSACTION)
+                                //                                .has(CURRENCY)  // TODO Add currency https://github.com/graknlabs/simulation/issues/31
+                                .has(VALUE, value)
+                                .has(PRODUCT_QUANTITY, productQuantity)
+                                .has(IS_TAXABLE, isTaxable),
+                        Graql.var(LOCATES)
+                                .rel(LOCATES_LOCATION, Graql.var(COUNTRY))
+                                .rel(LOCATES_LOCATED, Graql.var(TRANSACTION))
+                                .isa(LOCATES)
+                );
     }
 
     @Override

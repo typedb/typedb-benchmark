@@ -15,15 +15,15 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package grakn.simulation.common.agent.write;
+package grakn.benchmark.common.agent.write;
 
-import grakn.simulation.common.agent.base.SimulationContext;
-import grakn.simulation.common.action.ActionFactory;
-import grakn.simulation.common.agent.region.CityAgent;
-import grakn.simulation.common.driver.DbDriver;
-import grakn.simulation.common.driver.DbOperation;
-import grakn.simulation.common.driver.DbOperationFactory;
-import grakn.simulation.common.world.World;
+import grakn.benchmark.common.action.ActionFactory;
+import grakn.benchmark.common.agent.base.SimulationContext;
+import grakn.benchmark.common.agent.region.CityAgent;
+import grakn.benchmark.common.driver.DbDriver;
+import grakn.benchmark.common.driver.DbOperation;
+import grakn.benchmark.common.driver.DbOperationFactory;
+import grakn.benchmark.common.world.World;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -63,6 +63,10 @@ public class MarriageAgent<DB_OPERATION extends DbOperation> extends CityAgent<D
             }
 
             int numMarriagesPossible = Math.min(simulationContext.world().getScaleFactor(), Math.min(womenEmails.size(), menEmails.size()));
+            if (iteration() >= 5) {
+                System.out.println("asdf");
+                assert true;
+            }
             try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker(), iteration(), trace())) {
                 if (numMarriagesPossible > 0) {
                     for (int i = 0; i < numMarriagesPossible; i++) {

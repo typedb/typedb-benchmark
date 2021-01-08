@@ -15,18 +15,18 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package grakn.simulation.neo4j.action.write;
+package grakn.benchmark.neo4j.action.write;
 
-import grakn.simulation.common.action.Action;
-import grakn.simulation.common.action.SpouseType;
-import grakn.simulation.common.action.write.InsertParentShipAction;
-import grakn.simulation.neo4j.driver.Neo4jOperation;
+import grakn.benchmark.common.action.Action;
+import grakn.benchmark.common.action.SpouseType;
+import grakn.benchmark.common.action.write.InsertParentShipAction;
+import grakn.benchmark.neo4j.driver.Neo4jOperation;
 import org.neo4j.driver.Query;
 import org.neo4j.driver.Record;
 
 import java.util.HashMap;
 
-import static grakn.simulation.neo4j.action.Model.EMAIL;
+import static grakn.benchmark.neo4j.action.Model.EMAIL;
 
 public class Neo4jInsertParentShipAction extends InsertParentShipAction<Neo4jOperation, Record> {
     public Neo4jInsertParentShipAction(Neo4jOperation dbOperation, HashMap<SpouseType, String> marriage, String childEmail) {
@@ -35,7 +35,7 @@ public class Neo4jInsertParentShipAction extends InsertParentShipAction<Neo4jOpe
 
     @Override
     public Record run() {
-        HashMap<String, Object> parameters = new HashMap<String, Object>(){{
+        HashMap<String, Object> parameters = new HashMap<String, Object>() {{
             put("motherEmail", marriage.get(SpouseType.WIFE));
             put("fatherEmail", marriage.get(SpouseType.HUSBAND));
             put("childEmail", childEmail);
@@ -52,7 +52,7 @@ public class Neo4jInsertParentShipAction extends InsertParentShipAction<Neo4jOpe
 
     @Override
     protected HashMap<ComparableField, Object> outputForReport(Record answer) {
-        return new HashMap<ComparableField, Object> () {
+        return new HashMap<ComparableField, Object>() {
             {
                 put(InsertParentShipActionField.WIFE_EMAIL, answer.asMap().get("mother." + EMAIL));
                 put(InsertParentShipActionField.HUSBAND_EMAIL, answer.asMap().get("father." + EMAIL));

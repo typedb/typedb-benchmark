@@ -15,66 +15,66 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package grakn.simulation.grakn.action;
+package grakn.benchmark.grakn.action;
 
+import grakn.benchmark.common.action.ActionFactory;
+import grakn.benchmark.common.action.SpouseType;
+import grakn.benchmark.common.action.insight.ArbitraryOneHopAction;
+import grakn.benchmark.common.action.insight.FindCurrentResidentsAction;
+import grakn.benchmark.common.action.insight.FindLivedInAction;
+import grakn.benchmark.common.action.insight.FindSpecificMarriageAction;
+import grakn.benchmark.common.action.insight.FindSpecificPersonAction;
+import grakn.benchmark.common.action.insight.FindTransactionCurrencyAction;
+import grakn.benchmark.common.action.insight.FourHopAction;
+import grakn.benchmark.common.action.insight.MeanWageOfPeopleInWorldAction;
+import grakn.benchmark.common.action.insight.ThreeHopAction;
+import grakn.benchmark.common.action.insight.TwoHopAction;
+import grakn.benchmark.common.action.read.BirthsInCityAction;
+import grakn.benchmark.common.action.read.CitiesInContinentAction;
+import grakn.benchmark.common.action.read.MarriedCoupleAction;
+import grakn.benchmark.common.action.read.ProductsInContinentAction;
+import grakn.benchmark.common.action.read.UnmarriedPeopleInCityAction;
+import grakn.benchmark.common.action.write.InsertCompanyAction;
+import grakn.benchmark.common.action.write.InsertEmploymentAction;
+import grakn.benchmark.common.action.write.InsertFriendshipAction;
+import grakn.benchmark.common.action.write.InsertMarriageAction;
+import grakn.benchmark.common.action.write.InsertParentShipAction;
+import grakn.benchmark.common.action.write.InsertPersonAction;
+import grakn.benchmark.common.action.write.InsertProductAction;
+import grakn.benchmark.common.action.write.InsertRelocationAction;
+import grakn.benchmark.common.action.write.InsertTransactionAction;
+import grakn.benchmark.common.action.write.UpdateAgesOfPeopleInCityAction;
+import grakn.benchmark.common.world.World;
+import grakn.benchmark.grakn.action.insight.GraknArbitraryOneHopAction;
+import grakn.benchmark.grakn.action.insight.GraknFindCurrentResidentsAction;
+import grakn.benchmark.grakn.action.insight.GraknFindLivedInAction;
+import grakn.benchmark.grakn.action.insight.GraknFindSpecificMarriageAction;
+import grakn.benchmark.grakn.action.insight.GraknFindSpecificPersonAction;
+import grakn.benchmark.grakn.action.insight.GraknFindTransactionCurrencyAction;
+import grakn.benchmark.grakn.action.insight.GraknFourHopAction;
+import grakn.benchmark.grakn.action.insight.GraknMeanWageOfPeopleInWorldAction;
+import grakn.benchmark.grakn.action.insight.GraknThreeHopAction;
+import grakn.benchmark.grakn.action.insight.GraknTwoHopAction;
+import grakn.benchmark.grakn.action.read.GraknBirthsInCityAction;
+import grakn.benchmark.grakn.action.read.GraknCitiesInContinentAction;
+import grakn.benchmark.grakn.action.read.GraknCompaniesInCountryAction;
+import grakn.benchmark.grakn.action.read.GraknMarriedCoupleAction;
+import grakn.benchmark.grakn.action.read.GraknProductsInContinentAction;
+import grakn.benchmark.grakn.action.read.GraknResidentsInCityAction;
+import grakn.benchmark.grakn.action.read.GraknUnmarriedPeopleInCityAction;
+import grakn.benchmark.grakn.action.write.GraknInsertCompanyAction;
+import grakn.benchmark.grakn.action.write.GraknInsertEmploymentAction;
+import grakn.benchmark.grakn.action.write.GraknInsertFriendshipAction;
+import grakn.benchmark.grakn.action.write.GraknInsertMarriageAction;
+import grakn.benchmark.grakn.action.write.GraknInsertParentShipAction;
+import grakn.benchmark.grakn.action.write.GraknInsertPersonAction;
+import grakn.benchmark.grakn.action.write.GraknInsertProductAction;
+import grakn.benchmark.grakn.action.write.GraknInsertRelocationAction;
+import grakn.benchmark.grakn.action.write.GraknInsertTransactionAction;
+import grakn.benchmark.grakn.action.write.GraknUpdateAgesOfPeopleInCityAction;
+import grakn.benchmark.grakn.driver.GraknOperation;
 import grakn.client.concept.answer.ConceptMap;
 import grakn.common.collection.Pair;
-import grakn.simulation.common.action.ActionFactory;
-import grakn.simulation.common.action.SpouseType;
-import grakn.simulation.common.action.read.BirthsInCityAction;
-import grakn.simulation.common.action.read.CitiesInContinentAction;
-import grakn.simulation.common.action.insight.FindCurrentResidentsAction;
-import grakn.simulation.common.action.insight.FindLivedInAction;
-import grakn.simulation.common.action.insight.FindSpecificMarriageAction;
-import grakn.simulation.common.action.insight.FindSpecificPersonAction;
-import grakn.simulation.common.action.insight.FindTransactionCurrencyAction;
-import grakn.simulation.common.action.insight.FourHopAction;
-import grakn.simulation.common.action.insight.ArbitraryOneHopAction;
-import grakn.simulation.common.action.read.MarriedCoupleAction;
-import grakn.simulation.common.action.insight.MeanWageOfPeopleInWorldAction;
-import grakn.simulation.common.action.read.ProductsInContinentAction;
-import grakn.simulation.common.action.insight.ThreeHopAction;
-import grakn.simulation.common.action.insight.TwoHopAction;
-import grakn.simulation.common.action.read.UnmarriedPeopleInCityAction;
-import grakn.simulation.common.action.write.UpdateAgesOfPeopleInCityAction;
-import grakn.simulation.common.action.write.InsertCompanyAction;
-import grakn.simulation.common.action.write.InsertEmploymentAction;
-import grakn.simulation.common.action.write.InsertFriendshipAction;
-import grakn.simulation.common.action.write.InsertMarriageAction;
-import grakn.simulation.common.action.write.InsertParentShipAction;
-import grakn.simulation.common.action.write.InsertPersonAction;
-import grakn.simulation.common.action.write.InsertProductAction;
-import grakn.simulation.common.action.write.InsertRelocationAction;
-import grakn.simulation.common.action.write.InsertTransactionAction;
-import grakn.simulation.common.world.World;
-import grakn.simulation.grakn.action.read.GraknBirthsInCityAction;
-import grakn.simulation.grakn.action.read.GraknCitiesInContinentAction;
-import grakn.simulation.grakn.action.read.GraknCompaniesInCountryAction;
-import grakn.simulation.grakn.action.insight.GraknFindCurrentResidentsAction;
-import grakn.simulation.grakn.action.insight.GraknFindLivedInAction;
-import grakn.simulation.grakn.action.insight.GraknFindSpecificMarriageAction;
-import grakn.simulation.grakn.action.insight.GraknFindSpecificPersonAction;
-import grakn.simulation.grakn.action.insight.GraknFindTransactionCurrencyAction;
-import grakn.simulation.grakn.action.insight.GraknFourHopAction;
-import grakn.simulation.grakn.action.insight.GraknArbitraryOneHopAction;
-import grakn.simulation.grakn.action.read.GraknMarriedCoupleAction;
-import grakn.simulation.grakn.action.insight.GraknMeanWageOfPeopleInWorldAction;
-import grakn.simulation.grakn.action.read.GraknProductsInContinentAction;
-import grakn.simulation.grakn.action.read.GraknResidentsInCityAction;
-import grakn.simulation.grakn.action.insight.GraknThreeHopAction;
-import grakn.simulation.grakn.action.insight.GraknTwoHopAction;
-import grakn.simulation.grakn.action.read.GraknUnmarriedPeopleInCityAction;
-import grakn.simulation.grakn.action.write.GraknUpdateAgesOfPeopleInCityAction;
-import grakn.simulation.grakn.action.write.GraknInsertCompanyAction;
-import grakn.simulation.grakn.action.write.GraknInsertEmploymentAction;
-import grakn.simulation.grakn.action.write.GraknInsertFriendshipAction;
-import grakn.simulation.grakn.action.write.GraknInsertMarriageAction;
-import grakn.simulation.grakn.action.write.GraknInsertParentShipAction;
-import grakn.simulation.grakn.action.write.GraknInsertPersonAction;
-import grakn.simulation.grakn.action.write.GraknInsertProductAction;
-import grakn.simulation.grakn.action.write.GraknInsertRelocationAction;
-import grakn.simulation.grakn.action.write.GraknInsertTransactionAction;
-import grakn.simulation.grakn.driver.GraknOperation;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -150,7 +150,7 @@ public class GraknActionFactory extends ActionFactory<GraknOperation, ConceptMap
     public InsertRelocationAction<GraknOperation, ConceptMap> insertRelocationAction(GraknOperation dbOperation, World.City city, LocalDateTime today, String residentEmail, String relocationCityName) {
         return new GraknInsertRelocationAction(dbOperation, city, today, residentEmail, relocationCityName);
     }
-    
+
     @Override
     public ProductsInContinentAction<GraknOperation> productsInContinentAction(GraknOperation dbOperation, World.Continent continent) {
         return new GraknProductsInContinentAction(dbOperation, continent);

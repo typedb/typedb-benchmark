@@ -15,18 +15,18 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package grakn.simulation.neo4j;
+package grakn.benchmark.neo4j;
 
-import grakn.simulation.common.TransactionalSimulation;
-import grakn.simulation.common.action.ActionFactory;
-import grakn.simulation.common.world.World;
-import grakn.simulation.common.yaml_tool.YAMLException;
-import grakn.simulation.common.yaml_tool.YAMLLoader;
-import grakn.simulation.config.Config;
-import grakn.simulation.neo4j.action.Neo4jActionFactory;
-import grakn.simulation.neo4j.driver.Neo4jDriver;
-import grakn.simulation.neo4j.driver.Neo4jOperation;
-import grakn.simulation.neo4j.yaml_tool.Neo4jYAMLLoader;
+import grakn.benchmark.common.TransactionalSimulation;
+import grakn.benchmark.common.action.ActionFactory;
+import grakn.benchmark.common.world.World;
+import grakn.benchmark.common.yaml_tool.YAMLException;
+import grakn.benchmark.common.yaml_tool.YAMLLoader;
+import grakn.benchmark.config.Config;
+import grakn.benchmark.neo4j.action.Neo4jActionFactory;
+import grakn.benchmark.neo4j.driver.Neo4jDriver;
+import grakn.benchmark.neo4j.driver.Neo4jOperation;
+import grakn.benchmark.neo4j.yaml_tool.Neo4jYAMLLoader;
 import org.neo4j.driver.Query;
 import org.neo4j.driver.Session;
 import org.neo4j.driver.Transaction;
@@ -67,6 +67,7 @@ public class Neo4jSimulation extends TransactionalSimulation<Neo4jDriver, Neo4jO
      * Neo4j Community can create only uniqueness constraints, and only on nodes, not relationships. This means that it
      * does not enforce the existence of a property on those nodes. `exists()` is only available in Neo4j Enterprise.
      * https://neo4j.com/developer/kb/how-to-implement-a-primary-key-property-for-a-label/
+     *
      * @param session
      */
     private void addKeyConstraints(Session session) {

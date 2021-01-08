@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package grakn.simulation.common.driver;
+package grakn.benchmark.common.driver;
 
 public abstract class TransactionalDbOperation extends DbOperation implements AutoCloseable {
     public TransactionalDbOperation(String tracker, long iteration, boolean trace) {

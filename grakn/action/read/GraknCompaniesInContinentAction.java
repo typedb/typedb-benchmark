@@ -15,25 +15,25 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package grakn.simulation.grakn.action.read;
+package grakn.benchmark.grakn.action.read;
 
-import grakn.simulation.common.action.read.CompaniesInContinentAction;
-import grakn.simulation.common.world.World;
-import grakn.simulation.grakn.driver.GraknOperation;
+import grakn.benchmark.common.action.read.CompaniesInContinentAction;
+import grakn.benchmark.common.world.World;
+import grakn.benchmark.grakn.driver.GraknOperation;
 import graql.lang.Graql;
 import graql.lang.query.GraqlMatch;
 
 import java.util.List;
 
-import static grakn.simulation.grakn.action.Model.COMPANY;
-import static grakn.simulation.grakn.action.Model.COMPANY_NUMBER;
-import static grakn.simulation.grakn.action.Model.CONTINENT;
-import static grakn.simulation.grakn.action.Model.COUNTRY;
-import static grakn.simulation.grakn.action.Model.INCORPORATION;
-import static grakn.simulation.grakn.action.Model.INCORPORATION_INCORPORATED;
-import static grakn.simulation.grakn.action.Model.INCORPORATION_INCORPORATING;
-import static grakn.simulation.grakn.action.Model.LOCATION_HIERARCHY;
-import static grakn.simulation.grakn.action.Model.LOCATION_NAME;
+import static grakn.benchmark.grakn.action.Model.COMPANY;
+import static grakn.benchmark.grakn.action.Model.COMPANY_NUMBER;
+import static grakn.benchmark.grakn.action.Model.CONTINENT;
+import static grakn.benchmark.grakn.action.Model.COUNTRY;
+import static grakn.benchmark.grakn.action.Model.INCORPORATION;
+import static grakn.benchmark.grakn.action.Model.INCORPORATION_INCORPORATED;
+import static grakn.benchmark.grakn.action.Model.INCORPORATION_INCORPORATING;
+import static grakn.benchmark.grakn.action.Model.LOCATION_HIERARCHY;
+import static grakn.benchmark.grakn.action.Model.LOCATION_NAME;
 
 public class GraknCompaniesInContinentAction extends CompaniesInContinentAction<GraknOperation> {
     public GraknCompaniesInContinentAction(GraknOperation dbOperation, World.Continent continent) {
@@ -48,16 +48,16 @@ public class GraknCompaniesInContinentAction extends CompaniesInContinentAction<
 
     public static GraqlMatch.Unfiltered query(String continentName) {
         return Graql.match(
-                    Graql.var(CONTINENT).isa(CONTINENT)
-                            .has(LOCATION_NAME, continentName),
-                    Graql.var(LOCATION_HIERARCHY).rel(COUNTRY).rel(CONTINENT).isa(LOCATION_HIERARCHY),
-                    Graql.var(COUNTRY).isa(COUNTRY),
-                    Graql.var(COMPANY).isa(COMPANY)
-                            .has(COMPANY_NUMBER, Graql.var(COMPANY_NUMBER)),
-                    Graql.var(INCORPORATION)
-                            .rel(INCORPORATION_INCORPORATED, Graql.var(COMPANY))
-                            .rel(INCORPORATION_INCORPORATING, Graql.var(COUNTRY))
-                            .isa(INCORPORATION)
-            );
+                Graql.var(CONTINENT).isa(CONTINENT)
+                        .has(LOCATION_NAME, continentName),
+                Graql.var(LOCATION_HIERARCHY).rel(COUNTRY).rel(CONTINENT).isa(LOCATION_HIERARCHY),
+                Graql.var(COUNTRY).isa(COUNTRY),
+                Graql.var(COMPANY).isa(COMPANY)
+                        .has(COMPANY_NUMBER, Graql.var(COMPANY_NUMBER)),
+                Graql.var(INCORPORATION)
+                        .rel(INCORPORATION_INCORPORATED, Graql.var(COMPANY))
+                        .rel(INCORPORATION_INCORPORATING, Graql.var(COUNTRY))
+                        .isa(INCORPORATION)
+        );
     }
 }

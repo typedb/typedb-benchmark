@@ -15,18 +15,18 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package grakn.simulation.grakn.action.insight;
+package grakn.benchmark.grakn.action.insight;
 
+import grakn.benchmark.common.action.insight.ArbitraryOneHopAction;
+import grakn.benchmark.grakn.driver.GraknOperation;
 import grakn.client.concept.answer.ConceptMap;
-import grakn.simulation.common.action.insight.ArbitraryOneHopAction;
-import grakn.simulation.grakn.driver.GraknOperation;
 import graql.lang.Graql;
 import graql.lang.query.GraqlMatch;
 
 import java.util.List;
 
-import static grakn.simulation.grakn.action.Model.EMAIL;
-import static grakn.simulation.grakn.action.Model.PERSON;
+import static grakn.benchmark.grakn.action.Model.EMAIL;
+import static grakn.benchmark.grakn.action.Model.PERSON;
 
 public class GraknArbitraryOneHopAction extends ArbitraryOneHopAction<GraknOperation> {
     public GraknArbitraryOneHopAction(GraknOperation dbOperation) {
@@ -41,8 +41,8 @@ public class GraknArbitraryOneHopAction extends ArbitraryOneHopAction<GraknOpera
 
     public static GraqlMatch.Filtered query() {
         return Graql.match(
-                    Graql.var(PERSON).isa(PERSON).has(EMAIL, PERSON_EMAIL_FOR_QUERY),
-                    Graql.var().rel(Graql.var(PERSON)).rel(Graql.var("x"))
-            ).get("x");
+                Graql.var(PERSON).isa(PERSON).has(EMAIL, PERSON_EMAIL_FOR_QUERY),
+                Graql.var().rel(Graql.var(PERSON)).rel(Graql.var("x"))
+        ).get("x");
     }
 }

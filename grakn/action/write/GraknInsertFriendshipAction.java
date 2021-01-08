@@ -15,12 +15,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package grakn.simulation.grakn.action.write;
+package grakn.benchmark.grakn.action.write;
 
+import grakn.benchmark.common.action.Action;
+import grakn.benchmark.common.action.write.InsertFriendshipAction;
+import grakn.benchmark.grakn.driver.GraknOperation;
 import grakn.client.concept.answer.ConceptMap;
-import grakn.simulation.common.action.Action;
-import grakn.simulation.common.action.write.InsertFriendshipAction;
-import grakn.simulation.grakn.driver.GraknOperation;
 import graql.lang.Graql;
 import graql.lang.pattern.variable.ThingVariable;
 import graql.lang.pattern.variable.UnboundVariable;
@@ -29,11 +29,11 @@ import graql.lang.query.GraqlInsert;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 
-import static grakn.simulation.grakn.action.Model.EMAIL;
-import static grakn.simulation.grakn.action.Model.FRIENDSHIP;
-import static grakn.simulation.grakn.action.Model.FRIENDSHIP_FRIEND;
-import static grakn.simulation.grakn.action.Model.PERSON;
-import static grakn.simulation.grakn.action.Model.START_DATE;
+import static grakn.benchmark.grakn.action.Model.EMAIL;
+import static grakn.benchmark.grakn.action.Model.FRIENDSHIP;
+import static grakn.benchmark.grakn.action.Model.FRIENDSHIP_FRIEND;
+import static grakn.benchmark.grakn.action.Model.PERSON;
+import static grakn.benchmark.grakn.action.Model.START_DATE;
 
 public class GraknInsertFriendshipAction extends InsertFriendshipAction<GraknOperation, ConceptMap> {
 

@@ -15,16 +15,16 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package grakn.simulation.grakn.action.insight;
+package grakn.benchmark.grakn.action.insight;
 
-import grakn.simulation.common.action.insight.MeanWageOfPeopleInWorldAction;
-import grakn.simulation.grakn.driver.GraknOperation;
+import grakn.benchmark.common.action.insight.MeanWageOfPeopleInWorldAction;
+import grakn.benchmark.grakn.driver.GraknOperation;
 import graql.lang.Graql;
 import graql.lang.pattern.variable.UnboundVariable;
 import graql.lang.query.GraqlMatch;
 
-import static grakn.simulation.grakn.action.Model.WAGE;
-import static grakn.simulation.grakn.action.Model.WAGE_VALUE;
+import static grakn.benchmark.grakn.action.Model.WAGE;
+import static grakn.benchmark.grakn.action.Model.WAGE_VALUE;
 
 public class GraknMeanWageOfPeopleInWorldAction extends MeanWageOfPeopleInWorldAction<GraknOperation> {
     public GraknMeanWageOfPeopleInWorldAction(GraknOperation dbOperation) {

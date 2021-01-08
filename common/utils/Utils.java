@@ -1,4 +1,4 @@
-package grakn.simulation.common.utils;
+package grakn.benchmark.common.utils;
 
 import grakn.common.collection.Pair;
 

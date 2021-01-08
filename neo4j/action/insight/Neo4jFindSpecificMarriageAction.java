@@ -15,10 +15,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package grakn.simulation.neo4j.action.insight;
+package grakn.benchmark.neo4j.action.insight;
 
-import grakn.simulation.common.action.insight.FindSpecificMarriageAction;
-import grakn.simulation.neo4j.driver.Neo4jOperation;
+import grakn.benchmark.common.action.insight.FindSpecificMarriageAction;
+import grakn.benchmark.neo4j.driver.Neo4jOperation;
 import org.neo4j.driver.Query;
 
 import java.util.stream.Collectors;

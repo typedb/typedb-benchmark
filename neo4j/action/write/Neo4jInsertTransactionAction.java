@@ -15,13 +15,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package grakn.simulation.neo4j.action.write;
+package grakn.benchmark.neo4j.action.write;
 
+import grakn.benchmark.common.action.write.InsertTransactionAction;
+import grakn.benchmark.common.world.World;
+import grakn.benchmark.neo4j.action.Model;
+import grakn.benchmark.neo4j.driver.Neo4jOperation;
 import grakn.common.collection.Pair;
-import grakn.simulation.common.action.write.InsertTransactionAction;
-import grakn.simulation.common.world.World;
-import grakn.simulation.neo4j.driver.Neo4jOperation;
-import grakn.simulation.neo4j.action.Model;
 import org.neo4j.driver.Query;
 import org.neo4j.driver.Record;
 
@@ -35,7 +35,7 @@ public class Neo4jInsertTransactionAction extends InsertTransactionAction<Neo4jO
 
     @Override
     public Record run() {
-        HashMap<String, Object> parameters = new HashMap<String, Object>(){{
+        HashMap<String, Object> parameters = new HashMap<String, Object>() {{
             put("barcode", transaction.second());
             put("buyerNumber", transaction.first());
             put("sellerNumber", sellerCompanyNumber);

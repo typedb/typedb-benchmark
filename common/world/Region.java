@@ -15,10 +15,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package grakn.simulation.common.world;
+package grakn.benchmark.common.world;
 
 public interface Region {
     String name();
+
     String tracker();
+
     String topLevelName(); // Used to assign session keys for Grakn model
 }

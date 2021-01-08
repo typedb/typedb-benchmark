@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package grakn.simulation.common.world;
+package grakn.benchmark.common.world;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
@@ -58,7 +58,7 @@ public class World implements Region {
 
         try {
             this.logDirPath = Paths.get(System.getenv("LOG_DIR_PATH"));
-        } catch (NullPointerException n){
+        } catch (NullPointerException n) {
             this.logDirPath = null;
         }
 

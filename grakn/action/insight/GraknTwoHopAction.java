@@ -15,25 +15,25 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package grakn.simulation.grakn.action.insight;
+package grakn.benchmark.grakn.action.insight;
 
-import grakn.simulation.common.action.insight.TwoHopAction;
-import grakn.simulation.grakn.driver.GraknOperation;
+import grakn.benchmark.common.action.insight.TwoHopAction;
+import grakn.benchmark.grakn.driver.GraknOperation;
 import graql.lang.Graql;
 import graql.lang.query.GraqlMatch;
 
 import java.util.List;
 
-import static grakn.simulation.grakn.action.Model.BORN_IN;
-import static grakn.simulation.grakn.action.Model.BORN_IN_CHILD;
-import static grakn.simulation.grakn.action.Model.BORN_IN_PLACE_OF_BIRTH;
-import static grakn.simulation.grakn.action.Model.CITY;
-import static grakn.simulation.grakn.action.Model.EMAIL;
-import static grakn.simulation.grakn.action.Model.LOCATION_NAME;
-import static grakn.simulation.grakn.action.Model.PARENTSHIP;
-import static grakn.simulation.grakn.action.Model.PARENTSHIP_CHILD;
-import static grakn.simulation.grakn.action.Model.PARENTSHIP_PARENT;
-import static grakn.simulation.grakn.action.Model.PERSON;
+import static grakn.benchmark.grakn.action.Model.BORN_IN;
+import static grakn.benchmark.grakn.action.Model.BORN_IN_CHILD;
+import static grakn.benchmark.grakn.action.Model.BORN_IN_PLACE_OF_BIRTH;
+import static grakn.benchmark.grakn.action.Model.CITY;
+import static grakn.benchmark.grakn.action.Model.EMAIL;
+import static grakn.benchmark.grakn.action.Model.LOCATION_NAME;
+import static grakn.benchmark.grakn.action.Model.PARENTSHIP;
+import static grakn.benchmark.grakn.action.Model.PARENTSHIP_CHILD;
+import static grakn.benchmark.grakn.action.Model.PARENTSHIP_PARENT;
+import static grakn.benchmark.grakn.action.Model.PERSON;
 
 public class GraknTwoHopAction extends TwoHopAction<GraknOperation> {
     public GraknTwoHopAction(GraknOperation dbOperation) {
@@ -47,11 +47,11 @@ public class GraknTwoHopAction extends TwoHopAction<GraknOperation> {
 
     public static GraqlMatch.Unfiltered query() {
         return Graql.match(
-                    Graql.var(CITY).isa(CITY).has(LOCATION_NAME, "London"),
-                    Graql.var().rel(BORN_IN_PLACE_OF_BIRTH, Graql.var(CITY)).rel(BORN_IN_CHILD, Graql.var("child")).isa(BORN_IN),
-                    Graql.var("child").isa(PERSON),
-                    Graql.var().rel(PARENTSHIP_PARENT, Graql.var("parent")).rel(PARENTSHIP_CHILD, Graql.var("child")).isa(PARENTSHIP),
-                    Graql.var("parent").isa(PERSON).has(EMAIL, Graql.var(EMAIL))
-            );
+                Graql.var(CITY).isa(CITY).has(LOCATION_NAME, "London"),
+                Graql.var().rel(BORN_IN_PLACE_OF_BIRTH, Graql.var(CITY)).rel(BORN_IN_CHILD, Graql.var("child")).isa(BORN_IN),
+                Graql.var("child").isa(PERSON),
+                Graql.var().rel(PARENTSHIP_PARENT, Graql.var("parent")).rel(PARENTSHIP_CHILD, Graql.var("child")).isa(PARENTSHIP),
+                Graql.var("parent").isa(PERSON).has(EMAIL, Graql.var(EMAIL))
+        );
     }
 }

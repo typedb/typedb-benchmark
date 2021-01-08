@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package grakn.simulation.common.utils;
+package grakn.benchmark.common.utils;
 
 import grabl.tracing.client.GrablTracingThreadStatic;
 

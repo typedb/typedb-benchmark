@@ -15,9 +15,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package grakn.simulation.common.action;
+package grakn.benchmark.common.action;
 
-import grakn.simulation.common.driver.DbOperation;
+import grakn.benchmark.common.driver.DbOperation;
 
 import java.util.ArrayList;
 import java.util.Arrays;

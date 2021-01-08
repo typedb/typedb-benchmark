@@ -15,33 +15,33 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package grakn.simulation.common.agent;
+package grakn.benchmark.common.agent;
 
-import grakn.simulation.common.action.ActionFactory;
-import grakn.simulation.common.agent.base.Agent;
-import grakn.simulation.common.agent.base.SimulationContext;
-import grakn.simulation.common.agent.insight.ArbitraryOneHopAgent;
-import grakn.simulation.common.agent.insight.FindCurrentResidentsAgent;
-import grakn.simulation.common.agent.insight.FindLivedInAgent;
-import grakn.simulation.common.agent.insight.FindSpecificMarriageAgent;
-import grakn.simulation.common.agent.insight.FindSpecificPersonAgent;
-import grakn.simulation.common.agent.insight.FindTransactionCurrencyAgent;
-import grakn.simulation.common.agent.insight.FourHopAgent;
-import grakn.simulation.common.agent.insight.MeanWageAgent;
-import grakn.simulation.common.agent.insight.ThreeHopAgent;
-import grakn.simulation.common.agent.insight.TwoHopAgent;
-import grakn.simulation.common.agent.write.AgeUpdateAgent;
-import grakn.simulation.common.agent.write.CompanyAgent;
-import grakn.simulation.common.agent.write.EmploymentAgent;
-import grakn.simulation.common.agent.write.FriendshipAgent;
-import grakn.simulation.common.agent.write.MarriageAgent;
-import grakn.simulation.common.agent.write.ParentshipAgent;
-import grakn.simulation.common.agent.write.PersonBirthAgent;
-import grakn.simulation.common.agent.write.ProductAgent;
-import grakn.simulation.common.agent.write.RelocationAgent;
-import grakn.simulation.common.agent.write.TransactionAgent;
-import grakn.simulation.common.driver.DbDriver;
-import grakn.simulation.common.driver.DbOperation;
+import grakn.benchmark.common.action.ActionFactory;
+import grakn.benchmark.common.agent.base.Agent;
+import grakn.benchmark.common.agent.base.SimulationContext;
+import grakn.benchmark.common.agent.insight.ArbitraryOneHopAgent;
+import grakn.benchmark.common.agent.insight.FindCurrentResidentsAgent;
+import grakn.benchmark.common.agent.insight.FindLivedInAgent;
+import grakn.benchmark.common.agent.insight.FindSpecificMarriageAgent;
+import grakn.benchmark.common.agent.insight.FindSpecificPersonAgent;
+import grakn.benchmark.common.agent.insight.FindTransactionCurrencyAgent;
+import grakn.benchmark.common.agent.insight.FourHopAgent;
+import grakn.benchmark.common.agent.insight.MeanWageAgent;
+import grakn.benchmark.common.agent.insight.ThreeHopAgent;
+import grakn.benchmark.common.agent.insight.TwoHopAgent;
+import grakn.benchmark.common.agent.write.AgeUpdateAgent;
+import grakn.benchmark.common.agent.write.CompanyAgent;
+import grakn.benchmark.common.agent.write.EmploymentAgent;
+import grakn.benchmark.common.agent.write.FriendshipAgent;
+import grakn.benchmark.common.agent.write.MarriageAgent;
+import grakn.benchmark.common.agent.write.ParentshipAgent;
+import grakn.benchmark.common.agent.write.PersonBirthAgent;
+import grakn.benchmark.common.agent.write.ProductAgent;
+import grakn.benchmark.common.agent.write.RelocationAgent;
+import grakn.benchmark.common.agent.write.TransactionAgent;
+import grakn.benchmark.common.driver.DbDriver;
+import grakn.benchmark.common.driver.DbOperation;
 
 public class AgentFactory<DB_OPERATION extends DbOperation, ACTION_FACTORY extends ActionFactory<DB_OPERATION, ?>> {
 

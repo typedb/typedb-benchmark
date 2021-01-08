@@ -15,10 +15,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package grakn.simulation.neo4j.yaml_tool;
+package grakn.benchmark.neo4j.yaml_tool;
 
-import grakn.simulation.common.yaml_tool.QueryTemplate;
-import grakn.simulation.common.yaml_tool.YAMLLoader;
+import grakn.benchmark.common.yaml_tool.QueryTemplate;
+import grakn.benchmark.common.yaml_tool.YAMLLoader;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import org.neo4j.driver.Query;

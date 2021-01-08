@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package grakn.simulation.test;
+package grakn.benchmark.test;
 
 import org.junit.runner.Runner;
 import org.junit.runner.notification.RunNotifier;
@@ -27,8 +27,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static grakn.simulation.test.SimulationsForComparison.grakn;
-import static grakn.simulation.test.SimulationsForComparison.neo4j;
+import static grakn.benchmark.test.SimulationsForComparison.grakn;
+import static grakn.benchmark.test.SimulationsForComparison.neo4j;
 
 public class ComparisonTestSuite extends Suite {
     private static final List<Runner> NO_RUNNERS = Collections.emptyList();

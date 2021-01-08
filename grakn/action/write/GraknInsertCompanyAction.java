@@ -15,28 +15,28 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package grakn.simulation.grakn.action.write;
+package grakn.benchmark.grakn.action.write;
 
+import grakn.benchmark.common.action.Action;
+import grakn.benchmark.common.action.write.InsertCompanyAction;
+import grakn.benchmark.common.world.World;
+import grakn.benchmark.grakn.driver.GraknOperation;
 import grakn.client.concept.answer.ConceptMap;
-import grakn.simulation.common.action.Action;
-import grakn.simulation.common.action.write.InsertCompanyAction;
-import grakn.simulation.common.world.World;
-import grakn.simulation.grakn.driver.GraknOperation;
 import graql.lang.Graql;
 import graql.lang.query.GraqlInsert;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
 
-import static grakn.simulation.grakn.action.Model.COMPANY;
-import static grakn.simulation.grakn.action.Model.COMPANY_NAME;
-import static grakn.simulation.grakn.action.Model.COMPANY_NUMBER;
-import static grakn.simulation.grakn.action.Model.COUNTRY;
-import static grakn.simulation.grakn.action.Model.DATE_OF_INCORPORATION;
-import static grakn.simulation.grakn.action.Model.INCORPORATION;
-import static grakn.simulation.grakn.action.Model.INCORPORATION_INCORPORATED;
-import static grakn.simulation.grakn.action.Model.INCORPORATION_INCORPORATING;
-import static grakn.simulation.grakn.action.Model.LOCATION_NAME;
+import static grakn.benchmark.grakn.action.Model.COMPANY;
+import static grakn.benchmark.grakn.action.Model.COMPANY_NAME;
+import static grakn.benchmark.grakn.action.Model.COMPANY_NUMBER;
+import static grakn.benchmark.grakn.action.Model.COUNTRY;
+import static grakn.benchmark.grakn.action.Model.DATE_OF_INCORPORATION;
+import static grakn.benchmark.grakn.action.Model.INCORPORATION;
+import static grakn.benchmark.grakn.action.Model.INCORPORATION_INCORPORATED;
+import static grakn.benchmark.grakn.action.Model.INCORPORATION_INCORPORATING;
+import static grakn.benchmark.grakn.action.Model.LOCATION_NAME;
 
 public class GraknInsertCompanyAction extends InsertCompanyAction<GraknOperation, ConceptMap> {
 

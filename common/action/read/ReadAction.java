@@ -15,10 +15,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package grakn.simulation.common.action.read;
+package grakn.benchmark.common.action.read;
 
-import grakn.simulation.common.action.Action;
-import grakn.simulation.common.driver.DbOperation;
+import grakn.benchmark.common.action.Action;
+import grakn.benchmark.common.driver.DbOperation;
 
 import java.util.HashMap;
 

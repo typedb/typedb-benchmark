@@ -15,16 +15,20 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package grakn.simulation.common.agent.base;
+package grakn.benchmark.common.agent.base;
 
-import grakn.simulation.common.world.World;
+import grakn.benchmark.common.world.World;
 
 import java.time.LocalDateTime;
 
 public interface SimulationContext {
     int iteration();
+
     LocalDateTime today();
+
     World world();
+
     boolean trace();
+
     boolean test();
 }

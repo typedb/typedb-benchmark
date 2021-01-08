@@ -15,9 +15,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package grakn.simulation.neo4j.driver;
+package grakn.benchmark.neo4j.driver;
 
-import grakn.simulation.common.driver.TransactionalDbOperationFactory;
+import grakn.benchmark.common.driver.TransactionalDbOperationFactory;
 import org.neo4j.driver.Session;
 import org.slf4j.Logger;
 

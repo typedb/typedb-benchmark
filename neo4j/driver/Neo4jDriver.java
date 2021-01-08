@@ -15,11 +15,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package grakn.simulation.neo4j.driver;
+package grakn.benchmark.neo4j.driver;
 
-import grakn.simulation.common.driver.DbOperationFactory;
-import grakn.simulation.common.driver.TransactionalDbDriver;
-import grakn.simulation.common.world.Region;
+import grakn.benchmark.common.driver.DbOperationFactory;
+import grakn.benchmark.common.driver.TransactionalDbDriver;
+import grakn.benchmark.common.world.Region;
 import org.neo4j.driver.AuthTokens;
 import org.neo4j.driver.Driver;
 import org.neo4j.driver.GraphDatabase;

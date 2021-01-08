@@ -15,12 +15,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package grakn.simulation.neo4j.action.write;
+package grakn.benchmark.neo4j.action.write;
 
-import grakn.simulation.common.action.write.UpdateAgesOfPeopleInCityAction;
-import grakn.simulation.common.world.World;
-import grakn.simulation.neo4j.driver.Neo4jOperation;
-import grakn.simulation.neo4j.action.Model;
+import grakn.benchmark.common.action.write.UpdateAgesOfPeopleInCityAction;
+import grakn.benchmark.common.world.World;
+import grakn.benchmark.neo4j.action.Model;
+import grakn.benchmark.neo4j.driver.Neo4jOperation;
 import org.neo4j.driver.Query;
 
 import java.time.LocalDateTime;
@@ -33,7 +33,7 @@ public class Neo4jUpdateAgesOfPeopleInCityAction extends UpdateAgesOfPeopleInCit
 
     @Override
     public Integer run() {
-        HashMap<String, Object> parameters = new HashMap<String, Object>(){{
+        HashMap<String, Object> parameters = new HashMap<String, Object>() {{
             put(Model.LOCATION_NAME, city.name());
             put("dateToday", today);
         }};

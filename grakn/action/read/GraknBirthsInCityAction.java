@@ -15,25 +15,25 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package grakn.simulation.grakn.action.read;
+package grakn.benchmark.grakn.action.read;
 
-import grakn.simulation.common.action.read.BirthsInCityAction;
-import grakn.simulation.common.world.World;
-import grakn.simulation.grakn.driver.GraknOperation;
+import grakn.benchmark.common.action.read.BirthsInCityAction;
+import grakn.benchmark.common.world.World;
+import grakn.benchmark.grakn.driver.GraknOperation;
 import graql.lang.Graql;
 import graql.lang.query.GraqlMatch;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static grakn.simulation.grakn.action.Model.BORN_IN;
-import static grakn.simulation.grakn.action.Model.BORN_IN_CHILD;
-import static grakn.simulation.grakn.action.Model.BORN_IN_PLACE_OF_BIRTH;
-import static grakn.simulation.grakn.action.Model.CITY;
-import static grakn.simulation.grakn.action.Model.DATE_OF_BIRTH;
-import static grakn.simulation.grakn.action.Model.EMAIL;
-import static grakn.simulation.grakn.action.Model.LOCATION_NAME;
-import static grakn.simulation.grakn.action.Model.PERSON;
+import static grakn.benchmark.grakn.action.Model.BORN_IN;
+import static grakn.benchmark.grakn.action.Model.BORN_IN_CHILD;
+import static grakn.benchmark.grakn.action.Model.BORN_IN_PLACE_OF_BIRTH;
+import static grakn.benchmark.grakn.action.Model.CITY;
+import static grakn.benchmark.grakn.action.Model.DATE_OF_BIRTH;
+import static grakn.benchmark.grakn.action.Model.EMAIL;
+import static grakn.benchmark.grakn.action.Model.LOCATION_NAME;
+import static grakn.benchmark.grakn.action.Model.PERSON;
 
 public class GraknBirthsInCityAction extends BirthsInCityAction<GraknOperation> {
     public GraknBirthsInCityAction(GraknOperation dbOperation, World.City city, LocalDateTime today) {
@@ -48,15 +48,15 @@ public class GraknBirthsInCityAction extends BirthsInCityAction<GraknOperation> 
 
     public static GraqlMatch.Unfiltered query(String worldCityName, LocalDateTime today) {
         return Graql.match(
-                    Graql.var("c").isa(CITY)
-                            .has(LOCATION_NAME, worldCityName),
-                    Graql.var("child").isa(PERSON)
-                            .has(EMAIL, Graql.var(EMAIL))
-                            .has(DATE_OF_BIRTH, today),
-                    Graql.var("bi")
-                            .rel(BORN_IN_PLACE_OF_BIRTH, "c")
-                            .rel(BORN_IN_CHILD, "child")
-                            .isa(BORN_IN)
-            );
+                Graql.var("c").isa(CITY)
+                        .has(LOCATION_NAME, worldCityName),
+                Graql.var("child").isa(PERSON)
+                        .has(EMAIL, Graql.var(EMAIL))
+                        .has(DATE_OF_BIRTH, today),
+                Graql.var("bi")
+                        .rel(BORN_IN_PLACE_OF_BIRTH, "c")
+                        .rel(BORN_IN_CHILD, "child")
+                        .isa(BORN_IN)
+        );
     }
 }

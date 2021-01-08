@@ -15,19 +15,18 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package grakn.simulation;
+package grakn.benchmark;
 
 import grabl.tracing.client.GrablTracing;
 import grabl.tracing.client.GrablTracingThreadStatic;
-import grakn.client.rpc.GraknClient;
-import grakn.simulation.config.Config;
-import grakn.simulation.config.ConfigLoader;
-import grakn.simulation.common.Simulation;
-import grakn.simulation.common.world.World;
-import grakn.simulation.grakn.GraknSimulation;
-import grakn.simulation.grakn.driver.GraknDriver;
-import grakn.simulation.neo4j.Neo4jSimulation;
-import grakn.simulation.neo4j.driver.Neo4jDriver;
+import grakn.benchmark.config.Config;
+import grakn.benchmark.config.ConfigLoader;
+import grakn.benchmark.common.Simulation;
+import grakn.benchmark.common.world.World;
+import grakn.benchmark.grakn.GraknSimulation;
+import grakn.benchmark.grakn.driver.GraknDriver;
+import grakn.benchmark.neo4j.Neo4jSimulation;
+import grakn.benchmark.neo4j.driver.Neo4jDriver;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
@@ -41,7 +40,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Duration;
 import java.time.Instant;
-import java.time.Period;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -49,7 +47,7 @@ import java.util.Optional;
 import static grabl.tracing.client.GrablTracing.tracing;
 import static grabl.tracing.client.GrablTracing.tracingNoOp;
 import static grabl.tracing.client.GrablTracing.withLogging;
-import static grakn.simulation.common.world.World.initialise;
+import static grakn.benchmark.common.world.World.initialise;
 
 public class SimulationRunner {
 

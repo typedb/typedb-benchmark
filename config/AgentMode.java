@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package grakn.simulation.config;
+package grakn.benchmark.config;
 
 public enum AgentMode {
     TRACE(true, true),

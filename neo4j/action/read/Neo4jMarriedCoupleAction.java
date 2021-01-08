@@ -15,12 +15,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package grakn.simulation.neo4j.action.read;
+package grakn.benchmark.neo4j.action.read;
 
-import grakn.simulation.common.action.SpouseType;
-import grakn.simulation.common.action.read.MarriedCoupleAction;
-import grakn.simulation.common.world.World;
-import grakn.simulation.neo4j.driver.Neo4jOperation;
+import grakn.benchmark.common.action.SpouseType;
+import grakn.benchmark.common.action.read.MarriedCoupleAction;
+import grakn.benchmark.common.world.World;
+import grakn.benchmark.neo4j.driver.Neo4jOperation;
 import org.neo4j.driver.Query;
 import org.neo4j.driver.Record;
 
@@ -38,7 +38,7 @@ public class Neo4jMarriedCoupleAction extends MarriedCoupleAction<Neo4jOperation
     @Override
     public List<HashMap<SpouseType, String>> run() {
         String template = query();
-        HashMap<String, Object> parameters = new HashMap<String, Object>(){{
+        HashMap<String, Object> parameters = new HashMap<String, Object>() {{
             put("locationName", city.name());
         }};
         List<Record> records = dbOperation.execute(new Query(template, parameters));

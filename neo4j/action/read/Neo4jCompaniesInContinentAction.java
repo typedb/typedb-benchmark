@@ -15,11 +15,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package grakn.simulation.neo4j.action.read;
+package grakn.benchmark.neo4j.action.read;
 
-import grakn.simulation.common.action.read.CompaniesInContinentAction;
-import grakn.simulation.common.world.World;
-import grakn.simulation.neo4j.driver.Neo4jOperation;
+import grakn.benchmark.common.action.read.CompaniesInContinentAction;
+import grakn.benchmark.common.world.World;
+import grakn.benchmark.neo4j.driver.Neo4jOperation;
 import org.neo4j.driver.Query;
 
 import java.util.HashMap;
@@ -32,7 +32,7 @@ public class Neo4jCompaniesInContinentAction extends CompaniesInContinentAction<
 
     @Override
     public List<Long> run() {
-        HashMap<String, Object> parameters = new HashMap<String, Object>(){{
+        HashMap<String, Object> parameters = new HashMap<String, Object>() {{
             put("continentName", continent.name());
         }};
         return dbOperation.sortedExecute(new Query(query(), parameters), "company.companyNumber", null);

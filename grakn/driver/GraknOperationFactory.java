@@ -15,10 +15,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package grakn.simulation.grakn.driver;
+package grakn.benchmark.grakn.driver;
 
+import grakn.benchmark.common.driver.TransactionalDbOperationFactory;
 import grakn.client.Grakn;
-import grakn.simulation.common.driver.TransactionalDbOperationFactory;
 import org.slf4j.Logger;
 
 public class GraknOperationFactory extends TransactionalDbOperationFactory<GraknOperation> {

@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package grakn.simulation.common.driver;
+package grakn.benchmark.common.driver;
 
 import org.slf4j.Logger;
 

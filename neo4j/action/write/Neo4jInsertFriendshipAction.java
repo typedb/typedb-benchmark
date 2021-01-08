@@ -15,19 +15,19 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package grakn.simulation.neo4j.action.write;
+package grakn.benchmark.neo4j.action.write;
 
-import grakn.simulation.common.action.Action;
-import grakn.simulation.common.action.write.InsertFriendshipAction;
-import grakn.simulation.neo4j.driver.Neo4jOperation;
+import grakn.benchmark.common.action.Action;
+import grakn.benchmark.common.action.write.InsertFriendshipAction;
+import grakn.benchmark.neo4j.driver.Neo4jOperation;
 import org.neo4j.driver.Query;
 import org.neo4j.driver.Record;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
 
-import static grakn.simulation.neo4j.action.Model.EMAIL;
-import static grakn.simulation.neo4j.action.Model.START_DATE;
+import static grakn.benchmark.neo4j.action.Model.EMAIL;
+import static grakn.benchmark.neo4j.action.Model.START_DATE;
 
 public class Neo4jInsertFriendshipAction extends InsertFriendshipAction<Neo4jOperation, Record> {
 
@@ -37,7 +37,7 @@ public class Neo4jInsertFriendshipAction extends InsertFriendshipAction<Neo4jOpe
 
     @Override
     public Record run() {
-        HashMap<String, Object> parameters = new HashMap<String, Object>(){{
+        HashMap<String, Object> parameters = new HashMap<String, Object>() {{
             put("p1Email", friend1Email);
             put("p2Email", friend2Email);
             put("startDate", today);

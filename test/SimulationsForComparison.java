@@ -15,16 +15,16 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package grakn.simulation.test;
+package grakn.benchmark.test;
 
-import grakn.simulation.config.AgentMode;
-import grakn.simulation.config.Config;
-import grakn.simulation.config.SamplingFunction;
-import grakn.simulation.common.world.World;
-import grakn.simulation.grakn.GraknSimulation;
-import grakn.simulation.grakn.driver.GraknDriver;
-import grakn.simulation.neo4j.Neo4jSimulation;
-import grakn.simulation.neo4j.driver.Neo4jDriver;
+import grakn.benchmark.common.world.World;
+import grakn.benchmark.config.AgentMode;
+import grakn.benchmark.config.Config;
+import grakn.benchmark.config.SamplingFunction;
+import grakn.benchmark.grakn.GraknSimulation;
+import grakn.benchmark.grakn.driver.GraknDriver;
+import grakn.benchmark.neo4j.Neo4jSimulation;
+import grakn.benchmark.neo4j.driver.Neo4jDriver;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
@@ -42,8 +42,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
 
-import static grakn.simulation.config.Config.Agent.ConstructAgentConfig;
-import static grakn.simulation.common.world.World.initialise;
+import static grakn.benchmark.common.world.World.initialise;
+import static grakn.benchmark.config.Config.Agent.ConstructAgentConfig;
 
 public class SimulationsForComparison {
     static final Neo4jSimulation neo4j;
@@ -55,11 +55,11 @@ public class SimulationsForComparison {
 
         Options options = new Options();
         options.addOption(Option.builder("g")
-                .longOpt("grakn-uri").desc("Grakn server URI").hasArg().required().argName("grakn-uri")
-                .build());
+                                  .longOpt("grakn-uri").desc("Grakn server URI").hasArg().required().argName("grakn-uri")
+                                  .build());
         options.addOption(Option.builder("n")
-                .longOpt("neo4j-uri").desc("Neo4j server URI").hasArg().required().argName("neo4j-uri")
-                .build());
+                                  .longOpt("neo4j-uri").desc("Neo4j server URI").hasArg().required().argName("neo4j-uri")
+                                  .build());
 
         CommandLineParser parser = new DefaultParser();
         CommandLine commandLine;
@@ -117,7 +117,7 @@ public class SimulationsForComparison {
         /////////////////
 
         grakn = new GraknSimulation(
-                new GraknDriver(graknUri,"world"),
+                new GraknDriver(graknUri, "world"),
                 files,
                 randomSeed,
                 world,

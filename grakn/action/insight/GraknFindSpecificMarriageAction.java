@@ -15,17 +15,17 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package grakn.simulation.grakn.action.insight;
+package grakn.benchmark.grakn.action.insight;
 
-import grakn.simulation.common.action.insight.FindSpecificMarriageAction;
-import grakn.simulation.grakn.driver.GraknOperation;
+import grakn.benchmark.common.action.insight.FindSpecificMarriageAction;
+import grakn.benchmark.grakn.driver.GraknOperation;
 import graql.lang.Graql;
 import graql.lang.query.GraqlMatch;
 
 import java.util.stream.Collectors;
 
-import static grakn.simulation.grakn.action.Model.MARRIAGE;
-import static grakn.simulation.grakn.action.Model.MARRIAGE_ID;
+import static grakn.benchmark.grakn.action.Model.MARRIAGE;
+import static grakn.benchmark.grakn.action.Model.MARRIAGE_ID;
 
 public class GraknFindSpecificMarriageAction extends FindSpecificMarriageAction<GraknOperation> {
     public GraknFindSpecificMarriageAction(GraknOperation dbOperation) {
@@ -40,8 +40,8 @@ public class GraknFindSpecificMarriageAction extends FindSpecificMarriageAction<
 
     public static GraqlMatch.Unfiltered query() {
         return Graql.match(
-                    Graql.var(MARRIAGE).isa(MARRIAGE).has(MARRIAGE_ID, Graql.var(MARRIAGE_ID)),
-                    Graql.var(MARRIAGE_ID).eq(MARRIAGE_ID_FOR_QUERY).isa(MARRIAGE_ID)
-            );
+                Graql.var(MARRIAGE).isa(MARRIAGE).has(MARRIAGE_ID, Graql.var(MARRIAGE_ID)),
+                Graql.var(MARRIAGE_ID).eq(MARRIAGE_ID_FOR_QUERY).isa(MARRIAGE_ID)
+        );
     }
 }

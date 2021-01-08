@@ -15,9 +15,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package grakn.simulation.common.action.insight;
+package grakn.benchmark.common.action.insight;
 
-import grakn.simulation.common.driver.DbOperation;
+import grakn.benchmark.common.driver.DbOperation;
 
 public abstract class MeanWageOfPeopleInWorldAction<DB_OPERATION extends DbOperation> extends WorldwideInsightAction<DB_OPERATION, Double> {
 

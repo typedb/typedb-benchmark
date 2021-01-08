@@ -15,11 +15,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package grakn.simulation.common.action.write;
+package grakn.benchmark.common.action.write;
 
-import grakn.simulation.common.action.Action;
-import grakn.simulation.common.driver.DbOperation;
-import grakn.simulation.common.world.World;
+import grakn.benchmark.common.action.Action;
+import grakn.benchmark.common.driver.DbOperation;
+import grakn.benchmark.common.world.World;
 
 import java.util.ArrayList;
 

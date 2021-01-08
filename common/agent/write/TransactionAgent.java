@@ -15,19 +15,19 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package grakn.simulation.common.agent.write;
+package grakn.benchmark.common.agent.write;
 
+import grakn.benchmark.common.action.ActionFactory;
+import grakn.benchmark.common.action.read.CompaniesInCountryAction;
+import grakn.benchmark.common.action.read.ProductsInContinentAction;
+import grakn.benchmark.common.agent.base.Allocation;
+import grakn.benchmark.common.agent.base.SimulationContext;
+import grakn.benchmark.common.agent.region.CountryAgent;
+import grakn.benchmark.common.driver.DbDriver;
+import grakn.benchmark.common.driver.DbOperation;
+import grakn.benchmark.common.driver.DbOperationFactory;
+import grakn.benchmark.common.world.World;
 import grakn.common.collection.Pair;
-import grakn.simulation.common.action.ActionFactory;
-import grakn.simulation.common.action.read.CompaniesInCountryAction;
-import grakn.simulation.common.action.read.ProductsInContinentAction;
-import grakn.simulation.common.agent.base.Allocation;
-import grakn.simulation.common.agent.base.SimulationContext;
-import grakn.simulation.common.agent.region.CountryAgent;
-import grakn.simulation.common.driver.DbDriver;
-import grakn.simulation.common.driver.DbOperation;
-import grakn.simulation.common.driver.DbOperationFactory;
-import grakn.simulation.common.world.World;
 
 import java.util.ArrayList;
 import java.util.List;

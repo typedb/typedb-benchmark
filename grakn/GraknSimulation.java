@@ -15,20 +15,20 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package grakn.simulation.grakn;
+package grakn.benchmark.grakn;
 
+import grakn.benchmark.common.TransactionalSimulation;
+import grakn.benchmark.common.action.ActionFactory;
+import grakn.benchmark.common.world.World;
+import grakn.benchmark.common.yaml_tool.YAMLException;
+import grakn.benchmark.common.yaml_tool.YAMLLoader;
+import grakn.benchmark.config.Config;
+import grakn.benchmark.grakn.action.GraknActionFactory;
+import grakn.benchmark.grakn.driver.GraknDriver;
+import grakn.benchmark.grakn.driver.GraknOperation;
+import grakn.benchmark.grakn.yaml_tool.GraknYAMLLoader;
 import grakn.client.Grakn;
 import grakn.client.Grakn.Session;
-import grakn.simulation.config.Config;
-import grakn.simulation.common.TransactionalSimulation;
-import grakn.simulation.common.action.ActionFactory;
-import grakn.simulation.common.world.World;
-import grakn.simulation.common.yaml_tool.YAMLException;
-import grakn.simulation.common.yaml_tool.YAMLLoader;
-import grakn.simulation.grakn.action.GraknActionFactory;
-import grakn.simulation.grakn.driver.GraknDriver;
-import grakn.simulation.grakn.driver.GraknOperation;
-import grakn.simulation.grakn.yaml_tool.GraknYAMLLoader;
 import graql.lang.Graql;
 
 import java.io.IOException;

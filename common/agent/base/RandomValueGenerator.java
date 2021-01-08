@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package grakn.simulation.common.agent.base;
+package grakn.benchmark.common.agent.base;
 
 import org.apache.commons.lang3.RandomStringUtils;
 
@@ -45,7 +45,7 @@ public class RandomValueGenerator {
 
     public double boundRandomDouble(Double min, Double max) {
         double value = doubleInterpolate(random.nextDouble(), min, max);
-        return (double)Math.round(value * 100000d) / 100000d; // Not 100% accurate, but serves our purpose to ensure different backends are given a precision they can handle
+        return (double) Math.round(value * 100000d) / 100000d; // Not 100% accurate, but serves our purpose to ensure different backends are given a precision they can handle
     }
 
     public boolean bool() {

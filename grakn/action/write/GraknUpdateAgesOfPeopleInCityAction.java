@@ -15,12 +15,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package grakn.simulation.grakn.action.write;
+package grakn.benchmark.grakn.action.write;
 
+import grakn.benchmark.common.action.write.UpdateAgesOfPeopleInCityAction;
+import grakn.benchmark.common.world.World;
+import grakn.benchmark.grakn.driver.GraknOperation;
 import grakn.common.collection.Pair;
-import grakn.simulation.common.action.write.UpdateAgesOfPeopleInCityAction;
-import grakn.simulation.common.world.World;
-import grakn.simulation.grakn.driver.GraknOperation;
 import graql.lang.Graql;
 import graql.lang.pattern.variable.UnboundVariable;
 import graql.lang.query.GraqlDelete;
@@ -31,16 +31,16 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.stream.Stream;
 
+import static grakn.benchmark.grakn.action.Model.AGE;
+import static grakn.benchmark.grakn.action.Model.BORN_IN;
+import static grakn.benchmark.grakn.action.Model.BORN_IN_CHILD;
+import static grakn.benchmark.grakn.action.Model.BORN_IN_PLACE_OF_BIRTH;
+import static grakn.benchmark.grakn.action.Model.CITY;
+import static grakn.benchmark.grakn.action.Model.DATE_OF_BIRTH;
+import static grakn.benchmark.grakn.action.Model.EMAIL;
+import static grakn.benchmark.grakn.action.Model.LOCATION_NAME;
+import static grakn.benchmark.grakn.action.Model.PERSON;
 import static grakn.common.collection.Collections.pair;
-import static grakn.simulation.grakn.action.Model.AGE;
-import static grakn.simulation.grakn.action.Model.BORN_IN;
-import static grakn.simulation.grakn.action.Model.BORN_IN_CHILD;
-import static grakn.simulation.grakn.action.Model.BORN_IN_PLACE_OF_BIRTH;
-import static grakn.simulation.grakn.action.Model.CITY;
-import static grakn.simulation.grakn.action.Model.DATE_OF_BIRTH;
-import static grakn.simulation.grakn.action.Model.EMAIL;
-import static grakn.simulation.grakn.action.Model.LOCATION_NAME;
-import static grakn.simulation.grakn.action.Model.PERSON;
 
 public class GraknUpdateAgesOfPeopleInCityAction extends UpdateAgesOfPeopleInCityAction<GraknOperation> {
     public GraknUpdateAgesOfPeopleInCityAction(GraknOperation dbOperation, LocalDateTime today, World.City city) {
@@ -108,14 +108,14 @@ public class GraknUpdateAgesOfPeopleInCityAction extends UpdateAgesOfPeopleInCit
         UnboundVariable person = Graql.var(PERSON);
         UnboundVariable age = Graql.var(AGE);
         return Graql.match(
-                    person
-                            .isa(PERSON)
-                            .has(EMAIL, personEmail)
-                            .has(AGE, age)
-            ).delete(
-                    person
-                            .has(AGE, age
-                            )
-            );
+                person
+                        .isa(PERSON)
+                        .has(EMAIL, personEmail)
+                        .has(AGE, age)
+        ).delete(
+                person
+                        .has(AGE, age
+                        )
+        );
     }
 }

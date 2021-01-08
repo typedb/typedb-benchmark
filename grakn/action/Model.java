@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package grakn.simulation.grakn.action;
+package grakn.benchmark.grakn.action;
 
 public class Model {
     public static final String CITY = "city";

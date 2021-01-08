@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package grakn.simulation.common.yaml_tool;
+package grakn.benchmark.common.yaml_tool;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
@@ -92,7 +92,7 @@ public abstract class YAMLLoader {
      * Helper method to avoid repeating nasty type checking code.
      *
      * @param object The document object Map.
-     * @param key A String key to lookup in the Map.
+     * @param key    A String key to lookup in the Map.
      * @return The String found.
      * @throws YAMLException when something other than a String is found.
      */

@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package grakn.simulation.common.agent.base;
+package grakn.benchmark.common.agent.base;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -28,7 +28,7 @@ import java.util.function.BiConsumer;
  */
 public class Allocation {
 
-    public static List<Integer> allocateEvenly(Integer numThingsToAllocate, Integer numBuckets){
+    public static List<Integer> allocateEvenly(Integer numThingsToAllocate, Integer numBuckets) {
         List<Integer> allocations = new ArrayList<>();
         for (int i = 0; i < numThingsToAllocate; i++) {
             allocations.add(i % numBuckets);
@@ -36,7 +36,7 @@ public class Allocation {
         return allocations;
     }
 
-    public static LinkedHashMap<Integer, List<Integer>> allocateEvenlyToMap(Integer numThingsToAllocate, Integer numBuckets){
+    public static LinkedHashMap<Integer, List<Integer>> allocateEvenlyToMap(Integer numThingsToAllocate, Integer numBuckets) {
         LinkedHashMap<Integer, List<Integer>> allocationMap = new LinkedHashMap<>();
         List<Integer> allocations = allocateEvenly(numThingsToAllocate, numBuckets);
         for (int i = 0; i < allocations.size(); i++) {

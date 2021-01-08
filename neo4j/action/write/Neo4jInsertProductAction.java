@@ -15,20 +15,20 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package grakn.simulation.neo4j.action.write;
+package grakn.benchmark.neo4j.action.write;
 
-import grakn.simulation.common.action.write.InsertProductAction;
-import grakn.simulation.common.world.World;
-import grakn.simulation.neo4j.driver.Neo4jOperation;
+import grakn.benchmark.common.action.write.InsertProductAction;
+import grakn.benchmark.common.world.World;
+import grakn.benchmark.neo4j.driver.Neo4jOperation;
 import org.neo4j.driver.Query;
 import org.neo4j.driver.Record;
 
 import java.util.HashMap;
 
-import static grakn.simulation.neo4j.action.Model.LOCATION_NAME;
-import static grakn.simulation.neo4j.action.Model.PRODUCT_BARCODE;
-import static grakn.simulation.neo4j.action.Model.PRODUCT_DESCRIPTION;
-import static grakn.simulation.neo4j.action.Model.PRODUCT_NAME;
+import static grakn.benchmark.neo4j.action.Model.LOCATION_NAME;
+import static grakn.benchmark.neo4j.action.Model.PRODUCT_BARCODE;
+import static grakn.benchmark.neo4j.action.Model.PRODUCT_DESCRIPTION;
+import static grakn.benchmark.neo4j.action.Model.PRODUCT_NAME;
 
 public class Neo4jInsertProductAction extends InsertProductAction<Neo4jOperation, Record> {
     public Neo4jInsertProductAction(Neo4jOperation dbOperation, World.Continent continent, Long barcode, String productName, String productDescription) {
@@ -38,7 +38,7 @@ public class Neo4jInsertProductAction extends InsertProductAction<Neo4jOperation
     @Override
     public Record run() {
         String template = query();
-        HashMap<String, Object> parameters = new HashMap<String, Object>(){{
+        HashMap<String, Object> parameters = new HashMap<String, Object>() {{
             put("continentName", continent.name());
             put("barcode", barcode);
             put("productName", productName);

@@ -15,20 +15,20 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package grakn.simulation.grakn.action.read;
+package grakn.benchmark.grakn.action.read;
 
-import grakn.simulation.common.action.read.CitiesInContinentAction;
-import grakn.simulation.common.world.World;
-import grakn.simulation.grakn.driver.GraknOperation;
+import grakn.benchmark.common.action.read.CitiesInContinentAction;
+import grakn.benchmark.common.world.World;
+import grakn.benchmark.grakn.driver.GraknOperation;
 import graql.lang.Graql;
 import graql.lang.query.GraqlMatch;
 
 import java.util.List;
 
-import static grakn.simulation.grakn.action.Model.CITY;
-import static grakn.simulation.grakn.action.Model.CONTINENT;
-import static grakn.simulation.grakn.action.Model.LOCATION_HIERARCHY;
-import static grakn.simulation.grakn.action.Model.LOCATION_NAME;
+import static grakn.benchmark.grakn.action.Model.CITY;
+import static grakn.benchmark.grakn.action.Model.CONTINENT;
+import static grakn.benchmark.grakn.action.Model.LOCATION_HIERARCHY;
+import static grakn.benchmark.grakn.action.Model.LOCATION_NAME;
 
 public class GraknCitiesInContinentAction extends CitiesInContinentAction<GraknOperation> {
     public GraknCitiesInContinentAction(GraknOperation dbOperation, World.City city) {
@@ -43,10 +43,10 @@ public class GraknCitiesInContinentAction extends CitiesInContinentAction<GraknO
 
     public static GraqlMatch.Unfiltered query(String cityName, String continentName) {
         return Graql.match(
-                    Graql.var(CITY).isa(CITY).has(LOCATION_NAME, Graql.var("city-name")),
-                    Graql.var(CONTINENT).isa(CONTINENT).has(LOCATION_NAME, continentName),
-                    Graql.var("lh1").rel(CITY).rel(CONTINENT).isa(LOCATION_HIERARCHY),
-                    Graql.var("city-name").neq(cityName)
-            );
+                Graql.var(CITY).isa(CITY).has(LOCATION_NAME, Graql.var("city-name")),
+                Graql.var(CONTINENT).isa(CONTINENT).has(LOCATION_NAME, continentName),
+                Graql.var("lh1").rel(CITY).rel(CONTINENT).isa(LOCATION_HIERARCHY),
+                Graql.var("city-name").neq(cityName)
+        );
     }
 }

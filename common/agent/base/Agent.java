@@ -15,18 +15,18 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package grakn.simulation.common.agent.base;
+package grakn.benchmark.common.agent.base;
 
 import grabl.tracing.client.GrablTracingThreadStatic;
-import grakn.simulation.common.action.Action;
-import grakn.simulation.common.action.ActionFactory;
-import grakn.simulation.common.driver.DbOperation;
-import grakn.simulation.common.driver.DbDriver;
-import grakn.simulation.common.driver.DbOperationFactory;
-import grakn.simulation.common.utils.Trace;
-import grakn.simulation.common.utils.Utils;
-import grakn.simulation.common.world.World;
-import grakn.simulation.common.utils.RandomSource;
+import grakn.benchmark.common.action.Action;
+import grakn.benchmark.common.action.ActionFactory;
+import grakn.benchmark.common.driver.DbDriver;
+import grakn.benchmark.common.driver.DbOperation;
+import grakn.benchmark.common.driver.DbOperationFactory;
+import grakn.benchmark.common.utils.RandomSource;
+import grakn.benchmark.common.utils.Trace;
+import grakn.benchmark.common.utils.Utils;
+import grakn.benchmark.common.world.World;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,10 +47,10 @@ import static grabl.tracing.client.GrablTracingThreadStatic.contextOnThread;
  * This class must be extended to provide the source of the random items and the methods to obtain the session key and
  * tracker from them.
  *
- * @param <REGION> The type of region used by the agent.
+ * @param <REGION>       The type of region used by the agent.
  * @param <DB_OPERATION> The abstraction of database operations used by the agent.
  */
-public abstract class Agent<REGION extends grakn.simulation.common.world.Region, DB_OPERATION extends DbOperation> {
+public abstract class Agent<REGION extends grakn.benchmark.common.world.Region, DB_OPERATION extends DbOperation> {
 
     private final Logger logger;
     private boolean trace = true;
@@ -174,6 +174,7 @@ public abstract class Agent<REGION extends grakn.simulation.common.world.Region,
 
         /**
          * Create a unique identifier, useful for creating keys without risk of collision
+         *
          * @param iterationScopeId An id that uniquely identifies a concept within the scope of the agent at a particular iteration
          * @return
          */

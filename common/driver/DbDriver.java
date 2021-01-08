@@ -15,9 +15,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package grakn.simulation.common.driver;
+package grakn.benchmark.common.driver;
 
-import grakn.simulation.common.world.Region;
+import grakn.benchmark.common.world.Region;
 import org.slf4j.Logger;
 
 public abstract class DbDriver<DB_OPERATION extends DbOperation> {

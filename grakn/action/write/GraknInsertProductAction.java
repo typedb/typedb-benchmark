@@ -15,26 +15,26 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package grakn.simulation.grakn.action.write;
+package grakn.benchmark.grakn.action.write;
 
+import grakn.benchmark.common.action.write.InsertProductAction;
+import grakn.benchmark.common.world.World;
+import grakn.benchmark.grakn.driver.GraknOperation;
 import grakn.client.concept.answer.ConceptMap;
-import grakn.simulation.common.action.write.InsertProductAction;
-import grakn.simulation.common.world.World;
-import grakn.simulation.grakn.driver.GraknOperation;
 import graql.lang.Graql;
 import graql.lang.query.GraqlInsert;
 
 import java.util.HashMap;
 
-import static grakn.simulation.grakn.action.Model.CONTINENT;
-import static grakn.simulation.grakn.action.Model.LOCATION_NAME;
-import static grakn.simulation.grakn.action.Model.PRODUCED_IN;
-import static grakn.simulation.grakn.action.Model.PRODUCED_IN_CONTINENT;
-import static grakn.simulation.grakn.action.Model.PRODUCED_IN_PRODUCT;
-import static grakn.simulation.grakn.action.Model.PRODUCT;
-import static grakn.simulation.grakn.action.Model.PRODUCT_BARCODE;
-import static grakn.simulation.grakn.action.Model.PRODUCT_DESCRIPTION;
-import static grakn.simulation.grakn.action.Model.PRODUCT_NAME;
+import static grakn.benchmark.grakn.action.Model.CONTINENT;
+import static grakn.benchmark.grakn.action.Model.LOCATION_NAME;
+import static grakn.benchmark.grakn.action.Model.PRODUCED_IN;
+import static grakn.benchmark.grakn.action.Model.PRODUCED_IN_CONTINENT;
+import static grakn.benchmark.grakn.action.Model.PRODUCED_IN_PRODUCT;
+import static grakn.benchmark.grakn.action.Model.PRODUCT;
+import static grakn.benchmark.grakn.action.Model.PRODUCT_BARCODE;
+import static grakn.benchmark.grakn.action.Model.PRODUCT_DESCRIPTION;
+import static grakn.benchmark.grakn.action.Model.PRODUCT_NAME;
 
 public class GraknInsertProductAction extends InsertProductAction<GraknOperation, ConceptMap> {
     public GraknInsertProductAction(GraknOperation dbOperation, World.Continent continent, Long barcode, String productName, String productDescription) {
@@ -49,20 +49,20 @@ public class GraknInsertProductAction extends InsertProductAction<GraknOperation
 
     public static GraqlInsert query(String continentName, Long barcode, String productName, String productDescription) {
         return Graql.match(
-                    Graql.var(CONTINENT)
-                            .isa(CONTINENT)
-                            .has(LOCATION_NAME, continentName)
-            ).insert(
-                    Graql.var(PRODUCT)
-                            .isa(PRODUCT)
-                            .has(PRODUCT_BARCODE, barcode)
-                            .has(PRODUCT_NAME, productName)
-                            .has(PRODUCT_DESCRIPTION, productDescription),
-                    Graql.var(PRODUCED_IN)
-                            .rel(PRODUCED_IN_PRODUCT, Graql.var(PRODUCT))
-                            .rel(PRODUCED_IN_CONTINENT, Graql.var(CONTINENT))
-                            .isa(PRODUCED_IN)
-            );
+                Graql.var(CONTINENT)
+                        .isa(CONTINENT)
+                        .has(LOCATION_NAME, continentName)
+        ).insert(
+                Graql.var(PRODUCT)
+                        .isa(PRODUCT)
+                        .has(PRODUCT_BARCODE, barcode)
+                        .has(PRODUCT_NAME, productName)
+                        .has(PRODUCT_DESCRIPTION, productDescription),
+                Graql.var(PRODUCED_IN)
+                        .rel(PRODUCED_IN_PRODUCT, Graql.var(PRODUCT))
+                        .rel(PRODUCED_IN_CONTINENT, Graql.var(CONTINENT))
+                        .isa(PRODUCED_IN)
+        );
     }
 
     @Override

@@ -15,13 +15,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package grakn.simulation.grakn.action.write;
+package grakn.benchmark.grakn.action.write;
 
+import grakn.benchmark.common.action.Action;
+import grakn.benchmark.common.action.write.InsertMarriageAction;
+import grakn.benchmark.common.world.World;
+import grakn.benchmark.grakn.driver.GraknOperation;
 import grakn.client.concept.answer.ConceptMap;
-import grakn.simulation.common.action.Action;
-import grakn.simulation.common.action.write.InsertMarriageAction;
-import grakn.simulation.common.world.World;
-import grakn.simulation.grakn.driver.GraknOperation;
 import graql.lang.Graql;
 import graql.lang.pattern.variable.ThingVariable;
 import graql.lang.pattern.variable.UnboundVariable;
@@ -29,17 +29,17 @@ import graql.lang.query.GraqlInsert;
 
 import java.util.HashMap;
 
-import static grakn.simulation.grakn.action.Model.CITY;
-import static grakn.simulation.grakn.action.Model.EMAIL;
-import static grakn.simulation.grakn.action.Model.LOCATES;
-import static grakn.simulation.grakn.action.Model.LOCATES_LOCATED;
-import static grakn.simulation.grakn.action.Model.LOCATES_LOCATION;
-import static grakn.simulation.grakn.action.Model.LOCATION_NAME;
-import static grakn.simulation.grakn.action.Model.MARRIAGE;
-import static grakn.simulation.grakn.action.Model.MARRIAGE_HUSBAND;
-import static grakn.simulation.grakn.action.Model.MARRIAGE_ID;
-import static grakn.simulation.grakn.action.Model.MARRIAGE_WIFE;
-import static grakn.simulation.grakn.action.Model.PERSON;
+import static grakn.benchmark.grakn.action.Model.CITY;
+import static grakn.benchmark.grakn.action.Model.EMAIL;
+import static grakn.benchmark.grakn.action.Model.LOCATES;
+import static grakn.benchmark.grakn.action.Model.LOCATES_LOCATED;
+import static grakn.benchmark.grakn.action.Model.LOCATES_LOCATION;
+import static grakn.benchmark.grakn.action.Model.LOCATION_NAME;
+import static grakn.benchmark.grakn.action.Model.MARRIAGE;
+import static grakn.benchmark.grakn.action.Model.MARRIAGE_HUSBAND;
+import static grakn.benchmark.grakn.action.Model.MARRIAGE_ID;
+import static grakn.benchmark.grakn.action.Model.MARRIAGE_WIFE;
+import static grakn.benchmark.grakn.action.Model.PERSON;
 
 public class GraknInsertMarriageAction extends InsertMarriageAction<GraknOperation, ConceptMap> {
 
@@ -70,17 +70,17 @@ public class GraknInsertMarriageAction extends InsertMarriageAction<GraknOperati
                 city.isa(CITY).has(LOCATION_NAME, cityNameVar.toString())
         ).insert(
                 marriage
-                    .rel(MARRIAGE_HUSBAND, husband)
-                    .rel(MARRIAGE_WIFE, wife)
-                    .isa(MARRIAGE)
-                    .has(MARRIAGE_ID, marriageIdentifierVar.toString()),
+                        .rel(MARRIAGE_HUSBAND, husband)
+                        .rel(MARRIAGE_WIFE, wife)
+                        .isa(MARRIAGE)
+                        .has(MARRIAGE_ID, marriageIdentifierVar.toString()),
                 Graql.var().rel(LOCATES_LOCATED, marriage).rel(LOCATES_LOCATION, city).isa(LOCATES)
         );
     }
 
     @Override
     protected HashMap<ComparableField, Object> outputForReport(ConceptMap answer) {
-        return new HashMap<ComparableField, Object>(){{
+        return new HashMap<ComparableField, Object>() {{
             put(InsertMarriageActionField.MARRIAGE_IDENTIFIER, dbOperation.getOnlyAttributeOfThing(answer, "marriage", MARRIAGE_ID));
             put(InsertMarriageActionField.WIFE_EMAIL, dbOperation.getOnlyAttributeOfThing(answer, "wife", EMAIL));
             put(InsertMarriageActionField.HUSBAND_EMAIL, dbOperation.getOnlyAttributeOfThing(answer, "husband", EMAIL));

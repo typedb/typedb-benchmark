@@ -15,12 +15,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package grakn.simulation.grakn.driver;
+package grakn.benchmark.grakn.driver;
 
+import grakn.benchmark.common.driver.LogWrapper;
+import grakn.benchmark.common.driver.TransactionalDbOperation;
 import grakn.client.Grakn;
 import grakn.client.concept.answer.ConceptMap;
-import grakn.simulation.common.driver.LogWrapper;
-import grakn.simulation.common.driver.TransactionalDbOperation;
 import graql.lang.query.GraqlDelete;
 import graql.lang.query.GraqlInsert;
 import graql.lang.query.GraqlMatch;

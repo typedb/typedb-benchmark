@@ -15,22 +15,22 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package grakn.simulation.neo4j.action.write;
+package grakn.benchmark.neo4j.action.write;
 
-import grakn.simulation.common.action.Action;
-import grakn.simulation.common.action.write.InsertCompanyAction;
-import grakn.simulation.common.world.World;
-import grakn.simulation.neo4j.driver.Neo4jOperation;
+import grakn.benchmark.common.action.Action;
+import grakn.benchmark.common.action.write.InsertCompanyAction;
+import grakn.benchmark.common.world.World;
+import grakn.benchmark.neo4j.driver.Neo4jOperation;
 import org.neo4j.driver.Query;
 import org.neo4j.driver.Record;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
 
-import static grakn.simulation.neo4j.action.Model.COMPANY_NAME;
-import static grakn.simulation.neo4j.action.Model.COMPANY_NUMBER;
-import static grakn.simulation.neo4j.action.Model.DATE_OF_INCORPORATION;
-import static grakn.simulation.neo4j.action.Model.LOCATION_NAME;
+import static grakn.benchmark.neo4j.action.Model.COMPANY_NAME;
+import static grakn.benchmark.neo4j.action.Model.COMPANY_NUMBER;
+import static grakn.benchmark.neo4j.action.Model.DATE_OF_INCORPORATION;
+import static grakn.benchmark.neo4j.action.Model.LOCATION_NAME;
 
 public class Neo4jInsertCompanyAction extends InsertCompanyAction<Neo4jOperation, Record> {
 
@@ -40,7 +40,7 @@ public class Neo4jInsertCompanyAction extends InsertCompanyAction<Neo4jOperation
 
     @Override
     public Record run() {
-        HashMap<String, Object> parameters = new HashMap<String, Object>(){{
+        HashMap<String, Object> parameters = new HashMap<String, Object>() {{
             put("countryName", country.name());
             put("companyNumber", companyNumber);
             put("companyName", companyName);

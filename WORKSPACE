@@ -16,7 +16,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 
-workspace(name = "graknlabs_simulation")
+workspace(name = "graknlabs_benchmark")
 
 ################################
 # Load @graknlabs_dependencies #
@@ -160,7 +160,7 @@ load("//dependencies/graknlabs:artifacts.bzl", "graknlabs_grakn_core_artifacts")
 graknlabs_grakn_core_artifacts()
 
 # Load maven
-load("//dependencies/maven:artifacts.bzl", graknlabs_simulation_artifacts = "artifacts")
+load("//dependencies/maven:artifacts.bzl", graknlabs_benchmark_artifacts = "artifacts")
 load("@graknlabs_client_java//dependencies/maven:artifacts.bzl", graknlabs_client_java_artifacts = "artifacts")
 load("@graknlabs_graql//dependencies/maven:artifacts.bzl", graknlabs_graql_artifacts = "artifacts")
 load("@graknlabs_protocol//dependencies/maven:artifacts.bzl", graknlabs_protocol_artifacts = "artifacts")
@@ -183,7 +183,7 @@ rje_maven_install(
 
 load("@graknlabs_dependencies//library/maven:rules.bzl", "maven")
 maven(
-    graknlabs_simulation_artifacts +
+    graknlabs_benchmark_artifacts +
     graknlabs_graql_artifacts +
     graknlabs_protocol_artifacts +
     graknlabs_client_java_artifacts

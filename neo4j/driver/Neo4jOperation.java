@@ -15,10 +15,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package grakn.simulation.neo4j.driver;
+package grakn.benchmark.neo4j.driver;
 
-import grakn.simulation.common.driver.LogWrapper;
-import grakn.simulation.common.driver.TransactionalDbOperation;
+import grakn.benchmark.common.driver.LogWrapper;
+import grakn.benchmark.common.driver.TransactionalDbOperation;
 import org.neo4j.driver.Query;
 import org.neo4j.driver.Record;
 import org.neo4j.driver.Result;

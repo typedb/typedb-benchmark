@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package grakn.simulation.common.action;
+package grakn.benchmark.common.action;
 
 public enum SpouseType {
     WIFE, HUSBAND

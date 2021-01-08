@@ -15,17 +15,17 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package grakn.simulation.test;
+package grakn.benchmark.test;
 
-import grakn.simulation.common.action.Action;
-import grakn.simulation.common.agent.base.Agent;
+import grakn.benchmark.common.action.Action;
+import grakn.benchmark.common.agent.base.Agent;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.util.Iterator;
 
-import static grakn.simulation.test.SimulationsForComparison.grakn;
-import static grakn.simulation.test.SimulationsForComparison.neo4j;
+import static grakn.benchmark.test.SimulationsForComparison.grakn;
+import static grakn.benchmark.test.SimulationsForComparison.neo4j;
 import static org.junit.Assert.assertEquals;
 
 @RunWith(ComparisonTestSuite.class)
