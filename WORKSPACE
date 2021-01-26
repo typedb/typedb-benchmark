@@ -156,8 +156,9 @@ graknlabs_graql()
 graknlabs_protocol()
 
 # Load artifact
-load("//dependencies/graknlabs:artifacts.bzl", "graknlabs_grakn_core_artifacts")
+load("//dependencies/graknlabs:artifacts.bzl", "graknlabs_grakn_core_artifacts", "graknlabs_grakn_cluster_artifacts")
 graknlabs_grakn_core_artifacts()
+graknlabs_grakn_cluster_artifacts()
 
 # Load maven
 load("//dependencies/maven:artifacts.bzl", graknlabs_benchmark_artifacts = "artifacts")

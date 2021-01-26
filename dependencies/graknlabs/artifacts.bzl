@@ -18,14 +18,24 @@
 #
 
 load("@graknlabs_dependencies//distribution/artifact:rules.bzl", "native_artifact_files")
-load("@graknlabs_dependencies//distribution:deployment.bzl", "deployment")
+load("@graknlabs_dependencies//distribution:deployment.bzl", "deployment", "deployment_private")
 
 def graknlabs_grakn_core_artifacts():
     native_artifact_files(
         name = "graknlabs_grakn_core_artifact",
         group_name = "graknlabs_grakn_core",
-        artifact_name = "grakn-core-server-{platform}-{version}.tar.gz",
+        artifact_name = "grakn-core-server-{platform}-{version}.{ext}",
         tag_source = deployment["artifact.release"],
         commit_source = deployment["artifact.snapshot"],
         commit = "1ca6886f8412a408cf8a4266c8923b07dd38e9ce",
+    )
+
+def graknlabs_grakn_cluster_artifacts():
+    native_artifact_files(
+        name = "graknlabs_grakn_cluster_artifact",
+        group_name = "graknlabs_grakn_cluster",
+        artifact_name = "grakn-cluster-server-{platform}-{version}.{ext}",
+        tag_source = deployment_private["artifact.release"],
+        commit_source = deployment_private["artifact.snapshot"],
+        commit = "74c7e69beca0f281528a4e27a9bca6feb033b386",
     )
