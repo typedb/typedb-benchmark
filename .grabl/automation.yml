@@ -6,6 +6,10 @@ build:
       type: background
       timeout: "5h"
       command: |
+        export ARTIFACT_USERNAME=$REPO_GRAKN_USERNAME
+        export ARTIFACT_PASSWORD=$REPO_GRAKN_PASSWORD
+        bazel run @graknlabs_dependencies//distribution/artifact:create-netrc
+
         cat > grakn-cluster.service <<- EOM
         [Unit]
         Description=Grakn Cluster
@@ -37,6 +41,10 @@ build:
       timeout: "5h"
       dependencies: [test-performance-small-grakn-cluster-background]
       command: |
+        export ARTIFACT_USERNAME=$REPO_GRAKN_USERNAME
+        export ARTIFACT_PASSWORD=$REPO_GRAKN_PASSWORD
+        bazel run @graknlabs_dependencies//distribution/artifact:create-netrc
+        
         bazel run --config=rbe //:benchmark-small -- \
           --database "Grakn Cluster 2.0" \
           --database-uri $GRABL_EXPORT_PERFORMANCE_SMALL_GRAKN_CLUSTER_URI \
