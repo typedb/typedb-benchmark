@@ -21,7 +21,7 @@ import grakn.benchmark.common.driver.DbOperationFactory;
 import grakn.benchmark.common.driver.TransactionalDbDriver;
 import grakn.benchmark.common.world.Region;
 import grakn.client.Grakn;
-import grakn.client.rpc.GraknClient;
+import grakn.client.GraknClient;
 import org.slf4j.Logger;
 
 import java.util.concurrent.ConcurrentHashMap;
@@ -33,7 +33,7 @@ public class GraknDriver extends TransactionalDbDriver<Grakn.Transaction, Grakn.
     private final ConcurrentHashMap<String, Grakn.Session> sessionMap = new ConcurrentHashMap<>();
 
     public GraknDriver(String hostUri, String database) {
-        this.client = new GraknClient(hostUri);
+        this.client = GraknClient.core(hostUri);
         this.database = database;
     }
 
