@@ -46,7 +46,6 @@ build:
         export ARTIFACT_PASSWORD=$REPO_GRAKN_PASSWORD
         bazel run @graknlabs_dependencies//distribution/artifact:create-netrc
 
-        sleep 1800
         bazel run --config=rbe //:benchmark-small -- \
           --database "Grakn Cluster 2.0" \
           --database-uri $GRABL_EXPORT_PERFORMANCE_SMALL_GRAKN_CLUSTER_URI \
