@@ -41,7 +41,7 @@ public class GraknDriver extends TransactionalDbDriver<Grakn.Transaction, Grakn.
         return new GraknDriver(Either.second(GraknClient.cluster(hostUri)), database);
     }
 
-    public GraknDriver(Either<Grakn.Client, GraknClient.Cluster> client, String database) {
+    private GraknDriver(Either<Grakn.Client, GraknClient.Cluster> client, String database) {
         this.client = client;
         this.database = database;
     }
