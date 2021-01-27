@@ -33,7 +33,6 @@ public class GraknDriver extends TransactionalDbDriver<Grakn.Transaction, Grakn.
     private final ConcurrentHashMap<String, Grakn.Session> sessionMap = new ConcurrentHashMap<>();
 
     public GraknDriver(String hostUri, String database) {
-        System.out.println("------  " + hostUri);
         this.client = GraknClient.cluster(hostUri);
         this.database = database;
     }

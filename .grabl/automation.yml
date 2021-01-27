@@ -36,7 +36,7 @@ build:
         sudo systemctl start grakn-cluster
       monitor: |
         sleep 10s
-        tail -f -n +1 ./simulation/dist/grakn-cluster-all-linux/server/logs/grakn.log
+        tail -f -n +1 ./benchmark/dist/grakn-cluster-all-linux/server/logs/grakn.log
     test-performance-small-grakn-cluster:
       image: graknlabs-ubuntu-20.04
       timeout: "5h"
@@ -57,85 +57,85 @@ build:
           --username $GRABL_OWNER \
           --api-token $GRABL_TOKEN \
           --config-file /home/grabl/$GRABL_REPO/config/config_test.yml
-#    test-performance-small-grakn-core-background:
-#      machine: 16cpus-32gb
-#      image: graknlabs-ubuntu-20.04
-#      type: background
-#      timeout: "5h"
-#      command: |
-#        cat > grakn.service <<- EOM
-#        [Unit]
-#        Description=Grakn Core
-#
-#        [Service]
-#        Type=simple
-#        ExecStart=/home/grabl/benchmark/dist/grakn-core-all-linux/grakn server
-#        Restart=on-failure
-#        RestartSec=10
-#        KillMode=process
-#
-#        [Install]
-#        WantedBy=multi-user.target
-#        EOM
-#
-#        sudo mv grakn.service /etc/systemd/system/
-#
-#        bazel run --config=rbe //test:grakn-extractor-linux -- dist/grakn-core-all-linux
-#        cd ./dist/grakn-core-all-linux/
-#
-#        sudo systemctl daemon-reload
-#        sudo systemctl start grakn
-#        export GRABL_EXPORT_PERFORMANCE_SMALL_GRAKN_CORE_URI="${HOSTNAME}:1729"
-#      monitor: |
-#        sleep 10s
-#        tail -f -n +1 /home/grabl/benchmark/dist/grakn-core-all-linux/server/logs/grakn.log
-#    test-performance-small-grakn-core:
-#      image: graknlabs-ubuntu-20.04
-#      timeout: "5h"
-#      dependencies: [test-performance-small-grakn-core-background]
-#      command: |
-#        bazel run --config=rbe //:benchmark-small -- \
-#          --database "Grakn Core 2.0" \
-#          --database-uri $GRABL_EXPORT_PERFORMANCE_SMALL_GRAKN_CORE_URI \
-#          --tracing-uri $GRABL_TRACING_URI \
-#          --org $GRABL_OWNER \
-#          --repo $GRABL_REPO \
-#          --commit $GRABL_COMMIT \
-#          --username $GRABL_OWNER \
-#          --api-token $GRABL_TOKEN \
-#          --config-file /home/grabl/$GRABL_REPO/config/config_test.yml
-#    test-performance-small-neo4j-background:
-#      machine: 16cpus-32gb
-#      image: graknlabs-ubuntu-20.04
-#      type: background
-#      timeout: "5h"
-#      command: |
-#        sudo add-apt-repository -y ppa:openjdk-r/ppa
-#        curl https://cli-assets.heroku.com/apt/release.key | sudo apt-key add -
-#        curl https://dl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
-#        sudo apt-get update
-#        wget -O - https://debian.neo4j.com/neotechnology.gpg.key | sudo apt-key add -
-#        echo 'deb https://debian.neo4j.com stable 4.1' | sudo tee -a /etc/apt/sources.list.d/neo4j.list
-#        sudo apt-get update
-#        sudo apt-get install -y neo4j=1:4.1.0
-#        sudo update-java-alternatives --jre --set java-1.11.0-openjdk-amd64
-#        echo 'dbms.connectors.default_listen_address=0.0.0.0' | sudo tee -a /etc/neo4j/neo4j.conf
-#        echo 'dbms.security.auth_enabled=false' | sudo tee -a /etc/neo4j/neo4j.conf
-#        ps aux | grep "org.neo4j.server" | awk '{print $2}' | xargs sudo kill -9 >/dev/null 2&>1 || true
-#        sudo neo4j start
-#        export GRABL_EXPORT_PERFORMANCE_SMALL_NEO4J_URI="bolt://${HOSTNAME}:7687"
-#    test-performance-small-neo4j:
-#      image: graknlabs-ubuntu-20.04
-#      dependencies: [test-performance-small-neo4j-background]
-#      timeout: "5h"
-#      command: |
-#        bazel run --config=rbe //:benchmark-small -- \
-#          --database Neo4j \
-#          --database-uri $GRABL_EXPORT_PERFORMANCE_SMALL_NEO4J_URI \
-#          --tracing-uri $GRABL_TRACING_URI \
-#          --org $GRABL_OWNER \
-#          --repo $GRABL_REPO \
-#          --commit $GRABL_COMMIT \
-#          --username $GRABL_OWNER \
-#          --api-token $GRABL_TOKEN \
-#          --config-file /home/grabl/$GRABL_REPO/config/config_test.yml
+    test-performance-small-grakn-core-background:
+      machine: 16cpus-32gb
+      image: graknlabs-ubuntu-20.04
+      type: background
+      timeout: "5h"
+      command: |
+        cat > grakn.service <<- EOM
+        [Unit]
+        Description=Grakn Core
+
+        [Service]
+        Type=simple
+        ExecStart=/home/grabl/benchmark/dist/grakn-core-all-linux/grakn server
+        Restart=on-failure
+        RestartSec=10
+        KillMode=process
+
+        [Install]
+        WantedBy=multi-user.target
+        EOM
+
+        sudo mv grakn.service /etc/systemd/system/
+
+        bazel run --config=rbe //test:grakn-extractor-linux -- dist/grakn-core-all-linux
+        cd ./dist/grakn-core-all-linux/
+
+        sudo systemctl daemon-reload
+        sudo systemctl start grakn
+        export GRABL_EXPORT_PERFORMANCE_SMALL_GRAKN_CORE_URI="${HOSTNAME}:1729"
+      monitor: |
+        sleep 10s
+        tail -f -n +1 /home/grabl/benchmark/dist/grakn-core-all-linux/server/logs/grakn.log
+    test-performance-small-grakn-core:
+      image: graknlabs-ubuntu-20.04
+      timeout: "5h"
+      dependencies: [test-performance-small-grakn-core-background]
+      command: |
+        bazel run --config=rbe //:benchmark-small -- \
+          --database "Grakn Core 2.0" \
+          --database-uri $GRABL_EXPORT_PERFORMANCE_SMALL_GRAKN_CORE_URI \
+          --tracing-uri $GRABL_TRACING_URI \
+          --org $GRABL_OWNER \
+          --repo $GRABL_REPO \
+          --commit $GRABL_COMMIT \
+          --username $GRABL_OWNER \
+          --api-token $GRABL_TOKEN \
+          --config-file /home/grabl/$GRABL_REPO/config/config_test.yml
+    test-performance-small-neo4j-background:
+      machine: 16cpus-32gb
+      image: graknlabs-ubuntu-20.04
+      type: background
+      timeout: "5h"
+      command: |
+        sudo add-apt-repository -y ppa:openjdk-r/ppa
+        curl https://cli-assets.heroku.com/apt/release.key | sudo apt-key add -
+        curl https://dl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
+        sudo apt-get update
+        wget -O - https://debian.neo4j.com/neotechnology.gpg.key | sudo apt-key add -
+        echo 'deb https://debian.neo4j.com stable 4.1' | sudo tee -a /etc/apt/sources.list.d/neo4j.list
+        sudo apt-get update
+        sudo apt-get install -y neo4j=1:4.1.0
+        sudo update-java-alternatives --jre --set java-1.11.0-openjdk-amd64
+        echo 'dbms.connectors.default_listen_address=0.0.0.0' | sudo tee -a /etc/neo4j/neo4j.conf
+        echo 'dbms.security.auth_enabled=false' | sudo tee -a /etc/neo4j/neo4j.conf
+        ps aux | grep "org.neo4j.server" | awk '{print $2}' | xargs sudo kill -9 >/dev/null 2&>1 || true
+        sudo neo4j start
+        export GRABL_EXPORT_PERFORMANCE_SMALL_NEO4J_URI="bolt://${HOSTNAME}:7687"
+    test-performance-small-neo4j:
+      image: graknlabs-ubuntu-20.04
+      dependencies: [test-performance-small-neo4j-background]
+      timeout: "5h"
+      command: |
+        bazel run --config=rbe //:benchmark-small -- \
+          --database Neo4j \
+          --database-uri $GRABL_EXPORT_PERFORMANCE_SMALL_NEO4J_URI \
+          --tracing-uri $GRABL_TRACING_URI \
+          --org $GRABL_OWNER \
+          --repo $GRABL_REPO \
+          --commit $GRABL_COMMIT \
+          --username $GRABL_OWNER \
+          --api-token $GRABL_TOKEN \
+          --config-file /home/grabl/$GRABL_REPO/config/config_test.yml
