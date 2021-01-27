@@ -63,7 +63,7 @@ build:
       type: background
       timeout: "5h"
       command: |
-        cat > grakn.service <<- EOM
+        cat > grakn-core.service <<- EOM
         [Unit]
         Description=Grakn Core
 
@@ -78,13 +78,13 @@ build:
         WantedBy=multi-user.target
         EOM
 
-        sudo mv grakn.service /etc/systemd/system/
+        sudo mv grakn-core.service /etc/systemd/system/
 
-        bazel run --config=rbe //test:grakn-extractor-linux -- dist/grakn-core-all-linux
+        bazel run --config=rbe //test:grakn-core-extractor-linux -- dist/grakn-core-all-linux
         cd ./dist/grakn-core-all-linux/
 
         sudo systemctl daemon-reload
-        sudo systemctl start grakn
+        sudo systemctl start grakn-core
         export GRABL_EXPORT_PERFORMANCE_SMALL_GRAKN_CORE_URI="${HOSTNAME}:1729"
       monitor: |
         sleep 10s
