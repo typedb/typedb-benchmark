@@ -27,7 +27,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static grakn.benchmark.test.BenchmarksForComparison.grakn;
+import static grakn.benchmark.test.BenchmarksForComparison.graknCore;
 import static grakn.benchmark.test.BenchmarksForComparison.neo4j;
 
 public class ComparisonTestSuite extends Suite {
@@ -58,10 +58,10 @@ public class ComparisonTestSuite extends Suite {
     protected void runChild(Runner runner, final RunNotifier notifier) {
         iteration++;
         neo4j.iterate();
-        grakn.iterate();
+        graknCore.iterate();
         super.runChild(runner, notifier);
         if (iteration == BenchmarksForComparison.numIterations + 1) {
-            grakn.close();
+            graknCore.close();
             neo4j.close();
         }
     }
