@@ -49,6 +49,7 @@ import static grakn.benchmark.common.world.World.initialise;
 public class BenchmarkRunner {
 
     final static Logger LOG = LoggerFactory.getLogger(grakn.benchmark.BenchmarkRunner.class);
+    public static final String DATABASE = "world";
 
     public static void main(String[] args) {
 
@@ -110,9 +111,12 @@ public class BenchmarkRunner {
                 if (dbName.toLowerCase().startsWith("grakn")) {
                     defaultUri = "localhost:48555";
                     if (hostUri == null) hostUri = defaultUri;
-
+                    GraknDriver graknDriver;
+                    if (dbName.toLowerCase().contains("core")) graknDriver = GraknDriver.core(hostUri, DATABASE);
+                    else if (dbName.toLowerCase().contains("cluster")) graknDriver = GraknDriver.cluster(hostUri, DATABASE);
+                    else throw new IllegalArgumentException("Unexpected database name: " + dbName);
                     benchmark = new grakn.benchmark.grakn.GraknBenchmark(
-                            new GraknDriver(hostUri, "world"),
+                            graknDriver,
                             initialisationDataFiles,
                             config.getRandomSeed(),
                             world,
@@ -132,7 +136,7 @@ public class BenchmarkRunner {
                             config.getTraceSampling().getSamplingFunction(),
                             false);
                 } else {
-                    throw new IllegalArgumentException("Unexpected value: " + dbName);
+                    throw new IllegalArgumentException("Unexpected database name: " + dbName);
                 }
 
                 ///////////////

@@ -32,8 +32,17 @@ public class GraknDriver extends TransactionalDbDriver<Grakn.Transaction, Grakn.
     private final String database;
     private final ConcurrentHashMap<String, Grakn.Session> sessionMap = new ConcurrentHashMap<>();
 
-    public GraknDriver(String hostUri, String database) {
-        this.client = GraknClient.cluster(hostUri);
+    public static GraknDriver core(String hostUri, String database) {
+        return new GraknDriver(GraknClient.core(hostUri), database);
+    }
+
+    public static GraknDriver cluster(String hostUri, String database) {
+        return new GraknDriver(GraknClient.cluster(hostUri), database);
+    }
+
+
+    public GraknDriver(Grakn.Client client, String database) {
+        this.client = client;
         this.database = database;
     }
 
