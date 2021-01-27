@@ -35,7 +35,8 @@ build:
         export GRABL_EXPORT_PERFORMANCE_SMALL_GRAKN_CLUSTER_URI="${HOSTNAME}:1729"
       monitor: |
         sleep 10s
-        tail -f -n +1 /home/grabl/$GRABL_REPO/dist/grakn-cluster-all-linux/server/logs/grakn.log
+        pwd
+        tail -f -n +1 /home/grabl/simulation/dist/grakn-cluster-all-linux/server/logs/grakn.log
     test-performance-small-grakn-cluster:
       image: graknlabs-ubuntu-20.04
       timeout: "5h"
