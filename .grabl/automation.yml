@@ -18,7 +18,7 @@ build:
 
         [Service]
         Type=simple
-        ExecStart=/home/grabl/$GRABL_REPO/dist/grakn-cluster-all-linux/grakn server --address=$GRABL_EXPORT_PERFORMANCE_SMALL_GRAKN_CLUSTER_URI
+        ExecStart=/home/grabl/$GRABL_REPO/dist/grakn-cluster-all-linux/grakn server --address=$GRABL_EXPORT_PERFORMANCE_SMALL_GRAKN_CLUSTER_URI:1730
         Restart=on-failure
         RestartSec=10
         KillMode=process
