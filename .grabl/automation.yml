@@ -16,7 +16,7 @@ build:
 
         [Service]
         Type=simple
-        ExecStart=/home/grabl/benchmark/dist/grakn-cluster-all-linux/grakn server
+        ExecStart=/home/grabl/$GRABL_REPO/dist/grakn-cluster-all-linux/grakn server
         Restart=on-failure
         RestartSec=10
         KillMode=process
@@ -35,7 +35,7 @@ build:
         export GRABL_EXPORT_PERFORMANCE_SMALL_GRAKN_CLUSTER_URI="${HOSTNAME}:1729"
       monitor: |
         sleep 10s
-        tail -f -n +1 /home/grabl/benchmark/dist/grakn-cluster-all-linux/server/logs/grakn.log
+        tail -f -n +1 /home/grabl/$GRABL_REPO/dist/grakn-cluster-all-linux/server/logs/grakn.log
     test-performance-small-grakn-cluster:
       image: graknlabs-ubuntu-20.04
       timeout: "5h"
@@ -44,7 +44,7 @@ build:
         export ARTIFACT_USERNAME=$REPO_GRAKN_USERNAME
         export ARTIFACT_PASSWORD=$REPO_GRAKN_PASSWORD
         bazel run @graknlabs_dependencies//distribution/artifact:create-netrc
-        
+
         bazel run --config=rbe //:benchmark-small -- \
           --database "Grakn Cluster 2.0" \
           --database-uri $GRABL_EXPORT_PERFORMANCE_SMALL_GRAKN_CLUSTER_URI \
