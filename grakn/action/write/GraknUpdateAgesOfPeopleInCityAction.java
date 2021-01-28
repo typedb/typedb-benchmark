@@ -21,7 +21,6 @@ import grakn.benchmark.common.action.write.UpdateAgesOfPeopleInCityAction;
 import grakn.benchmark.common.world.World;
 import grakn.benchmark.grakn.driver.GraknOperation;
 import grakn.common.collection.Pair;
-import graql.lang.Graql;
 import graql.lang.pattern.variable.UnboundVariable;
 import graql.lang.query.GraqlDelete;
 import graql.lang.query.GraqlInsert;
@@ -41,8 +40,11 @@ import static grakn.benchmark.grakn.action.Model.EMAIL;
 import static grakn.benchmark.grakn.action.Model.LOCATION_NAME;
 import static grakn.benchmark.grakn.action.Model.PERSON;
 import static grakn.common.collection.Collections.pair;
+import static graql.lang.Graql.match;
+import static graql.lang.Graql.var;
 
 public class GraknUpdateAgesOfPeopleInCityAction extends UpdateAgesOfPeopleInCityAction<GraknOperation> {
+
     public GraknUpdateAgesOfPeopleInCityAction(GraknOperation dbOperation, LocalDateTime today, World.City city) {
         super(dbOperation, today, city);
     }
@@ -58,28 +60,22 @@ public class GraknUpdateAgesOfPeopleInCityAction extends UpdateAgesOfPeopleInCit
         return null;
     }
 
-    public static GraqlMatch.Sorted getPeopleBornInCityQuery(String worldCityName) {
-        UnboundVariable city = Graql.var(CITY);
-        UnboundVariable person = Graql.var(PERSON);
-        UnboundVariable bornIn = Graql.var(BORN_IN);
-        UnboundVariable dobVar = Graql.var(DATE_OF_BIRTH);
-        UnboundVariable emailVar = Graql.var(EMAIL);
+    public static GraqlMatch getPeopleBornInCityQuery(String worldCityName) {
+        UnboundVariable city = var(CITY);
+        UnboundVariable person = var(PERSON);
+        UnboundVariable bornIn = var(BORN_IN);
+        UnboundVariable dobVar = var(DATE_OF_BIRTH);
+        UnboundVariable emailVar = var(EMAIL);
 
-        return Graql.match(
-                city.isa(CITY)
-                        .has(LOCATION_NAME, worldCityName),
-                person.isa(PERSON)
-                        .has(EMAIL, emailVar)
-                        .has(DATE_OF_BIRTH, dobVar),
-                bornIn
-                        .rel(BORN_IN_CHILD, person)
-                        .rel(BORN_IN_PLACE_OF_BIRTH, city)
-                        .isa(BORN_IN)
-        ).sort(EMAIL);
+        return match(
+                city.isa(CITY).has(LOCATION_NAME, worldCityName),
+                person.isa(PERSON).has(EMAIL, emailVar).has(DATE_OF_BIRTH, dobVar),
+                bornIn.rel(BORN_IN_CHILD, person).rel(BORN_IN_PLACE_OF_BIRTH, city).isa(BORN_IN)
+        );
     }
 
     private Stream<Pair<String, LocalDateTime>> getPeopleBornInCity(World.City worldCity) {
-        GraqlMatch.Sorted peopleQuery = getPeopleBornInCityQuery(worldCity.name());
+        GraqlMatch peopleQuery = getPeopleBornInCityQuery(worldCity.name());
         return dbOperation.executeAsync(peopleQuery).map(personAnswer -> {
             LocalDateTime dob = (LocalDateTime) personAnswer.get(DATE_OF_BIRTH).asThing().asAttribute().getValue();
             String email = personAnswer.get(EMAIL).asThing().asAttribute().getValue().toString();
@@ -93,28 +89,13 @@ public class GraknUpdateAgesOfPeopleInCityAction extends UpdateAgesOfPeopleInCit
     }
 
     public static GraqlInsert insertNewAgeQuery(String personEmail, long newAge) {
-        UnboundVariable person = Graql.var(PERSON);
-        return Graql.match(
-                person
-                        .isa(PERSON)
-                        .has(EMAIL, personEmail)
-        ).insert(
-                person
-                        .has(AGE, newAge)
-        );
+        UnboundVariable person = var(PERSON);
+        return match(person.isa(PERSON).has(EMAIL, personEmail)).insert(person.has(AGE, newAge));
     }
 
     public static GraqlDelete deleteHasQuery(String personEmail) {
-        UnboundVariable person = Graql.var(PERSON);
-        UnboundVariable age = Graql.var(AGE);
-        return Graql.match(
-                person
-                        .isa(PERSON)
-                        .has(EMAIL, personEmail)
-                        .has(AGE, age)
-        ).delete(
-                person
-                        .has(age)
-        );
+        UnboundVariable person = var(PERSON);
+        UnboundVariable age = var(AGE);
+        return match(person.isa(PERSON).has(EMAIL, personEmail).has(AGE, age)).delete(person.has(age));
     }
 }

@@ -37,25 +37,25 @@ build:
       monitor: |
         sleep 10s
         tail -f -n +1 ./benchmark/dist/grakn-cluster-all-linux/server/logs/grakn.log
-    test-performance-small-grakn-cluster:
-      image: graknlabs-ubuntu-20.04
-      timeout: "5h"
-      dependencies: [test-performance-small-grakn-cluster-background]
-      command: |
-        export ARTIFACT_USERNAME=$REPO_GRAKN_USERNAME
-        export ARTIFACT_PASSWORD=$REPO_GRAKN_PASSWORD
-        bazel run @graknlabs_dependencies//distribution/artifact:create-netrc
-
-        bazel run --config=rbe //:benchmark-small -- \
-          --database "Grakn Cluster 2.0" \
-          --database-uri $GRABL_EXPORT_PERFORMANCE_SMALL_GRAKN_CLUSTER_URI \
-          --tracing-uri $GRABL_TRACING_URI \
-          --org $GRABL_OWNER \
-          --repo $GRABL_REPO \
-          --commit $GRABL_COMMIT \
-          --username $GRABL_OWNER \
-          --api-token $GRABL_TOKEN \
-          --config-file /home/grabl/$GRABL_REPO/config/config_test.yml
+#    test-performance-small-grakn-cluster:
+#      image: graknlabs-ubuntu-20.04
+#      timeout: "5h"
+#      dependencies: [test-performance-small-grakn-cluster-background]
+#      command: |
+#        export ARTIFACT_USERNAME=$REPO_GRAKN_USERNAME
+#        export ARTIFACT_PASSWORD=$REPO_GRAKN_PASSWORD
+#        bazel run @graknlabs_dependencies//distribution/artifact:create-netrc
+#
+#        bazel run --config=rbe //:benchmark-small -- \
+#          --database "Grakn Cluster 2.0" \
+#          --database-uri $GRABL_EXPORT_PERFORMANCE_SMALL_GRAKN_CLUSTER_URI \
+#          --tracing-uri $GRABL_TRACING_URI \
+#          --org $GRABL_OWNER \
+#          --repo $GRABL_REPO \
+#          --commit $GRABL_COMMIT \
+#          --username $GRABL_OWNER \
+#          --api-token $GRABL_TOKEN \
+#          --config-file /home/grabl/$GRABL_REPO/config/config_test.yml
     test-performance-small-grakn-core-background:
       machine: 16cpus-32gb
       image: graknlabs-ubuntu-20.04
