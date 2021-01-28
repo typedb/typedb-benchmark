@@ -114,8 +114,7 @@ public class GraknUpdateAgesOfPeopleInCityAction extends UpdateAgesOfPeopleInCit
                         .has(AGE, age)
         ).delete(
                 person
-                        .has(AGE, age
-                        )
+                        .has(age)
         );
     }
 }
