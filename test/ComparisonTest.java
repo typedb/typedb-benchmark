@@ -24,7 +24,7 @@ import org.junit.runner.RunWith;
 
 import java.util.Iterator;
 
-import static grakn.benchmark.test.BenchmarksForComparison.grakn;
+import static grakn.benchmark.test.BenchmarksForComparison.graknCore;
 import static grakn.benchmark.test.BenchmarksForComparison.neo4j;
 import static org.junit.Assert.assertEquals;
 
@@ -33,7 +33,7 @@ public class ComparisonTest {
 
     private void compareReports(String agentName) {
 
-        Agent<?, ?>.Report graknAgentReport = grakn.getReport().getAgentReport(agentName);
+        Agent<?, ?>.Report graknAgentReport = graknCore.getReport().getAgentReport(agentName);
         Agent<?, ?>.Report neo4jAgentReport = neo4j.getReport().getAgentReport(agentName);
 
         if (!graknAgentReport.equals(neo4jAgentReport)) {

@@ -45,7 +45,7 @@ import static grakn.benchmark.config.Config.Agent.ConstructAgentConfig;
 
 public class BenchmarksForComparison {
     static final grakn.benchmark.neo4j.Neo4JBenchmark neo4j;
-    static final grakn.benchmark.grakn.GraknBenchmark grakn;
+    static final grakn.benchmark.grakn.GraknBenchmark graknCore;
     static final int numIterations = 5;
 
     static {
@@ -114,8 +114,8 @@ public class BenchmarksForComparison {
         // Grakn setup //
         /////////////////
 
-        grakn = new grakn.benchmark.grakn.GraknBenchmark(
-                new GraknDriver(graknUri, "world"),
+        graknCore = new grakn.benchmark.grakn.GraknBenchmark(
+                GraknDriver.core(graknUri, "world"),
                 files,
                 randomSeed,
                 world,
