@@ -24,6 +24,7 @@ import grakn.client.concept.answer.ConceptMap;
 import graql.lang.query.GraqlDelete;
 import graql.lang.query.GraqlInsert;
 import graql.lang.query.GraqlMatch;
+import graql.lang.query.GraqlUpdate;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -93,6 +94,11 @@ public class GraknOperation extends TransactionalDbOperation {
     public Stream<ConceptMap> executeAsync(GraqlInsert query) {
         log.query(tracker, iteration, query);
         return transaction.query().insert(query);
+    }
+
+    public Stream<ConceptMap> executeAsync(GraqlUpdate query) {
+        log.query(tracker, iteration, query);
+        return transaction.query().update(query);
     }
 
     public List<ConceptMap> execute(GraqlMatch query) {

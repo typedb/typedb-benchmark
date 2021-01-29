@@ -22,8 +22,6 @@ import grakn.benchmark.common.world.World;
 import grakn.benchmark.grakn.driver.GraknOperation;
 import grakn.common.collection.Pair;
 import graql.lang.pattern.variable.UnboundVariable;
-import graql.lang.query.GraqlDelete;
-import graql.lang.query.GraqlInsert;
 import graql.lang.query.GraqlMatch;
 
 import java.time.LocalDateTime;
@@ -60,6 +58,15 @@ public class GraknUpdateAgesOfPeopleInCityAction extends UpdateAgesOfPeopleInCit
         return null;
     }
 
+    private Stream<Pair<String, LocalDateTime>> getPeopleBornInCity(World.City worldCity) {
+        GraqlMatch peopleQuery = getPeopleBornInCityQuery(worldCity.name());
+        return dbOperation.executeAsync(peopleQuery).map(personAnswer -> {
+            LocalDateTime dob = (LocalDateTime) personAnswer.get(DATE_OF_BIRTH).asThing().asAttribute().getValue();
+            String email = personAnswer.get(EMAIL).asThing().asAttribute().getValue().toString();
+            return pair(email, dob);
+        });
+    }
+
     public static GraqlMatch getPeopleBornInCityQuery(String worldCityName) {
         UnboundVariable city = var(CITY);
         UnboundVariable person = var(PERSON);
@@ -74,28 +81,12 @@ public class GraknUpdateAgesOfPeopleInCityAction extends UpdateAgesOfPeopleInCit
         );
     }
 
-    private Stream<Pair<String, LocalDateTime>> getPeopleBornInCity(World.City worldCity) {
-        GraqlMatch peopleQuery = getPeopleBornInCityQuery(worldCity.name());
-        return dbOperation.executeAsync(peopleQuery).map(personAnswer -> {
-            LocalDateTime dob = (LocalDateTime) personAnswer.get(DATE_OF_BIRTH).asThing().asAttribute().getValue();
-            String email = personAnswer.get(EMAIL).asThing().asAttribute().getValue().toString();
-            return pair(email, dob);
-        });
-    }
-
     private void updatePersonAge(String personEmail, long newAge) {
-        dbOperation.executeAsync(deleteHasQuery(personEmail));
-        dbOperation.executeAsync(insertNewAgeQuery(personEmail, newAge));
+        dbOperation.executeAsync(
+                match(var(PERSON).isa(PERSON).has(EMAIL, personEmail).has(AGE, var(AGE)))
+                        .delete(var(PERSON).has(var(AGE)))
+                        .insert(var(PERSON).has(AGE, newAge))
+        );
     }
 
-    public static GraqlInsert insertNewAgeQuery(String personEmail, long newAge) {
-        UnboundVariable person = var(PERSON);
-        return match(person.isa(PERSON).has(EMAIL, personEmail)).insert(person.has(AGE, newAge));
-    }
-
-    public static GraqlDelete deleteHasQuery(String personEmail) {
-        UnboundVariable person = var(PERSON);
-        UnboundVariable age = var(AGE);
-        return match(person.isa(PERSON).has(EMAIL, personEmail).has(AGE, age)).delete(person.has(age));
-    }
 }
