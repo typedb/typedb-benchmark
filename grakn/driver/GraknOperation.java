@@ -19,7 +19,7 @@ package grakn.benchmark.grakn.driver;
 
 import grakn.benchmark.common.driver.LogWrapper;
 import grakn.benchmark.common.driver.TransactionalDbOperation;
-import grakn.client.Grakn;
+import grakn.client.GraknClient;
 import grakn.client.concept.answer.ConceptMap;
 import graql.lang.query.GraqlDelete;
 import graql.lang.query.GraqlInsert;
@@ -33,14 +33,14 @@ import static com.google.common.collect.Iterables.getOnlyElement;
 
 public class GraknOperation extends TransactionalDbOperation {
 
-    private final Grakn.Transaction transaction;
+    private final GraknClient.Transaction transaction;
     private final LogWrapper log;
 
     boolean closed = false;
 
-    public GraknOperation(Grakn.Session session, LogWrapper log, String tracker, long iteration, boolean trace) {
+    public GraknOperation(GraknClient.Session session, LogWrapper log, String tracker, long iteration, boolean trace) {
         super(tracker, iteration, trace);
-        this.transaction = session.transaction(Grakn.Transaction.Type.WRITE);
+        this.transaction = session.transaction(GraknClient.Transaction.Type.WRITE);
         this.log = log;
     }
 

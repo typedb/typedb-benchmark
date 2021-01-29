@@ -26,8 +26,8 @@ import grakn.benchmark.grakn.action.GraknActionFactory;
 import grakn.benchmark.grakn.driver.GraknDriver;
 import grakn.benchmark.grakn.driver.GraknOperation;
 import grakn.benchmark.grakn.yaml_tool.GraknYAMLLoader;
-import grakn.client.Grakn;
-import grakn.client.Grakn.Session;
+import grakn.client.GraknClient;
+import grakn.client.GraknClient.Session;
 import graql.lang.Graql;
 
 import java.io.IOException;
@@ -65,17 +65,17 @@ public class GraknBenchmark extends grakn.benchmark.common.TransactionalBenchmar
         }
     }
 
-    private static void initialiseSchema(Grakn.Session session, Map<String, Path> initialisationDataPaths) throws IOException {
+    private static void initialiseSchema(GraknClient.Session session, Map<String, Path> initialisationDataPaths) throws IOException {
         System.out.println(">>>> trace: initialiseSchema: start");
         String schemaQuery = new String(Files.readAllBytes(initialisationDataPaths.get("schema.gql")), StandardCharsets.UTF_8);
-        try (Grakn.Transaction tx = session.transaction(Grakn.Transaction.Type.WRITE)) {
+        try (GraknClient.Transaction tx = session.transaction(GraknClient.Transaction.Type.WRITE)) {
             tx.query().define(Graql.parseQuery(schemaQuery));
             tx.commit();
         }
         System.out.println(">>>> trace: initialiseSchema: end");
     }
 
-    private static void initialiseData(Grakn.Session session, Map<String, Path> initialisationDataPaths) throws IOException, YAMLException {
+    private static void initialiseData(GraknClient.Session session, Map<String, Path> initialisationDataPaths) throws IOException, YAMLException {
         System.out.println(">>>> trace: initialiseData: start");
         YAMLLoader loader = new GraknYAMLLoader(session, initialisationDataPaths);
         loader.loadFile(initialisationDataPaths.get("graql_templates.yml").toFile());

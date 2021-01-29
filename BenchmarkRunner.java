@@ -19,9 +19,9 @@ package grakn.benchmark;
 
 import grabl.tracing.client.GrablTracing;
 import grabl.tracing.client.GrablTracingThreadStatic;
+import grakn.benchmark.common.world.World;
 import grakn.benchmark.config.Config;
 import grakn.benchmark.config.ConfigLoader;
-import grakn.benchmark.common.world.World;
 import grakn.benchmark.grakn.driver.GraknDriver;
 import grakn.benchmark.neo4j.driver.Neo4jDriver;
 import org.apache.commons.cli.CommandLine;

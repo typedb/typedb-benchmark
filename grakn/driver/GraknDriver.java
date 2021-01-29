@@ -20,73 +20,48 @@ package grakn.benchmark.grakn.driver;
 import grakn.benchmark.common.driver.DbOperationFactory;
 import grakn.benchmark.common.driver.TransactionalDbDriver;
 import grakn.benchmark.common.world.Region;
-import grakn.client.Grakn;
 import grakn.client.GraknClient;
-import grakn.common.collection.Either;
 import org.slf4j.Logger;
 
 import java.util.concurrent.ConcurrentHashMap;
 
-public class GraknDriver extends TransactionalDbDriver<Grakn.Transaction, Grakn.Session, GraknOperation> {
+public class GraknDriver extends TransactionalDbDriver<GraknClient.Transaction, GraknClient.Session, GraknOperation> {
 
-    private final Either<Grakn.Client, GraknClient.Cluster> client;
+    private final GraknClient client;
     private final String database;
-    private final ConcurrentHashMap<String, Grakn.Session> sessionMap = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, GraknClient.Session> sessionMap = new ConcurrentHashMap<>();
 
     public static GraknDriver core(String hostUri, String database) {
-        return new GraknDriver(Either.first(GraknClient.core(hostUri)), database);
+        return new GraknDriver(GraknClient.core(hostUri), database);
     }
 
     public static GraknDriver cluster(String hostUri, String database) {
-        return new GraknDriver(Either.second(GraknClient.cluster(hostUri)), database);
+        return new GraknDriver(GraknClient.cluster(hostUri), database);
     }
 
-    private GraknDriver(Either<Grakn.Client, GraknClient.Cluster> client, String database) {
+    private GraknDriver(GraknClient client, String database) {
         this.client = client;
         this.database = database;
     }
 
     public void createDatabase() {
-        if (client.apply(
-                core -> core.databases().contains(database),
-                cluster -> cluster.databases().contains(database))
-        )
-            client.apply(
-                    core -> { core.databases().delete(database); return null; },
-                    cluster -> { cluster.databases().delete(database); return null; }
-            );
-        client.apply(
-                core -> { core.databases().create(database); return null; },
-                cluster -> { cluster.databases().create(database); return null; }
-        );
+        if (client.databases().contains(database))
+            client.databases().delete(database);
+        client.databases().create(database);
     }
 
     @Override
-    public Grakn.Session session(String sessionKey) {
-        return sessionMap.computeIfAbsent(
-                sessionKey,
-                k ->
-                        client.apply(
-                                core -> core.session(database, Grakn.Session.Type.DATA),
-                                cluster -> cluster.session(database, Grakn.Session.Type.DATA)
-                        )
-        );
+    public GraknClient.Session session(String sessionKey) {
+        return sessionMap.computeIfAbsent(sessionKey, k -> client.session(database, GraknClient.Session.Type.DATA));
     }
 
-    public Grakn.Session schemaSession(String sessionKey) {
-        return sessionMap.computeIfAbsent(
-                sessionKey,
-                k ->
-                        client.apply(
-                                core -> core.session(database, Grakn.Session.Type.SCHEMA),
-                                cluster -> cluster.session(database, Grakn.Session.Type.SCHEMA)
-                        )
-        );
+    public GraknClient.Session schemaSession(String sessionKey) {
+        return sessionMap.computeIfAbsent(sessionKey, k -> client.session(database, GraknClient.Session.Type.SCHEMA));
     }
 
     @Override
     public void closeSessions() {
-        for (Grakn.Session session : sessionMap.values()) {
+        for (GraknClient.Session session : sessionMap.values()) {
             session.close();
         }
         sessionMap.clear();
@@ -95,7 +70,7 @@ public class GraknDriver extends TransactionalDbDriver<Grakn.Transaction, Grakn.
     @Override
     public void close() {
         closeSessions();
-        client.apply(core -> { core.close(); return null; }, cluster -> { cluster.close(); return null; });
+        client.close();
     }
 
     @Override

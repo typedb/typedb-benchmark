@@ -18,14 +18,14 @@
 package grakn.benchmark.grakn.driver;
 
 import grakn.benchmark.common.driver.TransactionalDbOperationFactory;
-import grakn.client.Grakn;
+import grakn.client.GraknClient;
 import org.slf4j.Logger;
 
 public class GraknOperationFactory extends TransactionalDbOperationFactory<GraknOperation> {
 
-    private final Grakn.Session session;
+    private final GraknClient.Session session;
 
-    public GraknOperationFactory(Grakn.Session session, Logger logger) {
+    public GraknOperationFactory(GraknClient.Session session, Logger logger) {
         super(logger);
         this.session = session;
     }

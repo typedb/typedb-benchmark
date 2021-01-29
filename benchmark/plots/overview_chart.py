@@ -14,10 +14,9 @@
 #  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import collections
-
+import numpy as np
 from matplotlib import pyplot as plt
 from matplotlib.pyplot import tight_layout
-import numpy as np
 
 
 def overview_chart(iterations, agents, capsize, bar_edgecolor, grakn_overviews, neo4j_overviews, grakn_color,

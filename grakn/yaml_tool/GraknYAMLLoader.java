@@ -19,7 +19,7 @@ package grakn.benchmark.grakn.yaml_tool;
 
 import grakn.benchmark.common.yaml_tool.QueryTemplate;
 import grakn.benchmark.common.yaml_tool.YAMLLoader;
-import grakn.client.Grakn;
+import grakn.client.GraknClient;
 import graql.lang.Graql;
 import graql.lang.query.GraqlInsert;
 import org.apache.commons.csv.CSVParser;
@@ -31,16 +31,16 @@ import java.util.Map;
 
 public class GraknYAMLLoader extends YAMLLoader {
 
-    private final Grakn.Session session;
+    private final GraknClient.Session session;
 
-    public GraknYAMLLoader(Grakn.Session session, Map<String, Path> accessibleFiles) {
+    public GraknYAMLLoader(GraknClient.Session session, Map<String, Path> accessibleFiles) {
         super(accessibleFiles);
         this.session = session;
     }
 
     @Override
     protected void parseCSV(QueryTemplate template, CSVParser parser) throws IOException {
-        try (Grakn.Transaction tx = session.transaction(Grakn.Transaction.Type.WRITE)) {
+        try (GraknClient.Transaction tx = session.transaction(GraknClient.Transaction.Type.WRITE)) {
             for (CSVRecord record : parser.getRecords()) {
                 String interpolatedQuery = template.interpolate(record::get);
                 GraqlInsert insert = Graql.parseQuery(interpolatedQuery);

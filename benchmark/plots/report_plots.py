@@ -13,15 +13,13 @@
 #  You should have received a copy of the GNU Affero General Public License
 #  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import argparse
 import collections
-
 import json
+import os
 import urllib.request
-
 from line_chart import line_chart
 from overview_chart import overview_chart
-import os
-import argparse
 
 
 def get_json(json_url):
