@@ -1,42 +1,42 @@
 build:
   performance:
-    test-performance-small-grakn-cluster-background:
-      machine: 16cpus-32gb
-      image: graknlabs-ubuntu-20.04
-      type: background
-      timeout: "5h"
-      command: |
-        export GRABL_EXPORT_PERFORMANCE_SMALL_GRAKN_CLUSTER_URI="${HOSTNAME}:1729"
-
-        export ARTIFACT_USERNAME=$REPO_GRAKN_USERNAME
-        export ARTIFACT_PASSWORD=$REPO_GRAKN_PASSWORD
-        bazel run @graknlabs_dependencies//distribution/artifact:create-netrc
-
-        cat > grakn-cluster.service <<- EOM
-        [Unit]
-        Description=Grakn Cluster
-
-        [Service]
-        Type=simple
-        ExecStart=/home/grabl/$GRABL_REPO/dist/grakn-cluster-all-linux/grakn server --address=$GRABL_EXPORT_PERFORMANCE_SMALL_GRAKN_CLUSTER_URI:1730
-        Restart=on-failure
-        RestartSec=10
-        KillMode=process
-
-        [Install]
-        WantedBy=multi-user.target
-        EOM
-
-        sudo mv grakn-cluster.service /etc/systemd/system/
-
-        bazel run --config=rbe //test:grakn-cluster-extractor-linux -- dist/grakn-cluster-all-linux
-        cd ./dist/grakn-cluster-all-linux/
-
-        sudo systemctl daemon-reload
-        sudo systemctl start grakn-cluster
-      monitor: |
-        sleep 10s
-        tail -f -n +1 ./benchmark/dist/grakn-cluster-all-linux/server/logs/grakn.log
+#    test-performance-small-grakn-cluster-background:
+#      machine: 16cpus-32gb
+#      image: graknlabs-ubuntu-20.04
+#      type: background
+#      timeout: "5h"
+#      command: |
+#        export GRABL_EXPORT_PERFORMANCE_SMALL_GRAKN_CLUSTER_URI="${HOSTNAME}:1729"
+#
+#        export ARTIFACT_USERNAME=$REPO_GRAKN_USERNAME
+#        export ARTIFACT_PASSWORD=$REPO_GRAKN_PASSWORD
+#        bazel run @graknlabs_dependencies//distribution/artifact:create-netrc
+#
+#        cat > grakn-cluster.service <<- EOM
+#        [Unit]
+#        Description=Grakn Cluster
+#
+#        [Service]
+#        Type=simple
+#        ExecStart=/home/grabl/$GRABL_REPO/dist/grakn-cluster-all-linux/grakn server --address=$GRABL_EXPORT_PERFORMANCE_SMALL_GRAKN_CLUSTER_URI:1730
+#        Restart=on-failure
+#        RestartSec=10
+#        KillMode=process
+#
+#        [Install]
+#        WantedBy=multi-user.target
+#        EOM
+#
+#        sudo mv grakn-cluster.service /etc/systemd/system/
+#
+#        bazel run --config=rbe //test:grakn-cluster-extractor-linux -- dist/grakn-cluster-all-linux
+#        cd ./dist/grakn-cluster-all-linux/
+#
+#        sudo systemctl daemon-reload
+#        sudo systemctl start grakn-cluster
+#      monitor: |
+#        sleep 10s
+#        tail -f -n +1 ./benchmark/dist/grakn-cluster-all-linux/server/logs/grakn.log
 #    test-performance-small-grakn-cluster:
 #      image: graknlabs-ubuntu-20.04
 #      timeout: "5h"
