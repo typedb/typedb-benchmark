@@ -158,16 +158,17 @@ when {
     (superior: $a, subordinate: $c) isa location-hierarchy;
 };
 
+# TODO: uncomment once reasoning is enabled
 # Transitive group2 membership
 # Here we realise that it's common to say that when something takes place in a location it also takes place in the superior places.
 # This will lead to many rules of this kind. Can this be generified, and should it be?
-rule locates-transitive-with-location-hierarchy:
-when {
-    $loc(located: $thing, location: $a) isa locates;
-    $lh2(superior: $b, subordinate: $a) isa location-hierarchy;
-} then {
-    (located: $thing, location: $b) isa locates;
-};
+#rule locates-transitive-with-location-hierarchy:
+#when {
+#    $loc(located: $thing, location: $a) isa locates;
+#    $lh2(superior: $b, subordinate: $a) isa location-hierarchy;
+#} then {
+#    (located: $thing, location: $b) isa locates;
+#};
 
 # --------------------------------------------------------
 # Currency
