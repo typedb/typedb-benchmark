@@ -29,7 +29,7 @@ build:
 #
 #        sudo mv grakn-cluster.service /etc/systemd/system/
 #
-#        bazel run --config=rbe //test:grakn-cluster-extractor-linux -- dist/grakn-cluster-all-linux
+#        bazel run //test:grakn-cluster-extractor-linux -- dist/grakn-cluster-all-linux
 #        cd ./dist/grakn-cluster-all-linux/
 #
 #        sudo systemctl daemon-reload
@@ -46,7 +46,7 @@ build:
 #        export ARTIFACT_PASSWORD=$REPO_GRAKN_PASSWORD
 #        bazel run @graknlabs_dependencies//distribution/artifact:create-netrc
 #
-#        bazel run --config=rbe //:benchmark-small -- \
+#        bazel run //:benchmark-small -- \
 #          --database "Grakn Cluster 2.0" \
 #          --database-uri $GRABL_EXPORT_PERFORMANCE_SMALL_GRAKN_CLUSTER_URI \
 #          --tracing-uri $GRABL_TRACING_URI \
@@ -79,7 +79,7 @@ build:
 
         sudo mv grakn-core.service /etc/systemd/system/
 
-        bazel run --config=rbe //test:grakn-core-extractor-linux -- dist/grakn-core-all-linux
+        bazel run //test:grakn-core-extractor-linux -- dist/grakn-core-all-linux
         cd ./dist/grakn-core-all-linux/
 
         sudo systemctl daemon-reload
@@ -93,7 +93,7 @@ build:
       timeout: "5h"
       dependencies: [test-performance-small-grakn-core-background]
       command: |
-        bazel run --config=rbe //:benchmark-small -- \
+        bazel run //:benchmark-small -- \
           --database "Grakn Core 2.0" \
           --database-uri $GRABL_EXPORT_PERFORMANCE_SMALL_GRAKN_CORE_URI \
           --tracing-uri $GRABL_TRACING_URI \
@@ -128,7 +128,7 @@ build:
       dependencies: [test-performance-small-neo4j-background]
       timeout: "5h"
       command: |
-        bazel run --config=rbe //:benchmark-small -- \
+        bazel run //:benchmark-small -- \
           --database Neo4j \
           --database-uri $GRABL_EXPORT_PERFORMANCE_SMALL_NEO4J_URI \
           --tracing-uri $GRABL_TRACING_URI \

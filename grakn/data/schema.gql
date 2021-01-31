@@ -247,38 +247,41 @@ relocation sub relation,
 # - born in a location
 # - move to a location
 # - can be inferred from where someone works or studies at school or university
+# TODO: uncomment once reasoning is enabled
+#rule born-in-location-implies-residency:
+#when {
+#    $bi(place-of-birth: $location, child: $person) isa born-in;
+#} then {
+#    (resident: $person, location: $location) isa residency;
+#};
 
-rule born-in-location-implies-residency:
-when {
-    $bi(place-of-birth: $location, child: $person) isa born-in;
-} then {
-    (resident: $person, location: $location) isa residency;
-};
-
+# TODO: uncomment once reasoning is enabled
 # This rule can be triggered by a person moving back to their hometown having moved away, and add an incorrect start-date
-rule born-in-location-implies-residency-date:
-when {
-    $bi(place-of-birth: $location, child: $person) isa born-in;
-    $person isa person, has date-of-birth $dob;
-    $r(resident: $person, location: $location) isa residency;
-} then {
-    $r has $dob;
-};
+#rule born-in-location-implies-residency-date:
+#when {
+#    $bi(place-of-birth: $location, child: $person) isa born-in;
+#    $person isa person, has date-of-birth $dob;
+#    $r(resident: $person, location: $location) isa residency;
+#} then {
+#    $r has $dob;
+#};
 
-rule person-relocating-adds-new-residency:
-when {
-    $rel(relocated-person: $person, new-location: $location) isa relocation;
-} then {
-    (resident: $person, location: $location) isa residency;
-};
+# TODO: uncomment once reasoning is enabled
+#rule person-relocating-adds-new-residency:
+#when {
+#    $rel(relocated-person: $person, new-location: $location) isa relocation;
+#} then {
+#    (resident: $person, location: $location) isa residency;
+#};
 
-rule person-relocating-ends-old-residency:
-when {
-    $rel(relocated-person: $person, previous-location: $location) isa relocation, has relocation-date $rel-date;
-    $old-residency(resident: $person, location: $location) isa residency;
-} then {
-    $old-residency has $rel-date;
-};
+# TODO: uncomment once reasoning is enabled
+#rule person-relocating-ends-old-residency:
+#when {
+#    $rel(relocated-person: $person, previous-location: $location) isa relocation, has relocation-date $rel-date;
+#    $old-residency(resident: $person, location: $location) isa residency;
+#} then {
+#    $old-residency has $rel-date;
+#};
 
 rule residency-without-end-date-is-current:
 when {
