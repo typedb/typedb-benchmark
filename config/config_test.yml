@@ -5,7 +5,7 @@ agents:
   - name: "personBirth"
     mode: TRACE # yes
   - name: "ageUpdate"
-    mode: TRACE # yes
+    mode: OFF # until we have macro functions
   - name: "parentship"
     mode: OFF # no because of not
   - name: "relocation"
