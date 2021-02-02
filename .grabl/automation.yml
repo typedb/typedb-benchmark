@@ -36,7 +36,7 @@ build:
 #        sudo systemctl start grakn-cluster
 #      monitor: |
 #        sleep 10s
-#        tail -f -n +1 ./benchmark/dist/grakn-cluster-all-linux/server/logs/grakn.log
+#        tail -f -n +1 ./$GRABL_REPO/dist/grakn-cluster-all-linux/server/logs/grakn.log
 #    test-performance-small-grakn-cluster:
 #      image: graknlabs-ubuntu-20.04
 #      timeout: "5h"
@@ -68,7 +68,7 @@ build:
 
         [Service]
         Type=simple
-        ExecStart=/home/grabl/benchmark/dist/grakn-core-all-linux/grakn server
+        ExecStart=/home/grabl/$GRABL_REPO/dist/grakn-core-all-linux/grakn server
         Restart=on-failure
         RestartSec=10
         KillMode=process
@@ -87,7 +87,7 @@ build:
         export GRABL_EXPORT_PERFORMANCE_SMALL_GRAKN_CORE_URI="${HOSTNAME}:1729"
       monitor: |
         sleep 10s
-        tail -f -n +1 /home/grabl/benchmark/dist/grakn-core-all-linux/server/logs/grakn.log
+        tail -f -n +1 /home/grabl/$GRABL_REPO/dist/grakn-core-all-linux/server/logs/grakn.log
     test-performance-small-grakn-core:
       image: graknlabs-ubuntu-20.04
       timeout: "5h"
