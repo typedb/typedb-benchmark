@@ -126,53 +126,53 @@ build:
           --api-token $GRABL_TOKEN \
           --config-file /home/grabl/$GRABL_REPO/config/config_test.yml
 
-#    test-performance-small-grakn-core-background:
-#      machine: 16cpus-32gb
-#      image: graknlabs-ubuntu-20.04
-#      type: background
-#      timeout: "5h"
-#      command: |
-#        cat > grakn-core.service <<- EOM
-#        [Unit]
-#        Description=Grakn Core
-#
-#        [Service]
-#        Type=simple
-#        ExecStart=/home/grabl/benchmark/dist/grakn-core-all-linux/grakn server
-#        Restart=on-failure
-#        RestartSec=10
-#        KillMode=process
-#
-#        [Install]
-#        WantedBy=multi-user.target
-#        EOM
-#
-#        sudo mv grakn-core.service /etc/systemd/system/
-#
-#        bazel run //test:grakn-core-extractor-linux -- dist/grakn-core-all-linux
-#        cd ./dist/grakn-core-all-linux/
-#
-#        sudo systemctl daemon-reload
-#        sudo systemctl start grakn-core
-#        export GRABL_EXPORT_PERFORMANCE_SMALL_GRAKN_CORE_URI="${HOSTNAME}:1729"
-#      monitor: |
-#        sleep 10s
-#        tail -f -n +1 /home/grabl/benchmark/dist/grakn-core-all-linux/server/logs/grakn.log
-#    test-performance-small-grakn-core:
-#      image: graknlabs-ubuntu-20.04
-#      timeout: "5h"
-#      dependencies: [test-performance-small-grakn-core-background]
-#      command: |
-#        bazel run //:benchmark-small -- \
-#          --database "Grakn Core 2.0" \
-#          --database-uri $GRABL_EXPORT_PERFORMANCE_SMALL_GRAKN_CORE_URI \
-#          --tracing-uri $GRABL_TRACING_URI \
-#          --org $GRABL_OWNER \
-#          --repo $GRABL_REPO \
-#          --commit $GRABL_COMMIT \
-#          --username $GRABL_OWNER \
-#          --api-token $GRABL_TOKEN \
-#          --config-file /home/grabl/$GRABL_REPO/config/config_test.yml
+    test-performance-small-grakn-core-background:
+      machine: 16cpus-32gb
+      image: graknlabs-ubuntu-20.04
+      type: background
+      timeout: "5h"
+      command: |
+        cat > grakn-core.service <<- EOM
+        [Unit]
+        Description=Grakn Core
+
+        [Service]
+        Type=simple
+        ExecStart=/home/grabl/benchmark/dist/grakn-core-all-linux/grakn server
+        Restart=on-failure
+        RestartSec=10
+        KillMode=process
+
+        [Install]
+        WantedBy=multi-user.target
+        EOM
+
+        sudo mv grakn-core.service /etc/systemd/system/
+
+        bazel run //test:grakn-core-extractor-linux -- dist/grakn-core-all-linux
+        cd ./dist/grakn-core-all-linux/
+
+        sudo systemctl daemon-reload
+        sudo systemctl start grakn-core
+        export GRABL_EXPORT_PERFORMANCE_SMALL_GRAKN_CORE_URI="${HOSTNAME}:1729"
+      monitor: |
+        sleep 10s
+        tail -f -n +1 /home/grabl/benchmark/dist/grakn-core-all-linux/server/logs/grakn.log
+    test-performance-small-grakn-core:
+      image: graknlabs-ubuntu-20.04
+      timeout: "5h"
+      dependencies: [test-performance-small-grakn-core-background]
+      command: |
+        bazel run //:benchmark-small -- \
+          --database "Grakn Core 2.0" \
+          --database-uri $GRABL_EXPORT_PERFORMANCE_SMALL_GRAKN_CORE_URI \
+          --tracing-uri $GRABL_TRACING_URI \
+          --org $GRABL_OWNER \
+          --repo $GRABL_REPO \
+          --commit $GRABL_COMMIT \
+          --username $GRABL_OWNER \
+          --api-token $GRABL_TOKEN \
+          --config-file /home/grabl/$GRABL_REPO/config/config_test.yml
 #    test-performance-small-neo4j-background:
 #      machine: 16cpus-32gb
 #      image: graknlabs-ubuntu-20.04
