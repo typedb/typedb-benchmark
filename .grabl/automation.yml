@@ -1,61 +1,131 @@
 build:
   performance:
-#    test-performance-small-grakn-cluster-background:
-#      machine: 16cpus-32gb
-#      image: graknlabs-ubuntu-20.04
-#      type: background
-#      timeout: "5h"
-#      command: |
-#        export GRABL_EXPORT_PERFORMANCE_SMALL_GRAKN_CLUSTER_URI="${HOSTNAME}:1729"
-#
-#        export ARTIFACT_USERNAME=$REPO_GRAKN_USERNAME
-#        export ARTIFACT_PASSWORD=$REPO_GRAKN_PASSWORD
-#        bazel run @graknlabs_dependencies//distribution/artifact:create-netrc
-#
-#        cat > grakn-cluster.service <<- EOM
-#        [Unit]
-#        Description=Grakn Cluster
-#
-#        [Service]
-#        Type=simple
-#        ExecStart=/home/grabl/$GRABL_REPO/dist/grakn-cluster-all-linux/grakn server --address=$GRABL_EXPORT_PERFORMANCE_SMALL_GRAKN_CLUSTER_URI:1730
-#        Restart=on-failure
-#        RestartSec=10
-#        KillMode=process
-#
-#        [Install]
-#        WantedBy=multi-user.target
-#        EOM
-#
-#        sudo mv grakn-cluster.service /etc/systemd/system/
-#
-#        bazel run //test:grakn-cluster-extractor-linux -- dist/grakn-cluster-all-linux
-#        cd ./dist/grakn-cluster-all-linux/
-#
-#        sudo systemctl daemon-reload
-#        sudo systemctl start grakn-cluster
-#      monitor: |
-#        sleep 10s
-#        tail -f -n +1 ./$GRABL_REPO/dist/grakn-cluster-all-linux/server/logs/grakn.log
-#    test-performance-small-grakn-cluster:
-#      image: graknlabs-ubuntu-20.04
-#      timeout: "5h"
-#      dependencies: [test-performance-small-grakn-cluster-background]
-#      command: |
-#        export ARTIFACT_USERNAME=$REPO_GRAKN_USERNAME
-#        export ARTIFACT_PASSWORD=$REPO_GRAKN_PASSWORD
-#        bazel run @graknlabs_dependencies//distribution/artifact:create-netrc
-#
-#        bazel run //:benchmark-small -- \
-#          --database "Grakn Cluster 2.0" \
-#          --database-uri $GRABL_EXPORT_PERFORMANCE_SMALL_GRAKN_CLUSTER_URI \
-#          --tracing-uri $GRABL_TRACING_URI \
-#          --org $GRABL_OWNER \
-#          --repo $GRABL_REPO \
-#          --commit $GRABL_COMMIT \
-#          --username $GRABL_OWNER \
-#          --api-token $GRABL_TOKEN \
-#          --config-file /home/grabl/$GRABL_REPO/config/config_test.yml
+
+    test-performance-small-grakn-cluster-bootstrapper-background:
+      image: graknlabs-ubuntu-20.04
+      type: background
+      command: |
+        bazel run //ci:install-ssh-credential
+        export GRABL_EXPORT_PERFORMANCE_SMALL_GRAKN_CLUSTER_BOOTSTRAPPER_URI="${HOSTNAME}"
+
+      monitor: |
+        bazel run //ci:wait-for -- /tmp/grakn-cluster-1.txt
+        bazel run //ci:wait-for -- /tmp/grakn-cluster-2.txt
+        bazel run //ci:wait-for -- /tmp/grakn-cluster-3.txt
+
+        echo "$(cat /tmp/grakn-cluster-1.txt):1729:1730,$(cat /tmp/grakn-cluster-2.txt):1729:1730,$(cat /tmp/grakn-cluster-3.txt):1729:1730" > /tmp/grakn-cluster-peers.txt
+
+        bazel run //ci:transfer-file -- /tmp/grakn-cluster-peers.txt grabl@$(cat /tmp/grakn-cluster-1.txt):/tmp/grakn-cluster-peers.txt
+        bazel run //ci:transfer-file -- /tmp/grakn-cluster-peers.txt grabl@$(cat /tmp/grakn-cluster-2.txt):/tmp/grakn-cluster-peers.txt
+        bazel run //ci:transfer-file -- /tmp/grakn-cluster-peers.txt grabl@$(cat /tmp/grakn-cluster-3.txt):/tmp/grakn-cluster-peers.txt
+
+        sleep 1800
+
+    test-performance-small-grakn-cluster-1-background:
+      machine: 16cpus-32gb
+      image: graknlabs-ubuntu-20.04
+      type: background
+      # timeout: "5h"
+      dependencies: [test-performance-small-grakn-cluster-bootstrapper-background]
+      command: |
+        export ARTIFACT_USERNAME=$REPO_GRAKN_USERNAME
+        export ARTIFACT_PASSWORD=$REPO_GRAKN_PASSWORD
+        bazel run @graknlabs_dependencies//distribution/artifact:create-netrc
+
+        bazel run //ci:install-ssh-credential
+
+        echo -n "${HOSTNAME}" > /tmp/hostname.txt
+        bazel run //ci:transfer-file -- /tmp/hostname.txt \
+          grabl@$GRABL_EXPORT_PERFORMANCE_SMALL_GRAKN_CLUSTER_BOOTSTRAPPER_URI:/tmp/grakn-cluster-1.txt
+
+        bazel run //ci:wait-for -- /tmp/grakn-cluster-peers.txt
+
+        bazel run //test:grakn-cluster-extractor-linux -- dist/grakn-cluster-all-linux
+        cd ./dist/grakn-cluster-all-linux/
+        bazel run //ci:create-systemd-service -- grakn-cluster "\/home\/grabl\/$GRABL_REPO\/dist\/grakn-cluster-all-linux\/grakn server --address=$(cat /tmp/hostname.txt):1729:1730 --peers=$(cat /tmp/grakn-cluster-peers.txt)"
+
+        sudo systemctl daemon-reload
+        sudo systemctl start grakn-cluster
+        export GRABL_EXPORT_PERFORMANCE_SMALL_GRAKN_CLUSTER_1_HOSTNAME="${HOSTNAME}"
+      monitor: |
+        sleep 20s
+        tail -f -n +1 ./dist/grakn-cluster-all-linux/server/logs/grakn.log
+    test-performance-small-grakn-cluster-2-background:
+      machine: 16cpus-32gb
+      image: graknlabs-ubuntu-20.04
+      type: background
+      # timeout: "5h"
+      dependencies: [test-performance-small-grakn-cluster-bootstrapper-background]
+      command: |
+        export ARTIFACT_USERNAME=$REPO_GRAKN_USERNAME
+        export ARTIFACT_PASSWORD=$REPO_GRAKN_PASSWORD
+        bazel run @graknlabs_dependencies//distribution/artifact:create-netrc
+
+        bazel run //ci:install-ssh-credential
+
+        echo -n "${HOSTNAME}" > /tmp/hostname.txt
+        bazel run //ci:transfer-file -- /tmp/hostname.txt \
+          grabl@$GRABL_EXPORT_PERFORMANCE_SMALL_GRAKN_CLUSTER_BOOTSTRAPPER_URI:/tmp/grakn-cluster-2.txt
+
+        bazel run //ci:wait-for -- /tmp/grakn-cluster-peers.txt
+
+        bazel run //test:grakn-cluster-extractor-linux -- dist/grakn-cluster-all-linux
+        cd ./dist/grakn-cluster-all-linux/
+        bazel run //ci:create-systemd-service -- grakn-cluster "\/home\/grabl\/$GRABL_REPO\/dist\/grakn-cluster-all-linux\/grakn server --address=$(cat /tmp/hostname.txt):1729:1730 --peers=$(cat /tmp/grakn-cluster-peers.txt)"
+
+        sudo systemctl daemon-reload
+        sudo systemctl start grakn-cluster
+      monitor: |
+        sleep 20s
+        tail -f -n +1 ./dist/grakn-cluster-all-linux/server/logs/grakn.log
+    test-performance-small-grakn-cluster-3-background:
+      machine: 16cpus-32gb
+      image: graknlabs-ubuntu-20.04
+      type: background
+      # timeout: "5h"
+      dependencies: [test-performance-small-grakn-cluster-bootstrapper-background]
+      command: |
+        export ARTIFACT_USERNAME=$REPO_GRAKN_USERNAME
+        export ARTIFACT_PASSWORD=$REPO_GRAKN_PASSWORD
+        bazel run @graknlabs_dependencies//distribution/artifact:create-netrc
+
+        bazel run //ci:install-ssh-credential
+
+        echo -n "${HOSTNAME}" > /tmp/hostname.txt
+        bazel run //ci:transfer-file -- /tmp/hostname.txt \
+          grabl@$GRABL_EXPORT_PERFORMANCE_SMALL_GRAKN_CLUSTER_BOOTSTRAPPER_URI:/tmp/grakn-cluster-3.txt
+
+        bazel run //ci:wait-for -- /tmp/grakn-cluster-peers.txt
+
+        bazel run //test:grakn-cluster-extractor-linux -- dist/grakn-cluster-all-linux
+        cd ./dist/grakn-cluster-all-linux/
+        bazel run //ci:create-systemd-service -- grakn-cluster "\/home\/grabl\/$GRABL_REPO\/dist\/grakn-cluster-all-linux\/grakn server --address=$(cat /tmp/hostname.txt):1729:1730 --peers=$(cat /tmp/grakn-cluster-peers.txt)"
+
+        sudo systemctl daemon-reload
+        sudo systemctl start grakn-cluster
+      monitor: |
+        sleep 20s
+        tail -f -n +1 ./dist/grakn-cluster-all-linux/server/logs/grakn.log
+    test-performance-small-grakn-cluster:
+      image: graknlabs-ubuntu-20.04
+      timeout: "5h"
+      dependencies: [test-performance-small-grakn-cluster-1-background, test-performance-small-grakn-cluster-2-background, test-performance-small-grakn-cluster-3-background]
+      command: |
+        export ARTIFACT_USERNAME=$REPO_GRAKN_USERNAME
+        export ARTIFACT_PASSWORD=$REPO_GRAKN_PASSWORD
+        bazel run @graknlabs_dependencies//distribution/artifact:create-netrc
+
+        bazel run //:benchmark-small -- \
+          --database "Grakn Cluster 2.0" \
+          --database-uri $GRABL_EXPORT_PERFORMANCE_SMALL_GRAKN_CLUSTER_1_HOSTNAME:1729 \
+          --tracing-uri $GRABL_TRACING_URI \
+          --org $GRABL_OWNER \
+          --repo $GRABL_REPO \
+          --commit $GRABL_COMMIT \
+          --username $GRABL_OWNER \
+          --api-token $GRABL_TOKEN \
+          --config-file /home/grabl/$GRABL_REPO/config/config_test.yml
+
     test-performance-small-grakn-core-background:
       machine: 16cpus-32gb
       image: graknlabs-ubuntu-20.04
