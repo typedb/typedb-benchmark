@@ -22,7 +22,9 @@ import java.util.List;
 import java.util.Random;
 
 public class RandomSource {
+
     private final long seed;
+    private Random random;
 
     public RandomSource(long seed) {
         this.seed = seed;
@@ -32,16 +34,15 @@ public class RandomSource {
         return new RandomSource(random.nextLong());
     }
 
-    public Random startNewRandom() {
-        return new Random(seed);
+    public Random get() {
+        if (random == null) random = new Random(seed);
+        return random;
     }
 
     public List<RandomSource> split(int times) {
-        Random random = startNewRandom();
+        Random random = get();
         List<RandomSource> sources = new ArrayList<>(times);
-        for (int i = 0; i < times; ++i) {
-            sources.add(nextSource(random));
-        }
+        for (int i = 0; i < times; ++i) sources.add(nextSource(random));
         return sources;
     }
 }

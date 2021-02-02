@@ -41,7 +41,7 @@ public class ParentshipAgent<DB_OPERATION extends DbOperation> extends CityAgent
     }
 
     @Override
-    protected Region getRegionalAgent(int iteration, String tracker, Random random, boolean test) {
+    protected Regional getRegionalAgent(int iteration, String tracker, Random random, boolean test) {
         return new City(iteration, tracker, random, test);
     }
 
@@ -55,20 +55,20 @@ public class ParentshipAgent<DB_OPERATION extends DbOperation> extends CityAgent
             // Query for married couples in the city who are not already in a parentship relation together
             List<String> childrenEmails;
 
-            try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker(), iteration(), trace())) {
+            try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker(), iteration(), isTracing())) {
                 BirthsInCityAction<?> birthsInCityAction = actionFactory().birthsInCityAction(dbOperation, city, benchmarkContext.today());
                 childrenEmails = runAction(birthsInCityAction);
             }
 
             List<HashMap<SpouseType, String>> marriedCouple;
 
-            try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker(), iteration(), trace())) {
+            try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker(), iteration(), isTracing())) {
                 MarriedCoupleAction<?> marriedCoupleAction = actionFactory().marriedCoupleAction(dbOperation, city, benchmarkContext.today());
                 marriedCouple = runAction(marriedCoupleAction);
             }
 
             if (marriedCouple.size() > 0 && childrenEmails.size() > 0) {
-                try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker(), iteration(), trace())) {
+                try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker(), iteration(), isTracing())) {
                     LinkedHashMap<Integer, List<Integer>> childrenPerMarriage = Allocation.allocateEvenlyToMap(childrenEmails.size(), marriedCouple.size());
                     for (Map.Entry<Integer, List<Integer>> childrenForMarriage : childrenPerMarriage.entrySet()) {
                         Integer marriageIndex = childrenForMarriage.getKey();

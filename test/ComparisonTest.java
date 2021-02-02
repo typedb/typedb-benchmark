@@ -38,8 +38,8 @@ public class ComparisonTest {
 
         if (!graknAgentReport.equals(neo4jAgentReport)) {
             graknAgentReport.trackers().forEach(tracker -> {
-                Agent.Region.Report graknRegionReport = graknAgentReport.getRegionalAgentReport(tracker);
-                Agent.Region.Report neo4jRegionReport = neo4jAgentReport.getRegionalAgentReport(tracker);
+                Agent.Regional.Report graknRegionReport = graknAgentReport.getRegionalAgentReport(tracker);
+                Agent.Regional.Report neo4jRegionReport = neo4jAgentReport.getRegionalAgentReport(tracker);
 
                 if (!graknRegionReport.equals(neo4jRegionReport)) {
                     Iterator<Action<?, ?>.Report> graknIter = graknRegionReport.getActionReportIterator();

@@ -38,7 +38,7 @@ public class RelocationAgent<DB_OPERATION extends DbOperation> extends CityAgent
     }
 
     @Override
-    protected Region getRegionalAgent(int iteration, String tracker, Random random, boolean test) {
+    protected Regional getRegionalAgent(int iteration, String tracker, Random random, boolean test) {
         return new City(iteration, tracker, random, test);
     }
 
@@ -61,18 +61,18 @@ public class RelocationAgent<DB_OPERATION extends DbOperation> extends CityAgent
             List<String> residentEmails;
             List<String> relocationCityNames;
 
-            try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker(), iteration(), trace())) {
+            try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker(), iteration(), isTracing())) {
                 ResidentsInCityAction<?> residentsInCityAction = actionFactory().residentsInCityAction(dbOperation, city, benchmarkContext.world().getScaleFactor(), earliestDateOfResidencyToRelocate);
                 residentEmails = runAction(residentsInCityAction);
             }
             shuffle(residentEmails);
 
-            try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker(), iteration(), trace())) {
+            try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker(), iteration(), isTracing())) {
                 CitiesInContinentAction<?> citiesInContinentAction = actionFactory().citiesInContinentAction(dbOperation, city);
                 relocationCityNames = runAction(citiesInContinentAction);
             }
 
-            try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker(), iteration(), trace())) {
+            try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker(), iteration(), isTracing())) {
                 Allocation.allocate(residentEmails, relocationCityNames, (residentEmail, relocationCityName) -> {
                     runAction(actionFactory().insertRelocationAction(dbOperation, city, benchmarkContext.today(), residentEmail, relocationCityName));
                 });

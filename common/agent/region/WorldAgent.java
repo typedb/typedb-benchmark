@@ -38,7 +38,7 @@ public abstract class WorldAgent<DB_OPERATION extends DbOperation> extends Agent
         return Collections.singletonList(world);
     }
 
-    protected abstract class WorldRegion extends Region {
+    protected abstract class WorldRegion extends Regional {
 
         public WorldRegion(int iteration, String tracker, Random random, boolean test) {
             super(iteration, tracker, random, test);

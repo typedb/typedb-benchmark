@@ -39,7 +39,7 @@ public abstract class CountryAgent<DB_OPERATION extends DbOperation> extends Age
         return world.getCountries().collect(toList());
     }
 
-    protected abstract class CountryRegion extends Region {
+    protected abstract class CountryRegion extends Regional {
         public CountryRegion(int iteration, String tracker, Random random, boolean test) {
             super(iteration, tracker, random, test);
         }

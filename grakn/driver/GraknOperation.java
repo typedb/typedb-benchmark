@@ -21,6 +21,7 @@ import grakn.benchmark.common.driver.LogWrapper;
 import grakn.benchmark.common.driver.TransactionalDbOperation;
 import grakn.client.GraknClient;
 import grakn.client.concept.answer.ConceptMap;
+import grakn.client.concept.answer.Numeric;
 import graql.lang.query.GraqlDelete;
 import graql.lang.query.GraqlInsert;
 import graql.lang.query.GraqlMatch;
@@ -111,12 +112,9 @@ public class GraknOperation extends TransactionalDbOperation {
         return transaction.query().match(query);
     }
 
-    public Number execute(GraqlMatch.Aggregate query) {
+    public Numeric execute(GraqlMatch.Aggregate query) {
         log.query(tracker, iteration, query);
-//        try (GrablTracingThreadStatic.ThreadTrace trace = traceOnThread(EXECUTE.getName())) {
-//            return getOnlyElement(transaction.query().match(query).get()).number();
-//        }
-        throw new RuntimeException("GraqlMatch.Aggregate is not implemented yet."); //todo
+        return transaction.query().match(query).get();
     }
 
     public Object getOnlyAttributeOfThing(ConceptMap answer, String varName, String attributeType) {

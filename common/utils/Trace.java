@@ -30,7 +30,7 @@ public class Trace {
      */
     public static <T> T trace(Supplier<T> methodToTrace, String traceName, boolean trace) {
         if (trace) {
-            try (GrablTracingThreadStatic.ThreadTrace threadTrace = traceOnThread(traceName)) {
+            try (GrablTracingThreadStatic.ThreadTrace ignored = traceOnThread(traceName)) {
                 return methodToTrace.get();
             }
         } else {

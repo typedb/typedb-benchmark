@@ -33,7 +33,7 @@ public class PersonBirthAgent<DB_OPERATION extends DbOperation> extends CityAgen
     }
 
     @Override
-    protected Region getRegionalAgent(int iteration, String tracker, Random random, boolean test) {
+    protected Regional getRegionalAgent(int iteration, String tracker, Random random, boolean test) {
         return new City(iteration, tracker, random, test);
     }
 
@@ -46,7 +46,7 @@ public class PersonBirthAgent<DB_OPERATION extends DbOperation> extends CityAgen
         protected void run(DbOperationFactory<DB_OPERATION> dbOperationFactory, World.City city) {
             // Find bachelors and bachelorettes who are considered adults and who are not in a marriage and pair them off randomly
             int numBirths = benchmarkContext.world().getScaleFactor();
-            try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker(), iteration(), trace())) {
+            try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker(), iteration(), isTracing())) {
                 for (int i = 0; i < numBirths; i++) {
                     String gender;
                     String forename;

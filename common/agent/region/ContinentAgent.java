@@ -39,7 +39,7 @@ public abstract class ContinentAgent<DB_OPERATION extends DbOperation> extends A
         return world.getContinents().collect(toList());
     }
 
-    protected abstract class ContinentRegion extends Region {
+    protected abstract class ContinentRegion extends Regional {
 
         public ContinentRegion(int iteration, String tracker, Random random, boolean test) {
             super(iteration, tracker, random, test);

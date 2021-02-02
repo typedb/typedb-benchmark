@@ -35,7 +35,7 @@ public class FriendshipAgent<DB_OPERATION extends DbOperation> extends CityAgent
     }
 
     @Override
-    protected Region getRegionalAgent(int iteration, String tracker, Random random, boolean test) {
+    protected Regional getRegionalAgent(int iteration, String tracker, Random random, boolean test) {
         return new City(iteration, tracker, random, test);
     }
 
@@ -47,12 +47,12 @@ public class FriendshipAgent<DB_OPERATION extends DbOperation> extends CityAgent
         @Override
         protected void run(DbOperationFactory<DB_OPERATION> dbOperationFactory, World.City city) {
             List<String> residentEmails;
-            try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker(), iteration(), trace())) {
+            try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker(), iteration(), isTracing())) {
                 ResidentsInCityAction<?> residentEmailsAction = actionFactory().residentsInCityAction(dbOperation, city, benchmarkContext.world().getScaleFactor(), benchmarkContext.today());
                 residentEmails = runAction(residentEmailsAction);
             } // TODO Closing and reopening the transaction here is a workaround for https://github.com/graknlabs/grakn/issues/5585
 
-            try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker(), iteration(), trace())) {
+            try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker(), iteration(), isTracing())) {
                 if (residentEmails.size() > 0) {
                     shuffle(residentEmails);
                     int numFriendships = benchmarkContext.world().getScaleFactor();

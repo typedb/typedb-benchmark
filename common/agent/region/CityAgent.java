@@ -39,7 +39,7 @@ public abstract class CityAgent<DB_OPERATION extends DbOperation> extends Agent<
         return world.getCities().collect(toList());
     }
 
-    protected abstract class CityRegion extends Region {
+    protected abstract class CityRegion extends Regional {
 
         public CityRegion(int iteration, String tracker, Random random, boolean test) {
             super(iteration, tracker, random, test);

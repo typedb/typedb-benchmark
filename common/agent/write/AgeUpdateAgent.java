@@ -34,7 +34,7 @@ public class AgeUpdateAgent<DB_OPERATION extends DbOperation> extends CityAgent<
     }
 
     @Override
-    protected Region getRegionalAgent(int iteration, String tracker, Random random, boolean test) {
+    protected Regional getRegionalAgent(int iteration, String tracker, Random random, boolean test) {
         return new City(iteration, tracker, random, test);
     }
 
@@ -45,7 +45,7 @@ public class AgeUpdateAgent<DB_OPERATION extends DbOperation> extends CityAgent<
 
         @Override
         protected void run(DbOperationFactory<DB_OPERATION> dbOperationFactory, World.City city) {
-            try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker(), iteration(), trace())) {
+            try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker(), iteration(), isTracing())) {
                 UpdateAgesOfPeopleInCityAction<DB_OPERATION> updateAgesOfAllPeopleInCityAction = actionFactory().updateAgesOfPeopleInCityAction(dbOperation, benchmarkContext.today(), city);
                 runAction(updateAgesOfAllPeopleInCityAction);
                 dbOperation.save();

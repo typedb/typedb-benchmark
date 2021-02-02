@@ -38,7 +38,7 @@ public abstract class WorldwideInsightAgent<DB_OPERATION extends DbOperation> ex
     }
 
     @Override
-    protected Region getRegionalAgent(int iteration, String tracker, Random random, boolean test) {
+    protected Regional getRegionalAgent(int iteration, String tracker, Random random, boolean test) {
         return new WorldWideWorker(iteration, tracker, random, test);
     }
 
@@ -53,7 +53,7 @@ public abstract class WorldwideInsightAgent<DB_OPERATION extends DbOperation> ex
         @Override
         protected void run(DbOperationFactory<DB_OPERATION> dbOperationFactory, World world) {
             for (int i = 0; i <= benchmarkContext.world().getScaleFactor(); i++) {
-                try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker(), iteration(), trace())) {
+                try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker(), iteration(), isTracing())) {
                     runAction(getAction(dbOperation));
                 }
             }

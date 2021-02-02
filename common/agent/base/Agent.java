@@ -24,9 +24,10 @@ import grakn.benchmark.common.driver.DbDriver;
 import grakn.benchmark.common.driver.DbOperation;
 import grakn.benchmark.common.driver.DbOperationFactory;
 import grakn.benchmark.common.utils.RandomSource;
-import grakn.benchmark.common.utils.Trace;
 import grakn.benchmark.common.utils.Utils;
+import grakn.benchmark.common.world.Region;
 import grakn.benchmark.common.world.World;
+import grakn.common.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,6 +40,8 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static grabl.tracing.client.GrablTracingThreadStatic.contextOnThread;
+import static grakn.benchmark.common.utils.Trace.trace;
+import static grakn.common.util.Objects.className;
 
 /**
  * Agent constructs regional agents of a given class and runs them in parallel, providing them with the appropriate
@@ -50,14 +53,14 @@ import static grabl.tracing.client.GrablTracingThreadStatic.contextOnThread;
  * @param <REGION>       The type of region used by the agent.
  * @param <DB_OPERATION> The abstraction of database operations used by the agent.
  */
-public abstract class Agent<REGION extends grakn.benchmark.common.world.Region, DB_OPERATION extends DbOperation> {
+public abstract class Agent<REGION extends Region, DB_OPERATION extends DbOperation> {
 
+    protected final BenchmarkContext benchmarkContext;
     private final Logger logger;
-    private boolean trace = true;
     private final DbDriver<DB_OPERATION> dbDriver;
     private final ActionFactory<DB_OPERATION, ?> actionFactory;
     private final Report report = new Report();
-    protected final BenchmarkContext benchmarkContext;
+    private boolean isTracing = true;
 
     protected Agent(DbDriver<DB_OPERATION> dbDriver, ActionFactory<DB_OPERATION, ?> actionFactory, BenchmarkContext benchmarkContext) {
         this.dbDriver = dbDriver;
@@ -70,47 +73,50 @@ public abstract class Agent<REGION extends grakn.benchmark.common.world.Region, 
         return actionFactory;
     }
 
-    public void setTrace(boolean trace) {
-        this.trace = trace;
+    public void setTracing(boolean isTracing) {
+        this.isTracing = isTracing;
     }
 
-    public boolean trace() {
-        return benchmarkContext.trace() && trace;
+    public boolean isTracing() {
+        return benchmarkContext.trace() && isTracing;
     }
 
     abstract protected List<REGION> getRegions(World world);
 
     public Report iterate(RandomSource randomSource) {
         List<REGION> regions = getRegions(benchmarkContext.world());
-        List<RandomSource> randomSources = randomSource.split(regions.size());
+        List<RandomSource> randomisers = randomSource.split(regions.size());
 
-        Utils.zip(randomSources, regions).parallelStream().forEach(
-                pair -> iterateRegionalAgent(pair.first(), pair.second())
-        );
+        trace(() -> {
+                Utils.pairs(randomisers, regions).parallelStream().forEach(
+                        pair -> executeRegionalAgent(pair.first(), pair.second())
+                );
+                return (Void) null;
+        }, name(), isTracing());
         return report;
     }
 
-    protected abstract Region getRegionalAgent(int iteration, String tracker, Random random, boolean test);
+    protected abstract Regional getRegionalAgent(int iteration, String tracker, Random random, boolean test);
 
-    private void iterateRegionalAgent(RandomSource source, REGION region) {
-        Random random = source.startNewRandom();
-        Random agentRandom = RandomSource.nextSource(random).startNewRandom();
+    private void executeRegionalAgent(RandomSource source, REGION region) {
+        Random random = source.get();
+        Random agentRandom = RandomSource.nextSource(random).get();
 
-        Region regionalAgent = getRegionalAgent(benchmarkContext.iteration(), region.tracker(), agentRandom, benchmarkContext.test());
+        Regional regionalAgent = getRegionalAgent(benchmarkContext.iteration(), region.tracker(), agentRandom, benchmarkContext.test());
         DbOperationFactory<DB_OPERATION> dbOperationFactory = dbDriver.getDbOperationFactory(region, logger);
 
-        Region.Report report = regionalAgent.runWithReport(dbOperationFactory, region);
+        Regional.Report report = regionalAgent.runWithReport(dbOperationFactory, region);
         this.report.addRegionalAgentReport(region.tracker(), report);
     }
 
     public String name() {
-        return getClass().getSimpleName();
+        return className(getClass());
     }
 
     public class Report {
-        ConcurrentHashMap<String, Region.Report> regionalAgentReports = new ConcurrentHashMap<>();
+        ConcurrentHashMap<String, Regional.Report> regionalAgentReports = new ConcurrentHashMap<>();
 
-        public void addRegionalAgentReport(String tracker, Region.Report regionalAgentReport) {
+        public void addRegionalAgentReport(String tracker, Regional.Report regionalAgentReport) {
             regionalAgentReports.put(tracker, regionalAgentReport);
         }
 
@@ -118,26 +124,26 @@ public abstract class Agent<REGION extends grakn.benchmark.common.world.Region, 
             return regionalAgentReports.keySet();
         }
 
-        public Region.Report getRegionalAgentReport(String tracker) {
+        public Regional.Report getRegionalAgentReport(String tracker) {
             return regionalAgentReports.get(tracker);
         }
     }
 
-    public abstract class Region implements AutoCloseable {
+    public abstract class Regional implements AutoCloseable {
 
         private final Random random;
-        private final boolean test;
         private final Report report = new Report();
         private final String tracker;
+        private final boolean isTest;
         private final int iteration;
         private GrablTracingThreadStatic.ThreadContext context;
 
-        public Region(int iteration, String tracker, Random random, boolean test) {
+        public Regional(int iteration, String tracker, Random random, boolean isTest) {
             this.iteration = iteration;
             this.tracker = tracker;
             this.random = random;
-            this.test = test;
-            if (trace()) {
+            this.isTest = isTest;
+            if (isTracing()) {
                 context = contextOnThread(tracker(), iteration());
             }
         }
@@ -151,10 +157,10 @@ public abstract class Agent<REGION extends grakn.benchmark.common.world.Region, 
         }
 
         protected Report runWithReport(DbOperationFactory<DB_OPERATION> dbOperationFactory, REGION region) {
-            Trace.trace(() -> {
+            trace(() -> {
                 run(dbOperationFactory, region);
                 return null;
-            }, name(), trace());
+            }, name(), isTracing());
             return report;
         }
 
@@ -188,8 +194,8 @@ public abstract class Agent<REGION extends grakn.benchmark.common.world.Region, 
 
         public <ACTION_RETURN_TYPE> ACTION_RETURN_TYPE runAction(Action<?, ACTION_RETURN_TYPE> action) {
             ACTION_RETURN_TYPE actionAnswer;
-            actionAnswer = Trace.trace(action::run, action.name(), trace());
-            if (test) {
+            actionAnswer = trace(action::run, action.name(), isTracing());
+            if (isTest) {
                 report.addActionReport(action.report(actionAnswer));
             }
             return actionAnswer;

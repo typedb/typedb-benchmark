@@ -33,7 +33,7 @@ public class GraknMeanWageOfPeopleInWorldAction extends MeanWageOfPeopleInWorldA
 
     @Override
     public Double run() {
-        return dbOperation.execute(query()).doubleValue();
+        return dbOperation.execute(query()).asDouble();
     }
 
     public static GraqlMatch.Aggregate query() {

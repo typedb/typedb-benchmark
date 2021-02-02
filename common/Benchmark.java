@@ -72,7 +72,7 @@ public abstract class Benchmark<DB_DRIVER extends DbDriver<DB_OPERATION>, DB_OPE
         for (Config.Agent agentConfig : agentConfigs) {
             if (agentConfig.getAgentMode().getRun()) {
                 Agent<?, DB_OPERATION> agent = agentFactory.get(agentConfig.getName());
-                agent.setTrace(agentConfig.getAgentMode().getTrace());
+                agent.setTracing(agentConfig.getAgentMode().getTrace());
                 agents.add(agent);
             }
         }

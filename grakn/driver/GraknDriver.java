@@ -17,6 +17,7 @@
 
 package grakn.benchmark.grakn.driver;
 
+import grabl.tracing.client.GrablTracingThreadStatic;
 import grakn.benchmark.common.driver.DbOperationFactory;
 import grakn.benchmark.common.driver.TransactionalDbDriver;
 import grakn.benchmark.common.world.Region;
@@ -24,6 +25,9 @@ import grakn.client.GraknClient;
 import org.slf4j.Logger;
 
 import java.util.concurrent.ConcurrentHashMap;
+
+import static grabl.tracing.client.GrablTracingThreadStatic.traceOnThread;
+import static grakn.benchmark.common.driver.TransactionalDbDriver.TracingLabel.OPEN_SESSION;
 
 public class GraknDriver extends TransactionalDbDriver<GraknClient.Transaction, GraknClient.Session, GraknOperation> {
 
@@ -52,11 +56,19 @@ public class GraknDriver extends TransactionalDbDriver<GraknClient.Transaction, 
 
     @Override
     public GraknClient.Session session(String sessionKey) {
-        return sessionMap.computeIfAbsent(sessionKey, k -> client.session(database, GraknClient.Session.Type.DATA));
+        return sessionMap.computeIfAbsent(sessionKey, k -> {
+            try (GrablTracingThreadStatic.ThreadTrace ignored = traceOnThread(OPEN_SESSION.getName())) {
+                return client.session(database, GraknClient.Session.Type.DATA);
+            }
+        });
     }
 
     public GraknClient.Session schemaSession(String sessionKey) {
-        return sessionMap.computeIfAbsent(sessionKey, k -> client.session(database, GraknClient.Session.Type.SCHEMA));
+        return sessionMap.computeIfAbsent(sessionKey, k -> {
+            try (GrablTracingThreadStatic.ThreadTrace ignored = traceOnThread(OPEN_SESSION.getName())) {
+                return client.session(database, GraknClient.Session.Type.SCHEMA);
+            }
+        });
     }
 
     @Override

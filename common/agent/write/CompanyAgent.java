@@ -34,7 +34,7 @@ public class CompanyAgent<DB_OPERATION extends DbOperation> extends CountryAgent
     }
 
     @Override
-    protected Region getRegionalAgent(int iteration, String tracker, Random random, boolean test) {
+    protected Regional getRegionalAgent(int iteration, String tracker, Random random, boolean test) {
         return new Country(iteration, tracker, random, test);
     }
 
@@ -47,7 +47,7 @@ public class CompanyAgent<DB_OPERATION extends DbOperation> extends CountryAgent
         protected void run(DbOperationFactory<DB_OPERATION> dbOperationFactory, World.Country country) {
             int numCompanies = benchmarkContext.world().getScaleFactor();
 
-            try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker(), iteration(), trace())) {
+            try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker(), iteration(), isTracing())) {
 
                 for (int i = 0; i < numCompanies; i++) {
                     String adjective = pickOne(benchmarkContext.world().getAdjectives());

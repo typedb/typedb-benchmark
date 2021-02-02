@@ -35,7 +35,7 @@ public class MarriageAgent<DB_OPERATION extends DbOperation> extends CityAgent<D
     }
 
     @Override
-    protected Region getRegionalAgent(int iteration, String tracker, Random random, boolean test) {
+    protected Regional getRegionalAgent(int iteration, String tracker, Random random, boolean test) {
         return new City(iteration, tracker, random, test);
     }
 
@@ -50,13 +50,13 @@ public class MarriageAgent<DB_OPERATION extends DbOperation> extends CityAgent<D
             // Find bachelors and bachelorettes who are considered adults and who are not in a marriage and pair them off randomly
             LocalDateTime dobOfAdults = benchmarkContext.today().minusYears(benchmarkContext.world().AGE_OF_ADULTHOOD);
             List<String> womenEmails;
-            try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker(), iteration(), trace())) {
+            try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker(), iteration(), isTracing())) {
                 womenEmails = runAction(actionFactory().unmarriedPeopleInCityAction(dbOperation, city, "female", dobOfAdults));
                 shuffle(womenEmails);
             }
 
             List<String> menEmails;
-            try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker(), iteration(), trace())) {
+            try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker(), iteration(), isTracing())) {
                 menEmails = runAction(actionFactory().unmarriedPeopleInCityAction(dbOperation, city, "male", dobOfAdults));
                 shuffle(menEmails);
             }
@@ -66,7 +66,7 @@ public class MarriageAgent<DB_OPERATION extends DbOperation> extends CityAgent<D
                 System.out.println("asdf");
                 assert true;
             }
-            try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker(), iteration(), trace())) {
+            try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker(), iteration(), isTracing())) {
                 if (numMarriagesPossible > 0) {
                     for (int i = 0; i < numMarriagesPossible; i++) {
                         String wifeEmail = womenEmails.get(i);
