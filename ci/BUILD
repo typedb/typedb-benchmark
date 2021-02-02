@@ -4,8 +4,8 @@ sh_binary(
 )
 
 sh_binary(
-    name = "wait-for",
-    srcs = [":wait-for.sh"],
+    name = "wait-for-file",
+    srcs = [":wait-for-file.sh"],
 )
 
 sh_binary(
