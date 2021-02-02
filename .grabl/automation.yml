@@ -108,6 +108,8 @@ build:
       image: graknlabs-ubuntu-20.04
       type: background
       timeout: "5h"
+      monitor: |
+        journalctl -fu neo4j
       command: |
         sudo add-apt-repository -y ppa:openjdk-r/ppa
         curl https://cli-assets.heroku.com/apt/release.key | sudo apt-key add -
@@ -118,10 +120,9 @@ build:
         sudo apt-get update
         sudo apt-get install -y neo4j=1:4.1.0
         sudo update-java-alternatives --jre --set java-1.11.0-openjdk-amd64
-        echo 'dbms.connectors.default_listen_address=0.0.0.0' | sudo tee -a /etc/neo4j/neo4j.conf
+        echo 'dbms.connector.bolt.listen_address=0.0.0.0:7687' | sudo tee -a /etc/neo4j/neo4j.conf
         echo 'dbms.security.auth_enabled=false' | sudo tee -a /etc/neo4j/neo4j.conf
-        ps aux | grep "org.neo4j.server" | awk '{print $2}' | xargs sudo kill -9 >/dev/null 2&>1 || true
-        sudo neo4j start
+        sudo systemctl restart neo4j
         export GRABL_EXPORT_PERFORMANCE_SMALL_NEO4J_URI="${HOSTNAME}:7687"
     test-performance-small-neo4j:
       image: graknlabs-ubuntu-20.04
