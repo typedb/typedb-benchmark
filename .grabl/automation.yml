@@ -128,6 +128,19 @@ build:
       dependencies: [test-performance-small-neo4j-background]
       timeout: "5h"
       command: |
+        echo 'Trying to connect to Neo4j'
+        attempt_counter=0
+        max_attempts=50
+        until $(curl --output /dev/null --silent --head --fail $GRABL_EXPORT_PERFORMANCE_SMALL_NEO4J_URI); do
+            if [ ${attempt_counter} -eq ${max_attempts} ];then
+              echo "Max attempts reached"
+              exit 1
+            fi
+
+            echo '...'
+            attempt_counter=$(($attempt_counter+1))
+            sleep 3
+        done
         bazel run //:benchmark-small -- \
           --database Neo4j \
           --database-uri $GRABL_EXPORT_PERFORMANCE_SMALL_NEO4J_URI \
