@@ -4,8 +4,8 @@ build:
     test-performance-small-grakn-cluster-bootstrapper-background:
       image: graknlabs-ubuntu-20.04
       filter:
-        owner: graknlabs
-        branch: grakn-cluster-2
+        owner: lolski
+        branch: grakn-cluster
       type: background
       command: |
         bazel run //ci:install-ssh-credential
@@ -25,11 +25,10 @@ build:
         sleep 1800
 
     test-performance-small-grakn-cluster-1-background:
-      machine: 16cpus-32gb
       image: graknlabs-ubuntu-20.04
       filter:
-        owner: graknlabs
-        branch: grakn-cluster-2
+        owner: lolski
+        branch: grakn-cluster
       type: background
       timeout: "5h"
       dependencies: [test-performance-small-grakn-cluster-bootstrapper-background]
@@ -57,11 +56,10 @@ build:
         sleep 20s
         tail -f -n +1 ./dist/grakn-cluster-all-linux/server/logs/grakn.log
     test-performance-small-grakn-cluster-2-background:
-      machine: 16cpus-32gb
       image: graknlabs-ubuntu-20.04
       filter:
-        owner: graknlabs
-        branch: grakn-cluster-2
+        owner: lolski
+        branch: grakn-cluster
       type: background
       timeout: "5h"
       dependencies: [test-performance-small-grakn-cluster-bootstrapper-background]
@@ -88,11 +86,10 @@ build:
         sleep 20s
         tail -f -n +1 ./dist/grakn-cluster-all-linux/server/logs/grakn.log
     test-performance-small-grakn-cluster-3-background:
-      machine: 16cpus-32gb
       image: graknlabs-ubuntu-20.04
       filter:
-        owner: graknlabs
-        branch: grakn-cluster-2
+        owner: lolski
+        branch: grakn-cluster
       type: background
       timeout: "5h"
       dependencies: [test-performance-small-grakn-cluster-bootstrapper-background]
@@ -121,8 +118,8 @@ build:
     test-performance-small-grakn-cluster:
       image: graknlabs-ubuntu-20.04
       filter:
-        owner: graknlabs
-        branch: grakn-cluster-2
+        owner: lolski
+        branch: grakn-cluster
       timeout: "5h"
       dependencies: [test-performance-small-grakn-cluster-1-background, test-performance-small-grakn-cluster-2-background, test-performance-small-grakn-cluster-3-background]
       command: |
