@@ -27,7 +27,6 @@ import grakn.benchmark.common.utils.RandomSource;
 import grakn.benchmark.common.utils.Utils;
 import grakn.benchmark.common.world.Region;
 import grakn.benchmark.common.world.World;
-import grakn.common.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,7 +37,6 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 
 import static grabl.tracing.client.GrablTracingThreadStatic.contextOnThread;
 import static grakn.benchmark.common.utils.Trace.trace;
