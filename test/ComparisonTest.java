@@ -96,8 +96,8 @@ public class ComparisonTest {
 //    }
 //
 //    @Test
-//    public void testTransactionAgent() {
-//        compareFields("TransactionAgent");
+//    public void testPurchaseAgent() {
+//        compareFields("PurchaseAgent");
 //    }
 //
 //    @Test

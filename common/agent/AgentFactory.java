@@ -38,7 +38,7 @@ import grakn.benchmark.common.agent.write.ParentshipAgent;
 import grakn.benchmark.common.agent.write.PersonBirthAgent;
 import grakn.benchmark.common.agent.write.ProductAgent;
 import grakn.benchmark.common.agent.write.RelocationAgent;
-import grakn.benchmark.common.agent.write.TransactionAgent;
+import grakn.benchmark.common.agent.write.PurchaseAgent;
 import grakn.benchmark.common.driver.DbDriver;
 import grakn.benchmark.common.driver.DbOperation;
 
@@ -86,8 +86,8 @@ public class AgentFactory<DB_OPERATION extends DbOperation, ACTION_FACTORY exten
         return new ProductAgent<>(dbDriver, actionFactory, benchmarkContext);
     }
 
-    public TransactionAgent<DB_OPERATION> transaction() {
-        return new TransactionAgent<>(dbDriver, actionFactory, benchmarkContext);
+    public PurchaseAgent<DB_OPERATION> transaction() {
+        return new PurchaseAgent<>(dbDriver, actionFactory, benchmarkContext);
     }
 
     public FriendshipAgent<DB_OPERATION> friendship() {
