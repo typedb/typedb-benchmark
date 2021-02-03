@@ -17,6 +17,7 @@
 
 package grakn.benchmark.neo4j.driver;
 
+import grabl.tracing.client.GrablTracingThreadStatic;
 import grakn.benchmark.common.driver.DbOperationFactory;
 import grakn.benchmark.common.driver.TransactionalDbDriver;
 import grakn.benchmark.common.world.Region;
@@ -26,6 +27,9 @@ import org.neo4j.driver.GraphDatabase;
 import org.slf4j.Logger;
 
 import java.util.concurrent.ConcurrentHashMap;
+
+import static grabl.tracing.client.GrablTracingThreadStatic.traceOnThread;
+import static grakn.benchmark.common.driver.TransactionalDbDriver.TracingLabel.OPEN_SESSION;
 
 public class Neo4jDriver extends TransactionalDbDriver<org.neo4j.driver.Transaction, org.neo4j.driver.Session, Neo4jOperation> {
 
@@ -38,7 +42,11 @@ public class Neo4jDriver extends TransactionalDbDriver<org.neo4j.driver.Transact
 
     @Override
     public org.neo4j.driver.Session session(String sessionKey) {
-        return sessionMap.computeIfAbsent(sessionKey, k -> driver.session());
+        return sessionMap.computeIfAbsent(sessionKey, k -> {
+            try (GrablTracingThreadStatic.ThreadTrace ignored = traceOnThread(OPEN_SESSION.getName())) {
+                return driver.session();
+            }
+        });
     }
 
     @Override
