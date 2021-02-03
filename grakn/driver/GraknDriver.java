@@ -57,17 +57,13 @@ public class GraknDriver extends TransactionalDbDriver<GraknClient.Transaction, 
     @Override
     public GraknClient.Session session(String sessionKey) {
         return sessionMap.computeIfAbsent(sessionKey, k -> {
-            try (GrablTracingThreadStatic.ThreadTrace ignored = traceOnThread(OPEN_SESSION.getName())) {
-                return client.session(database, GraknClient.Session.Type.DATA);
-            }
+            return client.session(database, GraknClient.Session.Type.DATA);
         });
     }
 
     public GraknClient.Session schemaSession(String sessionKey) {
         return sessionMap.computeIfAbsent(sessionKey, k -> {
-            try (GrablTracingThreadStatic.ThreadTrace ignored = traceOnThread(OPEN_SESSION.getName())) {
-                return client.session(database, GraknClient.Session.Type.SCHEMA);
-            }
+            return client.session(database, GraknClient.Session.Type.SCHEMA);
         });
     }
 

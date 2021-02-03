@@ -38,6 +38,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 import static grabl.tracing.client.GrablTracingThreadStatic.contextOnThread;
 import static grakn.benchmark.common.utils.Trace.trace;
@@ -88,12 +89,11 @@ public abstract class Agent<REGION extends Region, DB_OPERATION extends DbOperat
         List<RandomSource> randomisers = randomSource.split(regions.size());
 
         trace(() -> {
-                Utils.pairs(randomisers, regions).parallelStream().forEach(
-                        pair -> executeRegionalAgent(pair.first(), pair.second())
-                );
+                Utils.pairs(randomisers, regions).stream().parallel().forEach(pair -> {
+                    executeRegionalAgent(pair.first(), pair.second());
+                });
                 return (Void) null;
         }, name(), isTracing());
-        System.out.println(" name() in Report iterate is " + name());
         return report;
     }
 
@@ -158,11 +158,7 @@ public abstract class Agent<REGION extends Region, DB_OPERATION extends DbOperat
         }
 
         protected Report runWithReport(DbOperationFactory<DB_OPERATION> dbOperationFactory, REGION region) {
-            trace(() -> {
-                run(dbOperationFactory, region);
-                return null;
-            }, name() + "." + region.getClass().getSimpleName(), isTracing());
-            System.out.println(" name() in Regional runWithReport is " + name() + "." + region.getClass().getSimpleName());
+            run(dbOperationFactory, region);
             return report;
         }
 
@@ -196,8 +192,7 @@ public abstract class Agent<REGION extends Region, DB_OPERATION extends DbOperat
 
         public <ACTION_RETURN_TYPE> ACTION_RETURN_TYPE runAction(Action<?, ACTION_RETURN_TYPE> action) {
             ACTION_RETURN_TYPE actionAnswer;
-            actionAnswer = trace(action::run, action.name(), isTracing());
-            System.out.println(" action.name() in Regional runAction is " + action.name());
+            actionAnswer = action.run();
             if (isTest) {
                 report.addActionReport(action.report(actionAnswer));
             }
