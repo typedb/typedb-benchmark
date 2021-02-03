@@ -1,5 +1,5 @@
 agents:
-  # For each agent select a `mode`, `RUN` to TRACE without tracing, `TRACE` to TRACE with tracing, and `OFF` to not TRACE at all
+  # For each agent select a `mode`, `RUN` to run without tracing, `TRACE` to run with tracing, and `OFF` to not run at all
   - name: "marriage"
     mode: OFF # no because of not
   - name: "personBirth"
