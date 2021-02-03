@@ -27,7 +27,6 @@ import grakn.benchmark.common.utils.RandomSource;
 import grakn.benchmark.common.utils.Utils;
 import grakn.benchmark.common.world.Region;
 import grakn.benchmark.common.world.World;
-import grakn.common.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -87,12 +86,9 @@ public abstract class Agent<REGION extends Region, DB_OPERATION extends DbOperat
         List<REGION> regions = getRegions(benchmarkContext.world());
         List<RandomSource> randomisers = randomSource.split(regions.size());
 
-        trace(() -> {
-                Utils.pairs(randomisers, regions).parallelStream().forEach(
-                        pair -> executeRegionalAgent(pair.first(), pair.second())
-                );
-                return (Void) null;
-        }, name(), isTracing());
+        Utils.pairs(randomisers, regions).parallelStream().forEach(
+                pair -> executeRegionalAgent(pair.first(), pair.second())
+        );
         return report;
     }
 
