@@ -1,5 +1,5 @@
 agents:
-  # For each agent select a `mode`, `RUN` to run without tracing, `TRACE` to run with tracing, and `OFF` to not run at all
+  # For each agent select a `mode`, `RUN` to TRACE without tracing, `TRACE` to TRACE with tracing, and `OFF` to not TRACE at all
   - name: "marriage"
     mode: OFF # no because of not
   - name: "personBirth"
@@ -47,6 +47,6 @@ traceSampling:
   arg: 10
 
 randomSeed: 1
-iterations: 100
+iterations: 10
 scaleFactor: 3
 databaseName: "world"

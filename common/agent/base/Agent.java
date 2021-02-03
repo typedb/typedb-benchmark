@@ -93,6 +93,7 @@ public abstract class Agent<REGION extends Region, DB_OPERATION extends DbOperat
                 );
                 return (Void) null;
         }, name(), isTracing());
+        System.out.println(" name() in Report iterate is " + name());
         return report;
     }
 
@@ -160,7 +161,8 @@ public abstract class Agent<REGION extends Region, DB_OPERATION extends DbOperat
             trace(() -> {
                 run(dbOperationFactory, region);
                 return null;
-            }, name(), isTracing());
+            }, name() + "." + region.getClass().getSimpleName(), isTracing());
+            System.out.println(" name() in Regional runWithReport is " + name() + "." + region.getClass().getSimpleName());
             return report;
         }
 
@@ -195,6 +197,7 @@ public abstract class Agent<REGION extends Region, DB_OPERATION extends DbOperat
         public <ACTION_RETURN_TYPE> ACTION_RETURN_TYPE runAction(Action<?, ACTION_RETURN_TYPE> action) {
             ACTION_RETURN_TYPE actionAnswer;
             actionAnswer = trace(action::run, action.name(), isTracing());
+            System.out.println(" action.name() in Regional runAction is " + action.name());
             if (isTest) {
                 report.addActionReport(action.report(actionAnswer));
             }
