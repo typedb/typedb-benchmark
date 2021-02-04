@@ -86,12 +86,9 @@ public abstract class Agent<REGION extends Region, DB_OPERATION extends DbOperat
         List<REGION> regions = getRegions(benchmarkContext.world());
         List<RandomSource> randomisers = randomSource.split(regions.size());
 
-        trace(() -> {
-                Utils.pairs(randomisers, regions).stream().parallel().forEach(pair -> {
-                    executeRegionalAgent(pair.first(), pair.second());
-                });
-                return (Void) null;
-        }, name(), isTracing());
+        Utils.pairs(randomisers, regions).parallelStream().forEach(
+                pair -> executeRegionalAgent(pair.first(), pair.second())
+        );
         return report;
     }
 
@@ -156,7 +153,10 @@ public abstract class Agent<REGION extends Region, DB_OPERATION extends DbOperat
         }
 
         protected Report runWithReport(DbOperationFactory<DB_OPERATION> dbOperationFactory, REGION region) {
-            run(dbOperationFactory, region);
+            trace(() -> {
+                run(dbOperationFactory, region);
+                return null;
+            }, name(), isTracing());
             return report;
         }
 
@@ -190,7 +190,7 @@ public abstract class Agent<REGION extends Region, DB_OPERATION extends DbOperat
 
         public <ACTION_RETURN_TYPE> ACTION_RETURN_TYPE runAction(Action<?, ACTION_RETURN_TYPE> action) {
             ACTION_RETURN_TYPE actionAnswer;
-            actionAnswer = action.run();
+            actionAnswer = trace(action::run, action.name(), isTracing());
             if (isTest) {
                 report.addActionReport(action.report(actionAnswer));
             }
