@@ -65,7 +65,7 @@ public class Neo4jDriver extends TransactionalDbDriver<org.neo4j.driver.Transact
 
     @Override
     public void printStatistics(Logger LOG) {
-        org.neo4j.driver.Session session = session("statisticsDataSession");
+        org.neo4j.driver.Session session = session("statisticsSession");
 
         String numberOfNodesQ = "MATCH (n)\n RETURN count(n)";
         List<Record> numberOfNodesList = session.writeTransaction(tx -> {
