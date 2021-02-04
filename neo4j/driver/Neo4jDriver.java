@@ -81,17 +81,17 @@ public class Neo4jDriver extends TransactionalDbDriver<org.neo4j.driver.Transact
         });
         long numberOfRelationships = (long) getOnlyElement(numberOfRelationshipsList).asMap().get("count(*)");
 
-        LOG.info("\n");
+        LOG.info("");
 
-        LOG.info("Benchmark statistic.");
+        LOG.info("Benchmark statistic:");
 
-        LOG.info("\n");
+        LOG.info("");
 
         LOG.info("Number of 'node' elements: '{}'.", numberOfNodes);
         LOG.info("Number of 'relationship' elements: '{}'.", numberOfRelationships);
         LOG.info("Combined: '{}'.", numberOfNodes + numberOfRelationships);
 
-        LOG.info("\n");
+        LOG.info("");
     }
 
     @Override

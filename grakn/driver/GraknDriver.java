@@ -111,22 +111,22 @@ public class GraknDriver extends TransactionalDbDriver<GraknClient.Transaction, 
         long numberOfThings = tx.query().match(numberOfThingsQ).get().asLong();
 
 
-        LOG.info("\n");
+        LOG.info("");
 
-        LOG.info("Benchmark statistic.");
+        LOG.info("Benchmark statistic:");
 
-        LOG.info("\n");
+        LOG.info("");
 
         LOG.info("Number of 'entity' elements: '{}'.", numberOfEntities);
         LOG.info("Number of 'attribute' elements: '{}'.", numberOfAttributes);
         LOG.info("Number of 'relation' elements: '{}'.", numberOfRelations);
         LOG.info("Combined: '{}'.", numberOfEntities + numberOfAttributes + numberOfRelations);
 
-        LOG.info("\n");
+        LOG.info("");
 
         LOG.info("Number of 'thing' elements: '{}'.", numberOfThings);
 
-        LOG.info("\n");
+        LOG.info("");
     }
 
     @Override
