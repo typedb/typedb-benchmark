@@ -82,7 +82,7 @@ public abstract class Agent<REGION extends Region, DB_OPERATION extends DbOperat
 
     abstract protected List<REGION> getRegions(World world);
 
-    public Report iterate(RandomSource randomSource) {
+    public Report iterate(RandomSource randomSource, int iteration) {
         List<REGION> regions = getRegions(benchmarkContext.world());
         List<RandomSource> randomisers = randomSource.split(regions.size());
 

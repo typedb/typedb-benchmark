@@ -22,12 +22,16 @@ import grakn.benchmark.common.driver.DbOperationFactory;
 import grakn.benchmark.common.driver.TransactionalDbDriver;
 import grakn.benchmark.common.world.Region;
 import grakn.client.GraknClient;
+import graql.lang.Graql;
+import graql.lang.query.GraqlMatch;
 import org.slf4j.Logger;
 
 import java.util.concurrent.ConcurrentHashMap;
 
 import static grabl.tracing.client.GrablTracingThreadStatic.traceOnThread;
 import static grakn.benchmark.common.driver.TransactionalDbDriver.TracingLabel.OPEN_SESSION;
+import static grakn.benchmark.grakn.action.Model.*;
+import static grakn.benchmark.grakn.action.Model.LOCATION_HIERARCHY;
 
 public class GraknDriver extends TransactionalDbDriver<GraknClient.Transaction, GraknClient.Session, GraknOperation> {
 
@@ -79,6 +83,50 @@ public class GraknDriver extends TransactionalDbDriver<GraknClient.Transaction, 
     public void close() {
         closeSessions();
         client.close();
+    }
+
+    @Override
+    public void printStatistics(Logger LOG) {
+        GraknClient.Session session = session("statisticsDataSession");
+        GraknClient.Transaction tx = session.transaction(GraknClient.Transaction.Type.READ);
+
+        GraqlMatch.Unfiltered.Aggregate numberOfEntitiesQ = Graql.match(
+                Graql.var("x").isa("entity")
+        ).get("x").count();
+        long numberOfEntities = tx.query().match(numberOfEntitiesQ).get().asLong();
+
+        GraqlMatch.Unfiltered.Aggregate numberOfAttributesQ = Graql.match(
+                Graql.var("x").isa("attribute")
+        ).get("x").count();
+        long numberOfAttributes = tx.query().match(numberOfAttributesQ).get().asLong();
+
+        GraqlMatch.Unfiltered.Aggregate numberOfRelationsQ = Graql.match(
+                Graql.var("x").isa("relation")
+        ).get("x").count();
+        long numberOfRelations = tx.query().match(numberOfRelationsQ).get().asLong();
+
+        GraqlMatch.Unfiltered.Aggregate numberOfThingsQ = Graql.match(
+                Graql.var("x").isa("thing")
+        ).get("x").count();
+        long numberOfThings = tx.query().match(numberOfThingsQ).get().asLong();
+
+
+        LOG.info("\n");
+
+        LOG.info("Benchmark statistic.");
+
+        LOG.info("\n");
+
+        LOG.info("Number of 'entity' elements: '{}'.", numberOfEntities);
+        LOG.info("Number of 'attribute' elements: '{}'.", numberOfAttributes);
+        LOG.info("Number of 'relation' elements: '{}'.", numberOfRelations);
+        LOG.info("Combined: '{}'.", numberOfEntities + numberOfAttributes + numberOfRelations);
+
+        LOG.info("\n");
+
+        LOG.info("Number of 'thing' elements: '{}'.", numberOfThings);
+
+        LOG.info("\n");
     }
 
     @Override

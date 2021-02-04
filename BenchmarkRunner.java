@@ -145,6 +145,7 @@ public class BenchmarkRunner {
                 for (int i = 0; i < config.getIterations(); i++) {
                     benchmark.iterate();
                 }
+                benchmark.printStatistics(LOG);
                 benchmark.close();
             }
         } catch (Exception ex) {

@@ -21,6 +21,7 @@ import grakn.benchmark.common.driver.TransactionalDbDriver;
 import grakn.benchmark.common.driver.TransactionalDbOperation;
 import grakn.benchmark.common.world.World;
 import grakn.benchmark.config.Config;
+import org.slf4j.Logger;
 
 import java.nio.file.Path;
 import java.util.List;
@@ -41,5 +42,10 @@ public abstract class TransactionalBenchmark<DB_DRIVER extends TransactionalDbDr
     @Override
     public void close() {
         driver.close();
+    }
+
+    @Override
+    public void printStatistics(Logger LOG) {
+        driver.printStatistics(LOG);
     }
 }
