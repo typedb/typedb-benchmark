@@ -88,7 +88,7 @@ public abstract class Benchmark<DB_DRIVER extends DbDriver<DB_OPERATION>, DB_OPE
         LOG.info("Iteration: {}", iteration);
         report.clean();
         for (Agent<?, ?> agent : agentList) {
-            this.report.addAgentResult(agent.name(), agent.iterate(RandomSource.nextSource(random), iteration));
+            this.report.addAgentResult(agent.name(), agent.iterate(RandomSource.nextSource(random)));
         }
         closeIteration();  // We want to test opening new sessions each iteration.
         iteration++;
