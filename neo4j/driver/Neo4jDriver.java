@@ -87,9 +87,9 @@ public class Neo4jDriver extends TransactionalDbDriver<org.neo4j.driver.Transact
 
         LOG.info("");
 
-        LOG.info("Number of 'node' elements: '{}'.", numberOfNodes);
-        LOG.info("Number of 'relationship' elements: '{}'.", numberOfRelationships);
-        LOG.info("Combined: '{}'.", numberOfNodes + numberOfRelationships);
+        LOG.info("Total 'node' count: '{}'.", numberOfNodes);
+        LOG.info("Total 'relationship' count: '{}'.", numberOfRelationships);
+        LOG.info("Total count: '{}'.", numberOfNodes + numberOfRelationships);
 
         LOG.info("");
     }
