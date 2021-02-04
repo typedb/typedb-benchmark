@@ -38,6 +38,6 @@ public abstract class DbOperation implements AutoCloseable {
     public abstract void save();
 
     protected <T> T trace(Supplier<T> method, String traceName) {
-        return method.get();
+        return Trace.trace(method, traceName, trace);
     }
 }
