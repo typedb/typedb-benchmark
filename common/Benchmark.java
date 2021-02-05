@@ -40,8 +40,6 @@ import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
-import static grabl.tracing.client.GrablTracingThreadStatic.contextOnThread;
-
 public abstract class Benchmark<DB_DRIVER extends DbDriver<DB_OPERATION>, DB_OPERATION extends DbOperation> implements grakn.benchmark.common.agent.base.BenchmarkContext {
 
     final static Logger LOG = LoggerFactory.getLogger(grakn.benchmark.common.Benchmark.class);
@@ -91,7 +89,6 @@ public abstract class Benchmark<DB_DRIVER extends DbDriver<DB_OPERATION>, DB_OPE
 
         LOG.info("Iteration: {}", iteration);
         report.clean();
-//        context = contextOnThread("aggregated tracing contex", iteration());
         for (Agent<?, ?> agent : agentList) {
             this.report.addAgentResult(agent.name(), agent.iterate(RandomSource.nextSource(random)));
         }
