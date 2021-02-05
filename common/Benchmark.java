@@ -17,7 +17,6 @@
 
 package grakn.benchmark.common;
 
-import grabl.tracing.client.GrablTracingThreadStatic;
 import grakn.benchmark.common.action.ActionFactory;
 import grakn.benchmark.common.agent.AgentFactory;
 import grakn.benchmark.common.agent.base.Agent;
@@ -52,7 +51,6 @@ public abstract class Benchmark<DB_DRIVER extends DbDriver<DB_OPERATION>, DB_OPE
     private final World world;
     private final boolean test;
     private int iteration = 1;
-    private GrablTracingThreadStatic.ThreadContext context;
 
     public Benchmark(DB_DRIVER driver, Map<String, Path> initialisationDataPaths, int randomSeed, World world, List<Config.Agent> agentConfigs, Function<Integer, Boolean> iterationSamplingFunction, boolean test) {
         this.driver = driver;
