@@ -26,6 +26,7 @@ import graql.lang.Graql;
 import graql.lang.query.GraqlMatch;
 import org.slf4j.Logger;
 
+import java.text.DecimalFormat;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static grabl.tracing.client.GrablTracingThreadStatic.traceOnThread;
@@ -93,6 +94,7 @@ public class GraknDriver extends TransactionalDbDriver<GraknClient.Transaction, 
     public void printStatistics(Logger LOG) {
         GraknClient.Session session = session("statisticsDataSession");
         GraknClient.Transaction tx = session.transaction(GraknClient.Transaction.Type.READ);
+        DecimalFormat formatter = new DecimalFormat("#,###");
 
         long numberOfEntities = tx.query().match(match(var("x").isa("entity")).count()).get().asLong();
         long numberOfAttributes = tx.query().match(match(var("x").isa("attribute")).count()).get().asLong();
@@ -102,13 +104,13 @@ public class GraknDriver extends TransactionalDbDriver<GraknClient.Transaction, 
         LOG.info("");
         LOG.info("Benchmark statistic:");
         LOG.info("");
-        LOG.info("Count 'entity': {}", numberOfEntities);
-        LOG.info("Count 'relation': {}", numberOfRelations);
-        LOG.info("Count 'attribute': {}", numberOfAttributes);
+        LOG.info("Count 'entity': {}", formatter.format(numberOfEntities));
+        LOG.info("Count 'relation': {}", formatter.format(numberOfRelations));
+        LOG.info("Count 'attribute': {}", formatter.format(numberOfAttributes));
         if (numberOfThings != numberOfEntities + numberOfAttributes + numberOfRelations) {
-            LOG.error("The sum of 'entity', 'relation', and 'attribute' counts do not match the total 'thing' count: {}", numberOfThings);
+            LOG.error("The sum of 'entity', 'relation', and 'attribute' counts do not match the total 'thing' count: {}", formatter.format(numberOfThings));
         } else {
-            LOG.info("Count 'thing' (total): {}", numberOfThings);
+            LOG.info("Count 'thing' (total): {}", formatter.format(numberOfThings));
         }
         LOG.info("");
     }

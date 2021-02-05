@@ -24,6 +24,7 @@ import grakn.benchmark.common.world.Region;
 import org.neo4j.driver.*;
 import org.slf4j.Logger;
 
+import java.text.DecimalFormat;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -66,6 +67,7 @@ public class Neo4jDriver extends TransactionalDbDriver<org.neo4j.driver.Transact
     @Override
     public void printStatistics(Logger LOG) {
         org.neo4j.driver.Session session = session("statisticsSession");
+        DecimalFormat formatter = new DecimalFormat("#,###");
 
         String numberOfNodesQ = "MATCH (n)\n RETURN count(n)";
         List<Record> numberOfNodesList = session.writeTransaction(tx -> {
@@ -82,13 +84,11 @@ public class Neo4jDriver extends TransactionalDbDriver<org.neo4j.driver.Transact
         long numberOfRelationships = (long) getOnlyElement(numberOfRelationshipsList).asMap().get("count(*)");
 
         LOG.info("");
-
         LOG.info("Benchmark statistic:");
-
         LOG.info("");
 
-        LOG.info("Count 'node': {}", numberOfNodes);
-        LOG.info("Count 'relationship': {}", numberOfRelationships);
+        LOG.info("Count 'node': {}", formatter.format(numberOfNodes));
+        LOG.info("Count 'relationship': {}", formatter.format(numberOfRelationships));
         LOG.info("");
     }
 
