@@ -32,7 +32,6 @@ import static org.junit.Assert.assertEquals;
 public class ComparisonTest {
 
     private void compareReports(String agentName) {
-
         Agent<?, ?>.Report graknAgentReport = graknCore.getReport().getAgentReport(agentName);
         Agent<?, ?>.Report neo4jAgentReport = neo4j.getReport().getAgentReport(agentName);
 
