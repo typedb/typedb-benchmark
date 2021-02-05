@@ -30,6 +30,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import static grabl.tracing.client.GrablTracingThreadStatic.traceOnThread;
 import static grakn.benchmark.common.driver.TransactionalDbDriver.TracingLabel.OPEN_SESSION;
+import static graql.lang.Graql.match;
+import static graql.lang.Graql.var;
 
 public class GraknDriver extends TransactionalDbDriver<GraknClient.Transaction, GraknClient.Session, GraknOperation> {
 
@@ -92,33 +94,14 @@ public class GraknDriver extends TransactionalDbDriver<GraknClient.Transaction, 
         GraknClient.Session session = session("statisticsDataSession");
         GraknClient.Transaction tx = session.transaction(GraknClient.Transaction.Type.READ);
 
-        GraqlMatch.Unfiltered.Aggregate numberOfEntitiesQ = Graql.match(
-                Graql.var("x").isa("entity")
-        ).get("x").count();
-        long numberOfEntities = tx.query().match(numberOfEntitiesQ).get().asLong();
-
-        GraqlMatch.Unfiltered.Aggregate numberOfAttributesQ = Graql.match(
-                Graql.var("x").isa("attribute")
-        ).get("x").count();
-        long numberOfAttributes = tx.query().match(numberOfAttributesQ).get().asLong();
-
-        GraqlMatch.Unfiltered.Aggregate numberOfRelationsQ = Graql.match(
-                Graql.var("x").isa("relation")
-        ).get("x").count();
-        long numberOfRelations = tx.query().match(numberOfRelationsQ).get().asLong();
-
-        GraqlMatch.Unfiltered.Aggregate numberOfThingsQ = Graql.match(
-                Graql.var("x").isa("thing")
-        ).get("x").count();
-        long numberOfThings = tx.query().match(numberOfThingsQ).get().asLong();
-
+        long numberOfEntities = tx.query().match(match(var("x").isa("entity")).count()).get().asLong();
+        long numberOfAttributes = tx.query().match(match(var("x").isa("attribute")).count()).get().asLong();
+        long numberOfRelations = tx.query().match(match(var("x").isa("relation")).count()).get().asLong();
+        long numberOfThings = tx.query().match(match(var("x").isa("thing")).count()).get().asLong();
 
         LOG.info("");
-
         LOG.info("Benchmark statistic:");
-
         LOG.info("");
-
         LOG.info("Count 'entity': {}", numberOfEntities);
         LOG.info("Count 'relation': {}", numberOfRelations);
         LOG.info("Count 'attribute': {}", numberOfAttributes);
