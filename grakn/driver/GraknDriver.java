@@ -17,6 +17,7 @@
 
 package grakn.benchmark.grakn.driver;
 
+import grabl.tracing.client.GrablTracingThreadStatic;
 import grakn.benchmark.common.driver.DbOperationFactory;
 import grakn.benchmark.common.driver.TransactionalDbDriver;
 import grakn.benchmark.common.world.Region;
@@ -26,6 +27,9 @@ import graql.lang.query.GraqlMatch;
 import org.slf4j.Logger;
 
 import java.util.concurrent.ConcurrentHashMap;
+
+import static grabl.tracing.client.GrablTracingThreadStatic.traceOnThread;
+import static grakn.benchmark.common.driver.TransactionalDbDriver.TracingLabel.OPEN_SESSION;
 
 public class GraknDriver extends TransactionalDbDriver<GraknClient.Transaction, GraknClient.Session, GraknOperation> {
 
@@ -115,15 +119,14 @@ public class GraknDriver extends TransactionalDbDriver<GraknClient.Transaction, 
 
         LOG.info("");
 
-        LOG.info("Total 'entity' count: '{}'.", numberOfEntities);
-        LOG.info("Total 'attribute' count: '{}'.", numberOfAttributes);
-        LOG.info("Total 'relation' count: '{}'.", numberOfRelations);
-        LOG.info("Total count: '{}'.", numberOfEntities + numberOfAttributes + numberOfRelations);
-
-        LOG.info("");
-
-        LOG.info("Total 'thing' count: '{}'.", numberOfThings);
-
+        LOG.info("Count 'entity': {}", numberOfEntities);
+        LOG.info("Count 'relation': {}", numberOfRelations);
+        LOG.info("Count 'attribute': {}", numberOfAttributes);
+        if (numberOfThings != numberOfEntities + numberOfAttributes + numberOfRelations) {
+            LOG.error("The sum of 'entity', 'relation', and 'attribute' counts do not match the total 'thing' count: {}", numberOfThings);
+        } else {
+            LOG.info("Count 'thing' (total): {}", numberOfThings);
+        }
         LOG.info("");
     }
 
