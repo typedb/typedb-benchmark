@@ -91,9 +91,9 @@ public abstract class Agent<REGION extends Region, DB_OPERATION extends DbOperat
         contextOnThread("aggregated tracing contex", benchmarkContext.iteration());
 
         trace(() -> {
-            Utils.pairs(randomisers, regions).stream().parallel().forEach(pair -> {
-                executeRegionalAgent(pair.first(), pair.second());
-            });
+            Utils.pairs(randomisers, regions).parallelStream().forEach(
+                    pair -> executeRegionalAgent(pair.first(), pair.second())
+            );
             return (Void) null;
         }, name() + ": aggregate", isTracing());
 
@@ -199,7 +199,7 @@ public abstract class Agent<REGION extends Region, DB_OPERATION extends DbOperat
 
         public <ACTION_RETURN_TYPE> ACTION_RETURN_TYPE runAction(Action<?, ACTION_RETURN_TYPE> action) {
             ACTION_RETURN_TYPE actionAnswer;
-            actionAnswer = action.run();
+            actionAnswer = trace(action::run, action.name(), isTracing());
             if (isTest) {
                 report.addActionReport(action.report(actionAnswer));
             }

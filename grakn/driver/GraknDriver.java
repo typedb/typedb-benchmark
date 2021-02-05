@@ -22,12 +22,17 @@ import grakn.benchmark.common.driver.DbOperationFactory;
 import grakn.benchmark.common.driver.TransactionalDbDriver;
 import grakn.benchmark.common.world.Region;
 import grakn.client.GraknClient;
+import graql.lang.Graql;
+import graql.lang.query.GraqlMatch;
 import org.slf4j.Logger;
 
+import java.text.DecimalFormat;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static grabl.tracing.client.GrablTracingThreadStatic.traceOnThread;
 import static grakn.benchmark.common.driver.TransactionalDbDriver.TracingLabel.OPEN_SESSION;
+import static graql.lang.Graql.match;
+import static graql.lang.Graql.var;
 
 public class GraknDriver extends TransactionalDbDriver<GraknClient.Transaction, GraknClient.Session, GraknOperation> {
 
@@ -57,13 +62,17 @@ public class GraknDriver extends TransactionalDbDriver<GraknClient.Transaction, 
     @Override
     public GraknClient.Session session(String sessionKey) {
         return sessionMap.computeIfAbsent(sessionKey, k -> {
-            return client.session(database, GraknClient.Session.Type.DATA);
+            try (GrablTracingThreadStatic.ThreadTrace ignored = traceOnThread(OPEN_SESSION.getName())) {
+                return client.session(database, GraknClient.Session.Type.DATA);
+            }
         });
     }
 
     public GraknClient.Session schemaSession(String sessionKey) {
         return sessionMap.computeIfAbsent(sessionKey, k -> {
-            return client.session(database, GraknClient.Session.Type.SCHEMA);
+            try (GrablTracingThreadStatic.ThreadTrace ignored = traceOnThread(OPEN_SESSION.getName())) {
+                return client.session(database, GraknClient.Session.Type.SCHEMA);
+            }
         });
     }
 
@@ -79,6 +88,31 @@ public class GraknDriver extends TransactionalDbDriver<GraknClient.Transaction, 
     public void close() {
         closeSessions();
         client.close();
+    }
+
+    @Override
+    public void printStatistics(Logger LOG) {
+        GraknClient.Session session = session("statisticsDataSession");
+        GraknClient.Transaction tx = session.transaction(GraknClient.Transaction.Type.READ);
+        DecimalFormat formatter = new DecimalFormat("#,###");
+
+        long numberOfEntities = tx.query().match(match(var("x").isa("entity")).count()).get().asLong();
+        long numberOfAttributes = tx.query().match(match(var("x").isa("attribute")).count()).get().asLong();
+        long numberOfRelations = tx.query().match(match(var("x").isa("relation")).count()).get().asLong();
+        long numberOfThings = tx.query().match(match(var("x").isa("thing")).count()).get().asLong();
+
+        LOG.info("");
+        LOG.info("Benchmark statistic:");
+        LOG.info("");
+        LOG.info("Count 'entity': {}", formatter.format(numberOfEntities));
+        LOG.info("Count 'relation': {}", formatter.format(numberOfRelations));
+        LOG.info("Count 'attribute': {}", formatter.format(numberOfAttributes));
+        if (numberOfThings != numberOfEntities + numberOfAttributes + numberOfRelations) {
+            LOG.error("The sum of 'entity', 'relation', and 'attribute' counts do not match the total 'thing' count: {}", formatter.format(numberOfThings));
+        } else {
+            LOG.info("Count 'thing' (total): {}", formatter.format(numberOfThings));
+        }
+        LOG.info("");
     }
 
     @Override

@@ -21,13 +21,14 @@ import grabl.tracing.client.GrablTracingThreadStatic;
 import grakn.benchmark.common.driver.DbOperationFactory;
 import grakn.benchmark.common.driver.TransactionalDbDriver;
 import grakn.benchmark.common.world.Region;
-import org.neo4j.driver.AuthTokens;
-import org.neo4j.driver.Driver;
-import org.neo4j.driver.GraphDatabase;
+import org.neo4j.driver.*;
 import org.slf4j.Logger;
 
+import java.text.DecimalFormat;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static com.google.common.collect.Iterables.getOnlyElement;
 import static grabl.tracing.client.GrablTracingThreadStatic.traceOnThread;
 import static grakn.benchmark.common.driver.TransactionalDbDriver.TracingLabel.OPEN_SESSION;
 
@@ -61,6 +62,34 @@ public class Neo4jDriver extends TransactionalDbDriver<org.neo4j.driver.Transact
     public void close() {
         closeSessions();
         driver.close();
+    }
+
+    @Override
+    public void printStatistics(Logger LOG) {
+        org.neo4j.driver.Session session = session("statisticsSession");
+        DecimalFormat formatter = new DecimalFormat("#,###");
+
+        String numberOfNodesQ = "MATCH (n)\n RETURN count(n)";
+        List<Record> numberOfNodesList = session.writeTransaction(tx -> {
+            Result result = tx.run(new Query(numberOfNodesQ));
+            return result.list();
+        });
+        long numberOfNodes = (long) getOnlyElement(numberOfNodesList).asMap().get("count(n)");
+
+        String numberOfRelationshipsQ = "MATCH ()-->()\n RETURN count(*)";
+        List<Record> numberOfRelationshipsList = session.writeTransaction(tx -> {
+            Result result = tx.run(new Query(numberOfRelationshipsQ));
+            return result.list();
+        });
+        long numberOfRelationships = (long) getOnlyElement(numberOfRelationshipsList).asMap().get("count(*)");
+
+        LOG.info("");
+        LOG.info("Benchmark statistic:");
+        LOG.info("");
+
+        LOG.info("Count 'node': {}", formatter.format(numberOfNodes));
+        LOG.info("Count 'relationship': {}", formatter.format(numberOfRelationships));
+        LOG.info("");
     }
 
     @Override

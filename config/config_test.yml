@@ -48,5 +48,5 @@ traceSampling:
 
 randomSeed: 1
 iterations: 100
-scaleFactor: 3
+scaleFactor: 5
 databaseName: "world"

@@ -127,6 +127,8 @@ public abstract class Benchmark<DB_DRIVER extends DbDriver<DB_OPERATION>, DB_OPE
 
     public abstract void close();
 
+    public abstract void printStatistics(Logger LOG);
+
     public class Report {
 
         private ConcurrentHashMap<String, Agent<?, ?>.Report> agentReports = new ConcurrentHashMap<>();

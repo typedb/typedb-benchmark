@@ -145,6 +145,10 @@ public class BenchmarkRunner {
                 for (int i = 0; i < config.getIterations(); i++) {
                     benchmark.iterate();
                 }
+                Instant statisticStart = Instant.now();
+                benchmark.printStatistics(LOG);
+                Instant statisticEnd = Instant.now();
+                LOG.info("Statistics duration: " + printDuration(statisticStart, statisticEnd));
                 benchmark.close();
             }
         } catch (Exception ex) {
@@ -153,8 +157,16 @@ public class BenchmarkRunner {
         }
 
         Instant end = Instant.now();
-        LOG.info("Benchmark completed in " + Duration.between(start, end).toString().substring(2));
+        LOG.info("Benchmark duration: " + printDuration(start, end));
     }
+
+    private static String printDuration(Instant start, Instant end) {
+        return Duration.between(start, end).toString()
+                .substring(2)
+                .replaceAll("(\\d[HMS])(?!$)", "$1 ")
+                .toLowerCase();
+    }
+
 
     private static Optional<String> getOption(CommandLine commandLine, String option) {
         if (commandLine.hasOption(option)) {
