@@ -62,7 +62,7 @@ build:
         attempt_counter=0
         max_attempts=50
         expected_exit_code=52
-        until curl --output /dev/null --silent --head --fail $GRABL_EXPORT_PERFORMANCE_SMALL_NEO4J_URI || [[ $? == $expected_exit_code ]]; do
+        until curl --output /dev/null --silent --head --fail $GRABL_EXPORT_TEST_COMPARISON_NEO4J_URI || [[ $? == $expected_exit_code ]]; do
             if [ ${attempt_counter} -eq ${max_attempts} ];then
               echo "Max attempts reached"
               exit 1
