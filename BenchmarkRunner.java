@@ -145,6 +145,10 @@ public class BenchmarkRunner {
                 for (int i = 0; i < config.getIterations(); i++) {
                     benchmark.iterate();
                 }
+                Instant statisticStart = Instant.now();
+                benchmark.printStatistics(LOG);
+                Instant statisticEnd = Instant.now();
+                LOG.info("Statistic calculation took " + Duration.between(statisticStart, statisticEnd).toString().substring(2));
                 benchmark.close();
             }
         } catch (Exception ex) {
