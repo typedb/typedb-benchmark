@@ -46,7 +46,7 @@ public class ComparisonTest {
                     while (graknIter.hasNext() && neo4jIter.hasNext()) {
                         Action<?, ?>.Report graknActionReport = graknIter.next();
                         Action<?, ?>.Report neo4jActionReport = neo4jIter.next();
-                        assertEquals(graknActionReport, neo4jActionReport);
+                        assertEquals(neo4jActionReport, graknActionReport);
                     }
                 }
             });

@@ -46,13 +46,13 @@ public class Model {
     public static final String CONTRACTED_HOURS = "contractedHours";
 
     public static final String WAGE = "wage";
-    public static final String PRODUCT_BARCODE = "product-barcode";
-    public static final String PRODUCT_NAME = "product-name";
-    public static final String PRODUCT_DESCRIPTION = "product-description";
+    public static final String PRODUCT_BARCODE = "barcode";
+    public static final String PRODUCT_NAME = "name";
+    public static final String PRODUCT_DESCRIPTION = "description";
 
     public static final String VALUE = "value";
-    public static final String PRODUCT_QUANTITY = "product-quantity";
-    public static final String IS_TAXABLE = "is-taxable";
+    public static final String PRODUCT_QUANTITY = "productQuantity";
+    public static final String IS_TAXABLE = "isTaxable";
 
     private String name;
 
