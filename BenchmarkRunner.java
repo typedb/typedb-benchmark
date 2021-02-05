@@ -143,7 +143,10 @@ public class BenchmarkRunner {
                 // MAIN LOOP //
                 ///////////////
                 for (int i = 0; i < config.getIterations(); i++) {
+                    Instant iterStart = Instant.now();
                     benchmark.iterate();
+                    Instant iterEnd = Instant.now();
+                    LOG.info("Iteration {}: {}", i, printDuration(iterStart, iterEnd));
                 }
                 Instant end = Instant.now();
                 LOG.info("Benchmark duration: " + printDuration(start, end));

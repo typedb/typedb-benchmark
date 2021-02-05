@@ -84,8 +84,6 @@ public abstract class Benchmark<DB_DRIVER extends DbDriver<DB_OPERATION>, DB_OPE
     protected abstract void initialise(Map<String, Path> initialisationDataPaths);
 
     public void iterate() {
-
-        LOG.info("Iteration: {}", iteration);
         report.clean();
         for (Agent<?, ?> agent : agentList) {
             this.report.addAgentResult(agent.name(), agent.iterate(RandomSource.nextSource(random)));
