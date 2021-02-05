@@ -84,15 +84,20 @@ build:
       command: |
         bazel run //ci:install-ssh-credential
         export GRABL_EXPORT_PERFORMANCE_SMALL_GRAKN_CLUSTER_BOOTSTRAPPER_URI="${HOSTNAME}"
+
       monitor: |
         bazel run //ci:wait-for-file -- /tmp/grakn-cluster-1.txt
         bazel run //ci:wait-for-file -- /tmp/grakn-cluster-2.txt
         bazel run //ci:wait-for-file -- /tmp/grakn-cluster-3.txt
+
         echo "$(cat /tmp/grakn-cluster-1.txt):1729:1730,$(cat /tmp/grakn-cluster-2.txt):1729:1730,$(cat /tmp/grakn-cluster-3.txt):1729:1730" > /tmp/grakn-cluster-peers.txt
+
         bazel run //ci:transfer-file -- /tmp/grakn-cluster-peers.txt grabl@$(cat /tmp/grakn-cluster-1.txt):/tmp/grakn-cluster-peers.txt
         bazel run //ci:transfer-file -- /tmp/grakn-cluster-peers.txt grabl@$(cat /tmp/grakn-cluster-2.txt):/tmp/grakn-cluster-peers.txt
         bazel run //ci:transfer-file -- /tmp/grakn-cluster-peers.txt grabl@$(cat /tmp/grakn-cluster-3.txt):/tmp/grakn-cluster-peers.txt
+
         sleep 1800
+
     test-performance-small-grakn-cluster-1-background:
       machine: 16cpus-32gb
       image: graknlabs-ubuntu-20.04
@@ -106,14 +111,19 @@ build:
         export ARTIFACT_USERNAME=$REPO_GRAKN_USERNAME
         export ARTIFACT_PASSWORD=$REPO_GRAKN_PASSWORD
         bazel run @graknlabs_dependencies//distribution/artifact:create-netrc
+
         bazel run //ci:install-ssh-credential
+
         echo -n "${HOSTNAME}" > /tmp/hostname.txt
         bazel run //ci:transfer-file -- /tmp/hostname.txt \
           grabl@$GRABL_EXPORT_PERFORMANCE_SMALL_GRAKN_CLUSTER_BOOTSTRAPPER_URI:/tmp/grakn-cluster-1.txt
+
         bazel run //ci:wait-for-file -- /tmp/grakn-cluster-peers.txt
+
         bazel run //test:grakn-cluster-extractor-linux -- dist/grakn-cluster-all-linux
         cd ./dist/grakn-cluster-all-linux/
         bazel run //ci:create-systemd-service -- grakn-cluster "\/home\/grabl\/$GRABL_REPO\/dist\/grakn-cluster-all-linux\/grakn server --address=$(cat /tmp/hostname.txt):1729:1730 --peers=$(cat /tmp/grakn-cluster-peers.txt)"
+
         sudo systemctl daemon-reload
         sudo systemctl start grakn-cluster
         export GRABL_EXPORT_PERFORMANCE_SMALL_GRAKN_CLUSTER_1_HOSTNAME="${HOSTNAME}"
@@ -133,14 +143,19 @@ build:
         export ARTIFACT_USERNAME=$REPO_GRAKN_USERNAME
         export ARTIFACT_PASSWORD=$REPO_GRAKN_PASSWORD
         bazel run @graknlabs_dependencies//distribution/artifact:create-netrc
+
         bazel run //ci:install-ssh-credential
+
         echo -n "${HOSTNAME}" > /tmp/hostname.txt
         bazel run //ci:transfer-file -- /tmp/hostname.txt \
           grabl@$GRABL_EXPORT_PERFORMANCE_SMALL_GRAKN_CLUSTER_BOOTSTRAPPER_URI:/tmp/grakn-cluster-2.txt
+
         bazel run //ci:wait-for-file -- /tmp/grakn-cluster-peers.txt
+
         bazel run //test:grakn-cluster-extractor-linux -- dist/grakn-cluster-all-linux
         cd ./dist/grakn-cluster-all-linux/
         bazel run //ci:create-systemd-service -- grakn-cluster "\/home\/grabl\/$GRABL_REPO\/dist\/grakn-cluster-all-linux\/grakn server --address=$(cat /tmp/hostname.txt):1729:1730 --peers=$(cat /tmp/grakn-cluster-peers.txt)"
+
         sudo systemctl daemon-reload
         sudo systemctl start grakn-cluster
       monitor: |
@@ -159,14 +174,19 @@ build:
         export ARTIFACT_USERNAME=$REPO_GRAKN_USERNAME
         export ARTIFACT_PASSWORD=$REPO_GRAKN_PASSWORD
         bazel run @graknlabs_dependencies//distribution/artifact:create-netrc
+
         bazel run //ci:install-ssh-credential
+
         echo -n "${HOSTNAME}" > /tmp/hostname.txt
         bazel run //ci:transfer-file -- /tmp/hostname.txt \
           grabl@$GRABL_EXPORT_PERFORMANCE_SMALL_GRAKN_CLUSTER_BOOTSTRAPPER_URI:/tmp/grakn-cluster-3.txt
+
         bazel run //ci:wait-for-file -- /tmp/grakn-cluster-peers.txt
+
         bazel run //test:grakn-cluster-extractor-linux -- dist/grakn-cluster-all-linux
         cd ./dist/grakn-cluster-all-linux/
         bazel run //ci:create-systemd-service -- grakn-cluster "\/home\/grabl\/$GRABL_REPO\/dist\/grakn-cluster-all-linux\/grakn server --address=$(cat /tmp/hostname.txt):1729:1730 --peers=$(cat /tmp/grakn-cluster-peers.txt)"
+
         sudo systemctl daemon-reload
         sudo systemctl start grakn-cluster
       monitor: |
@@ -183,6 +203,7 @@ build:
         export ARTIFACT_USERNAME=$REPO_GRAKN_USERNAME
         export ARTIFACT_PASSWORD=$REPO_GRAKN_PASSWORD
         bazel run @graknlabs_dependencies//distribution/artifact:create-netrc
+
         bazel run //:benchmark-small -- \
           --database "Grakn Cluster 2.0" \
           --database-uri $GRABL_EXPORT_PERFORMANCE_SMALL_GRAKN_CLUSTER_1_HOSTNAME:1729 \
@@ -193,6 +214,7 @@ build:
           --username $GRABL_OWNER \
           --api-token $GRABL_TOKEN \
           --config-file /home/grabl/$GRABL_REPO/config/config_test.yml
+
     test-performance-small-grakn-core-background:
       machine: 16cpus-32gb
       image: graknlabs-ubuntu-20.04
@@ -202,18 +224,23 @@ build:
         cat > grakn-core.service <<- EOM
         [Unit]
         Description=Grakn Core
+
         [Service]
         Type=simple
         ExecStart=/home/grabl/$GRABL_REPO/dist/grakn-core-all-linux/grakn server
         Restart=on-failure
         RestartSec=10
         KillMode=process
+
         [Install]
         WantedBy=multi-user.target
         EOM
+
         sudo mv grakn-core.service /etc/systemd/system/
+
         bazel run //test:grakn-core-extractor-linux -- dist/grakn-core-all-linux
         cd ./dist/grakn-core-all-linux/
+
         sudo systemctl daemon-reload
         sudo systemctl start grakn-core
         export GRABL_EXPORT_PERFORMANCE_SMALL_GRAKN_CORE_URI="${HOSTNAME}:1729"
@@ -270,6 +297,7 @@ build:
               echo "Max attempts reached"
               exit 1
             fi
+
             echo '...'
             attempt_counter=$(($attempt_counter+1))
             sleep 3
