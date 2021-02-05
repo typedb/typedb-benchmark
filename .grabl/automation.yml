@@ -1,7 +1,6 @@
 build:
   correctness:
     test-comparison-grakn-background:
-      machine: 16cpus-32gb
       image: graknlabs-ubuntu-20.04
       type: background
       timeout: "5h"
@@ -33,7 +32,6 @@ build:
         sleep 10s
         tail -f -n +1 /home/grabl/$GRABL_REPO/dist/grakn-core-all-linux/server/logs/grakn.log
     test-comparison-neo4j-background:
-      machine: 16cpus-32gb
       image: graknlabs-ubuntu-20.04
       type: background
       timeout: "5h"
