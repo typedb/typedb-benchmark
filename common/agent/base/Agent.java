@@ -89,15 +89,12 @@ public abstract class Agent<REGION extends Region, DB_OPERATION extends DbOperat
         List<RandomSource> randomisers = randomSource.split(regions.size());
 
         contextOnThread("aggregated tracing contex", benchmarkContext.iteration());
-        Instant start = Instant.now();
         trace(() -> {
-                Utils.pairs(randomisers, regions).stream().parallel().forEach(pair -> {
-                    executeRegionalAgent(pair.first(), pair.second());
-                });
-                return (Void) null;
-        }, name() + ".aggregate", isTracing());
-        Instant end = Instant.now();
-        System.out.println(name() + ".aggregate   -   " + Duration.between(start, end).toMillis());
+            Utils.pairs(randomisers, regions).stream().parallel().forEach(pair -> {
+                executeRegionalAgent(pair.first(), pair.second());
+            });
+            return (Void) null;
+        }, name() + ": aggregate", isTracing());
 
         return report;
     }
@@ -163,13 +160,10 @@ public abstract class Agent<REGION extends Region, DB_OPERATION extends DbOperat
         }
 
         protected Report runWithReport(DbOperationFactory<DB_OPERATION> dbOperationFactory, REGION region) {
-            Instant start = Instant.now();
             trace(() -> {
                 run(dbOperationFactory, region);
                 return null;
-            }, name() + ".single", isTracing());
-            Instant end = Instant.now();
-            System.out.println(name() + ".single   -   " + Duration.between(start, end).toMillis());
+            }, name() + ": single", isTracing());
             return report;
         }
 
