@@ -93,15 +93,15 @@ public class BenchmarksForComparison {
         });
 
         ArrayList<String> agentNames = new ArrayList<>();
-        agentNames.add("marriage");
+//        agentNames.add("marriage");
         agentNames.add("personBirth");
-        agentNames.add("ageUpdate");
+//        agentNames.add("ageUpdate");
 //        agentNames.add("parentship");
 //        agentNames.add("relocation");
         agentNames.add("company");
-        agentNames.add("employment");
-//        agentNames.add("product");
-//        agentNames.add("transaction");
+//        agentNames.add("employment");
+        agentNames.add("product");
+        agentNames.add("transaction");
 //        agentNames.add("friendship");
 
         ArrayList<Config.Agent> agentConfigs = new ArrayList<>();

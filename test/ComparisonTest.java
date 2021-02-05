@@ -54,10 +54,10 @@ public class ComparisonTest {
         }
     }
 
-    @Test
-    public void testMarriageAgent() {
-        compareReports("MarriageAgent");
-    }
+//    @Test
+//    public void testMarriageAgent() {
+//        compareReports("MarriageAgent");
+//    }
 
     @Test
     public void testPersonBirthAgent() {
@@ -85,21 +85,21 @@ public class ComparisonTest {
         compareReports("CompanyAgent");
     }
 
+//    @Test
+//    public void testEmploymentAgent() {
+//        compareReports("EmploymentAgent");
+//    }
+
     @Test
-    public void testEmploymentAgent() {
-        compareReports("EmploymentAgent");
+    public void testProductAgent() {
+        compareReports("ProductAgent");
     }
 
-//    @Test
-//    public void testProductAgent() {
-//        compareFields("ProductAgent");
-//    }
-//
-//    @Test
-//    public void testPurchaseAgent() {
-//        compareFields("PurchaseAgent");
-//    }
-//
+    @Test
+    public void testPurchaseAgent() {
+        compareReports("PurchaseAgent");
+    }
+
 //    @Test
 //    public void testFriendshipAgent() {
 //        compareFields("FriendshipAgent");
