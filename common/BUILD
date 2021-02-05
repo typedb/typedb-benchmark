@@ -13,6 +13,7 @@ java_library(
         "//common/action",
         "//common/utils",
         "//config",
+        "@graknlabs_grabl_tracing//client",
         "@maven//:ch_qos_logback_logback_classic",
         "@maven//:commons_cli_commons_cli",
         "@maven//:org_slf4j_slf4j_api",

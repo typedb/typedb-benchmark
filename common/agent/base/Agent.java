@@ -30,6 +30,8 @@ import grakn.benchmark.common.world.World;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -86,15 +88,17 @@ public abstract class Agent<REGION extends Region, DB_OPERATION extends DbOperat
         List<REGION> regions = getRegions(benchmarkContext.world());
         List<RandomSource> randomisers = randomSource.split(regions.size());
 
-        System.out.println("AGENT THREAD IS " + Thread.currentThread().getId());
-
+        contextOnThread("aggregated tracing contex", benchmarkContext.iteration());
+        Instant start = Instant.now();
         trace(() -> {
                 Utils.pairs(randomisers, regions).stream().parallel().forEach(pair -> {
-                    System.out.println("traceOnThread " + Thread.currentThread().getId() + "        -        traceName = " + name());
                     executeRegionalAgent(pair.first(), pair.second());
                 });
                 return (Void) null;
-        }, name(), isTracing());
+        }, name() + ".aggregate", isTracing());
+        Instant end = Instant.now();
+        System.out.println(name() + ".aggregate   -   " + Duration.between(start, end).toMillis());
+
         return report;
     }
 
@@ -159,7 +163,13 @@ public abstract class Agent<REGION extends Region, DB_OPERATION extends DbOperat
         }
 
         protected Report runWithReport(DbOperationFactory<DB_OPERATION> dbOperationFactory, REGION region) {
-            run(dbOperationFactory, region);
+            Instant start = Instant.now();
+            trace(() -> {
+                run(dbOperationFactory, region);
+                return null;
+            }, name() + ".single", isTracing());
+            Instant end = Instant.now();
+            System.out.println(name() + ".single   -   " + Duration.between(start, end).toMillis());
             return report;
         }
 

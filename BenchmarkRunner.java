@@ -106,7 +106,7 @@ public class BenchmarkRunner {
         LOG.info(String.format("Connecting to %s...", dbName));
 
         try {
-            try (GrablTracing tracingIgnored = grablTracing(grablTracingUri, grablTracingOrganisation, grablTracingRepository, grablTracingCommit, grablTracingUsername, grablTracingToken, disableTracing, dbName)) {
+            try (GrablTracing ignored = grablTracing(grablTracingUri, grablTracingOrganisation, grablTracingRepository, grablTracingCommit, grablTracingUsername, grablTracingToken, disableTracing, dbName)) {
                 grakn.benchmark.common.Benchmark<?, ?> benchmark;
                 if (dbName.toLowerCase().startsWith("grakn")) {
                     defaultUri = "localhost:48555";
