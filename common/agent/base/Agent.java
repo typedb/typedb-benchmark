@@ -86,8 +86,11 @@ public abstract class Agent<REGION extends Region, DB_OPERATION extends DbOperat
         List<REGION> regions = getRegions(benchmarkContext.world());
         List<RandomSource> randomisers = randomSource.split(regions.size());
 
+        System.out.println("AGENT THREAD IS " + Thread.currentThread().getId());
+
         trace(() -> {
                 Utils.pairs(randomisers, regions).stream().parallel().forEach(pair -> {
+                    System.out.println("traceOnThread " + Thread.currentThread().getId() + "        -        traceName = " + name());
                     executeRegionalAgent(pair.first(), pair.second());
                 });
                 return (Void) null;
