@@ -29,6 +29,8 @@ import static grakn.benchmark.grakn.action.Model.CITY;
 import static grakn.benchmark.grakn.action.Model.CONTINENT;
 import static grakn.benchmark.grakn.action.Model.LOCATION_HIERARCHY;
 import static grakn.benchmark.grakn.action.Model.LOCATION_NAME;
+import static graql.lang.Graql.match;
+import static graql.lang.Graql.var;
 
 public class GraknCitiesInContinentAction extends CitiesInContinentAction<GraknOperation> {
     public GraknCitiesInContinentAction(GraknOperation dbOperation, World.City city) {
@@ -42,11 +44,11 @@ public class GraknCitiesInContinentAction extends CitiesInContinentAction<GraknO
     }
 
     public static GraqlMatch.Unfiltered query(String cityName, String continentName) {
-        return Graql.match(
-                Graql.var(CITY).isa(CITY).has(LOCATION_NAME, Graql.var("city-name")),
-                Graql.var(CONTINENT).isa(CONTINENT).has(LOCATION_NAME, continentName),
-                Graql.var("lh1").rel(CITY).rel(CONTINENT).isa(LOCATION_HIERARCHY),
-                Graql.var("city-name").neq(cityName)
+        return match(
+                var(CITY).isa(CITY).has(LOCATION_NAME, var("city-name")),
+                var(CONTINENT).isa(CONTINENT).has(LOCATION_NAME, continentName),
+                var("lh1").rel(CITY).rel(CONTINENT).isa(LOCATION_HIERARCHY),
+                var("city-name").neq(cityName)
         );
     }
 }

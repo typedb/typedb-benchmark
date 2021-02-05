@@ -58,7 +58,11 @@ java_test(
         "@maven//:junit_junit",
         "@maven//:org_slf4j_slf4j_api",
     ],
-    size = "enormous"
+    size = "enormous",
+    resource_strip_prefix = "config/",
+    resources = [
+        "//config:logback.xml",
+    ],
 )
 
 checkstyle_test(

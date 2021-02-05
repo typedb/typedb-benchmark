@@ -43,6 +43,8 @@ import static grakn.benchmark.grakn.action.Model.TRANSACTION_BUYER;
 import static grakn.benchmark.grakn.action.Model.TRANSACTION_MERCHANDISE;
 import static grakn.benchmark.grakn.action.Model.TRANSACTION_SELLER;
 import static grakn.benchmark.grakn.action.Model.VALUE;
+import static graql.lang.Graql.match;
+import static graql.lang.Graql.var;
 
 public class GraknInsertTransactionAction extends InsertTransactionAction<GraknOperation, ConceptMap> {
 
@@ -57,29 +59,29 @@ public class GraknInsertTransactionAction extends InsertTransactionAction<GraknO
     }
 
     public static GraqlInsert query(Pair<Long, Long> transaction, Long sellerCompanyNumber, String countryName, double value, int productQuantity, boolean isTaxable) {
-        return Graql.match(
-                Graql.var(PRODUCT)
+        return match(
+                var(PRODUCT)
                         .isa(PRODUCT)
                         .has(PRODUCT_BARCODE, transaction.second()),
-                Graql.var("c-buyer").isa(COMPANY)
+                var("c-buyer").isa(COMPANY)
                         .has(COMPANY_NUMBER, transaction.first()),
-                Graql.var("c-seller").isa(COMPANY)
+                var("c-seller").isa(COMPANY)
                         .has(COMPANY_NUMBER, sellerCompanyNumber),
-                Graql.var(COUNTRY).isa(COUNTRY)
+                var(COUNTRY).isa(COUNTRY)
                         .has(LOCATION_NAME, countryName))
                 .insert(
-                        Graql.var(TRANSACTION)
-                                .rel(TRANSACTION_SELLER, Graql.var("c-seller"))
-                                .rel(TRANSACTION_BUYER, Graql.var("c-buyer"))
-                                .rel(TRANSACTION_MERCHANDISE, Graql.var(PRODUCT))
+                        var(TRANSACTION)
+                                .rel(TRANSACTION_SELLER, var("c-seller"))
+                                .rel(TRANSACTION_BUYER, var("c-buyer"))
+                                .rel(TRANSACTION_MERCHANDISE, var(PRODUCT))
                                 .isa(TRANSACTION)
                                 //                                .has(CURRENCY)  // TODO Add currency https://github.com/graknlabs/benchmark/issues/31
                                 .has(VALUE, value)
                                 .has(PRODUCT_QUANTITY, productQuantity)
                                 .has(IS_TAXABLE, isTaxable),
-                        Graql.var(LOCATES)
-                                .rel(LOCATES_LOCATION, Graql.var(COUNTRY))
-                                .rel(LOCATES_LOCATED, Graql.var(TRANSACTION))
+                        var(LOCATES)
+                                .rel(LOCATES_LOCATION, var(COUNTRY))
+                                .rel(LOCATES_LOCATED, var(TRANSACTION))
                                 .isa(LOCATES)
                 );
     }

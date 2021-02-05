@@ -32,7 +32,6 @@ import static org.junit.Assert.assertEquals;
 public class ComparisonTest {
 
     private void compareReports(String agentName) {
-
         Agent<?, ?>.Report graknAgentReport = graknCore.getReport().getAgentReport(agentName);
         Agent<?, ?>.Report neo4jAgentReport = neo4j.getReport().getAgentReport(agentName);
 
@@ -47,17 +46,17 @@ public class ComparisonTest {
                     while (graknIter.hasNext() && neo4jIter.hasNext()) {
                         Action<?, ?>.Report graknActionReport = graknIter.next();
                         Action<?, ?>.Report neo4jActionReport = neo4jIter.next();
-                        assertEquals(graknActionReport, neo4jActionReport);
+                        assertEquals(neo4jActionReport, graknActionReport);
                     }
                 }
             });
         }
     }
 
-    @Test
-    public void testMarriageAgent() {
-        compareReports("MarriageAgent");
-    }
+//    @Test
+//    public void testMarriageAgent() {
+//        compareReports("MarriageAgent");
+//    }
 
     @Test
     public void testPersonBirthAgent() {
@@ -85,21 +84,21 @@ public class ComparisonTest {
         compareReports("CompanyAgent");
     }
 
+//    @Test
+//    public void testEmploymentAgent() {
+//        compareReports("EmploymentAgent");
+//    }
+
     @Test
-    public void testEmploymentAgent() {
-        compareReports("EmploymentAgent");
+    public void testProductAgent() {
+        compareReports("ProductAgent");
     }
 
-//    @Test
-//    public void testProductAgent() {
-//        compareFields("ProductAgent");
-//    }
-//
-//    @Test
-//    public void testPurchaseAgent() {
-//        compareFields("PurchaseAgent");
-//    }
-//
+    @Test
+    public void testPurchaseAgent() {
+        compareReports("PurchaseAgent");
+    }
+
 //    @Test
 //    public void testFriendshipAgent() {
 //        compareFields("FriendshipAgent");

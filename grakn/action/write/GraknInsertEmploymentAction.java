@@ -51,6 +51,7 @@ import static grakn.benchmark.grakn.action.Model.PERSON;
 import static grakn.benchmark.grakn.action.Model.START_DATE;
 import static grakn.benchmark.grakn.action.Model.WAGE;
 import static grakn.benchmark.grakn.action.Model.WAGE_VALUE;
+import static graql.lang.Graql.match;
 
 public class GraknInsertEmploymentAction extends InsertEmploymentAction<GraknOperation, ConceptMap> {
     public GraknInsertEmploymentAction(GraknOperation dbOperation, World.City worldCity, String employeeEmail, long companyNumber, LocalDateTime employmentDate, double wageValue, String contractContent, double contractedHours) {
@@ -74,7 +75,7 @@ public class GraknInsertEmploymentAction extends InsertEmploymentAction<GraknOpe
         UnboundVariable contract = Graql.var(CONTRACT);
         UnboundVariable currency = Graql.var(CURRENCY);
 
-        return Graql.match(
+        return match(
                 city
                         .isa(CITY)
                         .has(LOCATION_NAME, worldCityName),

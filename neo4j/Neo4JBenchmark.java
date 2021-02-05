@@ -52,6 +52,7 @@ public class Neo4JBenchmark extends grakn.benchmark.common.TransactionalBenchmar
     protected void initialise(Map<String, Path> initialisationDataPaths) {
         Session session = driver.session("initialise");
         addKeyConstraints(session);
+        cleanDatabase(session);
         YAMLLoader loader = new Neo4jYAMLLoader(session, initialisationDataPaths);
         try {
             loader.loadFile(initialisationDataPaths.get("cypher_templates.yml").toFile());
@@ -60,6 +61,12 @@ public class Neo4JBenchmark extends grakn.benchmark.common.TransactionalBenchmar
 
         }
         driver.closeSessions();
+    }
+
+    private void cleanDatabase(Session session) {
+        Transaction tx = session.beginTransaction();
+        tx.run(new Query("MATCH (n) DETACH DELETE n"));
+        tx.commit();
     }
 
     /**
@@ -71,11 +78,11 @@ public class Neo4JBenchmark extends grakn.benchmark.common.TransactionalBenchmar
      */
     private void addKeyConstraints(Session session) {
         List<String> queries = new ArrayList<String>() {{
-            add("CREATE CONSTRAINT ON (person:Person) ASSERT person.email IS UNIQUE");
-            add("CREATE CONSTRAINT ON (location:Location) ASSERT location.locationName IS UNIQUE");
-            add("CREATE CONSTRAINT ON (company:Company) ASSERT company.companyName IS UNIQUE");
-            add("CREATE CONSTRAINT ON (company:Company) ASSERT company.companyNumber IS UNIQUE");
-            add("CREATE CONSTRAINT ON (product:Product) ASSERT product.productBarcode IS UNIQUE");
+            add("CREATE CONSTRAINT unique_person_email IF NOT EXISTS ON (person:Person) ASSERT person.email IS UNIQUE");
+            add("CREATE CONSTRAINT unique_location_locationName IF NOT EXISTS ON (location:Location) ASSERT location.locationName IS UNIQUE");
+            add("CREATE CONSTRAINT unique_company_companyName IF NOT EXISTS ON (company:Company) ASSERT company.companyName IS UNIQUE");
+            add("CREATE CONSTRAINT unique_company_companyNumber IF NOT EXISTS ON (company:Company) ASSERT company.companyNumber IS UNIQUE");
+            add("CREATE CONSTRAINT unique_product_productBarcode IF NOT EXISTS ON (product:Product) ASSERT product.productBarcode IS UNIQUE");
         }};
         Transaction tx = session.beginTransaction();
         for (String query : queries) {

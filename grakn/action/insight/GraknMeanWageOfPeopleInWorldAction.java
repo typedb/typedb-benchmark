@@ -25,6 +25,8 @@ import graql.lang.query.GraqlMatch;
 
 import static grakn.benchmark.grakn.action.Model.WAGE;
 import static grakn.benchmark.grakn.action.Model.WAGE_VALUE;
+import static graql.lang.Graql.match;
+import static graql.lang.Graql.var;
 
 public class GraknMeanWageOfPeopleInWorldAction extends MeanWageOfPeopleInWorldAction<GraknOperation> {
     public GraknMeanWageOfPeopleInWorldAction(GraknOperation dbOperation) {
@@ -37,9 +39,9 @@ public class GraknMeanWageOfPeopleInWorldAction extends MeanWageOfPeopleInWorldA
     }
 
     public static GraqlMatch.Aggregate query() {
-        UnboundVariable wageValue = Graql.var(WAGE_VALUE);
-        return Graql.match(
-                Graql.var(WAGE).isa(WAGE)
+        UnboundVariable wageValue = var(WAGE_VALUE);
+        return match(
+                var(WAGE).isa(WAGE)
                         .has(WAGE_VALUE, wageValue)
         ).get(wageValue).mean(wageValue);
     }

@@ -40,6 +40,9 @@ import static grakn.benchmark.grakn.action.Model.PERSON;
 import static grakn.benchmark.grakn.action.Model.RESIDENCY;
 import static grakn.benchmark.grakn.action.Model.RESIDENCY_LOCATION;
 import static grakn.benchmark.grakn.action.Model.RESIDENCY_RESIDENT;
+import static graql.lang.Graql.match;
+import static graql.lang.Graql.not;
+import static graql.lang.Graql.var;
 
 public class GraknUnmarriedPeopleInCityAction extends UnmarriedPeopleInCityAction<GraknOperation> {
     public GraknUnmarriedPeopleInCityAction(GraknOperation dbOperation, World.City city, String gender, LocalDateTime dobOfAdults) {
@@ -62,14 +65,14 @@ public class GraknUnmarriedPeopleInCityAction extends UnmarriedPeopleInCityActio
     }
 
     public static GraqlMatch query(String marriageRole, String gender, LocalDateTime dobOfAdults, String cityName) {
-        UnboundVariable personVar = Graql.var(PERSON);
-        UnboundVariable cityVar = Graql.var(CITY);
-        return Graql.match(
-                personVar.isa(PERSON).has(GENDER, gender).has(EMAIL, Graql.var(EMAIL)).has(DATE_OF_BIRTH, Graql.var(DATE_OF_BIRTH)),
-                Graql.var(DATE_OF_BIRTH).lte(dobOfAdults),
-                Graql.not(Graql.var("m").rel(marriageRole, personVar).isa(MARRIAGE)),
-                Graql.var("r").rel(RESIDENCY_RESIDENT, personVar).rel(RESIDENCY_LOCATION, cityVar).isa(RESIDENCY),
-                Graql.not(Graql.var("r").has(END_DATE, Graql.var(END_DATE))),
+        UnboundVariable personVar = var(PERSON);
+        UnboundVariable cityVar = var(CITY);
+        return match(
+                personVar.isa(PERSON).has(GENDER, gender).has(EMAIL, var(EMAIL)).has(DATE_OF_BIRTH, var(DATE_OF_BIRTH)),
+                var(DATE_OF_BIRTH).lte(dobOfAdults),
+                not(var("m").rel(marriageRole, personVar).isa(MARRIAGE)),
+                var("r").rel(RESIDENCY_RESIDENT, personVar).rel(RESIDENCY_LOCATION, cityVar).isa(RESIDENCY),
+                not(var("r").has(END_DATE, var(END_DATE))),
                 cityVar.isa(CITY).has(LOCATION_NAME, cityName)
         ).get(EMAIL);
     }

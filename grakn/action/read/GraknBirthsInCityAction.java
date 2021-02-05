@@ -34,6 +34,8 @@ import static grakn.benchmark.grakn.action.Model.DATE_OF_BIRTH;
 import static grakn.benchmark.grakn.action.Model.EMAIL;
 import static grakn.benchmark.grakn.action.Model.LOCATION_NAME;
 import static grakn.benchmark.grakn.action.Model.PERSON;
+import static graql.lang.Graql.match;
+import static graql.lang.Graql.var;
 
 public class GraknBirthsInCityAction extends BirthsInCityAction<GraknOperation> {
     public GraknBirthsInCityAction(GraknOperation dbOperation, World.City city, LocalDateTime today) {
@@ -47,13 +49,13 @@ public class GraknBirthsInCityAction extends BirthsInCityAction<GraknOperation> 
     }
 
     public static GraqlMatch.Unfiltered query(String worldCityName, LocalDateTime today) {
-        return Graql.match(
-                Graql.var("c").isa(CITY)
+        return match(
+                var("c").isa(CITY)
                         .has(LOCATION_NAME, worldCityName),
-                Graql.var("child").isa(PERSON)
-                        .has(EMAIL, Graql.var(EMAIL))
+                var("child").isa(PERSON)
+                        .has(EMAIL, var(EMAIL))
                         .has(DATE_OF_BIRTH, today),
-                Graql.var("bi")
+                var("bi")
                         .rel(BORN_IN_PLACE_OF_BIRTH, "c")
                         .rel(BORN_IN_CHILD, "child")
                         .isa(BORN_IN)

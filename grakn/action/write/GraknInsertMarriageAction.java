@@ -40,6 +40,8 @@ import static grakn.benchmark.grakn.action.Model.MARRIAGE_HUSBAND;
 import static grakn.benchmark.grakn.action.Model.MARRIAGE_ID;
 import static grakn.benchmark.grakn.action.Model.MARRIAGE_WIFE;
 import static grakn.benchmark.grakn.action.Model.PERSON;
+import static graql.lang.Graql.match;
+import static graql.lang.Graql.var;
 
 public class GraknInsertMarriageAction extends InsertMarriageAction<GraknOperation, ConceptMap> {
 
@@ -54,17 +56,17 @@ public class GraknInsertMarriageAction extends InsertMarriageAction<GraknOperati
     }
 
     private GraqlInsert query(String worldCityName, int marriageIdentifier, String wifeEmail, String husbandEmail) {
-        UnboundVariable husband = Graql.var("husband");
-        UnboundVariable wife = Graql.var("wife");
-        UnboundVariable city = Graql.var(CITY);
-        UnboundVariable marriage = Graql.var("marriage");
+        UnboundVariable husband = var("husband");
+        UnboundVariable wife = var("wife");
+        UnboundVariable city = var(CITY);
+        UnboundVariable marriage = var("marriage");
 
-        ThingVariable.Attribute cityNameVar = Graql.var().eq(worldCityName);
-        ThingVariable.Attribute marriageIdentifierVar = Graql.var().eq(marriageIdentifier);
-        ThingVariable.Attribute husbandEmailVar = Graql.var().eq(husbandEmail);
-        ThingVariable.Attribute wifeEmailVar = Graql.var().eq(wifeEmail);
+        ThingVariable.Attribute cityNameVar = var().eq(worldCityName);
+        ThingVariable.Attribute marriageIdentifierVar = var().eq(marriageIdentifier);
+        ThingVariable.Attribute husbandEmailVar = var().eq(husbandEmail);
+        ThingVariable.Attribute wifeEmailVar = var().eq(wifeEmail);
 
-        return Graql.match(
+        return match(
                 husband.isa(PERSON).has(EMAIL, husbandEmailVar.toString()),
                 wife.isa(PERSON).has(EMAIL, wifeEmailVar.toString()),
                 city.isa(CITY).has(LOCATION_NAME, cityNameVar.toString())
@@ -74,7 +76,7 @@ public class GraknInsertMarriageAction extends InsertMarriageAction<GraknOperati
                         .rel(MARRIAGE_WIFE, wife)
                         .isa(MARRIAGE)
                         .has(MARRIAGE_ID, marriageIdentifierVar.toString()),
-                Graql.var().rel(LOCATES_LOCATED, marriage).rel(LOCATES_LOCATION, city).isa(LOCATES)
+                var().rel(LOCATES_LOCATED, marriage).rel(LOCATES_LOCATION, city).isa(LOCATES)
         );
     }
 

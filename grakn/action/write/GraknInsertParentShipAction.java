@@ -33,6 +33,8 @@ import static grakn.benchmark.grakn.action.Model.PARENTSHIP;
 import static grakn.benchmark.grakn.action.Model.PARENTSHIP_CHILD;
 import static grakn.benchmark.grakn.action.Model.PARENTSHIP_PARENT;
 import static grakn.benchmark.grakn.action.Model.PERSON;
+import static graql.lang.Graql.match;
+import static graql.lang.Graql.var;
 
 public class GraknInsertParentShipAction extends InsertParentShipAction<GraknOperation, ConceptMap> {
     public GraknInsertParentShipAction(GraknOperation dbOperation, HashMap<SpouseType, String> marriage, String childEmail) {
@@ -49,12 +51,12 @@ public class GraknInsertParentShipAction extends InsertParentShipAction<GraknOpe
     }
 
     public static GraqlInsert query(HashMap<SpouseType, String> marriage, String childEmail) {
-        UnboundVariable parentship = Graql.var(PARENTSHIP);
-        UnboundVariable child = Graql.var("child");
-        UnboundVariable mother = Graql.var("mother");
-        UnboundVariable father = Graql.var("father");
+        UnboundVariable parentship = var(PARENTSHIP);
+        UnboundVariable child = var("child");
+        UnboundVariable mother = var("mother");
+        UnboundVariable father = var("father");
 
-        return Graql.match(
+        return match(
                 mother.isa(PERSON).has(EMAIL, marriage.get(SpouseType.WIFE)),
                 father.isa(PERSON).has(EMAIL, marriage.get(SpouseType.HUSBAND)),
                 child.isa(PERSON).has(EMAIL, childEmail)

@@ -67,14 +67,13 @@ public class Neo4jInsertTransactionAction extends InsertTransactionAction<Neo4jO
     @Override
     protected HashMap<ComparableField, Object> outputForReport(Record answer) {
         return new HashMap<ComparableField, Object>() {{
-            put(InsertTransactionActionField.SELLER, answer.asMap().get("seller" + Model.COMPANY_NUMBER));
-            put(InsertTransactionActionField.BUYER, answer.asMap().get("buyer" + Model.COMPANY_NUMBER));
+            put(InsertTransactionActionField.SELLER, answer.asMap().get("seller." + Model.COMPANY_NUMBER));
+            put(InsertTransactionActionField.BUYER, answer.asMap().get("buyer." + Model.COMPANY_NUMBER));
             put(InsertTransactionActionField.MERCHANDISE, answer.asMap().get("product." + Model.PRODUCT_BARCODE));
             put(InsertTransactionActionField.VALUE, answer.asMap().get("transaction." + Model.VALUE));
             put(InsertTransactionActionField.PRODUCT_QUANTITY, answer.asMap().get("transaction." + Model.PRODUCT_QUANTITY));
             put(InsertTransactionActionField.IS_TAXABLE, answer.asMap().get("transaction." + Model.IS_TAXABLE));
             put(InsertTransactionActionField.COUNTRY, answer.asMap().get("country." + Model.LOCATION_NAME));
-
         }};
     }
 }

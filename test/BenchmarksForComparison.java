@@ -46,7 +46,7 @@ import static grakn.benchmark.config.Config.Agent.ConstructAgentConfig;
 public class BenchmarksForComparison {
     static final grakn.benchmark.neo4j.Neo4JBenchmark neo4j;
     static final grakn.benchmark.grakn.GraknBenchmark graknCore;
-    static final int numIterations = 5;
+    static final int numIterations = 30;
 
     static {
         String[] args = System.getProperty("sun.java.command").split(" ");
@@ -93,15 +93,15 @@ public class BenchmarksForComparison {
         });
 
         ArrayList<String> agentNames = new ArrayList<>();
-        agentNames.add("marriage");
+//        agentNames.add("marriage");
         agentNames.add("personBirth");
-        agentNames.add("ageUpdate");
+//        agentNames.add("ageUpdate");
 //        agentNames.add("parentship");
 //        agentNames.add("relocation");
         agentNames.add("company");
-        agentNames.add("employment");
-//        agentNames.add("product");
-//        agentNames.add("transaction");
+//        agentNames.add("employment");
+        agentNames.add("product");
+        agentNames.add("transaction");
 //        agentNames.add("friendship");
 
         ArrayList<Config.Agent> agentConfigs = new ArrayList<>();

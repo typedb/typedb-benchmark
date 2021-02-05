@@ -26,6 +26,8 @@ import java.util.stream.Collectors;
 
 import static grakn.benchmark.grakn.action.Model.EMAIL;
 import static grakn.benchmark.grakn.action.Model.PERSON;
+import static graql.lang.Graql.match;
+import static graql.lang.Graql.var;
 
 public class GraknFindSpecificPersonAction extends FindSpecificPersonAction<GraknOperation> {
     public GraknFindSpecificPersonAction(GraknOperation dbOperation) {
@@ -38,9 +40,9 @@ public class GraknFindSpecificPersonAction extends FindSpecificPersonAction<Grak
     }
 
     public static GraqlMatch.Unfiltered query() {
-        return Graql.match(
-                Graql.var(PERSON).isa(PERSON).has(EMAIL, Graql.var(EMAIL)),
-                Graql.var(EMAIL).eq(PERSON_EMAIL_FOR_QUERY).isa(EMAIL)
+        return match(
+                var(PERSON).isa(PERSON).has(EMAIL, var(EMAIL)),
+                var(EMAIL).eq(PERSON_EMAIL_FOR_QUERY).isa(EMAIL)
         );
     }
 }

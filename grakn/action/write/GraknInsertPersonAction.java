@@ -40,6 +40,7 @@ import static grakn.benchmark.grakn.action.Model.GENDER;
 import static grakn.benchmark.grakn.action.Model.LOCATION_NAME;
 import static grakn.benchmark.grakn.action.Model.PERSON;
 import static grakn.benchmark.grakn.action.Model.SURNAME;
+import static graql.lang.Graql.var;
 
 public class GraknInsertPersonAction extends InsertPersonAction<GraknOperation, ConceptMap> {
     public GraknInsertPersonAction(GraknOperation dbOperation, World.City city, LocalDateTime today, String email, String gender, String forename, String surname) {
@@ -53,9 +54,9 @@ public class GraknInsertPersonAction extends InsertPersonAction<GraknOperation, 
     }
 
     public static GraqlInsert query(String worldCityName, String email, String gender, String forename, String surname, LocalDateTime today) {
-        UnboundVariable city = Graql.var(CITY);
-        UnboundVariable person = Graql.var(PERSON);
-        UnboundVariable bornIn = Graql.var(BORN_IN);
+        UnboundVariable city = var(CITY);
+        UnboundVariable person = var(PERSON);
+        UnboundVariable bornIn = var(BORN_IN);
         return Graql.match(
                 city.isa(CITY)
                         .has(LOCATION_NAME, worldCityName))
