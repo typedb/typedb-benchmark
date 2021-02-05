@@ -89,12 +89,14 @@ public abstract class Agent<REGION extends Region, DB_OPERATION extends DbOperat
         List<RandomSource> randomisers = randomSource.split(regions.size());
 
         contextOnThread("aggregated tracing contex", benchmarkContext.iteration());
+
         trace(() -> {
             Utils.pairs(randomisers, regions).stream().parallel().forEach(pair -> {
                 executeRegionalAgent(pair.first(), pair.second());
             });
             return (Void) null;
         }, name() + ": aggregate", isTracing());
+
 
         return report;
     }
