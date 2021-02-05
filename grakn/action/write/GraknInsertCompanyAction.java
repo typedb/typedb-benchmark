@@ -37,6 +37,7 @@ import static grakn.benchmark.grakn.action.Model.INCORPORATION;
 import static grakn.benchmark.grakn.action.Model.INCORPORATION_INCORPORATED;
 import static grakn.benchmark.grakn.action.Model.INCORPORATION_INCORPORATING;
 import static grakn.benchmark.grakn.action.Model.LOCATION_NAME;
+import static graql.lang.Graql.var;
 
 public class GraknInsertCompanyAction extends InsertCompanyAction<GraknOperation, ConceptMap> {
 
@@ -51,14 +52,14 @@ public class GraknInsertCompanyAction extends InsertCompanyAction<GraknOperation
 
     public static GraqlInsert query(String countryName, LocalDateTime today, int companyNumber, String companyName) {
         return Graql.match(
-                Graql.var(COUNTRY).isa(COUNTRY)
+                var(COUNTRY).isa(COUNTRY)
                         .has(LOCATION_NAME, countryName))
-                .insert(Graql.var(COMPANY).isa(COMPANY)
+                .insert(var(COMPANY).isa(COMPANY)
                                 .has(COMPANY_NAME, companyName)
                                 .has(COMPANY_NUMBER, companyNumber),
-                        Graql.var(INCORPORATION)
-                                .rel(INCORPORATION_INCORPORATED, Graql.var(COMPANY))
-                                .rel(INCORPORATION_INCORPORATING, Graql.var(COUNTRY))
+                        var(INCORPORATION)
+                                .rel(INCORPORATION_INCORPORATED, var(COMPANY))
+                                .rel(INCORPORATION_INCORPORATING, var(COUNTRY))
                                 .isa(INCORPORATION)
                                 .has(DATE_OF_INCORPORATION, today)
                 );

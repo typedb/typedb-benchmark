@@ -31,6 +31,8 @@ import static grakn.benchmark.grakn.action.Model.PERSON;
 import static grakn.benchmark.grakn.action.Model.RESIDENCY;
 import static grakn.benchmark.grakn.action.Model.RESIDENCY_LOCATION;
 import static grakn.benchmark.grakn.action.Model.RESIDENCY_RESIDENT;
+import static graql.lang.Graql.match;
+import static graql.lang.Graql.var;
 
 public class GraknFindLivedInAction extends FindLivedInAction<GraknOperation> {
     public GraknFindLivedInAction(GraknOperation dbOperation) {
@@ -43,14 +45,14 @@ public class GraknFindLivedInAction extends FindLivedInAction<GraknOperation> {
     }
 
     public static GraqlMatch.Unfiltered query() {
-        return Graql.match(
-                Graql.var(CITY).isa(CITY)
+        return match(
+                var(CITY).isa(CITY)
                         .has(LOCATION_NAME, "Berlin"),
-                Graql.var(RESIDENCY)
-                        .rel(RESIDENCY_LOCATION, Graql.var(CITY))
-                        .rel(RESIDENCY_RESIDENT, Graql.var(PERSON))
+                var(RESIDENCY)
+                        .rel(RESIDENCY_LOCATION, var(CITY))
+                        .rel(RESIDENCY_RESIDENT, var(PERSON))
                         .isa(RESIDENCY),
-                Graql.var(PERSON).isa(PERSON).has(EMAIL, Graql.var(EMAIL))
+                var(PERSON).isa(PERSON).has(EMAIL, var(EMAIL))
         );
     }
 }

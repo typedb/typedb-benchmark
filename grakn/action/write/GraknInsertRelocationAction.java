@@ -37,6 +37,8 @@ import static grakn.benchmark.grakn.action.Model.RELOCATION_DATE;
 import static grakn.benchmark.grakn.action.Model.RELOCATION_NEW_LOCATION;
 import static grakn.benchmark.grakn.action.Model.RELOCATION_PREVIOUS_LOCATION;
 import static grakn.benchmark.grakn.action.Model.RELOCATION_RELOCATED_PERSON;
+import static graql.lang.Graql.match;
+import static graql.lang.Graql.var;
 
 public class GraknInsertRelocationAction extends InsertRelocationAction<GraknOperation, ConceptMap> {
     public GraknInsertRelocationAction(GraknOperation dbOperation, World.City city, LocalDateTime today, String relocateeEmail, String relocationCityName) {
@@ -50,12 +52,12 @@ public class GraknInsertRelocationAction extends InsertRelocationAction<GraknOpe
     }
 
     public static GraqlInsert query(String relocateeEmail, String relocationCityName, String cityName, LocalDateTime today) {
-        return Graql.match(
-                Graql.var(PERSON).isa(PERSON).has(EMAIL, relocateeEmail),
-                Graql.var("new-city").isa(CITY).has(LOCATION_NAME, relocationCityName),
-                Graql.var("old-city").isa(CITY).has(LOCATION_NAME, cityName)
+        return match(
+                var(PERSON).isa(PERSON).has(EMAIL, relocateeEmail),
+                var("new-city").isa(CITY).has(LOCATION_NAME, relocationCityName),
+                var("old-city").isa(CITY).has(LOCATION_NAME, cityName)
         ).insert(
-                Graql.var(RELOCATION)
+                var(RELOCATION)
                         .rel(RELOCATION_PREVIOUS_LOCATION, "old-city")
                         .rel(RELOCATION_NEW_LOCATION, "new-city")
                         .rel(RELOCATION_RELOCATED_PERSON, PERSON)

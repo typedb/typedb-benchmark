@@ -32,6 +32,8 @@ import static grakn.benchmark.grakn.action.Model.PRODUCED_IN_CONTINENT;
 import static grakn.benchmark.grakn.action.Model.PRODUCED_IN_PRODUCT;
 import static grakn.benchmark.grakn.action.Model.PRODUCT;
 import static grakn.benchmark.grakn.action.Model.PRODUCT_BARCODE;
+import static graql.lang.Graql.match;
+import static graql.lang.Graql.var;
 
 public class GraknProductsInContinentAction extends ProductsInContinentAction<GraknOperation> {
 
@@ -46,16 +48,16 @@ public class GraknProductsInContinentAction extends ProductsInContinentAction<Gr
     }
 
     public static GraqlMatch.Unfiltered query(String continentName) {
-        return Graql.match(
-                Graql.var(CONTINENT)
+        return match(
+                var(CONTINENT)
                         .isa(CONTINENT)
                         .has(LOCATION_NAME, continentName),
-                Graql.var(PRODUCT)
+                var(PRODUCT)
                         .isa(PRODUCT)
-                        .has(PRODUCT_BARCODE, Graql.var(PRODUCT_BARCODE)),
-                Graql.var(PRODUCED_IN)
-                        .rel(PRODUCED_IN_PRODUCT, Graql.var(PRODUCT))
-                        .rel(PRODUCED_IN_CONTINENT, Graql.var(CONTINENT))
+                        .has(PRODUCT_BARCODE, var(PRODUCT_BARCODE)),
+                var(PRODUCED_IN)
+                        .rel(PRODUCED_IN_PRODUCT, var(PRODUCT))
+                        .rel(PRODUCED_IN_CONTINENT, var(CONTINENT))
                         .isa(PRODUCED_IN)
 
         );

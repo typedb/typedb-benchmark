@@ -41,6 +41,8 @@ import static grakn.benchmark.grakn.action.Model.PERSON;
 import static grakn.benchmark.grakn.action.Model.TRANSACTION;
 import static grakn.benchmark.grakn.action.Model.TRANSACTION_BUYER;
 import static grakn.benchmark.grakn.action.Model.TRANSACTION_SELLER;
+import static graql.lang.Graql.match;
+import static graql.lang.Graql.var;
 
 public class GraknFourHopAction extends FourHopAction<GraknOperation> {
     public GraknFourHopAction(GraknOperation dbOperation) {
@@ -53,16 +55,16 @@ public class GraknFourHopAction extends FourHopAction<GraknOperation> {
     }
 
     public static GraqlMatch.Unfiltered query() {
-        return Graql.match(
-                Graql.var(CITY).isa(CITY).has(LOCATION_NAME, "London"),
-                Graql.var().rel(BORN_IN_PLACE_OF_BIRTH, Graql.var(CITY)).rel(BORN_IN_CHILD, Graql.var("child")).isa(BORN_IN),
-                Graql.var("child").isa(PERSON),
-                Graql.var().rel(PARENTSHIP_PARENT, Graql.var("parent")).rel(PARENTSHIP_CHILD, Graql.var("child")).isa(PARENTSHIP),
-                Graql.var("parent").isa(PERSON),
-                Graql.var().rel(EMPLOYMENT_EMPLOYEE, Graql.var("parent")).rel(EMPLOYMENT_EMPLOYER, Graql.var("buyer")).isa(EMPLOYMENT),
-                Graql.var("buyer").isa(COMPANY),
-                Graql.var().rel(TRANSACTION_BUYER, Graql.var("buyer")).rel(TRANSACTION_SELLER, Graql.var("seller")).isa(TRANSACTION),
-                Graql.var("seller").isa(COMPANY).has(COMPANY_NAME, Graql.var(COMPANY_NAME))
+        return match(
+                var(CITY).isa(CITY).has(LOCATION_NAME, "London"),
+                var().rel(BORN_IN_PLACE_OF_BIRTH, var(CITY)).rel(BORN_IN_CHILD, var("child")).isa(BORN_IN),
+                var("child").isa(PERSON),
+                var().rel(PARENTSHIP_PARENT, var("parent")).rel(PARENTSHIP_CHILD, var("child")).isa(PARENTSHIP),
+                var("parent").isa(PERSON),
+                var().rel(EMPLOYMENT_EMPLOYEE, var("parent")).rel(EMPLOYMENT_EMPLOYER, var("buyer")).isa(EMPLOYMENT),
+                var("buyer").isa(COMPANY),
+                var().rel(TRANSACTION_BUYER, var("buyer")).rel(TRANSACTION_SELLER, var("seller")).isa(TRANSACTION),
+                var("seller").isa(COMPANY).has(COMPANY_NAME, var(COMPANY_NAME))
         );
     }
 }

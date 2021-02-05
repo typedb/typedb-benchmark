@@ -27,6 +27,8 @@ import java.util.stream.Collectors;
 
 import static grakn.benchmark.grakn.action.Model.CURRENCY;
 import static grakn.benchmark.grakn.action.Model.TRANSACTION;
+import static graql.lang.Graql.match;
+import static graql.lang.Graql.var;
 
 public class GraknFindTransactionCurrencyAction extends FindTransactionCurrencyAction<GraknOperation> {
     public GraknFindTransactionCurrencyAction(GraknOperation dbOperation) {
@@ -39,8 +41,8 @@ public class GraknFindTransactionCurrencyAction extends FindTransactionCurrencyA
     }
 
     public static GraqlMatch.Unfiltered query() {
-        return Graql.match(
-                Graql.var(TRANSACTION).isa(TRANSACTION).has(CURRENCY, Graql.var(CURRENCY))
+        return match(
+                var(TRANSACTION).isa(TRANSACTION).has(CURRENCY, var(CURRENCY))
         );
     }
 }

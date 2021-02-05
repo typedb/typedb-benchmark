@@ -35,6 +35,8 @@ import static grakn.benchmark.grakn.action.Model.PRODUCT;
 import static grakn.benchmark.grakn.action.Model.PRODUCT_BARCODE;
 import static grakn.benchmark.grakn.action.Model.PRODUCT_DESCRIPTION;
 import static grakn.benchmark.grakn.action.Model.PRODUCT_NAME;
+import static graql.lang.Graql.match;
+import static graql.lang.Graql.var;
 
 public class GraknInsertProductAction extends InsertProductAction<GraknOperation, ConceptMap> {
     public GraknInsertProductAction(GraknOperation dbOperation, World.Continent continent, Long barcode, String productName, String productDescription) {
@@ -48,19 +50,19 @@ public class GraknInsertProductAction extends InsertProductAction<GraknOperation
     }
 
     public static GraqlInsert query(String continentName, Long barcode, String productName, String productDescription) {
-        return Graql.match(
-                Graql.var(CONTINENT)
+        return match(
+                var(CONTINENT)
                         .isa(CONTINENT)
                         .has(LOCATION_NAME, continentName)
         ).insert(
-                Graql.var(PRODUCT)
+                var(PRODUCT)
                         .isa(PRODUCT)
                         .has(PRODUCT_BARCODE, barcode)
                         .has(PRODUCT_NAME, productName)
                         .has(PRODUCT_DESCRIPTION, productDescription),
-                Graql.var(PRODUCED_IN)
-                        .rel(PRODUCED_IN_PRODUCT, Graql.var(PRODUCT))
-                        .rel(PRODUCED_IN_CONTINENT, Graql.var(CONTINENT))
+                var(PRODUCED_IN)
+                        .rel(PRODUCED_IN_PRODUCT, var(PRODUCT))
+                        .rel(PRODUCED_IN_CONTINENT, var(CONTINENT))
                         .isa(PRODUCED_IN)
         );
     }

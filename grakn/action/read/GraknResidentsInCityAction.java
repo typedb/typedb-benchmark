@@ -36,6 +36,9 @@ import static grakn.benchmark.grakn.action.Model.RESIDENCY;
 import static grakn.benchmark.grakn.action.Model.RESIDENCY_LOCATION;
 import static grakn.benchmark.grakn.action.Model.RESIDENCY_RESIDENT;
 import static grakn.benchmark.grakn.action.Model.START_DATE;
+import static graql.lang.Graql.match;
+import static graql.lang.Graql.not;
+import static graql.lang.Graql.var;
 
 public class GraknResidentsInCityAction extends ResidentsInCityAction<GraknOperation> {
 
@@ -49,14 +52,14 @@ public class GraknResidentsInCityAction extends ResidentsInCityAction<GraknOpera
     }
 
     public static GraqlMatch.Unfiltered query(String cityName, LocalDateTime earliestDate) {
-        UnboundVariable person = Graql.var(PERSON);
-        UnboundVariable cityVar = Graql.var(CITY);
-        UnboundVariable residency = Graql.var("r");
-        UnboundVariable startDate = Graql.var(START_DATE);
-        UnboundVariable endDate = Graql.var(END_DATE);
-        return Graql.match(
+        UnboundVariable person = var(PERSON);
+        UnboundVariable cityVar = var(CITY);
+        UnboundVariable residency = var("r");
+        UnboundVariable startDate = var(START_DATE);
+        UnboundVariable endDate = var(END_DATE);
+        return match(
                 person.isa(PERSON)
-                        .has(EMAIL, Graql.var(EMAIL)),
+                        .has(EMAIL, var(EMAIL)),
                 cityVar
                         .isa(CITY).has(LOCATION_NAME, cityName),
                 residency
@@ -64,7 +67,7 @@ public class GraknResidentsInCityAction extends ResidentsInCityAction<GraknOpera
                         .rel(RESIDENCY_LOCATION, CITY)
                         .isa(RESIDENCY)
                         .has(START_DATE, startDate),
-                Graql.not(
+                not(
                         residency
                                 .has(END_DATE, endDate)
                 ),

@@ -26,6 +26,8 @@ import java.util.stream.Collectors;
 
 import static grakn.benchmark.grakn.action.Model.MARRIAGE;
 import static grakn.benchmark.grakn.action.Model.MARRIAGE_ID;
+import static graql.lang.Graql.match;
+import static graql.lang.Graql.var;
 
 public class GraknFindSpecificMarriageAction extends FindSpecificMarriageAction<GraknOperation> {
     public GraknFindSpecificMarriageAction(GraknOperation dbOperation) {
@@ -39,9 +41,9 @@ public class GraknFindSpecificMarriageAction extends FindSpecificMarriageAction<
     }
 
     public static GraqlMatch.Unfiltered query() {
-        return Graql.match(
-                Graql.var(MARRIAGE).isa(MARRIAGE).has(MARRIAGE_ID, Graql.var(MARRIAGE_ID)),
-                Graql.var(MARRIAGE_ID).eq(MARRIAGE_ID_FOR_QUERY).isa(MARRIAGE_ID)
+        return match(
+                var(MARRIAGE).isa(MARRIAGE).has(MARRIAGE_ID, var(MARRIAGE_ID)),
+                var(MARRIAGE_ID).eq(MARRIAGE_ID_FOR_QUERY).isa(MARRIAGE_ID)
         );
     }
 }

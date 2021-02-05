@@ -41,6 +41,8 @@ import static grakn.benchmark.grakn.action.Model.MARRIAGE_WIFE;
 import static grakn.benchmark.grakn.action.Model.PARENTSHIP;
 import static grakn.benchmark.grakn.action.Model.PARENTSHIP_PARENT;
 import static grakn.benchmark.grakn.action.Model.PERSON;
+import static graql.lang.Graql.match;
+import static graql.lang.Graql.var;
 import static java.util.stream.Collectors.toList;
 
 public class GraknMarriedCoupleAction extends MarriedCoupleAction<GraknOperation> {
@@ -61,27 +63,27 @@ public class GraknMarriedCoupleAction extends MarriedCoupleAction<GraknOperation
     }
 
     public static GraqlMatch.Sorted query(String cityName) {
-        return Graql.match(
-                Graql.var(CITY).isa(CITY)
+        return match(
+                var(CITY).isa(CITY)
                         .has(LOCATION_NAME, cityName),
-                Graql.var("m")
-                        .rel(MARRIAGE_HUSBAND, Graql.var("husband"))
-                        .rel(MARRIAGE_WIFE, Graql.var("wife"))
+                var("m")
+                        .rel(MARRIAGE_HUSBAND, var("husband"))
+                        .rel(MARRIAGE_WIFE, var("wife"))
                         .isa(MARRIAGE)
-                        .has(MARRIAGE_ID, Graql.var(MARRIAGE_ID)),
+                        .has(MARRIAGE_ID, var(MARRIAGE_ID)),
                 Graql.not(
-                        Graql.var("par")
+                        var("par")
                                 .rel(PARENTSHIP_PARENT, "husband")
                                 .rel(PARENTSHIP_PARENT, "wife")
                                 .isa(PARENTSHIP)
                 ),
-                Graql.var("husband").isa(PERSON)
-                        .has(EMAIL, Graql.var("husband-email")),
-                Graql.var("wife").isa(PERSON)
-                        .has(EMAIL, Graql.var("wife-email")),
-                Graql.var()
-                        .rel(LOCATES_LOCATED, Graql.var("m"))
-                        .rel(LOCATES_LOCATION, Graql.var(CITY))
+                var("husband").isa(PERSON)
+                        .has(EMAIL, var("husband-email")),
+                var("wife").isa(PERSON)
+                        .has(EMAIL, var("wife-email")),
+                var()
+                        .rel(LOCATES_LOCATED, var("m"))
+                        .rel(LOCATES_LOCATION, var(CITY))
                         .isa(LOCATES)
         ).sort(MARRIAGE_ID);
     }

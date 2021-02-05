@@ -27,6 +27,8 @@ import java.util.List;
 
 import static grakn.benchmark.grakn.action.Model.EMAIL;
 import static grakn.benchmark.grakn.action.Model.PERSON;
+import static graql.lang.Graql.match;
+import static graql.lang.Graql.var;
 
 public class GraknArbitraryOneHopAction extends ArbitraryOneHopAction<GraknOperation> {
     public GraknArbitraryOneHopAction(GraknOperation dbOperation) {
@@ -40,9 +42,9 @@ public class GraknArbitraryOneHopAction extends ArbitraryOneHopAction<GraknOpera
     }
 
     public static GraqlMatch.Filtered query() {
-        return Graql.match(
-                Graql.var(PERSON).isa(PERSON).has(EMAIL, PERSON_EMAIL_FOR_QUERY),
-                Graql.var().rel(Graql.var(PERSON)).rel(Graql.var("x"))
+        return match(
+                var(PERSON).isa(PERSON).has(EMAIL, PERSON_EMAIL_FOR_QUERY),
+                var().rel(var(PERSON)).rel(var("x"))
         ).get("x");
     }
 }

@@ -34,6 +34,9 @@ import static grakn.benchmark.grakn.action.Model.FRIENDSHIP;
 import static grakn.benchmark.grakn.action.Model.FRIENDSHIP_FRIEND;
 import static grakn.benchmark.grakn.action.Model.PERSON;
 import static grakn.benchmark.grakn.action.Model.START_DATE;
+import static graql.lang.Graql.match;
+import static graql.lang.Graql.not;
+import static graql.lang.Graql.var;
 
 public class GraknInsertFriendshipAction extends InsertFriendshipAction<GraknOperation, ConceptMap> {
 
@@ -47,27 +50,27 @@ public class GraknInsertFriendshipAction extends InsertFriendshipAction<GraknOpe
     }
 
     public static GraqlInsert query(LocalDateTime today, String friend1Email, String friend2Email) {
-        UnboundVariable person1 = Graql.var("p1");
-        UnboundVariable person2 = Graql.var("p2");
-        UnboundVariable friendship = Graql.var();
+        UnboundVariable person1 = var("p1");
+        UnboundVariable person2 = var("p2");
+        UnboundVariable friendship = var();
 
-        ThingVariable.Attribute friend1EmailVar = Graql.var().eq(friend1Email);
-        ThingVariable.Attribute friend2EmailVar = Graql.var().eq(friend2Email);
-        ThingVariable.Attribute startDate = Graql.var().eq(today);
+        ThingVariable.Attribute friend1EmailVar = var().eq(friend1Email);
+        ThingVariable.Attribute friend2EmailVar = var().eq(friend2Email);
+        ThingVariable.Attribute startDate = var().eq(today);
 
-        return Graql.match(
+        return match(
                 person1
                         .isa(PERSON).has(EMAIL, friend1EmailVar.toString()),
                 person2
                         .isa(PERSON).has(EMAIL, friend2EmailVar.toString()),
-                Graql.not(
+                not(
                         friendship
                                 .rel(FRIENDSHIP_FRIEND, person1)
                                 .rel(FRIENDSHIP_FRIEND, person2)
                                 .isa(FRIENDSHIP)
                 )
         ).insert(
-                Graql.var(FRIENDSHIP)
+                var(FRIENDSHIP)
                         .rel(FRIENDSHIP_FRIEND, person1)
                         .rel(FRIENDSHIP_FRIEND, person2)
                         .isa(FRIENDSHIP)

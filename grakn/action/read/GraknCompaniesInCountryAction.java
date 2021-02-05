@@ -32,6 +32,8 @@ import static grakn.benchmark.grakn.action.Model.INCORPORATION;
 import static grakn.benchmark.grakn.action.Model.INCORPORATION_INCORPORATED;
 import static grakn.benchmark.grakn.action.Model.INCORPORATION_INCORPORATING;
 import static grakn.benchmark.grakn.action.Model.LOCATION_NAME;
+import static graql.lang.Graql.match;
+import static graql.lang.Graql.var;
 
 public class GraknCompaniesInCountryAction extends CompaniesInCountryAction<GraknOperation> {
     public GraknCompaniesInCountryAction(GraknOperation dbOperation, World.Country country, int numCompanies) {
@@ -45,14 +47,14 @@ public class GraknCompaniesInCountryAction extends CompaniesInCountryAction<Grak
     }
 
     public static GraqlMatch.Unfiltered query(String countryName) {
-        return Graql.match(
-                Graql.var(COUNTRY).isa(COUNTRY)
+        return match(
+                var(COUNTRY).isa(COUNTRY)
                         .has(LOCATION_NAME, countryName),
-                Graql.var(COMPANY).isa(COMPANY)
-                        .has(COMPANY_NUMBER, Graql.var(COMPANY_NUMBER)),
-                Graql.var(INCORPORATION)
-                        .rel(INCORPORATION_INCORPORATED, Graql.var(COMPANY))
-                        .rel(INCORPORATION_INCORPORATING, Graql.var(COUNTRY))
+                var(COMPANY).isa(COMPANY)
+                        .has(COMPANY_NUMBER, var(COMPANY_NUMBER)),
+                var(INCORPORATION)
+                        .rel(INCORPORATION_INCORPORATED, var(COMPANY))
+                        .rel(INCORPORATION_INCORPORATING, var(COUNTRY))
                         .isa(INCORPORATION)
         );
     }
