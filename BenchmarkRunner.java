@@ -145,6 +145,8 @@ public class BenchmarkRunner {
                 for (int i = 0; i < config.getIterations(); i++) {
                     benchmark.iterate();
                 }
+                Instant end = Instant.now();
+                LOG.info("Benchmark duration: " + printDuration(start, end));
                 Instant statisticStart = Instant.now();
                 benchmark.printStatistics(LOG);
                 Instant statisticEnd = Instant.now();
@@ -155,9 +157,6 @@ public class BenchmarkRunner {
             ex.printStackTrace();
             System.exit(1);
         }
-
-        Instant end = Instant.now();
-        LOG.info("Benchmark duration: " + printDuration(start, end));
     }
 
     private static String printDuration(Instant start, Instant end) {
