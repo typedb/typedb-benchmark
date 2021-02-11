@@ -283,15 +283,16 @@ relocation sub relation,
 #    $old-residency has $rel-date;
 #};
 
-rule residency-without-end-date-is-current:
-when {
-    $res(resident: $person, location: $location) isa residency;
-    not {
-        $res has end-date $rel-date;
-    };
-} then {
-    $res has is-current true;
-};
+# TODO: uncomment once reasoning is enabled
+#rule residency-without-end-date-is-current:
+#when {
+#    $res(resident: $person, location: $location) isa residency;
+#    not {
+#        $res has end-date $rel-date;
+#    };
+#} then {
+#    $res has is-current true;
+#};
 
 rule label-non-current-residency:
 when {
