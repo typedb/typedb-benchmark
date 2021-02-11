@@ -5,7 +5,7 @@ build:
       type: background
       timeout: "30m"
       command: |
-        bazel run @graknlabs_dependencies//tool/util:create-systemd-service -- grakn-core "\/home\/grabl\/$GRABL_REPO\/dist\/grakn-core-all-linux\/grakn server"
+        bazel run @graknlabs_dependencies//tool/util:create-systemd-service -- grakn-core "SERVER_JAVAOPTS=\"-Xmx16G\" \/home\/grabl\/$GRABL_REPO\/dist\/grakn-core-all-linux\/grakn server"
         bazel run //test:grakn-core-extractor-linux -- dist/grakn-core-all-linux
         cd ./dist/grakn-core-all-linux/
 
@@ -205,7 +205,7 @@ build:
       type: background
       timeout: "30m"
       command: |
-        bazel run @graknlabs_dependencies//tool/util:create-systemd-service -- grakn-core "\/home\/grabl\/$GRABL_REPO\/dist\/grakn-core-all-linux\/grakn server"
+        bazel run @graknlabs_dependencies//tool/util:create-systemd-service -- grakn-core "SERVER_JAVAOPTS=\"-Xmx16G\" \/home\/grabl\/$GRABL_REPO\/dist\/grakn-core-all-linux\/grakn server"
         bazel run //test:grakn-core-extractor-linux -- dist/grakn-core-all-linux
         cd ./dist/grakn-core-all-linux/
 
@@ -250,6 +250,7 @@ build:
         sudo update-java-alternatives --jre --set java-1.11.0-openjdk-amd64
         echo 'dbms.connector.bolt.listen_address=0.0.0.0:7687' | sudo tee -a /etc/neo4j/neo4j.conf
         echo 'dbms.security.auth_enabled=false' | sudo tee -a /etc/neo4j/neo4j.conf
+        echo 'dbms.memory.heap.max_size=24G' | sudo tee -a /etc/neo4j/neo4j.conf
         sudo systemctl restart neo4j
         export GRABL_EXPORT_PERFORMANCE_SMALL_NEO4J_URI="${HOSTNAME}:7687"
     test-performance-small-neo4j:
