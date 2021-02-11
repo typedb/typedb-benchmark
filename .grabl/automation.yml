@@ -1,6 +1,7 @@
 build:
   correctness:
     test-comparison-grakn-background:
+      machine: 16-core-32-gb
       image: graknlabs-ubuntu-20.04
       type: background
       timeout: "30m"
@@ -16,6 +17,7 @@ build:
         sleep 10s
         tail -f -n +1 /home/grabl/$GRABL_REPO/dist/grakn-core-all-linux/server/logs/grakn.log
     test-comparison-neo4j-background:
+      machine: 16-core-32-gb
       image: graknlabs-ubuntu-20.04
       type: background
       timeout: "30m"
@@ -31,11 +33,13 @@ build:
         sudo update-java-alternatives --jre --set java-1.11.0-openjdk-amd64
         echo 'dbms.connector.bolt.listen_address=0.0.0.0:7687' | sudo tee -a /etc/neo4j/neo4j.conf
         echo 'dbms.security.auth_enabled=false' | sudo tee -a /etc/neo4j/neo4j.conf
+        echo 'dbms.memory.heap.max_size=24G' | sudo tee -a /etc/neo4j/neo4j.conf
         sudo systemctl restart neo4j
         export GRABL_EXPORT_TEST_COMPARISON_NEO4J_URI="${HOSTNAME}:7687"
       monitor: |
         journalctl -fu neo4j
     test-comparison-grakn-and-neo4j:
+      machine: 16-core-32-gb
       image: graknlabs-ubuntu-20.04
       timeout: "30m"
       dependencies: [test-comparison-grakn-background, test-comparison-neo4j-background]
@@ -216,7 +220,7 @@ build:
         sleep 10s
         tail -f -n +1 /home/grabl/$GRABL_REPO/dist/grakn-core-all-linux/server/logs/grakn.log
     test-performance-small-grakn-core:
-      machine: 8-core-16-gb
+      machine: 16-core-32-gb
       image: graknlabs-ubuntu-20.04
       timeout: "30m"
       dependencies: [test-performance-small-grakn-core-background]
@@ -254,7 +258,7 @@ build:
         sudo systemctl restart neo4j
         export GRABL_EXPORT_PERFORMANCE_SMALL_NEO4J_URI="${HOSTNAME}:7687"
     test-performance-small-neo4j:
-      machine: 8-core-16-gb
+      machine: 16-core-32-gb
       image: graknlabs-ubuntu-20.04
       dependencies: [test-performance-small-neo4j-background]
       timeout: "30m"
