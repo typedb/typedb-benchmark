@@ -5,23 +5,7 @@ build:
       type: background
       timeout: "5h"
       command: |
-        cat > grakn-core.service <<- EOM
-        [Unit]
-        Description=Grakn Core
-
-        [Service]
-        Type=simple
-        ExecStart=/home/grabl/$GRABL_REPO/dist/grakn-core-all-linux/grakn server
-        Restart=on-failure
-        RestartSec=10
-        KillMode=process
-
-        [Install]
-        WantedBy=multi-user.target
-        EOM
-
-        sudo mv grakn-core.service /etc/systemd/system/
-
+        bazel run @graknlabs_dependencies//tool/util:create-systemd-service -- grakn-core "\/home\/grabl\/$GRABL_REPO\/dist\/grakn-core-all-linux\/grakn server"
         bazel run //test:grakn-core-extractor-linux -- dist/grakn-core-all-linux
         cd ./dist/grakn-core-all-linux/
 
@@ -122,7 +106,7 @@ build:
 
         bazel run //test:grakn-cluster-extractor-linux -- dist/grakn-cluster-all-linux
         cd ./dist/grakn-cluster-all-linux/
-        bazel run //ci:create-systemd-service -- grakn-cluster "\/home\/grabl\/$GRABL_REPO\/dist\/grakn-cluster-all-linux\/grakn server --address=$(cat /tmp/hostname.txt):1729:1730 --peers=$(cat /tmp/grakn-cluster-peers.txt)"
+        bazel run @graknlabs_dependencies//tool/util:create-systemd-service -- grakn-cluster "\/home\/grabl\/$GRABL_REPO\/dist\/grakn-cluster-all-linux\/grakn server --address=$(cat /tmp/hostname.txt):1729:1730 --peers=$(cat /tmp/grakn-cluster-peers.txt)"
 
         sudo systemctl daemon-reload
         sudo systemctl start grakn-cluster
@@ -154,7 +138,7 @@ build:
 
         bazel run //test:grakn-cluster-extractor-linux -- dist/grakn-cluster-all-linux
         cd ./dist/grakn-cluster-all-linux/
-        bazel run //ci:create-systemd-service -- grakn-cluster "\/home\/grabl\/$GRABL_REPO\/dist\/grakn-cluster-all-linux\/grakn server --address=$(cat /tmp/hostname.txt):1729:1730 --peers=$(cat /tmp/grakn-cluster-peers.txt)"
+        bazel run @graknlabs_dependencies//tool/util:create-systemd-service -- grakn-cluster "\/home\/grabl\/$GRABL_REPO\/dist\/grakn-cluster-all-linux\/grakn server --address=$(cat /tmp/hostname.txt):1729:1730 --peers=$(cat /tmp/grakn-cluster-peers.txt)"
 
         sudo systemctl daemon-reload
         sudo systemctl start grakn-cluster
@@ -185,7 +169,7 @@ build:
 
         bazel run //test:grakn-cluster-extractor-linux -- dist/grakn-cluster-all-linux
         cd ./dist/grakn-cluster-all-linux/
-        bazel run //ci:create-systemd-service -- grakn-cluster "\/home\/grabl\/$GRABL_REPO\/dist\/grakn-cluster-all-linux\/grakn server --address=$(cat /tmp/hostname.txt):1729:1730 --peers=$(cat /tmp/grakn-cluster-peers.txt)"
+        bazel run @graknlabs_dependencies//tool/util:create-systemd-service -- grakn-cluster "\/home\/grabl\/$GRABL_REPO\/dist\/grakn-cluster-all-linux\/grakn server --address=$(cat /tmp/hostname.txt):1729:1730 --peers=$(cat /tmp/grakn-cluster-peers.txt)"
 
         sudo systemctl daemon-reload
         sudo systemctl start grakn-cluster
@@ -221,23 +205,7 @@ build:
       type: background
       timeout: "5h"
       command: |
-        cat > grakn-core.service <<- EOM
-        [Unit]
-        Description=Grakn Core
-
-        [Service]
-        Type=simple
-        ExecStart=/home/grabl/$GRABL_REPO/dist/grakn-core-all-linux/grakn server
-        Restart=on-failure
-        RestartSec=10
-        KillMode=process
-
-        [Install]
-        WantedBy=multi-user.target
-        EOM
-
-        sudo mv grakn-core.service /etc/systemd/system/
-
+        bazel run @graknlabs_dependencies//tool/util:create-systemd-service -- grakn-core "\/home\/grabl\/$GRABL_REPO\/dist\/grakn-core-all-linux\/grakn server"
         bazel run //test:grakn-core-extractor-linux -- dist/grakn-core-all-linux
         cd ./dist/grakn-core-all-linux/
 
