@@ -22,8 +22,6 @@ import grakn.benchmark.common.driver.DbOperationFactory;
 import grakn.benchmark.common.driver.TransactionalDbDriver;
 import grakn.benchmark.common.world.Region;
 import grakn.client.GraknClient;
-import graql.lang.Graql;
-import graql.lang.query.GraqlMatch;
 import org.slf4j.Logger;
 
 import java.text.DecimalFormat;
@@ -54,8 +52,7 @@ public class GraknDriver extends TransactionalDbDriver<GraknClient.Transaction, 
     }
 
     public void createDatabase() {
-        if (client.databases().contains(database))
-            client.databases().delete(database);
+        if (client.databases().contains(database)) client.databases().get(database).delete();
         client.databases().create(database);
     }
 
