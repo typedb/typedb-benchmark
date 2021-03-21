@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package grakn.benchmark.benchmark
+package grakn.benchmark.report
 
 import grakn.benchmark.common.agent.insight.*
 import grakn.benchmark.common.agent.write.AgeUpdateAgent
