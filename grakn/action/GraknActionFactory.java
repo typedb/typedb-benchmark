@@ -73,7 +73,7 @@ import grakn.benchmark.grakn.action.write.GraknInsertRelocationAction;
 import grakn.benchmark.grakn.action.write.GraknInsertTransactionAction;
 import grakn.benchmark.grakn.action.write.GraknUpdateAgesOfPeopleInCityAction;
 import grakn.benchmark.grakn.driver.GraknOperation;
-import grakn.client.concept.answer.ConceptMap;
+import grakn.client.api.answer.ConceptMap;
 import grakn.common.collection.Pair;
 
 import java.time.LocalDateTime;

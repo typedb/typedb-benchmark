@@ -20,7 +20,7 @@ package grakn.benchmark.grakn.action.write;
 import grakn.benchmark.common.action.write.InsertTransactionAction;
 import grakn.benchmark.common.world.World;
 import grakn.benchmark.grakn.driver.GraknOperation;
-import grakn.client.concept.answer.ConceptMap;
+import grakn.client.api.answer.ConceptMap;
 import grakn.common.collection.Pair;
 import graql.lang.Graql;
 import graql.lang.query.GraqlInsert;

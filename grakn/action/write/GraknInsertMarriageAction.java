@@ -21,7 +21,7 @@ import grakn.benchmark.common.action.Action;
 import grakn.benchmark.common.action.write.InsertMarriageAction;
 import grakn.benchmark.common.world.World;
 import grakn.benchmark.grakn.driver.GraknOperation;
-import grakn.client.concept.answer.ConceptMap;
+import grakn.client.api.answer.ConceptMap;
 import graql.lang.Graql;
 import graql.lang.pattern.variable.ThingVariable;
 import graql.lang.pattern.variable.UnboundVariable;
