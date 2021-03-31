@@ -40,7 +40,8 @@ import java.util.function.Function;
 
 public class GraknBenchmark extends grakn.benchmark.common.TransactionalBenchmark<GraknDriver, GraknOperation> {
 
-    public GraknBenchmark(GraknDriver driver, Map<String, Path> initialisationDataPaths, int randomSeed, World world, List<Config.Agent> agentConfigs, Function<Integer, Boolean> iterationSamplingFunction, boolean test) {
+    public GraknBenchmark(GraknDriver driver, Map<String, Path> initialisationDataPaths, int randomSeed, World world,
+                          List<Config.Agent> agentConfigs, Function<Integer, Boolean> iterationSamplingFunction, boolean test) {
         super(driver, initialisationDataPaths, randomSeed, world, agentConfigs, iterationSamplingFunction, test);
     }
 

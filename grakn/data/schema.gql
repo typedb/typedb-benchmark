@@ -443,10 +443,10 @@ wage sub entity,
 #    $content has content-language $lang1;
 #};
 
-rule contracted-hours-apply-to-employment:
-when {
-    $emp(contract: $c) isa employment;
-    $c isa employment-contract, has contracted-hours $hours;
-} then {
-    $emp has $hours;
-};
+#rule contracted-hours-apply-to-employment:
+#when {
+#    $emp(contract: $c) isa employment;
+#    $c isa employment-contract, has contracted-hours $hours;
+#} then {
+#    $emp has $hours;
+#};
