@@ -17,8 +17,6 @@
 
 package grakn.benchmark.simulation.utils;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
 
 public class RandomSource {
@@ -30,19 +28,12 @@ public class RandomSource {
         this.seed = seed;
     }
 
-    public static RandomSource nextSource(Random random) {
-        return new RandomSource(random.nextLong());
+    public RandomSource next() {
+        return new RandomSource(get().nextLong());
     }
 
     public Random get() {
         if (random == null) random = new Random(seed);
         return random;
-    }
-
-    public List<RandomSource> split(int times) {
-        Random random = get();
-        List<RandomSource> sources = new ArrayList<>(times);
-        for (int i = 0; i < times; ++i) sources.add(nextSource(random));
-        return sources;
     }
 }

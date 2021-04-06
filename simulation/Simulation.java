@@ -17,6 +17,7 @@
 
 package grakn.benchmark.simulation;
 
+import grakn.benchmark.config.Config;
 import grakn.benchmark.simulation.action.ActionFactory;
 import grakn.benchmark.simulation.agent.AgentFactory;
 import grakn.benchmark.simulation.agent.base.AgentManager;
@@ -24,7 +25,6 @@ import grakn.benchmark.simulation.driver.Client;
 import grakn.benchmark.simulation.driver.Transaction;
 import grakn.benchmark.simulation.utils.RandomSource;
 import grakn.benchmark.simulation.world.World;
-import grakn.benchmark.config.Config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,7 +35,6 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
@@ -44,7 +43,7 @@ public abstract class Simulation<DB_DRIVER extends Client<TX>, TX extends Transa
     final static Logger LOG = LoggerFactory.getLogger(Simulation.class);
     private final List<AgentManager<?, TX>> agentMgrs;
     protected final DB_DRIVER driver;
-    private final Random random;
+    private final RandomSource randomSource;
     private final List<Config.Agent> agentConfigs;
     private final Function<Integer, Boolean> iterationSamplingFunction;
     private final Report report;
@@ -54,7 +53,7 @@ public abstract class Simulation<DB_DRIVER extends Client<TX>, TX extends Transa
 
     public Simulation(DB_DRIVER driver, Map<String, Path> initialisationDataPaths, int randomSeed, World world, List<Config.Agent> agentConfigs, Function<Integer, Boolean> iterationSamplingFunction, boolean test) {
         this.driver = driver;
-        this.random = new Random(randomSeed);
+        this.randomSource = new RandomSource(randomSeed);
         this.agentConfigs = agentConfigs;
         this.iterationSamplingFunction = iterationSamplingFunction;
         this.world = world;
@@ -86,7 +85,7 @@ public abstract class Simulation<DB_DRIVER extends Client<TX>, TX extends Transa
     public void iterate() {
         report.clean();
         for (AgentManager<?, ?> agentMgr : agentMgrs) {
-            this.report.addAgentResult(agentMgr.name(), agentMgr.iterate(RandomSource.nextSource(random)));
+            this.report.addAgentResult(agentMgr.name(), agentMgr.iterate(randomSource.next()));
         }
         closeIteration();  // We want to test opening new sessions each iteration.
         iteration++;

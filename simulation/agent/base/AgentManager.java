@@ -21,10 +21,9 @@ import grabl.tracing.client.GrablTracingThreadStatic;
 import grakn.benchmark.simulation.action.Action;
 import grakn.benchmark.simulation.action.ActionFactory;
 import grakn.benchmark.simulation.driver.Client;
-import grakn.benchmark.simulation.driver.Transaction;
 import grakn.benchmark.simulation.driver.Session;
+import grakn.benchmark.simulation.driver.Transaction;
 import grakn.benchmark.simulation.utils.RandomSource;
-import grakn.benchmark.simulation.utils.Utils;
 import grakn.benchmark.simulation.world.Region;
 import grakn.benchmark.simulation.world.World;
 import org.slf4j.Logger;
@@ -49,8 +48,8 @@ import static grakn.common.util.Objects.className;
  * This class must be extended to provide the source of the random items and the methods to obtain the session key and
  * tracker from them.
  *
- * @param <REGION>       The type of region used by the agent.
- * @param <TX> The abstraction of database operations used by the agent.
+ * @param <REGION> The type of region used by the agent.
+ * @param <TX>     The abstraction of database operations used by the agent.
  */
 public abstract class AgentManager<REGION extends Region, TX extends Transaction> {
 
@@ -84,21 +83,15 @@ public abstract class AgentManager<REGION extends Region, TX extends Transaction
 
     public Report iterate(RandomSource randomSource) {
         List<REGION> regions = getRegions(benchmarkContext.world());
-        List<RandomSource> randomisers = randomSource.split(regions.size());
-
-        Utils.pairs(randomisers, regions).parallelStream().forEach(
-                pair -> executeAgent(pair.first(), pair.second())
-        );
+        regions.parallelStream().forEach(region -> executeAgent(randomSource.next(), region));
         return report;
     }
 
     protected abstract Agent getAgent(int iteration, String tracker, Random random, boolean test);
 
     private void executeAgent(RandomSource source, REGION region) {
-        Random random = source.get();
-        Random agentRandom = RandomSource.nextSource(random).get();
 
-        Agent regionalAgent = getAgent(benchmarkContext.iteration(), region.tracker(), agentRandom, benchmarkContext.test());
+        Agent regionalAgent = getAgent(benchmarkContext.iteration(), region.tracker(), source.next().get(), benchmarkContext.test());
         Session<TX> session = client.session(region, logger);
 
         Agent.Report report = regionalAgent.runWithReport(session, region);
