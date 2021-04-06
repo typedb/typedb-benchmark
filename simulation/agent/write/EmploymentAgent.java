@@ -20,6 +20,7 @@ package grakn.benchmark.simulation.agent.write;
 import grakn.benchmark.simulation.action.ActionFactory;
 import grakn.benchmark.simulation.action.read.CompaniesInCountryAction;
 import grakn.benchmark.simulation.action.read.ResidentsInCityAction;
+import grakn.benchmark.simulation.agent.base.SimulationContext;
 import grakn.benchmark.simulation.agent.region.CityAgentManager;
 import grakn.benchmark.simulation.driver.Client;
 import grakn.benchmark.simulation.driver.Transaction;
@@ -34,7 +35,7 @@ import static grakn.benchmark.simulation.agent.base.Allocation.allocate;
 
 public class EmploymentAgent<TX extends Transaction> extends CityAgentManager<TX> {
 
-    public EmploymentAgent(Client<TX> dbDriver, ActionFactory<TX, ?> actionFactory, grakn.benchmark.simulation.agent.base.BenchmarkContext benchmarkContext) {
+    public EmploymentAgent(Client<TX> dbDriver, ActionFactory<TX, ?> actionFactory, SimulationContext benchmarkContext) {
         super(dbDriver, actionFactory, benchmarkContext);
     }
 

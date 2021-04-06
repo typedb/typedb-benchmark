@@ -22,6 +22,7 @@ import grakn.benchmark.simulation.action.SpouseType;
 import grakn.benchmark.simulation.action.read.BirthsInCityAction;
 import grakn.benchmark.simulation.action.read.MarriedCoupleAction;
 import grakn.benchmark.simulation.agent.base.Allocation;
+import grakn.benchmark.simulation.agent.base.SimulationContext;
 import grakn.benchmark.simulation.agent.region.CityAgentManager;
 import grakn.benchmark.simulation.driver.Client;
 import grakn.benchmark.simulation.driver.Transaction;
@@ -36,7 +37,7 @@ import java.util.Random;
 
 public class ParentshipAgent<TX extends Transaction> extends CityAgentManager<TX> {
 
-    public ParentshipAgent(Client<TX> dbDriver, ActionFactory<TX, ?> actionFactory, grakn.benchmark.simulation.agent.base.BenchmarkContext benchmarkContext) {
+    public ParentshipAgent(Client<TX> dbDriver, ActionFactory<TX, ?> actionFactory, SimulationContext benchmarkContext) {
         super(dbDriver, actionFactory, benchmarkContext);
     }
 

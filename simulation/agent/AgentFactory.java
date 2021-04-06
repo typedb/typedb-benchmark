@@ -19,6 +19,7 @@ package grakn.benchmark.simulation.agent;
 
 import grakn.benchmark.simulation.action.ActionFactory;
 import grakn.benchmark.simulation.agent.base.AgentManager;
+import grakn.benchmark.simulation.agent.base.SimulationContext;
 import grakn.benchmark.simulation.agent.insight.ArbitraryOneHopAgent;
 import grakn.benchmark.simulation.agent.insight.FindCurrentResidentsAgent;
 import grakn.benchmark.simulation.agent.insight.FindLivedInAgent;
@@ -46,9 +47,9 @@ public class AgentFactory<TX extends Transaction, ACTION_FACTORY extends ActionF
 
     private final Client<TX> dbDriver;
     private final ACTION_FACTORY actionFactory;
-    private final grakn.benchmark.simulation.agent.base.BenchmarkContext benchmarkContext;
+    private final SimulationContext benchmarkContext;
 
-    public AgentFactory(Client<TX> dbDriver, ACTION_FACTORY actionFactory, grakn.benchmark.simulation.agent.base.BenchmarkContext benchmarkContext) {
+    public AgentFactory(Client<TX> dbDriver, ACTION_FACTORY actionFactory, SimulationContext benchmarkContext) {
         this.dbDriver = dbDriver;
         this.actionFactory = actionFactory;
         this.benchmarkContext = benchmarkContext;

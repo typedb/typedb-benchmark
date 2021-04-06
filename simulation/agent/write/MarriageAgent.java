@@ -18,6 +18,7 @@
 package grakn.benchmark.simulation.agent.write;
 
 import grakn.benchmark.simulation.action.ActionFactory;
+import grakn.benchmark.simulation.agent.base.SimulationContext;
 import grakn.benchmark.simulation.agent.region.CityAgentManager;
 import grakn.benchmark.simulation.driver.Client;
 import grakn.benchmark.simulation.driver.Transaction;
@@ -30,7 +31,7 @@ import java.util.Random;
 
 public class MarriageAgent<TX extends Transaction> extends CityAgentManager<TX> {
 
-    public MarriageAgent(Client<TX> dbDriver, ActionFactory<TX, ?> actionFactory, grakn.benchmark.simulation.agent.base.BenchmarkContext benchmarkContext) {
+    public MarriageAgent(Client<TX> dbDriver, ActionFactory<TX, ?> actionFactory, SimulationContext benchmarkContext) {
         super(dbDriver, actionFactory, benchmarkContext);
     }
 

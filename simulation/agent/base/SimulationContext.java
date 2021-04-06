@@ -21,14 +21,15 @@ import grakn.benchmark.simulation.world.World;
 
 import java.time.LocalDateTime;
 
-public interface BenchmarkContext {
-    int iteration();
+public interface SimulationContext {
 
     LocalDateTime today();
 
     World world();
 
+    int iteration();
+
     boolean trace();
 
-    boolean test();
+    boolean isTest();
 }

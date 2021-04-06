@@ -19,6 +19,7 @@ package grakn.benchmark.simulation.agent.write;
 
 import grakn.benchmark.simulation.action.ActionFactory;
 import grakn.benchmark.simulation.action.write.UpdateAgesOfPeopleInCityAction;
+import grakn.benchmark.simulation.agent.base.SimulationContext;
 import grakn.benchmark.simulation.agent.region.CityAgentManager;
 import grakn.benchmark.simulation.driver.Client;
 import grakn.benchmark.simulation.driver.Transaction;
@@ -29,7 +30,7 @@ import java.util.Random;
 
 public class AgeUpdateAgent<TX extends Transaction> extends CityAgentManager<TX> {
 
-    public AgeUpdateAgent(Client<TX> dbDriver, ActionFactory<TX, ?> actionFactory, grakn.benchmark.simulation.agent.base.BenchmarkContext benchmarkContext) {
+    public AgeUpdateAgent(Client<TX> dbDriver, ActionFactory<TX, ?> actionFactory, SimulationContext benchmarkContext) {
         super(dbDriver, actionFactory, benchmarkContext);
     }
 
@@ -39,6 +40,7 @@ public class AgeUpdateAgent<TX extends Transaction> extends CityAgentManager<TX>
     }
 
     public class City extends CityAgent {
+
         public City(int iteration, String tracker, Random random, boolean test) {
             super(iteration, tracker, random, test);
         }

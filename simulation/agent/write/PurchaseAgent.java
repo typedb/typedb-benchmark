@@ -21,6 +21,7 @@ import grakn.benchmark.simulation.action.ActionFactory;
 import grakn.benchmark.simulation.action.read.CompaniesInCountryAction;
 import grakn.benchmark.simulation.action.read.ProductsInContinentAction;
 import grakn.benchmark.simulation.agent.base.Allocation;
+import grakn.benchmark.simulation.agent.base.SimulationContext;
 import grakn.benchmark.simulation.agent.region.CountryAgent;
 import grakn.benchmark.simulation.driver.Client;
 import grakn.benchmark.simulation.driver.Transaction;
@@ -36,7 +37,7 @@ import static grakn.common.collection.Collections.pair;
 
 public class PurchaseAgent<TX extends Transaction> extends CountryAgent<TX> {
 
-    public PurchaseAgent(Client<TX> dbDriver, ActionFactory<TX, ?> actionFactory, grakn.benchmark.simulation.agent.base.BenchmarkContext benchmarkContext) {
+    public PurchaseAgent(Client<TX> dbDriver, ActionFactory<TX, ?> actionFactory, SimulationContext benchmarkContext) {
         super(dbDriver, actionFactory, benchmarkContext);
     }
 

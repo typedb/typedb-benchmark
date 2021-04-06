@@ -53,14 +53,14 @@ import static grakn.common.util.Objects.className;
  */
 public abstract class AgentManager<REGION extends Region, TX extends Transaction> {
 
-    protected final BenchmarkContext benchmarkContext;
+    protected final SimulationContext benchmarkContext;
     private final Logger logger;
     private final Client<TX> client;
     private final ActionFactory<TX, ?> actionFactory;
     private final Report report = new Report();
     private boolean isTracing = true;
 
-    protected AgentManager(Client<TX> client, ActionFactory<TX, ?> actionFactory, BenchmarkContext benchmarkContext) {
+    protected AgentManager(Client<TX> client, ActionFactory<TX, ?> actionFactory, SimulationContext benchmarkContext) {
         this.client = client;
         this.actionFactory = actionFactory;
         this.benchmarkContext = benchmarkContext;
@@ -83,18 +83,17 @@ public abstract class AgentManager<REGION extends Region, TX extends Transaction
 
     public Report iterate(RandomSource randomSource) {
         List<REGION> regions = getRegions(benchmarkContext.world());
-        regions.parallelStream().forEach(region -> executeAgent(randomSource.next(), region));
+        regions.parallelStream().forEach(region -> executeAgent(region, randomSource.next()));
         return report;
     }
 
     protected abstract Agent getAgent(int iteration, String tracker, Random random, boolean test);
 
-    private void executeAgent(RandomSource source, REGION region) {
-
-        Agent regionalAgent = getAgent(benchmarkContext.iteration(), region.tracker(), source.next().get(), benchmarkContext.test());
+    private void executeAgent(REGION region, RandomSource source) {
+        Agent agent = getAgent(benchmarkContext.iteration(), region.tracker(), source.next().get(), benchmarkContext.isTest());
         Session<TX> session = client.session(region, logger);
 
-        Agent.Report report = regionalAgent.runWithReport(session, region);
+        Agent.Report report = agent.runWithReport(session, region);
         this.report.addRegionalAgentReport(region.tracker(), report);
     }
 
@@ -173,7 +172,7 @@ public abstract class AgentManager<REGION extends Region, TX extends Transaction
          * @param iterationScopeId An id that uniquely identifies a concept within the scope of the agent at a particular iteration
          * @return
          */
-        public String uniqueId(BenchmarkContext benchmarkContext, int iterationScopeId) {
+        public String uniqueId(SimulationContext benchmarkContext, int iterationScopeId) {
             return benchmarkContext.iteration() + "/" + tracker() + "/" + iterationScopeId;
         }
 

@@ -21,6 +21,7 @@ import grakn.benchmark.config.Config;
 import grakn.benchmark.simulation.action.ActionFactory;
 import grakn.benchmark.simulation.agent.AgentFactory;
 import grakn.benchmark.simulation.agent.base.AgentManager;
+import grakn.benchmark.simulation.agent.base.SimulationContext;
 import grakn.benchmark.simulation.driver.Client;
 import grakn.benchmark.simulation.driver.Transaction;
 import grakn.benchmark.simulation.utils.RandomSource;
@@ -38,7 +39,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
-public abstract class Simulation<DB_DRIVER extends Client<TX>, TX extends Transaction> implements grakn.benchmark.simulation.agent.base.BenchmarkContext {
+public abstract class Simulation<DB_DRIVER extends Client<TX>, TX extends Transaction> implements SimulationContext {
 
     final static Logger LOG = LoggerFactory.getLogger(Simulation.class);
     private final List<AgentManager<?, TX>> agentMgrs;
@@ -114,7 +115,7 @@ public abstract class Simulation<DB_DRIVER extends Client<TX>, TX extends Transa
     }
 
     @Override
-    public boolean test() {
+    public boolean isTest() {
         return test;
     }
 
