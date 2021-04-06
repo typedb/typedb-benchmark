@@ -43,16 +43,16 @@ public class ProductAgent<TX extends Transaction> extends ContinentAgent<TX> {
         }
 
         @Override
-        protected void run(Session<TX> dbOperationFactory, World.Continent continent) {
+        protected void run(Session<TX> session, World.Continent continent) {
             int numProducts = benchmarkContext.world().getScaleFactor();
-            try (TX dbOperation = dbOperationFactory.newTransaction(tracker(), iteration(), isTracing())) {
+            try (TX dbOperation = session.newTransaction(tracker(), iteration(), isTracing())) {
                 for (int i = 0; i < numProducts; i++) {
                     String productName = randomAttributeGenerator().boundRandomLengthRandomString(5, 20);
                     String productDescription = randomAttributeGenerator().boundRandomLengthRandomString(75, 100);
                     Long barcode = (long) uniqueId(benchmarkContext, i).hashCode();
                     runAction(actionFactory().insertProductAction(dbOperation, continent, barcode, productName, productDescription));
                 }
-                dbOperation.save();
+                dbOperation.commit();
             }
         }
     }

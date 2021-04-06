@@ -56,13 +56,13 @@ public abstract class Agent<REGION extends Region, TX extends Transaction> {
 
     protected final BenchmarkContext benchmarkContext;
     private final Logger logger;
-    private final Client<TX> dbDriver;
+    private final Client<TX> client;
     private final ActionFactory<TX, ?> actionFactory;
     private final Report report = new Report();
     private boolean isTracing = true;
 
-    protected Agent(Client<TX> dbDriver, ActionFactory<TX, ?> actionFactory, BenchmarkContext benchmarkContext) {
-        this.dbDriver = dbDriver;
+    protected Agent(Client<TX> client, ActionFactory<TX, ?> actionFactory, BenchmarkContext benchmarkContext) {
+        this.client = client;
         this.actionFactory = actionFactory;
         this.benchmarkContext = benchmarkContext;
         logger = LoggerFactory.getLogger(this.getClass());
@@ -99,9 +99,9 @@ public abstract class Agent<REGION extends Region, TX extends Transaction> {
         Random agentRandom = RandomSource.nextSource(random).get();
 
         Regional regionalAgent = getRegionalAgent(benchmarkContext.iteration(), region.tracker(), agentRandom, benchmarkContext.test());
-        Session<TX> dbOperationFactory = dbDriver.getDbOperationFactory(region, logger);
+        Session<TX> session = client.session(region, logger);
 
-        Regional.Report report = regionalAgent.runWithReport(dbOperationFactory, region);
+        Regional.Report report = regionalAgent.runWithReport(session, region);
         this.report.addRegionalAgentReport(region.tracker(), report);
     }
 
@@ -152,15 +152,15 @@ public abstract class Agent<REGION extends Region, TX extends Transaction> {
             return tracker;
         }
 
-        protected Report runWithReport(Session<TX> dbOperationFactory, REGION region) {
+        protected Report runWithReport(Session<TX> session, REGION region) {
             trace(() -> {
-                run(dbOperationFactory, region);
+                run(session, region);
                 return null;
             }, name(), isTracing());
             return report;
         }
 
-        protected abstract void run(Session<TX> dbOperationFactory, REGION region);
+        protected abstract void run(Session<TX> session, REGION region);
 
         public <U> U pickOne(List<U> list) { // TODO can be a util
             return list.get(random().nextInt(list.size()));

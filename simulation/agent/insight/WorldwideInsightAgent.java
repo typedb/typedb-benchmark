@@ -51,9 +51,9 @@ public abstract class WorldwideInsightAgent<TX extends Transaction> extends Worl
         }
 
         @Override
-        protected void run(Session<TX> dbOperationFactory, World world) {
+        protected void run(Session<TX> session, World world) {
             for (int i = 0; i <= benchmarkContext.world().getScaleFactor(); i++) {
-                try (TX dbOperation = dbOperationFactory.newTransaction(tracker(), iteration(), isTracing())) {
+                try (TX dbOperation = session.newTransaction(tracker(), iteration(), isTracing())) {
                     runAction(getAction(dbOperation));
                 }
             }

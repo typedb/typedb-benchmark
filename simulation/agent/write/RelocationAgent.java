@@ -48,7 +48,7 @@ public class RelocationAgent<TX extends Transaction> extends CityAgent<TX> {
         }
 
         @Override
-        protected void run(Session<TX> dbOperationFactory, World.City city) {
+        protected void run(Session<TX> session, World.City city) {
         /*
         Find people currently resident the city
         Find other cities in the continent
@@ -61,22 +61,22 @@ public class RelocationAgent<TX extends Transaction> extends CityAgent<TX> {
             List<String> residentEmails;
             List<String> relocationCityNames;
 
-            try (TX dbOperation = dbOperationFactory.newTransaction(tracker(), iteration(), isTracing())) {
+            try (TX dbOperation = session.newTransaction(tracker(), iteration(), isTracing())) {
                 ResidentsInCityAction<?> residentsInCityAction = actionFactory().residentsInCityAction(dbOperation, city, benchmarkContext.world().getScaleFactor(), earliestDateOfResidencyToRelocate);
                 residentEmails = runAction(residentsInCityAction);
             }
             shuffle(residentEmails);
 
-            try (TX dbOperation = dbOperationFactory.newTransaction(tracker(), iteration(), isTracing())) {
+            try (TX dbOperation = session.newTransaction(tracker(), iteration(), isTracing())) {
                 CitiesInContinentAction<?> citiesInContinentAction = actionFactory().citiesInContinentAction(dbOperation, city);
                 relocationCityNames = runAction(citiesInContinentAction);
             }
 
-            try (TX dbOperation = dbOperationFactory.newTransaction(tracker(), iteration(), isTracing())) {
+            try (TX dbOperation = session.newTransaction(tracker(), iteration(), isTracing())) {
                 Allocation.allocate(residentEmails, relocationCityNames, (residentEmail, relocationCityName) -> {
                     runAction(actionFactory().insertRelocationAction(dbOperation, city, benchmarkContext.today(), residentEmail, relocationCityName));
                 });
-                dbOperation.save();
+                dbOperation.commit();
             }
         }
     }

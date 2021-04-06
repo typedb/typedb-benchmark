@@ -51,17 +51,17 @@ public class PurchaseAgent<TX extends Transaction> extends CountryAgent<TX> {
         }
 
         @Override
-        protected void run(Session<TX> dbOperationFactory, World.Country country) {
+        protected void run(Session<TX> session, World.Country country) {
             List<Long> companyNumbers;
 
-            try (TX dbOperation = dbOperationFactory.newTransaction(tracker(), iteration(), isTracing())) {
+            try (TX dbOperation = session.newTransaction(tracker(), iteration(), isTracing())) {
                 CompaniesInCountryAction<TX> companiesInContinentAction = actionFactory().companiesInCountryAction(dbOperation, country, 100);
                 companyNumbers = runAction(companiesInContinentAction);
             }
             shuffle(companyNumbers);
 
             List<Long> productBarcodes;
-            try (TX dbOperation = dbOperationFactory.newTransaction(tracker(), iteration(), isTracing())) {
+            try (TX dbOperation = session.newTransaction(tracker(), iteration(), isTracing())) {
                 ProductsInContinentAction<?> productsInContinentAction = actionFactory().productsInContinentAction(dbOperation, country.continent());
                 productBarcodes = runAction(productsInContinentAction);
             }
@@ -79,14 +79,14 @@ public class PurchaseAgent<TX extends Transaction> extends CountryAgent<TX> {
                 Pair<Long, Long> buyerAndProduct = pair(companyNumber, productBarcode);
                 transactions.add(buyerAndProduct);
             }
-            try (TX dbOperation = dbOperationFactory.newTransaction(tracker(), iteration(), isTracing())) {
+            try (TX dbOperation = session.newTransaction(tracker(), iteration(), isTracing())) {
                 Allocation.allocate(transactions, companyNumbers, (transaction, sellerCompanyNumber) -> {
                     double value = randomAttributeGenerator().boundRandomDouble(0.01, 10000.00);
                     int productQuantity = randomAttributeGenerator().boundRandomInt(1, 1000);
                     boolean isTaxable = randomAttributeGenerator().bool();
                     runAction(actionFactory().insertTransactionAction(dbOperation, country, transaction, sellerCompanyNumber, value, productQuantity, isTaxable));
                 });
-                dbOperation.save();
+                dbOperation.commit();
             }
         }
     }

@@ -44,11 +44,11 @@ public class AgeUpdateAgent<TX extends Transaction> extends CityAgent<TX> {
         }
 
         @Override
-        protected void run(Session<TX> dbOperationFactory, World.City city) {
-            try (TX dbOperation = dbOperationFactory.newTransaction(tracker(), iteration(), isTracing())) {
-                UpdateAgesOfPeopleInCityAction<TX> updateAgesOfAllPeopleInCityAction = actionFactory().updateAgesOfPeopleInCityAction(dbOperation, benchmarkContext.today(), city);
+        protected void run(Session<TX> session, World.City city) {
+            try (TX tx = session.newTransaction(tracker(), iteration(), isTracing())) {
+                UpdateAgesOfPeopleInCityAction<TX> updateAgesOfAllPeopleInCityAction = actionFactory().updateAgesOfPeopleInCityAction(tx, benchmarkContext.today(), city);
                 runAction(updateAgesOfAllPeopleInCityAction);
-                dbOperation.save();
+                tx.commit();
             }
         }
     }

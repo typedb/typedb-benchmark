@@ -43,10 +43,10 @@ public class PersonBirthAgent<TX extends Transaction> extends CityAgent<TX> {
         }
 
         @Override
-        protected void run(Session<TX> dbOperationFactory, World.City city) {
+        protected void run(Session<TX> session, World.City city) {
             // Find bachelors and bachelorettes who are considered adults and who are not in a marriage and pair them off randomly
             int numBirths = benchmarkContext.world().getScaleFactor();
-            try (TX dbOperation = dbOperationFactory.newTransaction(tracker(), iteration(), isTracing())) {
+            try (TX dbOperation = session.newTransaction(tracker(), iteration(), isTracing())) {
                 for (int i = 0; i < numBirths; i++) {
                     String gender;
                     String forename;
@@ -63,7 +63,7 @@ public class PersonBirthAgent<TX extends Transaction> extends CityAgent<TX> {
                     String email = "email/" + uniqueId(benchmarkContext, i);
                     runAction(actionFactory().insertPersonAction(dbOperation, city, benchmarkContext.today(), email, gender, forename, surname));
                 }
-                dbOperation.save();
+                dbOperation.commit();
             }
         }
     }

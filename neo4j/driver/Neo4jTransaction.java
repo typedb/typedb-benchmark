@@ -49,7 +49,7 @@ public class Neo4jTransaction extends TransactionalTransaction {
      * Not necessary when using Neo4j's Transaction Functions
      */
     @Override
-    public void save() {}
+    public void commit() {}
 
     public List<Record> execute(Query query) {
         log.query(tracker, iteration, query);

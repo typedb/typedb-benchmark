@@ -51,24 +51,24 @@ public class ParentshipAgent<TX extends Transaction> extends CityAgent<TX> {
         }
 
         @Override
-        protected void run(Session<TX> dbOperationFactory, World.City city) {
+        protected void run(Session<TX> session, World.City city) {
             // Query for married couples in the city who are not already in a parentship relation together
             List<String> childrenEmails;
 
-            try (TX dbOperation = dbOperationFactory.newTransaction(tracker(), iteration(), isTracing())) {
+            try (TX dbOperation = session.newTransaction(tracker(), iteration(), isTracing())) {
                 BirthsInCityAction<?> birthsInCityAction = actionFactory().birthsInCityAction(dbOperation, city, benchmarkContext.today());
                 childrenEmails = runAction(birthsInCityAction);
             }
 
             List<HashMap<SpouseType, String>> marriedCouple;
 
-            try (TX dbOperation = dbOperationFactory.newTransaction(tracker(), iteration(), isTracing())) {
+            try (TX dbOperation = session.newTransaction(tracker(), iteration(), isTracing())) {
                 MarriedCoupleAction<?> marriedCoupleAction = actionFactory().marriedCoupleAction(dbOperation, city, benchmarkContext.today());
                 marriedCouple = runAction(marriedCoupleAction);
             }
 
             if (marriedCouple.size() > 0 && childrenEmails.size() > 0) {
-                try (TX dbOperation = dbOperationFactory.newTransaction(tracker(), iteration(), isTracing())) {
+                try (TX dbOperation = session.newTransaction(tracker(), iteration(), isTracing())) {
                     LinkedHashMap<Integer, List<Integer>> childrenPerMarriage = Allocation.allocateEvenlyToMap(childrenEmails.size(), marriedCouple.size());
                     for (Map.Entry<Integer, List<Integer>> childrenForMarriage : childrenPerMarriage.entrySet()) {
                         Integer marriageIndex = childrenForMarriage.getKey();
@@ -80,7 +80,7 @@ public class ParentshipAgent<TX extends Transaction> extends CityAgent<TX> {
                             runAction(actionFactory().insertParentshipAction(dbOperation, marriage, childEmail));
                         }
                     }
-                    dbOperation.save();
+                    dbOperation.commit();
                 }
             }
         }

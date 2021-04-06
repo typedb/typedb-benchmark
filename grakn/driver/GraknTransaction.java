@@ -53,7 +53,7 @@ public class GraknTransaction extends TransactionalTransaction {
     }
 
     @Override
-    public void save() {
+    public void commit() {
         throwIfClosed();
         transaction.commit();
         closed = true;

@@ -113,7 +113,7 @@ public class GraknClient extends TransactionalClient<grakn.client.api.GraknSessi
     }
 
     @Override
-    public Session<GraknTransaction> getDbOperationFactory(Region region, Logger logger) {
+    public Session<GraknTransaction> session(Region region, Logger logger) {
         return new GraknSession(session(region.topLevelName()), logger);
     }
 }

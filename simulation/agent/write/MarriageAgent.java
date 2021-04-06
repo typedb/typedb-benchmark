@@ -45,18 +45,18 @@ public class MarriageAgent<TX extends Transaction> extends CityAgent<TX> {
         }
 
         @Override
-        protected void run(Session<TX> dbOperationFactory, World.City city) {
+        protected void run(Session<TX> session, World.City city) {
 
             // Find bachelors and bachelorettes who are considered adults and who are not in a marriage and pair them off randomly
             LocalDateTime dobOfAdults = benchmarkContext.today().minusYears(benchmarkContext.world().AGE_OF_ADULTHOOD);
             List<String> womenEmails;
-            try (TX dbOperation = dbOperationFactory.newTransaction(tracker(), iteration(), isTracing())) {
+            try (TX dbOperation = session.newTransaction(tracker(), iteration(), isTracing())) {
                 womenEmails = runAction(actionFactory().unmarriedPeopleInCityAction(dbOperation, city, "female", dobOfAdults));
                 shuffle(womenEmails);
             }
 
             List<String> menEmails;
-            try (TX dbOperation = dbOperationFactory.newTransaction(tracker(), iteration(), isTracing())) {
+            try (TX dbOperation = session.newTransaction(tracker(), iteration(), isTracing())) {
                 menEmails = runAction(actionFactory().unmarriedPeopleInCityAction(dbOperation, city, "male", dobOfAdults));
                 shuffle(menEmails);
             }
@@ -66,7 +66,7 @@ public class MarriageAgent<TX extends Transaction> extends CityAgent<TX> {
                 System.out.println("asdf");
                 assert true;
             }
-            try (TX dbOperation = dbOperationFactory.newTransaction(tracker(), iteration(), isTracing())) {
+            try (TX dbOperation = session.newTransaction(tracker(), iteration(), isTracing())) {
                 if (numMarriagesPossible > 0) {
                     for (int i = 0; i < numMarriagesPossible; i++) {
                         String wifeEmail = womenEmails.get(i);
@@ -74,7 +74,7 @@ public class MarriageAgent<TX extends Transaction> extends CityAgent<TX> {
                         int marriageIdentifier = uniqueId(benchmarkContext, i).hashCode();
                         runAction(actionFactory().insertMarriageAction(dbOperation, city, marriageIdentifier, wifeEmail, husbandEmail));
                     }
-                    dbOperation.save();
+                    dbOperation.commit();
                 }
             }
         }

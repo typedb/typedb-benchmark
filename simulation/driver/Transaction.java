@@ -35,7 +35,7 @@ public abstract class Transaction implements AutoCloseable {
 
     public abstract void close();
 
-    public abstract void save();
+    public abstract void commit();
 
     protected <T> T trace(Supplier<T> method, String traceName) {
         return Trace.trace(method, traceName, trace);

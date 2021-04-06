@@ -22,7 +22,7 @@ import org.slf4j.Logger;
 
 public abstract class Client<TX extends Transaction> {
 
-    public abstract Session<TX> getDbOperationFactory(Region region, Logger logger);
+    public abstract Session<TX> session(Region region, Logger logger);
 
     public abstract void printStatistics(Logger LOG);
 

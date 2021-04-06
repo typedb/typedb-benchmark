@@ -45,21 +45,21 @@ public class FriendshipAgent<TX extends Transaction> extends CityAgent<TX> {
         }
 
         @Override
-        protected void run(Session<TX> dbOperationFactory, World.City city) {
+        protected void run(Session<TX> session, World.City city) {
             List<String> residentEmails;
-            try (TX dbOperation = dbOperationFactory.newTransaction(tracker(), iteration(), isTracing())) {
+            try (TX dbOperation = session.newTransaction(tracker(), iteration(), isTracing())) {
                 ResidentsInCityAction<?> residentEmailsAction = actionFactory().residentsInCityAction(dbOperation, city, benchmarkContext.world().getScaleFactor(), benchmarkContext.today());
                 residentEmails = runAction(residentEmailsAction);
             } // TODO Closing and reopening the transaction here is a workaround for https://github.com/graknlabs/grakn/issues/5585
 
-            try (TX dbOperation = dbOperationFactory.newTransaction(tracker(), iteration(), isTracing())) {
+            try (TX dbOperation = session.newTransaction(tracker(), iteration(), isTracing())) {
                 if (residentEmails.size() > 0) {
                     shuffle(residentEmails);
                     int numFriendships = benchmarkContext.world().getScaleFactor();
                     for (int i = 0; i < numFriendships; i++) {
                         runAction(actionFactory().insertFriendshipAction(dbOperation, benchmarkContext.today(), pickOne(residentEmails), pickOne(residentEmails)));
                     }
-                    dbOperation.save();
+                    dbOperation.commit();
                 }
             }
         }

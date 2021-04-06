@@ -44,10 +44,10 @@ public class CompanyAgent<TX extends Transaction> extends CountryAgent<TX> {
         }
 
         @Override
-        protected void run(Session<TX> dbOperationFactory, World.Country country) {
+        protected void run(Session<TX> session, World.Country country) {
             int numCompanies = benchmarkContext.world().getScaleFactor();
 
-            try (TX dbOperation = dbOperationFactory.newTransaction(tracker(), iteration(), isTracing())) {
+            try (TX dbOperation = session.newTransaction(tracker(), iteration(), isTracing())) {
 
                 for (int i = 0; i < numCompanies; i++) {
                     String adjective = pickOne(benchmarkContext.world().getAdjectives());
@@ -57,7 +57,7 @@ public class CompanyAgent<TX extends Transaction> extends CountryAgent<TX> {
                     String companyName = StringUtils.capitalize(adjective) + StringUtils.capitalize(noun) + "-" + companyNumber;
                     runAction(actionFactory().insertCompanyAction(dbOperation, country, benchmarkContext.today(), companyNumber, companyName));
                 }
-                dbOperation.save();
+                dbOperation.commit();
             }
         }
     }
