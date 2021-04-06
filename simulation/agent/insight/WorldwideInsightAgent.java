@@ -30,10 +30,10 @@ import java.util.Random;
 /**
  * Agent to perform a single action, where that action requires no parameters
  *
- * @param <DB_OPERATION>
+ * @param <TX>
  */
-public abstract class WorldwideInsightAgent<DB_OPERATION extends Transaction> extends WorldAgent<DB_OPERATION> {
-    public WorldwideInsightAgent(Client<DB_OPERATION> dbDriver, ActionFactory<DB_OPERATION, ?> actionFactory, grakn.benchmark.simulation.agent.base.BenchmarkContext benchmarkContext) {
+public abstract class WorldwideInsightAgent<TX extends Transaction> extends WorldAgent<TX> {
+    public WorldwideInsightAgent(Client<TX> dbDriver, ActionFactory<TX, ?> actionFactory, grakn.benchmark.simulation.agent.base.BenchmarkContext benchmarkContext) {
         super(dbDriver, actionFactory, benchmarkContext);
     }
 
@@ -42,7 +42,7 @@ public abstract class WorldwideInsightAgent<DB_OPERATION extends Transaction> ex
         return new WorldWideWorker(iteration, tracker, random, test);
     }
 
-    protected abstract ReadAction<DB_OPERATION, ?> getAction(DB_OPERATION dbOperation);
+    protected abstract ReadAction<TX, ?> getAction(TX dbOperation);
 
     public class WorldWideWorker extends WorldRegion {
 
@@ -51,9 +51,9 @@ public abstract class WorldwideInsightAgent<DB_OPERATION extends Transaction> ex
         }
 
         @Override
-        protected void run(Session<DB_OPERATION> dbOperationFactory, World world) {
+        protected void run(Session<TX> dbOperationFactory, World world) {
             for (int i = 0; i <= benchmarkContext.world().getScaleFactor(); i++) {
-                try (DB_OPERATION dbOperation = dbOperationFactory.newTransaction(tracker(), iteration(), isTracing())) {
+                try (TX dbOperation = dbOperationFactory.newTransaction(tracker(), iteration(), isTracing())) {
                     runAction(getAction(dbOperation));
                 }
             }

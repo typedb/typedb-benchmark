@@ -24,7 +24,7 @@ import grakn.benchmark.simulation.world.World;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 
-public abstract class InsertEmploymentAction<DB_OPERATION extends Transaction, ACTION_RETURN_TYPE> extends Action<DB_OPERATION, ACTION_RETURN_TYPE> {
+public abstract class InsertEmploymentAction<TX extends Transaction, ACTION_RETURN_TYPE> extends Action<TX, ACTION_RETURN_TYPE> {
 
     protected final World.City worldCity;
     protected final String employeeEmail;
@@ -34,7 +34,7 @@ public abstract class InsertEmploymentAction<DB_OPERATION extends Transaction, A
     protected final String contractContent;
     protected final double contractedHours;
 
-    public InsertEmploymentAction(DB_OPERATION dbOperation, World.City city, String employeeEmail, long companyNumber, LocalDateTime employmentDate, double wageValue, String contractContent, double contractedHours) {
+    public InsertEmploymentAction(TX dbOperation, World.City city, String employeeEmail, long companyNumber, LocalDateTime employmentDate, double wageValue, String contractContent, double contractedHours) {
         super(dbOperation);
         this.worldCity = city;
         this.employeeEmail = employeeEmail;

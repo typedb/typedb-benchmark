@@ -22,8 +22,8 @@ import grakn.benchmark.simulation.driver.Transaction;
 
 import java.util.HashMap;
 
-public abstract class ReadAction<DB_OPERATION extends Transaction, ACTION_RETURN_TYPE> extends Action<DB_OPERATION, ACTION_RETURN_TYPE> {
-    public ReadAction(DB_OPERATION dbOperation) {
+public abstract class ReadAction<TX extends Transaction, ACTION_RETURN_TYPE> extends Action<TX, ACTION_RETURN_TYPE> {
+    public ReadAction(TX dbOperation) {
         super(dbOperation);
     }
 

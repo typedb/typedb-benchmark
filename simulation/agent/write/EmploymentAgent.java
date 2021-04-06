@@ -32,9 +32,9 @@ import java.util.Random;
 
 import static grakn.benchmark.simulation.agent.base.Allocation.allocate;
 
-public class EmploymentAgent<DB_OPERATION extends Transaction> extends CityAgent<DB_OPERATION> {
+public class EmploymentAgent<TX extends Transaction> extends CityAgent<TX> {
 
-    public EmploymentAgent(Client<DB_OPERATION> dbDriver, ActionFactory<DB_OPERATION, ?> actionFactory, grakn.benchmark.simulation.agent.base.BenchmarkContext benchmarkContext) {
+    public EmploymentAgent(Client<TX> dbDriver, ActionFactory<TX, ?> actionFactory, grakn.benchmark.simulation.agent.base.BenchmarkContext benchmarkContext) {
         super(dbDriver, actionFactory, benchmarkContext);
     }
 
@@ -56,22 +56,22 @@ public class EmploymentAgent<DB_OPERATION extends Transaction> extends CityAgent
         }
 
         @Override
-        protected void run(Session<DB_OPERATION> dbOperationFactory, World.City city) {
+        protected void run(Session<TX> dbOperationFactory, World.City city) {
             LocalDateTime employmentDate = benchmarkContext.today().minusYears(0);
             List<String> employeeEmails;
             List<Long> companyNumbers;
 
-            try (DB_OPERATION dbOperation = dbOperationFactory.newTransaction(tracker(), iteration(), isTracing())) {
-                ResidentsInCityAction<DB_OPERATION> employeeEmailsAction = actionFactory().residentsInCityAction(dbOperation, city, benchmarkContext.world().getScaleFactor(), employmentDate);
+            try (TX dbOperation = dbOperationFactory.newTransaction(tracker(), iteration(), isTracing())) {
+                ResidentsInCityAction<TX> employeeEmailsAction = actionFactory().residentsInCityAction(dbOperation, city, benchmarkContext.world().getScaleFactor(), employmentDate);
                 employeeEmails = runAction(employeeEmailsAction);
             }
 
-            try (DB_OPERATION dbOperation = dbOperationFactory.newTransaction(tracker(), iteration(), isTracing())) {
-                CompaniesInCountryAction<DB_OPERATION> companyNumbersAction = actionFactory().companiesInCountryAction(dbOperation, city.country(), benchmarkContext.world().getScaleFactor());
+            try (TX dbOperation = dbOperationFactory.newTransaction(tracker(), iteration(), isTracing())) {
+                CompaniesInCountryAction<TX> companyNumbersAction = actionFactory().companiesInCountryAction(dbOperation, city.country(), benchmarkContext.world().getScaleFactor());
                 companyNumbers = runAction(companyNumbersAction);
             }
 
-            try (DB_OPERATION dbOperation = dbOperationFactory.newTransaction(tracker(), iteration(), isTracing())) {
+            try (TX dbOperation = dbOperationFactory.newTransaction(tracker(), iteration(), isTracing())) {
                 // A second transaction is being used to circumvent graknlabs/grakn issue #5585
                 boolean allocated = allocate(employeeEmails, companyNumbers, (employeeEmail, companyNumber) -> {
                     double wageValue = randomAttributeGenerator().boundRandomDouble(MIN_ANNUAL_WAGE, MAX_ANNUAL_WAGE);

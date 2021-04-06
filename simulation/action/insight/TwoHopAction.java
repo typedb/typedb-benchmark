@@ -21,9 +21,9 @@ import grakn.benchmark.simulation.driver.Transaction;
 
 import java.util.List;
 
-public abstract class TwoHopAction<DB_OPERATION extends Transaction> extends WorldwideInsightAction<DB_OPERATION, List<String>> {
+public abstract class TwoHopAction<TX extends Transaction> extends WorldwideInsightAction<TX, List<String>> {
 
-    public TwoHopAction(DB_OPERATION dbOperation) {
+    public TwoHopAction(TX dbOperation) {
         super(dbOperation);
     }
 

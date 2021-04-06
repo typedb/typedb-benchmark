@@ -23,10 +23,10 @@ import grakn.benchmark.simulation.world.World;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class CitiesInContinentAction<DB_OPERATION extends Transaction> extends ReadAction<DB_OPERATION, List<String>> {
+public abstract class CitiesInContinentAction<TX extends Transaction> extends ReadAction<TX, List<String>> {
     protected final World.City city;
 
-    public CitiesInContinentAction(DB_OPERATION dbOperation, World.City city) {
+    public CitiesInContinentAction(TX dbOperation, World.City city) {
         super(dbOperation);
         this.city = city;
     }

@@ -26,9 +26,9 @@ import grakn.benchmark.simulation.world.World;
 
 import java.util.Random;
 
-public class ProductAgent<DB_OPERATION extends Transaction> extends ContinentAgent<DB_OPERATION> {
+public class ProductAgent<TX extends Transaction> extends ContinentAgent<TX> {
 
-    public ProductAgent(Client<DB_OPERATION> dbDriver, ActionFactory<DB_OPERATION, ?> actionFactory, grakn.benchmark.simulation.agent.base.BenchmarkContext benchmarkContext) {
+    public ProductAgent(Client<TX> dbDriver, ActionFactory<TX, ?> actionFactory, grakn.benchmark.simulation.agent.base.BenchmarkContext benchmarkContext) {
         super(dbDriver, actionFactory, benchmarkContext);
     }
 
@@ -43,9 +43,9 @@ public class ProductAgent<DB_OPERATION extends Transaction> extends ContinentAge
         }
 
         @Override
-        protected void run(Session<DB_OPERATION> dbOperationFactory, World.Continent continent) {
+        protected void run(Session<TX> dbOperationFactory, World.Continent continent) {
             int numProducts = benchmarkContext.world().getScaleFactor();
-            try (DB_OPERATION dbOperation = dbOperationFactory.newTransaction(tracker(), iteration(), isTracing())) {
+            try (TX dbOperation = dbOperationFactory.newTransaction(tracker(), iteration(), isTracing())) {
                 for (int i = 0; i < numProducts; i++) {
                     String productName = randomAttributeGenerator().boundRandomLengthRandomString(5, 20);
                     String productDescription = randomAttributeGenerator().boundRandomLengthRandomString(75, 100);

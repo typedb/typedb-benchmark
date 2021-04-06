@@ -24,13 +24,13 @@ import grakn.benchmark.simulation.world.World;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 
-public abstract class InsertRelocationAction<DB_OPERATION extends Transaction, ACTION_RETURN_TYPE> extends Action<DB_OPERATION, ACTION_RETURN_TYPE> {
+public abstract class InsertRelocationAction<TX extends Transaction, ACTION_RETURN_TYPE> extends Action<TX, ACTION_RETURN_TYPE> {
     protected final World.City city;
     protected final LocalDateTime today;
     protected final String relocateeEmail;
     protected final String relocationCityName;
 
-    public InsertRelocationAction(DB_OPERATION dbOperation, World.City city, LocalDateTime today, String relocateeEmail, String relocationCityName) {
+    public InsertRelocationAction(TX dbOperation, World.City city, LocalDateTime today, String relocateeEmail, String relocationCityName) {
         super(dbOperation);
         this.city = city;
         this.today = today;

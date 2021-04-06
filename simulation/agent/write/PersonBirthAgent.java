@@ -26,9 +26,9 @@ import grakn.benchmark.simulation.world.World;
 
 import java.util.Random;
 
-public class PersonBirthAgent<DB_OPERATION extends Transaction> extends CityAgent<DB_OPERATION> {
+public class PersonBirthAgent<TX extends Transaction> extends CityAgent<TX> {
 
-    public PersonBirthAgent(Client<DB_OPERATION> dbDriver, ActionFactory<DB_OPERATION, ?> actionFactory, grakn.benchmark.simulation.agent.base.BenchmarkContext benchmarkContext) {
+    public PersonBirthAgent(Client<TX> dbDriver, ActionFactory<TX, ?> actionFactory, grakn.benchmark.simulation.agent.base.BenchmarkContext benchmarkContext) {
         super(dbDriver, actionFactory, benchmarkContext);
     }
 
@@ -43,10 +43,10 @@ public class PersonBirthAgent<DB_OPERATION extends Transaction> extends CityAgen
         }
 
         @Override
-        protected void run(Session<DB_OPERATION> dbOperationFactory, World.City city) {
+        protected void run(Session<TX> dbOperationFactory, World.City city) {
             // Find bachelors and bachelorettes who are considered adults and who are not in a marriage and pair them off randomly
             int numBirths = benchmarkContext.world().getScaleFactor();
-            try (DB_OPERATION dbOperation = dbOperationFactory.newTransaction(tracker(), iteration(), isTracing())) {
+            try (TX dbOperation = dbOperationFactory.newTransaction(tracker(), iteration(), isTracing())) {
                 for (int i = 0; i < numBirths; i++) {
                     String gender;
                     String forename;

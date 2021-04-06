@@ -24,7 +24,7 @@ import grakn.common.collection.Pair;
 
 import java.util.ArrayList;
 
-public abstract class InsertTransactionAction<DB_OPERATION extends Transaction, ACTION_RETURN_TYPE> extends Action<DB_OPERATION, ACTION_RETURN_TYPE> {
+public abstract class InsertTransactionAction<TX extends Transaction, ACTION_RETURN_TYPE> extends Action<TX, ACTION_RETURN_TYPE> {
     protected final World.Country country;
     protected final Pair<Long, Long> transaction;
     protected final Long sellerCompanyNumber;
@@ -32,7 +32,7 @@ public abstract class InsertTransactionAction<DB_OPERATION extends Transaction, 
     protected final int productQuantity;
     protected final boolean isTaxable;
 
-    public InsertTransactionAction(DB_OPERATION dbOperation, World.Country country, Pair<Long, Long> transaction, Long sellerCompanyNumber, double value, int productQuantity, boolean isTaxable) {
+    public InsertTransactionAction(TX dbOperation, World.Country country, Pair<Long, Long> transaction, Long sellerCompanyNumber, double value, int productQuantity, boolean isTaxable) {
         super(dbOperation);
         this.country = country;
         this.transaction = transaction;

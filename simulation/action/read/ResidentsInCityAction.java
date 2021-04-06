@@ -24,13 +24,13 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class ResidentsInCityAction<DB_OPERATION extends Transaction> extends ReadAction<DB_OPERATION, List<String>> {
+public abstract class ResidentsInCityAction<TX extends Transaction> extends ReadAction<TX, List<String>> {
 
     protected final World.City city;
     protected final int numResidents;
     protected final LocalDateTime earliestDate;
 
-    public ResidentsInCityAction(DB_OPERATION dbOperation, World.City city, int numResidents, LocalDateTime earliestDate) {
+    public ResidentsInCityAction(TX dbOperation, World.City city, int numResidents, LocalDateTime earliestDate) {
         super(dbOperation);
         this.city = city;
         this.numResidents = numResidents;

@@ -23,13 +23,13 @@ import grakn.benchmark.simulation.world.World;
 
 import java.util.ArrayList;
 
-public abstract class InsertProductAction<DB_OPERATION extends Transaction, ACTION_RETURN_TYPE> extends Action<DB_OPERATION, ACTION_RETURN_TYPE> {
+public abstract class InsertProductAction<TX extends Transaction, ACTION_RETURN_TYPE> extends Action<TX, ACTION_RETURN_TYPE> {
     protected final World.Continent continent;
     protected final Long barcode;
     protected final String productName;
     protected final String productDescription;
 
-    public InsertProductAction(DB_OPERATION dbOperation, World.Continent continent, Long barcode, String productName, String productDescription) {
+    public InsertProductAction(TX dbOperation, World.Continent continent, Long barcode, String productName, String productDescription) {
         super(dbOperation);
         this.continent = continent;
         this.barcode = barcode;

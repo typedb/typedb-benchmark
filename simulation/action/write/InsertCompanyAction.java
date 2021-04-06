@@ -24,14 +24,14 @@ import grakn.benchmark.simulation.world.World;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 
-public abstract class InsertCompanyAction<DB_OPERATION extends Transaction, ACTION_RETURN_TYPE> extends Action<DB_OPERATION, ACTION_RETURN_TYPE> {
+public abstract class InsertCompanyAction<TX extends Transaction, ACTION_RETURN_TYPE> extends Action<TX, ACTION_RETURN_TYPE> {
 
     protected final World.Country country;
     protected final LocalDateTime today;
     protected final int companyNumber;
     protected final String companyName;
 
-    public InsertCompanyAction(DB_OPERATION dbOperation, World.Country country, LocalDateTime today, int companyNumber, String companyName) {
+    public InsertCompanyAction(TX dbOperation, World.Country country, LocalDateTime today, int companyNumber, String companyName) {
         super(dbOperation);
         this.country = country;
         this.today = today;

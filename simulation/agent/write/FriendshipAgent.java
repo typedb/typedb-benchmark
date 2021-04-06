@@ -28,9 +28,9 @@ import grakn.benchmark.simulation.world.World;
 import java.util.List;
 import java.util.Random;
 
-public class FriendshipAgent<DB_OPERATION extends Transaction> extends CityAgent<DB_OPERATION> {
+public class FriendshipAgent<TX extends Transaction> extends CityAgent<TX> {
 
-    public FriendshipAgent(Client<DB_OPERATION> dbDriver, ActionFactory<DB_OPERATION, ?> actionFactory, grakn.benchmark.simulation.agent.base.BenchmarkContext benchmarkContext) {
+    public FriendshipAgent(Client<TX> dbDriver, ActionFactory<TX, ?> actionFactory, grakn.benchmark.simulation.agent.base.BenchmarkContext benchmarkContext) {
         super(dbDriver, actionFactory, benchmarkContext);
     }
 
@@ -45,14 +45,14 @@ public class FriendshipAgent<DB_OPERATION extends Transaction> extends CityAgent
         }
 
         @Override
-        protected void run(Session<DB_OPERATION> dbOperationFactory, World.City city) {
+        protected void run(Session<TX> dbOperationFactory, World.City city) {
             List<String> residentEmails;
-            try (DB_OPERATION dbOperation = dbOperationFactory.newTransaction(tracker(), iteration(), isTracing())) {
+            try (TX dbOperation = dbOperationFactory.newTransaction(tracker(), iteration(), isTracing())) {
                 ResidentsInCityAction<?> residentEmailsAction = actionFactory().residentsInCityAction(dbOperation, city, benchmarkContext.world().getScaleFactor(), benchmarkContext.today());
                 residentEmails = runAction(residentEmailsAction);
             } // TODO Closing and reopening the transaction here is a workaround for https://github.com/graknlabs/grakn/issues/5585
 
-            try (DB_OPERATION dbOperation = dbOperationFactory.newTransaction(tracker(), iteration(), isTracing())) {
+            try (TX dbOperation = dbOperationFactory.newTransaction(tracker(), iteration(), isTracing())) {
                 if (residentEmails.size() > 0) {
                     shuffle(residentEmails);
                     int numFriendships = benchmarkContext.world().getScaleFactor();

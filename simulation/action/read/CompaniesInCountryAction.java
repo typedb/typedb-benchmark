@@ -23,12 +23,12 @@ import grakn.benchmark.simulation.world.World;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class CompaniesInCountryAction<DB_OPERATION extends Transaction> extends ReadAction<DB_OPERATION, List<Long>> {
+public abstract class CompaniesInCountryAction<TX extends Transaction> extends ReadAction<TX, List<Long>> {
 
     protected final World.Country country;
     protected final int numCompanies;
 
-    public CompaniesInCountryAction(DB_OPERATION dbOperation, World.Country country, int numCompanies) {
+    public CompaniesInCountryAction(TX dbOperation, World.Country country, int numCompanies) {
         super(dbOperation);
         this.country = country;
         this.numCompanies = numCompanies;

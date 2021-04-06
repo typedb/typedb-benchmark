@@ -22,9 +22,9 @@ import grakn.benchmark.simulation.driver.Transaction;
 
 import java.util.ArrayList;
 
-public abstract class WorldwideInsightAction<DB_OPERATION extends Transaction, ACTION_RETURN_TYPE> extends ReadAction<DB_OPERATION, ACTION_RETURN_TYPE> {
+public abstract class WorldwideInsightAction<TX extends Transaction, ACTION_RETURN_TYPE> extends ReadAction<TX, ACTION_RETURN_TYPE> {
 
-    public WorldwideInsightAction(DB_OPERATION dbOperation) {
+    public WorldwideInsightAction(TX dbOperation) {
         super(dbOperation);
     }
 

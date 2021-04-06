@@ -20,9 +20,9 @@ package grakn.benchmark.simulation.driver;
 import grakn.benchmark.simulation.world.Region;
 import org.slf4j.Logger;
 
-public abstract class Client<DB_OPERATION extends Transaction> {
+public abstract class Client<TX extends Transaction> {
 
-    public abstract Session<DB_OPERATION> getDbOperationFactory(Region region, Logger logger);
+    public abstract Session<TX> getDbOperationFactory(Region region, Logger logger);
 
     public abstract void printStatistics(Logger LOG);
 

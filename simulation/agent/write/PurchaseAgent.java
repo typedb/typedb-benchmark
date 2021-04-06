@@ -34,9 +34,9 @@ import java.util.Random;
 
 import static grakn.common.collection.Collections.pair;
 
-public class PurchaseAgent<DB_OPERATION extends Transaction> extends CountryAgent<DB_OPERATION> {
+public class PurchaseAgent<TX extends Transaction> extends CountryAgent<TX> {
 
-    public PurchaseAgent(Client<DB_OPERATION> dbDriver, ActionFactory<DB_OPERATION, ?> actionFactory, grakn.benchmark.simulation.agent.base.BenchmarkContext benchmarkContext) {
+    public PurchaseAgent(Client<TX> dbDriver, ActionFactory<TX, ?> actionFactory, grakn.benchmark.simulation.agent.base.BenchmarkContext benchmarkContext) {
         super(dbDriver, actionFactory, benchmarkContext);
     }
 
@@ -51,17 +51,17 @@ public class PurchaseAgent<DB_OPERATION extends Transaction> extends CountryAgen
         }
 
         @Override
-        protected void run(Session<DB_OPERATION> dbOperationFactory, World.Country country) {
+        protected void run(Session<TX> dbOperationFactory, World.Country country) {
             List<Long> companyNumbers;
 
-            try (DB_OPERATION dbOperation = dbOperationFactory.newTransaction(tracker(), iteration(), isTracing())) {
-                CompaniesInCountryAction<DB_OPERATION> companiesInContinentAction = actionFactory().companiesInCountryAction(dbOperation, country, 100);
+            try (TX dbOperation = dbOperationFactory.newTransaction(tracker(), iteration(), isTracing())) {
+                CompaniesInCountryAction<TX> companiesInContinentAction = actionFactory().companiesInCountryAction(dbOperation, country, 100);
                 companyNumbers = runAction(companiesInContinentAction);
             }
             shuffle(companyNumbers);
 
             List<Long> productBarcodes;
-            try (DB_OPERATION dbOperation = dbOperationFactory.newTransaction(tracker(), iteration(), isTracing())) {
+            try (TX dbOperation = dbOperationFactory.newTransaction(tracker(), iteration(), isTracing())) {
                 ProductsInContinentAction<?> productsInContinentAction = actionFactory().productsInContinentAction(dbOperation, country.continent());
                 productBarcodes = runAction(productsInContinentAction);
             }
@@ -79,7 +79,7 @@ public class PurchaseAgent<DB_OPERATION extends Transaction> extends CountryAgen
                 Pair<Long, Long> buyerAndProduct = pair(companyNumber, productBarcode);
                 transactions.add(buyerAndProduct);
             }
-            try (DB_OPERATION dbOperation = dbOperationFactory.newTransaction(tracker(), iteration(), isTracing())) {
+            try (TX dbOperation = dbOperationFactory.newTransaction(tracker(), iteration(), isTracing())) {
                 Allocation.allocate(transactions, companyNumbers, (transaction, sellerCompanyNumber) -> {
                     double value = randomAttributeGenerator().boundRandomDouble(0.01, 10000.00);
                     int productQuantity = randomAttributeGenerator().boundRandomInt(1, 1000);

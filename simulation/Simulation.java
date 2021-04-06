@@ -39,10 +39,10 @@ import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
-public abstract class Simulation<DB_DRIVER extends Client<DB_OPERATION>, DB_OPERATION extends Transaction> implements grakn.benchmark.simulation.agent.base.BenchmarkContext {
+public abstract class Simulation<DB_DRIVER extends Client<TX>, TX extends Transaction> implements grakn.benchmark.simulation.agent.base.BenchmarkContext {
 
     final static Logger LOG = LoggerFactory.getLogger(Simulation.class);
-    private final List<Agent<?, DB_OPERATION>> agentList;
+    private final List<Agent<?, TX>> agentList;
     protected final DB_DRIVER driver;
     private final Random random;
     private final List<Config.Agent> agentConfigs;
@@ -64,14 +64,14 @@ public abstract class Simulation<DB_DRIVER extends Client<DB_OPERATION>, DB_OPER
         this.report = new Report();
     }
 
-    protected List<Agent<?, DB_OPERATION>> agentListFromConfigs() {
-        List<Agent<?, DB_OPERATION>> agents = new ArrayList<>();
-        ActionFactory<DB_OPERATION, ?> actionFactory = actionFactory();
-        AgentFactory<DB_OPERATION, ?> agentFactory = new AgentFactory<>(driver, actionFactory, this);
+    protected List<Agent<?, TX>> agentListFromConfigs() {
+        List<Agent<?, TX>> agents = new ArrayList<>();
+        ActionFactory<TX, ?> actionFactory = actionFactory();
+        AgentFactory<TX, ?> agentFactory = new AgentFactory<>(driver, actionFactory, this);
 
         for (Config.Agent agentConfig : agentConfigs) {
             if (agentConfig.getAgentMode().getRun()) {
-                Agent<?, DB_OPERATION> agent = agentFactory.get(agentConfig.getName());
+                Agent<?, TX> agent = agentFactory.get(agentConfig.getName());
                 agent.setTracing(agentConfig.getAgentMode().getTrace());
                 agents.add(agent);
             }
@@ -79,7 +79,7 @@ public abstract class Simulation<DB_DRIVER extends Client<DB_OPERATION>, DB_OPER
         return agents;
     }
 
-    protected abstract ActionFactory<DB_OPERATION, ?> actionFactory();
+    protected abstract ActionFactory<TX, ?> actionFactory();
 
     protected abstract void initialise(Map<String, Path> initialisationDataPaths);
 

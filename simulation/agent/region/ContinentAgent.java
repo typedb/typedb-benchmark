@@ -28,9 +28,9 @@ import java.util.Random;
 
 import static java.util.stream.Collectors.toList;
 
-public abstract class ContinentAgent<DB_OPERATION extends Transaction> extends Agent<World.Continent, DB_OPERATION> {
+public abstract class ContinentAgent<TX extends Transaction> extends Agent<World.Continent, TX> {
 
-    public ContinentAgent(Client<DB_OPERATION> dbDriver, ActionFactory<DB_OPERATION, ?> actionFactory, grakn.benchmark.simulation.agent.base.BenchmarkContext benchmarkContext) {
+    public ContinentAgent(Client<TX> dbDriver, ActionFactory<TX, ?> actionFactory, grakn.benchmark.simulation.agent.base.BenchmarkContext benchmarkContext) {
         super(dbDriver, actionFactory, benchmarkContext);
     }
 

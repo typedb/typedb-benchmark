@@ -25,11 +25,11 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public abstract class UpdateAgesOfPeopleInCityAction<DB_OPERATION extends Transaction> extends ReadAction<DB_OPERATION, Integer> {
+public abstract class UpdateAgesOfPeopleInCityAction<TX extends Transaction> extends ReadAction<TX, Integer> {
     protected final LocalDateTime today;
     protected final World.City city;
 
-    public UpdateAgesOfPeopleInCityAction(DB_OPERATION dbOperation, LocalDateTime today, World.City city) {
+    public UpdateAgesOfPeopleInCityAction(TX dbOperation, LocalDateTime today, World.City city) {
         super(dbOperation);
         this.today = today;
         this.city = city;

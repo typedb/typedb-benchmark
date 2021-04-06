@@ -22,13 +22,13 @@ import grakn.benchmark.simulation.action.read.ReadAction;
 import grakn.benchmark.simulation.driver.Client;
 import grakn.benchmark.simulation.driver.Transaction;
 
-public class FourHopAgent<DB_OPERATION extends Transaction> extends WorldwideInsightAgent<DB_OPERATION> {
-    public FourHopAgent(Client<DB_OPERATION> dbDriver, ActionFactory<DB_OPERATION, ?> actionFactory, grakn.benchmark.simulation.agent.base.BenchmarkContext benchmarkContext) {
+public class FourHopAgent<TX extends Transaction> extends WorldwideInsightAgent<TX> {
+    public FourHopAgent(Client<TX> dbDriver, ActionFactory<TX, ?> actionFactory, grakn.benchmark.simulation.agent.base.BenchmarkContext benchmarkContext) {
         super(dbDriver, actionFactory, benchmarkContext);
     }
 
     @Override
-    protected ReadAction<DB_OPERATION, ?> getAction(DB_OPERATION dbOperation) {
+    protected ReadAction<TX, ?> getAction(TX dbOperation) {
         return actionFactory().fourHopAction(dbOperation);
     }
 }

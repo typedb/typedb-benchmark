@@ -50,25 +50,25 @@ import static grakn.common.util.Objects.className;
  * tracker from them.
  *
  * @param <REGION>       The type of region used by the agent.
- * @param <DB_OPERATION> The abstraction of database operations used by the agent.
+ * @param <TX> The abstraction of database operations used by the agent.
  */
-public abstract class Agent<REGION extends Region, DB_OPERATION extends Transaction> {
+public abstract class Agent<REGION extends Region, TX extends Transaction> {
 
     protected final BenchmarkContext benchmarkContext;
     private final Logger logger;
-    private final Client<DB_OPERATION> dbDriver;
-    private final ActionFactory<DB_OPERATION, ?> actionFactory;
+    private final Client<TX> dbDriver;
+    private final ActionFactory<TX, ?> actionFactory;
     private final Report report = new Report();
     private boolean isTracing = true;
 
-    protected Agent(Client<DB_OPERATION> dbDriver, ActionFactory<DB_OPERATION, ?> actionFactory, BenchmarkContext benchmarkContext) {
+    protected Agent(Client<TX> dbDriver, ActionFactory<TX, ?> actionFactory, BenchmarkContext benchmarkContext) {
         this.dbDriver = dbDriver;
         this.actionFactory = actionFactory;
         this.benchmarkContext = benchmarkContext;
         logger = LoggerFactory.getLogger(this.getClass());
     }
 
-    protected ActionFactory<DB_OPERATION, ?> actionFactory() {
+    protected ActionFactory<TX, ?> actionFactory() {
         return actionFactory;
     }
 
@@ -99,7 +99,7 @@ public abstract class Agent<REGION extends Region, DB_OPERATION extends Transact
         Random agentRandom = RandomSource.nextSource(random).get();
 
         Regional regionalAgent = getRegionalAgent(benchmarkContext.iteration(), region.tracker(), agentRandom, benchmarkContext.test());
-        Session<DB_OPERATION> dbOperationFactory = dbDriver.getDbOperationFactory(region, logger);
+        Session<TX> dbOperationFactory = dbDriver.getDbOperationFactory(region, logger);
 
         Regional.Report report = regionalAgent.runWithReport(dbOperationFactory, region);
         this.report.addRegionalAgentReport(region.tracker(), report);
@@ -152,7 +152,7 @@ public abstract class Agent<REGION extends Region, DB_OPERATION extends Transact
             return tracker;
         }
 
-        protected Report runWithReport(Session<DB_OPERATION> dbOperationFactory, REGION region) {
+        protected Report runWithReport(Session<TX> dbOperationFactory, REGION region) {
             trace(() -> {
                 run(dbOperationFactory, region);
                 return null;
@@ -160,7 +160,7 @@ public abstract class Agent<REGION extends Region, DB_OPERATION extends Transact
             return report;
         }
 
-        protected abstract void run(Session<DB_OPERATION> dbOperationFactory, REGION region);
+        protected abstract void run(Session<TX> dbOperationFactory, REGION region);
 
         public <U> U pickOne(List<U> list) { // TODO can be a util
             return list.get(random().nextInt(list.size()));

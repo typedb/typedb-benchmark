@@ -27,11 +27,11 @@ import java.util.Objects;
 
 import static com.google.common.collect.Iterables.getOnlyElement;
 
-public abstract class Action<DB_OPERATION extends Transaction, ACTION_RETURN_TYPE> {
+public abstract class Action<TX extends Transaction, ACTION_RETURN_TYPE> {
 
-    protected DB_OPERATION dbOperation;
+    protected TX dbOperation;
 
-    public Action(DB_OPERATION dbOperation) {
+    public Action(TX dbOperation) {
         this.dbOperation = dbOperation;
     }
 

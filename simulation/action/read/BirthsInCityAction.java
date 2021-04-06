@@ -24,11 +24,11 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class BirthsInCityAction<DB_OPERATION extends Transaction> extends ReadAction<DB_OPERATION, List<String>> {
+public abstract class BirthsInCityAction<TX extends Transaction> extends ReadAction<TX, List<String>> {
     protected final World.City worldCity;
     protected final LocalDateTime today;
 
-    public BirthsInCityAction(DB_OPERATION dbOperation, World.City city, LocalDateTime today) {
+    public BirthsInCityAction(TX dbOperation, World.City city, LocalDateTime today) {
         super(dbOperation);
         this.worldCity = city;
         this.today = today;

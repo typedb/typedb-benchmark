@@ -31,9 +31,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Random;
 
-public class RelocationAgent<DB_OPERATION extends Transaction> extends CityAgent<DB_OPERATION> {
+public class RelocationAgent<TX extends Transaction> extends CityAgent<TX> {
 
-    public RelocationAgent(Client<DB_OPERATION> dbDriver, ActionFactory<DB_OPERATION, ?> actionFactory, grakn.benchmark.simulation.agent.base.BenchmarkContext benchmarkContext) {
+    public RelocationAgent(Client<TX> dbDriver, ActionFactory<TX, ?> actionFactory, grakn.benchmark.simulation.agent.base.BenchmarkContext benchmarkContext) {
         super(dbDriver, actionFactory, benchmarkContext);
     }
 
@@ -48,7 +48,7 @@ public class RelocationAgent<DB_OPERATION extends Transaction> extends CityAgent
         }
 
         @Override
-        protected void run(Session<DB_OPERATION> dbOperationFactory, World.City city) {
+        protected void run(Session<TX> dbOperationFactory, World.City city) {
         /*
         Find people currently resident the city
         Find other cities in the continent
@@ -61,18 +61,18 @@ public class RelocationAgent<DB_OPERATION extends Transaction> extends CityAgent
             List<String> residentEmails;
             List<String> relocationCityNames;
 
-            try (DB_OPERATION dbOperation = dbOperationFactory.newTransaction(tracker(), iteration(), isTracing())) {
+            try (TX dbOperation = dbOperationFactory.newTransaction(tracker(), iteration(), isTracing())) {
                 ResidentsInCityAction<?> residentsInCityAction = actionFactory().residentsInCityAction(dbOperation, city, benchmarkContext.world().getScaleFactor(), earliestDateOfResidencyToRelocate);
                 residentEmails = runAction(residentsInCityAction);
             }
             shuffle(residentEmails);
 
-            try (DB_OPERATION dbOperation = dbOperationFactory.newTransaction(tracker(), iteration(), isTracing())) {
+            try (TX dbOperation = dbOperationFactory.newTransaction(tracker(), iteration(), isTracing())) {
                 CitiesInContinentAction<?> citiesInContinentAction = actionFactory().citiesInContinentAction(dbOperation, city);
                 relocationCityNames = runAction(citiesInContinentAction);
             }
 
-            try (DB_OPERATION dbOperation = dbOperationFactory.newTransaction(tracker(), iteration(), isTracing())) {
+            try (TX dbOperation = dbOperationFactory.newTransaction(tracker(), iteration(), isTracing())) {
                 Allocation.allocate(residentEmails, relocationCityNames, (residentEmail, relocationCityName) -> {
                     runAction(actionFactory().insertRelocationAction(dbOperation, city, benchmarkContext.today(), residentEmail, relocationCityName));
                 });

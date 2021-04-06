@@ -22,13 +22,13 @@ import grakn.benchmark.simulation.action.read.ReadAction;
 import grakn.benchmark.simulation.driver.Client;
 import grakn.benchmark.simulation.driver.Transaction;
 
-public class FindSpecificPersonAgent<DB_OPERATION extends Transaction> extends WorldwideInsightAgent<DB_OPERATION> {
-    public FindSpecificPersonAgent(Client<DB_OPERATION> dbDriver, ActionFactory<DB_OPERATION, ?> actionFactory, grakn.benchmark.simulation.agent.base.BenchmarkContext benchmarkContext) {
+public class FindSpecificPersonAgent<TX extends Transaction> extends WorldwideInsightAgent<TX> {
+    public FindSpecificPersonAgent(Client<TX> dbDriver, ActionFactory<TX, ?> actionFactory, grakn.benchmark.simulation.agent.base.BenchmarkContext benchmarkContext) {
         super(dbDriver, actionFactory, benchmarkContext);
     }
 
     @Override
-    protected ReadAction<DB_OPERATION, ?> getAction(DB_OPERATION dbOperation) {
+    protected ReadAction<TX, ?> getAction(TX dbOperation) {
         return actionFactory().findSpecificPersonAction(dbOperation);
     }
 }

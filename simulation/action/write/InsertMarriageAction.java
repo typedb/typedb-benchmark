@@ -23,13 +23,13 @@ import grakn.benchmark.simulation.world.World;
 
 import java.util.ArrayList;
 
-public abstract class InsertMarriageAction<DB_OPERATION extends Transaction, ACTION_RETURN_TYPE> extends Action<DB_OPERATION, ACTION_RETURN_TYPE> {
+public abstract class InsertMarriageAction<TX extends Transaction, ACTION_RETURN_TYPE> extends Action<TX, ACTION_RETURN_TYPE> {
     protected final World.City worldCity;
     protected final int marriageIdentifier;
     protected final String wifeEmail;
     protected final String husbandEmail;
 
-    public InsertMarriageAction(DB_OPERATION dbOperation, World.City city, int marriageIdentifier, String wifeEmail, String husbandEmail) {
+    public InsertMarriageAction(TX dbOperation, World.City city, int marriageIdentifier, String wifeEmail, String husbandEmail) {
         super(dbOperation);
         this.worldCity = city;
         this.marriageIdentifier = marriageIdentifier;

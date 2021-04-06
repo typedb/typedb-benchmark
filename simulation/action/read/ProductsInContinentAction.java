@@ -23,10 +23,10 @@ import grakn.benchmark.simulation.world.World;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class ProductsInContinentAction<DB_OPERATION extends Transaction> extends ReadAction<DB_OPERATION, List<Long>> {
+public abstract class ProductsInContinentAction<TX extends Transaction> extends ReadAction<TX, List<Long>> {
     protected final World.Continent continent;
 
-    public ProductsInContinentAction(DB_OPERATION dbOperation, World.Continent continent) {
+    public ProductsInContinentAction(TX dbOperation, World.Continent continent) {
         super(dbOperation);
         this.continent = continent;
     }

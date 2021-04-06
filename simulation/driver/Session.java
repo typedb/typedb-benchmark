@@ -19,7 +19,7 @@ package grakn.benchmark.simulation.driver;
 
 import org.slf4j.Logger;
 
-public abstract class Session<DB_OPERATION extends Transaction> {
+public abstract class Session<TX extends Transaction> {
 
     private final LogWrapper logWrapper;
 
@@ -31,7 +31,7 @@ public abstract class Session<DB_OPERATION extends Transaction> {
         return logWrapper;
     }
 
-    public abstract DB_OPERATION transaction();
+    public abstract TX transaction();
 
-    public abstract DB_OPERATION newTransaction(String tracker, long iteration, boolean trace);
+    public abstract TX newTransaction(String tracker, long iteration, boolean trace);
 }

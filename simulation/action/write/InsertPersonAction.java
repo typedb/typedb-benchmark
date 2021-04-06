@@ -24,7 +24,7 @@ import grakn.benchmark.simulation.world.World;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 
-public abstract class InsertPersonAction<DB_OPERATION extends Transaction, ACTION_RETURN_TYPE> extends Action<DB_OPERATION, ACTION_RETURN_TYPE> {
+public abstract class InsertPersonAction<TX extends Transaction, ACTION_RETURN_TYPE> extends Action<TX, ACTION_RETURN_TYPE> {
     protected final World.City worldCity;
     protected final LocalDateTime today;
     protected final String email;
@@ -32,7 +32,7 @@ public abstract class InsertPersonAction<DB_OPERATION extends Transaction, ACTIO
     protected final String forename;
     protected final String surname;
 
-    public InsertPersonAction(DB_OPERATION dbOperation, World.City city, LocalDateTime today, String email, String gender, String forename, String surname) {
+    public InsertPersonAction(TX dbOperation, World.City city, LocalDateTime today, String email, String gender, String forename, String surname) {
         super(dbOperation);
         this.worldCity = city;
         this.today = today;

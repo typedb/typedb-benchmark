@@ -19,11 +19,11 @@ package grakn.benchmark.simulation.action.insight;
 
 import grakn.benchmark.simulation.driver.Transaction;
 
-public abstract class FindSpecificPersonAction<DB_OPERATION extends Transaction> extends WorldwideInsightAction<DB_OPERATION, String> {
+public abstract class FindSpecificPersonAction<TX extends Transaction> extends WorldwideInsightAction<TX, String> {
 
     protected static String PERSON_EMAIL_FOR_QUERY = "email/1/Europe:United Kingdom:London/0";
 
-    public FindSpecificPersonAction(DB_OPERATION dbOperation) {
+    public FindSpecificPersonAction(TX dbOperation) {
         super(dbOperation);
     }
 }

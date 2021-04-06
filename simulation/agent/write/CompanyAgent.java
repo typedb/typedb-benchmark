@@ -27,9 +27,9 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.Random;
 
-public class CompanyAgent<DB_OPERATION extends Transaction> extends CountryAgent<DB_OPERATION> {
+public class CompanyAgent<TX extends Transaction> extends CountryAgent<TX> {
 
-    public CompanyAgent(Client<DB_OPERATION> dbDriver, ActionFactory<DB_OPERATION, ?> actionFactory, grakn.benchmark.simulation.agent.base.BenchmarkContext benchmarkContext) {
+    public CompanyAgent(Client<TX> dbDriver, ActionFactory<TX, ?> actionFactory, grakn.benchmark.simulation.agent.base.BenchmarkContext benchmarkContext) {
         super(dbDriver, actionFactory, benchmarkContext);
     }
 
@@ -44,10 +44,10 @@ public class CompanyAgent<DB_OPERATION extends Transaction> extends CountryAgent
         }
 
         @Override
-        protected void run(Session<DB_OPERATION> dbOperationFactory, World.Country country) {
+        protected void run(Session<TX> dbOperationFactory, World.Country country) {
             int numCompanies = benchmarkContext.world().getScaleFactor();
 
-            try (DB_OPERATION dbOperation = dbOperationFactory.newTransaction(tracker(), iteration(), isTracing())) {
+            try (TX dbOperation = dbOperationFactory.newTransaction(tracker(), iteration(), isTracing())) {
 
                 for (int i = 0; i < numCompanies; i++) {
                     String adjective = pickOne(benchmarkContext.world().getAdjectives());

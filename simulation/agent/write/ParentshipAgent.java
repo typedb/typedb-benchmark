@@ -34,9 +34,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-public class ParentshipAgent<DB_OPERATION extends Transaction> extends CityAgent<DB_OPERATION> {
+public class ParentshipAgent<TX extends Transaction> extends CityAgent<TX> {
 
-    public ParentshipAgent(Client<DB_OPERATION> dbDriver, ActionFactory<DB_OPERATION, ?> actionFactory, grakn.benchmark.simulation.agent.base.BenchmarkContext benchmarkContext) {
+    public ParentshipAgent(Client<TX> dbDriver, ActionFactory<TX, ?> actionFactory, grakn.benchmark.simulation.agent.base.BenchmarkContext benchmarkContext) {
         super(dbDriver, actionFactory, benchmarkContext);
     }
 
@@ -51,24 +51,24 @@ public class ParentshipAgent<DB_OPERATION extends Transaction> extends CityAgent
         }
 
         @Override
-        protected void run(Session<DB_OPERATION> dbOperationFactory, World.City city) {
+        protected void run(Session<TX> dbOperationFactory, World.City city) {
             // Query for married couples in the city who are not already in a parentship relation together
             List<String> childrenEmails;
 
-            try (DB_OPERATION dbOperation = dbOperationFactory.newTransaction(tracker(), iteration(), isTracing())) {
+            try (TX dbOperation = dbOperationFactory.newTransaction(tracker(), iteration(), isTracing())) {
                 BirthsInCityAction<?> birthsInCityAction = actionFactory().birthsInCityAction(dbOperation, city, benchmarkContext.today());
                 childrenEmails = runAction(birthsInCityAction);
             }
 
             List<HashMap<SpouseType, String>> marriedCouple;
 
-            try (DB_OPERATION dbOperation = dbOperationFactory.newTransaction(tracker(), iteration(), isTracing())) {
+            try (TX dbOperation = dbOperationFactory.newTransaction(tracker(), iteration(), isTracing())) {
                 MarriedCoupleAction<?> marriedCoupleAction = actionFactory().marriedCoupleAction(dbOperation, city, benchmarkContext.today());
                 marriedCouple = runAction(marriedCoupleAction);
             }
 
             if (marriedCouple.size() > 0 && childrenEmails.size() > 0) {
-                try (DB_OPERATION dbOperation = dbOperationFactory.newTransaction(tracker(), iteration(), isTracing())) {
+                try (TX dbOperation = dbOperationFactory.newTransaction(tracker(), iteration(), isTracing())) {
                     LinkedHashMap<Integer, List<Integer>> childrenPerMarriage = Allocation.allocateEvenlyToMap(childrenEmails.size(), marriedCouple.size());
                     for (Map.Entry<Integer, List<Integer>> childrenForMarriage : childrenPerMarriage.entrySet()) {
                         Integer marriageIndex = childrenForMarriage.getKey();

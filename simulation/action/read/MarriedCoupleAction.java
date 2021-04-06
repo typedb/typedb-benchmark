@@ -27,11 +27,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public abstract class MarriedCoupleAction<DB_OPERATION extends Transaction> extends ReadAction<DB_OPERATION, List<HashMap<SpouseType, String>>> {
+public abstract class MarriedCoupleAction<TX extends Transaction> extends ReadAction<TX, List<HashMap<SpouseType, String>>> {
     protected final World.City city;
     protected final LocalDateTime today;
 
-    public MarriedCoupleAction(DB_OPERATION dbOperation, World.City city, LocalDateTime today) {
+    public MarriedCoupleAction(TX dbOperation, World.City city, LocalDateTime today) {
         super(dbOperation);
         this.city = city;
         this.today = today;

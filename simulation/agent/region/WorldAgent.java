@@ -27,9 +27,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
-public abstract class WorldAgent<DB_OPERATION extends Transaction> extends Agent<World, DB_OPERATION> {
+public abstract class WorldAgent<TX extends Transaction> extends Agent<World, TX> {
 
-    public WorldAgent(Client<DB_OPERATION> dbDriver, ActionFactory<DB_OPERATION, ?> actionFactory, grakn.benchmark.simulation.agent.base.BenchmarkContext benchmarkContext) {
+    public WorldAgent(Client<TX> dbDriver, ActionFactory<TX, ?> actionFactory, grakn.benchmark.simulation.agent.base.BenchmarkContext benchmarkContext) {
         super(dbDriver, actionFactory, benchmarkContext);
     }
 

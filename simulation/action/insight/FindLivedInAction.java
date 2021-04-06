@@ -21,9 +21,9 @@ import grakn.benchmark.simulation.driver.Transaction;
 
 import java.util.List;
 
-public abstract class FindLivedInAction<DB_OPERATION extends Transaction> extends WorldwideInsightAction<DB_OPERATION, List<String>> {
+public abstract class FindLivedInAction<TX extends Transaction> extends WorldwideInsightAction<TX, List<String>> {
 
-    public FindLivedInAction(DB_OPERATION dbOperation) {
+    public FindLivedInAction(TX dbOperation) {
         super(dbOperation);
     }
 
