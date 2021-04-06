@@ -1,0 +1,109 @@
+/*
+ * Copyright (C) 2020 Grakn Labs
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+package grakn.benchmark.simulation.action;
+
+import grakn.benchmark.simulation.action.insight.ArbitraryOneHopAction;
+import grakn.benchmark.simulation.action.insight.FindCurrentResidentsAction;
+import grakn.benchmark.simulation.action.insight.FindLivedInAction;
+import grakn.benchmark.simulation.action.insight.FindSpecificMarriageAction;
+import grakn.benchmark.simulation.action.insight.FindSpecificPersonAction;
+import grakn.benchmark.simulation.action.insight.FindTransactionCurrencyAction;
+import grakn.benchmark.simulation.action.insight.FourHopAction;
+import grakn.benchmark.simulation.action.insight.MeanWageOfPeopleInWorldAction;
+import grakn.benchmark.simulation.action.insight.ThreeHopAction;
+import grakn.benchmark.simulation.action.insight.TwoHopAction;
+import grakn.benchmark.simulation.action.read.BirthsInCityAction;
+import grakn.benchmark.simulation.action.read.CitiesInContinentAction;
+import grakn.benchmark.simulation.action.read.CompaniesInCountryAction;
+import grakn.benchmark.simulation.action.read.MarriedCoupleAction;
+import grakn.benchmark.simulation.action.read.ProductsInContinentAction;
+import grakn.benchmark.simulation.action.read.ResidentsInCityAction;
+import grakn.benchmark.simulation.action.read.UnmarriedPeopleInCityAction;
+import grakn.benchmark.simulation.action.write.InsertCompanyAction;
+import grakn.benchmark.simulation.action.write.InsertEmploymentAction;
+import grakn.benchmark.simulation.action.write.InsertFriendshipAction;
+import grakn.benchmark.simulation.action.write.InsertMarriageAction;
+import grakn.benchmark.simulation.action.write.InsertParentShipAction;
+import grakn.benchmark.simulation.action.write.InsertPersonAction;
+import grakn.benchmark.simulation.action.write.InsertProductAction;
+import grakn.benchmark.simulation.action.write.InsertRelocationAction;
+import grakn.benchmark.simulation.action.write.InsertTransactionAction;
+import grakn.benchmark.simulation.action.write.UpdateAgesOfPeopleInCityAction;
+import grakn.benchmark.simulation.driver.DbOperation;
+import grakn.benchmark.simulation.world.World;
+import grakn.common.collection.Pair;
+
+import java.time.LocalDateTime;
+import java.util.HashMap;
+
+public abstract class ActionFactory<DB_OPERATION extends DbOperation, DB_RETURN_TYPE> {
+
+    public abstract UpdateAgesOfPeopleInCityAction<DB_OPERATION> updateAgesOfPeopleInCityAction(DB_OPERATION dbOperation, LocalDateTime today, World.City city);
+
+    public abstract ResidentsInCityAction<DB_OPERATION> residentsInCityAction(DB_OPERATION dbOperation, World.City city, int numEmployments, LocalDateTime earliestDate);
+
+    public abstract CompaniesInCountryAction<DB_OPERATION> companiesInCountryAction(DB_OPERATION dbOperation, World.Country country, int numCompanies);
+
+    public abstract InsertEmploymentAction<DB_OPERATION, DB_RETURN_TYPE> insertEmploymentAction(DB_OPERATION dbOperation, World.City city, String employeeEmail, long companyNumber, LocalDateTime employmentDate, double wageValue, String contractContent, double contractedHours);
+
+    public abstract InsertCompanyAction<DB_OPERATION, DB_RETURN_TYPE> insertCompanyAction(DB_OPERATION dbOperation, World.Country country, LocalDateTime today, int companyNumber, String companyName);
+
+    public abstract InsertFriendshipAction<DB_OPERATION, DB_RETURN_TYPE> insertFriendshipAction(DB_OPERATION dbOperation, LocalDateTime today, String friend1Email, String friend2Email);
+
+    public abstract UnmarriedPeopleInCityAction<DB_OPERATION> unmarriedPeopleInCityAction(DB_OPERATION dbOperation, World.City city, String gender, LocalDateTime dobOfAdults);
+
+    public abstract InsertMarriageAction<DB_OPERATION, DB_RETURN_TYPE> insertMarriageAction(DB_OPERATION dbOperation, World.City city, int marriageIdentifier, String wifeEmail, String husbandEmail);
+
+    public abstract BirthsInCityAction<DB_OPERATION> birthsInCityAction(DB_OPERATION dbOperation, World.City city, LocalDateTime today);
+
+    public abstract MarriedCoupleAction<DB_OPERATION> marriedCoupleAction(DB_OPERATION dbOperation, World.City city, LocalDateTime today);
+
+    public abstract InsertParentShipAction<DB_OPERATION, DB_RETURN_TYPE> insertParentshipAction(DB_OPERATION dbOperation, HashMap<SpouseType, String> marriage, String childEmail);
+
+    public abstract InsertPersonAction<DB_OPERATION, DB_RETURN_TYPE> insertPersonAction(DB_OPERATION dbOperation, World.City city, LocalDateTime today, String email, String gender, String forename, String surname);
+
+    public abstract InsertProductAction<DB_OPERATION, DB_RETURN_TYPE> insertProductAction(DB_OPERATION dbOperation, World.Continent continent, Long barcode, String productName, String productDescription);
+
+    public abstract CitiesInContinentAction<DB_OPERATION> citiesInContinentAction(DB_OPERATION dbOperation, World.City city);
+
+    public abstract InsertRelocationAction<DB_OPERATION, DB_RETURN_TYPE> insertRelocationAction(DB_OPERATION dbOperation, World.City city, LocalDateTime today, String residentEmail, String relocationCityName);
+
+    public abstract ProductsInContinentAction<DB_OPERATION> productsInContinentAction(DB_OPERATION dbOperation, World.Continent continent);
+
+    public abstract InsertTransactionAction<DB_OPERATION, DB_RETURN_TYPE> insertTransactionAction(DB_OPERATION dbOperation, World.Country country, Pair<Long, Long> transaction, Long sellerCompanyNumber, double value, int productQuantity, boolean isTaxable);
+
+    public abstract MeanWageOfPeopleInWorldAction<DB_OPERATION> meanWageOfPeopleInWorldAction(DB_OPERATION dbOperation);
+
+    public abstract FindLivedInAction<DB_OPERATION> findlivedInAction(DB_OPERATION dbOperation);
+
+    public abstract FindCurrentResidentsAction<DB_OPERATION> findCurrentResidentsAction(DB_OPERATION dbOperation);
+
+    public abstract FindTransactionCurrencyAction<DB_OPERATION> findTransactionCurrencyAction(DB_OPERATION dbOperation);
+
+    public abstract ArbitraryOneHopAction<DB_OPERATION> arbitraryOneHopAction(DB_OPERATION dbOperation);
+
+    public abstract TwoHopAction<DB_OPERATION> twoHopAction(DB_OPERATION dbOperation);
+
+    public abstract ThreeHopAction<DB_OPERATION> threeHopAction(DB_OPERATION dbOperation);
+
+    public abstract FourHopAction<DB_OPERATION> fourHopAction(DB_OPERATION dbOperation);
+
+    public abstract FindSpecificMarriageAction<DB_OPERATION> findSpecificMarriageAction(DB_OPERATION dbOperation);
+
+    public abstract FindSpecificPersonAction<DB_OPERATION> findSpecificPersonAction(DB_OPERATION dbOperation);
+}

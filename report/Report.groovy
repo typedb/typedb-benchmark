@@ -17,9 +17,9 @@
 
 package grakn.benchmark.report
 
-import grakn.benchmark.common.agent.insight.*
-import grakn.benchmark.common.agent.write.AgeUpdateAgent
-import grakn.benchmark.common.agent.write.PersonBirthAgent
+import grakn.benchmark.simulation.agent.insight.*
+import grakn.benchmark.simulation.agent.write.AgeUpdateAgent
+import grakn.benchmark.simulation.agent.write.PersonBirthAgent
 import grakn.benchmark.grakn.action.insight.*
 import grakn.benchmark.grakn.action.read.GraknBirthsInCityAction
 import grakn.benchmark.grakn.action.write.GraknUpdateAgesOfPeopleInCityAction

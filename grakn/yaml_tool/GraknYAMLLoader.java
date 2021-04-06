@@ -17,8 +17,8 @@
 
 package grakn.benchmark.grakn.yaml_tool;
 
-import grakn.benchmark.common.yaml_tool.QueryTemplate;
-import grakn.benchmark.common.yaml_tool.YAMLLoader;
+import grakn.benchmark.simulation.yaml_tool.QueryTemplate;
+import grakn.benchmark.simulation.yaml_tool.YAMLLoader;
 import grakn.client.api.GraknSession;
 import grakn.client.api.GraknTransaction;
 import graql.lang.Graql;

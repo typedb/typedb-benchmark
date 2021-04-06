@@ -17,15 +17,16 @@
 
 package grakn.benchmark.grakn;
 
-import grakn.benchmark.common.action.ActionFactory;
-import grakn.benchmark.common.world.World;
-import grakn.benchmark.common.yaml_tool.YAMLException;
-import grakn.benchmark.common.yaml_tool.YAMLLoader;
 import grakn.benchmark.config.Config;
 import grakn.benchmark.grakn.action.GraknActionFactory;
 import grakn.benchmark.grakn.driver.GraknDriver;
 import grakn.benchmark.grakn.driver.GraknOperation;
 import grakn.benchmark.grakn.yaml_tool.GraknYAMLLoader;
+import grakn.benchmark.simulation.TransactionalSimulation;
+import grakn.benchmark.simulation.action.ActionFactory;
+import grakn.benchmark.simulation.world.World;
+import grakn.benchmark.simulation.yaml_tool.YAMLException;
+import grakn.benchmark.simulation.yaml_tool.YAMLLoader;
 import grakn.client.api.GraknSession;
 import grakn.client.api.GraknTransaction;
 import graql.lang.Graql;
@@ -38,7 +39,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
-public class GraknBenchmark extends grakn.benchmark.common.TransactionalBenchmark<GraknDriver, GraknOperation> {
+public class GraknBenchmark extends TransactionalSimulation<GraknDriver, GraknOperation> {
 
     public GraknBenchmark(GraknDriver driver, Map<String, Path> initialisationDataPaths, int randomSeed, World world,
                           List<Config.Agent> agentConfigs, Function<Integer, Boolean> iterationSamplingFunction, boolean test) {

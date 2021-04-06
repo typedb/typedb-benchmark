@@ -17,8 +17,8 @@
 
 package grakn.benchmark.test;
 
-import grakn.benchmark.common.action.Action;
-import grakn.benchmark.common.agent.base.Agent;
+import grakn.benchmark.simulation.action.Action;
+import grakn.benchmark.simulation.agent.base.Agent;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 

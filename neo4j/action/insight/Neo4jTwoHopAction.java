@@ -17,8 +17,8 @@
 
 package grakn.benchmark.neo4j.action.insight;
 
-import grakn.benchmark.common.action.insight.TwoHopAction;
 import grakn.benchmark.neo4j.driver.Neo4jOperation;
+import grakn.benchmark.simulation.action.insight.TwoHopAction;
 import org.neo4j.driver.Query;
 
 import java.util.List;

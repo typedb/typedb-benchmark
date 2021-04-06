@@ -17,8 +17,8 @@
 
 package grakn.benchmark.neo4j.yaml_tool;
 
-import grakn.benchmark.common.yaml_tool.QueryTemplate;
-import grakn.benchmark.common.yaml_tool.YAMLLoader;
+import grakn.benchmark.simulation.yaml_tool.QueryTemplate;
+import grakn.benchmark.simulation.yaml_tool.YAMLLoader;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import org.neo4j.driver.Query;

@@ -17,12 +17,11 @@
 
 package grakn.benchmark.grakn.action.write;
 
-import grakn.benchmark.common.action.Action;
-import grakn.benchmark.common.action.SpouseType;
-import grakn.benchmark.common.action.write.InsertParentShipAction;
 import grakn.benchmark.grakn.driver.GraknOperation;
+import grakn.benchmark.simulation.action.Action;
+import grakn.benchmark.simulation.action.SpouseType;
+import grakn.benchmark.simulation.action.write.InsertParentShipAction;
 import grakn.client.api.answer.ConceptMap;
-import graql.lang.Graql;
 import graql.lang.pattern.variable.UnboundVariable;
 import graql.lang.query.GraqlInsert;
 

@@ -17,15 +17,16 @@
 
 package grakn.benchmark.neo4j;
 
-import grakn.benchmark.common.action.ActionFactory;
-import grakn.benchmark.common.world.World;
-import grakn.benchmark.common.yaml_tool.YAMLException;
-import grakn.benchmark.common.yaml_tool.YAMLLoader;
 import grakn.benchmark.config.Config;
 import grakn.benchmark.neo4j.action.Neo4jActionFactory;
 import grakn.benchmark.neo4j.driver.Neo4jDriver;
 import grakn.benchmark.neo4j.driver.Neo4jOperation;
 import grakn.benchmark.neo4j.yaml_tool.Neo4jYAMLLoader;
+import grakn.benchmark.simulation.TransactionalSimulation;
+import grakn.benchmark.simulation.action.ActionFactory;
+import grakn.benchmark.simulation.world.World;
+import grakn.benchmark.simulation.yaml_tool.YAMLException;
+import grakn.benchmark.simulation.yaml_tool.YAMLLoader;
 import org.neo4j.driver.Query;
 import org.neo4j.driver.Session;
 import org.neo4j.driver.Transaction;
@@ -37,7 +38,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
-public class Neo4JBenchmark extends grakn.benchmark.common.TransactionalBenchmark<Neo4jDriver, Neo4jOperation> {
+public class Neo4JBenchmark extends TransactionalSimulation<Neo4jDriver, Neo4jOperation> {
 
     public Neo4JBenchmark(Neo4jDriver driver, Map<String, Path> initialisationDataPaths, int randomSeed, World world, List<Config.Agent> agentConfigs, Function<Integer, Boolean> iterationSamplingFunction, boolean test) {
         super(driver, initialisationDataPaths, randomSeed, world, agentConfigs, iterationSamplingFunction, test);

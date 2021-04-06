@@ -17,10 +17,10 @@
 
 package grakn.benchmark.neo4j.action.write;
 
-import grakn.benchmark.common.action.write.UpdateAgesOfPeopleInCityAction;
-import grakn.benchmark.common.world.World;
 import grakn.benchmark.neo4j.action.Model;
 import grakn.benchmark.neo4j.driver.Neo4jOperation;
+import grakn.benchmark.simulation.action.write.UpdateAgesOfPeopleInCityAction;
+import grakn.benchmark.simulation.world.World;
 import org.neo4j.driver.Query;
 
 import java.time.LocalDateTime;

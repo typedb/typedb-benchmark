@@ -17,12 +17,11 @@
 
 package grakn.benchmark.grakn.action.write;
 
-import grakn.benchmark.common.action.write.InsertTransactionAction;
-import grakn.benchmark.common.world.World;
 import grakn.benchmark.grakn.driver.GraknOperation;
+import grakn.benchmark.simulation.action.write.InsertTransactionAction;
+import grakn.benchmark.simulation.world.World;
 import grakn.client.api.answer.ConceptMap;
 import grakn.common.collection.Pair;
-import graql.lang.Graql;
 import graql.lang.query.GraqlInsert;
 
 import java.util.HashMap;

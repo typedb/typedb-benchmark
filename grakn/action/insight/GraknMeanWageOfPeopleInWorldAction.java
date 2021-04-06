@@ -17,9 +17,8 @@
 
 package grakn.benchmark.grakn.action.insight;
 
-import grakn.benchmark.common.action.insight.MeanWageOfPeopleInWorldAction;
 import grakn.benchmark.grakn.driver.GraknOperation;
-import graql.lang.Graql;
+import grakn.benchmark.simulation.action.insight.MeanWageOfPeopleInWorldAction;
 import graql.lang.pattern.variable.UnboundVariable;
 import graql.lang.query.GraqlMatch;
 

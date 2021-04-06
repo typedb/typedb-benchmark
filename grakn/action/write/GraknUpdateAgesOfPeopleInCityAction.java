@@ -17,9 +17,9 @@
 
 package grakn.benchmark.grakn.action.write;
 
-import grakn.benchmark.common.action.write.UpdateAgesOfPeopleInCityAction;
-import grakn.benchmark.common.world.World;
 import grakn.benchmark.grakn.driver.GraknOperation;
+import grakn.benchmark.simulation.action.write.UpdateAgesOfPeopleInCityAction;
+import grakn.benchmark.simulation.world.World;
 import grakn.common.collection.Pair;
 import graql.lang.pattern.variable.UnboundVariable;
 import graql.lang.query.GraqlMatch;

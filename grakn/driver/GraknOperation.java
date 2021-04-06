@@ -17,8 +17,8 @@
 
 package grakn.benchmark.grakn.driver;
 
-import grakn.benchmark.common.driver.LogWrapper;
-import grakn.benchmark.common.driver.TransactionalDbOperation;
+import grakn.benchmark.simulation.driver.LogWrapper;
+import grakn.benchmark.simulation.driver.TransactionalDbOperation;
 import grakn.client.api.GraknSession;
 import grakn.client.api.GraknTransaction;
 import grakn.client.api.answer.ConceptMap;

@@ -19,7 +19,8 @@ package grakn.benchmark;
 
 import grabl.tracing.client.GrablTracing;
 import grabl.tracing.client.GrablTracingThreadStatic;
-import grakn.benchmark.common.world.World;
+import grakn.benchmark.simulation.Simulation;
+import grakn.benchmark.simulation.world.World;
 import grakn.benchmark.config.Config;
 import grakn.benchmark.config.ConfigLoader;
 import grakn.benchmark.grakn.driver.GraknDriver;
@@ -44,7 +45,7 @@ import java.util.Optional;
 import static grabl.tracing.client.GrablTracing.tracing;
 import static grabl.tracing.client.GrablTracing.tracingNoOp;
 import static grabl.tracing.client.GrablTracing.withLogging;
-import static grakn.benchmark.common.world.World.initialise;
+import static grakn.benchmark.simulation.world.World.initialise;
 
 public class BenchmarkRunner {
 
@@ -107,7 +108,7 @@ public class BenchmarkRunner {
 
         try {
             try (GrablTracing tracingIgnored = grablTracing(grablTracingUri, grablTracingOrganisation, grablTracingRepository, grablTracingCommit, grablTracingUsername, grablTracingToken, disableTracing, dbName)) {
-                grakn.benchmark.common.Benchmark<?, ?> benchmark;
+                Simulation<?, ?> benchmark;
                 if (dbName.toLowerCase().startsWith("grakn")) {
                     defaultUri = "localhost:48555";
                     if (hostUri == null) hostUri = defaultUri;

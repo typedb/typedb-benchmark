@@ -17,9 +17,9 @@
 
 package grakn.benchmark.neo4j.action.write;
 
-import grakn.benchmark.common.action.Action;
-import grakn.benchmark.common.action.write.InsertFriendshipAction;
 import grakn.benchmark.neo4j.driver.Neo4jOperation;
+import grakn.benchmark.simulation.action.Action;
+import grakn.benchmark.simulation.action.write.InsertFriendshipAction;
 import org.neo4j.driver.Query;
 import org.neo4j.driver.Record;
 

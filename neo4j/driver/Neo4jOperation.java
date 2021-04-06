@@ -17,8 +17,8 @@
 
 package grakn.benchmark.neo4j.driver;
 
-import grakn.benchmark.common.driver.LogWrapper;
-import grakn.benchmark.common.driver.TransactionalDbOperation;
+import grakn.benchmark.simulation.driver.LogWrapper;
+import grakn.benchmark.simulation.driver.TransactionalDbOperation;
 import org.neo4j.driver.Query;
 import org.neo4j.driver.Record;
 import org.neo4j.driver.Result;

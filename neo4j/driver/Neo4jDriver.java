@@ -18,10 +18,15 @@
 package grakn.benchmark.neo4j.driver;
 
 import grabl.tracing.client.GrablTracingThreadStatic;
-import grakn.benchmark.common.driver.DbOperationFactory;
-import grakn.benchmark.common.driver.TransactionalDbDriver;
-import grakn.benchmark.common.world.Region;
-import org.neo4j.driver.*;
+import grakn.benchmark.simulation.driver.DbOperationFactory;
+import grakn.benchmark.simulation.driver.TransactionalDbDriver;
+import grakn.benchmark.simulation.world.Region;
+import org.neo4j.driver.AuthTokens;
+import org.neo4j.driver.Driver;
+import org.neo4j.driver.GraphDatabase;
+import org.neo4j.driver.Query;
+import org.neo4j.driver.Record;
+import org.neo4j.driver.Result;
 import org.slf4j.Logger;
 
 import java.text.DecimalFormat;
@@ -30,7 +35,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import static com.google.common.collect.Iterables.getOnlyElement;
 import static grabl.tracing.client.GrablTracingThreadStatic.traceOnThread;
-import static grakn.benchmark.common.driver.TransactionalDbDriver.TracingLabel.OPEN_SESSION;
+import static grakn.benchmark.simulation.driver.TransactionalDbDriver.TracingLabel.OPEN_SESSION;
 
 public class Neo4jDriver extends TransactionalDbDriver<org.neo4j.driver.Transaction, org.neo4j.driver.Session, Neo4jOperation> {
 

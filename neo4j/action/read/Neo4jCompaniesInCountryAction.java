@@ -17,9 +17,9 @@
 
 package grakn.benchmark.neo4j.action.read;
 
-import grakn.benchmark.common.action.read.CompaniesInCountryAction;
-import grakn.benchmark.common.world.World;
 import grakn.benchmark.neo4j.driver.Neo4jOperation;
+import grakn.benchmark.simulation.action.read.CompaniesInCountryAction;
+import grakn.benchmark.simulation.world.World;
 import org.neo4j.driver.Query;
 
 import java.util.HashMap;

@@ -17,9 +17,8 @@
 
 package grakn.benchmark.grakn.action.insight;
 
-import grakn.benchmark.common.action.insight.FindSpecificMarriageAction;
 import grakn.benchmark.grakn.driver.GraknOperation;
-import graql.lang.Graql;
+import grakn.benchmark.simulation.action.insight.FindSpecificMarriageAction;
 import graql.lang.query.GraqlMatch;
 
 import java.util.stream.Collectors;

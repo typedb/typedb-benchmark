@@ -12,8 +12,8 @@ java_library(
     visibility = ["//visibility:public"],
     deps = [
         "//config",
-        "//common:benchmark-common",
-        "//common/world",
+        "//simulation:simulation",
+        "//simulation/world",
         "//grakn",
         "//neo4j",
         "@graknlabs_grabl_tracing//client",
@@ -28,13 +28,13 @@ java_binary(
     name = "benchmark-big",
     args = [
         "config/config_big.yml",
-        "$(locations //common/data)",
+        "$(locations //simulation/data)",
         "$(locations //grakn/data)",
         "$(locations //neo4j/data)",
     ],
     data = [
         "//config:config_big.yml",
-        "//common/data",
+        "//simulation/data",
         "//grakn/data",
         "//neo4j/data",
     ],
@@ -46,13 +46,13 @@ java_binary(
     name = "benchmark-small",
     args = [
         "config/config_small.yml",
-        "$(locations //common/data)",
+        "$(locations //simulation/data)",
         "$(locations //grakn/data)",
         "$(locations //neo4j/data)",
     ],
     data = [
         "//config:config_small.yml",
-        "//common/data",
+        "//simulation/data",
         "//grakn/data",
         "//neo4j/data",
     ],

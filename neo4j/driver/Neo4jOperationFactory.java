@@ -17,7 +17,7 @@
 
 package grakn.benchmark.neo4j.driver;
 
-import grakn.benchmark.common.driver.TransactionalDbOperationFactory;
+import grakn.benchmark.simulation.driver.TransactionalDbOperationFactory;
 import org.neo4j.driver.Session;
 import org.slf4j.Logger;
 

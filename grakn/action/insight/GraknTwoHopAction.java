@@ -17,9 +17,8 @@
 
 package grakn.benchmark.grakn.action.insight;
 
-import grakn.benchmark.common.action.insight.TwoHopAction;
 import grakn.benchmark.grakn.driver.GraknOperation;
-import graql.lang.Graql;
+import grakn.benchmark.simulation.action.insight.TwoHopAction;
 import graql.lang.query.GraqlMatch;
 
 import java.util.List;

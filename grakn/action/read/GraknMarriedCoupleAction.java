@@ -17,10 +17,10 @@
 
 package grakn.benchmark.grakn.action.read;
 
-import grakn.benchmark.common.action.SpouseType;
-import grakn.benchmark.common.action.read.MarriedCoupleAction;
-import grakn.benchmark.common.world.World;
 import grakn.benchmark.grakn.driver.GraknOperation;
+import grakn.benchmark.simulation.action.SpouseType;
+import grakn.benchmark.simulation.action.read.MarriedCoupleAction;
+import grakn.benchmark.simulation.world.World;
 import graql.lang.Graql;
 import graql.lang.query.GraqlMatch;
 

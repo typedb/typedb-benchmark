@@ -17,12 +17,11 @@
 
 package grakn.benchmark.grakn.action.write;
 
-import grakn.benchmark.common.action.Action;
-import grakn.benchmark.common.action.write.InsertRelocationAction;
-import grakn.benchmark.common.world.World;
 import grakn.benchmark.grakn.driver.GraknOperation;
+import grakn.benchmark.simulation.action.Action;
+import grakn.benchmark.simulation.action.write.InsertRelocationAction;
+import grakn.benchmark.simulation.world.World;
 import grakn.client.api.answer.ConceptMap;
-import graql.lang.Graql;
 import graql.lang.query.GraqlInsert;
 
 import java.time.LocalDateTime;

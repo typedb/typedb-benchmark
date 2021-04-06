@@ -17,8 +17,8 @@
 
 package grakn.benchmark.neo4j.action.insight;
 
-import grakn.benchmark.common.action.insight.ArbitraryOneHopAction;
 import grakn.benchmark.neo4j.driver.Neo4jOperation;
+import grakn.benchmark.simulation.action.insight.ArbitraryOneHopAction;
 import org.neo4j.driver.Query;
 import org.neo4j.driver.Record;
 

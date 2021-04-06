@@ -17,10 +17,10 @@
 
 package grakn.benchmark.neo4j.action.write;
 
-import grakn.benchmark.common.action.Action;
-import grakn.benchmark.common.action.SpouseType;
-import grakn.benchmark.common.action.write.InsertParentShipAction;
 import grakn.benchmark.neo4j.driver.Neo4jOperation;
+import grakn.benchmark.simulation.action.Action;
+import grakn.benchmark.simulation.action.SpouseType;
+import grakn.benchmark.simulation.action.write.InsertParentShipAction;
 import org.neo4j.driver.Query;
 import org.neo4j.driver.Record;
 

@@ -18,9 +18,9 @@
 package grakn.benchmark.grakn.driver;
 
 import grabl.tracing.client.GrablTracingThreadStatic;
-import grakn.benchmark.common.driver.DbOperationFactory;
-import grakn.benchmark.common.driver.TransactionalDbDriver;
-import grakn.benchmark.common.world.Region;
+import grakn.benchmark.simulation.driver.DbOperationFactory;
+import grakn.benchmark.simulation.driver.TransactionalDbDriver;
+import grakn.benchmark.simulation.world.Region;
 import grakn.client.Grakn;
 import grakn.client.api.GraknClient;
 import grakn.client.api.GraknSession;
@@ -31,7 +31,7 @@ import java.text.DecimalFormat;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static grabl.tracing.client.GrablTracingThreadStatic.traceOnThread;
-import static grakn.benchmark.common.driver.TransactionalDbDriver.TracingLabel.OPEN_SESSION;
+import static grakn.benchmark.simulation.driver.TransactionalDbDriver.TracingLabel.OPEN_SESSION;
 import static graql.lang.Graql.match;
 import static graql.lang.Graql.var;
 

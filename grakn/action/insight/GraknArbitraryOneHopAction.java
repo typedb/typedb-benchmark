@@ -17,10 +17,9 @@
 
 package grakn.benchmark.grakn.action.insight;
 
-import grakn.benchmark.common.action.insight.ArbitraryOneHopAction;
 import grakn.benchmark.grakn.driver.GraknOperation;
+import grakn.benchmark.simulation.action.insight.ArbitraryOneHopAction;
 import grakn.client.api.answer.ConceptMap;
-import graql.lang.Graql;
 import graql.lang.query.GraqlMatch;
 
 import java.util.List;

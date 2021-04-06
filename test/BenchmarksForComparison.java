@@ -17,12 +17,12 @@
 
 package grakn.benchmark.test;
 
-import grakn.benchmark.common.world.World;
 import grakn.benchmark.config.AgentMode;
 import grakn.benchmark.config.Config;
 import grakn.benchmark.config.SamplingFunction;
 import grakn.benchmark.grakn.driver.GraknDriver;
 import grakn.benchmark.neo4j.driver.Neo4jDriver;
+import grakn.benchmark.simulation.world.World;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
@@ -40,8 +40,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
 
-import static grakn.benchmark.common.world.World.initialise;
 import static grakn.benchmark.config.Config.Agent.ConstructAgentConfig;
+import static grakn.benchmark.simulation.world.World.initialise;
 
 public class BenchmarksForComparison {
     static final grakn.benchmark.neo4j.Neo4JBenchmark neo4j;

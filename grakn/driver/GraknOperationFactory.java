@@ -17,7 +17,7 @@
 
 package grakn.benchmark.grakn.driver;
 
-import grakn.benchmark.common.driver.TransactionalDbOperationFactory;
+import grakn.benchmark.simulation.driver.TransactionalDbOperationFactory;
 import grakn.client.api.GraknSession;
 import org.slf4j.Logger;
 
