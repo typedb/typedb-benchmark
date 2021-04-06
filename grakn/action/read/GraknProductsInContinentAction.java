@@ -17,7 +17,7 @@
 
 package grakn.benchmark.grakn.action.read;
 
-import grakn.benchmark.grakn.driver.GraknOperation;
+import grakn.benchmark.grakn.driver.GraknTransaction;
 import grakn.benchmark.simulation.action.read.ProductsInContinentAction;
 import grakn.benchmark.simulation.world.World;
 import graql.lang.query.GraqlMatch;
@@ -34,9 +34,9 @@ import static grakn.benchmark.grakn.action.Model.PRODUCT_BARCODE;
 import static graql.lang.Graql.match;
 import static graql.lang.Graql.var;
 
-public class GraknProductsInContinentAction extends ProductsInContinentAction<GraknOperation> {
+public class GraknProductsInContinentAction extends ProductsInContinentAction<GraknTransaction> {
 
-    public GraknProductsInContinentAction(GraknOperation dbOperation, World.Continent continent) {
+    public GraknProductsInContinentAction(GraknTransaction dbOperation, World.Continent continent) {
         super(dbOperation, continent);
     }
 

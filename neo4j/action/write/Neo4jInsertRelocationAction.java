@@ -17,7 +17,7 @@
 
 package grakn.benchmark.neo4j.action.write;
 
-import grakn.benchmark.neo4j.driver.Neo4jOperation;
+import grakn.benchmark.neo4j.driver.Neo4jTransaction;
 import grakn.benchmark.simulation.action.Action;
 import grakn.benchmark.simulation.action.write.InsertRelocationAction;
 import grakn.benchmark.simulation.world.World;
@@ -31,8 +31,8 @@ import static grakn.benchmark.neo4j.action.Model.EMAIL;
 import static grakn.benchmark.neo4j.action.Model.LOCATION_NAME;
 import static grakn.benchmark.neo4j.action.Model.RELOCATION_DATE;
 
-public class Neo4jInsertRelocationAction extends InsertRelocationAction<Neo4jOperation, Record> {
-    public Neo4jInsertRelocationAction(Neo4jOperation dbOperation, World.City city, LocalDateTime today, String relocateeEmail, String relocationCityName) {
+public class Neo4jInsertRelocationAction extends InsertRelocationAction<Neo4jTransaction, Record> {
+    public Neo4jInsertRelocationAction(Neo4jTransaction dbOperation, World.City city, LocalDateTime today, String relocateeEmail, String relocationCityName) {
         super(dbOperation, city, today, relocateeEmail, relocationCityName);
     }
 

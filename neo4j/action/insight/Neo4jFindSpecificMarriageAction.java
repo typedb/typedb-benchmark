@@ -17,14 +17,14 @@
 
 package grakn.benchmark.neo4j.action.insight;
 
-import grakn.benchmark.neo4j.driver.Neo4jOperation;
+import grakn.benchmark.neo4j.driver.Neo4jTransaction;
 import grakn.benchmark.simulation.action.insight.FindSpecificMarriageAction;
 import org.neo4j.driver.Query;
 
 import java.util.stream.Collectors;
 
-public class Neo4jFindSpecificMarriageAction extends FindSpecificMarriageAction<Neo4jOperation> {
-    public Neo4jFindSpecificMarriageAction(Neo4jOperation dbOperation) {
+public class Neo4jFindSpecificMarriageAction extends FindSpecificMarriageAction<Neo4jTransaction> {
+    public Neo4jFindSpecificMarriageAction(Neo4jTransaction dbOperation) {
         super(dbOperation);
     }
 

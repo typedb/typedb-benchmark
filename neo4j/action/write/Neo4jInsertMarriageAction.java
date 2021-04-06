@@ -17,7 +17,7 @@
 
 package grakn.benchmark.neo4j.action.write;
 
-import grakn.benchmark.neo4j.driver.Neo4jOperation;
+import grakn.benchmark.neo4j.driver.Neo4jTransaction;
 import grakn.benchmark.simulation.action.Action;
 import grakn.benchmark.simulation.action.write.InsertMarriageAction;
 import grakn.benchmark.simulation.world.World;
@@ -30,9 +30,9 @@ import static grakn.benchmark.neo4j.action.Model.EMAIL;
 import static grakn.benchmark.neo4j.action.Model.LOCATION_NAME;
 import static grakn.benchmark.neo4j.action.Model.MARRIAGE_ID;
 
-public class Neo4jInsertMarriageAction extends InsertMarriageAction<Neo4jOperation, Record> {
+public class Neo4jInsertMarriageAction extends InsertMarriageAction<Neo4jTransaction, Record> {
 
-    public Neo4jInsertMarriageAction(Neo4jOperation dbOperation, World.City city, int marriageIdentifier, String wifeEmail, String husbandEmail) {
+    public Neo4jInsertMarriageAction(Neo4jTransaction dbOperation, World.City city, int marriageIdentifier, String wifeEmail, String husbandEmail) {
         super(dbOperation, city, marriageIdentifier, wifeEmail, husbandEmail);
     }
 

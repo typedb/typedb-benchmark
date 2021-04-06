@@ -17,7 +17,7 @@
 
 package grakn.benchmark.neo4j.action.write;
 
-import grakn.benchmark.neo4j.driver.Neo4jOperation;
+import grakn.benchmark.neo4j.driver.Neo4jTransaction;
 import grakn.benchmark.simulation.action.Action;
 import grakn.benchmark.simulation.action.write.InsertFriendshipAction;
 import org.neo4j.driver.Query;
@@ -29,9 +29,9 @@ import java.util.HashMap;
 import static grakn.benchmark.neo4j.action.Model.EMAIL;
 import static grakn.benchmark.neo4j.action.Model.START_DATE;
 
-public class Neo4jInsertFriendshipAction extends InsertFriendshipAction<Neo4jOperation, Record> {
+public class Neo4jInsertFriendshipAction extends InsertFriendshipAction<Neo4jTransaction, Record> {
 
-    public Neo4jInsertFriendshipAction(Neo4jOperation dbOperation, LocalDateTime today, String friend1Email, String friend2Email) {
+    public Neo4jInsertFriendshipAction(Neo4jTransaction dbOperation, LocalDateTime today, String friend1Email, String friend2Email) {
         super(dbOperation, today, friend1Email, friend2Email);
     }
 

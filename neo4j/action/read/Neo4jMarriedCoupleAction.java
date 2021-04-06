@@ -17,7 +17,7 @@
 
 package grakn.benchmark.neo4j.action.read;
 
-import grakn.benchmark.neo4j.driver.Neo4jOperation;
+import grakn.benchmark.neo4j.driver.Neo4jTransaction;
 import grakn.benchmark.simulation.action.SpouseType;
 import grakn.benchmark.simulation.action.read.MarriedCoupleAction;
 import grakn.benchmark.simulation.world.World;
@@ -30,8 +30,8 @@ import java.util.List;
 
 import static java.util.stream.Collectors.toList;
 
-public class Neo4jMarriedCoupleAction extends MarriedCoupleAction<Neo4jOperation> {
-    public Neo4jMarriedCoupleAction(Neo4jOperation dbOperation, World.City city, LocalDateTime today) {
+public class Neo4jMarriedCoupleAction extends MarriedCoupleAction<Neo4jTransaction> {
+    public Neo4jMarriedCoupleAction(Neo4jTransaction dbOperation, World.City city, LocalDateTime today) {
         super(dbOperation, city, today);
     }
 

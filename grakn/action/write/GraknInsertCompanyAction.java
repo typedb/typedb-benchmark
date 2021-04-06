@@ -17,7 +17,7 @@
 
 package grakn.benchmark.grakn.action.write;
 
-import grakn.benchmark.grakn.driver.GraknOperation;
+import grakn.benchmark.grakn.driver.GraknTransaction;
 import grakn.benchmark.simulation.action.Action;
 import grakn.benchmark.simulation.action.write.InsertCompanyAction;
 import grakn.benchmark.simulation.world.World;
@@ -39,9 +39,9 @@ import static grakn.benchmark.grakn.action.Model.INCORPORATION_INCORPORATING;
 import static grakn.benchmark.grakn.action.Model.LOCATION_NAME;
 import static graql.lang.Graql.var;
 
-public class GraknInsertCompanyAction extends InsertCompanyAction<GraknOperation, ConceptMap> {
+public class GraknInsertCompanyAction extends InsertCompanyAction<GraknTransaction, ConceptMap> {
 
-    public GraknInsertCompanyAction(GraknOperation dbOperation, World.Country country, LocalDateTime today, int companyNumber, String companyName) {
+    public GraknInsertCompanyAction(GraknTransaction dbOperation, World.Country country, LocalDateTime today, int companyNumber, String companyName) {
         super(dbOperation, country, today, companyNumber, companyName);
     }
 

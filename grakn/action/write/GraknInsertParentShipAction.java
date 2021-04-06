@@ -17,7 +17,7 @@
 
 package grakn.benchmark.grakn.action.write;
 
-import grakn.benchmark.grakn.driver.GraknOperation;
+import grakn.benchmark.grakn.driver.GraknTransaction;
 import grakn.benchmark.simulation.action.Action;
 import grakn.benchmark.simulation.action.SpouseType;
 import grakn.benchmark.simulation.action.write.InsertParentShipAction;
@@ -35,8 +35,8 @@ import static grakn.benchmark.grakn.action.Model.PERSON;
 import static graql.lang.Graql.match;
 import static graql.lang.Graql.var;
 
-public class GraknInsertParentShipAction extends InsertParentShipAction<GraknOperation, ConceptMap> {
-    public GraknInsertParentShipAction(GraknOperation dbOperation, HashMap<SpouseType, String> marriage, String childEmail) {
+public class GraknInsertParentShipAction extends InsertParentShipAction<GraknTransaction, ConceptMap> {
+    public GraknInsertParentShipAction(GraknTransaction dbOperation, HashMap<SpouseType, String> marriage, String childEmail) {
         super(dbOperation, marriage, childEmail);
     }
 

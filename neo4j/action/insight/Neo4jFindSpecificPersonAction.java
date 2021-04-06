@@ -17,13 +17,13 @@
 
 package grakn.benchmark.neo4j.action.insight;
 
-import grakn.benchmark.neo4j.driver.Neo4jOperation;
+import grakn.benchmark.neo4j.driver.Neo4jTransaction;
 import grakn.benchmark.simulation.action.insight.FindSpecificPersonAction;
 import org.neo4j.driver.Query;
 import org.neo4j.driver.Record;
 
-public class Neo4jFindSpecificPersonAction extends FindSpecificPersonAction<Neo4jOperation> {
-    public Neo4jFindSpecificPersonAction(Neo4jOperation dbOperation) {
+public class Neo4jFindSpecificPersonAction extends FindSpecificPersonAction<Neo4jTransaction> {
+    public Neo4jFindSpecificPersonAction(Neo4jTransaction dbOperation) {
         super(dbOperation);
     }
 

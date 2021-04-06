@@ -17,27 +17,14 @@
 
 package grakn.benchmark.simulation.driver;
 
-import grakn.benchmark.simulation.utils.Trace;
+import grakn.benchmark.simulation.world.Region;
+import org.slf4j.Logger;
 
-import java.util.function.Supplier;
+public abstract class Client<DB_OPERATION extends Transaction> {
 
-public abstract class DbOperation implements AutoCloseable {
+    public abstract Session<DB_OPERATION> getDbOperationFactory(Region region, Logger logger);
 
-    protected final String tracker;
-    protected final long iteration;
-    private final boolean trace;
-
-    public DbOperation(String tracker, long iteration, boolean trace) {
-        this.iteration = iteration;
-        this.tracker = tracker;
-        this.trace = trace;
-    }
+    public abstract void printStatistics(Logger LOG);
 
     public abstract void close();
-
-    public abstract void save();
-
-    protected <T> T trace(Supplier<T> method, String traceName) {
-        return Trace.trace(method, traceName, trace);
-    }
 }

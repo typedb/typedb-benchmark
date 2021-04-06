@@ -19,16 +19,16 @@ package grakn.benchmark.simulation.agent.write;
 
 import grakn.benchmark.simulation.action.ActionFactory;
 import grakn.benchmark.simulation.agent.region.ContinentAgent;
-import grakn.benchmark.simulation.driver.DbDriver;
-import grakn.benchmark.simulation.driver.DbOperation;
-import grakn.benchmark.simulation.driver.DbOperationFactory;
+import grakn.benchmark.simulation.driver.Client;
+import grakn.benchmark.simulation.driver.Transaction;
+import grakn.benchmark.simulation.driver.Session;
 import grakn.benchmark.simulation.world.World;
 
 import java.util.Random;
 
-public class ProductAgent<DB_OPERATION extends DbOperation> extends ContinentAgent<DB_OPERATION> {
+public class ProductAgent<DB_OPERATION extends Transaction> extends ContinentAgent<DB_OPERATION> {
 
-    public ProductAgent(DbDriver<DB_OPERATION> dbDriver, ActionFactory<DB_OPERATION, ?> actionFactory, grakn.benchmark.simulation.agent.base.BenchmarkContext benchmarkContext) {
+    public ProductAgent(Client<DB_OPERATION> dbDriver, ActionFactory<DB_OPERATION, ?> actionFactory, grakn.benchmark.simulation.agent.base.BenchmarkContext benchmarkContext) {
         super(dbDriver, actionFactory, benchmarkContext);
     }
 
@@ -43,9 +43,9 @@ public class ProductAgent<DB_OPERATION extends DbOperation> extends ContinentAge
         }
 
         @Override
-        protected void run(DbOperationFactory<DB_OPERATION> dbOperationFactory, World.Continent continent) {
+        protected void run(Session<DB_OPERATION> dbOperationFactory, World.Continent continent) {
             int numProducts = benchmarkContext.world().getScaleFactor();
-            try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker(), iteration(), isTracing())) {
+            try (DB_OPERATION dbOperation = dbOperationFactory.newTransaction(tracker(), iteration(), isTracing())) {
                 for (int i = 0; i < numProducts; i++) {
                     String productName = randomAttributeGenerator().boundRandomLengthRandomString(5, 20);
                     String productDescription = randomAttributeGenerator().boundRandomLengthRandomString(75, 100);

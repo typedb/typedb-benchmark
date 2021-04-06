@@ -17,13 +17,13 @@
 
 package grakn.benchmark.simulation.action.read;
 
-import grakn.benchmark.simulation.driver.DbOperation;
+import grakn.benchmark.simulation.driver.Transaction;
 import grakn.benchmark.simulation.world.World;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class CitiesInContinentAction<DB_OPERATION extends DbOperation> extends ReadAction<DB_OPERATION, List<String>> {
+public abstract class CitiesInContinentAction<DB_OPERATION extends Transaction> extends ReadAction<DB_OPERATION, List<String>> {
     protected final World.City city;
 
     public CitiesInContinentAction(DB_OPERATION dbOperation, World.City city) {

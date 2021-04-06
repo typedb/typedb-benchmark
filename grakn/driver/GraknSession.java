@@ -15,10 +15,22 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package grakn.benchmark.simulation.driver;
+package grakn.benchmark.grakn.driver;
 
-public abstract class TransactionalDbOperation extends DbOperation implements AutoCloseable {
-    public TransactionalDbOperation(String tracker, long iteration, boolean trace) {
-        super(tracker, iteration, trace);
+import grakn.benchmark.simulation.driver.TransactionalSession;
+import org.slf4j.Logger;
+
+public class GraknSession extends TransactionalSession<GraknTransaction> {
+
+    private final grakn.client.api.GraknSession session;
+
+    public GraknSession(grakn.client.api.GraknSession session, Logger logger) {
+        super(logger);
+        this.session = session;
+    }
+
+    @Override
+    public GraknTransaction newTransaction(String tracker, long iteration, boolean trace) {
+        return new GraknTransaction(session, logger(), tracker, iteration, trace);
     }
 }

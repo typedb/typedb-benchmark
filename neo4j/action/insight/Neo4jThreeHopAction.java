@@ -17,14 +17,14 @@
 
 package grakn.benchmark.neo4j.action.insight;
 
-import grakn.benchmark.neo4j.driver.Neo4jOperation;
+import grakn.benchmark.neo4j.driver.Neo4jTransaction;
 import grakn.benchmark.simulation.action.insight.ThreeHopAction;
 import org.neo4j.driver.Query;
 
 import java.util.List;
 
-public class Neo4jThreeHopAction extends ThreeHopAction<Neo4jOperation> {
-    public Neo4jThreeHopAction(Neo4jOperation dbOperation) {
+public class Neo4jThreeHopAction extends ThreeHopAction<Neo4jTransaction> {
+    public Neo4jThreeHopAction(Neo4jTransaction dbOperation) {
         super(dbOperation);
     }
 

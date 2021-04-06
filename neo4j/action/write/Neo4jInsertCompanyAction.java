@@ -17,7 +17,7 @@
 
 package grakn.benchmark.neo4j.action.write;
 
-import grakn.benchmark.neo4j.driver.Neo4jOperation;
+import grakn.benchmark.neo4j.driver.Neo4jTransaction;
 import grakn.benchmark.simulation.action.Action;
 import grakn.benchmark.simulation.action.write.InsertCompanyAction;
 import grakn.benchmark.simulation.world.World;
@@ -32,9 +32,9 @@ import static grakn.benchmark.neo4j.action.Model.COMPANY_NUMBER;
 import static grakn.benchmark.neo4j.action.Model.DATE_OF_INCORPORATION;
 import static grakn.benchmark.neo4j.action.Model.LOCATION_NAME;
 
-public class Neo4jInsertCompanyAction extends InsertCompanyAction<Neo4jOperation, Record> {
+public class Neo4jInsertCompanyAction extends InsertCompanyAction<Neo4jTransaction, Record> {
 
-    public Neo4jInsertCompanyAction(Neo4jOperation dbOperation, World.Country country, LocalDateTime today, int companyNumber, String companyName) {
+    public Neo4jInsertCompanyAction(Neo4jTransaction dbOperation, World.Country country, LocalDateTime today, int companyNumber, String companyName) {
         super(dbOperation, country, today, companyNumber, companyName);
     }
 

@@ -17,7 +17,7 @@
 
 package grakn.benchmark.neo4j.action.read;
 
-import grakn.benchmark.neo4j.driver.Neo4jOperation;
+import grakn.benchmark.neo4j.driver.Neo4jTransaction;
 import grakn.benchmark.simulation.action.read.ResidentsInCityAction;
 import grakn.benchmark.simulation.world.World;
 import org.neo4j.driver.Query;
@@ -26,9 +26,9 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 
-public class Neo4jResidentsInCityAction extends ResidentsInCityAction<Neo4jOperation> {
+public class Neo4jResidentsInCityAction extends ResidentsInCityAction<Neo4jTransaction> {
 
-    public Neo4jResidentsInCityAction(Neo4jOperation dbOperation, World.City city, int numResidents, LocalDateTime earliestDate) {
+    public Neo4jResidentsInCityAction(Neo4jTransaction dbOperation, World.City city, int numResidents, LocalDateTime earliestDate) {
         super(dbOperation, city, numResidents, earliestDate);
     }
 

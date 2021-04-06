@@ -19,18 +19,18 @@ package grakn.benchmark.simulation.agent.write;
 
 import grakn.benchmark.simulation.action.ActionFactory;
 import grakn.benchmark.simulation.agent.region.CityAgent;
-import grakn.benchmark.simulation.driver.DbDriver;
-import grakn.benchmark.simulation.driver.DbOperation;
-import grakn.benchmark.simulation.driver.DbOperationFactory;
+import grakn.benchmark.simulation.driver.Client;
+import grakn.benchmark.simulation.driver.Transaction;
+import grakn.benchmark.simulation.driver.Session;
 import grakn.benchmark.simulation.world.World;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Random;
 
-public class MarriageAgent<DB_OPERATION extends DbOperation> extends CityAgent<DB_OPERATION> {
+public class MarriageAgent<DB_OPERATION extends Transaction> extends CityAgent<DB_OPERATION> {
 
-    public MarriageAgent(DbDriver<DB_OPERATION> dbDriver, ActionFactory<DB_OPERATION, ?> actionFactory, grakn.benchmark.simulation.agent.base.BenchmarkContext benchmarkContext) {
+    public MarriageAgent(Client<DB_OPERATION> dbDriver, ActionFactory<DB_OPERATION, ?> actionFactory, grakn.benchmark.simulation.agent.base.BenchmarkContext benchmarkContext) {
         super(dbDriver, actionFactory, benchmarkContext);
     }
 
@@ -45,18 +45,18 @@ public class MarriageAgent<DB_OPERATION extends DbOperation> extends CityAgent<D
         }
 
         @Override
-        protected void run(DbOperationFactory<DB_OPERATION> dbOperationFactory, World.City city) {
+        protected void run(Session<DB_OPERATION> dbOperationFactory, World.City city) {
 
             // Find bachelors and bachelorettes who are considered adults and who are not in a marriage and pair them off randomly
             LocalDateTime dobOfAdults = benchmarkContext.today().minusYears(benchmarkContext.world().AGE_OF_ADULTHOOD);
             List<String> womenEmails;
-            try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker(), iteration(), isTracing())) {
+            try (DB_OPERATION dbOperation = dbOperationFactory.newTransaction(tracker(), iteration(), isTracing())) {
                 womenEmails = runAction(actionFactory().unmarriedPeopleInCityAction(dbOperation, city, "female", dobOfAdults));
                 shuffle(womenEmails);
             }
 
             List<String> menEmails;
-            try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker(), iteration(), isTracing())) {
+            try (DB_OPERATION dbOperation = dbOperationFactory.newTransaction(tracker(), iteration(), isTracing())) {
                 menEmails = runAction(actionFactory().unmarriedPeopleInCityAction(dbOperation, city, "male", dobOfAdults));
                 shuffle(menEmails);
             }
@@ -66,7 +66,7 @@ public class MarriageAgent<DB_OPERATION extends DbOperation> extends CityAgent<D
                 System.out.println("asdf");
                 assert true;
             }
-            try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker(), iteration(), isTracing())) {
+            try (DB_OPERATION dbOperation = dbOperationFactory.newTransaction(tracker(), iteration(), isTracing())) {
                 if (numMarriagesPossible > 0) {
                     for (int i = 0; i < numMarriagesPossible; i++) {
                         String wifeEmail = womenEmails.get(i);

@@ -44,7 +44,7 @@ import grakn.benchmark.grakn.action.write.GraknInsertProductAction;
 import grakn.benchmark.grakn.action.write.GraknInsertRelocationAction;
 import grakn.benchmark.grakn.action.write.GraknInsertTransactionAction;
 import grakn.benchmark.grakn.action.write.GraknUpdateAgesOfPeopleInCityAction;
-import grakn.benchmark.grakn.driver.GraknOperation;
+import grakn.benchmark.grakn.driver.GraknTransaction;
 import grakn.benchmark.simulation.action.ActionFactory;
 import grakn.benchmark.simulation.action.SpouseType;
 import grakn.benchmark.simulation.action.insight.ArbitraryOneHopAction;
@@ -79,140 +79,140 @@ import grakn.common.collection.Pair;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 
-public class GraknActionFactory extends ActionFactory<GraknOperation, ConceptMap> {
+public class GraknActionFactory extends ActionFactory<GraknTransaction, ConceptMap> {
 
     @Override
-    public GraknResidentsInCityAction residentsInCityAction(GraknOperation dbOperation, World.City city, int numResidents, LocalDateTime earliestDate) {
+    public GraknResidentsInCityAction residentsInCityAction(GraknTransaction dbOperation, World.City city, int numResidents, LocalDateTime earliestDate) {
         return new GraknResidentsInCityAction(dbOperation, city, numResidents, earliestDate);
     }
 
     @Override
-    public GraknCompaniesInCountryAction companiesInCountryAction(GraknOperation dbOperation, World.Country country, int numCompanies) {
+    public GraknCompaniesInCountryAction companiesInCountryAction(GraknTransaction dbOperation, World.Country country, int numCompanies) {
         return new GraknCompaniesInCountryAction(dbOperation, country, numCompanies);
     }
 
     @Override
-    public InsertEmploymentAction<GraknOperation, ConceptMap> insertEmploymentAction(GraknOperation dbOperation, World.City city, String employeeEmail, long companyNumber, LocalDateTime employmentDate, double wageValue, String contractContent, double contractedHours) {
+    public InsertEmploymentAction<GraknTransaction, ConceptMap> insertEmploymentAction(GraknTransaction dbOperation, World.City city, String employeeEmail, long companyNumber, LocalDateTime employmentDate, double wageValue, String contractContent, double contractedHours) {
         return new GraknInsertEmploymentAction(dbOperation, city, employeeEmail, companyNumber, employmentDate, wageValue, contractContent, contractedHours);
     }
 
     @Override
-    public InsertCompanyAction<GraknOperation, ConceptMap> insertCompanyAction(GraknOperation dbOperation, World.Country country, LocalDateTime today, int companyNumber, String companyName) {
+    public InsertCompanyAction<GraknTransaction, ConceptMap> insertCompanyAction(GraknTransaction dbOperation, World.Country country, LocalDateTime today, int companyNumber, String companyName) {
         return new GraknInsertCompanyAction(dbOperation, country, today, companyNumber, companyName);
     }
 
     @Override
-    public InsertFriendshipAction<GraknOperation, ConceptMap> insertFriendshipAction(GraknOperation dbOperation, LocalDateTime today, String friend1Email, String friend2Email) {
+    public InsertFriendshipAction<GraknTransaction, ConceptMap> insertFriendshipAction(GraknTransaction dbOperation, LocalDateTime today, String friend1Email, String friend2Email) {
         return new GraknInsertFriendshipAction(dbOperation, today, friend1Email, friend2Email);
     }
 
     @Override
-    public UnmarriedPeopleInCityAction<GraknOperation> unmarriedPeopleInCityAction(GraknOperation dbOperation, World.City city, String gender, LocalDateTime dobOfAdults) {
+    public UnmarriedPeopleInCityAction<GraknTransaction> unmarriedPeopleInCityAction(GraknTransaction dbOperation, World.City city, String gender, LocalDateTime dobOfAdults) {
         return new GraknUnmarriedPeopleInCityAction(dbOperation, city, gender, dobOfAdults);
     }
 
     @Override
-    public InsertMarriageAction<GraknOperation, ConceptMap> insertMarriageAction(GraknOperation dbOperation, World.City city, int marriageIdentifier, String wifeEmail, String husbandEmail) {
+    public InsertMarriageAction<GraknTransaction, ConceptMap> insertMarriageAction(GraknTransaction dbOperation, World.City city, int marriageIdentifier, String wifeEmail, String husbandEmail) {
         return new GraknInsertMarriageAction(dbOperation, city, marriageIdentifier, wifeEmail, husbandEmail);
     }
 
     @Override
-    public BirthsInCityAction<GraknOperation> birthsInCityAction(GraknOperation dbOperation, World.City city, LocalDateTime today) {
+    public BirthsInCityAction<GraknTransaction> birthsInCityAction(GraknTransaction dbOperation, World.City city, LocalDateTime today) {
         return new GraknBirthsInCityAction(dbOperation, city, today);
     }
 
     @Override
-    public MarriedCoupleAction<GraknOperation> marriedCoupleAction(GraknOperation dbOperation, World.City city, LocalDateTime today) {
+    public MarriedCoupleAction<GraknTransaction> marriedCoupleAction(GraknTransaction dbOperation, World.City city, LocalDateTime today) {
         return new GraknMarriedCoupleAction(dbOperation, city, today);
     }
 
     @Override
-    public InsertParentShipAction<GraknOperation, ConceptMap> insertParentshipAction(GraknOperation dbOperation, HashMap<SpouseType, String> marriage, String childEmail) {
+    public InsertParentShipAction<GraknTransaction, ConceptMap> insertParentshipAction(GraknTransaction dbOperation, HashMap<SpouseType, String> marriage, String childEmail) {
         return new GraknInsertParentShipAction(dbOperation, marriage, childEmail);
     }
 
     @Override
-    public InsertPersonAction<GraknOperation, ConceptMap> insertPersonAction(GraknOperation dbOperation, World.City city, LocalDateTime today, String email, String gender, String forename, String surname) {
+    public InsertPersonAction<GraknTransaction, ConceptMap> insertPersonAction(GraknTransaction dbOperation, World.City city, LocalDateTime today, String email, String gender, String forename, String surname) {
         return new GraknInsertPersonAction(dbOperation, city, today, email, gender, forename, surname);
     }
 
     @Override
-    public InsertProductAction<GraknOperation, ConceptMap> insertProductAction(GraknOperation dbOperation, World.Continent continent, Long barcode, String productName, String productDescription) {
+    public InsertProductAction<GraknTransaction, ConceptMap> insertProductAction(GraknTransaction dbOperation, World.Continent continent, Long barcode, String productName, String productDescription) {
         return new GraknInsertProductAction(dbOperation, continent, barcode, productName, productDescription);
     }
 
     @Override
-    public CitiesInContinentAction<GraknOperation> citiesInContinentAction(GraknOperation dbOperation, World.City city) {
+    public CitiesInContinentAction<GraknTransaction> citiesInContinentAction(GraknTransaction dbOperation, World.City city) {
         return new GraknCitiesInContinentAction(dbOperation, city);
     }
 
     @Override
-    public InsertRelocationAction<GraknOperation, ConceptMap> insertRelocationAction(GraknOperation dbOperation, World.City city, LocalDateTime today, String residentEmail, String relocationCityName) {
+    public InsertRelocationAction<GraknTransaction, ConceptMap> insertRelocationAction(GraknTransaction dbOperation, World.City city, LocalDateTime today, String residentEmail, String relocationCityName) {
         return new GraknInsertRelocationAction(dbOperation, city, today, residentEmail, relocationCityName);
     }
 
     @Override
-    public ProductsInContinentAction<GraknOperation> productsInContinentAction(GraknOperation dbOperation, World.Continent continent) {
+    public ProductsInContinentAction<GraknTransaction> productsInContinentAction(GraknTransaction dbOperation, World.Continent continent) {
         return new GraknProductsInContinentAction(dbOperation, continent);
     }
 
     @Override
-    public InsertTransactionAction<GraknOperation, ConceptMap> insertTransactionAction(GraknOperation dbOperation, World.Country country, Pair<Long, Long> transaction, Long sellerCompanyNumber, double value, int productQuantity, boolean isTaxable) {
+    public InsertTransactionAction<GraknTransaction, ConceptMap> insertTransactionAction(GraknTransaction dbOperation, World.Country country, Pair<Long, Long> transaction, Long sellerCompanyNumber, double value, int productQuantity, boolean isTaxable) {
         return new GraknInsertTransactionAction(dbOperation, country, transaction, sellerCompanyNumber, value, productQuantity, isTaxable);
     }
 
     @Override
-    public UpdateAgesOfPeopleInCityAction<GraknOperation> updateAgesOfPeopleInCityAction(GraknOperation dbOperation, LocalDateTime today, World.City city) {
+    public UpdateAgesOfPeopleInCityAction<GraknTransaction> updateAgesOfPeopleInCityAction(GraknTransaction dbOperation, LocalDateTime today, World.City city) {
         return new GraknUpdateAgesOfPeopleInCityAction(dbOperation, today, city);
     }
 
     @Override
-    public MeanWageOfPeopleInWorldAction<GraknOperation> meanWageOfPeopleInWorldAction(GraknOperation dbOperation) {
+    public MeanWageOfPeopleInWorldAction<GraknTransaction> meanWageOfPeopleInWorldAction(GraknTransaction dbOperation) {
         return new GraknMeanWageOfPeopleInWorldAction(dbOperation);
     }
 
     @Override
-    public FindLivedInAction<GraknOperation> findlivedInAction(GraknOperation dbOperation) {
+    public FindLivedInAction<GraknTransaction> findlivedInAction(GraknTransaction dbOperation) {
         return new GraknFindLivedInAction(dbOperation);
     }
 
     @Override
-    public FindCurrentResidentsAction<GraknOperation> findCurrentResidentsAction(GraknOperation dbOperation) {
+    public FindCurrentResidentsAction<GraknTransaction> findCurrentResidentsAction(GraknTransaction dbOperation) {
         return new GraknFindCurrentResidentsAction(dbOperation);
     }
 
     @Override
-    public FindTransactionCurrencyAction<GraknOperation> findTransactionCurrencyAction(GraknOperation dbOperation) {
+    public FindTransactionCurrencyAction<GraknTransaction> findTransactionCurrencyAction(GraknTransaction dbOperation) {
         return new GraknFindTransactionCurrencyAction(dbOperation);
     }
 
     @Override
-    public ArbitraryOneHopAction<GraknOperation> arbitraryOneHopAction(GraknOperation dbOperation) {
+    public ArbitraryOneHopAction<GraknTransaction> arbitraryOneHopAction(GraknTransaction dbOperation) {
         return new GraknArbitraryOneHopAction(dbOperation);
     }
 
     @Override
-    public TwoHopAction<GraknOperation> twoHopAction(GraknOperation dbOperation) {
+    public TwoHopAction<GraknTransaction> twoHopAction(GraknTransaction dbOperation) {
         return new GraknTwoHopAction(dbOperation);
     }
 
     @Override
-    public ThreeHopAction<GraknOperation> threeHopAction(GraknOperation dbOperation) {
+    public ThreeHopAction<GraknTransaction> threeHopAction(GraknTransaction dbOperation) {
         return new GraknThreeHopAction(dbOperation);
     }
 
     @Override
-    public FourHopAction<GraknOperation> fourHopAction(GraknOperation dbOperation) {
+    public FourHopAction<GraknTransaction> fourHopAction(GraknTransaction dbOperation) {
         return new GraknFourHopAction(dbOperation);
     }
 
     @Override
-    public FindSpecificMarriageAction<GraknOperation> findSpecificMarriageAction(GraknOperation dbOperation) {
+    public FindSpecificMarriageAction<GraknTransaction> findSpecificMarriageAction(GraknTransaction dbOperation) {
         return new GraknFindSpecificMarriageAction(dbOperation);
     }
 
     @Override
-    public FindSpecificPersonAction<GraknOperation> findSpecificPersonAction(GraknOperation dbOperation) {
+    public FindSpecificPersonAction<GraknTransaction> findSpecificPersonAction(GraknTransaction dbOperation) {
         return new GraknFindSpecificPersonAction(dbOperation);
     }
 }

@@ -18,14 +18,14 @@
 package grakn.benchmark.simulation.action.write;
 
 import grakn.benchmark.simulation.action.read.ReadAction;
-import grakn.benchmark.simulation.driver.DbOperation;
+import grakn.benchmark.simulation.driver.Transaction;
 import grakn.benchmark.simulation.world.World;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public abstract class UpdateAgesOfPeopleInCityAction<DB_OPERATION extends DbOperation> extends ReadAction<DB_OPERATION, Integer> {
+public abstract class UpdateAgesOfPeopleInCityAction<DB_OPERATION extends Transaction> extends ReadAction<DB_OPERATION, Integer> {
     protected final LocalDateTime today;
     protected final World.City city;
 

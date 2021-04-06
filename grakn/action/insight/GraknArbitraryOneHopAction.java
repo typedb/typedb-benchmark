@@ -17,7 +17,7 @@
 
 package grakn.benchmark.grakn.action.insight;
 
-import grakn.benchmark.grakn.driver.GraknOperation;
+import grakn.benchmark.grakn.driver.GraknTransaction;
 import grakn.benchmark.simulation.action.insight.ArbitraryOneHopAction;
 import grakn.client.api.answer.ConceptMap;
 import graql.lang.query.GraqlMatch;
@@ -29,8 +29,8 @@ import static grakn.benchmark.grakn.action.Model.PERSON;
 import static graql.lang.Graql.match;
 import static graql.lang.Graql.var;
 
-public class GraknArbitraryOneHopAction extends ArbitraryOneHopAction<GraknOperation> {
-    public GraknArbitraryOneHopAction(GraknOperation dbOperation) {
+public class GraknArbitraryOneHopAction extends ArbitraryOneHopAction<GraknTransaction> {
+    public GraknArbitraryOneHopAction(GraknTransaction dbOperation) {
         super(dbOperation);
     }
 

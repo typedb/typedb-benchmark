@@ -44,14 +44,14 @@ import grakn.benchmark.simulation.action.write.InsertProductAction;
 import grakn.benchmark.simulation.action.write.InsertRelocationAction;
 import grakn.benchmark.simulation.action.write.InsertTransactionAction;
 import grakn.benchmark.simulation.action.write.UpdateAgesOfPeopleInCityAction;
-import grakn.benchmark.simulation.driver.DbOperation;
+import grakn.benchmark.simulation.driver.Transaction;
 import grakn.benchmark.simulation.world.World;
 import grakn.common.collection.Pair;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
 
-public abstract class ActionFactory<DB_OPERATION extends DbOperation, DB_RETURN_TYPE> {
+public abstract class ActionFactory<DB_OPERATION extends Transaction, DB_RETURN_TYPE> {
 
     public abstract UpdateAgesOfPeopleInCityAction<DB_OPERATION> updateAgesOfPeopleInCityAction(DB_OPERATION dbOperation, LocalDateTime today, World.City city);
 

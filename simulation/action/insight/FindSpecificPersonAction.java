@@ -17,9 +17,9 @@
 
 package grakn.benchmark.simulation.action.insight;
 
-import grakn.benchmark.simulation.driver.DbOperation;
+import grakn.benchmark.simulation.driver.Transaction;
 
-public abstract class FindSpecificPersonAction<DB_OPERATION extends DbOperation> extends WorldwideInsightAction<DB_OPERATION, String> {
+public abstract class FindSpecificPersonAction<DB_OPERATION extends Transaction> extends WorldwideInsightAction<DB_OPERATION, String> {
 
     protected static String PERSON_EMAIL_FOR_QUERY = "email/1/Europe:United Kingdom:London/0";
 

@@ -19,8 +19,8 @@ package grakn.benchmark.simulation.agent.region;
 
 import grakn.benchmark.simulation.action.ActionFactory;
 import grakn.benchmark.simulation.agent.base.Agent;
-import grakn.benchmark.simulation.driver.DbDriver;
-import grakn.benchmark.simulation.driver.DbOperation;
+import grakn.benchmark.simulation.driver.Client;
+import grakn.benchmark.simulation.driver.Transaction;
 import grakn.benchmark.simulation.world.World;
 
 import java.util.List;
@@ -28,9 +28,9 @@ import java.util.Random;
 
 import static java.util.stream.Collectors.toList;
 
-public abstract class CountryAgent<DB_OPERATION extends DbOperation> extends Agent<World.Country, DB_OPERATION> {
+public abstract class CountryAgent<DB_OPERATION extends Transaction> extends Agent<World.Country, DB_OPERATION> {
 
-    public CountryAgent(DbDriver<DB_OPERATION> dbDriver, ActionFactory<DB_OPERATION, ?> actionFactory, grakn.benchmark.simulation.agent.base.BenchmarkContext benchmarkContext) {
+    public CountryAgent(Client<DB_OPERATION> dbDriver, ActionFactory<DB_OPERATION, ?> actionFactory, grakn.benchmark.simulation.agent.base.BenchmarkContext benchmarkContext) {
         super(dbDriver, actionFactory, benchmarkContext);
     }
 

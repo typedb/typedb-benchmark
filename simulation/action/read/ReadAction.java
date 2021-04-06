@@ -18,11 +18,11 @@
 package grakn.benchmark.simulation.action.read;
 
 import grakn.benchmark.simulation.action.Action;
-import grakn.benchmark.simulation.driver.DbOperation;
+import grakn.benchmark.simulation.driver.Transaction;
 
 import java.util.HashMap;
 
-public abstract class ReadAction<DB_OPERATION extends DbOperation, ACTION_RETURN_TYPE> extends Action<DB_OPERATION, ACTION_RETURN_TYPE> {
+public abstract class ReadAction<DB_OPERATION extends Transaction, ACTION_RETURN_TYPE> extends Action<DB_OPERATION, ACTION_RETURN_TYPE> {
     public ReadAction(DB_OPERATION dbOperation) {
         super(dbOperation);
     }

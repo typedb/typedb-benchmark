@@ -17,9 +17,9 @@
 
 package grakn.benchmark.simulation.action.insight;
 
-import grakn.benchmark.simulation.driver.DbOperation;
+import grakn.benchmark.simulation.driver.Transaction;
 
-public abstract class FindSpecificMarriageAction<DB_OPERATION extends DbOperation> extends WorldwideInsightAction<DB_OPERATION, String> {
+public abstract class FindSpecificMarriageAction<DB_OPERATION extends Transaction> extends WorldwideInsightAction<DB_OPERATION, String> {
 
     protected static int MARRIAGE_ID_FOR_QUERY = "3/Australasia:Australia:Canberra/0".hashCode();
 

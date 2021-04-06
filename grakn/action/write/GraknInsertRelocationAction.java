@@ -17,7 +17,7 @@
 
 package grakn.benchmark.grakn.action.write;
 
-import grakn.benchmark.grakn.driver.GraknOperation;
+import grakn.benchmark.grakn.driver.GraknTransaction;
 import grakn.benchmark.simulation.action.Action;
 import grakn.benchmark.simulation.action.write.InsertRelocationAction;
 import grakn.benchmark.simulation.world.World;
@@ -39,8 +39,8 @@ import static grakn.benchmark.grakn.action.Model.RELOCATION_RELOCATED_PERSON;
 import static graql.lang.Graql.match;
 import static graql.lang.Graql.var;
 
-public class GraknInsertRelocationAction extends InsertRelocationAction<GraknOperation, ConceptMap> {
-    public GraknInsertRelocationAction(GraknOperation dbOperation, World.City city, LocalDateTime today, String relocateeEmail, String relocationCityName) {
+public class GraknInsertRelocationAction extends InsertRelocationAction<GraknTransaction, ConceptMap> {
+    public GraknInsertRelocationAction(GraknTransaction dbOperation, World.City city, LocalDateTime today, String relocateeEmail, String relocationCityName) {
         super(dbOperation, city, today, relocateeEmail, relocationCityName);
     }
 

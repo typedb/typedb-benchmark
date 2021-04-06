@@ -20,9 +20,9 @@ package grakn.benchmark.simulation.agent.base;
 import grabl.tracing.client.GrablTracingThreadStatic;
 import grakn.benchmark.simulation.action.Action;
 import grakn.benchmark.simulation.action.ActionFactory;
-import grakn.benchmark.simulation.driver.DbDriver;
-import grakn.benchmark.simulation.driver.DbOperation;
-import grakn.benchmark.simulation.driver.DbOperationFactory;
+import grakn.benchmark.simulation.driver.Client;
+import grakn.benchmark.simulation.driver.Transaction;
+import grakn.benchmark.simulation.driver.Session;
 import grakn.benchmark.simulation.utils.RandomSource;
 import grakn.benchmark.simulation.utils.Utils;
 import grakn.benchmark.simulation.world.Region;
@@ -52,16 +52,16 @@ import static grakn.common.util.Objects.className;
  * @param <REGION>       The type of region used by the agent.
  * @param <DB_OPERATION> The abstraction of database operations used by the agent.
  */
-public abstract class Agent<REGION extends Region, DB_OPERATION extends DbOperation> {
+public abstract class Agent<REGION extends Region, DB_OPERATION extends Transaction> {
 
     protected final BenchmarkContext benchmarkContext;
     private final Logger logger;
-    private final DbDriver<DB_OPERATION> dbDriver;
+    private final Client<DB_OPERATION> dbDriver;
     private final ActionFactory<DB_OPERATION, ?> actionFactory;
     private final Report report = new Report();
     private boolean isTracing = true;
 
-    protected Agent(DbDriver<DB_OPERATION> dbDriver, ActionFactory<DB_OPERATION, ?> actionFactory, BenchmarkContext benchmarkContext) {
+    protected Agent(Client<DB_OPERATION> dbDriver, ActionFactory<DB_OPERATION, ?> actionFactory, BenchmarkContext benchmarkContext) {
         this.dbDriver = dbDriver;
         this.actionFactory = actionFactory;
         this.benchmarkContext = benchmarkContext;
@@ -99,7 +99,7 @@ public abstract class Agent<REGION extends Region, DB_OPERATION extends DbOperat
         Random agentRandom = RandomSource.nextSource(random).get();
 
         Regional regionalAgent = getRegionalAgent(benchmarkContext.iteration(), region.tracker(), agentRandom, benchmarkContext.test());
-        DbOperationFactory<DB_OPERATION> dbOperationFactory = dbDriver.getDbOperationFactory(region, logger);
+        Session<DB_OPERATION> dbOperationFactory = dbDriver.getDbOperationFactory(region, logger);
 
         Regional.Report report = regionalAgent.runWithReport(dbOperationFactory, region);
         this.report.addRegionalAgentReport(region.tracker(), report);
@@ -152,7 +152,7 @@ public abstract class Agent<REGION extends Region, DB_OPERATION extends DbOperat
             return tracker;
         }
 
-        protected Report runWithReport(DbOperationFactory<DB_OPERATION> dbOperationFactory, REGION region) {
+        protected Report runWithReport(Session<DB_OPERATION> dbOperationFactory, REGION region) {
             trace(() -> {
                 run(dbOperationFactory, region);
                 return null;
@@ -160,7 +160,7 @@ public abstract class Agent<REGION extends Region, DB_OPERATION extends DbOperat
             return report;
         }
 
-        protected abstract void run(DbOperationFactory<DB_OPERATION> dbOperationFactory, REGION region);
+        protected abstract void run(Session<DB_OPERATION> dbOperationFactory, REGION region);
 
         public <U> U pickOne(List<U> list) { // TODO can be a util
             return list.get(random().nextInt(list.size()));

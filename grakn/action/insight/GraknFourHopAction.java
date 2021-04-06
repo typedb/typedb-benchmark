@@ -17,7 +17,7 @@
 
 package grakn.benchmark.grakn.action.insight;
 
-import grakn.benchmark.grakn.driver.GraknOperation;
+import grakn.benchmark.grakn.driver.GraknTransaction;
 import grakn.benchmark.simulation.action.insight.FourHopAction;
 import graql.lang.query.GraqlMatch;
 
@@ -43,8 +43,8 @@ import static grakn.benchmark.grakn.action.Model.TRANSACTION_SELLER;
 import static graql.lang.Graql.match;
 import static graql.lang.Graql.var;
 
-public class GraknFourHopAction extends FourHopAction<GraknOperation> {
-    public GraknFourHopAction(GraknOperation dbOperation) {
+public class GraknFourHopAction extends FourHopAction<GraknTransaction> {
+    public GraknFourHopAction(GraknTransaction dbOperation) {
         super(dbOperation);
     }
 

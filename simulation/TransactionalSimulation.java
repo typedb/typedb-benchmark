@@ -17,8 +17,8 @@
 
 package grakn.benchmark.simulation;
 
-import grakn.benchmark.simulation.driver.TransactionalDbDriver;
-import grakn.benchmark.simulation.driver.TransactionalDbOperation;
+import grakn.benchmark.simulation.driver.TransactionalClient;
+import grakn.benchmark.simulation.driver.TransactionalTransaction;
 import grakn.benchmark.simulation.world.World;
 import grakn.benchmark.config.Config;
 import org.slf4j.Logger;
@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
-public abstract class TransactionalSimulation<DB_DRIVER extends TransactionalDbDriver<?, DB_OPERATION>, DB_OPERATION extends TransactionalDbOperation> extends Simulation<DB_DRIVER, DB_OPERATION> {
+public abstract class TransactionalSimulation<DB_DRIVER extends TransactionalClient<?, DB_OPERATION>, DB_OPERATION extends TransactionalTransaction> extends Simulation<DB_DRIVER, DB_OPERATION> {
 
     public TransactionalSimulation(DB_DRIVER driver, Map<String, Path> initialisationDataPaths, int randomSeed, World world, List<Config.Agent> agentConfigs, Function<Integer, Boolean> iterationSamplingFunction, boolean test) {
         super(driver, initialisationDataPaths, randomSeed, world, agentConfigs, iterationSamplingFunction, test);

@@ -17,7 +17,7 @@
 
 package grakn.benchmark.grakn.action.read;
 
-import grakn.benchmark.grakn.driver.GraknOperation;
+import grakn.benchmark.grakn.driver.GraknTransaction;
 import grakn.benchmark.simulation.action.read.CompaniesInCountryAction;
 import grakn.benchmark.simulation.world.World;
 import graql.lang.query.GraqlMatch;
@@ -34,8 +34,8 @@ import static grakn.benchmark.grakn.action.Model.LOCATION_NAME;
 import static graql.lang.Graql.match;
 import static graql.lang.Graql.var;
 
-public class GraknCompaniesInCountryAction extends CompaniesInCountryAction<GraknOperation> {
-    public GraknCompaniesInCountryAction(GraknOperation dbOperation, World.Country country, int numCompanies) {
+public class GraknCompaniesInCountryAction extends CompaniesInCountryAction<GraknTransaction> {
+    public GraknCompaniesInCountryAction(GraknTransaction dbOperation, World.Country country, int numCompanies) {
         super(dbOperation, country, numCompanies);
     }
 

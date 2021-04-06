@@ -17,7 +17,7 @@
 
 package grakn.benchmark.grakn.action.write;
 
-import grakn.benchmark.grakn.driver.GraknOperation;
+import grakn.benchmark.grakn.driver.GraknTransaction;
 import grakn.benchmark.simulation.action.Action;
 import grakn.benchmark.simulation.action.write.InsertFriendshipAction;
 import grakn.client.api.answer.ConceptMap;
@@ -37,9 +37,9 @@ import static graql.lang.Graql.match;
 import static graql.lang.Graql.not;
 import static graql.lang.Graql.var;
 
-public class GraknInsertFriendshipAction extends InsertFriendshipAction<GraknOperation, ConceptMap> {
+public class GraknInsertFriendshipAction extends InsertFriendshipAction<GraknTransaction, ConceptMap> {
 
-    public GraknInsertFriendshipAction(GraknOperation dbOperation, LocalDateTime today, String friend1Email, String friend2Email) {
+    public GraknInsertFriendshipAction(GraknTransaction dbOperation, LocalDateTime today, String friend1Email, String friend2Email) {
         super(dbOperation, today, friend1Email, friend2Email);
     }
 

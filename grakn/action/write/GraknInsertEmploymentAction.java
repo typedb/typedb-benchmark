@@ -17,7 +17,7 @@
 
 package grakn.benchmark.grakn.action.write;
 
-import grakn.benchmark.grakn.driver.GraknOperation;
+import grakn.benchmark.grakn.driver.GraknTransaction;
 import grakn.benchmark.simulation.action.write.InsertEmploymentAction;
 import grakn.benchmark.simulation.world.World;
 import grakn.client.api.answer.ConceptMap;
@@ -53,8 +53,8 @@ import static grakn.benchmark.grakn.action.Model.WAGE;
 import static grakn.benchmark.grakn.action.Model.WAGE_VALUE;
 import static graql.lang.Graql.match;
 
-public class GraknInsertEmploymentAction extends InsertEmploymentAction<GraknOperation, ConceptMap> {
-    public GraknInsertEmploymentAction(GraknOperation dbOperation, World.City worldCity, String employeeEmail, long companyNumber, LocalDateTime employmentDate, double wageValue, String contractContent, double contractedHours) {
+public class GraknInsertEmploymentAction extends InsertEmploymentAction<GraknTransaction, ConceptMap> {
+    public GraknInsertEmploymentAction(GraknTransaction dbOperation, World.City worldCity, String employeeEmail, long companyNumber, LocalDateTime employmentDate, double wageValue, String contractContent, double contractedHours) {
         super(dbOperation, worldCity, employeeEmail, companyNumber, employmentDate, wageValue, contractContent, contractedHours);
     }
 

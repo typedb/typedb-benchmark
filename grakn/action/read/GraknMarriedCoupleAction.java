@@ -17,7 +17,7 @@
 
 package grakn.benchmark.grakn.action.read;
 
-import grakn.benchmark.grakn.driver.GraknOperation;
+import grakn.benchmark.grakn.driver.GraknTransaction;
 import grakn.benchmark.simulation.action.SpouseType;
 import grakn.benchmark.simulation.action.read.MarriedCoupleAction;
 import grakn.benchmark.simulation.world.World;
@@ -45,8 +45,8 @@ import static graql.lang.Graql.match;
 import static graql.lang.Graql.var;
 import static java.util.stream.Collectors.toList;
 
-public class GraknMarriedCoupleAction extends MarriedCoupleAction<GraknOperation> {
-    public GraknMarriedCoupleAction(GraknOperation dbOperation, World.City city, LocalDateTime today) {
+public class GraknMarriedCoupleAction extends MarriedCoupleAction<GraknTransaction> {
+    public GraknMarriedCoupleAction(GraknTransaction dbOperation, World.City city, LocalDateTime today) {
         super(dbOperation, city, today);
     }
 

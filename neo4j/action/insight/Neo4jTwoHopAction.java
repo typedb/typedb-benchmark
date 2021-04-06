@@ -17,14 +17,14 @@
 
 package grakn.benchmark.neo4j.action.insight;
 
-import grakn.benchmark.neo4j.driver.Neo4jOperation;
+import grakn.benchmark.neo4j.driver.Neo4jTransaction;
 import grakn.benchmark.simulation.action.insight.TwoHopAction;
 import org.neo4j.driver.Query;
 
 import java.util.List;
 
-public class Neo4jTwoHopAction extends TwoHopAction<Neo4jOperation> {
-    public Neo4jTwoHopAction(Neo4jOperation dbOperation) {
+public class Neo4jTwoHopAction extends TwoHopAction<Neo4jTransaction> {
+    public Neo4jTwoHopAction(Neo4jTransaction dbOperation) {
         super(dbOperation);
     }
 

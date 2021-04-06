@@ -17,7 +17,7 @@
 
 package grakn.benchmark.grakn.action.write;
 
-import grakn.benchmark.grakn.driver.GraknOperation;
+import grakn.benchmark.grakn.driver.GraknTransaction;
 import grakn.benchmark.simulation.action.Action;
 import grakn.benchmark.simulation.action.write.InsertMarriageAction;
 import grakn.benchmark.simulation.world.World;
@@ -42,9 +42,9 @@ import static grakn.benchmark.grakn.action.Model.PERSON;
 import static graql.lang.Graql.match;
 import static graql.lang.Graql.var;
 
-public class GraknInsertMarriageAction extends InsertMarriageAction<GraknOperation, ConceptMap> {
+public class GraknInsertMarriageAction extends InsertMarriageAction<GraknTransaction, ConceptMap> {
 
-    public GraknInsertMarriageAction(GraknOperation dbOperation, World.City city, int marriageIdentifier, String wifeEmail, String husbandEmail) {
+    public GraknInsertMarriageAction(GraknTransaction dbOperation, World.City city, int marriageIdentifier, String wifeEmail, String husbandEmail) {
         super(dbOperation, city, marriageIdentifier, wifeEmail, husbandEmail);
     }
 

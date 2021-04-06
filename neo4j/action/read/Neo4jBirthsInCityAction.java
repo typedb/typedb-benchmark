@@ -17,7 +17,7 @@
 
 package grakn.benchmark.neo4j.action.read;
 
-import grakn.benchmark.neo4j.driver.Neo4jOperation;
+import grakn.benchmark.neo4j.driver.Neo4jTransaction;
 import grakn.benchmark.simulation.action.read.BirthsInCityAction;
 import grakn.benchmark.simulation.world.World;
 import org.neo4j.driver.Query;
@@ -26,8 +26,8 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 
-public class Neo4jBirthsInCityAction extends BirthsInCityAction<Neo4jOperation> {
-    public Neo4jBirthsInCityAction(Neo4jOperation dbOperation, World.City city, LocalDateTime today) {
+public class Neo4jBirthsInCityAction extends BirthsInCityAction<Neo4jTransaction> {
+    public Neo4jBirthsInCityAction(Neo4jTransaction dbOperation, World.City city, LocalDateTime today) {
         super(dbOperation, city, today);
     }
 

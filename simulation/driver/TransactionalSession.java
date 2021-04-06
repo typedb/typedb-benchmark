@@ -15,23 +15,21 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package grakn.benchmark.grakn.driver;
+package grakn.benchmark.simulation.driver;
 
-import grakn.benchmark.simulation.driver.TransactionalDbOperationFactory;
-import grakn.client.api.GraknSession;
 import org.slf4j.Logger;
 
-public class GraknOperationFactory extends TransactionalDbOperationFactory<GraknOperation> {
 
-    private final GraknSession session;
+public abstract class TransactionalSession<TX extends TransactionalTransaction> extends Session<TX> {
 
-    public GraknOperationFactory(GraknSession session, Logger logger) {
+    public TransactionalSession(Logger logger) {
         super(logger);
-        this.session = session;
+    }
+
+    public TX transaction() { // Needed for now but will disappear once agents give the operations to the actions rather than the ActionFactory
+        return null;
     }
 
     @Override
-    public GraknOperation newDbOperation(String tracker, long iteration, boolean trace) {
-        return new GraknOperation(session, logger(), tracker, iteration, trace);
-    }
+    public abstract TX newTransaction(String tracker, long iteration, boolean trace);
 }

@@ -17,7 +17,7 @@
 
 package grakn.benchmark.neo4j.action.read;
 
-import grakn.benchmark.neo4j.driver.Neo4jOperation;
+import grakn.benchmark.neo4j.driver.Neo4jTransaction;
 import grakn.benchmark.simulation.action.read.CitiesInContinentAction;
 import grakn.benchmark.simulation.world.World;
 import org.neo4j.driver.Query;
@@ -25,8 +25,8 @@ import org.neo4j.driver.Query;
 import java.util.HashMap;
 import java.util.List;
 
-public class Neo4jCitiesInContinentAction extends CitiesInContinentAction<Neo4jOperation> {
-    public Neo4jCitiesInContinentAction(Neo4jOperation dbOperation, World.City city) {
+public class Neo4jCitiesInContinentAction extends CitiesInContinentAction<Neo4jTransaction> {
+    public Neo4jCitiesInContinentAction(Neo4jTransaction dbOperation, World.City city) {
         super(dbOperation, city);
     }
 

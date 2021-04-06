@@ -18,7 +18,7 @@
 package grakn.benchmark.neo4j.driver;
 
 import grakn.benchmark.simulation.driver.LogWrapper;
-import grakn.benchmark.simulation.driver.TransactionalDbOperation;
+import grakn.benchmark.simulation.driver.TransactionalTransaction;
 import org.neo4j.driver.Query;
 import org.neo4j.driver.Record;
 import org.neo4j.driver.Result;
@@ -28,12 +28,12 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class Neo4jOperation extends TransactionalDbOperation {
+public class Neo4jTransaction extends TransactionalTransaction {
 
     private final Session session;
     private final LogWrapper log;
 
-    public Neo4jOperation(Session session, LogWrapper log, String tracker, long iteration, boolean trace) {
+    public Neo4jTransaction(Session session, LogWrapper log, String tracker, long iteration, boolean trace) {
         super(tracker, iteration, trace);
         this.session = session;
         this.log = log;

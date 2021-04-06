@@ -17,7 +17,7 @@
 
 package grakn.benchmark.grakn.action.insight;
 
-import grakn.benchmark.grakn.driver.GraknOperation;
+import grakn.benchmark.grakn.driver.GraknTransaction;
 import grakn.benchmark.simulation.action.insight.FindSpecificMarriageAction;
 import graql.lang.query.GraqlMatch;
 
@@ -28,8 +28,8 @@ import static grakn.benchmark.grakn.action.Model.MARRIAGE_ID;
 import static graql.lang.Graql.match;
 import static graql.lang.Graql.var;
 
-public class GraknFindSpecificMarriageAction extends FindSpecificMarriageAction<GraknOperation> {
-    public GraknFindSpecificMarriageAction(GraknOperation dbOperation) {
+public class GraknFindSpecificMarriageAction extends FindSpecificMarriageAction<GraknTransaction> {
+    public GraknFindSpecificMarriageAction(GraknTransaction dbOperation) {
         super(dbOperation);
     }
 

@@ -39,16 +39,16 @@ import grakn.benchmark.simulation.agent.write.PersonBirthAgent;
 import grakn.benchmark.simulation.agent.write.ProductAgent;
 import grakn.benchmark.simulation.agent.write.RelocationAgent;
 import grakn.benchmark.simulation.agent.write.PurchaseAgent;
-import grakn.benchmark.simulation.driver.DbDriver;
-import grakn.benchmark.simulation.driver.DbOperation;
+import grakn.benchmark.simulation.driver.Client;
+import grakn.benchmark.simulation.driver.Transaction;
 
-public class AgentFactory<DB_OPERATION extends DbOperation, ACTION_FACTORY extends ActionFactory<DB_OPERATION, ?>> {
+public class AgentFactory<DB_OPERATION extends Transaction, ACTION_FACTORY extends ActionFactory<DB_OPERATION, ?>> {
 
-    private final DbDriver<DB_OPERATION> dbDriver;
+    private final Client<DB_OPERATION> dbDriver;
     private final ACTION_FACTORY actionFactory;
     private final grakn.benchmark.simulation.agent.base.BenchmarkContext benchmarkContext;
 
-    public AgentFactory(DbDriver<DB_OPERATION> dbDriver, ACTION_FACTORY actionFactory, grakn.benchmark.simulation.agent.base.BenchmarkContext benchmarkContext) {
+    public AgentFactory(Client<DB_OPERATION> dbDriver, ACTION_FACTORY actionFactory, grakn.benchmark.simulation.agent.base.BenchmarkContext benchmarkContext) {
         this.dbDriver = dbDriver;
         this.actionFactory = actionFactory;
         this.benchmarkContext = benchmarkContext;

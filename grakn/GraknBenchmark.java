@@ -19,8 +19,8 @@ package grakn.benchmark.grakn;
 
 import grakn.benchmark.config.Config;
 import grakn.benchmark.grakn.action.GraknActionFactory;
-import grakn.benchmark.grakn.driver.GraknDriver;
-import grakn.benchmark.grakn.driver.GraknOperation;
+import grakn.benchmark.grakn.driver.GraknClient;
+import grakn.benchmark.grakn.driver.GraknTransaction;
 import grakn.benchmark.grakn.yaml_tool.GraknYAMLLoader;
 import grakn.benchmark.simulation.TransactionalSimulation;
 import grakn.benchmark.simulation.action.ActionFactory;
@@ -28,7 +28,6 @@ import grakn.benchmark.simulation.world.World;
 import grakn.benchmark.simulation.yaml_tool.YAMLException;
 import grakn.benchmark.simulation.yaml_tool.YAMLLoader;
 import grakn.client.api.GraknSession;
-import grakn.client.api.GraknTransaction;
 import graql.lang.Graql;
 
 import java.io.IOException;
@@ -39,15 +38,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
-public class GraknBenchmark extends TransactionalSimulation<GraknDriver, GraknOperation> {
+public class GraknBenchmark extends TransactionalSimulation<GraknClient, GraknTransaction> {
 
-    public GraknBenchmark(GraknDriver driver, Map<String, Path> initialisationDataPaths, int randomSeed, World world,
+    public GraknBenchmark(GraknClient driver, Map<String, Path> initialisationDataPaths, int randomSeed, World world,
                           List<Config.Agent> agentConfigs, Function<Integer, Boolean> iterationSamplingFunction, boolean test) {
         super(driver, initialisationDataPaths, randomSeed, world, agentConfigs, iterationSamplingFunction, test);
     }
 
     @Override
-    protected ActionFactory<GraknOperation, ?> actionFactory() {
+    protected ActionFactory<GraknTransaction, ?> actionFactory() {
         return new GraknActionFactory();
     }
 
@@ -70,7 +69,7 @@ public class GraknBenchmark extends TransactionalSimulation<GraknDriver, GraknOp
     private static void initialiseSchema(GraknSession session, Map<String, Path> initialisationDataPaths) throws IOException {
         System.out.println(">>>> trace: initialiseSchema: start");
         String schemaQuery = new String(Files.readAllBytes(initialisationDataPaths.get("schema.gql")), StandardCharsets.UTF_8);
-        try (GraknTransaction tx = session.transaction(GraknTransaction.Type.WRITE)) {
+        try (grakn.client.api.GraknTransaction tx = session.transaction(grakn.client.api.GraknTransaction.Type.WRITE)) {
             tx.query().define(Graql.parseQuery(schemaQuery));
             tx.commit();
         }

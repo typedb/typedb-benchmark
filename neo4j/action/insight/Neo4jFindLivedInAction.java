@@ -17,14 +17,14 @@
 
 package grakn.benchmark.neo4j.action.insight;
 
-import grakn.benchmark.neo4j.driver.Neo4jOperation;
+import grakn.benchmark.neo4j.driver.Neo4jTransaction;
 import grakn.benchmark.simulation.action.insight.FindLivedInAction;
 import org.neo4j.driver.Query;
 
 import java.util.List;
 
-public class Neo4jFindLivedInAction extends FindLivedInAction<Neo4jOperation> {
-    public Neo4jFindLivedInAction(Neo4jOperation dbOperation) {
+public class Neo4jFindLivedInAction extends FindLivedInAction<Neo4jTransaction> {
+    public Neo4jFindLivedInAction(Neo4jTransaction dbOperation) {
         super(dbOperation);
     }
 

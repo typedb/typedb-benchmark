@@ -18,13 +18,13 @@
 package grakn.benchmark.simulation.action.write;
 
 import grakn.benchmark.simulation.action.Action;
-import grakn.benchmark.simulation.driver.DbOperation;
+import grakn.benchmark.simulation.driver.Transaction;
 import grakn.benchmark.simulation.world.World;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 
-public abstract class InsertEmploymentAction<DB_OPERATION extends DbOperation, ACTION_RETURN_TYPE> extends Action<DB_OPERATION, ACTION_RETURN_TYPE> {
+public abstract class InsertEmploymentAction<DB_OPERATION extends Transaction, ACTION_RETURN_TYPE> extends Action<DB_OPERATION, ACTION_RETURN_TYPE> {
 
     protected final World.City worldCity;
     protected final String employeeEmail;

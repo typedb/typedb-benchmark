@@ -17,7 +17,7 @@
 
 package grakn.benchmark.neo4j.action.write;
 
-import grakn.benchmark.neo4j.driver.Neo4jOperation;
+import grakn.benchmark.neo4j.driver.Neo4jTransaction;
 import grakn.benchmark.simulation.action.Action;
 import grakn.benchmark.simulation.action.SpouseType;
 import grakn.benchmark.simulation.action.write.InsertParentShipAction;
@@ -28,8 +28,8 @@ import java.util.HashMap;
 
 import static grakn.benchmark.neo4j.action.Model.EMAIL;
 
-public class Neo4jInsertParentShipAction extends InsertParentShipAction<Neo4jOperation, Record> {
-    public Neo4jInsertParentShipAction(Neo4jOperation dbOperation, HashMap<SpouseType, String> marriage, String childEmail) {
+public class Neo4jInsertParentShipAction extends InsertParentShipAction<Neo4jTransaction, Record> {
+    public Neo4jInsertParentShipAction(Neo4jTransaction dbOperation, HashMap<SpouseType, String> marriage, String childEmail) {
         super(dbOperation, marriage, childEmail);
     }
 

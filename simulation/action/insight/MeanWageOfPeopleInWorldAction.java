@@ -17,9 +17,9 @@
 
 package grakn.benchmark.simulation.action.insight;
 
-import grakn.benchmark.simulation.driver.DbOperation;
+import grakn.benchmark.simulation.driver.Transaction;
 
-public abstract class MeanWageOfPeopleInWorldAction<DB_OPERATION extends DbOperation> extends WorldwideInsightAction<DB_OPERATION, Double> {
+public abstract class MeanWageOfPeopleInWorldAction<DB_OPERATION extends Transaction> extends WorldwideInsightAction<DB_OPERATION, Double> {
 
     public MeanWageOfPeopleInWorldAction(DB_OPERATION dbOperation) {
         super(dbOperation);

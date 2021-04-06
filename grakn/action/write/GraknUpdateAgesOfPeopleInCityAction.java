@@ -17,7 +17,7 @@
 
 package grakn.benchmark.grakn.action.write;
 
-import grakn.benchmark.grakn.driver.GraknOperation;
+import grakn.benchmark.grakn.driver.GraknTransaction;
 import grakn.benchmark.simulation.action.write.UpdateAgesOfPeopleInCityAction;
 import grakn.benchmark.simulation.world.World;
 import grakn.common.collection.Pair;
@@ -41,9 +41,9 @@ import static grakn.common.collection.Collections.pair;
 import static graql.lang.Graql.match;
 import static graql.lang.Graql.var;
 
-public class GraknUpdateAgesOfPeopleInCityAction extends UpdateAgesOfPeopleInCityAction<GraknOperation> {
+public class GraknUpdateAgesOfPeopleInCityAction extends UpdateAgesOfPeopleInCityAction<GraknTransaction> {
 
-    public GraknUpdateAgesOfPeopleInCityAction(GraknOperation dbOperation, LocalDateTime today, World.City city) {
+    public GraknUpdateAgesOfPeopleInCityAction(GraknTransaction dbOperation, LocalDateTime today, World.City city) {
         super(dbOperation, today, city);
     }
 

@@ -18,8 +18,8 @@
 package grakn.benchmark.neo4j.driver;
 
 import grabl.tracing.client.GrablTracingThreadStatic;
-import grakn.benchmark.simulation.driver.DbOperationFactory;
-import grakn.benchmark.simulation.driver.TransactionalDbDriver;
+import grakn.benchmark.simulation.driver.Session;
+import grakn.benchmark.simulation.driver.TransactionalClient;
 import grakn.benchmark.simulation.world.Region;
 import org.neo4j.driver.AuthTokens;
 import org.neo4j.driver.Driver;
@@ -35,14 +35,14 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import static com.google.common.collect.Iterables.getOnlyElement;
 import static grabl.tracing.client.GrablTracingThreadStatic.traceOnThread;
-import static grakn.benchmark.simulation.driver.TransactionalDbDriver.TracingLabel.OPEN_SESSION;
+import static grakn.benchmark.simulation.driver.TransactionalClient.TracingLabel.OPEN_SESSION;
 
-public class Neo4jDriver extends TransactionalDbDriver<org.neo4j.driver.Session, Neo4jOperation> {
+public class Neo4jClient extends TransactionalClient<org.neo4j.driver.Session, Neo4jTransaction> {
 
     private final Driver driver;
     private final ConcurrentHashMap<String, org.neo4j.driver.Session> sessionMap = new ConcurrentHashMap<>();
 
-    public Neo4jDriver(String hostUri) {
+    public Neo4jClient(String hostUri) {
         this.driver = GraphDatabase.driver(hostUri, AuthTokens.basic("neo4j", "admin"));
     }
 
@@ -98,7 +98,7 @@ public class Neo4jDriver extends TransactionalDbDriver<org.neo4j.driver.Session,
     }
 
     @Override
-    public DbOperationFactory<Neo4jOperation> getDbOperationFactory(Region region, Logger logger) {
-        return new Neo4jOperationFactory(session(region.name()), logger);
+    public Session<Neo4jTransaction> getDbOperationFactory(Region region, Logger logger) {
+        return new Neo4jSession(session(region.name()), logger);
     }
 }

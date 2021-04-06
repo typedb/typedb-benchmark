@@ -17,7 +17,7 @@
 
 package grakn.benchmark.grakn.action.insight;
 
-import grakn.benchmark.grakn.driver.GraknOperation;
+import grakn.benchmark.grakn.driver.GraknTransaction;
 import grakn.benchmark.simulation.action.insight.FindLivedInAction;
 import graql.lang.query.GraqlMatch;
 
@@ -33,8 +33,8 @@ import static grakn.benchmark.grakn.action.Model.RESIDENCY_RESIDENT;
 import static graql.lang.Graql.match;
 import static graql.lang.Graql.var;
 
-public class GraknFindLivedInAction extends FindLivedInAction<GraknOperation> {
-    public GraknFindLivedInAction(GraknOperation dbOperation) {
+public class GraknFindLivedInAction extends FindLivedInAction<GraknTransaction> {
+    public GraknFindLivedInAction(GraknTransaction dbOperation) {
         super(dbOperation);
     }
 

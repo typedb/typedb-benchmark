@@ -17,7 +17,7 @@
 
 package grakn.benchmark.grakn.action.insight;
 
-import grakn.benchmark.grakn.driver.GraknOperation;
+import grakn.benchmark.grakn.driver.GraknTransaction;
 import grakn.benchmark.simulation.action.insight.ThreeHopAction;
 import graql.lang.query.GraqlMatch;
 
@@ -40,8 +40,8 @@ import static grakn.benchmark.grakn.action.Model.PERSON;
 import static graql.lang.Graql.match;
 import static graql.lang.Graql.var;
 
-public class GraknThreeHopAction extends ThreeHopAction<GraknOperation> {
-    public GraknThreeHopAction(GraknOperation dbOperation) {
+public class GraknThreeHopAction extends ThreeHopAction<GraknTransaction> {
+    public GraknThreeHopAction(GraknTransaction dbOperation) {
         super(dbOperation);
     }
 

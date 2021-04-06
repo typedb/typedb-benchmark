@@ -17,7 +17,7 @@
 
 package grakn.benchmark.neo4j.action.write;
 
-import grakn.benchmark.neo4j.driver.Neo4jOperation;
+import grakn.benchmark.neo4j.driver.Neo4jTransaction;
 import grakn.benchmark.simulation.action.write.InsertEmploymentAction;
 import grakn.benchmark.simulation.world.World;
 import org.neo4j.driver.Query;
@@ -35,8 +35,8 @@ import static grakn.benchmark.neo4j.action.Model.LOCATION_NAME;
 import static grakn.benchmark.neo4j.action.Model.START_DATE;
 import static grakn.benchmark.neo4j.action.Model.WAGE;
 
-public class Neo4jInsertEmploymentAction extends InsertEmploymentAction<Neo4jOperation, Record> {
-    public Neo4jInsertEmploymentAction(Neo4jOperation dbOperation, World.City worldCity, String employeeEmail, long companyNumber, LocalDateTime employmentDate, double wageValue, String contractContent, double contractedHours) {
+public class Neo4jInsertEmploymentAction extends InsertEmploymentAction<Neo4jTransaction, Record> {
+    public Neo4jInsertEmploymentAction(Neo4jTransaction dbOperation, World.City worldCity, String employeeEmail, long companyNumber, LocalDateTime employmentDate, double wageValue, String contractContent, double contractedHours) {
         super(dbOperation, worldCity, employeeEmail, companyNumber, employmentDate, wageValue, contractContent, contractedHours);
     }
 

@@ -17,15 +17,15 @@
 
 package grakn.benchmark.neo4j.action.insight;
 
-import grakn.benchmark.neo4j.driver.Neo4jOperation;
+import grakn.benchmark.neo4j.driver.Neo4jTransaction;
 import grakn.benchmark.simulation.action.insight.FindTransactionCurrencyAction;
 import org.neo4j.driver.Query;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class Neo4jFindTransactionCurrencyAction extends FindTransactionCurrencyAction<Neo4jOperation> {
-    public Neo4jFindTransactionCurrencyAction(Neo4jOperation dbOperation) {
+public class Neo4jFindTransactionCurrencyAction extends FindTransactionCurrencyAction<Neo4jTransaction> {
+    public Neo4jFindTransactionCurrencyAction(Neo4jTransaction dbOperation) {
         super(dbOperation);
     }
 

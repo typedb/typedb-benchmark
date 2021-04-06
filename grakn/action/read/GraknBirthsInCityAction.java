@@ -17,7 +17,7 @@
 
 package grakn.benchmark.grakn.action.read;
 
-import grakn.benchmark.grakn.driver.GraknOperation;
+import grakn.benchmark.grakn.driver.GraknTransaction;
 import grakn.benchmark.simulation.action.read.BirthsInCityAction;
 import grakn.benchmark.simulation.world.World;
 import graql.lang.query.GraqlMatch;
@@ -36,8 +36,8 @@ import static grakn.benchmark.grakn.action.Model.PERSON;
 import static graql.lang.Graql.match;
 import static graql.lang.Graql.var;
 
-public class GraknBirthsInCityAction extends BirthsInCityAction<GraknOperation> {
-    public GraknBirthsInCityAction(GraknOperation dbOperation, World.City city, LocalDateTime today) {
+public class GraknBirthsInCityAction extends BirthsInCityAction<GraknTransaction> {
+    public GraknBirthsInCityAction(GraknTransaction dbOperation, World.City city, LocalDateTime today) {
         super(dbOperation, city, today);
     }
 

@@ -17,7 +17,7 @@
 
 package grakn.benchmark.simulation.driver;
 
-public abstract class TransactionalDbDriver<SESSION, DB_OPERATION extends TransactionalDbOperation> extends DbDriver<DB_OPERATION> {
+public abstract class TransactionalClient<SESSION, DB_OPERATION extends TransactionalTransaction> extends Client<DB_OPERATION> {
 
     public enum TracingLabel {
         OPEN_CLIENT("openClient"),

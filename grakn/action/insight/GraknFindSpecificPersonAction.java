@@ -17,7 +17,7 @@
 
 package grakn.benchmark.grakn.action.insight;
 
-import grakn.benchmark.grakn.driver.GraknOperation;
+import grakn.benchmark.grakn.driver.GraknTransaction;
 import grakn.benchmark.simulation.action.insight.FindSpecificPersonAction;
 import graql.lang.query.GraqlMatch;
 
@@ -28,8 +28,8 @@ import static grakn.benchmark.grakn.action.Model.PERSON;
 import static graql.lang.Graql.match;
 import static graql.lang.Graql.var;
 
-public class GraknFindSpecificPersonAction extends FindSpecificPersonAction<GraknOperation> {
-    public GraknFindSpecificPersonAction(GraknOperation dbOperation) {
+public class GraknFindSpecificPersonAction extends FindSpecificPersonAction<GraknTransaction> {
+    public GraknFindSpecificPersonAction(GraknTransaction dbOperation) {
         super(dbOperation);
     }
 

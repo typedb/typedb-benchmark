@@ -17,7 +17,7 @@
 
 package grakn.benchmark.neo4j.action.insight;
 
-import grakn.benchmark.neo4j.driver.Neo4jOperation;
+import grakn.benchmark.neo4j.driver.Neo4jTransaction;
 import grakn.benchmark.simulation.action.insight.MeanWageOfPeopleInWorldAction;
 import org.neo4j.driver.Query;
 import org.neo4j.driver.Record;
@@ -26,9 +26,9 @@ import java.util.List;
 
 import static com.google.common.collect.Iterables.getOnlyElement;
 
-public class Neo4jMeanWageOfPeopleInWorldAction extends MeanWageOfPeopleInWorldAction<Neo4jOperation> {
+public class Neo4jMeanWageOfPeopleInWorldAction extends MeanWageOfPeopleInWorldAction<Neo4jTransaction> {
 
-    public Neo4jMeanWageOfPeopleInWorldAction(Neo4jOperation dbOperation) {
+    public Neo4jMeanWageOfPeopleInWorldAction(Neo4jTransaction dbOperation) {
         super(dbOperation);
     }
 

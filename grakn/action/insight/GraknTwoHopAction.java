@@ -17,7 +17,7 @@
 
 package grakn.benchmark.grakn.action.insight;
 
-import grakn.benchmark.grakn.driver.GraknOperation;
+import grakn.benchmark.grakn.driver.GraknTransaction;
 import grakn.benchmark.simulation.action.insight.TwoHopAction;
 import graql.lang.query.GraqlMatch;
 
@@ -36,8 +36,8 @@ import static grakn.benchmark.grakn.action.Model.PERSON;
 import static graql.lang.Graql.match;
 import static graql.lang.Graql.var;
 
-public class GraknTwoHopAction extends TwoHopAction<GraknOperation> {
-    public GraknTwoHopAction(GraknOperation dbOperation) {
+public class GraknTwoHopAction extends TwoHopAction<GraknTransaction> {
+    public GraknTwoHopAction(GraknTransaction dbOperation) {
         super(dbOperation);
     }
 

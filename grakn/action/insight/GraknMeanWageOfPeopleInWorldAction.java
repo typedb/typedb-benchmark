@@ -17,7 +17,7 @@
 
 package grakn.benchmark.grakn.action.insight;
 
-import grakn.benchmark.grakn.driver.GraknOperation;
+import grakn.benchmark.grakn.driver.GraknTransaction;
 import grakn.benchmark.simulation.action.insight.MeanWageOfPeopleInWorldAction;
 import graql.lang.pattern.variable.UnboundVariable;
 import graql.lang.query.GraqlMatch;
@@ -27,8 +27,8 @@ import static grakn.benchmark.grakn.action.Model.WAGE_VALUE;
 import static graql.lang.Graql.match;
 import static graql.lang.Graql.var;
 
-public class GraknMeanWageOfPeopleInWorldAction extends MeanWageOfPeopleInWorldAction<GraknOperation> {
-    public GraknMeanWageOfPeopleInWorldAction(GraknOperation dbOperation) {
+public class GraknMeanWageOfPeopleInWorldAction extends MeanWageOfPeopleInWorldAction<GraknTransaction> {
+    public GraknMeanWageOfPeopleInWorldAction(GraknTransaction dbOperation) {
         super(dbOperation);
     }
 

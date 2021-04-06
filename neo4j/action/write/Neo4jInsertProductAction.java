@@ -17,7 +17,7 @@
 
 package grakn.benchmark.neo4j.action.write;
 
-import grakn.benchmark.neo4j.driver.Neo4jOperation;
+import grakn.benchmark.neo4j.driver.Neo4jTransaction;
 import grakn.benchmark.simulation.action.write.InsertProductAction;
 import grakn.benchmark.simulation.world.World;
 import org.neo4j.driver.Query;
@@ -30,8 +30,8 @@ import static grakn.benchmark.neo4j.action.Model.PRODUCT_BARCODE;
 import static grakn.benchmark.neo4j.action.Model.PRODUCT_DESCRIPTION;
 import static grakn.benchmark.neo4j.action.Model.PRODUCT_NAME;
 
-public class Neo4jInsertProductAction extends InsertProductAction<Neo4jOperation, Record> {
-    public Neo4jInsertProductAction(Neo4jOperation dbOperation, World.Continent continent, Long barcode, String productName, String productDescription) {
+public class Neo4jInsertProductAction extends InsertProductAction<Neo4jTransaction, Record> {
+    public Neo4jInsertProductAction(Neo4jTransaction dbOperation, World.Continent continent, Long barcode, String productName, String productDescription) {
         super(dbOperation, continent, barcode, productName, productDescription);
     }
 

@@ -20,9 +20,9 @@ package grakn.benchmark.simulation.agent.insight;
 import grakn.benchmark.simulation.action.ActionFactory;
 import grakn.benchmark.simulation.action.read.ReadAction;
 import grakn.benchmark.simulation.agent.region.WorldAgent;
-import grakn.benchmark.simulation.driver.DbDriver;
-import grakn.benchmark.simulation.driver.DbOperation;
-import grakn.benchmark.simulation.driver.DbOperationFactory;
+import grakn.benchmark.simulation.driver.Client;
+import grakn.benchmark.simulation.driver.Transaction;
+import grakn.benchmark.simulation.driver.Session;
 import grakn.benchmark.simulation.world.World;
 
 import java.util.Random;
@@ -32,8 +32,8 @@ import java.util.Random;
  *
  * @param <DB_OPERATION>
  */
-public abstract class WorldwideInsightAgent<DB_OPERATION extends DbOperation> extends WorldAgent<DB_OPERATION> {
-    public WorldwideInsightAgent(DbDriver<DB_OPERATION> dbDriver, ActionFactory<DB_OPERATION, ?> actionFactory, grakn.benchmark.simulation.agent.base.BenchmarkContext benchmarkContext) {
+public abstract class WorldwideInsightAgent<DB_OPERATION extends Transaction> extends WorldAgent<DB_OPERATION> {
+    public WorldwideInsightAgent(Client<DB_OPERATION> dbDriver, ActionFactory<DB_OPERATION, ?> actionFactory, grakn.benchmark.simulation.agent.base.BenchmarkContext benchmarkContext) {
         super(dbDriver, actionFactory, benchmarkContext);
     }
 
@@ -51,9 +51,9 @@ public abstract class WorldwideInsightAgent<DB_OPERATION extends DbOperation> ex
         }
 
         @Override
-        protected void run(DbOperationFactory<DB_OPERATION> dbOperationFactory, World world) {
+        protected void run(Session<DB_OPERATION> dbOperationFactory, World world) {
             for (int i = 0; i <= benchmarkContext.world().getScaleFactor(); i++) {
-                try (DB_OPERATION dbOperation = dbOperationFactory.newDbOperation(tracker(), iteration(), isTracing())) {
+                try (DB_OPERATION dbOperation = dbOperationFactory.newTransaction(tracker(), iteration(), isTracing())) {
                     runAction(getAction(dbOperation));
                 }
             }

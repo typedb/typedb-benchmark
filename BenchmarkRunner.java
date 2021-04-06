@@ -23,8 +23,8 @@ import grakn.benchmark.simulation.Simulation;
 import grakn.benchmark.simulation.world.World;
 import grakn.benchmark.config.Config;
 import grakn.benchmark.config.ConfigLoader;
-import grakn.benchmark.grakn.driver.GraknDriver;
-import grakn.benchmark.neo4j.driver.Neo4jDriver;
+import grakn.benchmark.grakn.driver.GraknClient;
+import grakn.benchmark.neo4j.driver.Neo4jClient;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
@@ -112,9 +112,9 @@ public class BenchmarkRunner {
                 if (dbName.toLowerCase().startsWith("grakn")) {
                     defaultUri = "localhost:48555";
                     if (hostUri == null) hostUri = defaultUri;
-                    GraknDriver graknDriver;
-                    if (dbName.toLowerCase().contains("core")) graknDriver = GraknDriver.core(hostUri, DATABASE);
-                    else if (dbName.toLowerCase().contains("cluster")) graknDriver = GraknDriver.cluster(hostUri, DATABASE);
+                    GraknClient graknDriver;
+                    if (dbName.toLowerCase().contains("core")) graknDriver = GraknClient.core(hostUri, DATABASE);
+                    else if (dbName.toLowerCase().contains("cluster")) graknDriver = GraknClient.cluster(hostUri, DATABASE);
                     else throw new IllegalArgumentException("Unexpected database name: " + dbName);
                     benchmark = new grakn.benchmark.grakn.GraknBenchmark(
                             graknDriver,
@@ -129,7 +129,7 @@ public class BenchmarkRunner {
                     if (hostUri == null) hostUri = defaultUri;
 
                     benchmark = new grakn.benchmark.neo4j.Neo4JBenchmark(
-                            new Neo4jDriver(hostUri),
+                            new Neo4jClient(hostUri),
                             initialisationDataFiles,
                             config.getRandomSeed(),
                             world,

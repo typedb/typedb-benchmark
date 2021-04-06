@@ -17,15 +17,15 @@
 
 package grakn.benchmark.neo4j.action.insight;
 
-import grakn.benchmark.neo4j.driver.Neo4jOperation;
+import grakn.benchmark.neo4j.driver.Neo4jTransaction;
 import grakn.benchmark.simulation.action.insight.ArbitraryOneHopAction;
 import org.neo4j.driver.Query;
 import org.neo4j.driver.Record;
 
 import java.util.List;
 
-public class Neo4jArbitraryOneHopAction extends ArbitraryOneHopAction<Neo4jOperation> {
-    public Neo4jArbitraryOneHopAction(Neo4jOperation dbOperation) {
+public class Neo4jArbitraryOneHopAction extends ArbitraryOneHopAction<Neo4jTransaction> {
+    public Neo4jArbitraryOneHopAction(Neo4jTransaction dbOperation) {
         super(dbOperation);
     }
 

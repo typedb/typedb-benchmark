@@ -17,21 +17,8 @@
 
 package grakn.benchmark.simulation.driver;
 
-import org.slf4j.Logger;
-
-public abstract class DbOperationFactory<DB_OPERATION extends DbOperation> {
-
-    private final LogWrapper logWrapper;
-
-    DbOperationFactory(Logger logger) {
-        this.logWrapper = new LogWrapper(logger);
+public abstract class TransactionalTransaction extends Transaction implements AutoCloseable {
+    public TransactionalTransaction(String tracker, long iteration, boolean trace) {
+        super(tracker, iteration, trace);
     }
-
-    public LogWrapper logger() {
-        return logWrapper;
-    }
-
-    public abstract DB_OPERATION dbOperation();
-
-    public abstract DB_OPERATION newDbOperation(String tracker, long iteration, boolean trace);
 }

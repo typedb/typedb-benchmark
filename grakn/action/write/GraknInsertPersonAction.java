@@ -17,7 +17,7 @@
 
 package grakn.benchmark.grakn.action.write;
 
-import grakn.benchmark.grakn.driver.GraknOperation;
+import grakn.benchmark.grakn.driver.GraknTransaction;
 import grakn.benchmark.simulation.action.Action;
 import grakn.benchmark.simulation.action.write.InsertPersonAction;
 import grakn.benchmark.simulation.world.World;
@@ -42,8 +42,8 @@ import static grakn.benchmark.grakn.action.Model.PERSON;
 import static grakn.benchmark.grakn.action.Model.SURNAME;
 import static graql.lang.Graql.var;
 
-public class GraknInsertPersonAction extends InsertPersonAction<GraknOperation, ConceptMap> {
-    public GraknInsertPersonAction(GraknOperation dbOperation, World.City city, LocalDateTime today, String email, String gender, String forename, String surname) {
+public class GraknInsertPersonAction extends InsertPersonAction<GraknTransaction, ConceptMap> {
+    public GraknInsertPersonAction(GraknTransaction dbOperation, World.City city, LocalDateTime today, String email, String gender, String forename, String surname) {
         super(dbOperation, city, today, email, gender, forename, surname);
     }
 

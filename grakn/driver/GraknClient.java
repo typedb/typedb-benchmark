@@ -18,38 +18,35 @@
 package grakn.benchmark.grakn.driver;
 
 import grabl.tracing.client.GrablTracingThreadStatic;
-import grakn.benchmark.simulation.driver.DbOperationFactory;
-import grakn.benchmark.simulation.driver.TransactionalDbDriver;
+import grakn.benchmark.simulation.driver.Session;
+import grakn.benchmark.simulation.driver.TransactionalClient;
 import grakn.benchmark.simulation.world.Region;
 import grakn.client.Grakn;
-import grakn.client.api.GraknClient;
-import grakn.client.api.GraknSession;
-import grakn.client.api.GraknTransaction;
 import org.slf4j.Logger;
 
 import java.text.DecimalFormat;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static grabl.tracing.client.GrablTracingThreadStatic.traceOnThread;
-import static grakn.benchmark.simulation.driver.TransactionalDbDriver.TracingLabel.OPEN_SESSION;
+import static grakn.benchmark.simulation.driver.TransactionalClient.TracingLabel.OPEN_SESSION;
 import static graql.lang.Graql.match;
 import static graql.lang.Graql.var;
 
-public class GraknDriver extends TransactionalDbDriver<GraknSession, GraknOperation> {
+public class GraknClient extends TransactionalClient<grakn.client.api.GraknSession, GraknTransaction> {
 
-    private final GraknClient client;
+    private final grakn.client.api.GraknClient client;
     private final String database;
-    private final ConcurrentHashMap<String, GraknSession> sessionMap = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, grakn.client.api.GraknSession> sessionMap = new ConcurrentHashMap<>();
 
-    public static GraknDriver core(String hostUri, String database) {
-        return new GraknDriver(Grakn.coreClient(hostUri), database);
+    public static GraknClient core(String hostUri, String database) {
+        return new GraknClient(Grakn.coreClient(hostUri), database);
     }
 
-    public static GraknDriver cluster(String hostUri, String database) {
-        return new GraknDriver(Grakn.clusterClient(hostUri), database);
+    public static GraknClient cluster(String hostUri, String database) {
+        return new GraknClient(Grakn.clusterClient(hostUri), database);
     }
 
-    private GraknDriver(GraknClient client, String database) {
+    private GraknClient(grakn.client.api.GraknClient client, String database) {
         this.client = client;
         this.database = database;
     }
@@ -60,25 +57,25 @@ public class GraknDriver extends TransactionalDbDriver<GraknSession, GraknOperat
     }
 
     @Override
-    public GraknSession session(String sessionKey) {
+    public grakn.client.api.GraknSession session(String sessionKey) {
         return sessionMap.computeIfAbsent(sessionKey, k -> {
             try (GrablTracingThreadStatic.ThreadTrace ignored = traceOnThread(OPEN_SESSION.getName())) {
-                return client.session(database, GraknSession.Type.DATA);
+                return client.session(database, grakn.client.api.GraknSession.Type.DATA);
             }
         });
     }
 
-    public GraknSession schemaSession(String sessionKey) {
+    public grakn.client.api.GraknSession schemaSession(String sessionKey) {
         return sessionMap.computeIfAbsent(sessionKey, k -> {
             try (GrablTracingThreadStatic.ThreadTrace ignored = traceOnThread(OPEN_SESSION.getName())) {
-                return client.session(database, GraknSession.Type.SCHEMA);
+                return client.session(database, grakn.client.api.GraknSession.Type.SCHEMA);
             }
         });
     }
 
     @Override
     public void closeSessions() {
-        for (GraknSession session : sessionMap.values()) {
+        for (grakn.client.api.GraknSession session : sessionMap.values()) {
             session.close();
         }
         sessionMap.clear();
@@ -92,8 +89,8 @@ public class GraknDriver extends TransactionalDbDriver<GraknSession, GraknOperat
 
     @Override
     public void printStatistics(Logger LOG) {
-        GraknSession session = session("statisticsDataSession");
-        GraknTransaction tx = session.transaction(GraknTransaction.Type.READ);
+        grakn.client.api.GraknSession session = session("statisticsDataSession");
+        grakn.client.api.GraknTransaction tx = session.transaction(grakn.client.api.GraknTransaction.Type.READ);
         DecimalFormat formatter = new DecimalFormat("#,###");
 
         long numberOfEntities = tx.query().match(match(var("x").isa("entity")).count()).get().asLong();
@@ -116,7 +113,7 @@ public class GraknDriver extends TransactionalDbDriver<GraknSession, GraknOperat
     }
 
     @Override
-    public DbOperationFactory<GraknOperation> getDbOperationFactory(Region region, Logger logger) {
-        return new GraknOperationFactory(session(region.topLevelName()), logger);
+    public Session<GraknTransaction> getDbOperationFactory(Region region, Logger logger) {
+        return new GraknSession(session(region.topLevelName()), logger);
     }
 }

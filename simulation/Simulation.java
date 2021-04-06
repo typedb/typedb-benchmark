@@ -20,8 +20,8 @@ package grakn.benchmark.simulation;
 import grakn.benchmark.simulation.action.ActionFactory;
 import grakn.benchmark.simulation.agent.AgentFactory;
 import grakn.benchmark.simulation.agent.base.Agent;
-import grakn.benchmark.simulation.driver.DbDriver;
-import grakn.benchmark.simulation.driver.DbOperation;
+import grakn.benchmark.simulation.driver.Client;
+import grakn.benchmark.simulation.driver.Transaction;
 import grakn.benchmark.simulation.utils.RandomSource;
 import grakn.benchmark.simulation.world.World;
 import grakn.benchmark.config.Config;
@@ -39,7 +39,7 @@ import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
-public abstract class Simulation<DB_DRIVER extends DbDriver<DB_OPERATION>, DB_OPERATION extends DbOperation> implements grakn.benchmark.simulation.agent.base.BenchmarkContext {
+public abstract class Simulation<DB_DRIVER extends Client<DB_OPERATION>, DB_OPERATION extends Transaction> implements grakn.benchmark.simulation.agent.base.BenchmarkContext {
 
     final static Logger LOG = LoggerFactory.getLogger(Simulation.class);
     private final List<Agent<?, DB_OPERATION>> agentList;

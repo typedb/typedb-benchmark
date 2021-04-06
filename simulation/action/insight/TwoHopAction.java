@@ -17,11 +17,11 @@
 
 package grakn.benchmark.simulation.action.insight;
 
-import grakn.benchmark.simulation.driver.DbOperation;
+import grakn.benchmark.simulation.driver.Transaction;
 
 import java.util.List;
 
-public abstract class TwoHopAction<DB_OPERATION extends DbOperation> extends WorldwideInsightAction<DB_OPERATION, List<String>> {
+public abstract class TwoHopAction<DB_OPERATION extends Transaction> extends WorldwideInsightAction<DB_OPERATION, List<String>> {
 
     public TwoHopAction(DB_OPERATION dbOperation) {
         super(dbOperation);

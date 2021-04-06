@@ -17,7 +17,7 @@
 
 package grakn.benchmark.grakn.action.insight;
 
-import grakn.benchmark.grakn.driver.GraknOperation;
+import grakn.benchmark.grakn.driver.GraknTransaction;
 import grakn.benchmark.simulation.action.insight.FindTransactionCurrencyAction;
 import graql.lang.query.GraqlMatch;
 
@@ -29,8 +29,8 @@ import static grakn.benchmark.grakn.action.Model.TRANSACTION;
 import static graql.lang.Graql.match;
 import static graql.lang.Graql.var;
 
-public class GraknFindTransactionCurrencyAction extends FindTransactionCurrencyAction<GraknOperation> {
-    public GraknFindTransactionCurrencyAction(GraknOperation dbOperation) {
+public class GraknFindTransactionCurrencyAction extends FindTransactionCurrencyAction<GraknTransaction> {
+    public GraknFindTransactionCurrencyAction(GraknTransaction dbOperation) {
         super(dbOperation);
     }
 

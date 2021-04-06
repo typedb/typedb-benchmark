@@ -17,19 +17,27 @@
 
 package grakn.benchmark.simulation.driver;
 
-import org.slf4j.Logger;
+import grakn.benchmark.simulation.utils.Trace;
 
+import java.util.function.Supplier;
 
-public abstract class TransactionalDbOperationFactory<DB_OPERATION extends TransactionalDbOperation> extends DbOperationFactory<DB_OPERATION> {
+public abstract class Transaction implements AutoCloseable {
 
-    public TransactionalDbOperationFactory(Logger logger) {
-        super(logger);
+    protected final String tracker;
+    protected final long iteration;
+    private final boolean trace;
+
+    public Transaction(String tracker, long iteration, boolean trace) {
+        this.iteration = iteration;
+        this.tracker = tracker;
+        this.trace = trace;
     }
 
-    public DB_OPERATION dbOperation() { // Needed for now but will disappear once agents give the operations to the actions rather than the ActionFactory
-        return null;
-    }
+    public abstract void close();
 
-    @Override
-    public abstract DB_OPERATION newDbOperation(String tracker, long iteration, boolean trace);
+    public abstract void save();
+
+    protected <T> T trace(Supplier<T> method, String traceName) {
+        return Trace.trace(method, traceName, trace);
+    }
 }

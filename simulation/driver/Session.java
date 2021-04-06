@@ -17,14 +17,21 @@
 
 package grakn.benchmark.simulation.driver;
 
-import grakn.benchmark.simulation.world.Region;
 import org.slf4j.Logger;
 
-public abstract class DbDriver<DB_OPERATION extends DbOperation> {
+public abstract class Session<DB_OPERATION extends Transaction> {
 
-    public abstract DbOperationFactory<DB_OPERATION> getDbOperationFactory(Region region, Logger logger);
+    private final LogWrapper logWrapper;
 
-    public abstract void printStatistics(Logger LOG);
+    Session(Logger logger) {
+        this.logWrapper = new LogWrapper(logger);
+    }
 
-    public abstract void close();
+    public LogWrapper logger() {
+        return logWrapper;
+    }
+
+    public abstract DB_OPERATION transaction();
+
+    public abstract DB_OPERATION newTransaction(String tracker, long iteration, boolean trace);
 }

@@ -17,7 +17,7 @@
 
 package grakn.benchmark.grakn.action.write;
 
-import grakn.benchmark.grakn.driver.GraknOperation;
+import grakn.benchmark.grakn.driver.GraknTransaction;
 import grakn.benchmark.simulation.action.write.InsertProductAction;
 import grakn.benchmark.simulation.world.World;
 import grakn.client.api.answer.ConceptMap;
@@ -37,8 +37,8 @@ import static grakn.benchmark.grakn.action.Model.PRODUCT_NAME;
 import static graql.lang.Graql.match;
 import static graql.lang.Graql.var;
 
-public class GraknInsertProductAction extends InsertProductAction<GraknOperation, ConceptMap> {
-    public GraknInsertProductAction(GraknOperation dbOperation, World.Continent continent, Long barcode, String productName, String productDescription) {
+public class GraknInsertProductAction extends InsertProductAction<GraknTransaction, ConceptMap> {
+    public GraknInsertProductAction(GraknTransaction dbOperation, World.Continent continent, Long barcode, String productName, String productDescription) {
         super(dbOperation, continent, barcode, productName, productDescription);
     }
 
