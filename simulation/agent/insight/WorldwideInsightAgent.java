@@ -38,7 +38,7 @@ public abstract class WorldwideInsightAgent<TX extends Transaction> extends Worl
     }
 
     @Override
-    protected Regional getRegionalAgent(int iteration, String tracker, Random random, boolean test) {
+    protected Agent getAgent(int iteration, String tracker, Random random, boolean test) {
         return new WorldWideWorker(iteration, tracker, random, test);
     }
 

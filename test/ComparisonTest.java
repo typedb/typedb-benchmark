@@ -18,7 +18,7 @@
 package grakn.benchmark.test;
 
 import grakn.benchmark.simulation.action.Action;
-import grakn.benchmark.simulation.agent.base.Agent;
+import grakn.benchmark.simulation.agent.base.AgentManager;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -32,13 +32,13 @@ import static org.junit.Assert.assertEquals;
 public class ComparisonTest {
 
     private void compareReports(String agentName) {
-        Agent<?, ?>.Report graknAgentReport = graknCore.getReport().getAgentReport(agentName);
-        Agent<?, ?>.Report neo4jAgentReport = neo4j.getReport().getAgentReport(agentName);
+        AgentManager<?, ?>.Report graknAgentReport = graknCore.getReport().getAgentReport(agentName);
+        AgentManager<?, ?>.Report neo4jAgentReport = neo4j.getReport().getAgentReport(agentName);
 
         if (!graknAgentReport.equals(neo4jAgentReport)) {
             graknAgentReport.trackers().forEach(tracker -> {
-                Agent.Regional.Report graknRegionReport = graknAgentReport.getRegionalAgentReport(tracker);
-                Agent.Regional.Report neo4jRegionReport = neo4jAgentReport.getRegionalAgentReport(tracker);
+                AgentManager.Agent.Report graknRegionReport = graknAgentReport.getRegionalAgentReport(tracker);
+                AgentManager.Agent.Report neo4jRegionReport = neo4jAgentReport.getRegionalAgentReport(tracker);
 
                 if (!graknRegionReport.equals(neo4jRegionReport)) {
                     Iterator<Action<?, ?>.Report> graknIter = graknRegionReport.getActionReportIterator();

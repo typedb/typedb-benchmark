@@ -22,7 +22,7 @@ import grakn.benchmark.simulation.action.SpouseType;
 import grakn.benchmark.simulation.action.read.BirthsInCityAction;
 import grakn.benchmark.simulation.action.read.MarriedCoupleAction;
 import grakn.benchmark.simulation.agent.base.Allocation;
-import grakn.benchmark.simulation.agent.region.CityAgent;
+import grakn.benchmark.simulation.agent.region.CityAgentManager;
 import grakn.benchmark.simulation.driver.Client;
 import grakn.benchmark.simulation.driver.Transaction;
 import grakn.benchmark.simulation.driver.Session;
@@ -34,18 +34,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-public class ParentshipAgent<TX extends Transaction> extends CityAgent<TX> {
+public class ParentshipAgent<TX extends Transaction> extends CityAgentManager<TX> {
 
     public ParentshipAgent(Client<TX> dbDriver, ActionFactory<TX, ?> actionFactory, grakn.benchmark.simulation.agent.base.BenchmarkContext benchmarkContext) {
         super(dbDriver, actionFactory, benchmarkContext);
     }
 
     @Override
-    protected Regional getRegionalAgent(int iteration, String tracker, Random random, boolean test) {
+    protected Agent getAgent(int iteration, String tracker, Random random, boolean test) {
         return new City(iteration, tracker, random, test);
     }
 
-    public class City extends CityRegion {
+    public class City extends CityAgent {
         public City(int iteration, String tracker, Random random, boolean test) {
             super(iteration, tracker, random, test);
         }

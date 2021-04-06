@@ -52,7 +52,7 @@ import static grakn.common.util.Objects.className;
  * @param <REGION>       The type of region used by the agent.
  * @param <TX> The abstraction of database operations used by the agent.
  */
-public abstract class Agent<REGION extends Region, TX extends Transaction> {
+public abstract class AgentManager<REGION extends Region, TX extends Transaction> {
 
     protected final BenchmarkContext benchmarkContext;
     private final Logger logger;
@@ -61,7 +61,7 @@ public abstract class Agent<REGION extends Region, TX extends Transaction> {
     private final Report report = new Report();
     private boolean isTracing = true;
 
-    protected Agent(Client<TX> client, ActionFactory<TX, ?> actionFactory, BenchmarkContext benchmarkContext) {
+    protected AgentManager(Client<TX> client, ActionFactory<TX, ?> actionFactory, BenchmarkContext benchmarkContext) {
         this.client = client;
         this.actionFactory = actionFactory;
         this.benchmarkContext = benchmarkContext;
@@ -87,21 +87,21 @@ public abstract class Agent<REGION extends Region, TX extends Transaction> {
         List<RandomSource> randomisers = randomSource.split(regions.size());
 
         Utils.pairs(randomisers, regions).parallelStream().forEach(
-                pair -> executeRegionalAgent(pair.first(), pair.second())
+                pair -> executeAgent(pair.first(), pair.second())
         );
         return report;
     }
 
-    protected abstract Regional getRegionalAgent(int iteration, String tracker, Random random, boolean test);
+    protected abstract Agent getAgent(int iteration, String tracker, Random random, boolean test);
 
-    private void executeRegionalAgent(RandomSource source, REGION region) {
+    private void executeAgent(RandomSource source, REGION region) {
         Random random = source.get();
         Random agentRandom = RandomSource.nextSource(random).get();
 
-        Regional regionalAgent = getRegionalAgent(benchmarkContext.iteration(), region.tracker(), agentRandom, benchmarkContext.test());
+        Agent regionalAgent = getAgent(benchmarkContext.iteration(), region.tracker(), agentRandom, benchmarkContext.test());
         Session<TX> session = client.session(region, logger);
 
-        Regional.Report report = regionalAgent.runWithReport(session, region);
+        Agent.Report report = regionalAgent.runWithReport(session, region);
         this.report.addRegionalAgentReport(region.tracker(), report);
     }
 
@@ -110,9 +110,9 @@ public abstract class Agent<REGION extends Region, TX extends Transaction> {
     }
 
     public class Report {
-        ConcurrentHashMap<String, Regional.Report> regionalAgentReports = new ConcurrentHashMap<>();
+        ConcurrentHashMap<String, Agent.Report> regionalAgentReports = new ConcurrentHashMap<>();
 
-        public void addRegionalAgentReport(String tracker, Regional.Report regionalAgentReport) {
+        public void addRegionalAgentReport(String tracker, Agent.Report regionalAgentReport) {
             regionalAgentReports.put(tracker, regionalAgentReport);
         }
 
@@ -120,12 +120,12 @@ public abstract class Agent<REGION extends Region, TX extends Transaction> {
             return regionalAgentReports.keySet();
         }
 
-        public Regional.Report getRegionalAgentReport(String tracker) {
+        public Agent.Report getRegionalAgentReport(String tracker) {
             return regionalAgentReports.get(tracker);
         }
     }
 
-    public abstract class Regional implements AutoCloseable {
+    public abstract class Agent implements AutoCloseable {
 
         private final Random random;
         private final Report report = new Report();
@@ -134,7 +134,7 @@ public abstract class Agent<REGION extends Region, TX extends Transaction> {
         private final int iteration;
         private GrablTracingThreadStatic.ThreadContext context;
 
-        public Regional(int iteration, String tracker, Random random, boolean isTest) {
+        public Agent(int iteration, String tracker, Random random, boolean isTest) {
             this.iteration = iteration;
             this.tracker = tracker;
             this.random = random;

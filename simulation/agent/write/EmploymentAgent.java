@@ -20,7 +20,7 @@ package grakn.benchmark.simulation.agent.write;
 import grakn.benchmark.simulation.action.ActionFactory;
 import grakn.benchmark.simulation.action.read.CompaniesInCountryAction;
 import grakn.benchmark.simulation.action.read.ResidentsInCityAction;
-import grakn.benchmark.simulation.agent.region.CityAgent;
+import grakn.benchmark.simulation.agent.region.CityAgentManager;
 import grakn.benchmark.simulation.driver.Client;
 import grakn.benchmark.simulation.driver.Transaction;
 import grakn.benchmark.simulation.driver.Session;
@@ -32,18 +32,18 @@ import java.util.Random;
 
 import static grakn.benchmark.simulation.agent.base.Allocation.allocate;
 
-public class EmploymentAgent<TX extends Transaction> extends CityAgent<TX> {
+public class EmploymentAgent<TX extends Transaction> extends CityAgentManager<TX> {
 
     public EmploymentAgent(Client<TX> dbDriver, ActionFactory<TX, ?> actionFactory, grakn.benchmark.simulation.agent.base.BenchmarkContext benchmarkContext) {
         super(dbDriver, actionFactory, benchmarkContext);
     }
 
     @Override
-    protected Regional getRegionalAgent(int iteration, String tracker, Random random, boolean test) {
+    protected Agent getAgent(int iteration, String tracker, Random random, boolean test) {
         return new City(iteration, tracker, random, test);
     }
 
-    public class City extends CityRegion {
+    public class City extends CityAgent {
         double MIN_ANNUAL_WAGE = 18000.00;
         double MAX_ANNUAL_WAGE = 80000.00;
         double MIN_CONTRACTED_HOURS = 30.0;

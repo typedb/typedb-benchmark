@@ -18,7 +18,7 @@
 package grakn.benchmark.simulation.agent.region;
 
 import grakn.benchmark.simulation.action.ActionFactory;
-import grakn.benchmark.simulation.agent.base.Agent;
+import grakn.benchmark.simulation.agent.base.AgentManager;
 import grakn.benchmark.simulation.driver.Client;
 import grakn.benchmark.simulation.driver.Transaction;
 import grakn.benchmark.simulation.world.World;
@@ -28,7 +28,7 @@ import java.util.Random;
 
 import static java.util.stream.Collectors.toList;
 
-public abstract class ContinentAgent<TX extends Transaction> extends Agent<World.Continent, TX> {
+public abstract class ContinentAgent<TX extends Transaction> extends AgentManager<World.Continent, TX> {
 
     public ContinentAgent(Client<TX> dbDriver, ActionFactory<TX, ?> actionFactory, grakn.benchmark.simulation.agent.base.BenchmarkContext benchmarkContext) {
         super(dbDriver, actionFactory, benchmarkContext);
@@ -39,7 +39,7 @@ public abstract class ContinentAgent<TX extends Transaction> extends Agent<World
         return world.getContinents().collect(toList());
     }
 
-    protected abstract class ContinentRegion extends Regional {
+    protected abstract class ContinentRegion extends Agent {
 
         public ContinentRegion(int iteration, String tracker, Random random, boolean test) {
             super(iteration, tracker, random, test);

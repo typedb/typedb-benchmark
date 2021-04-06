@@ -19,7 +19,7 @@ package grakn.benchmark.simulation.agent.write;
 
 import grakn.benchmark.simulation.action.ActionFactory;
 import grakn.benchmark.simulation.action.read.ResidentsInCityAction;
-import grakn.benchmark.simulation.agent.region.CityAgent;
+import grakn.benchmark.simulation.agent.region.CityAgentManager;
 import grakn.benchmark.simulation.driver.Client;
 import grakn.benchmark.simulation.driver.Transaction;
 import grakn.benchmark.simulation.driver.Session;
@@ -28,18 +28,18 @@ import grakn.benchmark.simulation.world.World;
 import java.util.List;
 import java.util.Random;
 
-public class FriendshipAgent<TX extends Transaction> extends CityAgent<TX> {
+public class FriendshipAgent<TX extends Transaction> extends CityAgentManager<TX> {
 
     public FriendshipAgent(Client<TX> dbDriver, ActionFactory<TX, ?> actionFactory, grakn.benchmark.simulation.agent.base.BenchmarkContext benchmarkContext) {
         super(dbDriver, actionFactory, benchmarkContext);
     }
 
     @Override
-    protected Regional getRegionalAgent(int iteration, String tracker, Random random, boolean test) {
+    protected Agent getAgent(int iteration, String tracker, Random random, boolean test) {
         return new City(iteration, tracker, random, test);
     }
 
-    public class City extends CityRegion {
+    public class City extends CityAgent {
         public City(int iteration, String tracker, Random random, boolean test) {
             super(iteration, tracker, random, test);
         }

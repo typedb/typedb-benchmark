@@ -33,7 +33,7 @@ public class ProductAgent<TX extends Transaction> extends ContinentAgent<TX> {
     }
 
     @Override
-    protected Regional getRegionalAgent(int iteration, String tracker, Random random, boolean test) {
+    protected Agent getAgent(int iteration, String tracker, Random random, boolean test) {
         return new RegionalProductAgent(iteration, tracker, random, test);
     }
 

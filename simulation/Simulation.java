@@ -19,7 +19,7 @@ package grakn.benchmark.simulation;
 
 import grakn.benchmark.simulation.action.ActionFactory;
 import grakn.benchmark.simulation.agent.AgentFactory;
-import grakn.benchmark.simulation.agent.base.Agent;
+import grakn.benchmark.simulation.agent.base.AgentManager;
 import grakn.benchmark.simulation.driver.Client;
 import grakn.benchmark.simulation.driver.Transaction;
 import grakn.benchmark.simulation.utils.RandomSource;
@@ -42,7 +42,7 @@ import java.util.function.Function;
 public abstract class Simulation<DB_DRIVER extends Client<TX>, TX extends Transaction> implements grakn.benchmark.simulation.agent.base.BenchmarkContext {
 
     final static Logger LOG = LoggerFactory.getLogger(Simulation.class);
-    private final List<Agent<?, TX>> agentList;
+    private final List<AgentManager<?, TX>> agentMgrs;
     protected final DB_DRIVER driver;
     private final Random random;
     private final List<Config.Agent> agentConfigs;
@@ -60,18 +60,18 @@ public abstract class Simulation<DB_DRIVER extends Client<TX>, TX extends Transa
         this.world = world;
         this.test = test;
         initialise(initialisationDataPaths);
-        this.agentList = agentListFromConfigs();
+        this.agentMgrs = agentListFromConfigs();
         this.report = new Report();
     }
 
-    protected List<Agent<?, TX>> agentListFromConfigs() {
-        List<Agent<?, TX>> agents = new ArrayList<>();
+    protected List<AgentManager<?, TX>> agentListFromConfigs() {
+        List<AgentManager<?, TX>> agents = new ArrayList<>();
         ActionFactory<TX, ?> actionFactory = actionFactory();
         AgentFactory<TX, ?> agentFactory = new AgentFactory<>(driver, actionFactory, this);
 
         for (Config.Agent agentConfig : agentConfigs) {
             if (agentConfig.getAgentMode().getRun()) {
-                Agent<?, TX> agent = agentFactory.get(agentConfig.getName());
+                AgentManager<?, TX> agent = agentFactory.get(agentConfig.getName());
                 agent.setTracing(agentConfig.getAgentMode().getTrace());
                 agents.add(agent);
             }
@@ -85,8 +85,8 @@ public abstract class Simulation<DB_DRIVER extends Client<TX>, TX extends Transa
 
     public void iterate() {
         report.clean();
-        for (Agent<?, ?> agent : agentList) {
-            this.report.addAgentResult(agent.name(), agent.iterate(RandomSource.nextSource(random)));
+        for (AgentManager<?, ?> agentMgr : agentMgrs) {
+            this.report.addAgentResult(agentMgr.name(), agentMgr.iterate(RandomSource.nextSource(random)));
         }
         closeIteration();  // We want to test opening new sessions each iteration.
         iteration++;
@@ -129,16 +129,16 @@ public abstract class Simulation<DB_DRIVER extends Client<TX>, TX extends Transa
 
     public class Report {
 
-        private ConcurrentHashMap<String, Agent<?, ?>.Report> agentReports = new ConcurrentHashMap<>();
+        private ConcurrentHashMap<String, AgentManager<?, ?>.Report> agentReports = new ConcurrentHashMap<>();
 
-        public void addAgentResult(String agentName, Agent<?, ?>.Report agentReport) {
+        public void addAgentResult(String agentName, AgentManager<?, ?>.Report agentReport) {
             if (agentReport == null) {
                 throw new NullPointerException(String.format("The result returned from a %s agent was null", agentName));
             }
             agentReports.put(agentName, agentReport);
         }
 
-        public Agent<?, ?>.Report getAgentReport(String agentName) {
+        public AgentManager<?, ?>.Report getAgentReport(String agentName) {
             return agentReports.get(agentName);
         }
 
