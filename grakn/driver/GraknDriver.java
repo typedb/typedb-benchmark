@@ -35,7 +35,7 @@ import static grakn.benchmark.simulation.driver.TransactionalDbDriver.TracingLab
 import static graql.lang.Graql.match;
 import static graql.lang.Graql.var;
 
-public class GraknDriver extends TransactionalDbDriver<GraknTransaction, GraknSession, GraknOperation> {
+public class GraknDriver extends TransactionalDbDriver<GraknSession, GraknOperation> {
 
     private final GraknClient client;
     private final String database;

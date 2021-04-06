@@ -37,7 +37,7 @@ import static com.google.common.collect.Iterables.getOnlyElement;
 import static grabl.tracing.client.GrablTracingThreadStatic.traceOnThread;
 import static grakn.benchmark.simulation.driver.TransactionalDbDriver.TracingLabel.OPEN_SESSION;
 
-public class Neo4jDriver extends TransactionalDbDriver<org.neo4j.driver.Transaction, org.neo4j.driver.Session, Neo4jOperation> {
+public class Neo4jDriver extends TransactionalDbDriver<org.neo4j.driver.Session, Neo4jOperation> {
 
     private final Driver driver;
     private final ConcurrentHashMap<String, org.neo4j.driver.Session> sessionMap = new ConcurrentHashMap<>();
