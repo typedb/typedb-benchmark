@@ -35,7 +35,7 @@ import static java.util.stream.Collectors.toList;
 
 public class AgeUpdateAgent<TX extends Transaction> extends Agent<World.City, TX> {
 
-    public AgeUpdateAgent(Client<? extends Session<TX>, TX> client, ActionFactory<TX, ?> actionFactory, SimulationContext context) {
+    public AgeUpdateAgent(Client<?, TX> client, ActionFactory<TX, ?> actionFactory, SimulationContext context) {
         super(client, actionFactory, context);
     }
 

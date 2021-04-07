@@ -26,7 +26,7 @@ import grakn.benchmark.simulation.driver.Client;
 
 public class MeanWageAgent<TX extends Transaction> extends ReadAgent<TX> {
 
-    public MeanWageAgent(Client<? extends Session<TX>, TX> client, ActionFactory<TX, ?> actionFactory, SimulationContext context) {
+    public MeanWageAgent(Client<?, TX> client, ActionFactory<TX, ?> actionFactory, SimulationContext context) {
         super(client, actionFactory, context);
     }
 

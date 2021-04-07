@@ -35,7 +35,7 @@ import static java.util.stream.Collectors.toList;
 
 public class ProductAgent<TX extends Transaction> extends Agent<World.Continent, TX> {
 
-    public ProductAgent(Client<? extends Session<TX>, TX> client, ActionFactory<TX, ?> actionFactory, SimulationContext context) {
+    public ProductAgent(Client<?, TX> client, ActionFactory<TX, ?> actionFactory, SimulationContext context) {
         super(client, actionFactory, context);
     }
 

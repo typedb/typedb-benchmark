@@ -26,7 +26,7 @@ import grakn.benchmark.simulation.driver.Client;
 
 public class ThreeHopAgent<TX extends Transaction> extends ReadAgent<TX> {
 
-    public ThreeHopAgent(Client<? extends Session<TX>, TX> client, ActionFactory<TX, ?> actionFactory, SimulationContext context) {
+    public ThreeHopAgent(Client<?, TX> client, ActionFactory<TX, ?> actionFactory, SimulationContext context) {
         super(client, actionFactory, context);
     }
 

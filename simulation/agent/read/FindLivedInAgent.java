@@ -26,7 +26,7 @@ import grakn.benchmark.simulation.driver.Client;
 
 public class FindLivedInAgent<TX extends Transaction> extends ReadAgent<TX> {
 
-    public FindLivedInAgent(Client<? extends Session<TX>, TX> client, ActionFactory<TX, ?> actionFactory, SimulationContext context) {
+    public FindLivedInAgent(Client<?, TX> client, ActionFactory<TX, ?> actionFactory, SimulationContext context) {
         super(client, actionFactory, context);
     }
 

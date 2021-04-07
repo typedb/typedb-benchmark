@@ -34,7 +34,7 @@ import java.util.Random;
 
 public abstract class ReadAgent<TX extends Transaction> extends Agent<World, TX> {
 
-    public ReadAgent(Client<? extends Session<TX>, TX> client, ActionFactory<TX, ?> actionFactory, SimulationContext context) {
+    public ReadAgent(Client<?, TX> client, ActionFactory<TX, ?> actionFactory, SimulationContext context) {
         super(client, actionFactory, context);
     }
 

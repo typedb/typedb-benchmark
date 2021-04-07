@@ -36,7 +36,7 @@ import static java.util.stream.Collectors.toList;
 
 public class MarriageAgent<TX extends Transaction> extends Agent<World.City, TX> {
 
-    public MarriageAgent(Client<? extends Session<TX>, TX> client, ActionFactory<TX, ?> actionFactory, SimulationContext context) {
+    public MarriageAgent(Client<?, TX> client, ActionFactory<TX, ?> actionFactory, SimulationContext context) {
         super(client, actionFactory, context);
     }
 

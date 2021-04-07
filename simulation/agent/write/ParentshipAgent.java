@@ -41,7 +41,7 @@ import static java.util.stream.Collectors.toList;
 
 public class ParentshipAgent<TX extends Transaction> extends Agent<World.City, TX> {
 
-    public ParentshipAgent(Client<? extends Session<TX>, TX> client, ActionFactory<TX, ?> actionFactory, SimulationContext context) {
+    public ParentshipAgent(Client<?, TX> client, ActionFactory<TX, ?> actionFactory, SimulationContext context) {
         super(client, actionFactory, context);
     }
 

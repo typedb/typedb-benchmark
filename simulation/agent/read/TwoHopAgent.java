@@ -26,7 +26,7 @@ import grakn.benchmark.simulation.driver.Client;
 
 public class TwoHopAgent<TX extends Transaction> extends ReadAgent<TX> {
 
-    public TwoHopAgent(Client<? extends Session<TX>, TX> client, ActionFactory<TX, ?> actionFactory, SimulationContext context) {
+    public TwoHopAgent(Client<?, TX> client, ActionFactory<TX, ?> actionFactory, SimulationContext context) {
         super(client, actionFactory, context);
     }
 

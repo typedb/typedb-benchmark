@@ -26,7 +26,7 @@ import grakn.benchmark.simulation.driver.Client;
 
 public class FindTransactionCurrencyAgent<TX extends Transaction> extends ReadAgent<TX> {
 
-    public FindTransactionCurrencyAgent(Client<? extends Session<TX>, TX> client, ActionFactory<TX, ?> actionFactory, SimulationContext context) {
+    public FindTransactionCurrencyAgent(Client<?, TX> client, ActionFactory<TX, ?> actionFactory, SimulationContext context) {
         super(client, actionFactory, context);
     }
 

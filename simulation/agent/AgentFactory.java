@@ -45,11 +45,11 @@ import grakn.benchmark.simulation.driver.Client;
 
 public class AgentFactory<TX extends Transaction, ACTION_FACTORY extends ActionFactory<TX, ?>> {
 
-    private final Client<? extends Session<TX>, TX> client;
+    private final Client<?, TX> client;
     private final ACTION_FACTORY actionFactory;
     private final SimulationContext benchmarkContext;
 
-    public AgentFactory(Client<? extends Session<TX>, TX> client, ACTION_FACTORY actionFactory, SimulationContext benchmarkContext) {
+    public AgentFactory(Client<?, TX> client, ACTION_FACTORY actionFactory, SimulationContext benchmarkContext) {
         this.client = client;
         this.actionFactory = actionFactory;
         this.benchmarkContext = benchmarkContext;

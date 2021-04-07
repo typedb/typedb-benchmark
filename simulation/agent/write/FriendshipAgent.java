@@ -36,7 +36,7 @@ import static java.util.stream.Collectors.toList;
 
 public class FriendshipAgent<TX extends Transaction> extends Agent<World.City, TX> {
 
-    public FriendshipAgent(Client<? extends Session<TX>, TX> client, ActionFactory<TX, ?> actionFactory, SimulationContext context) {
+    public FriendshipAgent(Client<?, TX> client, ActionFactory<TX, ?> actionFactory, SimulationContext context) {
         super(client, actionFactory, context);
     }
 

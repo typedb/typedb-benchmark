@@ -41,7 +41,7 @@ import static java.util.stream.Collectors.toList;
 
 public class PurchaseAgent<TX extends Transaction> extends Agent<World.Country, TX> {
 
-    public PurchaseAgent(Client<? extends Session<TX>, TX> client, ActionFactory<TX, ?> actionFactory, SimulationContext context) {
+    public PurchaseAgent(Client<?, TX> client, ActionFactory<TX, ?> actionFactory, SimulationContext context) {
         super(client, actionFactory, context);
     }
 

@@ -26,7 +26,7 @@ import grakn.benchmark.simulation.driver.Client;
 
 public class FourHopAgent<TX extends Transaction> extends ReadAgent<TX> {
 
-    public FourHopAgent(Client<? extends Session<TX>, TX> client, ActionFactory<TX, ?> actionFactory, SimulationContext context) {
+    public FourHopAgent(Client<?, TX> client, ActionFactory<TX, ?> actionFactory, SimulationContext context) {
         super(client, actionFactory, context);
     }
 

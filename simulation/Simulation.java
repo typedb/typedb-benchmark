@@ -41,7 +41,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
-public abstract class Simulation<CLIENT extends Client<? extends Session<TX>, TX>, TX extends Transaction> implements SimulationContext {
+public abstract class Simulation<CLIENT extends Client<?, TX>, TX extends Transaction> implements SimulationContext {
 
     final static Logger LOG = LoggerFactory.getLogger(Simulation.class);
     private final List<Agent<?, TX>> agents;

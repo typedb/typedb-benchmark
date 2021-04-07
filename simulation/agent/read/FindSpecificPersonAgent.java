@@ -26,7 +26,7 @@ import grakn.benchmark.simulation.driver.Client;
 
 public class FindSpecificPersonAgent<TX extends Transaction> extends ReadAgent<TX> {
 
-    public FindSpecificPersonAgent(Client<? extends Session<TX>, TX> client, ActionFactory<TX, ?> actionFactory, SimulationContext context) {
+    public FindSpecificPersonAgent(Client<?, TX> client, ActionFactory<TX, ?> actionFactory, SimulationContext context) {
         super(client, actionFactory, context);
     }
 

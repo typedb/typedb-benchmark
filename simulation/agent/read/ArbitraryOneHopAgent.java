@@ -26,7 +26,7 @@ import grakn.benchmark.simulation.driver.Client;
 
 public class ArbitraryOneHopAgent<TX extends Transaction> extends ReadAgent<TX> {
 
-    public ArbitraryOneHopAgent(Client<? extends Session<TX>, TX> client, ActionFactory<TX, ?> actionFactory, SimulationContext context) {
+    public ArbitraryOneHopAgent(Client<?, TX> client, ActionFactory<TX, ?> actionFactory, SimulationContext context) {
         super(client, actionFactory, context);
     }
 

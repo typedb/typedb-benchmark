@@ -41,8 +41,6 @@ public class GraknFindTransactionCurrencyAction extends FindTransactionCurrencyA
     }
 
     public static GraqlMatch.Unfiltered query() {
-        return match(
-                var(TRANSACTION).isa(TRANSACTION).has(CURRENCY, var(CURRENCY))
-        );
+        return match(var(TRANSACTION).isa(TRANSACTION).has(CURRENCY, var(CURRENCY)));
     }
 }

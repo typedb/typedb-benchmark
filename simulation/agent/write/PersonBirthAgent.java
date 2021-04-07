@@ -34,7 +34,7 @@ import static java.util.stream.Collectors.toList;
 
 public class PersonBirthAgent<TX extends Transaction> extends Agent<World.City, TX> {
 
-    public PersonBirthAgent(Client<? extends Session<TX>, TX> client, ActionFactory<TX, ?> actionFactory, SimulationContext context) {
+    public PersonBirthAgent(Client<?, TX> client, ActionFactory<TX, ?> actionFactory, SimulationContext context) {
         super(client, actionFactory, context);
     }
 

@@ -39,7 +39,7 @@ import static java.util.stream.Collectors.toList;
 
 public class RelocationAgent<TX extends Transaction> extends Agent<World.City, TX> {
 
-    public RelocationAgent(Client<? extends Session<TX>, TX> client, ActionFactory<TX, ?> actionFactory, SimulationContext context) {
+    public RelocationAgent(Client<?, TX> client, ActionFactory<TX, ?> actionFactory, SimulationContext context) {
         super(client, actionFactory, context);
     }
 

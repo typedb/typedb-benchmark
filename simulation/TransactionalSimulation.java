@@ -29,7 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
-public abstract class TransactionalSimulation<CLIENT extends Client<? extends Session<TX>, TX>, TX extends Transaction> extends Simulation<CLIENT, TX> {
+public abstract class TransactionalSimulation<CLIENT extends Client<?, TX>, TX extends Transaction> extends Simulation<CLIENT, TX> {
 
     public TransactionalSimulation(CLIENT driver, Map<String, Path> initialisationDataPaths, int randomSeed, World world, List<Config.Agent> agentConfigs, Function<Integer, Boolean> iterationSamplingFunction, boolean test) {
         super(driver, initialisationDataPaths, randomSeed, world, agentConfigs, iterationSamplingFunction, test);
