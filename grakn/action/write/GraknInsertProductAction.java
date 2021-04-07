@@ -38,14 +38,15 @@ import static graql.lang.Graql.match;
 import static graql.lang.Graql.var;
 
 public class GraknInsertProductAction extends InsertProductAction<GraknTransaction, ConceptMap> {
-    public GraknInsertProductAction(GraknTransaction dbOperation, World.Continent continent, Long barcode, String productName, String productDescription) {
-        super(dbOperation, continent, barcode, productName, productDescription);
+
+    public GraknInsertProductAction(GraknTransaction tx, World.Continent continent, Long barcode, String productName, String productDescription) {
+        super(tx, continent, barcode, productName, productDescription);
     }
 
     @Override
     public ConceptMap run() {
         GraqlInsert insertProductQuery = query(continent.name(), barcode, productName, productDescription);
-        return singleResult(dbOperation.execute(insertProductQuery));
+        return singleResult(tx.execute(insertProductQuery));
     }
 
     public static GraqlInsert query(String continentName, Long barcode, String productName, String productDescription) {
@@ -69,10 +70,10 @@ public class GraknInsertProductAction extends InsertProductAction<GraknTransacti
     @Override
     protected HashMap<ComparableField, Object> outputForReport(ConceptMap answer) {
         return new HashMap<ComparableField, Object>() {{
-            put(InsertProductActionField.PRODUCT_BARCODE, dbOperation.getOnlyAttributeOfThing(answer, PRODUCT, PRODUCT_BARCODE));
-            put(InsertProductActionField.PRODUCT_NAME, dbOperation.getOnlyAttributeOfThing(answer, PRODUCT, PRODUCT_NAME));
-            put(InsertProductActionField.PRODUCT_DESCRIPTION, dbOperation.getOnlyAttributeOfThing(answer, PRODUCT, PRODUCT_DESCRIPTION));
-            put(InsertProductActionField.CONTINENT, dbOperation.getOnlyAttributeOfThing(answer, CONTINENT, LOCATION_NAME));
+            put(InsertProductActionField.PRODUCT_BARCODE, tx.getOnlyAttributeOfThing(answer, PRODUCT, PRODUCT_BARCODE));
+            put(InsertProductActionField.PRODUCT_NAME, tx.getOnlyAttributeOfThing(answer, PRODUCT, PRODUCT_NAME));
+            put(InsertProductActionField.PRODUCT_DESCRIPTION, tx.getOnlyAttributeOfThing(answer, PRODUCT, PRODUCT_DESCRIPTION));
+            put(InsertProductActionField.CONTINENT, tx.getOnlyAttributeOfThing(answer, CONTINENT, LOCATION_NAME));
         }};
     }
 }

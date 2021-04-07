@@ -25,13 +25,14 @@ import org.neo4j.driver.Record;
 import java.util.List;
 
 public class Neo4jArbitraryOneHopAction extends ArbitraryOneHopAction<Neo4jTransaction> {
-    public Neo4jArbitraryOneHopAction(Neo4jTransaction dbOperation) {
-        super(dbOperation);
+
+    public Neo4jArbitraryOneHopAction(Neo4jTransaction tx) {
+        super(tx);
     }
 
     @Override
     public Integer run() {
-        List<Record> results = dbOperation.execute(new Query(query()));
+        List<Record> results = tx.execute(new Query(query()));
         return null;
     }
 

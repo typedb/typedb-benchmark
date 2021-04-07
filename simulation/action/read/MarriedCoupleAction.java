@@ -31,8 +31,8 @@ public abstract class MarriedCoupleAction<TX extends Transaction> extends ReadAc
     protected final World.City city;
     protected final LocalDateTime today;
 
-    public MarriedCoupleAction(TX dbOperation, World.City city, LocalDateTime today) {
-        super(dbOperation);
+    public MarriedCoupleAction(TX tx, World.City city, LocalDateTime today) {
+        super(tx);
         this.city = city;
         this.today = today;
     }

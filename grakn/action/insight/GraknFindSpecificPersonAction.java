@@ -29,13 +29,14 @@ import static graql.lang.Graql.match;
 import static graql.lang.Graql.var;
 
 public class GraknFindSpecificPersonAction extends FindSpecificPersonAction<GraknTransaction> {
-    public GraknFindSpecificPersonAction(GraknTransaction dbOperation) {
-        super(dbOperation);
+
+    public GraknFindSpecificPersonAction(GraknTransaction tx) {
+        super(tx);
     }
 
     @Override
     public String run() {
-        return optionalSingleResult(dbOperation.execute(query()).stream().map(ans -> ans.get(EMAIL).asThing().asAttribute().getValue().toString()).collect(Collectors.toList()));
+        return optionalSingleResult(tx.execute(query()).stream().map(ans -> ans.get(EMAIL).asThing().asAttribute().getValue().toString()).collect(Collectors.toList()));
     }
 
     public static GraqlMatch.Unfiltered query() {

@@ -32,8 +32,8 @@ public abstract class InsertPersonAction<TX extends Transaction, ACTION_RETURN_T
     protected final String forename;
     protected final String surname;
 
-    public InsertPersonAction(TX dbOperation, World.City city, LocalDateTime today, String email, String gender, String forename, String surname) {
-        super(dbOperation);
+    public InsertPersonAction(TX tx, World.City city, LocalDateTime today, String email, String gender, String forename, String surname) {
+        super(tx);
         this.worldCity = city;
         this.today = today;
         this.email = email;

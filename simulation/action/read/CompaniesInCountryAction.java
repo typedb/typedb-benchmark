@@ -28,8 +28,8 @@ public abstract class CompaniesInCountryAction<TX extends Transaction> extends R
     protected final World.Country country;
     protected final int numCompanies;
 
-    public CompaniesInCountryAction(TX dbOperation, World.Country country, int numCompanies) {
-        super(dbOperation);
+    public CompaniesInCountryAction(TX tx, World.Country country, int numCompanies) {
+        super(tx);
         this.country = country;
         this.numCompanies = numCompanies;
     }

@@ -26,8 +26,9 @@ import java.util.HashMap;
 import java.util.List;
 
 public class Neo4jCitiesInContinentAction extends CitiesInContinentAction<Neo4jTransaction> {
-    public Neo4jCitiesInContinentAction(Neo4jTransaction dbOperation, World.City city) {
-        super(dbOperation, city);
+
+    public Neo4jCitiesInContinentAction(Neo4jTransaction tx, World.City city) {
+        super(tx, city);
     }
 
     @Override
@@ -36,7 +37,7 @@ public class Neo4jCitiesInContinentAction extends CitiesInContinentAction<Neo4jT
             put("continentName", city.country().continent().name());
             put("cityName", city.name());
         }};
-        return dbOperation.sortedExecute(new Query(query(), parameters), "city.locationName", null);
+        return tx.sortedExecute(new Query(query(), parameters), "city.locationName", null);
     }
 
     public static String query() {

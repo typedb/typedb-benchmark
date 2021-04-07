@@ -41,13 +41,14 @@ import static graql.lang.Graql.match;
 import static graql.lang.Graql.var;
 
 public class GraknThreeHopAction extends ThreeHopAction<GraknTransaction> {
-    public GraknThreeHopAction(GraknTransaction dbOperation) {
-        super(dbOperation);
+
+    public GraknThreeHopAction(GraknTransaction tx) {
+        super(tx);
     }
 
     @Override
     public List<String> run() {
-        return dbOperation.sortedExecute(query(), COMPANY_NAME, null);
+        return tx.sortedExecute(query(), COMPANY_NAME, null);
     }
 
     public static GraqlMatch.Unfiltered query() {

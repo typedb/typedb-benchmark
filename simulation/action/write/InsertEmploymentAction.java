@@ -34,8 +34,8 @@ public abstract class InsertEmploymentAction<TX extends Transaction, ACTION_RETU
     protected final String contractContent;
     protected final double contractedHours;
 
-    public InsertEmploymentAction(TX dbOperation, World.City city, String employeeEmail, long companyNumber, LocalDateTime employmentDate, double wageValue, String contractContent, double contractedHours) {
-        super(dbOperation);
+    public InsertEmploymentAction(TX tx, World.City city, String employeeEmail, long companyNumber, LocalDateTime employmentDate, double wageValue, String contractContent, double contractedHours) {
+        super(tx);
         this.worldCity = city;
         this.employeeEmail = employeeEmail;
         this.companyNumber = companyNumber;

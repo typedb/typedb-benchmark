@@ -32,8 +32,8 @@ import static grakn.benchmark.neo4j.action.Model.MARRIAGE_ID;
 
 public class Neo4jInsertMarriageAction extends InsertMarriageAction<Neo4jTransaction, Record> {
 
-    public Neo4jInsertMarriageAction(Neo4jTransaction dbOperation, World.City city, int marriageIdentifier, String wifeEmail, String husbandEmail) {
-        super(dbOperation, city, marriageIdentifier, wifeEmail, husbandEmail);
+    public Neo4jInsertMarriageAction(Neo4jTransaction tx, World.City city, int marriageIdentifier, String wifeEmail, String husbandEmail) {
+        super(tx, city, marriageIdentifier, wifeEmail, husbandEmail);
     }
 
     @Override
@@ -44,7 +44,7 @@ public class Neo4jInsertMarriageAction extends InsertMarriageAction<Neo4jTransac
             put("husbandEmail", husbandEmail);
             put(LOCATION_NAME, worldCity.name());
         }};
-        return Action.singleResult(dbOperation.execute(new Query(query(), parameters)));
+        return Action.singleResult(tx.execute(new Query(query(), parameters)));
     }
 
     public static String query() {

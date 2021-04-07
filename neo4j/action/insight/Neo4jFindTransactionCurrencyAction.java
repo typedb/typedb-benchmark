@@ -25,13 +25,14 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class Neo4jFindTransactionCurrencyAction extends FindTransactionCurrencyAction<Neo4jTransaction> {
-    public Neo4jFindTransactionCurrencyAction(Neo4jTransaction dbOperation) {
-        super(dbOperation);
+
+    public Neo4jFindTransactionCurrencyAction(Neo4jTransaction tx) {
+        super(tx);
     }
 
     @Override
     public List<String> run() {
-        return dbOperation.execute(new Query(query())).stream().map(ans -> ans.get("transaction.currency").asString()).collect(Collectors.toList());
+        return tx.execute(new Query(query())).stream().map(ans -> ans.get("transaction.currency").asString()).collect(Collectors.toList());
     }
 
     public static String query() {

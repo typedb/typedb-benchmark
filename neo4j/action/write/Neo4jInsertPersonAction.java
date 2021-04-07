@@ -35,8 +35,8 @@ import static grakn.benchmark.neo4j.action.Model.LOCATION_NAME;
 import static grakn.benchmark.neo4j.action.Model.SURNAME;
 
 public class Neo4jInsertPersonAction extends InsertPersonAction<Neo4jTransaction, Record> {
-    public Neo4jInsertPersonAction(Neo4jTransaction dbOperation, World.City city, LocalDateTime today, String email, String gender, String forename, String surname) {
-        super(dbOperation, city, today, email, gender, forename, surname);
+    public Neo4jInsertPersonAction(Neo4jTransaction tx, World.City city, LocalDateTime today, String email, String gender, String forename, String surname) {
+        super(tx, city, today, email, gender, forename, surname);
     }
 
     @Override
@@ -49,7 +49,7 @@ public class Neo4jInsertPersonAction extends InsertPersonAction<Neo4jTransaction
             put(FORENAME, forename);
             put(SURNAME, surname);
         }};
-        return Action.singleResult(dbOperation.execute(new Query(query(), parameters)));
+        return Action.singleResult(tx.execute(new Query(query(), parameters)));
     }
 
     public static String query() {

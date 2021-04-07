@@ -36,13 +36,13 @@ import static graql.lang.Graql.var;
 
 public class GraknFindCurrentResidentsAction extends FindCurrentResidentsAction<GraknTransaction> {
 
-    public GraknFindCurrentResidentsAction(GraknTransaction dbOperation) {
-        super(dbOperation);
+    public GraknFindCurrentResidentsAction(GraknTransaction tx) {
+        super(tx);
     }
 
     @Override
     public List<String> run() {
-        return dbOperation.sortedExecute(query(), EMAIL, null);
+        return tx.sortedExecute(query(), EMAIL, null);
     }
 
     public static GraqlMatch.Unfiltered query() {

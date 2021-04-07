@@ -29,8 +29,8 @@ import java.util.HashMap;
 import static grakn.benchmark.neo4j.action.Model.EMAIL;
 
 public class Neo4jInsertParentShipAction extends InsertParentShipAction<Neo4jTransaction, Record> {
-    public Neo4jInsertParentShipAction(Neo4jTransaction dbOperation, HashMap<SpouseType, String> marriage, String childEmail) {
-        super(dbOperation, marriage, childEmail);
+    public Neo4jInsertParentShipAction(Neo4jTransaction tx, HashMap<SpouseType, String> marriage, String childEmail) {
+        super(tx, marriage, childEmail);
     }
 
     @Override
@@ -40,7 +40,7 @@ public class Neo4jInsertParentShipAction extends InsertParentShipAction<Neo4jTra
             put("fatherEmail", marriage.get(SpouseType.HUSBAND));
             put("childEmail", childEmail);
         }};
-        return Action.singleResult(dbOperation.execute(new Query(query(), parameters)));
+        return Action.singleResult(tx.execute(new Query(query(), parameters)));
     }
 
     public static String query() {

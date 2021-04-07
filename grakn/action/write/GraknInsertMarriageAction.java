@@ -44,14 +44,14 @@ import static graql.lang.Graql.var;
 
 public class GraknInsertMarriageAction extends InsertMarriageAction<GraknTransaction, ConceptMap> {
 
-    public GraknInsertMarriageAction(GraknTransaction dbOperation, World.City city, int marriageIdentifier, String wifeEmail, String husbandEmail) {
-        super(dbOperation, city, marriageIdentifier, wifeEmail, husbandEmail);
+    public GraknInsertMarriageAction(GraknTransaction tx, World.City city, int marriageIdentifier, String wifeEmail, String husbandEmail) {
+        super(tx, city, marriageIdentifier, wifeEmail, husbandEmail);
     }
 
     @Override
     public ConceptMap run() {
         GraqlInsert marriageQuery = query(worldCity.name(), marriageIdentifier, wifeEmail, husbandEmail);
-        return Action.singleResult(dbOperation.execute(marriageQuery));
+        return Action.singleResult(tx.execute(marriageQuery));
     }
 
     private GraqlInsert query(String worldCityName, int marriageIdentifier, String wifeEmail, String husbandEmail) {
@@ -82,10 +82,10 @@ public class GraknInsertMarriageAction extends InsertMarriageAction<GraknTransac
     @Override
     protected HashMap<ComparableField, Object> outputForReport(ConceptMap answer) {
         return new HashMap<ComparableField, Object>() {{
-            put(InsertMarriageActionField.MARRIAGE_IDENTIFIER, dbOperation.getOnlyAttributeOfThing(answer, "marriage", MARRIAGE_ID));
-            put(InsertMarriageActionField.WIFE_EMAIL, dbOperation.getOnlyAttributeOfThing(answer, "wife", EMAIL));
-            put(InsertMarriageActionField.HUSBAND_EMAIL, dbOperation.getOnlyAttributeOfThing(answer, "husband", EMAIL));
-            put(InsertMarriageActionField.CITY_NAME, dbOperation.getOnlyAttributeOfThing(answer, CITY, LOCATION_NAME));
+            put(InsertMarriageActionField.MARRIAGE_IDENTIFIER, tx.getOnlyAttributeOfThing(answer, "marriage", MARRIAGE_ID));
+            put(InsertMarriageActionField.WIFE_EMAIL, tx.getOnlyAttributeOfThing(answer, "wife", EMAIL));
+            put(InsertMarriageActionField.HUSBAND_EMAIL, tx.getOnlyAttributeOfThing(answer, "husband", EMAIL));
+            put(InsertMarriageActionField.CITY_NAME, tx.getOnlyAttributeOfThing(answer, CITY, LOCATION_NAME));
         }};
     }
 }

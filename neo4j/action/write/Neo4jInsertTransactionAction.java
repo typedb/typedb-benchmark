@@ -29,8 +29,8 @@ import java.util.HashMap;
 
 public class Neo4jInsertTransactionAction extends InsertTransactionAction<Neo4jTransaction, Record> {
 
-    public Neo4jInsertTransactionAction(Neo4jTransaction dbOperation, World.Country country, Pair<Long, Long> transaction, Long sellerCompanyNumber, double value, int productQuantity, boolean isTaxable) {
-        super(dbOperation, country, transaction, sellerCompanyNumber, value, productQuantity, isTaxable);
+    public Neo4jInsertTransactionAction(Neo4jTransaction tx, World.Country country, Pair<Long, Long> transaction, Long sellerCompanyNumber, double value, int productQuantity, boolean isTaxable) {
+        super(tx, country, transaction, sellerCompanyNumber, value, productQuantity, isTaxable);
     }
 
     @Override
@@ -44,7 +44,7 @@ public class Neo4jInsertTransactionAction extends InsertTransactionAction<Neo4jT
             put("productQuantity", productQuantity);
             put("isTaxable", isTaxable);
         }};
-        return singleResult(dbOperation.execute(new Query(query(), parameters)));
+        return singleResult(tx.execute(new Query(query(), parameters)));
     }
 
     public static String query() {

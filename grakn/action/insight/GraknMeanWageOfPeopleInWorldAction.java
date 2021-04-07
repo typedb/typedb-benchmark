@@ -28,13 +28,14 @@ import static graql.lang.Graql.match;
 import static graql.lang.Graql.var;
 
 public class GraknMeanWageOfPeopleInWorldAction extends MeanWageOfPeopleInWorldAction<GraknTransaction> {
-    public GraknMeanWageOfPeopleInWorldAction(GraknTransaction dbOperation) {
-        super(dbOperation);
+
+    public GraknMeanWageOfPeopleInWorldAction(GraknTransaction tx) {
+        super(tx);
     }
 
     @Override
     public Double run() {
-        return dbOperation.execute(query()).asDouble();
+        return tx.execute(query()).asDouble();
     }
 
     public static GraqlMatch.Aggregate query() {

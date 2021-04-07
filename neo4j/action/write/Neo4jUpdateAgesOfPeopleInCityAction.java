@@ -27,8 +27,9 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 
 public class Neo4jUpdateAgesOfPeopleInCityAction extends UpdateAgesOfPeopleInCityAction<Neo4jTransaction> {
-    public Neo4jUpdateAgesOfPeopleInCityAction(Neo4jTransaction dbOperation, LocalDateTime today, World.City city) {
-        super(dbOperation, today, city);
+
+    public Neo4jUpdateAgesOfPeopleInCityAction(Neo4jTransaction tx, LocalDateTime today, World.City city) {
+        super(tx, today, city);
     }
 
     @Override
@@ -37,7 +38,7 @@ public class Neo4jUpdateAgesOfPeopleInCityAction extends UpdateAgesOfPeopleInCit
             put(Model.LOCATION_NAME, city.name());
             put("dateToday", today);
         }};
-        dbOperation.execute(new Query(query(), parameters));
+        tx.execute(new Query(query(), parameters));
         return null;
     }
 

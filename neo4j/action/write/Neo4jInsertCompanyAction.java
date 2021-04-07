@@ -34,8 +34,8 @@ import static grakn.benchmark.neo4j.action.Model.LOCATION_NAME;
 
 public class Neo4jInsertCompanyAction extends InsertCompanyAction<Neo4jTransaction, Record> {
 
-    public Neo4jInsertCompanyAction(Neo4jTransaction dbOperation, World.Country country, LocalDateTime today, int companyNumber, String companyName) {
-        super(dbOperation, country, today, companyNumber, companyName);
+    public Neo4jInsertCompanyAction(Neo4jTransaction tx, World.Country country, LocalDateTime today, int companyNumber, String companyName) {
+        super(tx, country, today, companyNumber, companyName);
     }
 
     @Override
@@ -46,7 +46,7 @@ public class Neo4jInsertCompanyAction extends InsertCompanyAction<Neo4jTransacti
             put("companyName", companyName);
             put("dateOfIncorporation", today);
         }};
-        return Action.singleResult(dbOperation.execute(new Query(query(), parameters)));
+        return Action.singleResult(tx.execute(new Query(query(), parameters)));
     }
 
     public static String query() {

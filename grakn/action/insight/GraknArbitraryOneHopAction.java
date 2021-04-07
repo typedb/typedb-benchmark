@@ -30,13 +30,13 @@ import static graql.lang.Graql.match;
 import static graql.lang.Graql.var;
 
 public class GraknArbitraryOneHopAction extends ArbitraryOneHopAction<GraknTransaction> {
-    public GraknArbitraryOneHopAction(GraknTransaction dbOperation) {
-        super(dbOperation);
+    public GraknArbitraryOneHopAction(GraknTransaction tx) {
+        super(tx);
     }
 
     @Override
     public Integer run() {
-        List<ConceptMap> results = dbOperation.execute(query());
+        List<ConceptMap> results = tx.execute(query());
         return null;
     }
 

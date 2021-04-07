@@ -41,13 +41,13 @@ import static graql.lang.Graql.var;
 
 public class GraknResidentsInCityAction extends ResidentsInCityAction<GraknTransaction> {
 
-    public GraknResidentsInCityAction(GraknTransaction dbOperation, World.City city, int numResidents, LocalDateTime earliestDate) {
-        super(dbOperation, city, numResidents, earliestDate);
+    public GraknResidentsInCityAction(GraknTransaction tx, World.City city, int numResidents, LocalDateTime earliestDate) {
+        super(tx, city, numResidents, earliestDate);
     }
 
     @Override
     public List<String> run() {
-        return dbOperation.sortedExecute(query(city.name(), earliestDate), EMAIL, numResidents);
+        return tx.sortedExecute(query(city.name(), earliestDate), EMAIL, numResidents);
     }
 
     public static GraqlMatch.Unfiltered query(String cityName, LocalDateTime earliestDate) {

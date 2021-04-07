@@ -43,8 +43,8 @@ import static graql.lang.Graql.var;
 
 public class GraknUpdateAgesOfPeopleInCityAction extends UpdateAgesOfPeopleInCityAction<GraknTransaction> {
 
-    public GraknUpdateAgesOfPeopleInCityAction(GraknTransaction dbOperation, LocalDateTime today, World.City city) {
-        super(dbOperation, today, city);
+    public GraknUpdateAgesOfPeopleInCityAction(GraknTransaction tx, LocalDateTime today, World.City city) {
+        super(tx, today, city);
     }
 
     @Override
@@ -60,7 +60,7 @@ public class GraknUpdateAgesOfPeopleInCityAction extends UpdateAgesOfPeopleInCit
 
     private Stream<Pair<String, LocalDateTime>> getPeopleBornInCity(World.City worldCity) {
         GraqlMatch peopleQuery = getPeopleBornInCityQuery(worldCity.name());
-        return dbOperation.executeAsync(peopleQuery).map(personAnswer -> {
+        return tx.executeAsync(peopleQuery).map(personAnswer -> {
             LocalDateTime dob = (LocalDateTime) personAnswer.get(DATE_OF_BIRTH).asThing().asAttribute().getValue();
             String email = personAnswer.get(EMAIL).asThing().asAttribute().getValue().toString();
             return pair(email, dob);
@@ -82,7 +82,7 @@ public class GraknUpdateAgesOfPeopleInCityAction extends UpdateAgesOfPeopleInCit
     }
 
     private void updatePersonAge(String personEmail, long newAge) {
-        dbOperation.executeAsync(
+        tx.executeAsync(
                 match(var(PERSON).isa(PERSON).has(EMAIL, personEmail).has(AGE, var(AGE)))
                         .delete(var(PERSON).has(var(AGE)))
                         .insert(var(PERSON).has(AGE, newAge))

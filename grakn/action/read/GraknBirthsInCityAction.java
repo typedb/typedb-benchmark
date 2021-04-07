@@ -37,14 +37,14 @@ import static graql.lang.Graql.match;
 import static graql.lang.Graql.var;
 
 public class GraknBirthsInCityAction extends BirthsInCityAction<GraknTransaction> {
-    public GraknBirthsInCityAction(GraknTransaction dbOperation, World.City city, LocalDateTime today) {
-        super(dbOperation, city, today);
+    public GraknBirthsInCityAction(GraknTransaction tx, World.City city, LocalDateTime today) {
+        super(tx, city, today);
     }
 
     @Override
     public List<String> run() {
         GraqlMatch.Unfiltered childrenQuery = query(worldCity.name(), today);
-        return dbOperation.sortedExecute(childrenQuery, EMAIL, null);
+        return tx.sortedExecute(childrenQuery, EMAIL, null);
     }
 
     public static GraqlMatch.Unfiltered query(String worldCityName, LocalDateTime today) {

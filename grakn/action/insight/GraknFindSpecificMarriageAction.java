@@ -29,14 +29,15 @@ import static graql.lang.Graql.match;
 import static graql.lang.Graql.var;
 
 public class GraknFindSpecificMarriageAction extends FindSpecificMarriageAction<GraknTransaction> {
-    public GraknFindSpecificMarriageAction(GraknTransaction dbOperation) {
-        super(dbOperation);
+
+    public GraknFindSpecificMarriageAction(GraknTransaction tx) {
+        super(tx);
     }
 
     @Override
     public String run() {
         GraqlMatch.Unfiltered query = query();
-        return optionalSingleResult(dbOperation.execute(query).stream().map(ans -> ans.get(MARRIAGE_ID).asThing().asAttribute().getValue().toString()).collect(Collectors.toList()));
+        return optionalSingleResult(tx.execute(query).stream().map(ans -> ans.get(MARRIAGE_ID).asThing().asAttribute().getValue().toString()).collect(Collectors.toList()));
     }
 
     public static GraqlMatch.Unfiltered query() {

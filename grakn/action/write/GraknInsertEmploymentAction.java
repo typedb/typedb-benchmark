@@ -54,13 +54,14 @@ import static grakn.benchmark.grakn.action.Model.WAGE_VALUE;
 import static graql.lang.Graql.match;
 
 public class GraknInsertEmploymentAction extends InsertEmploymentAction<GraknTransaction, ConceptMap> {
-    public GraknInsertEmploymentAction(GraknTransaction dbOperation, World.City worldCity, String employeeEmail, long companyNumber, LocalDateTime employmentDate, double wageValue, String contractContent, double contractedHours) {
-        super(dbOperation, worldCity, employeeEmail, companyNumber, employmentDate, wageValue, contractContent, contractedHours);
+
+    public GraknInsertEmploymentAction(GraknTransaction tx, World.City worldCity, String employeeEmail, long companyNumber, LocalDateTime employmentDate, double wageValue, String contractContent, double contractedHours) {
+        super(tx, worldCity, employeeEmail, companyNumber, employmentDate, wageValue, contractContent, contractedHours);
     }
 
     @Override
     public ConceptMap run() {
-        return singleResult(dbOperation.execute(query(worldCity.name(), employeeEmail, companyNumber, employmentDate, wageValue, contractContent, contractedHours)));
+        return singleResult(tx.execute(query(worldCity.name(), employeeEmail, companyNumber, employmentDate, wageValue, contractContent, contractedHours)));
     }
 
     public static GraqlInsert query(String worldCityName, String employeeEmail, long companyNumber, LocalDateTime employmentDate, double wageValue, String contractContent, double contractedHours) {
@@ -118,14 +119,14 @@ public class GraknInsertEmploymentAction extends InsertEmploymentAction<GraknTra
     @Override
     public HashMap<ComparableField, Object> outputForReport(ConceptMap answer) {
         return new HashMap<ComparableField, Object>() {{
-            put(InsertEmploymentActionField.CITY_NAME, dbOperation.getOnlyAttributeOfThing(answer, CITY, LOCATION_NAME));
-            put(InsertEmploymentActionField.PERSON_EMAIL, dbOperation.getOnlyAttributeOfThing(answer, PERSON, EMAIL));
-            put(InsertEmploymentActionField.COMPANY_NUMBER, dbOperation.getOnlyAttributeOfThing(answer, COMPANY, COMPANY_NUMBER));
-            put(InsertEmploymentActionField.START_DATE, dbOperation.getOnlyAttributeOfThing(answer, EMPLOYMENT, START_DATE));
-            put(InsertEmploymentActionField.WAGE, dbOperation.getOnlyAttributeOfThing(answer, WAGE, WAGE_VALUE));
-            put(InsertEmploymentActionField.CURRENCY, dbOperation.getOnlyAttributeOfThing(answer, WAGE, CURRENCY));
-            put(InsertEmploymentActionField.CONTRACT_CONTENT, dbOperation.getOnlyAttributeOfThing(answer, CONTRACT, CONTRACT_CONTENT));
-            put(InsertEmploymentActionField.CONTRACTED_HOURS, dbOperation.getOnlyAttributeOfThing(answer, CONTRACT, CONTRACTED_HOURS));
+            put(InsertEmploymentActionField.CITY_NAME, tx.getOnlyAttributeOfThing(answer, CITY, LOCATION_NAME));
+            put(InsertEmploymentActionField.PERSON_EMAIL, tx.getOnlyAttributeOfThing(answer, PERSON, EMAIL));
+            put(InsertEmploymentActionField.COMPANY_NUMBER, tx.getOnlyAttributeOfThing(answer, COMPANY, COMPANY_NUMBER));
+            put(InsertEmploymentActionField.START_DATE, tx.getOnlyAttributeOfThing(answer, EMPLOYMENT, START_DATE));
+            put(InsertEmploymentActionField.WAGE, tx.getOnlyAttributeOfThing(answer, WAGE, WAGE_VALUE));
+            put(InsertEmploymentActionField.CURRENCY, tx.getOnlyAttributeOfThing(answer, WAGE, CURRENCY));
+            put(InsertEmploymentActionField.CONTRACT_CONTENT, tx.getOnlyAttributeOfThing(answer, CONTRACT, CONTRACT_CONTENT));
+            put(InsertEmploymentActionField.CONTRACTED_HOURS, tx.getOnlyAttributeOfThing(answer, CONTRACT, CONTRACTED_HOURS));
         }};
     }
 }

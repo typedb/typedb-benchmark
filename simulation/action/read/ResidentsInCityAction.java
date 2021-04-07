@@ -30,8 +30,8 @@ public abstract class ResidentsInCityAction<TX extends Transaction> extends Read
     protected final int numResidents;
     protected final LocalDateTime earliestDate;
 
-    public ResidentsInCityAction(TX dbOperation, World.City city, int numResidents, LocalDateTime earliestDate) {
-        super(dbOperation);
+    public ResidentsInCityAction(TX tx, World.City city, int numResidents, LocalDateTime earliestDate) {
+        super(tx);
         this.city = city;
         this.numResidents = numResidents;
         this.earliestDate = earliestDate;

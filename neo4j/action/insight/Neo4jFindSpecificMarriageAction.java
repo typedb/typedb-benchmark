@@ -24,13 +24,14 @@ import org.neo4j.driver.Query;
 import java.util.stream.Collectors;
 
 public class Neo4jFindSpecificMarriageAction extends FindSpecificMarriageAction<Neo4jTransaction> {
-    public Neo4jFindSpecificMarriageAction(Neo4jTransaction dbOperation) {
-        super(dbOperation);
+
+    public Neo4jFindSpecificMarriageAction(Neo4jTransaction tx) {
+        super(tx);
     }
 
     @Override
     public String run() {
-        return optionalSingleResult(dbOperation.execute(new Query(query())).stream().map(ans -> ans.get("marriedTo.marriageId").asString()).collect(Collectors.toList()));
+        return optionalSingleResult(tx.execute(new Query(query())).stream().map(ans -> ans.get("marriedTo.marriageId").asString()).collect(Collectors.toList()));
     }
 
     public static String query() {

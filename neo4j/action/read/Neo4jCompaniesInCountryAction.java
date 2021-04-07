@@ -26,8 +26,9 @@ import java.util.HashMap;
 import java.util.List;
 
 public class Neo4jCompaniesInCountryAction extends CompaniesInCountryAction<Neo4jTransaction> {
-    public Neo4jCompaniesInCountryAction(Neo4jTransaction dbOperation, World.Country country, int numCompanies) {
-        super(dbOperation, country, numCompanies);
+
+    public Neo4jCompaniesInCountryAction(Neo4jTransaction tx, World.Country country, int numCompanies) {
+        super(tx, country, numCompanies);
     }
 
     @Override
@@ -35,7 +36,7 @@ public class Neo4jCompaniesInCountryAction extends CompaniesInCountryAction<Neo4
         HashMap<String, Object> parameters = new HashMap<String, Object>() {{
             put("countryName", country.name());
         }};
-        return dbOperation.sortedExecute(new Query(query(), parameters), "company.companyNumber", numCompanies);
+        return tx.sortedExecute(new Query(query(), parameters), "company.companyNumber", numCompanies);
     }
 
     public static String query() {

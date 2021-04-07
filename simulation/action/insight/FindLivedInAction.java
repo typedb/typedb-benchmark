@@ -23,8 +23,7 @@ import java.util.List;
 
 public abstract class FindLivedInAction<TX extends Transaction> extends WorldwideInsightAction<TX, List<String>> {
 
-    public FindLivedInAction(TX dbOperation) {
-        super(dbOperation);
+    public FindLivedInAction(TX tx) {
+        super(tx);
     }
-
 }

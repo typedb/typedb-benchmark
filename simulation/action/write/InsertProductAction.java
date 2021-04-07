@@ -29,8 +29,8 @@ public abstract class InsertProductAction<TX extends Transaction, ACTION_RETURN_
     protected final String productName;
     protected final String productDescription;
 
-    public InsertProductAction(TX dbOperation, World.Continent continent, Long barcode, String productName, String productDescription) {
-        super(dbOperation);
+    public InsertProductAction(TX tx, World.Continent continent, Long barcode, String productName, String productDescription) {
+        super(tx);
         this.continent = continent;
         this.barcode = barcode;
         this.productName = productName;

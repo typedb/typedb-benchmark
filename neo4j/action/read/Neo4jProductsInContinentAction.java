@@ -27,8 +27,8 @@ import java.util.List;
 
 public class Neo4jProductsInContinentAction extends ProductsInContinentAction<Neo4jTransaction> {
 
-    public Neo4jProductsInContinentAction(Neo4jTransaction dbOperation, World.Continent continent) {
-        super(dbOperation, continent);
+    public Neo4jProductsInContinentAction(Neo4jTransaction tx, World.Continent continent) {
+        super(tx, continent);
     }
 
     @Override
@@ -36,7 +36,7 @@ public class Neo4jProductsInContinentAction extends ProductsInContinentAction<Ne
         HashMap<String, Object> parameters = new HashMap<String, Object>() {{
             put("continentName", continent.name());
         }};
-        return dbOperation.sortedExecute(new Query(query(), parameters), "product.barcode", null);
+        return tx.sortedExecute(new Query(query(), parameters), "product.barcode", null);
     }
 
     public static String query() {

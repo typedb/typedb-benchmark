@@ -31,8 +31,8 @@ public abstract class InsertCompanyAction<TX extends Transaction, ACTION_RETURN_
     protected final int companyNumber;
     protected final String companyName;
 
-    public InsertCompanyAction(TX dbOperation, World.Country country, LocalDateTime today, int companyNumber, String companyName) {
-        super(dbOperation);
+    public InsertCompanyAction(TX tx, World.Country country, LocalDateTime today, int companyNumber, String companyName) {
+        super(tx);
         this.country = country;
         this.today = today;
         this.companyNumber = companyNumber;

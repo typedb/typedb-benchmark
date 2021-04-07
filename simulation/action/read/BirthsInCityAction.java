@@ -28,8 +28,8 @@ public abstract class BirthsInCityAction<TX extends Transaction> extends ReadAct
     protected final World.City worldCity;
     protected final LocalDateTime today;
 
-    public BirthsInCityAction(TX dbOperation, World.City city, LocalDateTime today) {
-        super(dbOperation);
+    public BirthsInCityAction(TX tx, World.City city, LocalDateTime today) {
+        super(tx);
         this.worldCity = city;
         this.today = today;
     }

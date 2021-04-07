@@ -30,8 +30,9 @@ import static grakn.benchmark.neo4j.action.Model.GENDER;
 import static grakn.benchmark.neo4j.action.Model.LOCATION_NAME;
 
 public class Neo4jUnmarriedPeopleInCityAction extends UnmarriedPeopleInCityAction<Neo4jTransaction> {
-    public Neo4jUnmarriedPeopleInCityAction(Neo4jTransaction dbOperation, World.City city, String gender, LocalDateTime dobOfAdults) {
-        super(dbOperation, city, gender, dobOfAdults);
+
+    public Neo4jUnmarriedPeopleInCityAction(Neo4jTransaction tx, World.City city, String gender, LocalDateTime dobOfAdults) {
+        super(tx, city, gender, dobOfAdults);
     }
 
     @Override
@@ -41,7 +42,7 @@ public class Neo4jUnmarriedPeopleInCityAction extends UnmarriedPeopleInCityActio
             put(GENDER, gender);
             put("dobOfAdults", dobOfAdults);
         }};
-        return dbOperation.sortedExecute(new Query(query(), parameters), "email", null);
+        return tx.sortedExecute(new Query(query(), parameters), "email", null);
     }
 
     public static String query() {

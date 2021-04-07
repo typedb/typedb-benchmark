@@ -40,14 +40,15 @@ import static graql.lang.Graql.match;
 import static graql.lang.Graql.var;
 
 public class GraknInsertRelocationAction extends InsertRelocationAction<GraknTransaction, ConceptMap> {
-    public GraknInsertRelocationAction(GraknTransaction dbOperation, World.City city, LocalDateTime today, String relocateeEmail, String relocationCityName) {
-        super(dbOperation, city, today, relocateeEmail, relocationCityName);
+
+    public GraknInsertRelocationAction(GraknTransaction tx, World.City city, LocalDateTime today, String relocateeEmail, String relocationCityName) {
+        super(tx, city, today, relocateeEmail, relocationCityName);
     }
 
     @Override
     public ConceptMap run() {
         GraqlInsert relocatePersonQuery = query(relocateeEmail, relocationCityName, city.name(), today);
-        return Action.singleResult(dbOperation.execute(relocatePersonQuery));
+        return Action.singleResult(tx.execute(relocatePersonQuery));
     }
 
     public static GraqlInsert query(String relocateeEmail, String relocationCityName, String cityName, LocalDateTime today) {
@@ -68,9 +69,9 @@ public class GraknInsertRelocationAction extends InsertRelocationAction<GraknTra
     @Override
     protected HashMap<ComparableField, Object> outputForReport(ConceptMap answer) {
         return new HashMap<ComparableField, Object>() {{
-            put(InsertRelocationActionField.PERSON_EMAIL, dbOperation.getOnlyAttributeOfThing(answer, PERSON, EMAIL));
-            put(InsertRelocationActionField.NEW_CITY_NAME, dbOperation.getOnlyAttributeOfThing(answer, "new-city", LOCATION_NAME));
-            put(InsertRelocationActionField.RELOCATION_DATE, dbOperation.getOnlyAttributeOfThing(answer, RELOCATION, RELOCATION_DATE));
+            put(InsertRelocationActionField.PERSON_EMAIL, tx.getOnlyAttributeOfThing(answer, PERSON, EMAIL));
+            put(InsertRelocationActionField.NEW_CITY_NAME, tx.getOnlyAttributeOfThing(answer, "new-city", LOCATION_NAME));
+            put(InsertRelocationActionField.RELOCATION_DATE, tx.getOnlyAttributeOfThing(answer, RELOCATION, RELOCATION_DATE));
         }};
     }
 }

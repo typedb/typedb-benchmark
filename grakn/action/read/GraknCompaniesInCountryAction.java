@@ -35,14 +35,15 @@ import static graql.lang.Graql.match;
 import static graql.lang.Graql.var;
 
 public class GraknCompaniesInCountryAction extends CompaniesInCountryAction<GraknTransaction> {
-    public GraknCompaniesInCountryAction(GraknTransaction dbOperation, World.Country country, int numCompanies) {
-        super(dbOperation, country, numCompanies);
+
+    public GraknCompaniesInCountryAction(GraknTransaction tx, World.Country country, int numCompanies) {
+        super(tx, country, numCompanies);
     }
 
     @Override
     public List<Long> run() {
         GraqlMatch.Unfiltered companyNumbersQuery = query(country.name());
-        return dbOperation.sortedExecute(companyNumbersQuery, COMPANY_NUMBER, numCompanies);
+        return tx.sortedExecute(companyNumbersQuery, COMPANY_NUMBER, numCompanies);
     }
 
     public static GraqlMatch.Unfiltered query(String countryName) {

@@ -23,7 +23,7 @@ public abstract class FindSpecificMarriageAction<TX extends Transaction> extends
 
     protected static int MARRIAGE_ID_FOR_QUERY = "3/Australasia:Australia:Canberra/0".hashCode();
 
-    public FindSpecificMarriageAction(TX dbOperation) {
-        super(dbOperation);
+    public FindSpecificMarriageAction(TX tx) {
+        super(tx);
     }
 }

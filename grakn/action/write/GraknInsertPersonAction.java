@@ -43,14 +43,15 @@ import static grakn.benchmark.grakn.action.Model.SURNAME;
 import static graql.lang.Graql.var;
 
 public class GraknInsertPersonAction extends InsertPersonAction<GraknTransaction, ConceptMap> {
-    public GraknInsertPersonAction(GraknTransaction dbOperation, World.City city, LocalDateTime today, String email, String gender, String forename, String surname) {
-        super(dbOperation, city, today, email, gender, forename, surname);
+
+    public GraknInsertPersonAction(GraknTransaction tx, World.City city, LocalDateTime today, String email, String gender, String forename, String surname) {
+        super(tx, city, today, email, gender, forename, surname);
     }
 
     @Override
     public ConceptMap run() {
         GraqlInsert query = query(worldCity.name(), email, gender, forename, surname, today);
-        return Action.singleResult(dbOperation.execute(query));
+        return Action.singleResult(tx.execute(query));
     }
 
     public static GraqlInsert query(String worldCityName, String email, String gender, String forename, String surname, LocalDateTime today) {
@@ -78,11 +79,11 @@ public class GraknInsertPersonAction extends InsertPersonAction<GraknTransaction
     protected HashMap<ComparableField, Object> outputForReport(ConceptMap answer) {
         return new HashMap<ComparableField, Object>() {
             {
-                put(InsertPersonActionField.EMAIL, dbOperation.getOnlyAttributeOfThing(answer, PERSON, EMAIL));
-                put(InsertPersonActionField.DATE_OF_BIRTH, dbOperation.getOnlyAttributeOfThing(answer, PERSON, DATE_OF_BIRTH));
-                put(InsertPersonActionField.GENDER, dbOperation.getOnlyAttributeOfThing(answer, PERSON, GENDER));
-                put(InsertPersonActionField.FORENAME, dbOperation.getOnlyAttributeOfThing(answer, PERSON, FORENAME));
-                put(InsertPersonActionField.SURNAME, dbOperation.getOnlyAttributeOfThing(answer, PERSON, SURNAME));
+                put(InsertPersonActionField.EMAIL, tx.getOnlyAttributeOfThing(answer, PERSON, EMAIL));
+                put(InsertPersonActionField.DATE_OF_BIRTH, tx.getOnlyAttributeOfThing(answer, PERSON, DATE_OF_BIRTH));
+                put(InsertPersonActionField.GENDER, tx.getOnlyAttributeOfThing(answer, PERSON, GENDER));
+                put(InsertPersonActionField.FORENAME, tx.getOnlyAttributeOfThing(answer, PERSON, FORENAME));
+                put(InsertPersonActionField.SURNAME, tx.getOnlyAttributeOfThing(answer, PERSON, SURNAME));
             }
         };
     }

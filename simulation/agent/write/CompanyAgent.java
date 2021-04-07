@@ -48,15 +48,15 @@ public class CompanyAgent<TX extends Transaction> extends Agent<World.Country, T
     protected List<Action<?, ?>.Report> run(Session<TX> session, World.Country region, Random random) {
         List<Action<?, ?>.Report> reports = new ArrayList<>();
         int numCompanies = context.world().getScaleFactor();
-        try (TX dbOperation = session.newTransaction(region.tracker(), context.iteration(), isTracing())) {
+        try (TX tx = session.newTransaction(region.tracker(), context.iteration(), isTracing())) {
             for (int i = 0; i < numCompanies; i++) {
                 String adjective = pickOne(context.world().getAdjectives(), random);
                 String noun = pickOne(context.world().getNouns(), random);
                 int companyNumber = uniqueId(context, region.tracker(), i).hashCode();
                 String companyName = StringUtils.capitalize(adjective) + StringUtils.capitalize(noun) + "-" + companyNumber;
-                runAction(actionFactory().insertCompanyAction(dbOperation, region, context.today(), companyNumber, companyName), reports);
+                runAction(actionFactory().insertCompanyAction(tx, region, context.today(), companyNumber, companyName), reports);
             }
-            dbOperation.commit();
+            tx.commit();
         }
 
         return reports;

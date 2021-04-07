@@ -28,8 +28,8 @@ import java.util.List;
 
 public class Neo4jResidentsInCityAction extends ResidentsInCityAction<Neo4jTransaction> {
 
-    public Neo4jResidentsInCityAction(Neo4jTransaction dbOperation, World.City city, int numResidents, LocalDateTime earliestDate) {
-        super(dbOperation, city, numResidents, earliestDate);
+    public Neo4jResidentsInCityAction(Neo4jTransaction tx, World.City city, int numResidents, LocalDateTime earliestDate) {
+        super(tx, city, numResidents, earliestDate);
     }
 
     @Override
@@ -39,7 +39,7 @@ public class Neo4jResidentsInCityAction extends ResidentsInCityAction<Neo4jTrans
             put("locationName", city.name());
             put("earliestDate", earliestDate);
         }};
-        return dbOperation.sortedExecute(new Query(template, parameters), "email", numResidents);
+        return tx.sortedExecute(new Query(template, parameters), "email", numResidents);
     }
 
     public static String query() {

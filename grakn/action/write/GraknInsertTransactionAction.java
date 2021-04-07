@@ -47,14 +47,14 @@ import static graql.lang.Graql.var;
 
 public class GraknInsertTransactionAction extends InsertTransactionAction<GraknTransaction, ConceptMap> {
 
-    public GraknInsertTransactionAction(GraknTransaction dbOperation, World.Country country, Pair<Long, Long> transaction, Long sellerCompanyNumber, double value, int productQuantity, boolean isTaxable) {
-        super(dbOperation, country, transaction, sellerCompanyNumber, value, productQuantity, isTaxable);
+    public GraknInsertTransactionAction(GraknTransaction tx, World.Country country, Pair<Long, Long> transaction, Long sellerCompanyNumber, double value, int productQuantity, boolean isTaxable) {
+        super(tx, country, transaction, sellerCompanyNumber, value, productQuantity, isTaxable);
     }
 
     @Override
     public ConceptMap run() {
         GraqlInsert insertTransactionQuery = query(transaction, sellerCompanyNumber, country.name(), value, productQuantity, isTaxable);
-        return singleResult(dbOperation.execute(insertTransactionQuery));
+        return singleResult(tx.execute(insertTransactionQuery));
     }
 
     public static GraqlInsert query(Pair<Long, Long> transaction, Long sellerCompanyNumber, String countryName, double value, int productQuantity, boolean isTaxable) {
@@ -88,13 +88,13 @@ public class GraknInsertTransactionAction extends InsertTransactionAction<GraknT
     @Override
     protected HashMap<ComparableField, Object> outputForReport(ConceptMap answer) {
         return new HashMap<ComparableField, Object>() {{
-            put(InsertTransactionActionField.SELLER, dbOperation.getOnlyAttributeOfThing(answer, "c-seller", COMPANY_NUMBER));
-            put(InsertTransactionActionField.BUYER, dbOperation.getOnlyAttributeOfThing(answer, "c-buyer", COMPANY_NUMBER));
-            put(InsertTransactionActionField.MERCHANDISE, dbOperation.getOnlyAttributeOfThing(answer, PRODUCT, PRODUCT_BARCODE));
-            put(InsertTransactionActionField.VALUE, dbOperation.getOnlyAttributeOfThing(answer, TRANSACTION, VALUE));
-            put(InsertTransactionActionField.PRODUCT_QUANTITY, dbOperation.getOnlyAttributeOfThing(answer, TRANSACTION, PRODUCT_QUANTITY));
-            put(InsertTransactionActionField.IS_TAXABLE, dbOperation.getOnlyAttributeOfThing(answer, TRANSACTION, IS_TAXABLE));
-            put(InsertTransactionActionField.COUNTRY, dbOperation.getOnlyAttributeOfThing(answer, COUNTRY, LOCATION_NAME));
+            put(InsertTransactionActionField.SELLER, tx.getOnlyAttributeOfThing(answer, "c-seller", COMPANY_NUMBER));
+            put(InsertTransactionActionField.BUYER, tx.getOnlyAttributeOfThing(answer, "c-buyer", COMPANY_NUMBER));
+            put(InsertTransactionActionField.MERCHANDISE, tx.getOnlyAttributeOfThing(answer, PRODUCT, PRODUCT_BARCODE));
+            put(InsertTransactionActionField.VALUE, tx.getOnlyAttributeOfThing(answer, TRANSACTION, VALUE));
+            put(InsertTransactionActionField.PRODUCT_QUANTITY, tx.getOnlyAttributeOfThing(answer, TRANSACTION, PRODUCT_QUANTITY));
+            put(InsertTransactionActionField.IS_TAXABLE, tx.getOnlyAttributeOfThing(answer, TRANSACTION, IS_TAXABLE));
+            put(InsertTransactionActionField.COUNTRY, tx.getOnlyAttributeOfThing(answer, COUNTRY, LOCATION_NAME));
         }};
     }
 }

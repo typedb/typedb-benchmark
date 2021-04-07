@@ -27,8 +27,9 @@ import java.util.HashMap;
 import java.util.List;
 
 public class Neo4jBirthsInCityAction extends BirthsInCityAction<Neo4jTransaction> {
-    public Neo4jBirthsInCityAction(Neo4jTransaction dbOperation, World.City city, LocalDateTime today) {
-        super(dbOperation, city, today);
+
+    public Neo4jBirthsInCityAction(Neo4jTransaction tx, World.City city, LocalDateTime today) {
+        super(tx, city, today);
     }
 
     @Override
@@ -37,7 +38,7 @@ public class Neo4jBirthsInCityAction extends BirthsInCityAction<Neo4jTransaction
             put("dateOfBirth", today);
             put("locationName", worldCity.name());
         }};
-        return dbOperation.sortedExecute(new Query(query(), parameters), "child.email", null);
+        return tx.sortedExecute(new Query(query(), parameters), "child.email", null);
     }
 
     public static String query() {

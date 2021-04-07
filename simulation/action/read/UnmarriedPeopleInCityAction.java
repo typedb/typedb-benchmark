@@ -29,8 +29,8 @@ public abstract class UnmarriedPeopleInCityAction<TX extends Transaction> extend
     protected final String gender;
     protected final LocalDateTime dobOfAdults;
 
-    public UnmarriedPeopleInCityAction(TX dbOperation, World.City city, String gender, LocalDateTime dobOfAdults) {
-        super(dbOperation);
+    public UnmarriedPeopleInCityAction(TX tx, World.City city, String gender, LocalDateTime dobOfAdults) {
+        super(tx);
         this.city = city;
         this.gender = gender;
         this.dobOfAdults = dobOfAdults;

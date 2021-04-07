@@ -29,8 +29,8 @@ public abstract class InsertMarriageAction<TX extends Transaction, ACTION_RETURN
     protected final String wifeEmail;
     protected final String husbandEmail;
 
-    public InsertMarriageAction(TX dbOperation, World.City city, int marriageIdentifier, String wifeEmail, String husbandEmail) {
-        super(dbOperation);
+    public InsertMarriageAction(TX tx, World.City city, int marriageIdentifier, String wifeEmail, String husbandEmail) {
+        super(tx);
         this.worldCity = city;
         this.marriageIdentifier = marriageIdentifier;
         this.wifeEmail = wifeEmail;

@@ -28,14 +28,14 @@ import static com.google.common.collect.Iterables.getOnlyElement;
 
 public class Neo4jMeanWageOfPeopleInWorldAction extends MeanWageOfPeopleInWorldAction<Neo4jTransaction> {
 
-    public Neo4jMeanWageOfPeopleInWorldAction(Neo4jTransaction dbOperation) {
-        super(dbOperation);
+    public Neo4jMeanWageOfPeopleInWorldAction(Neo4jTransaction tx) {
+        super(tx);
     }
 
     @Override
     public Double run() {
         String template = query();
-        List<Record> records = dbOperation.execute(new Query(template));
+        List<Record> records = tx.execute(new Query(template));
         return (Double) getOnlyElement(records).asMap().get("avg(employs.wage)");
     }
 

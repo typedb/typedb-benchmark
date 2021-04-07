@@ -24,13 +24,14 @@ import org.neo4j.driver.Query;
 import java.util.List;
 
 public class Neo4jThreeHopAction extends ThreeHopAction<Neo4jTransaction> {
-    public Neo4jThreeHopAction(Neo4jTransaction dbOperation) {
-        super(dbOperation);
+
+    public Neo4jThreeHopAction(Neo4jTransaction tx) {
+        super(tx);
     }
 
     @Override
     public List<String> run() {
-        return dbOperation.sortedExecute(new Query(query()), "company.companyName", null);
+        return tx.sortedExecute(new Query(query()), "company.companyName", null);
     }
 
     public static String query() {

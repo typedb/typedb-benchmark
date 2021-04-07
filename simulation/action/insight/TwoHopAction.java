@@ -23,8 +23,8 @@ import java.util.List;
 
 public abstract class TwoHopAction<TX extends Transaction> extends WorldwideInsightAction<TX, List<String>> {
 
-    public TwoHopAction(TX dbOperation) {
-        super(dbOperation);
+    public TwoHopAction(TX tx) {
+        super(tx);
     }
 
 }

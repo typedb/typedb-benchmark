@@ -36,8 +36,9 @@ import static graql.lang.Graql.match;
 import static graql.lang.Graql.var;
 
 public class GraknInsertParentShipAction extends InsertParentShipAction<GraknTransaction, ConceptMap> {
-    public GraknInsertParentShipAction(GraknTransaction dbOperation, HashMap<SpouseType, String> marriage, String childEmail) {
-        super(dbOperation, marriage, childEmail);
+
+    public GraknInsertParentShipAction(GraknTransaction tx, HashMap<SpouseType, String> marriage, String childEmail) {
+        super(tx, marriage, childEmail);
     }
 
     @Override
@@ -45,7 +46,7 @@ public class GraknInsertParentShipAction extends InsertParentShipAction<GraknTra
         // Parentship where parents have multiple children is represented as multiple ternary relations, each with
         // both parents and one child. They had these children at the same time, and will not have any subsequently.
         GraqlInsert parentshipQuery = query(marriage, childEmail);
-        return Action.singleResult(dbOperation.execute(parentshipQuery));
+        return Action.singleResult(tx.execute(parentshipQuery));
 
     }
 
@@ -72,9 +73,9 @@ public class GraknInsertParentShipAction extends InsertParentShipAction<GraknTra
     protected HashMap<ComparableField, Object> outputForReport(ConceptMap answer) {
         return new HashMap<ComparableField, Object>() {
             {
-                put(InsertParentShipActionField.WIFE_EMAIL, dbOperation.getOnlyAttributeOfThing(answer, "mother", EMAIL));
-                put(InsertParentShipActionField.HUSBAND_EMAIL, dbOperation.getOnlyAttributeOfThing(answer, "father", EMAIL));
-                put(InsertParentShipActionField.CHILD_EMAIL, dbOperation.getOnlyAttributeOfThing(answer, "child", EMAIL));
+                put(InsertParentShipActionField.WIFE_EMAIL, tx.getOnlyAttributeOfThing(answer, "mother", EMAIL));
+                put(InsertParentShipActionField.HUSBAND_EMAIL, tx.getOnlyAttributeOfThing(answer, "father", EMAIL));
+                put(InsertParentShipActionField.CHILD_EMAIL, tx.getOnlyAttributeOfThing(answer, "child", EMAIL));
             }
         };
     }

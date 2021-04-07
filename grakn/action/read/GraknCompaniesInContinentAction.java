@@ -37,14 +37,15 @@ import static graql.lang.Graql.match;
 import static graql.lang.Graql.var;
 
 public class GraknCompaniesInContinentAction extends CompaniesInContinentAction<GraknTransaction> {
-    public GraknCompaniesInContinentAction(GraknTransaction dbOperation, World.Continent continent) {
-        super(dbOperation, continent);
+
+    public GraknCompaniesInContinentAction(GraknTransaction tx, World.Continent continent) {
+        super(tx, continent);
     }
 
     @Override
     public List<Long> run() {
         GraqlMatch.Unfiltered query = query(continent.name());
-        return dbOperation.sortedExecute(query, COMPANY_NUMBER, null);
+        return tx.sortedExecute(query, COMPANY_NUMBER, null);
     }
 
     public static GraqlMatch.Unfiltered query(String continentName) {

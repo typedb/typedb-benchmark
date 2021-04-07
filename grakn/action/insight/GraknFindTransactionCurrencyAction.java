@@ -30,13 +30,14 @@ import static graql.lang.Graql.match;
 import static graql.lang.Graql.var;
 
 public class GraknFindTransactionCurrencyAction extends FindTransactionCurrencyAction<GraknTransaction> {
-    public GraknFindTransactionCurrencyAction(GraknTransaction dbOperation) {
-        super(dbOperation);
+
+    public GraknFindTransactionCurrencyAction(GraknTransaction tx) {
+        super(tx);
     }
 
     @Override
     public List<String> run() {
-        return dbOperation.execute(query()).stream().map(ans -> ans.get(CURRENCY).asThing().asAttribute().getValue().toString()).collect(Collectors.toList());
+        return tx.execute(query()).stream().map(ans -> ans.get(CURRENCY).asThing().asAttribute().getValue().toString()).collect(Collectors.toList());
     }
 
     public static GraqlMatch.Unfiltered query() {

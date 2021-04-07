@@ -36,8 +36,9 @@ import static grakn.benchmark.neo4j.action.Model.START_DATE;
 import static grakn.benchmark.neo4j.action.Model.WAGE;
 
 public class Neo4jInsertEmploymentAction extends InsertEmploymentAction<Neo4jTransaction, Record> {
-    public Neo4jInsertEmploymentAction(Neo4jTransaction dbOperation, World.City worldCity, String employeeEmail, long companyNumber, LocalDateTime employmentDate, double wageValue, String contractContent, double contractedHours) {
-        super(dbOperation, worldCity, employeeEmail, companyNumber, employmentDate, wageValue, contractContent, contractedHours);
+
+    public Neo4jInsertEmploymentAction(Neo4jTransaction tx, World.City worldCity, String employeeEmail, long companyNumber, LocalDateTime employmentDate, double wageValue, String contractContent, double contractedHours) {
+        super(tx, worldCity, employeeEmail, companyNumber, employmentDate, wageValue, contractContent, contractedHours);
     }
 
     @Override
@@ -51,7 +52,7 @@ public class Neo4jInsertEmploymentAction extends InsertEmploymentAction<Neo4jTra
             put("contractContent", contractContent);
             put("contractedHours", contractedHours);
         }};
-        return singleResult(dbOperation.execute(new Query(query(), parameters)));
+        return singleResult(tx.execute(new Query(query(), parameters)));
     }
 
     public static String query() {

@@ -23,7 +23,7 @@ public abstract class FindSpecificPersonAction<TX extends Transaction> extends W
 
     protected static String PERSON_EMAIL_FOR_QUERY = "email/1/Europe:United Kingdom:London/0";
 
-    public FindSpecificPersonAction(TX dbOperation) {
-        super(dbOperation);
+    public FindSpecificPersonAction(TX tx) {
+        super(tx);
     }
 }

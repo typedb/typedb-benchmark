@@ -23,8 +23,8 @@ public abstract class ArbitraryOneHopAction<TX extends Transaction> extends Worl
 
     protected static String PERSON_EMAIL_FOR_QUERY = "email/0/World:Europe:United Kingdom:London/0";
 
-    public ArbitraryOneHopAction(TX dbOperation) {
-        super(dbOperation);
+    public ArbitraryOneHopAction(TX tx) {
+        super(tx);
     }
 
 }

@@ -41,13 +41,13 @@ import static graql.lang.Graql.var;
 
 public class GraknInsertCompanyAction extends InsertCompanyAction<GraknTransaction, ConceptMap> {
 
-    public GraknInsertCompanyAction(GraknTransaction dbOperation, World.Country country, LocalDateTime today, int companyNumber, String companyName) {
-        super(dbOperation, country, today, companyNumber, companyName);
+    public GraknInsertCompanyAction(GraknTransaction tx, World.Country country, LocalDateTime today, int companyNumber, String companyName) {
+        super(tx, country, today, companyNumber, companyName);
     }
 
     @Override
     public ConceptMap run() {
-        return Action.singleResult(dbOperation.execute(query(country.name(), today, companyNumber, companyName)));
+        return Action.singleResult(tx.execute(query(country.name(), today, companyNumber, companyName)));
     }
 
     public static GraqlInsert query(String countryName, LocalDateTime today, int companyNumber, String companyName) {
@@ -69,10 +69,10 @@ public class GraknInsertCompanyAction extends InsertCompanyAction<GraknTransacti
     protected HashMap<ComparableField, Object> outputForReport(ConceptMap answer) {
         return new HashMap<ComparableField, Object>() {
             {
-                put(InsertCompanyActionField.COMPANY_NAME, dbOperation.getOnlyAttributeOfThing(answer, COMPANY, COMPANY_NAME));
-                put(InsertCompanyActionField.COMPANY_NUMBER, dbOperation.getOnlyAttributeOfThing(answer, COMPANY, COMPANY_NUMBER));
-                put(InsertCompanyActionField.COUNTRY, dbOperation.getOnlyAttributeOfThing(answer, COUNTRY, LOCATION_NAME));
-                put(InsertCompanyActionField.DATE_OF_INCORPORATION, dbOperation.getOnlyAttributeOfThing(answer, INCORPORATION, DATE_OF_INCORPORATION));
+                put(InsertCompanyActionField.COMPANY_NAME, tx.getOnlyAttributeOfThing(answer, COMPANY, COMPANY_NAME));
+                put(InsertCompanyActionField.COMPANY_NUMBER, tx.getOnlyAttributeOfThing(answer, COMPANY, COMPANY_NUMBER));
+                put(InsertCompanyActionField.COUNTRY, tx.getOnlyAttributeOfThing(answer, COUNTRY, LOCATION_NAME));
+                put(InsertCompanyActionField.DATE_OF_INCORPORATION, tx.getOnlyAttributeOfThing(answer, INCORPORATION, DATE_OF_INCORPORATION));
             }
         };
     }

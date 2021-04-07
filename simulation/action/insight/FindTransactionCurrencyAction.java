@@ -23,8 +23,7 @@ import java.util.List;
 
 public abstract class FindTransactionCurrencyAction<TX extends Transaction> extends WorldwideInsightAction<TX, List<String>> {
 
-    public FindTransactionCurrencyAction(TX dbOperation) {
-        super(dbOperation);
+    public FindTransactionCurrencyAction(TX tx) {
+        super(tx);
     }
-
 }

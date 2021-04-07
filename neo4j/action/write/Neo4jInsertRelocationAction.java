@@ -32,8 +32,9 @@ import static grakn.benchmark.neo4j.action.Model.LOCATION_NAME;
 import static grakn.benchmark.neo4j.action.Model.RELOCATION_DATE;
 
 public class Neo4jInsertRelocationAction extends InsertRelocationAction<Neo4jTransaction, Record> {
-    public Neo4jInsertRelocationAction(Neo4jTransaction dbOperation, World.City city, LocalDateTime today, String relocateeEmail, String relocationCityName) {
-        super(dbOperation, city, today, relocateeEmail, relocationCityName);
+
+    public Neo4jInsertRelocationAction(Neo4jTransaction tx, World.City city, LocalDateTime today, String relocateeEmail, String relocationCityName) {
+        super(tx, city, today, relocateeEmail, relocationCityName);
     }
 
     @Override
@@ -49,7 +50,7 @@ public class Neo4jInsertRelocationAction extends InsertRelocationAction<Neo4jTra
             put("newCityName", relocationCityName);
             put("relocationDate", today);
         }};
-        return Action.singleResult(dbOperation.execute(new Query(createRelocationQuery(), parameters)));
+        return Action.singleResult(tx.execute(new Query(createRelocationQuery(), parameters)));
     }
 
     public static String createRelocationQuery() {

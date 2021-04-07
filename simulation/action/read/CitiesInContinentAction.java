@@ -26,8 +26,8 @@ import java.util.List;
 public abstract class CitiesInContinentAction<TX extends Transaction> extends ReadAction<TX, List<String>> {
     protected final World.City city;
 
-    public CitiesInContinentAction(TX dbOperation, World.City city) {
-        super(dbOperation);
+    public CitiesInContinentAction(TX tx, World.City city) {
+        super(tx);
         this.city = city;
     }
 

@@ -29,8 +29,8 @@ public abstract class UpdateAgesOfPeopleInCityAction<TX extends Transaction> ext
     protected final LocalDateTime today;
     protected final World.City city;
 
-    public UpdateAgesOfPeopleInCityAction(TX dbOperation, LocalDateTime today, World.City city) {
-        super(dbOperation);
+    public UpdateAgesOfPeopleInCityAction(TX tx, LocalDateTime today, World.City city) {
+        super(tx);
         this.today = today;
         this.city = city;
     }

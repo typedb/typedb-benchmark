@@ -21,7 +21,7 @@ import grakn.benchmark.simulation.driver.Transaction;
 
 public abstract class MeanWageOfPeopleInWorldAction<TX extends Transaction> extends WorldwideInsightAction<TX, Double> {
 
-    public MeanWageOfPeopleInWorldAction(TX dbOperation) {
-        super(dbOperation);
+    public MeanWageOfPeopleInWorldAction(TX tx) {
+        super(tx);
     }
 }

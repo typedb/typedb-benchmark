@@ -32,8 +32,8 @@ public abstract class InsertTransactionAction<TX extends Transaction, ACTION_RET
     protected final int productQuantity;
     protected final boolean isTaxable;
 
-    public InsertTransactionAction(TX dbOperation, World.Country country, Pair<Long, Long> transaction, Long sellerCompanyNumber, double value, int productQuantity, boolean isTaxable) {
-        super(dbOperation);
+    public InsertTransactionAction(TX tx, World.Country country, Pair<Long, Long> transaction, Long sellerCompanyNumber, double value, int productQuantity, boolean isTaxable) {
+        super(tx);
         this.country = country;
         this.transaction = transaction;
         this.sellerCompanyNumber = sellerCompanyNumber;

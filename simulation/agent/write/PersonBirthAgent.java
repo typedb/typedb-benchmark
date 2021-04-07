@@ -48,7 +48,7 @@ public class PersonBirthAgent<TX extends Transaction> extends Agent<World.City, 
         // Find bachelors and bachelorettes who are considered adults and who are not in a marriage and pair them off randomly
         List<Action<?, ?>.Report> reports = new ArrayList<>();
         int numBirths = context.world().getScaleFactor();
-        try (TX dbOperation = session.newTransaction(region.tracker(), context.iteration(), isTracing())) {
+        try (TX tx = session.newTransaction(region.tracker(), context.iteration(), isTracing())) {
             for (int i = 0; i < numBirths; i++) {
                 String gender;
                 String forename;
@@ -63,9 +63,9 @@ public class PersonBirthAgent<TX extends Transaction> extends Agent<World.City, 
                     forename = pickOne(context.world().getFemaleForenames(), random);
                 }
                 String email = "email/" + uniqueId(context, region.tracker(), i);
-                runAction(actionFactory().insertPersonAction(dbOperation, region, context.today(), email, gender, forename, surname), reports);
+                runAction(actionFactory().insertPersonAction(tx, region, context.today(), email, gender, forename, surname), reports);
             }
-            dbOperation.commit();
+            tx.commit();
         }
 
         return reports;

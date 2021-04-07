@@ -23,13 +23,14 @@ import org.neo4j.driver.Query;
 import org.neo4j.driver.Record;
 
 public class Neo4jFindSpecificPersonAction extends FindSpecificPersonAction<Neo4jTransaction> {
-    public Neo4jFindSpecificPersonAction(Neo4jTransaction dbOperation) {
-        super(dbOperation);
+
+    public Neo4jFindSpecificPersonAction(Neo4jTransaction tx) {
+        super(tx);
     }
 
     @Override
     public String run() {
-        Record result = singleResult(dbOperation.execute(new Query(query())));
+        Record result = singleResult(tx.execute(new Query(query())));
         return result.get("person.email").asString();
     }
 

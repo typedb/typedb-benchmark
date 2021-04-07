@@ -46,14 +46,15 @@ import static graql.lang.Graql.var;
 import static java.util.stream.Collectors.toList;
 
 public class GraknMarriedCoupleAction extends MarriedCoupleAction<GraknTransaction> {
-    public GraknMarriedCoupleAction(GraknTransaction dbOperation, World.City city, LocalDateTime today) {
-        super(dbOperation, city, today);
+
+    public GraknMarriedCoupleAction(GraknTransaction tx, World.City city, LocalDateTime today) {
+        super(tx, city, today);
     }
 
     @Override
     public List<HashMap<SpouseType, String>> run() {
         GraqlMatch.Sorted marriageQuery = query(city.name());
-        return dbOperation.execute(marriageQuery)
+        return tx.execute(marriageQuery)
                 .stream()
                 .map(a -> new HashMap<SpouseType, String>() {{
                     put(SpouseType.WIFE, a.get("wife-email").asThing().asAttribute().getValue().toString());

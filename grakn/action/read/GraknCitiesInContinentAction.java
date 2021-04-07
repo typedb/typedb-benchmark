@@ -32,14 +32,15 @@ import static graql.lang.Graql.match;
 import static graql.lang.Graql.var;
 
 public class GraknCitiesInContinentAction extends CitiesInContinentAction<GraknTransaction> {
-    public GraknCitiesInContinentAction(GraknTransaction dbOperation, World.City city) {
-        super(dbOperation, city);
+
+    public GraknCitiesInContinentAction(GraknTransaction tx, World.City city) {
+        super(tx, city);
     }
 
     @Override
     public List<String> run() {
         GraqlMatch.Unfiltered relocationCitiesQuery = query(city.name(), city.country().continent().name());
-        return dbOperation.sortedExecute(relocationCitiesQuery, "city-name", null);
+        return tx.sortedExecute(relocationCitiesQuery, "city-name", null);
     }
 
     public static GraqlMatch.Unfiltered query(String cityName, String continentName) {

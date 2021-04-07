@@ -30,8 +30,8 @@ public abstract class InsertRelocationAction<TX extends Transaction, ACTION_RETU
     protected final String relocateeEmail;
     protected final String relocationCityName;
 
-    public InsertRelocationAction(TX dbOperation, World.City city, LocalDateTime today, String relocateeEmail, String relocationCityName) {
-        super(dbOperation);
+    public InsertRelocationAction(TX tx, World.City city, LocalDateTime today, String relocateeEmail, String relocationCityName) {
+        super(tx);
         this.city = city;
         this.today = today;
         this.relocateeEmail = relocateeEmail;

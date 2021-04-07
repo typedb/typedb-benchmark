@@ -48,14 +48,14 @@ public class ProductAgent<TX extends Transaction> extends Agent<World.Continent,
     protected List<Action<?, ?>.Report> run(Session<TX> session, World.Continent region, Random random) {
         List<Action<?, ?>.Report> reports = new ArrayList<>();
         int numProducts = context.world().getScaleFactor();
-        try (TX dbOperation = session.newTransaction(region.tracker(), context.iteration(), isTracing())) {
+        try (TX tx = session.newTransaction(region.tracker(), context.iteration(), isTracing())) {
             for (int i = 0; i < numProducts; i++) {
                 String productName = RandomValueGenerator.of(random).boundRandomLengthRandomString(5, 20);
                 String productDescription = RandomValueGenerator.of(random).boundRandomLengthRandomString(75, 100);
                 long barcode = uniqueId(context, region.tracker(), i).hashCode();
-                runAction(actionFactory().insertProductAction(dbOperation, region, barcode, productName, productDescription), reports);
+                runAction(actionFactory().insertProductAction(tx, region, barcode, productName, productDescription), reports);
             }
-            dbOperation.commit();
+            tx.commit();
         }
         return reports;
     }

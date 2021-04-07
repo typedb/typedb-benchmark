@@ -29,10 +29,10 @@ import static com.google.common.collect.Iterables.getOnlyElement;
 
 public abstract class Action<TX extends Transaction, ACTION_RETURN_TYPE> {
 
-    protected TX dbOperation;
+    protected TX tx;
 
-    public Action(TX dbOperation) {
-        this.dbOperation = dbOperation;
+    public Action(TX tx) {
+        this.tx = tx;
     }
 
     public static <DB_ANSWER_TYPE> DB_ANSWER_TYPE singleResult(List<DB_ANSWER_TYPE> answers) {

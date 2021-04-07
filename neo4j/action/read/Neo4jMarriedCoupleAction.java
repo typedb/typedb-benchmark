@@ -31,8 +31,9 @@ import java.util.List;
 import static java.util.stream.Collectors.toList;
 
 public class Neo4jMarriedCoupleAction extends MarriedCoupleAction<Neo4jTransaction> {
-    public Neo4jMarriedCoupleAction(Neo4jTransaction dbOperation, World.City city, LocalDateTime today) {
-        super(dbOperation, city, today);
+
+    public Neo4jMarriedCoupleAction(Neo4jTransaction tx, World.City city, LocalDateTime today) {
+        super(tx, city, today);
     }
 
     @Override
@@ -41,7 +42,7 @@ public class Neo4jMarriedCoupleAction extends MarriedCoupleAction<Neo4jTransacti
         HashMap<String, Object> parameters = new HashMap<String, Object>() {{
             put("locationName", city.name());
         }};
-        List<Record> records = dbOperation.execute(new Query(template, parameters));
+        List<Record> records = tx.execute(new Query(template, parameters));
         return records.stream().map(Record::asMap).map(r -> new HashMap<SpouseType, String>() {{
             put(SpouseType.WIFE, r.get("wife.email").toString());
             put(SpouseType.HUSBAND, r.get("husband.email").toString());

@@ -24,13 +24,14 @@ import org.neo4j.driver.Query;
 import java.util.List;
 
 public class Neo4jFindLivedInAction extends FindLivedInAction<Neo4jTransaction> {
-    public Neo4jFindLivedInAction(Neo4jTransaction dbOperation) {
-        super(dbOperation);
+
+    public Neo4jFindLivedInAction(Neo4jTransaction tx) {
+        super(tx);
     }
 
     @Override
     public List<String> run() {
-        return dbOperation.sortedExecute(new Query(query()), "person.email", null);
+        return tx.sortedExecute(new Query(query()), "person.email", null);
     }
 
     public static String query() {

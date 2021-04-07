@@ -24,8 +24,8 @@ import java.util.ArrayList;
 
 public abstract class WorldwideInsightAction<TX extends Transaction, ACTION_RETURN_TYPE> extends ReadAction<TX, ACTION_RETURN_TYPE> {
 
-    public WorldwideInsightAction(TX dbOperation) {
-        super(dbOperation);
+    public WorldwideInsightAction(TX tx) {
+        super(tx);
     }
 
     @Override

@@ -31,8 +31,9 @@ import static grakn.benchmark.neo4j.action.Model.PRODUCT_DESCRIPTION;
 import static grakn.benchmark.neo4j.action.Model.PRODUCT_NAME;
 
 public class Neo4jInsertProductAction extends InsertProductAction<Neo4jTransaction, Record> {
-    public Neo4jInsertProductAction(Neo4jTransaction dbOperation, World.Continent continent, Long barcode, String productName, String productDescription) {
-        super(dbOperation, continent, barcode, productName, productDescription);
+
+    public Neo4jInsertProductAction(Neo4jTransaction tx, World.Continent continent, Long barcode, String productName, String productDescription) {
+        super(tx, continent, barcode, productName, productDescription);
     }
 
     @Override
@@ -44,7 +45,7 @@ public class Neo4jInsertProductAction extends InsertProductAction<Neo4jTransacti
             put("productName", productName);
             put("description", productDescription);
         }};
-        return singleResult(dbOperation.execute(new Query(template, parameters)));
+        return singleResult(tx.execute(new Query(template, parameters)));
     }
 
     public static String query() {

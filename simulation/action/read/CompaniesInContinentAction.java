@@ -26,8 +26,8 @@ import java.util.List;
 public abstract class CompaniesInContinentAction<TX extends Transaction> extends ReadAction<TX, List<Long>> {
     protected final World.Continent continent;
 
-    public CompaniesInContinentAction(TX dbOperation, World.Continent continent) {
-        super(dbOperation);
+    public CompaniesInContinentAction(TX tx, World.Continent continent) {
+        super(tx);
         this.continent = continent;
     }
 

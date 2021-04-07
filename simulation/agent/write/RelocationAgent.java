@@ -63,22 +63,22 @@ public class RelocationAgent<TX extends Transaction> extends Agent<World.City, T
         List<String> residentEmails;
         List<String> relocationCityNames;
 
-        try (TX dbOperation = session.newTransaction(region.tracker(), context.iteration(), isTracing())) {
-            ResidentsInCityAction<?> residentsInCityAction = actionFactory().residentsInCityAction(dbOperation, region, context.world().getScaleFactor(), earliestDateOfResidencyToRelocate);
+        try (TX tx = session.newTransaction(region.tracker(), context.iteration(), isTracing())) {
+            ResidentsInCityAction<?> residentsInCityAction = actionFactory().residentsInCityAction(tx, region, context.world().getScaleFactor(), earliestDateOfResidencyToRelocate);
             residentEmails = runAction(residentsInCityAction, reports);
         }
         shuffle(residentEmails, random);
 
-        try (TX dbOperation = session.newTransaction(region.tracker(), context.iteration(), isTracing())) {
-            CitiesInContinentAction<?> citiesInContinentAction = actionFactory().citiesInContinentAction(dbOperation, region);
+        try (TX tx = session.newTransaction(region.tracker(), context.iteration(), isTracing())) {
+            CitiesInContinentAction<?> citiesInContinentAction = actionFactory().citiesInContinentAction(tx, region);
             relocationCityNames = runAction(citiesInContinentAction, reports);
         }
 
-        try (TX dbOperation = session.newTransaction(region.tracker(), context.iteration(), isTracing())) {
+        try (TX tx = session.newTransaction(region.tracker(), context.iteration(), isTracing())) {
             Allocation.allocate(residentEmails, relocationCityNames, (residentEmail, relocationCityName) -> {
-                runAction(actionFactory().insertRelocationAction(dbOperation, region, context.today(), residentEmail, relocationCityName), reports);
+                runAction(actionFactory().insertRelocationAction(tx, region, context.today(), residentEmail, relocationCityName), reports);
             });
-            dbOperation.commit();
+            tx.commit();
         }
 
         return reports;

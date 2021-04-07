@@ -28,8 +28,8 @@ public abstract class InsertFriendshipAction<TX extends Transaction, ACTION_RETU
     protected final String friend1Email;
     protected final String friend2Email;
 
-    public InsertFriendshipAction(TX dbOperation, LocalDateTime today, String friend1Email, String friend2Email) {
-        super(dbOperation);
+    public InsertFriendshipAction(TX tx, LocalDateTime today, String friend1Email, String friend2Email) {
+        super(tx);
         this.today = today;
         this.friend1Email = friend1Email;
         this.friend2Email = friend2Email;

@@ -51,14 +51,14 @@ public class MarriageAgent<TX extends Transaction> extends Agent<World.City, TX>
         List<Action<?, ?>.Report> reports = new ArrayList<>();
         LocalDateTime dobOfAdults = context.today().minusYears(context.world().AGE_OF_ADULTHOOD);
         List<String> womenEmails;
-        try (TX dbOperation = session.newTransaction(region.tracker(), context.iteration(), isTracing())) {
-            womenEmails = runAction(actionFactory().unmarriedPeopleInCityAction(dbOperation, region, "female", dobOfAdults), reports);
+        try (TX tx = session.newTransaction(region.tracker(), context.iteration(), isTracing())) {
+            womenEmails = runAction(actionFactory().unmarriedPeopleInCityAction(tx, region, "female", dobOfAdults), reports);
             shuffle(womenEmails, random);
         }
 
         List<String> menEmails;
-        try (TX dbOperation = session.newTransaction(region.tracker(), context.iteration(), isTracing())) {
-            menEmails = runAction(actionFactory().unmarriedPeopleInCityAction(dbOperation, region, "male", dobOfAdults), reports);
+        try (TX tx = session.newTransaction(region.tracker(), context.iteration(), isTracing())) {
+            menEmails = runAction(actionFactory().unmarriedPeopleInCityAction(tx, region, "male", dobOfAdults), reports);
             shuffle(menEmails, random);
         }
 
@@ -67,15 +67,15 @@ public class MarriageAgent<TX extends Transaction> extends Agent<World.City, TX>
             System.out.println("asdf");
             assert true;
         }
-        try (TX dbOperation = session.newTransaction(region.tracker(), context.iteration(), isTracing())) {
+        try (TX tx = session.newTransaction(region.tracker(), context.iteration(), isTracing())) {
             if (numMarriagesPossible > 0) {
                 for (int i = 0; i < numMarriagesPossible; i++) {
                     String wifeEmail = womenEmails.get(i);
                     String husbandEmail = menEmails.get(i);
                     int marriageIdentifier = uniqueId(context, region.tracker(), i).hashCode();
-                    runAction(actionFactory().insertMarriageAction(dbOperation, region, marriageIdentifier, wifeEmail, husbandEmail), reports);
+                    runAction(actionFactory().insertMarriageAction(tx, region, marriageIdentifier, wifeEmail, husbandEmail), reports);
                 }
-                dbOperation.commit();
+                tx.commit();
             }
         }
 

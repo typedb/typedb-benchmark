@@ -24,13 +24,14 @@ import org.neo4j.driver.Query;
 import java.util.List;
 
 public class Neo4jFindCurrentResidentsAction extends FindCurrentResidentsAction<Neo4jTransaction> {
-    public Neo4jFindCurrentResidentsAction(Neo4jTransaction dbOperation) {
-        super(dbOperation);
+
+    public Neo4jFindCurrentResidentsAction(Neo4jTransaction tx) {
+        super(tx);
     }
 
     @Override
     public List<String> run() {
-        return dbOperation.sortedExecute(new Query(query()), "email", null);
+        return tx.sortedExecute(new Query(query()), "email", null);
     }
 
     public static String query() {

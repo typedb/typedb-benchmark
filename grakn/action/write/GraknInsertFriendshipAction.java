@@ -39,13 +39,13 @@ import static graql.lang.Graql.var;
 
 public class GraknInsertFriendshipAction extends InsertFriendshipAction<GraknTransaction, ConceptMap> {
 
-    public GraknInsertFriendshipAction(GraknTransaction dbOperation, LocalDateTime today, String friend1Email, String friend2Email) {
-        super(dbOperation, today, friend1Email, friend2Email);
+    public GraknInsertFriendshipAction(GraknTransaction tx, LocalDateTime today, String friend1Email, String friend2Email) {
+        super(tx, today, friend1Email, friend2Email);
     }
 
     @Override
     public ConceptMap run() {
-        return Action.optionalSingleResult(dbOperation.execute(query(today, friend1Email, friend2Email)));
+        return Action.optionalSingleResult(tx.execute(query(today, friend1Email, friend2Email)));
     }
 
     public static GraqlInsert query(LocalDateTime today, String friend1Email, String friend2Email) {
@@ -81,9 +81,9 @@ public class GraknInsertFriendshipAction extends InsertFriendshipAction<GraknTra
     protected HashMap<ComparableField, Object> outputForReport(ConceptMap answer) {
         return new HashMap<ComparableField, Object>() {
             {
-                put(InsertFriendshipActionField.FRIEND1_EMAIL, dbOperation.getOnlyAttributeOfThing(answer, "p1", EMAIL));
-                put(InsertFriendshipActionField.FRIEND2_EMAIL, dbOperation.getOnlyAttributeOfThing(answer, "p2", EMAIL));
-                put(InsertFriendshipActionField.START_DATE, dbOperation.getOnlyAttributeOfThing(answer, FRIENDSHIP, START_DATE));
+                put(InsertFriendshipActionField.FRIEND1_EMAIL, tx.getOnlyAttributeOfThing(answer, "p1", EMAIL));
+                put(InsertFriendshipActionField.FRIEND2_EMAIL, tx.getOnlyAttributeOfThing(answer, "p2", EMAIL));
+                put(InsertFriendshipActionField.START_DATE, tx.getOnlyAttributeOfThing(answer, FRIENDSHIP, START_DATE));
             }
         };
 

@@ -28,8 +28,8 @@ public abstract class InsertParentShipAction<TX extends Transaction, ACTION_RETU
     protected final HashMap<SpouseType, String> marriage;
     protected final String childEmail;
 
-    public InsertParentShipAction(TX dbOperation, HashMap<SpouseType, String> marriage, String childEmail) {
-        super(dbOperation);
+    public InsertParentShipAction(TX tx, HashMap<SpouseType, String> marriage, String childEmail) {
+        super(tx);
         this.marriage = marriage;
         this.childEmail = childEmail;
     }

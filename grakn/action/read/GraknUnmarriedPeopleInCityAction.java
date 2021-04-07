@@ -44,8 +44,9 @@ import static graql.lang.Graql.not;
 import static graql.lang.Graql.var;
 
 public class GraknUnmarriedPeopleInCityAction extends UnmarriedPeopleInCityAction<GraknTransaction> {
-    public GraknUnmarriedPeopleInCityAction(GraknTransaction dbOperation, World.City city, String gender, LocalDateTime dobOfAdults) {
-        super(dbOperation, city, gender, dobOfAdults);
+
+    public GraknUnmarriedPeopleInCityAction(GraknTransaction tx, World.City city, String gender, LocalDateTime dobOfAdults) {
+        super(tx, city, gender, dobOfAdults);
     }
 
     @Override
@@ -60,7 +61,7 @@ public class GraknUnmarriedPeopleInCityAction extends UnmarriedPeopleInCityActio
             throw new IllegalArgumentException("Gender must be male or female");
         }
         GraqlMatch query = query(marriageRole, gender, dobOfAdults, city.name());
-        return dbOperation.sortedExecute(query, EMAIL, null);
+        return tx.sortedExecute(query, EMAIL, null);
     }
 
     public static GraqlMatch query(String marriageRole, String gender, LocalDateTime dobOfAdults, String cityName) {

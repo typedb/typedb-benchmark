@@ -31,8 +31,8 @@ import static grakn.benchmark.neo4j.action.Model.START_DATE;
 
 public class Neo4jInsertFriendshipAction extends InsertFriendshipAction<Neo4jTransaction, Record> {
 
-    public Neo4jInsertFriendshipAction(Neo4jTransaction dbOperation, LocalDateTime today, String friend1Email, String friend2Email) {
-        super(dbOperation, today, friend1Email, friend2Email);
+    public Neo4jInsertFriendshipAction(Neo4jTransaction tx, LocalDateTime today, String friend1Email, String friend2Email) {
+        super(tx, today, friend1Email, friend2Email);
     }
 
     @Override
@@ -42,7 +42,7 @@ public class Neo4jInsertFriendshipAction extends InsertFriendshipAction<Neo4jTra
             put("p2Email", friend2Email);
             put("startDate", today);
         }};
-        return Action.optionalSingleResult(dbOperation.execute(new Query(query(), parameters)));
+        return Action.optionalSingleResult(tx.execute(new Query(query(), parameters)));
     }
 
     public static String query() {
