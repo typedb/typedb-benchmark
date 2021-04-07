@@ -17,7 +17,7 @@
 
 package grakn.benchmark.simulation.driver;
 
-public abstract class TransactionalClient<SESSION, TX extends TransactionalTransaction> extends Client<TX> {
+public abstract class TransactionalClient<SESSION, TX extends Transaction> extends Client<TX> {
 
     public enum TracingLabel {
         OPEN_CLIENT("openClient"),

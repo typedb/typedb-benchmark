@@ -17,7 +17,7 @@
 
 package grakn.benchmark.neo4j.driver;
 
-import grakn.benchmark.simulation.driver.TransactionalTransaction;
+import grakn.benchmark.simulation.driver.Transaction;
 import org.neo4j.driver.Query;
 import org.neo4j.driver.Record;
 import org.neo4j.driver.Result;
@@ -29,7 +29,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class Neo4jTransaction extends TransactionalTransaction {
+public class Neo4jTransaction extends Transaction {
 
     private static final Logger LOG = LoggerFactory.getLogger(Neo4jTransaction.class);
     private final Session session;

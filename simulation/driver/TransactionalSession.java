@@ -17,7 +17,7 @@
 
 package grakn.benchmark.simulation.driver;
 
-public abstract class TransactionalSession<TX extends TransactionalTransaction> extends Session<TX> {
+public abstract class TransactionalSession<TX extends Transaction> extends Session<TX> {
 
     public TransactionalSession() {}
 

@@ -17,7 +17,7 @@
 
 package grakn.benchmark.grakn.driver;
 
-import grakn.benchmark.simulation.driver.TransactionalTransaction;
+import grakn.benchmark.simulation.driver.Transaction;
 import grakn.client.api.GraknSession;
 import grakn.client.api.answer.ConceptMap;
 import grakn.client.api.answer.Numeric;
@@ -34,7 +34,7 @@ import java.util.stream.Stream;
 
 import static com.google.common.collect.Iterables.getOnlyElement;
 
-public class GraknTransaction extends TransactionalTransaction {
+public class GraknTransaction extends Transaction {
 
     private static final Logger LOG = LoggerFactory.getLogger(GraknTransaction.class);
 
