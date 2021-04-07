@@ -30,6 +30,7 @@ import grakn.benchmark.simulation.driver.Transaction;
 import grakn.benchmark.simulation.world.World;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -42,13 +43,14 @@ public class RelocationAgent<TX extends Transaction> extends CityAgent<TX> {
     }
 
     @Override
-    protected void run(Session<TX> session, World.City region, List<Action<?, ?>.Report> reports, Random random) {
+    protected List<Action<?, ?>.Report> run(Session<TX> session, World.City region, Random random) {
         /*
         Find people currently resident the city
         Find other cities in the continent
         Distribute the people among those cities via a relocation
          */
 
+        List<Action<?, ?>.Report> reports = new ArrayList<>();
         LocalDateTime earliestDateOfResidencyToRelocate;
         earliestDateOfResidencyToRelocate = context.today().minusYears(2);
 
@@ -57,20 +59,22 @@ public class RelocationAgent<TX extends Transaction> extends CityAgent<TX> {
 
         try (TX dbOperation = session.newTransaction(region.tracker(), context.iteration(), isTracing())) {
             ResidentsInCityAction<?> residentsInCityAction = actionFactory().residentsInCityAction(dbOperation, region, context.world().getScaleFactor(), earliestDateOfResidencyToRelocate);
-            residentEmails = runAction(residentsInCityAction, context.isTest(), reports);
+            residentEmails = runAction(residentsInCityAction, reports);
         }
         shuffle(residentEmails, random);
 
         try (TX dbOperation = session.newTransaction(region.tracker(), context.iteration(), isTracing())) {
             CitiesInContinentAction<?> citiesInContinentAction = actionFactory().citiesInContinentAction(dbOperation, region);
-            relocationCityNames = runAction(citiesInContinentAction, context.isTest(), reports);
+            relocationCityNames = runAction(citiesInContinentAction, reports);
         }
 
         try (TX dbOperation = session.newTransaction(region.tracker(), context.iteration(), isTracing())) {
             Allocation.allocate(residentEmails, relocationCityNames, (residentEmail, relocationCityName) -> {
-                runAction((Action<?, ?>) actionFactory().insertRelocationAction(dbOperation, region, context.today(), residentEmail, relocationCityName), context.isTest(), reports);
+                runAction(actionFactory().insertRelocationAction(dbOperation, region, context.today(), residentEmail, relocationCityName), reports);
             });
             dbOperation.commit();
         }
+
+        return reports;
     }
 }

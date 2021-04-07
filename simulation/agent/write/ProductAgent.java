@@ -27,6 +27,7 @@ import grakn.benchmark.simulation.driver.Session;
 import grakn.benchmark.simulation.driver.Transaction;
 import grakn.benchmark.simulation.world.World;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -37,16 +38,18 @@ public class ProductAgent<TX extends Transaction> extends ContinentAgent<TX> {
     }
 
     @Override
-    protected void run(Session<TX> session, World.Continent region, List<Action<?, ?>.Report> reports, Random random) {
+    protected List<Action<?, ?>.Report> run(Session<TX> session, World.Continent region, Random random) {
+        List<Action<?, ?>.Report> reports = new ArrayList<>();
         int numProducts = context.world().getScaleFactor();
         try (TX dbOperation = session.newTransaction(region.tracker(), context.iteration(), isTracing())) {
             for (int i = 0; i < numProducts; i++) {
                 String productName = RandomValueGenerator.of(random).boundRandomLengthRandomString(5, 20);
                 String productDescription = RandomValueGenerator.of(random).boundRandomLengthRandomString(75, 100);
                 long barcode = uniqueId(context, region.tracker(), i).hashCode();
-                runAction((Action<?, ?>) actionFactory().insertProductAction(dbOperation, region, barcode, productName, productDescription), context.isTest(), reports);
+                runAction(actionFactory().insertProductAction(dbOperation, region, barcode, productName, productDescription), reports);
             }
             dbOperation.commit();
         }
+        return reports;
     }
 }

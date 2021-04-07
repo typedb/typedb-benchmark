@@ -27,6 +27,7 @@ import grakn.benchmark.simulation.driver.Session;
 import grakn.benchmark.simulation.driver.Transaction;
 import grakn.benchmark.simulation.world.World;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -39,11 +40,12 @@ public class FriendshipAgent<TX extends Transaction> extends CityAgent<TX> {
     }
 
     @Override
-    protected void run(Session<TX> session, World.City region, List<Action<?, ?>.Report> reports, Random random) {
+    protected List<Action<?, ?>.Report> run(Session<TX> session, World.City region, Random random) {
+        List<Action<?, ?>.Report> reports = new ArrayList<>();
         List<String> residentEmails;
         try (TX dbOperation = session.newTransaction(region.tracker(), context.iteration(), isTracing())) {
             ResidentsInCityAction<?> residentEmailsAction = actionFactory().residentsInCityAction(dbOperation, region, context.world().getScaleFactor(), context.today());
-            residentEmails = runAction(residentEmailsAction, context.isTest(), reports);
+            residentEmails = runAction(residentEmailsAction, reports);
         } // TODO Closing and reopening the transaction here is a workaround for https://github.com/graknlabs/grakn/issues/5585
 
         try (TX dbOperation = session.newTransaction(region.tracker(), context.iteration(), isTracing())) {
@@ -51,12 +53,12 @@ public class FriendshipAgent<TX extends Transaction> extends CityAgent<TX> {
                 shuffle(residentEmails, random);
                 int numFriendships = context.world().getScaleFactor();
                 for (int i = 0; i < numFriendships; i++) {
-                    // TODO can be a util
-                    // TODO can be a util
-                    runAction((Action<?, ?>) actionFactory().insertFriendshipAction(dbOperation, context.today(), pickOne(residentEmails, random), pickOne(residentEmails, random)), context.isTest(), reports);
+                    runAction(actionFactory().insertFriendshipAction(dbOperation, context.today(), pickOne(residentEmails, random), pickOne(residentEmails, random)), reports);
                 }
                 dbOperation.commit();
             }
         }
+
+        return reports;
     }
 }

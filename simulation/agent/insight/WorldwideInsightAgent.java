@@ -27,6 +27,7 @@ import grakn.benchmark.simulation.driver.Transaction;
 import grakn.benchmark.simulation.driver.Session;
 import grakn.benchmark.simulation.world.World;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -44,11 +45,13 @@ public abstract class WorldwideInsightAgent<TX extends Transaction> extends Worl
     protected abstract ReadAction<TX, ?> getAction(TX tx);
 
     @Override
-    protected void run(Session<TX> session, World region, List<Action<?, ?>.Report> reports, Random random) {
+    protected List<Action<?, ?>.Report> run(Session<TX> session, World region, Random random) {
+        List<Action<?, ?>.Report> reports = new ArrayList<>();
         for (int i = 0; i <= context.world().getScaleFactor(); i++) {
             try (TX dbOperation = session.newTransaction(region.tracker(), context.iteration(), isTracing())) {
-                runAction((Action<?, ?>) getAction(dbOperation), context.isTest(), reports);
+                runAction(getAction(dbOperation), reports);
             }
         }
+        return reports;
     }
 }

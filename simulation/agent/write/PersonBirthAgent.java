@@ -26,6 +26,7 @@ import grakn.benchmark.simulation.driver.Session;
 import grakn.benchmark.simulation.driver.Transaction;
 import grakn.benchmark.simulation.world.World;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -36,8 +37,9 @@ public class PersonBirthAgent<TX extends Transaction> extends CityAgent<TX> {
     }
 
     @Override
-    protected void run(Session<TX> session, World.City region, List<Action<?, ?>.Report> reports, Random random) {
+    protected List<Action<?, ?>.Report> run(Session<TX> session, World.City region, Random random) {
         // Find bachelors and bachelorettes who are considered adults and who are not in a marriage and pair them off randomly
+        List<Action<?, ?>.Report> reports = new ArrayList<>();
         int numBirths = context.world().getScaleFactor();
         try (TX dbOperation = session.newTransaction(region.tracker(), context.iteration(), isTracing())) {
             for (int i = 0; i < numBirths; i++) {
@@ -54,9 +56,11 @@ public class PersonBirthAgent<TX extends Transaction> extends CityAgent<TX> {
                     forename = pickOne(context.world().getFemaleForenames(), random);
                 }
                 String email = "email/" + uniqueId(context, region.tracker(), i);
-                runAction((Action<?, ?>) actionFactory().insertPersonAction(dbOperation, region, context.today(), email, gender, forename, surname), context.isTest(), reports);
+                runAction(actionFactory().insertPersonAction(dbOperation, region, context.today(), email, gender, forename, surname), reports);
             }
             dbOperation.commit();
         }
+
+        return reports;
     }
 }

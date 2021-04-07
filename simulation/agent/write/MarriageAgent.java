@@ -27,6 +27,7 @@ import grakn.benchmark.simulation.driver.Transaction;
 import grakn.benchmark.simulation.world.World;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -39,19 +40,19 @@ public class MarriageAgent<TX extends Transaction> extends CityAgent<TX> {
     }
 
     @Override
-    protected void run(Session<TX> session, World.City region, List<Action<?, ?>.Report> reports, Random random) {
-
+    protected List<Action<?, ?>.Report> run(Session<TX> session, World.City region, Random random) {
         // Find bachelors and bachelorettes who are considered adults and who are not in a marriage and pair them off randomly
+        List<Action<?, ?>.Report> reports = new ArrayList<>();
         LocalDateTime dobOfAdults = context.today().minusYears(context.world().AGE_OF_ADULTHOOD);
         List<String> womenEmails;
         try (TX dbOperation = session.newTransaction(region.tracker(), context.iteration(), isTracing())) {
-            womenEmails = runAction(actionFactory().unmarriedPeopleInCityAction(dbOperation, region, "female", dobOfAdults), context.isTest(), reports);
+            womenEmails = runAction(actionFactory().unmarriedPeopleInCityAction(dbOperation, region, "female", dobOfAdults), reports);
             shuffle(womenEmails, random);
         }
 
         List<String> menEmails;
         try (TX dbOperation = session.newTransaction(region.tracker(), context.iteration(), isTracing())) {
-            menEmails = runAction(actionFactory().unmarriedPeopleInCityAction(dbOperation, region, "male", dobOfAdults), context.isTest(), reports);
+            menEmails = runAction(actionFactory().unmarriedPeopleInCityAction(dbOperation, region, "male", dobOfAdults), reports);
             shuffle(menEmails, random);
         }
 
@@ -66,10 +67,12 @@ public class MarriageAgent<TX extends Transaction> extends CityAgent<TX> {
                     String wifeEmail = womenEmails.get(i);
                     String husbandEmail = menEmails.get(i);
                     int marriageIdentifier = uniqueId(context, region.tracker(), i).hashCode();
-                    runAction((Action<?, ?>) actionFactory().insertMarriageAction(dbOperation, region, marriageIdentifier, wifeEmail, husbandEmail), context.isTest(), reports);
+                    runAction(actionFactory().insertMarriageAction(dbOperation, region, marriageIdentifier, wifeEmail, husbandEmail), reports);
                 }
                 dbOperation.commit();
             }
         }
+
+        return reports;
     }
 }

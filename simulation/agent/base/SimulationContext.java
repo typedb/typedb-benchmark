@@ -23,13 +23,13 @@ import java.time.LocalDateTime;
 
 public interface SimulationContext {
 
+    int iteration();
+
+    boolean isTracing();
+
+    boolean isTest();
+
     LocalDateTime today();
 
     World world();
-
-    int iteration();
-
-    boolean trace();
-
-    boolean isTest();
 }

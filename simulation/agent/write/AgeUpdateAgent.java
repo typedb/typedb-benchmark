@@ -27,6 +27,7 @@ import grakn.benchmark.simulation.driver.Session;
 import grakn.benchmark.simulation.driver.Transaction;
 import grakn.benchmark.simulation.world.World;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -37,11 +38,13 @@ public class AgeUpdateAgent<TX extends Transaction> extends CityAgent<TX> {
     }
 
     @Override
-    protected void run(Session<TX> session, World.City region, List<Action<?, ?>.Report> reports, Random random) {
+    protected List<Action<?, ?>.Report> run(Session<TX> session, World.City region, Random random) {
+        List<Action<?, ?>.Report> reports = new ArrayList<>();
         try (TX tx = session.newTransaction(region.tracker(), context.iteration(), isTracing())) {
             UpdateAgesOfPeopleInCityAction<TX> updateAgesOfAllPeopleInCityAction = actionFactory().updateAgesOfPeopleInCityAction(tx, context.today(), region);
-            runAction(updateAgesOfAllPeopleInCityAction, context.isTest(), reports);
+            runAction(updateAgesOfAllPeopleInCityAction, reports);
             tx.commit();
         }
+        return reports;
     }
 }

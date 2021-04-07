@@ -45,19 +45,20 @@ public class PurchaseAgent<TX extends Transaction> extends CountryAgent<TX> {
     }
 
     @Override
-    protected void run(Session<TX> session, World.Country region, List<Action<?, ?>.Report> reports, Random random) {
+    protected List<Action<?, ?>.Report> run(Session<TX> session, World.Country region, Random random) {
+        List<Action<?, ?>.Report> reports = new ArrayList<>();
         List<Long> companyNumbers;
 
         try (TX dbOperation = session.newTransaction(region.tracker(), context.iteration(), isTracing())) {
             CompaniesInCountryAction<TX> companiesInContinentAction = actionFactory().companiesInCountryAction(dbOperation, region, 100);
-            companyNumbers = runAction(companiesInContinentAction, context.isTest(), reports);
+            companyNumbers = runAction(companiesInContinentAction, reports);
         }
         shuffle(companyNumbers, random);
 
         List<Long> productBarcodes;
         try (TX dbOperation = session.newTransaction(region.tracker(), context.iteration(), isTracing())) {
             ProductsInContinentAction<?> productsInContinentAction = actionFactory().productsInContinentAction(dbOperation, region.continent());
-            productBarcodes = runAction(productsInContinentAction, context.isTest(), reports);
+            productBarcodes = runAction(productsInContinentAction, reports);
         }
 
         int numTransactions = context.world().getScaleFactor() * companyNumbers.size();
@@ -78,9 +79,11 @@ public class PurchaseAgent<TX extends Transaction> extends CountryAgent<TX> {
                 double value = RandomValueGenerator.of(random).boundRandomDouble(0.01, 10000.00);
                 int productQuantity = RandomValueGenerator.of(random).boundRandomInt(1, 1000);
                 boolean isTaxable = RandomValueGenerator.of(random).bool();
-                runAction((Action<?, ?>) actionFactory().insertTransactionAction(dbOperation, region, transaction, sellerCompanyNumber, value, productQuantity, isTaxable), context.isTest(), reports);
+                runAction(actionFactory().insertTransactionAction(dbOperation, region, transaction, sellerCompanyNumber, value, productQuantity, isTaxable), reports);
             });
             dbOperation.commit();
         }
+
+        return reports;
     }
 }

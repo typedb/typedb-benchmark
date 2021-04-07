@@ -30,6 +30,7 @@ import grakn.benchmark.simulation.driver.Transaction;
 import grakn.benchmark.simulation.world.World;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -49,19 +50,20 @@ public class EmploymentAgent<TX extends Transaction> extends CityAgent<TX> {
     }
 
     @Override
-    protected void run(Session<TX> session, World.City region, List<Action<?, ?>.Report> reports, Random random) {
+    protected List<Action<?, ?>.Report> run(Session<TX> session, World.City region, Random random) {
+        List<Action<?, ?>.Report> reports = new ArrayList<>();
         LocalDateTime employmentDate = context.today().minusYears(0);
         List<String> employeeEmails;
         List<Long> companyNumbers;
 
         try (TX tx = session.newTransaction(region.tracker(), context.iteration(), isTracing())) {
             ResidentsInCityAction<TX> employeeEmailsAction = actionFactory().residentsInCityAction(tx, region, context.world().getScaleFactor(), employmentDate);
-            employeeEmails = runAction(employeeEmailsAction, context.isTest(), reports);
+            employeeEmails = runAction(employeeEmailsAction, reports);
         }
 
         try (TX tx = session.newTransaction(region.tracker(), context.iteration(), isTracing())) {
             CompaniesInCountryAction<TX> companyNumbersAction = actionFactory().companiesInCountryAction(tx, region.country(), context.world().getScaleFactor());
-            companyNumbers = runAction(companyNumbersAction, context.isTest(), reports);
+            companyNumbers = runAction(companyNumbersAction, reports);
         }
 
         try (TX tx = session.newTransaction(region.tracker(), context.iteration(), isTracing())) {
@@ -70,11 +72,13 @@ public class EmploymentAgent<TX extends Transaction> extends CityAgent<TX> {
                 double wageValue = RandomValueGenerator.of(random).boundRandomDouble(MIN_ANNUAL_WAGE, MAX_ANNUAL_WAGE);
                 String contractContent = RandomValueGenerator.of(random).boundRandomLengthRandomString(MIN_CONTRACT_CHARACTER_LENGTH, MAX_CONTRACT_CHARACTER_LENGTH);
                 double contractedHours = RandomValueGenerator.of(random).boundRandomDouble(MIN_CONTRACTED_HOURS, MAX_CONTRACTED_HOURS);
-                runAction((Action<?, ?>) actionFactory().insertEmploymentAction(tx, region, employeeEmail, companyNumber, employmentDate, wageValue, contractContent, contractedHours), context.isTest(), reports);
+                runAction(actionFactory().insertEmploymentAction(tx, region, employeeEmail, companyNumber, employmentDate, wageValue, contractContent, contractedHours), reports);
             });
             if (allocated) {
                 tx.commit();
             }
         }
+
+        return reports;
     }
 }

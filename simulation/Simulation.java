@@ -112,7 +112,7 @@ public abstract class Simulation<DB_DRIVER extends Client<TX>, TX extends Transa
     }
 
     @Override
-    public boolean trace() {
+    public boolean isTracing() {
         return iterationSamplingFunction.apply(iteration());
     }
 

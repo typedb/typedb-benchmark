@@ -29,7 +29,6 @@ import grakn.benchmark.simulation.world.World;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -74,42 +73,37 @@ public abstract class Agent<REGION extends Region, TX extends Transaction> {
     }
 
     public boolean isTracing() {
-        return context.trace() && isTracing;
+        return context.isTracing() && isTracing;
     }
 
     public Map<String, List<Action<?, ?>.Report>> iterate(RandomSource randomSrc) {
         ConcurrentMap<String, List<Action<?, ?>.Report>> reports = new ConcurrentHashMap<>();
         List<REGION> regions = getRegions(context.world());
-        regions.parallelStream().forEach(region -> runAgent(region, reports, randomSrc.next().get()));
+        regions.parallelStream().forEach(region -> {
+            List<Action<?, ?>.Report> report = runWithTracing(region, randomSrc.next().get());
+            if (context.isTest()) reports.put(region.tracker(), report);
+        });
         return reports;
     }
 
     abstract protected List<REGION> getRegions(World world);
 
-    protected abstract void run(Session<TX> session, REGION region, List<Action<?, ?>.Report> reports, Random random);
+    protected abstract List<Action<?, ?>.Report> run(Session<TX> session, REGION region, Random random);
 
-    private void runAgent(REGION region, ConcurrentMap<String, List<Action<?, ?>.Report>> reports, Random random) {
+    private List<Action<?, ?>.Report> runWithTracing(REGION region, Random random) {
         GrablTracingThreadStatic.ThreadContext tracingCtx = null;
         try {
             if (isTracing()) tracingCtx = contextOnThread(region.tracker(), context.iteration());
-
             Session<TX> session = client.session(region, logger);
-            List<Action<?, ?>.Report> actionReports = new ArrayList<>();
-            trace(() -> {
-                run(session, region, actionReports, random);
-                return null;
-            }, className(getClass()), isTracing());
-            if (context.isTest()) reports.put(region.tracker(), actionReports);
+            return trace(() -> run(session, region, random), className(getClass()), isTracing());
         } finally {
             if (tracingCtx != null) tracingCtx.close();
         }
     }
 
-    public <ACTION_RETURN_TYPE> ACTION_RETURN_TYPE runAction(Action<?, ACTION_RETURN_TYPE> action, boolean isTest,
-                                                             List<Action<?, ?>.Report> actionReports) {
-        ACTION_RETURN_TYPE actionAnswer;
-        actionAnswer = trace(action::run, action.name(), isTracing());
-        if (isTest) actionReports.add(action.report(actionAnswer));
+    public <T> T runAction(Action<?, T> action, List<Action<?, ?>.Report> reports) {
+        T actionAnswer = trace(action::run, action.name(), isTracing());
+        if (context.isTest()) reports.add(action.report(actionAnswer));
         return actionAnswer;
     }
 
