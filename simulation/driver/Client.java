@@ -27,4 +27,27 @@ public abstract class Client<TX extends Transaction> {
     public abstract void printStatistics(Logger LOG);
 
     public abstract void close();
+
+    public enum TracingLabel {
+        OPEN_CLIENT("open_client"),
+        CLOSE_CLIENT("close_client"),
+        OPEN_SESSION("open_session"),
+        CLOSE_SESSION("close_session"),
+        OPEN_TRANSACTION("open_tx"),
+        CLOSE_TRANSACTION("close_tx"),
+        COMMIT_TRANSACTION("commit_tx"),
+        EXECUTE("execute"),
+        SORTED_EXECUTE("sorted_execute"),
+        EXECUTE_ASYNC("execute_async");
+
+        private String name;
+
+        TracingLabel(String name) {
+            this.name = name;
+        }
+
+        public String getName() {
+            return name;
+        }
+    }
 }

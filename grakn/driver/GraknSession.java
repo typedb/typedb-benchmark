@@ -21,14 +21,23 @@ import grakn.benchmark.simulation.driver.Session;
 
 public class GraknSession extends Session<GraknTransaction> {
 
-    private final grakn.client.api.GraknSession session;
+    private final grakn.client.api.GraknSession nativeSession;
 
-    public GraknSession(grakn.client.api.GraknSession session) {
-        this.session = session;
+    public GraknSession(grakn.client.api.GraknSession nativeSession) {
+        this.nativeSession = nativeSession;
+    }
+
+    public grakn.client.api.GraknSession unpack() {
+        return nativeSession;
     }
 
     @Override
     public GraknTransaction newTransaction(String tracker, long iteration, boolean trace) {
-        return new GraknTransaction(session, tracker, iteration, trace);
+        return new GraknTransaction(nativeSession, tracker, iteration, trace);
+    }
+
+    @Override
+    public void close() {
+        nativeSession.close();
     }
 }

@@ -28,15 +28,16 @@ import java.text.DecimalFormat;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static grabl.tracing.client.GrablTracingThreadStatic.traceOnThread;
-import static grakn.benchmark.simulation.driver.TransactionalClient.TracingLabel.OPEN_SESSION;
+import static grakn.benchmark.simulation.driver.Client.TracingLabel.OPEN_SESSION;
+import static grakn.client.api.GraknTransaction.Type.READ;
 import static graql.lang.Graql.match;
 import static graql.lang.Graql.var;
 
-public class GraknClient extends TransactionalClient<grakn.client.api.GraknSession, GraknTransaction> {
+public class GraknClient extends TransactionalClient<GraknSession, GraknTransaction> {
 
-    private final grakn.client.api.GraknClient client;
+    private final grakn.client.api.GraknClient nativeClient;
     private final String database;
-    private final ConcurrentHashMap<String, grakn.client.api.GraknSession> sessionMap = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, GraknSession> sessionMap = new ConcurrentHashMap<>();
 
     public static GraknClient core(String hostUri, String database) {
         return new GraknClient(Grakn.coreClient(hostUri), database);
@@ -46,36 +47,68 @@ public class GraknClient extends TransactionalClient<grakn.client.api.GraknSessi
         return new GraknClient(Grakn.clusterClient(hostUri), database);
     }
 
-    private GraknClient(grakn.client.api.GraknClient client, String database) {
-        this.client = client;
+    private GraknClient(grakn.client.api.GraknClient nativeClient, String database) {
+        this.nativeClient = nativeClient;
         this.database = database;
     }
 
     public void createDatabase() {
-        if (client.databases().contains(database)) client.databases().get(database).delete();
-        client.databases().create(database);
+        if (nativeClient.databases().contains(database)) nativeClient.databases().get(database).delete();
+        nativeClient.databases().create(database);
     }
 
     @Override
-    public grakn.client.api.GraknSession session(String sessionKey) {
+    public GraknSession session(String sessionKey) {
         return sessionMap.computeIfAbsent(sessionKey, k -> {
             try (GrablTracingThreadStatic.ThreadTrace ignored = traceOnThread(OPEN_SESSION.getName())) {
-                return client.session(database, grakn.client.api.GraknSession.Type.DATA);
+                return new GraknSession(nativeClient.session(database, grakn.client.api.GraknSession.Type.DATA));
             }
         });
     }
 
-    public grakn.client.api.GraknSession schemaSession(String sessionKey) {
+    public GraknSession schemaSession(String sessionKey) {
         return sessionMap.computeIfAbsent(sessionKey, k -> {
             try (GrablTracingThreadStatic.ThreadTrace ignored = traceOnThread(OPEN_SESSION.getName())) {
-                return client.session(database, grakn.client.api.GraknSession.Type.SCHEMA);
+                return new GraknSession(nativeClient.session(database, grakn.client.api.GraknSession.Type.SCHEMA));
             }
         });
+    }
+
+    @Override
+    public Session<GraknTransaction> session(Region region) {
+        return session(region.topLevelName());
+    }
+
+    @Override
+    public void printStatistics(Logger LOG) {
+        try (GraknSession session = session("statisticsDataSession")) {
+            grakn.client.api.GraknSession nativeSession = session.unpack();
+            try (grakn.client.api.GraknTransaction tx = nativeSession.transaction(READ)) {
+                DecimalFormat formatter = new DecimalFormat("#,###");
+                long numberOfEntities = tx.query().match(match(var("x").isa("entity")).count()).get().asLong();
+                long numberOfAttributes = tx.query().match(match(var("x").isa("attribute")).count()).get().asLong();
+                long numberOfRelations = tx.query().match(match(var("x").isa("relation")).count()).get().asLong();
+                long numberOfThings = tx.query().match(match(var("x").isa("thing")).count()).get().asLong();
+
+                LOG.info("");
+                LOG.info("Benchmark statistic:");
+                LOG.info("");
+                LOG.info("Count 'entity': {}", formatter.format(numberOfEntities));
+                LOG.info("Count 'relation': {}", formatter.format(numberOfRelations));
+                LOG.info("Count 'attribute': {}", formatter.format(numberOfAttributes));
+                if (numberOfThings != numberOfEntities + numberOfAttributes + numberOfRelations) {
+                    LOG.error("The sum of 'entity', 'relation', and 'attribute' counts do not match the total 'thing' count: {}", formatter.format(numberOfThings));
+                } else {
+                    LOG.info("Count 'thing' (total): {}", formatter.format(numberOfThings));
+                }
+                LOG.info("");
+            }
+        }
     }
 
     @Override
     public void closeSessions() {
-        for (grakn.client.api.GraknSession session : sessionMap.values()) {
+        for (GraknSession session : sessionMap.values()) {
             session.close();
         }
         sessionMap.clear();
@@ -84,36 +117,6 @@ public class GraknClient extends TransactionalClient<grakn.client.api.GraknSessi
     @Override
     public void close() {
         closeSessions();
-        client.close();
-    }
-
-    @Override
-    public void printStatistics(Logger LOG) {
-        grakn.client.api.GraknSession session = session("statisticsDataSession");
-        grakn.client.api.GraknTransaction tx = session.transaction(grakn.client.api.GraknTransaction.Type.READ);
-        DecimalFormat formatter = new DecimalFormat("#,###");
-
-        long numberOfEntities = tx.query().match(match(var("x").isa("entity")).count()).get().asLong();
-        long numberOfAttributes = tx.query().match(match(var("x").isa("attribute")).count()).get().asLong();
-        long numberOfRelations = tx.query().match(match(var("x").isa("relation")).count()).get().asLong();
-        long numberOfThings = tx.query().match(match(var("x").isa("thing")).count()).get().asLong();
-
-        LOG.info("");
-        LOG.info("Benchmark statistic:");
-        LOG.info("");
-        LOG.info("Count 'entity': {}", formatter.format(numberOfEntities));
-        LOG.info("Count 'relation': {}", formatter.format(numberOfRelations));
-        LOG.info("Count 'attribute': {}", formatter.format(numberOfAttributes));
-        if (numberOfThings != numberOfEntities + numberOfAttributes + numberOfRelations) {
-            LOG.error("The sum of 'entity', 'relation', and 'attribute' counts do not match the total 'thing' count: {}", formatter.format(numberOfThings));
-        } else {
-            LOG.info("Count 'thing' (total): {}", formatter.format(numberOfThings));
-        }
-        LOG.info("");
-    }
-
-    @Override
-    public Session<GraknTransaction> session(Region region) {
-        return new GraknSession(session(region.topLevelName()));
+        nativeClient.close();
     }
 }

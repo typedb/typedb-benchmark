@@ -20,6 +20,7 @@ package grakn.benchmark.neo4j;
 import grakn.benchmark.config.Config;
 import grakn.benchmark.neo4j.action.Neo4jActionFactory;
 import grakn.benchmark.neo4j.driver.Neo4jClient;
+import grakn.benchmark.neo4j.driver.Neo4jSession;
 import grakn.benchmark.neo4j.driver.Neo4jTransaction;
 import grakn.benchmark.neo4j.yaml_tool.Neo4jYAMLLoader;
 import grakn.benchmark.simulation.TransactionalSimulation;
@@ -51,10 +52,10 @@ public class Neo4JSimulation extends TransactionalSimulation<Neo4jClient, Neo4jT
 
     @Override
     protected void initialise(Map<String, Path> initialisationDataPaths) {
-        Session session = client.session("initialise");
-        addKeyConstraints(session);
-        cleanDatabase(session);
-        YAMLLoader loader = new Neo4jYAMLLoader(session, initialisationDataPaths);
+        Neo4jSession session = client.session("initialise");
+        addKeyConstraints(session.unpack());
+        cleanDatabase(session.unpack());
+        YAMLLoader loader = new Neo4jYAMLLoader(session.unpack(), initialisationDataPaths);
         try {
             loader.loadFile(initialisationDataPaths.get("cypher_templates.yml").toFile());
         } catch (YAMLException | FileNotFoundException e) {
