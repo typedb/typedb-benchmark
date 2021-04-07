@@ -21,9 +21,9 @@ import grakn.benchmark.simulation.action.Action;
 import grakn.benchmark.simulation.action.ActionFactory;
 import grakn.benchmark.simulation.agent.Agent;
 import grakn.benchmark.simulation.agent.base.SimulationContext;
+import grakn.benchmark.simulation.driver.Client;
 import grakn.benchmark.simulation.driver.Session;
 import grakn.benchmark.simulation.driver.Transaction;
-import grakn.benchmark.simulation.driver.Client;
 import grakn.benchmark.simulation.world.World;
 
 import java.time.LocalDateTime;
@@ -63,10 +63,6 @@ public class MarriageAgent<TX extends Transaction> extends Agent<World.City, TX>
         }
 
         int numMarriagesPossible = Math.min(context.world().getScaleFactor(), Math.min(womenEmails.size(), menEmails.size()));
-        if (context.iteration() >= 5) {
-            System.out.println("asdf");
-            assert true;
-        }
         try (TX tx = session.newTransaction(region.tracker(), context.iteration(), isTracing())) {
             if (numMarriagesPossible > 0) {
                 for (int i = 0; i < numMarriagesPossible; i++) {

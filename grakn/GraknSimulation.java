@@ -25,10 +25,12 @@ import grakn.benchmark.grakn.driver.GraknTransaction;
 import grakn.benchmark.grakn.loader.GraknYAMLLoader;
 import grakn.benchmark.simulation.TransactionalSimulation;
 import grakn.benchmark.simulation.action.ActionFactory;
-import grakn.benchmark.simulation.world.World;
 import grakn.benchmark.simulation.loader.YAMLException;
 import grakn.benchmark.simulation.loader.YAMLLoader;
+import grakn.benchmark.simulation.world.World;
 import graql.lang.Graql;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -39,6 +41,8 @@ import java.util.Map;
 import java.util.function.Function;
 
 public class GraknSimulation extends TransactionalSimulation<GraknClient, GraknTransaction> {
+
+    private static final Logger LOG = LoggerFactory.getLogger(GraknSimulation.class);
 
     public GraknSimulation(GraknClient driver, Map<String, Path> initialisationDataPaths, int randomSeed, World world,
                            List<Config.Agent> agentConfigs, Function<Integer, Boolean> iterationSamplingFunction, boolean test) {
@@ -68,20 +72,20 @@ public class GraknSimulation extends TransactionalSimulation<GraknClient, GraknT
 
     private static void initialiseSchema(grakn.client.api.GraknSession nativeSession,
                                          Map<String, Path> initialisationDataPaths) throws IOException {
-        System.out.println(">>>> trace: initialiseSchema: start");
+        LOG.info(">>>> trace: initialiseSchema: start");
         String schemaQuery = new String(Files.readAllBytes(initialisationDataPaths.get("schema.gql")), StandardCharsets.UTF_8);
         try (grakn.client.api.GraknTransaction tx = nativeSession.transaction(grakn.client.api.GraknTransaction.Type.WRITE)) {
             tx.query().define(Graql.parseQuery(schemaQuery));
             tx.commit();
         }
-        System.out.println(">>>> trace: initialiseSchema: end");
+        LOG.info(">>>> trace: initialiseSchema: end");
     }
 
     private static void initialiseData(grakn.client.api.GraknSession nativeSession,
                                        Map<String, Path> initialisationDataPaths) throws IOException, YAMLException {
-        System.out.println(">>>> trace: initialiseData: start");
+        LOG.info(">>>> trace: initialiseData: start");
         YAMLLoader loader = new GraknYAMLLoader(nativeSession, initialisationDataPaths);
         loader.loadFile(initialisationDataPaths.get("graql_templates.yml").toFile());
-        System.out.println(">>>> trace: initialiseData: end");
+        LOG.info(">>>> trace: initialiseData: end");
     }
 }
