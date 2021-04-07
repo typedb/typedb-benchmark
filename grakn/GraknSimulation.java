@@ -38,10 +38,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
-public class GraknBenchmark extends TransactionalSimulation<GraknClient, GraknTransaction> {
+public class GraknSimulation extends TransactionalSimulation<GraknClient, GraknTransaction> {
 
-    public GraknBenchmark(GraknClient driver, Map<String, Path> initialisationDataPaths, int randomSeed, World world,
-                          List<Config.Agent> agentConfigs, Function<Integer, Boolean> iterationSamplingFunction, boolean test) {
+    public GraknSimulation(GraknClient driver, Map<String, Path> initialisationDataPaths, int randomSeed, World world,
+                           List<Config.Agent> agentConfigs, Function<Integer, Boolean> iterationSamplingFunction, boolean test) {
         super(driver, initialisationDataPaths, randomSeed, world, agentConfigs, iterationSamplingFunction, test);
     }
 
@@ -52,14 +52,14 @@ public class GraknBenchmark extends TransactionalSimulation<GraknClient, GraknTr
 
     @Override
     protected void initialise(Map<String, Path> initialisationDataPaths) {
-        driver.createDatabase();
-        try (GraknSession schemaSession = driver.schemaSession("initialiseSchema")) {
+        client.createDatabase();
+        try (GraknSession schemaSession = client.schemaSession("initialiseSchema")) {
             initialiseSchema(schemaSession, initialisationDataPaths);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
 
-        try (GraknSession dataSession = driver.session("initialiseData")) {
+        try (GraknSession dataSession = client.session("initialiseData")) {
             initialiseData(dataSession, initialisationDataPaths);
         } catch (IOException | YAMLException e) {
             throw new RuntimeException(e);

@@ -28,24 +28,24 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
-public abstract class TransactionalSimulation<DB_DRIVER extends TransactionalClient<?, TX>, TX extends TransactionalTransaction> extends Simulation<DB_DRIVER, TX> {
+public abstract class TransactionalSimulation<CLIENT extends TransactionalClient<?, TX>, TX extends TransactionalTransaction> extends Simulation<CLIENT, TX> {
 
-    public TransactionalSimulation(DB_DRIVER driver, Map<String, Path> initialisationDataPaths, int randomSeed, World world, List<Config.Agent> agentConfigs, Function<Integer, Boolean> iterationSamplingFunction, boolean test) {
+    public TransactionalSimulation(CLIENT driver, Map<String, Path> initialisationDataPaths, int randomSeed, World world, List<Config.Agent> agentConfigs, Function<Integer, Boolean> iterationSamplingFunction, boolean test) {
         super(driver, initialisationDataPaths, randomSeed, world, agentConfigs, iterationSamplingFunction, test);
     }
 
     @Override
     protected void closeIteration() {
-        driver.closeSessions();
+        client.closeSessions();
     }
 
     @Override
     public void close() {
-        driver.close();
+        client.close();
     }
 
     @Override
     public void printStatistics(Logger LOG) {
-        driver.printStatistics(LOG);
+        client.printStatistics(LOG);
     }
 }

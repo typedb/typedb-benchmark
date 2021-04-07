@@ -40,11 +40,11 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
-public abstract class Simulation<DB_DRIVER extends Client<TX>, TX extends Transaction> implements SimulationContext {
+public abstract class Simulation<CLIENT extends Client<TX>, TX extends Transaction> implements SimulationContext {
 
     final static Logger LOG = LoggerFactory.getLogger(Simulation.class);
     private final List<Agent<?, TX>> agents;
-    protected final DB_DRIVER driver;
+    protected final CLIENT client;
     private final RandomSource randomSource;
     private final List<Config.Agent> agentConfigs;
     private final Function<Integer, Boolean> iterationSamplingFunction;
@@ -54,8 +54,8 @@ public abstract class Simulation<DB_DRIVER extends Client<TX>, TX extends Transa
     private int iteration = 1;
 
 
-    public Simulation(DB_DRIVER driver, Map<String, Path> initialisationDataPaths, int randomSeed, World world, List<Config.Agent> agentConfigs, Function<Integer, Boolean> iterationSamplingFunction, boolean test) {
-        this.driver = driver;
+    public Simulation(CLIENT client, Map<String, Path> initialisationDataPaths, int randomSeed, World world, List<Config.Agent> agentConfigs, Function<Integer, Boolean> iterationSamplingFunction, boolean test) {
+        this.client = client;
         this.randomSource = new RandomSource(randomSeed);
         this.agentConfigs = agentConfigs;
         this.iterationSamplingFunction = iterationSamplingFunction;
@@ -69,7 +69,7 @@ public abstract class Simulation<DB_DRIVER extends Client<TX>, TX extends Transa
     protected List<Agent<?, TX>> agentListFromConfigs() {
         List<Agent<?, TX>> agents = new ArrayList<>();
         ActionFactory<TX, ?> actionFactory = actionFactory();
-        AgentFactory<TX, ?> agentFactory = new AgentFactory<>(driver, actionFactory, this);
+        AgentFactory<TX, ?> agentFactory = new AgentFactory<>(client, actionFactory, this);
 
         for (Config.Agent agentConfig : agentConfigs) {
             if (agentConfig.getAgentMode().getRun()) {

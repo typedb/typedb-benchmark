@@ -19,6 +19,8 @@ package grakn.benchmark;
 
 import grabl.tracing.client.GrablTracing;
 import grabl.tracing.client.GrablTracingThreadStatic;
+import grakn.benchmark.grakn.GraknSimulation;
+import grakn.benchmark.neo4j.Neo4JSimulation;
 import grakn.benchmark.simulation.Simulation;
 import grakn.benchmark.simulation.world.World;
 import grakn.benchmark.config.Config;
@@ -112,12 +114,12 @@ public class BenchmarkRunner {
                 if (dbName.toLowerCase().startsWith("grakn")) {
                     defaultUri = "localhost:48555";
                     if (hostUri == null) hostUri = defaultUri;
-                    GraknClient graknDriver;
-                    if (dbName.toLowerCase().contains("core")) graknDriver = GraknClient.core(hostUri, DATABASE);
-                    else if (dbName.toLowerCase().contains("cluster")) graknDriver = GraknClient.cluster(hostUri, DATABASE);
+                    GraknClient graknClient;
+                    if (dbName.toLowerCase().contains("core")) graknClient = GraknClient.core(hostUri, DATABASE);
+                    else if (dbName.toLowerCase().contains("cluster")) graknClient = GraknClient.cluster(hostUri, DATABASE);
                     else throw new IllegalArgumentException("Unexpected database name: " + dbName);
-                    benchmark = new grakn.benchmark.grakn.GraknBenchmark(
-                            graknDriver,
+                    benchmark = new GraknSimulation(
+                            graknClient,
                             initialisationDataFiles,
                             config.getRandomSeed(),
                             world,
@@ -128,7 +130,7 @@ public class BenchmarkRunner {
                     defaultUri = "bolt://localhost:7687";
                     if (hostUri == null) hostUri = defaultUri;
 
-                    benchmark = new grakn.benchmark.neo4j.Neo4JBenchmark(
+                    benchmark = new Neo4JSimulation(
                             new Neo4jClient(hostUri),
                             initialisationDataFiles,
                             config.getRandomSeed(),

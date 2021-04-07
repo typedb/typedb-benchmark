@@ -38,9 +38,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
-public class Neo4JBenchmark extends TransactionalSimulation<Neo4jClient, Neo4jTransaction> {
+public class Neo4JSimulation extends TransactionalSimulation<Neo4jClient, Neo4jTransaction> {
 
-    public Neo4JBenchmark(Neo4jClient driver, Map<String, Path> initialisationDataPaths, int randomSeed, World world, List<Config.Agent> agentConfigs, Function<Integer, Boolean> iterationSamplingFunction, boolean test) {
+    public Neo4JSimulation(Neo4jClient driver, Map<String, Path> initialisationDataPaths, int randomSeed, World world, List<Config.Agent> agentConfigs, Function<Integer, Boolean> iterationSamplingFunction, boolean test) {
         super(driver, initialisationDataPaths, randomSeed, world, agentConfigs, iterationSamplingFunction, test);
     }
 
@@ -51,7 +51,7 @@ public class Neo4JBenchmark extends TransactionalSimulation<Neo4jClient, Neo4jTr
 
     @Override
     protected void initialise(Map<String, Path> initialisationDataPaths) {
-        Session session = driver.session("initialise");
+        Session session = client.session("initialise");
         addKeyConstraints(session);
         cleanDatabase(session);
         YAMLLoader loader = new Neo4jYAMLLoader(session, initialisationDataPaths);
@@ -61,7 +61,7 @@ public class Neo4JBenchmark extends TransactionalSimulation<Neo4jClient, Neo4jTr
             throw new RuntimeException(e);
 
         }
-        driver.closeSessions();
+        client.closeSessions();
     }
 
     private void cleanDatabase(Session session) {
