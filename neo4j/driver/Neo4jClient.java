@@ -19,7 +19,7 @@ package grakn.benchmark.neo4j.driver;
 
 import grabl.tracing.client.GrablTracingThreadStatic;
 import grakn.benchmark.simulation.driver.Session;
-import grakn.benchmark.simulation.driver.TransactionalClient;
+import grakn.benchmark.simulation.driver.Client;
 import grakn.benchmark.simulation.world.Region;
 import org.neo4j.driver.AuthTokens;
 import org.neo4j.driver.Driver;
@@ -37,7 +37,7 @@ import static com.google.common.collect.Iterables.getOnlyElement;
 import static grabl.tracing.client.GrablTracingThreadStatic.traceOnThread;
 import static grakn.benchmark.simulation.driver.Client.TracingLabel.OPEN_SESSION;
 
-public class Neo4jClient extends TransactionalClient<Neo4jSession, Neo4jTransaction> {
+public class Neo4jClient extends Client<Neo4jSession, Neo4jTransaction> {
 
     private final Driver nativeDriver;
     private final ConcurrentHashMap<String, Neo4jSession> sessionMap = new ConcurrentHashMap<>();

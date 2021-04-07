@@ -17,10 +17,11 @@
 
 package grakn.benchmark.simulation;
 
-import grakn.benchmark.simulation.driver.TransactionalClient;
+import grakn.benchmark.config.Config;
+import grakn.benchmark.simulation.driver.Client;
+import grakn.benchmark.simulation.driver.Session;
 import grakn.benchmark.simulation.driver.Transaction;
 import grakn.benchmark.simulation.world.World;
-import grakn.benchmark.config.Config;
 import org.slf4j.Logger;
 
 import java.nio.file.Path;
@@ -28,7 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
-public abstract class TransactionalSimulation<CLIENT extends TransactionalClient<?, TX>, TX extends Transaction> extends Simulation<CLIENT, TX> {
+public abstract class TransactionalSimulation<CLIENT extends Client<? extends Session<TX>, TX>, TX extends Transaction> extends Simulation<CLIENT, TX> {
 
     public TransactionalSimulation(CLIENT driver, Map<String, Path> initialisationDataPaths, int randomSeed, World world, List<Config.Agent> agentConfigs, Function<Integer, Boolean> iterationSamplingFunction, boolean test) {
         super(driver, initialisationDataPaths, randomSeed, world, agentConfigs, iterationSamplingFunction, test);

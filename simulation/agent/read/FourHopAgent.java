@@ -20,12 +20,13 @@ package grakn.benchmark.simulation.agent.read;
 import grakn.benchmark.simulation.action.ActionFactory;
 import grakn.benchmark.simulation.action.read.ReadAction;
 import grakn.benchmark.simulation.agent.base.SimulationContext;
-import grakn.benchmark.simulation.driver.Client;
+import grakn.benchmark.simulation.driver.Session;
 import grakn.benchmark.simulation.driver.Transaction;
+import grakn.benchmark.simulation.driver.Client;
 
 public class FourHopAgent<TX extends Transaction> extends ReadAgent<TX> {
 
-    public FourHopAgent(Client<TX> client, ActionFactory<TX, ?> actionFactory, SimulationContext context) {
+    public FourHopAgent(Client<? extends Session<TX>, TX> client, ActionFactory<TX, ?> actionFactory, SimulationContext context) {
         super(client, actionFactory, context);
     }
 

@@ -21,9 +21,9 @@ import grakn.benchmark.simulation.action.Action;
 import grakn.benchmark.simulation.action.ActionFactory;
 import grakn.benchmark.simulation.agent.Agent;
 import grakn.benchmark.simulation.agent.base.SimulationContext;
-import grakn.benchmark.simulation.driver.Client;
 import grakn.benchmark.simulation.driver.Session;
 import grakn.benchmark.simulation.driver.Transaction;
+import grakn.benchmark.simulation.driver.Client;
 import grakn.benchmark.simulation.world.World;
 
 import java.time.LocalDateTime;
@@ -36,7 +36,7 @@ import static java.util.stream.Collectors.toList;
 
 public class MarriageAgent<TX extends Transaction> extends Agent<World.City, TX> {
 
-    public MarriageAgent(Client<TX> client, ActionFactory<TX, ?> actionFactory, SimulationContext context) {
+    public MarriageAgent(Client<? extends Session<TX>, TX> client, ActionFactory<TX, ?> actionFactory, SimulationContext context) {
         super(client, actionFactory, context);
     }
 

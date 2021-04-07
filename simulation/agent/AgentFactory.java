@@ -39,16 +39,17 @@ import grakn.benchmark.simulation.agent.write.PersonBirthAgent;
 import grakn.benchmark.simulation.agent.write.ProductAgent;
 import grakn.benchmark.simulation.agent.write.RelocationAgent;
 import grakn.benchmark.simulation.agent.write.PurchaseAgent;
-import grakn.benchmark.simulation.driver.Client;
+import grakn.benchmark.simulation.driver.Session;
 import grakn.benchmark.simulation.driver.Transaction;
+import grakn.benchmark.simulation.driver.Client;
 
 public class AgentFactory<TX extends Transaction, ACTION_FACTORY extends ActionFactory<TX, ?>> {
 
-    private final Client<TX> client;
+    private final Client<? extends Session<TX>, TX> client;
     private final ACTION_FACTORY actionFactory;
     private final SimulationContext benchmarkContext;
 
-    public AgentFactory(Client<TX> client, ACTION_FACTORY actionFactory, SimulationContext benchmarkContext) {
+    public AgentFactory(Client<? extends Session<TX>, TX> client, ACTION_FACTORY actionFactory, SimulationContext benchmarkContext) {
         this.client = client;
         this.actionFactory = actionFactory;
         this.benchmarkContext = benchmarkContext;

@@ -19,7 +19,7 @@ package grakn.benchmark.grakn.driver;
 
 import grabl.tracing.client.GrablTracingThreadStatic;
 import grakn.benchmark.simulation.driver.Session;
-import grakn.benchmark.simulation.driver.TransactionalClient;
+import grakn.benchmark.simulation.driver.Client;
 import grakn.benchmark.simulation.world.Region;
 import grakn.client.Grakn;
 import org.slf4j.Logger;
@@ -33,7 +33,7 @@ import static grakn.client.api.GraknTransaction.Type.READ;
 import static graql.lang.Graql.match;
 import static graql.lang.Graql.var;
 
-public class GraknClient extends TransactionalClient<GraknSession, GraknTransaction> {
+public class GraknClient extends Client<GraknSession, GraknTransaction> {
 
     private final grakn.client.api.GraknClient nativeClient;
     private final String database;

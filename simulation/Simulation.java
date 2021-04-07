@@ -24,6 +24,7 @@ import grakn.benchmark.simulation.agent.AgentFactory;
 import grakn.benchmark.simulation.agent.Agent;
 import grakn.benchmark.simulation.agent.base.SimulationContext;
 import grakn.benchmark.simulation.driver.Client;
+import grakn.benchmark.simulation.driver.Session;
 import grakn.benchmark.simulation.driver.Transaction;
 import grakn.benchmark.simulation.utils.RandomSource;
 import grakn.benchmark.simulation.world.World;
@@ -40,7 +41,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
-public abstract class Simulation<CLIENT extends Client<TX>, TX extends Transaction> implements SimulationContext {
+public abstract class Simulation<CLIENT extends Client<? extends Session<TX>, TX>, TX extends Transaction> implements SimulationContext {
 
     final static Logger LOG = LoggerFactory.getLogger(Simulation.class);
     private final List<Agent<?, TX>> agents;

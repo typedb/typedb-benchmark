@@ -22,9 +22,9 @@ import grakn.benchmark.simulation.action.ActionFactory;
 import grakn.benchmark.simulation.action.read.ResidentsInCityAction;
 import grakn.benchmark.simulation.agent.Agent;
 import grakn.benchmark.simulation.agent.base.SimulationContext;
-import grakn.benchmark.simulation.driver.Client;
 import grakn.benchmark.simulation.driver.Session;
 import grakn.benchmark.simulation.driver.Transaction;
+import grakn.benchmark.simulation.driver.Client;
 import grakn.benchmark.simulation.world.World;
 
 import java.util.ArrayList;
@@ -36,7 +36,7 @@ import static java.util.stream.Collectors.toList;
 
 public class FriendshipAgent<TX extends Transaction> extends Agent<World.City, TX> {
 
-    public FriendshipAgent(Client<TX> client, ActionFactory<TX, ?> actionFactory, SimulationContext context) {
+    public FriendshipAgent(Client<? extends Session<TX>, TX> client, ActionFactory<TX, ?> actionFactory, SimulationContext context) {
         super(client, actionFactory, context);
     }
 

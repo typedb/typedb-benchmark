@@ -24,9 +24,9 @@ import grakn.benchmark.simulation.action.read.ResidentsInCityAction;
 import grakn.benchmark.simulation.agent.Agent;
 import grakn.benchmark.simulation.agent.base.Allocation;
 import grakn.benchmark.simulation.agent.base.SimulationContext;
-import grakn.benchmark.simulation.driver.Client;
 import grakn.benchmark.simulation.driver.Session;
 import grakn.benchmark.simulation.driver.Transaction;
+import grakn.benchmark.simulation.driver.Client;
 import grakn.benchmark.simulation.world.World;
 
 import java.time.LocalDateTime;
@@ -39,7 +39,7 @@ import static java.util.stream.Collectors.toList;
 
 public class RelocationAgent<TX extends Transaction> extends Agent<World.City, TX> {
 
-    public RelocationAgent(Client<TX> client, ActionFactory<TX, ?> actionFactory, SimulationContext context) {
+    public RelocationAgent(Client<? extends Session<TX>, TX> client, ActionFactory<TX, ?> actionFactory, SimulationContext context) {
         super(client, actionFactory, context);
     }
 

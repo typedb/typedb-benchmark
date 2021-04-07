@@ -21,9 +21,9 @@ import grakn.benchmark.simulation.action.Action;
 import grakn.benchmark.simulation.action.ActionFactory;
 import grakn.benchmark.simulation.agent.Agent;
 import grakn.benchmark.simulation.agent.base.SimulationContext;
-import grakn.benchmark.simulation.driver.Client;
 import grakn.benchmark.simulation.driver.Session;
 import grakn.benchmark.simulation.driver.Transaction;
+import grakn.benchmark.simulation.driver.Client;
 import grakn.benchmark.simulation.world.World;
 import org.apache.commons.lang3.StringUtils;
 
@@ -35,7 +35,7 @@ import static java.util.stream.Collectors.toList;
 
 public class CompanyAgent<TX extends Transaction> extends Agent<World.Country, TX> {
 
-    public CompanyAgent(Client<TX> client, ActionFactory<TX, ?> actionFactory, SimulationContext context) {
+    public CompanyAgent(Client<? extends Session<TX>, TX> client, ActionFactory<TX, ?> actionFactory, SimulationContext context) {
         super(client, actionFactory, context);
     }
 

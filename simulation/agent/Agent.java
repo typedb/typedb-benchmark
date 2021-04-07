@@ -52,17 +52,17 @@ import static grakn.common.util.Objects.className;
  */
 public abstract class Agent<REGION extends Region, TX extends Transaction> {
 
+    private static final Logger LOG = LoggerFactory.getLogger(Agent.class);
+
     protected final SimulationContext context;
-    private final Logger logger;
-    private final Client<TX> client;
+    private final Client<? extends Session<TX>, TX> client;
     private final ActionFactory<TX, ?> actionFactory;
     private boolean isTracing = true;
 
-    protected Agent(Client<TX> client, ActionFactory<TX, ?> actionFactory, SimulationContext context) {
+    protected Agent(Client<? extends Session<TX>, TX> client, ActionFactory<TX, ?> actionFactory, SimulationContext context) {
         this.client = client;
         this.actionFactory = actionFactory;
         this.context = context;
-        logger = LoggerFactory.getLogger(this.getClass());
     }
 
     protected ActionFactory<TX, ?> actionFactory() {
