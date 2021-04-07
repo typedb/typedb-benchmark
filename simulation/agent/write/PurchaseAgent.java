@@ -21,10 +21,10 @@ import grakn.benchmark.simulation.action.Action;
 import grakn.benchmark.simulation.action.ActionFactory;
 import grakn.benchmark.simulation.action.read.CompaniesInCountryAction;
 import grakn.benchmark.simulation.action.read.ProductsInContinentAction;
+import grakn.benchmark.simulation.agent.Agent;
 import grakn.benchmark.simulation.agent.base.Allocation;
 import grakn.benchmark.simulation.agent.base.RandomValueGenerator;
 import grakn.benchmark.simulation.agent.base.SimulationContext;
-import grakn.benchmark.simulation.agent.region.CountryAgent;
 import grakn.benchmark.simulation.driver.Client;
 import grakn.benchmark.simulation.driver.Session;
 import grakn.benchmark.simulation.driver.Transaction;
@@ -37,11 +37,17 @@ import java.util.Random;
 
 import static grakn.common.collection.Collections.pair;
 import static java.util.Collections.shuffle;
+import static java.util.stream.Collectors.toList;
 
-public class PurchaseAgent<TX extends Transaction> extends CountryAgent<TX> {
+public class PurchaseAgent<TX extends Transaction> extends Agent<World.Country, TX> {
 
     public PurchaseAgent(Client<TX> client, ActionFactory<TX, ?> actionFactory, SimulationContext context) {
         super(client, actionFactory, context);
+    }
+
+    @Override
+    protected List<World.Country> getRegions(World world) {
+        return world.getCountries().collect(toList());
     }
 
     @Override

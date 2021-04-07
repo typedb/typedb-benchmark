@@ -21,7 +21,7 @@ import grakn.benchmark.config.Config;
 import grakn.benchmark.simulation.action.Action;
 import grakn.benchmark.simulation.action.ActionFactory;
 import grakn.benchmark.simulation.agent.AgentFactory;
-import grakn.benchmark.simulation.agent.base.Agent;
+import grakn.benchmark.simulation.agent.Agent;
 import grakn.benchmark.simulation.agent.base.SimulationContext;
 import grakn.benchmark.simulation.driver.Client;
 import grakn.benchmark.simulation.driver.Transaction;
@@ -43,7 +43,7 @@ import java.util.function.Function;
 public abstract class Simulation<DB_DRIVER extends Client<TX>, TX extends Transaction> implements SimulationContext {
 
     final static Logger LOG = LoggerFactory.getLogger(Simulation.class);
-    private final List<Agent<?, TX>> agentMgrs;
+    private final List<Agent<?, TX>> agents;
     protected final DB_DRIVER driver;
     private final RandomSource randomSource;
     private final List<Config.Agent> agentConfigs;
@@ -63,7 +63,7 @@ public abstract class Simulation<DB_DRIVER extends Client<TX>, TX extends Transa
         this.test = test;
         this.agentReports = new ConcurrentHashMap<>();
         initialise(initialisationDataPaths);
-        this.agentMgrs = agentListFromConfigs();
+        this.agents = agentListFromConfigs();
     }
 
     protected List<Agent<?, TX>> agentListFromConfigs() {
@@ -87,8 +87,8 @@ public abstract class Simulation<DB_DRIVER extends Client<TX>, TX extends Transa
 
     public void iterate() {
         agentReports.clear();
-        for (Agent<?, ?> agentMgr : agentMgrs) {
-            agentReports.put(agentMgr.getClass(), agentMgr.iterate(randomSource.next()));
+        for (Agent<?, ?> agent : agents) {
+            agentReports.put(agent.getClass(), agent.iterate(randomSource.next()));
         }
         closeIteration();  // We want to test opening new sessions each iteration.
         iteration++;

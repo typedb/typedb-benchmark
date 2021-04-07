@@ -15,27 +15,22 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package grakn.benchmark.simulation.agent.region;
+package grakn.benchmark.simulation.agent.read;
 
 import grakn.benchmark.simulation.action.ActionFactory;
-import grakn.benchmark.simulation.agent.base.Agent;
+import grakn.benchmark.simulation.action.read.ReadAction;
 import grakn.benchmark.simulation.agent.base.SimulationContext;
 import grakn.benchmark.simulation.driver.Client;
 import grakn.benchmark.simulation.driver.Transaction;
-import grakn.benchmark.simulation.world.World;
 
-import java.util.List;
+public class FindSpecificMarriageAgent<TX extends Transaction> extends ReadAgent<TX> {
 
-import static java.util.stream.Collectors.toList;
-
-public abstract class CityAgent<TX extends Transaction> extends Agent<World.City, TX> {
-
-    public CityAgent(Client<TX> client, ActionFactory<TX, ?> actionFactory, SimulationContext context) {
+    public FindSpecificMarriageAgent(Client<TX> client, ActionFactory<TX, ?> actionFactory, SimulationContext context) {
         super(client, actionFactory, context);
     }
 
     @Override
-    protected List<World.City> getRegions(World world) {
-        return world.getCities().collect(toList());
+    protected ReadAction<TX, ?> getAction(TX tx) {
+        return actionFactory().findSpecificMarriageAction(tx);
     }
 }

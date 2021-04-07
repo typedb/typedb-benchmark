@@ -19,8 +19,8 @@ package grakn.benchmark.simulation.agent.write;
 
 import grakn.benchmark.simulation.action.Action;
 import grakn.benchmark.simulation.action.ActionFactory;
+import grakn.benchmark.simulation.agent.Agent;
 import grakn.benchmark.simulation.agent.base.SimulationContext;
-import grakn.benchmark.simulation.agent.region.CityAgent;
 import grakn.benchmark.simulation.driver.Client;
 import grakn.benchmark.simulation.driver.Session;
 import grakn.benchmark.simulation.driver.Transaction;
@@ -30,10 +30,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public class PersonBirthAgent<TX extends Transaction> extends CityAgent<TX> {
+import static java.util.stream.Collectors.toList;
+
+public class PersonBirthAgent<TX extends Transaction> extends Agent<World.City, TX> {
 
     public PersonBirthAgent(Client<TX> client, ActionFactory<TX, ?> actionFactory, SimulationContext context) {
         super(client, actionFactory, context);
+    }
+
+    @Override
+    protected List<World.City> getRegions(World world) {
+        return world.getCities().collect(toList());
     }
 
     @Override

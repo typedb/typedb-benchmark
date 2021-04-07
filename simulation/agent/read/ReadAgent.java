@@ -15,34 +15,35 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package grakn.benchmark.simulation.agent.insight;
+package grakn.benchmark.simulation.agent.read;
 
 import grakn.benchmark.simulation.action.Action;
 import grakn.benchmark.simulation.action.ActionFactory;
 import grakn.benchmark.simulation.action.read.ReadAction;
+import grakn.benchmark.simulation.agent.Agent;
 import grakn.benchmark.simulation.agent.base.SimulationContext;
-import grakn.benchmark.simulation.agent.region.WorldAgent;
 import grakn.benchmark.simulation.driver.Client;
-import grakn.benchmark.simulation.driver.Transaction;
 import grakn.benchmark.simulation.driver.Session;
+import grakn.benchmark.simulation.driver.Transaction;
 import grakn.benchmark.simulation.world.World;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
-/**
- * Agent to perform a single action, where that action requires no parameters
- *
- * @param <TX>
- */
-public abstract class WorldwideInsightAgent<TX extends Transaction> extends WorldAgent<TX> {
+public abstract class ReadAgent<TX extends Transaction> extends Agent<World, TX> {
 
-    public WorldwideInsightAgent(Client<TX> client, ActionFactory<TX, ?> actionFactory, SimulationContext context) {
+    public ReadAgent(Client<TX> client, ActionFactory<TX, ?> actionFactory, SimulationContext context) {
         super(client, actionFactory, context);
     }
 
     protected abstract ReadAction<TX, ?> getAction(TX tx);
+
+    @Override
+    protected List<World> getRegions(World world) {
+        return Collections.singletonList(world);
+    }
 
     @Override
     protected List<Action<?, ?>.Report> run(Session<TX> session, World region, Random random) {

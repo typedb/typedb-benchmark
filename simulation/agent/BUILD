@@ -2,13 +2,7 @@ load("@graknlabs_dependencies//tool/checkstyle:rules.bzl", "checkstyle_test")
 
 java_library(
     name = "agent",
-    srcs = glob([
-        "base/*.java",
-        "*.java",
-        "insight/*.java",
-        "write/*.java",
-        "region/*.java",
-    ]),
+    srcs = glob(["*.java", "*/*.java"]),
     visibility = ["//visibility:public"],
     deps = [
         "//simulation/action",

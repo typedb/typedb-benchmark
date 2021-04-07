@@ -19,9 +19,9 @@ package grakn.benchmark.simulation.agent.write;
 
 import grakn.benchmark.simulation.action.Action;
 import grakn.benchmark.simulation.action.ActionFactory;
+import grakn.benchmark.simulation.agent.Agent;
 import grakn.benchmark.simulation.agent.base.RandomValueGenerator;
 import grakn.benchmark.simulation.agent.base.SimulationContext;
-import grakn.benchmark.simulation.agent.region.ContinentAgent;
 import grakn.benchmark.simulation.driver.Client;
 import grakn.benchmark.simulation.driver.Session;
 import grakn.benchmark.simulation.driver.Transaction;
@@ -31,10 +31,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public class ProductAgent<TX extends Transaction> extends ContinentAgent<TX> {
+import static java.util.stream.Collectors.toList;
+
+public class ProductAgent<TX extends Transaction> extends Agent<World.Continent, TX> {
 
     public ProductAgent(Client<TX> client, ActionFactory<TX, ?> actionFactory, SimulationContext context) {
         super(client, actionFactory, context);
+    }
+
+    @Override
+    protected List<World.Continent> getRegions(World world) {
+        return world.getContinents().collect(toList());
     }
 
     @Override

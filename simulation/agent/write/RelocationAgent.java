@@ -21,9 +21,9 @@ import grakn.benchmark.simulation.action.Action;
 import grakn.benchmark.simulation.action.ActionFactory;
 import grakn.benchmark.simulation.action.read.CitiesInContinentAction;
 import grakn.benchmark.simulation.action.read.ResidentsInCityAction;
+import grakn.benchmark.simulation.agent.Agent;
 import grakn.benchmark.simulation.agent.base.Allocation;
 import grakn.benchmark.simulation.agent.base.SimulationContext;
-import grakn.benchmark.simulation.agent.region.CityAgent;
 import grakn.benchmark.simulation.driver.Client;
 import grakn.benchmark.simulation.driver.Session;
 import grakn.benchmark.simulation.driver.Transaction;
@@ -35,11 +35,17 @@ import java.util.List;
 import java.util.Random;
 
 import static java.util.Collections.shuffle;
+import static java.util.stream.Collectors.toList;
 
-public class RelocationAgent<TX extends Transaction> extends CityAgent<TX> {
+public class RelocationAgent<TX extends Transaction> extends Agent<World.City, TX> {
 
     public RelocationAgent(Client<TX> client, ActionFactory<TX, ?> actionFactory, SimulationContext context) {
         super(client, actionFactory, context);
+    }
+
+    @Override
+    protected List<World.City> getRegions(World world) {
+        return world.getCities().collect(toList());
     }
 
     @Override

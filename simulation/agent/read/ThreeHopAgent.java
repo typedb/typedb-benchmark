@@ -15,26 +15,22 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package grakn.benchmark.simulation.agent.region;
+package grakn.benchmark.simulation.agent.read;
 
 import grakn.benchmark.simulation.action.ActionFactory;
-import grakn.benchmark.simulation.agent.base.Agent;
+import grakn.benchmark.simulation.action.read.ReadAction;
 import grakn.benchmark.simulation.agent.base.SimulationContext;
 import grakn.benchmark.simulation.driver.Client;
 import grakn.benchmark.simulation.driver.Transaction;
-import grakn.benchmark.simulation.world.World;
 
-import java.util.Collections;
-import java.util.List;
+public class ThreeHopAgent<TX extends Transaction> extends ReadAgent<TX> {
 
-public abstract class WorldAgent<TX extends Transaction> extends Agent<World, TX> {
-
-    public WorldAgent(Client<TX> client, ActionFactory<TX, ?> actionFactory, SimulationContext context) {
+    public ThreeHopAgent(Client<TX> client, ActionFactory<TX, ?> actionFactory, SimulationContext context) {
         super(client, actionFactory, context);
     }
 
     @Override
-    protected List<World> getRegions(World world) {
-        return Collections.singletonList(world);
+    protected ReadAction<TX, ?> getAction(TX tx) {
+        return actionFactory().threeHopAction(tx);
     }
 }

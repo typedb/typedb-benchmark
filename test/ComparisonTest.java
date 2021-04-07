@@ -17,7 +17,7 @@
 
 package grakn.benchmark.test;
 
-import grakn.benchmark.simulation.agent.base.Agent;
+import grakn.benchmark.simulation.agent.Agent;
 import grakn.benchmark.simulation.agent.write.CompanyAgent;
 import grakn.benchmark.simulation.agent.write.PersonBirthAgent;
 import grakn.benchmark.simulation.agent.write.ProductAgent;

@@ -21,9 +21,9 @@ import grakn.benchmark.simulation.action.Action;
 import grakn.benchmark.simulation.action.ActionFactory;
 import grakn.benchmark.simulation.action.read.CompaniesInCountryAction;
 import grakn.benchmark.simulation.action.read.ResidentsInCityAction;
+import grakn.benchmark.simulation.agent.Agent;
 import grakn.benchmark.simulation.agent.base.RandomValueGenerator;
 import grakn.benchmark.simulation.agent.base.SimulationContext;
-import grakn.benchmark.simulation.agent.region.CityAgent;
 import grakn.benchmark.simulation.driver.Client;
 import grakn.benchmark.simulation.driver.Session;
 import grakn.benchmark.simulation.driver.Transaction;
@@ -35,8 +35,9 @@ import java.util.List;
 import java.util.Random;
 
 import static grakn.benchmark.simulation.agent.base.Allocation.allocate;
+import static java.util.stream.Collectors.toList;
 
-public class EmploymentAgent<TX extends Transaction> extends CityAgent<TX> {
+public class EmploymentAgent<TX extends Transaction> extends Agent<World.City, TX> {
 
     private static final double MIN_ANNUAL_WAGE = 18000.00;
     private static final double MAX_ANNUAL_WAGE = 80000.00;
@@ -47,6 +48,11 @@ public class EmploymentAgent<TX extends Transaction> extends CityAgent<TX> {
 
     public EmploymentAgent(Client<TX> client, ActionFactory<TX, ?> actionFactory, SimulationContext context) {
         super(client, actionFactory, context);
+    }
+
+    @Override
+    protected List<World.City> getRegions(World world) {
+        return world.getCities().collect(toList());
     }
 
     @Override

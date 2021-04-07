@@ -15,27 +15,22 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package grakn.benchmark.simulation.agent.region;
+package grakn.benchmark.simulation.agent.read;
 
 import grakn.benchmark.simulation.action.ActionFactory;
-import grakn.benchmark.simulation.agent.base.Agent;
+import grakn.benchmark.simulation.action.read.ReadAction;
 import grakn.benchmark.simulation.agent.base.SimulationContext;
 import grakn.benchmark.simulation.driver.Client;
 import grakn.benchmark.simulation.driver.Transaction;
-import grakn.benchmark.simulation.world.World;
 
-import java.util.List;
+public class ArbitraryOneHopAgent<TX extends Transaction> extends ReadAgent<TX> {
 
-import static java.util.stream.Collectors.toList;
-
-public abstract class CountryAgent<TX extends Transaction> extends Agent<World.Country, TX> {
-
-    public CountryAgent(Client<TX> client, ActionFactory<TX, ?> actionFactory, SimulationContext context) {
+    public ArbitraryOneHopAgent(Client<TX> client, ActionFactory<TX, ?> actionFactory, SimulationContext context) {
         super(client, actionFactory, context);
     }
 
     @Override
-    protected List<World.Country> getRegions(World world) {
-        return world.getCountries().collect(toList());
+    protected ReadAction<TX, ?> getAction(TX tx) {
+        return actionFactory().arbitraryOneHopAction(tx);
     }
 }
