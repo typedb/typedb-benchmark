@@ -18,7 +18,6 @@
 package grakn.benchmark.simulation.driver;
 
 import grakn.benchmark.simulation.world.Region;
-import org.slf4j.Logger;
 
 public abstract class Client<SESSION extends Session<TX>, TX extends Transaction> {
 
@@ -28,7 +27,7 @@ public abstract class Client<SESSION extends Session<TX>, TX extends Transaction
 
     public abstract Session<TX> session(Region region);
 
-    public abstract void printStatistics(Logger LOG);
+    public abstract String printStatistics();
 
     public abstract void close();
 

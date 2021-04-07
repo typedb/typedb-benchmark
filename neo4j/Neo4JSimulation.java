@@ -23,11 +23,10 @@ import grakn.benchmark.neo4j.driver.Neo4jClient;
 import grakn.benchmark.neo4j.driver.Neo4jSession;
 import grakn.benchmark.neo4j.driver.Neo4jTransaction;
 import grakn.benchmark.neo4j.loader.Neo4jYAMLLoader;
-import grakn.benchmark.simulation.TransactionalSimulation;
 import grakn.benchmark.simulation.action.ActionFactory;
-import grakn.benchmark.simulation.world.World;
 import grakn.benchmark.simulation.loader.YAMLException;
 import grakn.benchmark.simulation.loader.YAMLLoader;
+import grakn.benchmark.simulation.world.World;
 import org.neo4j.driver.Query;
 import org.neo4j.driver.Session;
 import org.neo4j.driver.Transaction;
@@ -39,7 +38,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
-public class Neo4JSimulation extends TransactionalSimulation<Neo4jClient, Neo4jTransaction> {
+public class Neo4JSimulation extends grakn.benchmark.simulation.Simulation<Neo4jClient, Neo4jTransaction> {
 
     public Neo4JSimulation(Neo4jClient driver, Map<String, Path> initialisationDataPaths, int randomSeed, World world, List<Config.Agent> agentConfigs, Function<Integer, Boolean> iterationSamplingFunction, boolean test) {
         super(driver, initialisationDataPaths, randomSeed, world, agentConfigs, iterationSamplingFunction, test);
@@ -78,7 +77,7 @@ public class Neo4JSimulation extends TransactionalSimulation<Neo4jClient, Neo4jT
      * @param session
      */
     private void addKeyConstraints(Session session) {
-        List<String> queries = new ArrayList<String>() {{
+        List<String> queries = new ArrayList<>() {{
             add("CREATE CONSTRAINT unique_person_email IF NOT EXISTS ON (person:Person) ASSERT person.email IS UNIQUE");
             add("CREATE CONSTRAINT unique_location_locationName IF NOT EXISTS ON (location:Location) ASSERT location.locationName IS UNIQUE");
             add("CREATE CONSTRAINT unique_company_companyName IF NOT EXISTS ON (company:Company) ASSERT company.companyName IS UNIQUE");

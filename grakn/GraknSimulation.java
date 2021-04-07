@@ -23,7 +23,6 @@ import grakn.benchmark.grakn.driver.GraknClient;
 import grakn.benchmark.grakn.driver.GraknSession;
 import grakn.benchmark.grakn.driver.GraknTransaction;
 import grakn.benchmark.grakn.loader.GraknYAMLLoader;
-import grakn.benchmark.simulation.TransactionalSimulation;
 import grakn.benchmark.simulation.action.ActionFactory;
 import grakn.benchmark.simulation.loader.YAMLException;
 import grakn.benchmark.simulation.loader.YAMLLoader;
@@ -40,7 +39,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
-public class GraknSimulation extends TransactionalSimulation<GraknClient, GraknTransaction> {
+public class GraknSimulation extends grakn.benchmark.simulation.Simulation<GraknClient, GraknTransaction> {
 
     private static final Logger LOG = LoggerFactory.getLogger(GraknSimulation.class);
 

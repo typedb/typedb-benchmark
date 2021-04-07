@@ -18,11 +18,10 @@
 package grakn.benchmark.grakn.driver;
 
 import grabl.tracing.client.GrablTracingThreadStatic;
-import grakn.benchmark.simulation.driver.Session;
 import grakn.benchmark.simulation.driver.Client;
+import grakn.benchmark.simulation.driver.Session;
 import grakn.benchmark.simulation.world.Region;
 import grakn.client.Grakn;
-import org.slf4j.Logger;
 
 import java.text.DecimalFormat;
 import java.util.concurrent.ConcurrentHashMap;
@@ -80,7 +79,8 @@ public class GraknClient extends Client<GraknSession, GraknTransaction> {
     }
 
     @Override
-    public void printStatistics(Logger LOG) {
+    public String printStatistics() {
+        StringBuilder str = new StringBuilder();
         try (GraknSession session = session("statisticsDataSession")) {
             grakn.client.api.GraknSession nativeSession = session.unpack();
             try (grakn.client.api.GraknTransaction tx = nativeSession.transaction(READ)) {
@@ -90,20 +90,20 @@ public class GraknClient extends Client<GraknSession, GraknTransaction> {
                 long numberOfRelations = tx.query().match(match(var("x").isa("relation")).count()).get().asLong();
                 long numberOfThings = tx.query().match(match(var("x").isa("thing")).count()).get().asLong();
 
-                LOG.info("");
-                LOG.info("Benchmark statistic:");
-                LOG.info("");
-                LOG.info("Count 'entity': {}", formatter.format(numberOfEntities));
-                LOG.info("Count 'relation': {}", formatter.format(numberOfRelations));
-                LOG.info("Count 'attribute': {}", formatter.format(numberOfAttributes));
+                str.append("Benchmark statistic:");
+                str.append("\n");
+                str.append("Count 'entity': {}").append(formatter.format(numberOfEntities));
+                str.append("Count 'relation': {}").append(formatter.format(numberOfRelations));
+                str.append("Count 'attribute': {}").append(formatter.format(numberOfAttributes));
                 if (numberOfThings != numberOfEntities + numberOfAttributes + numberOfRelations) {
-                    LOG.error("The sum of 'entity', 'relation', and 'attribute' counts do not match the total 'thing' count: {}", formatter.format(numberOfThings));
+                    str.append("The sum of 'entity', 'relation', and 'attribute' counts do not match the total 'thing' count: {}").append(formatter.format(numberOfThings));
                 } else {
-                    LOG.info("Count 'thing' (total): {}", formatter.format(numberOfThings));
+                    str.append("Count 'thing' (total): {}").append(formatter.format(numberOfThings));
                 }
-                LOG.info("");
+                str.append("\n");
             }
         }
+        return str.toString();
     }
 
     @Override

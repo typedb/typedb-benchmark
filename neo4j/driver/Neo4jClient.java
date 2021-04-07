@@ -18,8 +18,8 @@
 package grakn.benchmark.neo4j.driver;
 
 import grabl.tracing.client.GrablTracingThreadStatic;
-import grakn.benchmark.simulation.driver.Session;
 import grakn.benchmark.simulation.driver.Client;
+import grakn.benchmark.simulation.driver.Session;
 import grakn.benchmark.simulation.world.Region;
 import org.neo4j.driver.AuthTokens;
 import org.neo4j.driver.Driver;
@@ -27,7 +27,6 @@ import org.neo4j.driver.GraphDatabase;
 import org.neo4j.driver.Query;
 import org.neo4j.driver.Record;
 import org.neo4j.driver.Result;
-import org.slf4j.Logger;
 
 import java.text.DecimalFormat;
 import java.util.List;
@@ -61,7 +60,8 @@ public class Neo4jClient extends Client<Neo4jSession, Neo4jTransaction> {
     }
 
     @Override
-    public void printStatistics(Logger LOG) {
+    public String printStatistics() {
+        StringBuilder str = new StringBuilder();
         try (Neo4jSession session = session("statisticsSession")) {
             org.neo4j.driver.Session nativeSession = session.unpack();
             DecimalFormat formatter = new DecimalFormat("#,###");
@@ -80,14 +80,14 @@ public class Neo4jClient extends Client<Neo4jSession, Neo4jTransaction> {
             });
             long numberOfRelationships = (long) getOnlyElement(numberOfRelationshipsList).asMap().get("count(*)");
 
-            LOG.info("");
-            LOG.info("Benchmark statistic:");
-            LOG.info("");
+            str.append("Benchmark statistic:");
+            str.append("\n");
 
-            LOG.info("Count 'node': {}", formatter.format(numberOfNodes));
-            LOG.info("Count 'relationship': {}", formatter.format(numberOfRelationships));
-            LOG.info("");
+            str.append("Count 'node': {}").append(formatter.format(numberOfNodes));
+            str.append("Count 'relationship': {}").append(formatter.format(numberOfRelationships));
+            str.append("\n");
         }
+        return str.toString();
     }
 
     @Override

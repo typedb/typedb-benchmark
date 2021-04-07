@@ -49,9 +49,9 @@ import static grabl.tracing.client.GrablTracing.tracingNoOp;
 import static grabl.tracing.client.GrablTracing.withLogging;
 import static grakn.benchmark.simulation.world.World.initialise;
 
-public class BenchmarkRunner {
+public class Benchmark {
 
-    final static Logger LOG = LoggerFactory.getLogger(grakn.benchmark.BenchmarkRunner.class);
+    final static Logger LOG = LoggerFactory.getLogger(Benchmark.class);
     public static final String DATABASE = "world";
 
     public static void main(String[] args) {
@@ -110,7 +110,7 @@ public class BenchmarkRunner {
 
         try {
             try (GrablTracing tracingIgnored = grablTracing(grablTracingUri, grablTracingOrganisation, grablTracingRepository, grablTracingCommit, grablTracingUsername, grablTracingToken, disableTracing, dbName)) {
-                Simulation<?, ?> benchmark;
+                Simulation<?, ?> simulation;
                 if (dbName.toLowerCase().startsWith("grakn")) {
                     defaultUri = "localhost:48555";
                     if (hostUri == null) hostUri = defaultUri;
@@ -118,7 +118,7 @@ public class BenchmarkRunner {
                     if (dbName.toLowerCase().contains("core")) graknClient = GraknClient.core(hostUri, DATABASE);
                     else if (dbName.toLowerCase().contains("cluster")) graknClient = GraknClient.cluster(hostUri, DATABASE);
                     else throw new IllegalArgumentException("Unexpected database name: " + dbName);
-                    benchmark = new GraknSimulation(
+                    simulation = new GraknSimulation(
                             graknClient,
                             initialisationDataFiles,
                             config.getRandomSeed(),
@@ -130,7 +130,7 @@ public class BenchmarkRunner {
                     defaultUri = "bolt://localhost:7687";
                     if (hostUri == null) hostUri = defaultUri;
 
-                    benchmark = new Neo4JSimulation(
+                    simulation = new Neo4JSimulation(
                             new Neo4jClient(hostUri),
                             initialisationDataFiles,
                             config.getRandomSeed(),
@@ -147,17 +147,17 @@ public class BenchmarkRunner {
                 ///////////////
                 for (int i = 0; i < config.getIterations(); i++) {
                     Instant iterStart = Instant.now();
-                    benchmark.iterate();
+                    simulation.iterate();
                     Instant iterEnd = Instant.now();
                     LOG.info("Iteration {}: {}", i, printDuration(iterStart, iterEnd));
                 }
                 Instant end = Instant.now();
                 LOG.info("Benchmark duration: " + printDuration(start, end));
                 Instant statisticStart = Instant.now();
-                benchmark.printStatistics(LOG);
+                LOG.info(simulation.printStatistics());
                 Instant statisticEnd = Instant.now();
                 LOG.info("Statistics duration: " + printDuration(statisticStart, statisticEnd));
-                benchmark.close();
+                simulation.close();
             }
         } catch (Exception ex) {
             ex.printStackTrace();

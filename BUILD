@@ -2,9 +2,7 @@ load("@graknlabs_dependencies//tool/checkstyle:rules.bzl", "checkstyle_test")
 
 java_library(
     name = "benchmark-lib",
-    srcs = [
-        "BenchmarkRunner.java",
-    ],
+    srcs = glob(["*.java"]),
     resource_strip_prefix = "config/",
     resources = [
         "//config:logback.xml",
@@ -38,7 +36,7 @@ java_binary(
         "//grakn/data",
         "//neo4j/data",
     ],
-    main_class = "grakn.benchmark.BenchmarkRunner",
+    main_class = "grakn.benchmark.Benchmark",
     runtime_deps = [":benchmark-lib"],
 )
 
@@ -56,7 +54,7 @@ java_binary(
         "//grakn/data",
         "//neo4j/data",
     ],
-    main_class = "grakn.benchmark.BenchmarkRunner",
+    main_class = "grakn.benchmark.Benchmark",
     runtime_deps = [":benchmark-lib"],
 )
 

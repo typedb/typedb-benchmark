@@ -20,11 +20,10 @@ package grakn.benchmark.simulation;
 import grakn.benchmark.config.Config;
 import grakn.benchmark.simulation.action.Action;
 import grakn.benchmark.simulation.action.ActionFactory;
-import grakn.benchmark.simulation.agent.AgentFactory;
 import grakn.benchmark.simulation.agent.Agent;
+import grakn.benchmark.simulation.agent.AgentFactory;
 import grakn.benchmark.simulation.agent.base.SimulationContext;
 import grakn.benchmark.simulation.driver.Client;
-import grakn.benchmark.simulation.driver.Session;
 import grakn.benchmark.simulation.driver.Transaction;
 import grakn.benchmark.simulation.utils.RandomSource;
 import grakn.benchmark.simulation.world.World;
@@ -95,8 +94,6 @@ public abstract class Simulation<CLIENT extends Client<?, TX>, TX extends Transa
         iteration++;
     }
 
-    protected abstract void closeIteration();
-
     @Override
     public int iteration() {
         return iteration;
@@ -126,7 +123,15 @@ public abstract class Simulation<CLIENT extends Client<?, TX>, TX extends Transa
         return agentReports.get(agentName);
     }
 
-    public abstract void printStatistics(Logger LOG);
+    public String printStatistics() {
+        return client.printStatistics();
+    }
 
-    public abstract void close();
+    protected void closeIteration() {
+        client.closeSessions();
+    }
+
+    public void close() {
+        client.close();
+    }
 }
