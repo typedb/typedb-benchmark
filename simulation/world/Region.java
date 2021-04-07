@@ -18,9 +18,10 @@
 package grakn.benchmark.simulation.world;
 
 public interface Region {
+
     String name();
 
     String tracker();
 
-    String topLevelName(); // Used to assign session keys for Grakn model
+    String sessionName(); // Used to assign session keys for Grakn model
 }

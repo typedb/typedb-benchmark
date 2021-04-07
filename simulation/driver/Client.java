@@ -17,15 +17,11 @@
 
 package grakn.benchmark.simulation.driver;
 
-import grakn.benchmark.simulation.world.Region;
-
 public abstract class Client<SESSION extends Session<TX>, TX extends Transaction> {
 
     public abstract SESSION session(String sessionKey);
 
     public abstract void closeSessions();
-
-    public abstract Session<TX> session(Region region);
 
     public abstract String printStatistics();
 
