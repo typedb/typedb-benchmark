@@ -24,7 +24,6 @@ import org.apache.commons.csv.CSVRecord;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -38,10 +37,8 @@ public class World implements Region {
 
     public final int AGE_OF_ADULTHOOD = 1;
     private final int scaleFactor;
-    private Path logDirPath;
 
     private List<Continent> continents = new ArrayList<>();
-
     private Map<String, Continent> continentMap = new HashMap<>();
     private Map<String, Country> countryMap = new HashMap<>();
     private Map<String, City> cityMap = new HashMap<>();
@@ -55,12 +52,6 @@ public class World implements Region {
     public World(int scaleFactor, Path continentsPath, Path countriesPath, Path citiesPath, Path femaleForenamesPath, Path maleForenamesPath, Path surnamesPath, Path adjectivesPath, Path nounsPath) throws IOException {
 
         this.scaleFactor = scaleFactor;
-
-        try {
-            this.logDirPath = Paths.get(System.getenv("LOG_DIR_PATH"));
-        } catch (NullPointerException n) {
-            this.logDirPath = null;
-        }
 
         iterateCSV(continentsPath, Continent::new);
         iterateCSV(countriesPath, Country::new);

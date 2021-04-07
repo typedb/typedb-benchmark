@@ -82,7 +82,7 @@ public class BenchmarksForComparison {
         Map<String, Path> files = new HashMap<>();
 
         List<String> dirPaths = new ArrayList<>();
-        dirPaths.add("common/data");
+        dirPaths.add("simulation/data");
         dirPaths.add("grakn/data");
         dirPaths.add("neo4j/data");
 
