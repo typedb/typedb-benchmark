@@ -15,10 +15,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package grakn.benchmark.grakn.yaml_tool;
+package grakn.benchmark.grakn.loader;
 
-import grakn.benchmark.simulation.yaml_tool.QueryTemplate;
-import grakn.benchmark.simulation.yaml_tool.YAMLLoader;
+import grakn.benchmark.simulation.loader.QueryTemplate;
+import grakn.benchmark.simulation.loader.YAMLLoader;
 import grakn.client.api.GraknSession;
 import grakn.client.api.GraknTransaction;
 import graql.lang.Graql;

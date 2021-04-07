@@ -65,6 +65,10 @@ public abstract class Agent<REGION extends Region, TX extends Transaction> {
         this.context = context;
     }
 
+    protected abstract List<REGION> getRegions(World world);
+
+    protected abstract List<Action<?, ?>.Report> run(Session<TX> session, REGION region, Random random);
+
     protected ActionFactory<TX, ?> actionFactory() {
         return actionFactory;
     }
@@ -86,10 +90,6 @@ public abstract class Agent<REGION extends Region, TX extends Transaction> {
         });
         return reports;
     }
-
-    abstract protected List<REGION> getRegions(World world);
-
-    protected abstract List<Action<?, ?>.Report> run(Session<TX> session, REGION region, Random random);
 
     private List<Action<?, ?>.Report> runWithTracing(REGION region, Random random) {
         GrablTracingThreadStatic.ThreadContext tracingCtx = null;

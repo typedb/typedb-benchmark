@@ -18,30 +18,21 @@
 load("@graknlabs_dependencies//tool/checkstyle:rules.bzl", "checkstyle_test")
 
 java_library(
-    name = "neo4j",
-    srcs = glob(["*.java", "*/*.java", "*/*/*.java"]),
+    name = "loader",
+    srcs = glob(["*.java"]),
     visibility = ["//visibility:public"],
     deps = [
-        "//simulation:simulation",
-        "//simulation/action",
-        "//simulation/driver",
-        "//simulation/utils",
-        "//simulation/world",
-        "//simulation/loader",
-        "//config",
-        "@graknlabs_grabl_tracing//client",
-        "@graknlabs_common//:common",
-        "@maven//:com_google_guava_guava",
+        "@graknlabs_graql//java:graql",
+        "@graknlabs_graql//java/common",
         "@maven//:org_apache_commons_commons_csv",
         "@maven//:org_apache_commons_commons_lang3",
-        "@maven//:org_slf4j_slf4j_api",
-        "@neo4j//:org_neo4j_driver_neo4j_java_driver",
+        "@maven//:org_yaml_snakeyaml",
     ],
 )
 
 checkstyle_test(
     name = "checkstyle",
-    include = [":neo4j"],
+    include = [":loader"],
     license_type = "agpl",
     size = "small",
 )

@@ -22,12 +22,12 @@ import grakn.benchmark.grakn.action.GraknActionFactory;
 import grakn.benchmark.grakn.driver.GraknClient;
 import grakn.benchmark.grakn.driver.GraknSession;
 import grakn.benchmark.grakn.driver.GraknTransaction;
-import grakn.benchmark.grakn.yaml_tool.GraknYAMLLoader;
+import grakn.benchmark.grakn.loader.GraknYAMLLoader;
 import grakn.benchmark.simulation.TransactionalSimulation;
 import grakn.benchmark.simulation.action.ActionFactory;
 import grakn.benchmark.simulation.world.World;
-import grakn.benchmark.simulation.yaml_tool.YAMLException;
-import grakn.benchmark.simulation.yaml_tool.YAMLLoader;
+import grakn.benchmark.simulation.loader.YAMLException;
+import grakn.benchmark.simulation.loader.YAMLLoader;
 import graql.lang.Graql;
 
 import java.io.IOException;
