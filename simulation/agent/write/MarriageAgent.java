@@ -39,13 +39,14 @@ public class MarriageAgent<TX extends Transaction> extends CityAgentManager<TX> 
     }
 
     @Override
-    protected Agent getAgent(int iteration, String tracker, Random random, boolean test) {
-        return new City(iteration, tracker, random, test);
+    protected Agent getAgent(World.City region, Random random, SimulationContext context) {
+        return new City(region, random, context);
     }
 
     public class City extends CityAgent {
-        public City(int iteration, String tracker, Random random, boolean test) {
-            super(iteration, tracker, random, test);
+
+        public City(World.City region, Random random, SimulationContext context) {
+            super(region, random, context);
         }
 
         @Override

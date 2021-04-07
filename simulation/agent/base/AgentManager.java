@@ -86,10 +86,10 @@ public abstract class AgentManager<REGION extends Region, TX extends Transaction
         return reports;
     }
 
-    protected abstract Agent getAgent(int iteration, String tracker, Random random, boolean test);
+    protected abstract Agent getAgent(REGION region, Random random, SimulationContext context);
 
     private void executeAgent(REGION region, RandomSource source) {
-        Agent agent = getAgent(context.iteration(), region.tracker(), source.next().get(), context.isTest());
+        Agent agent = getAgent(region, source.next().get(), context);
         Session<TX> session = client.session(region, logger);
 
         List<Action<?, ?>.Report> report = runWithReport(agent, session, region, agent.tracker(), agent.iteration());
@@ -132,26 +132,24 @@ public abstract class AgentManager<REGION extends Region, TX extends Transaction
 
     public abstract class Agent {
 
+        private final REGION region;
         private final Random random;
-        private final String tracker;
-        private final boolean isTest;
-        private final int iteration;
+        private final SimulationContext context;
         private final List<Action<?, ?>.Report> actionReports;
 
-        public Agent(int iteration, String tracker, Random random, boolean isTest) {
-            this.iteration = iteration;
-            this.tracker = tracker;
+        public Agent(REGION region, Random random, SimulationContext context) {
+            this.region = region;
             this.random = random;
-            this.isTest = isTest;
+            this.context = context;
             this.actionReports = new ArrayList<>();
         }
 
         public int iteration() {
-            return iteration;
+            return context.iteration();
         }
 
         public String tracker() {
-            return tracker;
+            return region.tracker();
         }
 
         public Random random() {
@@ -159,7 +157,7 @@ public abstract class AgentManager<REGION extends Region, TX extends Transaction
         }
 
         public boolean isTest() {
-            return isTest;
+            return context.isTest();
         }
 
         public List<Action<?, ?>.Report> actionReports() {

@@ -25,8 +25,8 @@ import grakn.benchmark.simulation.agent.base.RandomValueGenerator;
 import grakn.benchmark.simulation.agent.base.SimulationContext;
 import grakn.benchmark.simulation.agent.region.CityAgentManager;
 import grakn.benchmark.simulation.driver.Client;
-import grakn.benchmark.simulation.driver.Transaction;
 import grakn.benchmark.simulation.driver.Session;
+import grakn.benchmark.simulation.driver.Transaction;
 import grakn.benchmark.simulation.world.World;
 
 import java.time.LocalDateTime;
@@ -37,25 +37,26 @@ import static grakn.benchmark.simulation.agent.base.Allocation.allocate;
 
 public class EmploymentAgent<TX extends Transaction> extends CityAgentManager<TX> {
 
+    private static final double MIN_ANNUAL_WAGE = 18000.00;
+    private static final double MAX_ANNUAL_WAGE = 80000.00;
+    private static final double MIN_CONTRACTED_HOURS = 30.0;
+    private static final double MAX_CONTRACTED_HOURS = 70.0;
+    private static final int MIN_CONTRACT_CHARACTER_LENGTH = 200;
+    private static final int MAX_CONTRACT_CHARACTER_LENGTH = 600;
+
     public EmploymentAgent(Client<TX> dbDriver, ActionFactory<TX, ?> actionFactory, SimulationContext benchmarkContext) {
         super(dbDriver, actionFactory, benchmarkContext);
     }
 
     @Override
-    protected Agent getAgent(int iteration, String tracker, Random random, boolean test) {
-        return new City(iteration, tracker, random, test);
+    protected Agent getAgent(World.City region, Random random, SimulationContext context) {
+        return new City(region, random, context);
     }
 
     public class City extends CityAgent {
-        double MIN_ANNUAL_WAGE = 18000.00;
-        double MAX_ANNUAL_WAGE = 80000.00;
-        double MIN_CONTRACTED_HOURS = 30.0;
-        double MAX_CONTRACTED_HOURS = 70.0;
-        int MIN_CONTRACT_CHARACTER_LENGTH = 200;
-        int MAX_CONTRACT_CHARACTER_LENGTH = 600;
 
-        public City(int iteration, String tracker, Random random, boolean test) {
-            super(iteration, tracker, random, test);
+        public City(World.City region, Random random, SimulationContext context) {
+            super(region, random, context);
         }
 
         @Override

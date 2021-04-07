@@ -36,13 +36,14 @@ public class ProductAgent<TX extends Transaction> extends ContinentAgent<TX> {
     }
 
     @Override
-    protected Agent getAgent(int iteration, String tracker, Random random, boolean test) {
-        return new RegionalProductAgent(iteration, tracker, random, test);
+    protected Agent getAgent(World.Continent region, Random random, SimulationContext context) {
+        return new RegionalProductAgent(region, random, context);
     }
 
     public class RegionalProductAgent extends ContinentRegion {
-        public RegionalProductAgent(int iteration, String tracker, Random random, boolean test) {
-            super(iteration, tracker, random, test);
+
+        public RegionalProductAgent(World.Continent region, Random random, SimulationContext context) {
+            super(region, random, context);
         }
 
         @Override

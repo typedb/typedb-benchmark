@@ -41,8 +41,8 @@ public abstract class WorldAgent<TX extends Transaction> extends AgentManager<Wo
 
     protected abstract class WorldRegion extends Agent {
 
-        public WorldRegion(int iteration, String tracker, Random random, boolean test) {
-            super(iteration, tracker, random, test);
+        public WorldRegion(World world, Random random, SimulationContext context) {
+            super(world, random, context);
         }
     }
 }

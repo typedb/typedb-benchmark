@@ -40,16 +40,16 @@ public abstract class WorldwideInsightAgent<TX extends Transaction> extends Worl
     }
 
     @Override
-    protected Agent getAgent(int iteration, String tracker, Random random, boolean test) {
-        return new WorldWideWorker(iteration, tracker, random, test);
+    protected Agent getAgent(World region, Random random, SimulationContext context) {
+        return new WorldWideWorker(region, random, context);
     }
 
     protected abstract ReadAction<TX, ?> getAction(TX dbOperation);
 
     public class WorldWideWorker extends WorldRegion {
 
-        public WorldWideWorker(int iteration, String tracker, Random random, boolean test) {
-            super(iteration, tracker, random, test);
+        public WorldWideWorker(World region, Random random, SimulationContext context) {
+            super(region, random, context);
         }
 
         @Override

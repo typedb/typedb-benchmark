@@ -42,8 +42,8 @@ public abstract class CityAgentManager<TX extends Transaction> extends AgentMana
 
     protected abstract class CityAgent extends Agent {
 
-        public CityAgent(int iteration, String tracker, Random random, boolean test) {
-            super(iteration, tracker, random, test);
+        public CityAgent(World.City region, Random random, SimulationContext context) {
+            super(region, random, context);
         }
     }
 }

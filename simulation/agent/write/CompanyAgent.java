@@ -36,13 +36,13 @@ public class CompanyAgent<TX extends Transaction> extends CountryAgent<TX> {
     }
 
     @Override
-    protected Agent getAgent(int iteration, String tracker, Random random, boolean test) {
-        return new Country(iteration, tracker, random, test);
+    protected Agent getAgent(World.Country region, Random random, SimulationContext context) {
+        return new Country(region, random, context);
     }
 
     public class Country extends CountryRegion {
-        public Country(int iteration, String tracker, Random random, boolean test) {
-            super(iteration, tracker, random, test);
+        public Country(World.Country region, Random random, SimulationContext context) {
+            super(region, random, context);
         }
 
         @Override
