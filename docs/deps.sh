@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 #
 # Copyright (C) 2021 Grakn Labs
 #
@@ -14,3 +15,15 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
+
+popd > /dev/null
+
+[[ $(readlink $0) ]] && path=$(readlink $0) || path=$0
+OUT_DIR=$(cd "$(dirname "${path}")" && pwd -P)
+pushd "$OUT_DIR" > /dev/null
+
+bazel query "filter('^(?!(//dependencies|@graknlabs|//test).*$).*', kind(java_library, deps($1)))" --output graph > "$2".dot
+dot -Tpng < "$2".dot > "$2".png
+open "$2".png
+
+popd > /dev/null
