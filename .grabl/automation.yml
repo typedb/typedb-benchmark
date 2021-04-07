@@ -207,6 +207,8 @@ build:
       image: graknlabs-ubuntu-20.04
       type: background
       timeout: "30m"
+      filter:
+        owner: graknlabs
       command: |
         cat > grakn-core.service <<- EOM
         [Unit]
@@ -238,8 +240,10 @@ build:
     test-performance-small-grakn-core:
       machine: 16-core-32-gb
       image: graknlabs-ubuntu-20.04
-      timeout: "30m"
       dependencies: [test-performance-small-grakn-core-background]
+      timeout: "30m"
+      filter:
+        owner: graknlabs
       command: |
         bazel run //:benchmark-small -- \
           --database "Grakn Core 2.0" \
@@ -256,6 +260,8 @@ build:
       image: graknlabs-ubuntu-20.04
       type: background
       timeout: "30m"
+      filter:
+        owner: graknlabs
       monitor: |
         journalctl -fu neo4j
       command: |
@@ -278,6 +284,8 @@ build:
       image: graknlabs-ubuntu-20.04
       dependencies: [test-performance-small-neo4j-background]
       timeout: "30m"
+      filter:
+        owner: graknlabs
       command: |
         echo 'Trying to connect to Neo4j'
         attempt_counter=0
