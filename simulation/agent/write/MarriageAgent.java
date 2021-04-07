@@ -19,7 +19,6 @@ package grakn.benchmark.simulation.agent.write;
 
 import grakn.benchmark.simulation.action.Action;
 import grakn.benchmark.simulation.action.ActionFactory;
-import grakn.benchmark.simulation.agent.base.AgentManager;
 import grakn.benchmark.simulation.agent.base.SimulationContext;
 import grakn.benchmark.simulation.agent.region.CityAgentManager;
 import grakn.benchmark.simulation.driver.Client;
@@ -53,7 +52,7 @@ public class MarriageAgent<TX extends Transaction> extends CityAgentManager<TX> 
         protected void run(Session<TX> session, World.City city) {
 
             // Find bachelors and bachelorettes who are considered adults and who are not in a marriage and pair them off randomly
-            LocalDateTime dobOfAdults = benchmarkContext.today().minusYears(benchmarkContext.world().AGE_OF_ADULTHOOD);
+            LocalDateTime dobOfAdults = context.today().minusYears(context.world().AGE_OF_ADULTHOOD);
             List<String> womenEmails;
             try (TX dbOperation = session.newTransaction(tracker(), iteration(), isTracing())) {
                 womenEmails = runAction(actionFactory().unmarriedPeopleInCityAction(dbOperation, city, "female", dobOfAdults), isTest(), actionReports());
@@ -66,7 +65,7 @@ public class MarriageAgent<TX extends Transaction> extends CityAgentManager<TX> 
                 shuffle(menEmails, random());
             }
 
-            int numMarriagesPossible = Math.min(benchmarkContext.world().getScaleFactor(), Math.min(womenEmails.size(), menEmails.size()));
+            int numMarriagesPossible = Math.min(context.world().getScaleFactor(), Math.min(womenEmails.size(), menEmails.size()));
             if (iteration() >= 5) {
                 System.out.println("asdf");
                 assert true;
@@ -76,7 +75,7 @@ public class MarriageAgent<TX extends Transaction> extends CityAgentManager<TX> 
                     for (int i = 0; i < numMarriagesPossible; i++) {
                         String wifeEmail = womenEmails.get(i);
                         String husbandEmail = menEmails.get(i);
-                        int marriageIdentifier = uniqueId(benchmarkContext, tracker(), i).hashCode();
+                        int marriageIdentifier = uniqueId(context, tracker(), i).hashCode();
                         runAction((Action<?, ?>) actionFactory().insertMarriageAction(dbOperation, city, marriageIdentifier, wifeEmail, husbandEmail), isTest(), actionReports());
                     }
                     dbOperation.commit();

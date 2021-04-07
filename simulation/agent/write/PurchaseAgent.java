@@ -21,7 +21,6 @@ import grakn.benchmark.simulation.action.Action;
 import grakn.benchmark.simulation.action.ActionFactory;
 import grakn.benchmark.simulation.action.read.CompaniesInCountryAction;
 import grakn.benchmark.simulation.action.read.ProductsInContinentAction;
-import grakn.benchmark.simulation.agent.base.AgentManager;
 import grakn.benchmark.simulation.agent.base.Allocation;
 import grakn.benchmark.simulation.agent.base.RandomValueGenerator;
 import grakn.benchmark.simulation.agent.base.SimulationContext;
@@ -71,7 +70,7 @@ public class PurchaseAgent<TX extends Transaction> extends CountryAgent<TX> {
                 productBarcodes = runAction(productsInContinentAction, isTest(), actionReports());
             }
 
-            int numTransactions = benchmarkContext.world().getScaleFactor() * companyNumbers.size();
+            int numTransactions = context.world().getScaleFactor() * companyNumbers.size();
             // Company numbers is the list of sellers
             // Company numbers picked randomly is the list of buyers
             // Products randomly picked

@@ -30,7 +30,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -53,17 +52,17 @@ import static grakn.common.util.Objects.className;
  */
 public abstract class AgentManager<REGION extends Region, TX extends Transaction> {
 
-    protected final SimulationContext benchmarkContext;
+    protected final SimulationContext context;
     private final Logger logger;
     private final Client<TX> client;
     private final ActionFactory<TX, ?> actionFactory;
     private final ConcurrentMap<String, List<Action<?, ?>.Report>> reports = new ConcurrentHashMap<>();
     private boolean isTracing = true;
 
-    protected AgentManager(Client<TX> client, ActionFactory<TX, ?> actionFactory, SimulationContext benchmarkContext) {
+    protected AgentManager(Client<TX> client, ActionFactory<TX, ?> actionFactory, SimulationContext context) {
         this.client = client;
         this.actionFactory = actionFactory;
-        this.benchmarkContext = benchmarkContext;
+        this.context = context;
         logger = LoggerFactory.getLogger(this.getClass());
     }
 
@@ -76,13 +75,13 @@ public abstract class AgentManager<REGION extends Region, TX extends Transaction
     }
 
     public boolean isTracing() {
-        return benchmarkContext.trace() && isTracing;
+        return context.trace() && isTracing;
     }
 
     abstract protected List<REGION> getRegions(World world);
 
     public Map<String, List<Action<?, ?>.Report>> iterate(RandomSource randomSource) {
-        List<REGION> regions = getRegions(benchmarkContext.world());
+        List<REGION> regions = getRegions(context.world());
         regions.parallelStream().forEach(region -> executeAgent(region, randomSource.next()));
         return reports;
     }
@@ -90,10 +89,10 @@ public abstract class AgentManager<REGION extends Region, TX extends Transaction
     protected abstract Agent getAgent(int iteration, String tracker, Random random, boolean test);
 
     private void executeAgent(REGION region, RandomSource source) {
-        Agent agent = getAgent(benchmarkContext.iteration(), region.tracker(), source.next().get(), benchmarkContext.isTest());
+        Agent agent = getAgent(context.iteration(), region.tracker(), source.next().get(), context.isTest());
         Session<TX> session = client.session(region, logger);
 
-        List<Action<?, ?>.Report> report = agent.runWithReport(session, region);
+        List<Action<?, ?>.Report> report = runWithReport(agent, session, region, agent.tracker(), agent.iteration());
         reports.put(region.tracker(), report);
     }
 
@@ -117,6 +116,20 @@ public abstract class AgentManager<REGION extends Region, TX extends Transaction
         return actionAnswer;
     }
 
+    private List<Action<?, ?>.Report> runWithReport(Agent agent, Session<TX> session, REGION region, String tracker, int iteration) {
+        GrablTracingThreadStatic.ThreadContext context = null;
+        try {
+            if (isTracing()) context = contextOnThread(tracker, iteration);
+            trace(() -> {
+                agent.run(session, region);
+                return null;
+            }, name(), isTracing());
+            return agent.actionReports();
+        } finally {
+            if (context != null) context.close();
+        }
+    }
+
     public abstract class Agent {
 
         private final Random random;
@@ -124,7 +137,6 @@ public abstract class AgentManager<REGION extends Region, TX extends Transaction
         private final boolean isTest;
         private final int iteration;
         private final List<Action<?, ?>.Report> actionReports;
-
 
         public Agent(int iteration, String tracker, Random random, boolean isTest) {
             this.iteration = iteration;
@@ -155,19 +167,5 @@ public abstract class AgentManager<REGION extends Region, TX extends Transaction
         }
 
         protected abstract void run(Session<TX> session, REGION region);
-
-        protected List<Action<?, ?>.Report> runWithReport(Session<TX> session, REGION region) {
-            GrablTracingThreadStatic.ThreadContext context = null;
-            try {
-                if (isTracing()) context = contextOnThread(tracker(), iteration());
-                trace(() -> {
-                    run(session, region);
-                    return null;
-                }, name(), isTracing());
-                return actionReports;
-            } finally {
-                if (context != null) context.close();
-            }
-        }
     }
 }

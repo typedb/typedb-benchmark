@@ -21,7 +21,6 @@ import grakn.benchmark.simulation.action.Action;
 import grakn.benchmark.simulation.action.ActionFactory;
 import grakn.benchmark.simulation.action.read.CompaniesInCountryAction;
 import grakn.benchmark.simulation.action.read.ResidentsInCityAction;
-import grakn.benchmark.simulation.agent.base.AgentManager;
 import grakn.benchmark.simulation.agent.base.RandomValueGenerator;
 import grakn.benchmark.simulation.agent.base.SimulationContext;
 import grakn.benchmark.simulation.agent.region.CityAgentManager;
@@ -61,17 +60,17 @@ public class EmploymentAgent<TX extends Transaction> extends CityAgentManager<TX
 
         @Override
         protected void run(Session<TX> session, World.City city) {
-            LocalDateTime employmentDate = benchmarkContext.today().minusYears(0);
+            LocalDateTime employmentDate = context.today().minusYears(0);
             List<String> employeeEmails;
             List<Long> companyNumbers;
 
             try (TX tx = session.newTransaction(tracker(), iteration(), isTracing())) {
-                ResidentsInCityAction<TX> employeeEmailsAction = actionFactory().residentsInCityAction(tx, city, benchmarkContext.world().getScaleFactor(), employmentDate);
+                ResidentsInCityAction<TX> employeeEmailsAction = actionFactory().residentsInCityAction(tx, city, context.world().getScaleFactor(), employmentDate);
                 employeeEmails = runAction(employeeEmailsAction, isTest(), actionReports());
             }
 
             try (TX tx = session.newTransaction(tracker(), iteration(), isTracing())) {
-                CompaniesInCountryAction<TX> companyNumbersAction = actionFactory().companiesInCountryAction(tx, city.country(), benchmarkContext.world().getScaleFactor());
+                CompaniesInCountryAction<TX> companyNumbersAction = actionFactory().companiesInCountryAction(tx, city.country(), context.world().getScaleFactor());
                 companyNumbers = runAction(companyNumbersAction, isTest(), actionReports());
             }
 

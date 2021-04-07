@@ -22,7 +22,6 @@ import grakn.benchmark.simulation.action.ActionFactory;
 import grakn.benchmark.simulation.action.SpouseType;
 import grakn.benchmark.simulation.action.read.BirthsInCityAction;
 import grakn.benchmark.simulation.action.read.MarriedCoupleAction;
-import grakn.benchmark.simulation.agent.base.AgentManager;
 import grakn.benchmark.simulation.agent.base.Allocation;
 import grakn.benchmark.simulation.agent.base.SimulationContext;
 import grakn.benchmark.simulation.agent.region.CityAgentManager;
@@ -59,14 +58,14 @@ public class ParentshipAgent<TX extends Transaction> extends CityAgentManager<TX
             List<String> childrenEmails;
 
             try (TX dbOperation = session.newTransaction(tracker(), iteration(), isTracing())) {
-                BirthsInCityAction<?> birthsInCityAction = actionFactory().birthsInCityAction(dbOperation, city, benchmarkContext.today());
+                BirthsInCityAction<?> birthsInCityAction = actionFactory().birthsInCityAction(dbOperation, city, context.today());
                 childrenEmails = runAction(birthsInCityAction, isTest(), actionReports());
             }
 
             List<HashMap<SpouseType, String>> marriedCouple;
 
             try (TX dbOperation = session.newTransaction(tracker(), iteration(), isTracing())) {
-                MarriedCoupleAction<?> marriedCoupleAction = actionFactory().marriedCoupleAction(dbOperation, city, benchmarkContext.today());
+                MarriedCoupleAction<?> marriedCoupleAction = actionFactory().marriedCoupleAction(dbOperation, city, context.today());
                 marriedCouple = runAction(marriedCoupleAction, isTest(), actionReports());
             }
 

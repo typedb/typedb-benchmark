@@ -19,7 +19,6 @@ package grakn.benchmark.simulation.agent.write;
 
 import grakn.benchmark.simulation.action.Action;
 import grakn.benchmark.simulation.action.ActionFactory;
-import grakn.benchmark.simulation.agent.base.AgentManager;
 import grakn.benchmark.simulation.agent.base.SimulationContext;
 import grakn.benchmark.simulation.agent.region.CityAgentManager;
 import grakn.benchmark.simulation.driver.Client;
@@ -48,23 +47,23 @@ public class PersonBirthAgent<TX extends Transaction> extends CityAgentManager<T
         @Override
         protected void run(Session<TX> session, World.City city) {
             // Find bachelors and bachelorettes who are considered adults and who are not in a marriage and pair them off randomly
-            int numBirths = benchmarkContext.world().getScaleFactor();
+            int numBirths = context.world().getScaleFactor();
             try (TX dbOperation = session.newTransaction(tracker(), iteration(), isTracing())) {
                 for (int i = 0; i < numBirths; i++) {
                     String gender;
                     String forename;
-                    String surname = pickOne(benchmarkContext.world().getSurnames(), random());
+                    String surname = pickOne(context.world().getSurnames(), random());
 
                     boolean genderBool = random().nextBoolean();
                     if (genderBool) {
                         gender = "male";
-                        forename = pickOne(benchmarkContext.world().getMaleForenames(), random());
+                        forename = pickOne(context.world().getMaleForenames(), random());
                     } else {
                         gender = "female";
-                        forename = pickOne(benchmarkContext.world().getFemaleForenames(), random());
+                        forename = pickOne(context.world().getFemaleForenames(), random());
                     }
-                    String email = "email/" + uniqueId(benchmarkContext, tracker(), i);
-                    runAction((Action<?, ?>) actionFactory().insertPersonAction(dbOperation, city, benchmarkContext.today(), email, gender, forename, surname), isTest(), actionReports());
+                    String email = "email/" + uniqueId(context, tracker(), i);
+                    runAction((Action<?, ?>) actionFactory().insertPersonAction(dbOperation, city, context.today(), email, gender, forename, surname), isTest(), actionReports());
                 }
                 dbOperation.commit();
             }
