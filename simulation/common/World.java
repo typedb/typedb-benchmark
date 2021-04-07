@@ -152,7 +152,7 @@ public class World implements Region {
     }
 
     @Override
-    public String sessionName() {
+    public String group() {
         return name();
     }
 
@@ -186,7 +186,7 @@ public class World implements Region {
         }
 
         @Override
-        public String sessionName() {
+        public String group() {
             return this.name();
         }
     }
@@ -217,7 +217,7 @@ public class World implements Region {
             return continent;
         }
 
-        public String sessionName() {
+        public String group() {
             return continent.name();
         }
 
@@ -262,7 +262,7 @@ public class World implements Region {
         }
 
         @Override
-        public String sessionName() {
+        public String group() {
             return this.country.continent.name();
         }
     }

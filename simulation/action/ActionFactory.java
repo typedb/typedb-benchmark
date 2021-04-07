@@ -51,7 +51,7 @@ import grakn.common.collection.Pair;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 
-public abstract class ActionFactory<TX extends Transaction, DB_RETURN_TYPE> {
+public abstract class ActionFactory<TX extends Transaction, A> {
 
     public abstract UpdateAgesOfPeopleInCityAction<TX> updateAgesOfPeopleInCityAction(TX tx, LocalDateTime today, World.City city);
 
@@ -59,33 +59,33 @@ public abstract class ActionFactory<TX extends Transaction, DB_RETURN_TYPE> {
 
     public abstract CompaniesInCountryAction<TX> companiesInCountryAction(TX tx, World.Country country, int numCompanies);
 
-    public abstract InsertEmploymentAction<TX, DB_RETURN_TYPE> insertEmploymentAction(TX tx, World.City city, String employeeEmail, long companyNumber, LocalDateTime employmentDate, double wageValue, String contractContent, double contractedHours);
+    public abstract InsertEmploymentAction<TX, A> insertEmploymentAction(TX tx, World.City city, String employeeEmail, long companyNumber, LocalDateTime employmentDate, double wageValue, String contractContent, double contractedHours);
 
-    public abstract InsertCompanyAction<TX, DB_RETURN_TYPE> insertCompanyAction(TX tx, World.Country country, LocalDateTime today, int companyNumber, String companyName);
+    public abstract InsertCompanyAction<TX, A> insertCompanyAction(TX tx, World.Country country, LocalDateTime today, int companyNumber, String companyName);
 
-    public abstract InsertFriendshipAction<TX, DB_RETURN_TYPE> insertFriendshipAction(TX tx, LocalDateTime today, String friend1Email, String friend2Email);
+    public abstract InsertFriendshipAction<TX, A> insertFriendshipAction(TX tx, LocalDateTime today, String friend1Email, String friend2Email);
 
     public abstract UnmarriedPeopleInCityAction<TX> unmarriedPeopleInCityAction(TX tx, World.City city, String gender, LocalDateTime dobOfAdults);
 
-    public abstract InsertMarriageAction<TX, DB_RETURN_TYPE> insertMarriageAction(TX tx, World.City city, int marriageIdentifier, String wifeEmail, String husbandEmail);
+    public abstract InsertMarriageAction<TX, A> insertMarriageAction(TX tx, World.City city, int marriageIdentifier, String wifeEmail, String husbandEmail);
 
     public abstract BirthsInCityAction<TX> birthsInCityAction(TX tx, World.City city, LocalDateTime today);
 
     public abstract MarriedCoupleAction<TX> marriedCoupleAction(TX tx, World.City city, LocalDateTime today);
 
-    public abstract InsertParentShipAction<TX, DB_RETURN_TYPE> insertParentshipAction(TX tx, HashMap<SpouseType, String> marriage, String childEmail);
+    public abstract InsertParentShipAction<TX, A> insertParentshipAction(TX tx, HashMap<SpouseType, String> marriage, String childEmail);
 
-    public abstract InsertPersonAction<TX, DB_RETURN_TYPE> insertPersonAction(TX tx, World.City city, LocalDateTime today, String email, String gender, String forename, String surname);
+    public abstract InsertPersonAction<TX, A> insertPersonAction(TX tx, World.City city, LocalDateTime today, String email, String gender, String forename, String surname);
 
-    public abstract InsertProductAction<TX, DB_RETURN_TYPE> insertProductAction(TX tx, World.Continent continent, Long barcode, String productName, String productDescription);
+    public abstract InsertProductAction<TX, A> insertProductAction(TX tx, World.Continent continent, Long barcode, String productName, String productDescription);
 
     public abstract CitiesInContinentAction<TX> citiesInContinentAction(TX tx, World.City city);
 
-    public abstract InsertRelocationAction<TX, DB_RETURN_TYPE> insertRelocationAction(TX tx, World.City city, LocalDateTime today, String residentEmail, String relocationCityName);
+    public abstract InsertRelocationAction<TX, A> insertRelocationAction(TX tx, World.City city, LocalDateTime today, String residentEmail, String relocationCityName);
 
     public abstract ProductsInContinentAction<TX> productsInContinentAction(TX tx, World.Continent continent);
 
-    public abstract InsertTransactionAction<TX, DB_RETURN_TYPE> insertTransactionAction(TX tx, World.Country country, Pair<Long, Long> transaction, Long sellerCompanyNumber, double value, int productQuantity, boolean isTaxable);
+    public abstract InsertTransactionAction<TX, A> insertTransactionAction(TX tx, World.Country country, Pair<Long, Long> transaction, Long sellerCompanyNumber, double value, int productQuantity, boolean isTaxable);
 
     public abstract MeanWageOfPeopleInWorldAction<TX> meanWageOfPeopleInWorldAction(TX tx);
 

@@ -18,6 +18,7 @@
 package grakn.benchmark.neo4j.driver;
 
 import grabl.tracing.client.GrablTracingThreadStatic;
+import grakn.benchmark.simulation.common.Region;
 import grakn.benchmark.simulation.driver.Client;
 import org.neo4j.driver.AuthTokens;
 import org.neo4j.driver.Driver;
@@ -50,6 +51,11 @@ public class Neo4jClient implements Client<Neo4jSession, Neo4jTransaction> {
                 return new Neo4jSession(nativeDriver.session());
             }
         });
+    }
+
+    @Override
+    public Neo4jSession session(Region region) {
+        return session(region.name());
     }
 
     @Override

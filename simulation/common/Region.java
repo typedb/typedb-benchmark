@@ -23,5 +23,5 @@ public interface Region {
 
     String tracker();
 
-    String sessionName(); // Used to assign session keys for Grakn model
+    String group(); // Used to assign session keys for Grakn model
 }

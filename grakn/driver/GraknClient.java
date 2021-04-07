@@ -18,6 +18,7 @@
 package grakn.benchmark.grakn.driver;
 
 import grabl.tracing.client.GrablTracingThreadStatic;
+import grakn.benchmark.simulation.common.Region;
 import grakn.benchmark.simulation.driver.Client;
 import grakn.client.Grakn;
 
@@ -61,6 +62,11 @@ public class GraknClient implements Client<GraknSession, GraknTransaction> {
                 return new GraknSession(nativeClient.session(database, grakn.client.api.GraknSession.Type.DATA));
             }
         });
+    }
+
+    @Override
+    public GraknSession session(Region region) {
+        return session(region.group());
     }
 
     public GraknSession schemaSession(String sessionKey) {

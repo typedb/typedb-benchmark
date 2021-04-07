@@ -96,7 +96,7 @@ public abstract class Agent<REGION extends Region, TX extends Transaction> {
         GrablTracingThreadStatic.ThreadContext tracingCtx = null;
         try {
             if (isTracing()) tracingCtx = contextOnThread(region.tracker(), context.iteration());
-            Session<TX> session = client.session(region.sessionName());
+            Session<TX> session = client.session(region);
             return mayTrace(() -> run(session, region, random), className(getClass()));
         } finally {
             if (tracingCtx != null) tracingCtx.close();
@@ -104,9 +104,9 @@ public abstract class Agent<REGION extends Region, TX extends Transaction> {
     }
 
     public <T> T runAction(Action<?, T> action, List<Action<?, ?>.Report> reports) {
-        T actionAnswer = mayTrace(action::run, action.name());
-        if (context.isTest()) reports.add(action.report(actionAnswer));
-        return actionAnswer;
+        T answer = mayTrace(action::run, action.name());
+        if (context.isTest()) reports.add(action.report(answer));
+        return answer;
     }
 
     public <U> U pickOne(List<U> list, Random random) {

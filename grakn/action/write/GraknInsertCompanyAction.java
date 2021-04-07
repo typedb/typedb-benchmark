@@ -52,28 +52,22 @@ public class GraknInsertCompanyAction extends InsertCompanyAction<GraknTransacti
 
     public static GraqlInsert query(String countryName, LocalDateTime today, int companyNumber, String companyName) {
         return Graql.match(
-                var(COUNTRY).isa(COUNTRY)
-                        .has(LOCATION_NAME, countryName))
-                .insert(var(COMPANY).isa(COMPANY)
-                                .has(COMPANY_NAME, companyName)
-                                .has(COMPANY_NUMBER, companyNumber),
-                        var(INCORPORATION)
-                                .rel(INCORPORATION_INCORPORATED, var(COMPANY))
-                                .rel(INCORPORATION_INCORPORATING, var(COUNTRY))
-                                .isa(INCORPORATION)
-                                .has(DATE_OF_INCORPORATION, today)
-                );
+                var(COUNTRY).isa(COUNTRY).has(LOCATION_NAME, countryName)
+        ).insert(
+                var(COMPANY).isa(COMPANY).has(COMPANY_NAME, companyName).has(COMPANY_NUMBER, companyNumber),
+                var(INCORPORATION).rel(INCORPORATION_INCORPORATED, var(COMPANY))
+                        .rel(INCORPORATION_INCORPORATING, var(COUNTRY))
+                        .isa(INCORPORATION).has(DATE_OF_INCORPORATION, today)
+        );
     }
 
     @Override
     protected HashMap<ComparableField, Object> outputForReport(ConceptMap answer) {
-        return new HashMap<ComparableField, Object>() {
-            {
-                put(InsertCompanyActionField.COMPANY_NAME, tx.getOnlyAttributeOfThing(answer, COMPANY, COMPANY_NAME));
-                put(InsertCompanyActionField.COMPANY_NUMBER, tx.getOnlyAttributeOfThing(answer, COMPANY, COMPANY_NUMBER));
-                put(InsertCompanyActionField.COUNTRY, tx.getOnlyAttributeOfThing(answer, COUNTRY, LOCATION_NAME));
-                put(InsertCompanyActionField.DATE_OF_INCORPORATION, tx.getOnlyAttributeOfThing(answer, INCORPORATION, DATE_OF_INCORPORATION));
-            }
-        };
+        return new HashMap<>() {{
+            put(InsertCompanyActionField.COMPANY_NAME, tx.getOnlyAttributeOfThing(answer, COMPANY, COMPANY_NAME));
+            put(InsertCompanyActionField.COMPANY_NUMBER, tx.getOnlyAttributeOfThing(answer, COMPANY, COMPANY_NUMBER));
+            put(InsertCompanyActionField.COUNTRY, tx.getOnlyAttributeOfThing(answer, COUNTRY, LOCATION_NAME));
+            put(InsertCompanyActionField.DATE_OF_INCORPORATION, tx.getOnlyAttributeOfThing(answer, INCORPORATION, DATE_OF_INCORPORATION));
+        }};
     }
 }

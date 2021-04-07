@@ -27,7 +27,7 @@ import java.util.Objects;
 
 import static com.google.common.collect.Iterables.getOnlyElement;
 
-public abstract class Action<TX extends Transaction, ACTION_RETURN_TYPE> {
+public abstract class Action<TX extends Transaction, ANSWER> {
 
     protected TX tx;
 
@@ -35,16 +35,13 @@ public abstract class Action<TX extends Transaction, ACTION_RETURN_TYPE> {
         this.tx = tx;
     }
 
-    public static <DB_ANSWER_TYPE> DB_ANSWER_TYPE singleResult(List<DB_ANSWER_TYPE> answers) {
+    public static <A> A singleResult(List<A> answers) {
         return getOnlyElement(answers);
     }
 
-    public static <DB_ANSWER_TYPE> DB_ANSWER_TYPE optionalSingleResult(List<DB_ANSWER_TYPE> answers) {
-        if (answers.size() == 0) {
-            return null;
-        } else {
-            return getOnlyElement(answers);
-        }
+    public static <A> A optionalSingleResult(List<A> answers) {
+        if (answers.size() == 0) return null;
+        else return getOnlyElement(answers);
     }
 
     public String name() {
@@ -52,9 +49,9 @@ public abstract class Action<TX extends Transaction, ACTION_RETURN_TYPE> {
         return this.getClass().getSuperclass().getSimpleName();
     }
 
-    public abstract ACTION_RETURN_TYPE run();
+    public abstract ANSWER run();
 
-    protected abstract HashMap<ComparableField, Object> outputForReport(ACTION_RETURN_TYPE answer);
+    protected abstract HashMap<ComparableField, Object> outputForReport(ANSWER answer);
 
     protected abstract ArrayList<Object> inputForReport();
 
@@ -62,15 +59,16 @@ public abstract class Action<TX extends Transaction, ACTION_RETURN_TYPE> {
         return new ArrayList<>(Arrays.asList(args));
     }
 
-    public Report report(ACTION_RETURN_TYPE answer) {
+    public Report report(ANSWER answer) {
         return new Report(answer);
     }
 
     public class Report {
+
         ArrayList<Object> input;
         HashMap<ComparableField, Object> output;
 
-        public Report(ACTION_RETURN_TYPE answer) {
+        public Report(ANSWER answer) {
             this.input = inputForReport();
             this.output = outputForReport(answer);
         }
@@ -90,11 +88,7 @@ public abstract class Action<TX extends Transaction, ACTION_RETURN_TYPE> {
 
         @Override
         public String toString() {
-            return "Report " + name() +
-                    " {" +
-                    "input=" + input +
-                    ", output=" + output +
-                    "}";
+            return "Report " + name() + " {input=" + input + ", output=" + output + "}";
         }
     }
 
