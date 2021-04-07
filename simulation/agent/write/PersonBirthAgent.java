@@ -17,7 +17,9 @@
 
 package grakn.benchmark.simulation.agent.write;
 
+import grakn.benchmark.simulation.action.Action;
 import grakn.benchmark.simulation.action.ActionFactory;
+import grakn.benchmark.simulation.agent.base.AgentManager;
 import grakn.benchmark.simulation.agent.base.SimulationContext;
 import grakn.benchmark.simulation.agent.region.CityAgentManager;
 import grakn.benchmark.simulation.driver.Client;
@@ -51,18 +53,18 @@ public class PersonBirthAgent<TX extends Transaction> extends CityAgentManager<T
                 for (int i = 0; i < numBirths; i++) {
                     String gender;
                     String forename;
-                    String surname = pickOne(benchmarkContext.world().getSurnames());
+                    String surname = pickOne(benchmarkContext.world().getSurnames(), random());
 
                     boolean genderBool = random().nextBoolean();
                     if (genderBool) {
                         gender = "male";
-                        forename = pickOne(benchmarkContext.world().getMaleForenames());
+                        forename = pickOne(benchmarkContext.world().getMaleForenames(), random());
                     } else {
                         gender = "female";
-                        forename = pickOne(benchmarkContext.world().getFemaleForenames());
+                        forename = pickOne(benchmarkContext.world().getFemaleForenames(), random());
                     }
-                    String email = "email/" + uniqueId(benchmarkContext, i);
-                    runAction(actionFactory().insertPersonAction(dbOperation, city, benchmarkContext.today(), email, gender, forename, surname));
+                    String email = "email/" + uniqueId(benchmarkContext, tracker(), i);
+                    runAction((Action<?, ?>) actionFactory().insertPersonAction(dbOperation, city, benchmarkContext.today(), email, gender, forename, surname), isTest(), actionReports());
                 }
                 dbOperation.commit();
             }

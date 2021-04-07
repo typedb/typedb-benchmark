@@ -17,7 +17,9 @@
 
 package grakn.benchmark.simulation.agent.write;
 
+import grakn.benchmark.simulation.action.Action;
 import grakn.benchmark.simulation.action.ActionFactory;
+import grakn.benchmark.simulation.agent.base.AgentManager;
 import grakn.benchmark.simulation.agent.base.SimulationContext;
 import grakn.benchmark.simulation.agent.region.CountryAgent;
 import grakn.benchmark.simulation.driver.Client;
@@ -51,12 +53,14 @@ public class CompanyAgent<TX extends Transaction> extends CountryAgent<TX> {
             try (TX dbOperation = session.newTransaction(tracker(), iteration(), isTracing())) {
 
                 for (int i = 0; i < numCompanies; i++) {
-                    String adjective = pickOne(benchmarkContext.world().getAdjectives());
-                    String noun = pickOne(benchmarkContext.world().getNouns());
+                    // TODO can be a util
+                    String adjective = pickOne(benchmarkContext.world().getAdjectives(), random());
+                    // TODO can be a util
+                    String noun = pickOne(benchmarkContext.world().getNouns(), random());
 
-                    int companyNumber = uniqueId(benchmarkContext, i).hashCode();
+                    int companyNumber = uniqueId(benchmarkContext, tracker(), i).hashCode();
                     String companyName = StringUtils.capitalize(adjective) + StringUtils.capitalize(noun) + "-" + companyNumber;
-                    runAction(actionFactory().insertCompanyAction(dbOperation, country, benchmarkContext.today(), companyNumber, companyName));
+                    runAction((Action<?, ?>) actionFactory().insertCompanyAction(dbOperation, country, benchmarkContext.today(), companyNumber, companyName), isTest(), actionReports());
                 }
                 dbOperation.commit();
             }

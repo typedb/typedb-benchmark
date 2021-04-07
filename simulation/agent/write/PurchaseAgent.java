@@ -17,10 +17,13 @@
 
 package grakn.benchmark.simulation.agent.write;
 
+import grakn.benchmark.simulation.action.Action;
 import grakn.benchmark.simulation.action.ActionFactory;
 import grakn.benchmark.simulation.action.read.CompaniesInCountryAction;
 import grakn.benchmark.simulation.action.read.ProductsInContinentAction;
+import grakn.benchmark.simulation.agent.base.AgentManager;
 import grakn.benchmark.simulation.agent.base.Allocation;
+import grakn.benchmark.simulation.agent.base.RandomValueGenerator;
 import grakn.benchmark.simulation.agent.base.SimulationContext;
 import grakn.benchmark.simulation.agent.region.CountryAgent;
 import grakn.benchmark.simulation.driver.Client;
@@ -34,6 +37,7 @@ import java.util.List;
 import java.util.Random;
 
 import static grakn.common.collection.Collections.pair;
+import static java.util.Collections.shuffle;
 
 public class PurchaseAgent<TX extends Transaction> extends CountryAgent<TX> {
 
@@ -57,14 +61,14 @@ public class PurchaseAgent<TX extends Transaction> extends CountryAgent<TX> {
 
             try (TX dbOperation = session.newTransaction(tracker(), iteration(), isTracing())) {
                 CompaniesInCountryAction<TX> companiesInContinentAction = actionFactory().companiesInCountryAction(dbOperation, country, 100);
-                companyNumbers = runAction(companiesInContinentAction);
+                companyNumbers = runAction(companiesInContinentAction, isTest(), actionReports());
             }
-            shuffle(companyNumbers);
+            shuffle(companyNumbers, random());
 
             List<Long> productBarcodes;
             try (TX dbOperation = session.newTransaction(tracker(), iteration(), isTracing())) {
                 ProductsInContinentAction<?> productsInContinentAction = actionFactory().productsInContinentAction(dbOperation, country.continent());
-                productBarcodes = runAction(productsInContinentAction);
+                productBarcodes = runAction(productsInContinentAction, isTest(), actionReports());
             }
 
             int numTransactions = benchmarkContext.world().getScaleFactor() * companyNumbers.size();
@@ -75,17 +79,17 @@ public class PurchaseAgent<TX extends Transaction> extends CountryAgent<TX> {
             // See if we can allocate with a Pair, which is the buyer and the product id
             List<Pair<Long, Long>> transactions = new ArrayList<>();
             for (int i = 0; i < numTransactions; i++) {
-                Long companyNumber = pickOne(companyNumbers);
-                Long productBarcode = pickOne(productBarcodes);
+                Long companyNumber = pickOne(companyNumbers, random());
+                Long productBarcode = pickOne(productBarcodes, random());
                 Pair<Long, Long> buyerAndProduct = pair(companyNumber, productBarcode);
                 transactions.add(buyerAndProduct);
             }
             try (TX dbOperation = session.newTransaction(tracker(), iteration(), isTracing())) {
                 Allocation.allocate(transactions, companyNumbers, (transaction, sellerCompanyNumber) -> {
-                    double value = randomAttributeGenerator().boundRandomDouble(0.01, 10000.00);
-                    int productQuantity = randomAttributeGenerator().boundRandomInt(1, 1000);
-                    boolean isTaxable = randomAttributeGenerator().bool();
-                    runAction(actionFactory().insertTransactionAction(dbOperation, country, transaction, sellerCompanyNumber, value, productQuantity, isTaxable));
+                    double value = RandomValueGenerator.of(random()).boundRandomDouble(0.01, 10000.00);
+                    int productQuantity = RandomValueGenerator.of(random()).boundRandomInt(1, 1000);
+                    boolean isTaxable = RandomValueGenerator.of(random()).bool();
+                    runAction((Action<?, ?>) actionFactory().insertTransactionAction(dbOperation, country, transaction, sellerCompanyNumber, value, productQuantity, isTaxable), isTest(), actionReports());
                 });
                 dbOperation.commit();
             }

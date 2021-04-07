@@ -101,18 +101,29 @@ public abstract class AgentManager<REGION extends Region, TX extends Transaction
         return className(getClass());
     }
 
-    public Map<String, List<Action<?, ?>.Report>> reports() {
-        return reports;
+    public <U> U pickOne(List<U> list, Random random) { // TODO can be a util
+        return list.get(random.nextInt(list.size()));
     }
 
-    public abstract class Agent implements AutoCloseable {
+    public String uniqueId(SimulationContext benchmarkContext, String tracker, int iterationScopeId) {
+        return benchmarkContext.iteration() + "/" + tracker + "/" + iterationScopeId;
+    }
+
+    public <ACTION_RETURN_TYPE> ACTION_RETURN_TYPE runAction(Action<?, ACTION_RETURN_TYPE> action, boolean isTest,
+                                                             List<Action<?, ?>.Report> actionReports) {
+        ACTION_RETURN_TYPE actionAnswer;
+        actionAnswer = trace(action::run, action.name(), isTracing());
+        if (isTest) actionReports.add(action.report(actionAnswer));
+        return actionAnswer;
+    }
+
+    public abstract class Agent {
 
         private final Random random;
         private final String tracker;
         private final boolean isTest;
         private final int iteration;
-        private final List<Action<?, ?>.Report> actionReports = new ArrayList<>();
-        private GrablTracingThreadStatic.ThreadContext context;
+        private final List<Action<?, ?>.Report> actionReports;
 
 
         public Agent(int iteration, String tracker, Random random, boolean isTest) {
@@ -120,9 +131,7 @@ public abstract class AgentManager<REGION extends Region, TX extends Transaction
             this.tracker = tracker;
             this.random = random;
             this.isTest = isTest;
-            if (isTracing()) {
-                context = contextOnThread(tracker(), iteration());
-            }
+            this.actionReports = new ArrayList<>();
         }
 
         public int iteration() {
@@ -133,55 +142,31 @@ public abstract class AgentManager<REGION extends Region, TX extends Transaction
             return tracker;
         }
 
-        protected List<Action<?, ?>.Report> runWithReport(Session<TX> session, REGION region) {
-            trace(() -> {
-                run(session, region);
-                return null;
-            }, name(), isTracing());
+        public Random random() {
+            return random;
+        }
+
+        public boolean isTest() {
+            return isTest;
+        }
+
+        public List<Action<?, ?>.Report> actionReports() {
             return actionReports;
         }
 
         protected abstract void run(Session<TX> session, REGION region);
 
-        public <U> U pickOne(List<U> list) { // TODO can be a util
-            return list.get(random().nextInt(list.size()));
-        }
-
-        public Random random() {
-            return random;
-        }
-
-        protected void shuffle(List<?> list) {
-            Collections.shuffle(list, random());
-        }
-
-        /**
-         * Create a unique identifier, useful for creating keys without risk of collision
-         *
-         * @param iterationScopeId An id that uniquely identifies a concept within the scope of the agent at a particular iteration
-         * @return
-         */
-        public String uniqueId(SimulationContext benchmarkContext, int iterationScopeId) {
-            return benchmarkContext.iteration() + "/" + tracker() + "/" + iterationScopeId;
-        }
-
-        public RandomValueGenerator randomAttributeGenerator() {
-            return new RandomValueGenerator(random);
-        }
-
-        public <ACTION_RETURN_TYPE> ACTION_RETURN_TYPE runAction(Action<?, ACTION_RETURN_TYPE> action) {
-            ACTION_RETURN_TYPE actionAnswer;
-            actionAnswer = trace(action::run, action.name(), isTracing());
-            if (isTest) {
-                actionReports.add(action.report(actionAnswer));
-            }
-            return actionAnswer;
-        }
-
-        @Override
-        public void close() {
-            if (context != null) {
-                context.close();
+        protected List<Action<?, ?>.Report> runWithReport(Session<TX> session, REGION region) {
+            GrablTracingThreadStatic.ThreadContext context = null;
+            try {
+                if (isTracing()) context = contextOnThread(tracker(), iteration());
+                trace(() -> {
+                    run(session, region);
+                    return null;
+                }, name(), isTracing());
+                return actionReports;
+            } finally {
+                if (context != null) context.close();
             }
         }
     }

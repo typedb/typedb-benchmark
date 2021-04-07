@@ -17,10 +17,12 @@
 
 package grakn.benchmark.simulation.agent.write;
 
+import grakn.benchmark.simulation.action.Action;
 import grakn.benchmark.simulation.action.ActionFactory;
 import grakn.benchmark.simulation.action.SpouseType;
 import grakn.benchmark.simulation.action.read.BirthsInCityAction;
 import grakn.benchmark.simulation.action.read.MarriedCoupleAction;
+import grakn.benchmark.simulation.agent.base.AgentManager;
 import grakn.benchmark.simulation.agent.base.Allocation;
 import grakn.benchmark.simulation.agent.base.SimulationContext;
 import grakn.benchmark.simulation.agent.region.CityAgentManager;
@@ -58,14 +60,14 @@ public class ParentshipAgent<TX extends Transaction> extends CityAgentManager<TX
 
             try (TX dbOperation = session.newTransaction(tracker(), iteration(), isTracing())) {
                 BirthsInCityAction<?> birthsInCityAction = actionFactory().birthsInCityAction(dbOperation, city, benchmarkContext.today());
-                childrenEmails = runAction(birthsInCityAction);
+                childrenEmails = runAction(birthsInCityAction, isTest(), actionReports());
             }
 
             List<HashMap<SpouseType, String>> marriedCouple;
 
             try (TX dbOperation = session.newTransaction(tracker(), iteration(), isTracing())) {
                 MarriedCoupleAction<?> marriedCoupleAction = actionFactory().marriedCoupleAction(dbOperation, city, benchmarkContext.today());
-                marriedCouple = runAction(marriedCoupleAction);
+                marriedCouple = runAction(marriedCoupleAction, isTest(), actionReports());
             }
 
             if (marriedCouple.size() > 0 && childrenEmails.size() > 0) {
@@ -78,7 +80,7 @@ public class ParentshipAgent<TX extends Transaction> extends CityAgentManager<TX
 
                         for (Integer childIndex : children) {
                             String childEmail = childrenEmails.get(childIndex);
-                            runAction(actionFactory().insertParentshipAction(dbOperation, marriage, childEmail));
+                            runAction((Action<?, ?>) actionFactory().insertParentshipAction(dbOperation, marriage, childEmail), isTest(), actionReports());
                         }
                     }
                     dbOperation.commit();

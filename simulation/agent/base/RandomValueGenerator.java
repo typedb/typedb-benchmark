@@ -27,8 +27,12 @@ import java.util.Random;
 public class RandomValueGenerator {
     private final Random random;
 
-    public RandomValueGenerator(Random random) {
+    private RandomValueGenerator(Random random) {
         this.random = random;
+    }
+
+    public static RandomValueGenerator of(Random random) {
+        return new RandomValueGenerator(random);
     }
 
     private static double doubleInterpolate(double in, double min, double max) {

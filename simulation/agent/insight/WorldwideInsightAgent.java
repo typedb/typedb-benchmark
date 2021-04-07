@@ -17,8 +17,10 @@
 
 package grakn.benchmark.simulation.agent.insight;
 
+import grakn.benchmark.simulation.action.Action;
 import grakn.benchmark.simulation.action.ActionFactory;
 import grakn.benchmark.simulation.action.read.ReadAction;
+import grakn.benchmark.simulation.agent.base.AgentManager;
 import grakn.benchmark.simulation.agent.base.SimulationContext;
 import grakn.benchmark.simulation.agent.region.WorldAgent;
 import grakn.benchmark.simulation.driver.Client;
@@ -55,7 +57,7 @@ public abstract class WorldwideInsightAgent<TX extends Transaction> extends Worl
         protected void run(Session<TX> session, World world) {
             for (int i = 0; i <= benchmarkContext.world().getScaleFactor(); i++) {
                 try (TX dbOperation = session.newTransaction(tracker(), iteration(), isTracing())) {
-                    runAction(getAction(dbOperation));
+                    runAction((Action<?, ?>) getAction(dbOperation), isTest(), actionReports());
                 }
             }
         }

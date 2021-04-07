@@ -17,9 +17,11 @@
 
 package grakn.benchmark.simulation.agent.write;
 
+import grakn.benchmark.simulation.action.Action;
 import grakn.benchmark.simulation.action.ActionFactory;
 import grakn.benchmark.simulation.action.read.CitiesInContinentAction;
 import grakn.benchmark.simulation.action.read.ResidentsInCityAction;
+import grakn.benchmark.simulation.agent.base.AgentManager;
 import grakn.benchmark.simulation.agent.base.Allocation;
 import grakn.benchmark.simulation.agent.base.SimulationContext;
 import grakn.benchmark.simulation.agent.region.CityAgentManager;
@@ -31,6 +33,8 @@ import grakn.benchmark.simulation.world.World;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Random;
+
+import static java.util.Collections.shuffle;
 
 public class RelocationAgent<TX extends Transaction> extends CityAgentManager<TX> {
 
@@ -64,18 +68,18 @@ public class RelocationAgent<TX extends Transaction> extends CityAgentManager<TX
 
             try (TX dbOperation = session.newTransaction(tracker(), iteration(), isTracing())) {
                 ResidentsInCityAction<?> residentsInCityAction = actionFactory().residentsInCityAction(dbOperation, city, benchmarkContext.world().getScaleFactor(), earliestDateOfResidencyToRelocate);
-                residentEmails = runAction(residentsInCityAction);
+                residentEmails = runAction(residentsInCityAction, isTest(), actionReports());
             }
-            shuffle(residentEmails);
+            shuffle(residentEmails, random());
 
             try (TX dbOperation = session.newTransaction(tracker(), iteration(), isTracing())) {
                 CitiesInContinentAction<?> citiesInContinentAction = actionFactory().citiesInContinentAction(dbOperation, city);
-                relocationCityNames = runAction(citiesInContinentAction);
+                relocationCityNames = runAction(citiesInContinentAction, isTest(), actionReports());
             }
 
             try (TX dbOperation = session.newTransaction(tracker(), iteration(), isTracing())) {
                 Allocation.allocate(residentEmails, relocationCityNames, (residentEmail, relocationCityName) -> {
-                    runAction(actionFactory().insertRelocationAction(dbOperation, city, benchmarkContext.today(), residentEmail, relocationCityName));
+                    runAction((Action<?, ?>) actionFactory().insertRelocationAction(dbOperation, city, benchmarkContext.today(), residentEmail, relocationCityName), isTest(), actionReports());
                 });
                 dbOperation.commit();
             }

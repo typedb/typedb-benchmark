@@ -17,7 +17,9 @@
 
 package grakn.benchmark.simulation.agent.write;
 
+import grakn.benchmark.simulation.action.Action;
 import grakn.benchmark.simulation.action.ActionFactory;
+import grakn.benchmark.simulation.agent.base.AgentManager;
 import grakn.benchmark.simulation.agent.base.SimulationContext;
 import grakn.benchmark.simulation.agent.region.CityAgentManager;
 import grakn.benchmark.simulation.driver.Client;
@@ -28,6 +30,8 @@ import grakn.benchmark.simulation.world.World;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Random;
+
+import static java.util.Collections.shuffle;
 
 public class MarriageAgent<TX extends Transaction> extends CityAgentManager<TX> {
 
@@ -52,14 +56,14 @@ public class MarriageAgent<TX extends Transaction> extends CityAgentManager<TX> 
             LocalDateTime dobOfAdults = benchmarkContext.today().minusYears(benchmarkContext.world().AGE_OF_ADULTHOOD);
             List<String> womenEmails;
             try (TX dbOperation = session.newTransaction(tracker(), iteration(), isTracing())) {
-                womenEmails = runAction(actionFactory().unmarriedPeopleInCityAction(dbOperation, city, "female", dobOfAdults));
-                shuffle(womenEmails);
+                womenEmails = runAction(actionFactory().unmarriedPeopleInCityAction(dbOperation, city, "female", dobOfAdults), isTest(), actionReports());
+                shuffle(womenEmails, random());
             }
 
             List<String> menEmails;
             try (TX dbOperation = session.newTransaction(tracker(), iteration(), isTracing())) {
-                menEmails = runAction(actionFactory().unmarriedPeopleInCityAction(dbOperation, city, "male", dobOfAdults));
-                shuffle(menEmails);
+                menEmails = runAction(actionFactory().unmarriedPeopleInCityAction(dbOperation, city, "male", dobOfAdults), isTest(), actionReports());
+                shuffle(menEmails, random());
             }
 
             int numMarriagesPossible = Math.min(benchmarkContext.world().getScaleFactor(), Math.min(womenEmails.size(), menEmails.size()));
@@ -72,8 +76,8 @@ public class MarriageAgent<TX extends Transaction> extends CityAgentManager<TX> 
                     for (int i = 0; i < numMarriagesPossible; i++) {
                         String wifeEmail = womenEmails.get(i);
                         String husbandEmail = menEmails.get(i);
-                        int marriageIdentifier = uniqueId(benchmarkContext, i).hashCode();
-                        runAction(actionFactory().insertMarriageAction(dbOperation, city, marriageIdentifier, wifeEmail, husbandEmail));
+                        int marriageIdentifier = uniqueId(benchmarkContext, tracker(), i).hashCode();
+                        runAction((Action<?, ?>) actionFactory().insertMarriageAction(dbOperation, city, marriageIdentifier, wifeEmail, husbandEmail), isTest(), actionReports());
                     }
                     dbOperation.commit();
                 }

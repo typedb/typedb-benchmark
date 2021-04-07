@@ -17,9 +17,12 @@
 
 package grakn.benchmark.simulation.agent.write;
 
+import grakn.benchmark.simulation.action.Action;
 import grakn.benchmark.simulation.action.ActionFactory;
 import grakn.benchmark.simulation.action.read.CompaniesInCountryAction;
 import grakn.benchmark.simulation.action.read.ResidentsInCityAction;
+import grakn.benchmark.simulation.agent.base.AgentManager;
+import grakn.benchmark.simulation.agent.base.RandomValueGenerator;
 import grakn.benchmark.simulation.agent.base.SimulationContext;
 import grakn.benchmark.simulation.agent.region.CityAgentManager;
 import grakn.benchmark.simulation.driver.Client;
@@ -64,21 +67,21 @@ public class EmploymentAgent<TX extends Transaction> extends CityAgentManager<TX
 
             try (TX tx = session.newTransaction(tracker(), iteration(), isTracing())) {
                 ResidentsInCityAction<TX> employeeEmailsAction = actionFactory().residentsInCityAction(tx, city, benchmarkContext.world().getScaleFactor(), employmentDate);
-                employeeEmails = runAction(employeeEmailsAction);
+                employeeEmails = runAction(employeeEmailsAction, isTest(), actionReports());
             }
 
             try (TX tx = session.newTransaction(tracker(), iteration(), isTracing())) {
                 CompaniesInCountryAction<TX> companyNumbersAction = actionFactory().companiesInCountryAction(tx, city.country(), benchmarkContext.world().getScaleFactor());
-                companyNumbers = runAction(companyNumbersAction);
+                companyNumbers = runAction(companyNumbersAction, isTest(), actionReports());
             }
 
             try (TX tx = session.newTransaction(tracker(), iteration(), isTracing())) {
                 // A second transaction is being used to circumvent graknlabs/grakn issue #5585
                 boolean allocated = allocate(employeeEmails, companyNumbers, (employeeEmail, companyNumber) -> {
-                    double wageValue = randomAttributeGenerator().boundRandomDouble(MIN_ANNUAL_WAGE, MAX_ANNUAL_WAGE);
-                    String contractContent = randomAttributeGenerator().boundRandomLengthRandomString(MIN_CONTRACT_CHARACTER_LENGTH, MAX_CONTRACT_CHARACTER_LENGTH);
-                    double contractedHours = randomAttributeGenerator().boundRandomDouble(MIN_CONTRACTED_HOURS, MAX_CONTRACTED_HOURS);
-                    runAction(actionFactory().insertEmploymentAction(tx, city, employeeEmail, companyNumber, employmentDate, wageValue, contractContent, contractedHours));
+                    double wageValue = RandomValueGenerator.of(random()).boundRandomDouble(MIN_ANNUAL_WAGE, MAX_ANNUAL_WAGE);
+                    String contractContent = RandomValueGenerator.of(random()).boundRandomLengthRandomString(MIN_CONTRACT_CHARACTER_LENGTH, MAX_CONTRACT_CHARACTER_LENGTH);
+                    double contractedHours = RandomValueGenerator.of(random()).boundRandomDouble(MIN_CONTRACTED_HOURS, MAX_CONTRACTED_HOURS);
+                    runAction((Action<?, ?>) actionFactory().insertEmploymentAction(tx, city, employeeEmail, companyNumber, employmentDate, wageValue, contractContent, contractedHours), isTest(), actionReports());
                 });
                 if (allocated) {
                     tx.commit();

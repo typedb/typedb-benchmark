@@ -19,6 +19,7 @@ package grakn.benchmark.simulation.agent.write;
 
 import grakn.benchmark.simulation.action.ActionFactory;
 import grakn.benchmark.simulation.action.write.UpdateAgesOfPeopleInCityAction;
+import grakn.benchmark.simulation.agent.base.AgentManager;
 import grakn.benchmark.simulation.agent.base.SimulationContext;
 import grakn.benchmark.simulation.agent.region.CityAgentManager;
 import grakn.benchmark.simulation.driver.Client;
@@ -49,7 +50,7 @@ public class AgeUpdateAgent<TX extends Transaction> extends CityAgentManager<TX>
         protected void run(Session<TX> session, World.City city) {
             try (TX tx = session.newTransaction(tracker(), iteration(), isTracing())) {
                 UpdateAgesOfPeopleInCityAction<TX> updateAgesOfAllPeopleInCityAction = actionFactory().updateAgesOfPeopleInCityAction(tx, benchmarkContext.today(), city);
-                runAction(updateAgesOfAllPeopleInCityAction);
+                runAction(updateAgesOfAllPeopleInCityAction, isTest(), actionReports());
                 tx.commit();
             }
         }

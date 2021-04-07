@@ -17,7 +17,10 @@
 
 package grakn.benchmark.simulation.agent.write;
 
+import grakn.benchmark.simulation.action.Action;
 import grakn.benchmark.simulation.action.ActionFactory;
+import grakn.benchmark.simulation.agent.base.AgentManager;
+import grakn.benchmark.simulation.agent.base.RandomValueGenerator;
 import grakn.benchmark.simulation.agent.base.SimulationContext;
 import grakn.benchmark.simulation.agent.region.ContinentAgent;
 import grakn.benchmark.simulation.driver.Client;
@@ -48,10 +51,10 @@ public class ProductAgent<TX extends Transaction> extends ContinentAgent<TX> {
             int numProducts = benchmarkContext.world().getScaleFactor();
             try (TX dbOperation = session.newTransaction(tracker(), iteration(), isTracing())) {
                 for (int i = 0; i < numProducts; i++) {
-                    String productName = randomAttributeGenerator().boundRandomLengthRandomString(5, 20);
-                    String productDescription = randomAttributeGenerator().boundRandomLengthRandomString(75, 100);
-                    Long barcode = (long) uniqueId(benchmarkContext, i).hashCode();
-                    runAction(actionFactory().insertProductAction(dbOperation, continent, barcode, productName, productDescription));
+                    String productName = RandomValueGenerator.of(random()).boundRandomLengthRandomString(5, 20);
+                    String productDescription = RandomValueGenerator.of(random()).boundRandomLengthRandomString(75, 100);
+                    long barcode = uniqueId(benchmarkContext, tracker(), i).hashCode();
+                    runAction((Action<?, ?>) actionFactory().insertProductAction(dbOperation, continent, barcode, productName, productDescription), isTest(), actionReports());
                 }
                 dbOperation.commit();
             }
