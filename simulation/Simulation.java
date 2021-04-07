@@ -18,6 +18,7 @@
 package grakn.benchmark.simulation;
 
 import grakn.benchmark.config.Config;
+import grakn.benchmark.simulation.action.Action;
 import grakn.benchmark.simulation.action.ActionFactory;
 import grakn.benchmark.simulation.agent.AgentFactory;
 import grakn.benchmark.simulation.agent.base.AgentManager;
@@ -47,10 +48,11 @@ public abstract class Simulation<DB_DRIVER extends Client<TX>, TX extends Transa
     private final RandomSource randomSource;
     private final List<Config.Agent> agentConfigs;
     private final Function<Integer, Boolean> iterationSamplingFunction;
-    private final Report report;
     private final World world;
+    private final Map<Class<? extends AgentManager>, Map<String, List<Action<?, ?>.Report>>> agentReports;
     private final boolean test;
     private int iteration = 1;
+
 
     public Simulation(DB_DRIVER driver, Map<String, Path> initialisationDataPaths, int randomSeed, World world, List<Config.Agent> agentConfigs, Function<Integer, Boolean> iterationSamplingFunction, boolean test) {
         this.driver = driver;
@@ -59,9 +61,9 @@ public abstract class Simulation<DB_DRIVER extends Client<TX>, TX extends Transa
         this.iterationSamplingFunction = iterationSamplingFunction;
         this.world = world;
         this.test = test;
+        this.agentReports = new ConcurrentHashMap<>();
         initialise(initialisationDataPaths);
         this.agentMgrs = agentListFromConfigs();
-        this.report = new Report();
     }
 
     protected List<AgentManager<?, TX>> agentListFromConfigs() {
@@ -84,9 +86,9 @@ public abstract class Simulation<DB_DRIVER extends Client<TX>, TX extends Transa
     protected abstract void initialise(Map<String, Path> initialisationDataPaths);
 
     public void iterate() {
-        report.clean();
+        agentReports.clear();
         for (AgentManager<?, ?> agentMgr : agentMgrs) {
-            this.report.addAgentResult(agentMgr.name(), agentMgr.iterate(randomSource.next()));
+            agentReports.put(agentMgr.getClass(), agentMgr.iterate(randomSource.next()));
         }
         closeIteration();  // We want to test opening new sessions each iteration.
         iteration++;
@@ -119,31 +121,11 @@ public abstract class Simulation<DB_DRIVER extends Client<TX>, TX extends Transa
         return test;
     }
 
-    public Report getReport() {
-        return report;
+    public Map<String, List<Action<?, ?>.Report>> getReport(Class<? extends AgentManager> agentName) {
+        return agentReports.get(agentName);
     }
-
-    public abstract void close();
 
     public abstract void printStatistics(Logger LOG);
 
-    public class Report {
-
-        private ConcurrentHashMap<String, AgentManager<?, ?>.Report> agentReports = new ConcurrentHashMap<>();
-
-        public void addAgentResult(String agentName, AgentManager<?, ?>.Report agentReport) {
-            if (agentReport == null) {
-                throw new NullPointerException(String.format("The result returned from a %s agent was null", agentName));
-            }
-            agentReports.put(agentName, agentReport);
-        }
-
-        public AgentManager<?, ?>.Report getAgentReport(String agentName) {
-            return agentReports.get(agentName);
-        }
-
-        public void clean() {
-            agentReports = new ConcurrentHashMap<>();
-        }
-    }
+    public abstract void close();
 }

@@ -76,12 +76,11 @@ public abstract class Action<TX extends Transaction, ACTION_RETURN_TYPE> {
         }
 
         @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            Report report = (Report) o;
-            return input.equals(report.input) &&
-                    output.equals(report.output);
+        public boolean equals(Object object) {
+            if (this == object) return true;
+            if (object == null || getClass() != object.getClass()) return false;
+            Action<?, ?>.Report that = (Action<?, ?>.Report) object;
+            return input.equals(that.input) && output.equals(that.output);
         }
 
         @Override

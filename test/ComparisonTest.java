@@ -17,12 +17,13 @@
 
 package grakn.benchmark.test;
 
-import grakn.benchmark.simulation.action.Action;
 import grakn.benchmark.simulation.agent.base.AgentManager;
+import grakn.benchmark.simulation.agent.write.CompanyAgent;
+import grakn.benchmark.simulation.agent.write.PersonBirthAgent;
+import grakn.benchmark.simulation.agent.write.ProductAgent;
+import grakn.benchmark.simulation.agent.write.PurchaseAgent;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
-import java.util.Iterator;
 
 import static grakn.benchmark.test.BenchmarksForComparison.graknCore;
 import static grakn.benchmark.test.BenchmarksForComparison.neo4j;
@@ -31,26 +32,9 @@ import static org.junit.Assert.assertEquals;
 @RunWith(ComparisonTestSuite.class)
 public class ComparisonTest {
 
-    private void compareReports(String agentName) {
-        AgentManager<?, ?>.Report graknAgentReport = graknCore.getReport().getAgentReport(agentName);
-        AgentManager<?, ?>.Report neo4jAgentReport = neo4j.getReport().getAgentReport(agentName);
-
-        if (!graknAgentReport.equals(neo4jAgentReport)) {
-            graknAgentReport.trackers().forEach(tracker -> {
-                AgentManager.Agent.Report graknRegionReport = graknAgentReport.getRegionalAgentReport(tracker);
-                AgentManager.Agent.Report neo4jRegionReport = neo4jAgentReport.getRegionalAgentReport(tracker);
-
-                if (!graknRegionReport.equals(neo4jRegionReport)) {
-                    Iterator<Action<?, ?>.Report> graknIter = graknRegionReport.getActionReportIterator();
-                    Iterator<Action<?, ?>.Report> neo4jIter = neo4jRegionReport.getActionReportIterator();
-                    while (graknIter.hasNext() && neo4jIter.hasNext()) {
-                        Action<?, ?>.Report graknActionReport = graknIter.next();
-                        Action<?, ?>.Report neo4jActionReport = neo4jIter.next();
-                        assertEquals(neo4jActionReport, graknActionReport);
-                    }
-                }
-            });
-        }
+    // TODO: raw usage of class
+    private void compareReports(Class<? extends AgentManager> agentClass) {
+        assertEquals(graknCore.getReport(agentClass), neo4j.getReport(agentClass));
     }
 
 //    @Test
@@ -60,7 +44,7 @@ public class ComparisonTest {
 
     @Test
     public void testPersonBirthAgent() {
-        compareReports("PersonBirthAgent");
+        compareReports(PersonBirthAgent.class);
     }
 
 //    @Test
@@ -81,7 +65,7 @@ public class ComparisonTest {
 
     @Test
     public void testCompanyAgent() {
-        compareReports("CompanyAgent");
+        compareReports(CompanyAgent.class);
     }
 
 //    @Test
@@ -91,12 +75,12 @@ public class ComparisonTest {
 
     @Test
     public void testProductAgent() {
-        compareReports("ProductAgent");
+        compareReports(ProductAgent.class);
     }
 
     @Test
     public void testPurchaseAgent() {
-        compareReports("PurchaseAgent");
+        compareReports(PurchaseAgent.class);
     }
 
 //    @Test

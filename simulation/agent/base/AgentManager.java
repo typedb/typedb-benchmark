@@ -31,11 +31,11 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import static grabl.tracing.client.GrablTracingThreadStatic.contextOnThread;
 import static grakn.benchmark.simulation.utils.Trace.trace;
@@ -57,7 +57,7 @@ public abstract class AgentManager<REGION extends Region, TX extends Transaction
     private final Logger logger;
     private final Client<TX> client;
     private final ActionFactory<TX, ?> actionFactory;
-    private final Report report = new Report();
+    private final ConcurrentMap<String, List<Action<?, ?>.Report>> reports = new ConcurrentHashMap<>();
     private boolean isTracing = true;
 
     protected AgentManager(Client<TX> client, ActionFactory<TX, ?> actionFactory, SimulationContext benchmarkContext) {
@@ -81,10 +81,10 @@ public abstract class AgentManager<REGION extends Region, TX extends Transaction
 
     abstract protected List<REGION> getRegions(World world);
 
-    public Report iterate(RandomSource randomSource) {
+    public Map<String, List<Action<?, ?>.Report>> iterate(RandomSource randomSource) {
         List<REGION> regions = getRegions(benchmarkContext.world());
         regions.parallelStream().forEach(region -> executeAgent(region, randomSource.next()));
-        return report;
+        return reports;
     }
 
     protected abstract Agent getAgent(int iteration, String tracker, Random random, boolean test);
@@ -93,38 +93,27 @@ public abstract class AgentManager<REGION extends Region, TX extends Transaction
         Agent agent = getAgent(benchmarkContext.iteration(), region.tracker(), source.next().get(), benchmarkContext.isTest());
         Session<TX> session = client.session(region, logger);
 
-        Agent.Report report = agent.runWithReport(session, region);
-        this.report.addRegionalAgentReport(region.tracker(), report);
+        List<Action<?, ?>.Report> report = agent.runWithReport(session, region);
+        reports.put(region.tracker(), report);
     }
 
     public String name() {
         return className(getClass());
     }
 
-    public class Report {
-        ConcurrentHashMap<String, Agent.Report> regionalAgentReports = new ConcurrentHashMap<>();
-
-        public void addRegionalAgentReport(String tracker, Agent.Report regionalAgentReport) {
-            regionalAgentReports.put(tracker, regionalAgentReport);
-        }
-
-        public Set<String> trackers() {
-            return regionalAgentReports.keySet();
-        }
-
-        public Agent.Report getRegionalAgentReport(String tracker) {
-            return regionalAgentReports.get(tracker);
-        }
+    public Map<String, List<Action<?, ?>.Report>> reports() {
+        return reports;
     }
 
     public abstract class Agent implements AutoCloseable {
 
         private final Random random;
-        private final Report report = new Report();
         private final String tracker;
         private final boolean isTest;
         private final int iteration;
+        private final List<Action<?, ?>.Report> actionReports = new ArrayList<>();
         private GrablTracingThreadStatic.ThreadContext context;
+
 
         public Agent(int iteration, String tracker, Random random, boolean isTest) {
             this.iteration = iteration;
@@ -144,12 +133,12 @@ public abstract class AgentManager<REGION extends Region, TX extends Transaction
             return tracker;
         }
 
-        protected Report runWithReport(Session<TX> session, REGION region) {
+        protected List<Action<?, ?>.Report> runWithReport(Session<TX> session, REGION region) {
             trace(() -> {
                 run(session, region);
                 return null;
             }, name(), isTracing());
-            return report;
+            return actionReports;
         }
 
         protected abstract void run(Session<TX> session, REGION region);
@@ -184,21 +173,9 @@ public abstract class AgentManager<REGION extends Region, TX extends Transaction
             ACTION_RETURN_TYPE actionAnswer;
             actionAnswer = trace(action::run, action.name(), isTracing());
             if (isTest) {
-                report.addActionReport(action.report(actionAnswer));
+                actionReports.add(action.report(actionAnswer));
             }
             return actionAnswer;
-        }
-
-        public class Report {
-            List<Action<?, ?>.Report> actionReports = new ArrayList<>();
-
-            public void addActionReport(Action<?, ?>.Report actionReport) {
-                actionReports.add(actionReport);
-            }
-
-            public Iterator<Action<?, ?>.Report> getActionReportIterator() {
-                return actionReports.iterator();
-            }
         }
 
         @Override
