@@ -19,7 +19,9 @@ package grakn.benchmark.grakn.driver;
 
 import grakn.benchmark.simulation.driver.Session;
 
-public class GraknSession extends Session<GraknTransaction> {
+import static grakn.client.api.GraknTransaction.Type.WRITE;
+
+public class GraknSession implements Session<GraknTransaction> {
 
     private final grakn.client.api.GraknSession nativeSession;
 
@@ -32,8 +34,8 @@ public class GraknSession extends Session<GraknTransaction> {
     }
 
     @Override
-    public GraknTransaction newTransaction(String tracker, long iteration, boolean trace) {
-        return new GraknTransaction(nativeSession, tracker, iteration, trace);
+    public GraknTransaction transaction(String tracker, long iteration, boolean trace) {
+        return new GraknTransaction(nativeSession.transaction(WRITE), tracker, iteration);
     }
 
     @Override

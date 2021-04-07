@@ -17,27 +17,10 @@
 
 package grakn.benchmark.simulation.driver;
 
-import grakn.benchmark.simulation.utils.Trace;
+public interface Transaction extends AutoCloseable {
 
-import java.util.function.Supplier;
+    void commit();
 
-public abstract class Transaction implements AutoCloseable {
-
-    protected final String tracker;
-    protected final long iteration;
-    private final boolean trace;
-
-    public Transaction(String tracker, long iteration, boolean trace) {
-        this.iteration = iteration;
-        this.tracker = tracker;
-        this.trace = trace;
-    }
-
-    public abstract void close();
-
-    public abstract void commit();
-
-    protected <T> T trace(Supplier<T> method, String traceName) {
-        return Trace.trace(method, traceName, trace);
-    }
+    @Override
+    void close();
 }

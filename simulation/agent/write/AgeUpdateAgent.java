@@ -47,7 +47,7 @@ public class AgeUpdateAgent<TX extends Transaction> extends Agent<World.City, TX
     @Override
     protected List<Action<?, ?>.Report> run(Session<TX> session, World.City region, Random random) {
         List<Action<?, ?>.Report> reports = new ArrayList<>();
-        try (TX tx = session.newTransaction(region.tracker(), context.iteration(), isTracing())) {
+        try (TX tx = session.transaction(region.tracker(), context.iteration(), isTracing())) {
             UpdateAgesOfPeopleInCityAction<TX> updateAgesOfAllPeopleInCityAction = actionFactory().updateAgesOfPeopleInCityAction(tx, context.today(), region);
             runAction(updateAgesOfAllPeopleInCityAction, reports);
             tx.commit();

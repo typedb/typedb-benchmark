@@ -17,17 +17,18 @@
 
 package grakn.benchmark.simulation.driver;
 
-public abstract class Client<SESSION extends Session<TX>, TX extends Transaction> {
+public interface Client<SESSION extends Session<TX>, TX extends Transaction> extends AutoCloseable {
 
-    public abstract SESSION session(String sessionKey);
+    SESSION session(String sessionKey);
 
-    public abstract void closeSessions();
+    void closeSessions();
 
-    public abstract String printStatistics();
+    String printStatistics();
 
-    public abstract void close();
+    @Override
+    void close();
 
-    public enum TracingLabel {
+    enum TracingLabel {
         OPEN_CLIENT("open_client"),
         CLOSE_CLIENT("close_client"),
         OPEN_SESSION("open_session"),

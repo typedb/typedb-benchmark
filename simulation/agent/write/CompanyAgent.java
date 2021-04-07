@@ -48,7 +48,7 @@ public class CompanyAgent<TX extends Transaction> extends Agent<World.Country, T
     protected List<Action<?, ?>.Report> run(Session<TX> session, World.Country region, Random random) {
         List<Action<?, ?>.Report> reports = new ArrayList<>();
         int numCompanies = context.world().getScaleFactor();
-        try (TX tx = session.newTransaction(region.tracker(), context.iteration(), isTracing())) {
+        try (TX tx = session.transaction(region.tracker(), context.iteration(), isTracing())) {
             for (int i = 0; i < numCompanies; i++) {
                 String adjective = pickOne(context.world().getAdjectives(), random);
                 String noun = pickOne(context.world().getNouns(), random);

@@ -49,7 +49,7 @@ public abstract class ReadAgent<TX extends Transaction> extends Agent<World, TX>
     protected List<Action<?, ?>.Report> run(Session<TX> session, World region, Random random) {
         List<Action<?, ?>.Report> reports = new ArrayList<>();
         for (int i = 0; i <= context.world().getScaleFactor(); i++) {
-            try (TX tx = session.newTransaction(region.tracker(), context.iteration(), isTracing())) {
+            try (TX tx = session.transaction(region.tracker(), context.iteration(), isTracing())) {
                 runAction(getAction(tx), reports);
             }
         }

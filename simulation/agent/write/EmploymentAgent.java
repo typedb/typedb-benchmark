@@ -62,17 +62,17 @@ public class EmploymentAgent<TX extends Transaction> extends Agent<World.City, T
         List<String> employeeEmails;
         List<Long> companyNumbers;
 
-        try (TX tx = session.newTransaction(region.tracker(), context.iteration(), isTracing())) {
+        try (TX tx = session.transaction(region.tracker(), context.iteration(), isTracing())) {
             ResidentsInCityAction<TX> employeeEmailsAction = actionFactory().residentsInCityAction(tx, region, context.world().getScaleFactor(), employmentDate);
             employeeEmails = runAction(employeeEmailsAction, reports);
         }
 
-        try (TX tx = session.newTransaction(region.tracker(), context.iteration(), isTracing())) {
+        try (TX tx = session.transaction(region.tracker(), context.iteration(), isTracing())) {
             CompaniesInCountryAction<TX> companyNumbersAction = actionFactory().companiesInCountryAction(tx, region.country(), context.world().getScaleFactor());
             companyNumbers = runAction(companyNumbersAction, reports);
         }
 
-        try (TX tx = session.newTransaction(region.tracker(), context.iteration(), isTracing())) {
+        try (TX tx = session.transaction(region.tracker(), context.iteration(), isTracing())) {
             // A second transaction is being used to circumvent graknlabs/grakn issue #5585
             boolean allocated = allocate(employeeEmails, companyNumbers, (employeeEmail, companyNumber) -> {
                 double wageValue = RandomValueGenerator.of(random).boundRandomDouble(MIN_ANNUAL_WAGE, MAX_ANNUAL_WAGE);

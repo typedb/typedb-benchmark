@@ -29,27 +29,18 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class Neo4jTransaction extends Transaction {
+public class Neo4jTransaction implements Transaction {
 
     private static final Logger LOG = LoggerFactory.getLogger(Neo4jTransaction.class);
     private final Session session;
+    private final String tracker;
+    private final long iteration;
 
-    public Neo4jTransaction(Session session, String tracker, long iteration, boolean trace) {
-        super(tracker, iteration, trace);
+    public Neo4jTransaction(Session session, String tracker, long iteration) {
         this.session = session;
+        this.tracker = tracker;
+        this.iteration = iteration;
     }
-
-    /**
-     * Not necessary when using Neo4j's Transaction Functions
-     */
-    @Override
-    public void close() {}
-
-    /**
-     * Not necessary when using Neo4j's Transaction Functions
-     */
-    @Override
-    public void commit() {}
 
     public List<Record> execute(Query query) {
         LOG.debug("{}/{}:\n{}", iteration, tracker, query);
@@ -69,4 +60,16 @@ public class Neo4jTransaction extends Transaction {
         }
         return answerStream.collect(Collectors.toList());
     }
+
+    /**
+     * Not necessary when using Neo4j's Transaction Functions
+     */
+    @Override
+    public void commit() {}
+
+    /**
+     * Not necessary when using Neo4j's Transaction Functions
+     */
+    @Override
+    public void close() {}
 }

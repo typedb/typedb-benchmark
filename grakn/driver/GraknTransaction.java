@@ -18,7 +18,6 @@
 package grakn.benchmark.grakn.driver;
 
 import grakn.benchmark.simulation.driver.Transaction;
-import grakn.client.api.GraknSession;
 import grakn.client.api.answer.ConceptMap;
 import grakn.client.api.answer.Numeric;
 import graql.lang.query.GraqlDelete;
@@ -29,33 +28,36 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static com.google.common.collect.Iterables.getOnlyElement;
+import static java.util.stream.Collectors.toList;
 
-public class GraknTransaction extends Transaction {
+public class GraknTransaction implements Transaction {
 
     private static final Logger LOG = LoggerFactory.getLogger(GraknTransaction.class);
 
-    private final grakn.client.api.GraknTransaction transaction;
+    private final grakn.client.api.GraknTransaction tx;
+    private final String tracker;
+    private final long iteration;
     private boolean closed = false;
 
-    public GraknTransaction(GraknSession session, String tracker, long iteration, boolean trace) {
-        super(tracker, iteration, trace);
-        this.transaction = session.transaction(grakn.client.api.GraknTransaction.Type.WRITE);
+    public GraknTransaction(grakn.client.api.GraknTransaction tx, String tracker, long iteration) {
+        this.tx = tx;
+        this.tracker = tracker;
+        this.iteration = iteration;
     }
 
     @Override
     public void close() {
-        transaction.close();
+        tx.close();
         closed = true;
     }
 
     @Override
     public void commit() {
         throwIfClosed();
-        transaction.commit();
+        tx.commit();
         closed = true;
     }
 
@@ -68,57 +70,59 @@ public class GraknTransaction extends Transaction {
     public <T> List<T> sortedExecute(GraqlMatch query, String attributeName, Integer limit) {
         throwIfClosed();
         LOG.debug("{}/{}:\n{}", iteration, tracker, query);
-        Stream<T> answerStream = transaction.query().match(query)
+        Stream<T> answerStream = tx.query().match(query)
                 .map(conceptMap -> (T) conceptMap.get(attributeName).asThing().asAttribute().getValue())
                 .sorted();
         if (limit != null) {
             answerStream = answerStream.limit(limit);
         }
-        return answerStream.collect(Collectors.toList());
+        return answerStream.collect(toList());
     }
 
     public void execute(GraqlDelete query) {
         LOG.debug("{}/{}:\n{}", iteration, tracker, query);
-        transaction.query().delete(query).get();
+        tx.query().delete(query).get();
     }
 
     public void executeAsync(GraqlDelete query) {
         LOG.debug("{}/{}:\n{}", iteration, tracker, query);
-        transaction.query().delete(query);
+        tx.query().delete(query);
     }
 
     public List<ConceptMap> execute(GraqlInsert query) {
         LOG.debug("{}/{}:\n{}", iteration, tracker, query);
-        return transaction.query().insert(query).collect(Collectors.toList());
+        return tx.query().insert(query).collect(toList());
     }
 
     public Stream<ConceptMap> executeAsync(GraqlInsert query) {
         LOG.debug("{}/{}:\n{}", iteration, tracker, query);
-        return transaction.query().insert(query);
+        return tx.query().insert(query);
     }
 
     public Stream<ConceptMap> executeAsync(GraqlUpdate query) {
         LOG.debug("{}/{}:\n{}", iteration, tracker, query);
-        return transaction.query().update(query);
+        return tx.query().update(query);
     }
 
     public List<ConceptMap> execute(GraqlMatch query) {
         LOG.debug("{}/{}:\n{}", iteration, tracker, query);
-        return transaction.query().match(query).collect(Collectors.toList());
+        return tx.query().match(query).collect(toList());
     }
 
     public Stream<ConceptMap> executeAsync(GraqlMatch query) {
         LOG.debug("{}/{}:\n{}", iteration, tracker, query);
-        return transaction.query().match(query);
+        return tx.query().match(query);
     }
 
     public Numeric execute(GraqlMatch.Aggregate query) {
         LOG.debug("{}/{}:\n{}", iteration, tracker, query);
-        return transaction.query().match(query).get();
+        return tx.query().match(query).get();
     }
 
-    public Object getOnlyAttributeOfThing(ConceptMap answer, String varName, String attributeType) {
-        return getOnlyElement(answer.get(varName).asThing().asRemote(transaction).asThing().getHas(transaction.concepts().getAttributeType(attributeType)).collect(Collectors.toList())).getValue();
+    public Object getOnlyAttributeOfThing(ConceptMap answer, String var, String attributeType) {
+        return getOnlyElement(answer.get(var).asThing().asRemote(tx).asThing()
+                                      .getHas(tx.concepts().getAttributeType(attributeType))
+                                      .collect(toList())).getValue();
     }
 
     public Object getValueOfAttribute(ConceptMap answer, String varName) {

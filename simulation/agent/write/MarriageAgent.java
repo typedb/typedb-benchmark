@@ -51,19 +51,19 @@ public class MarriageAgent<TX extends Transaction> extends Agent<World.City, TX>
         List<Action<?, ?>.Report> reports = new ArrayList<>();
         LocalDateTime dobOfAdults = context.today().minusYears(context.world().AGE_OF_ADULTHOOD);
         List<String> womenEmails;
-        try (TX tx = session.newTransaction(region.tracker(), context.iteration(), isTracing())) {
+        try (TX tx = session.transaction(region.tracker(), context.iteration(), isTracing())) {
             womenEmails = runAction(actionFactory().unmarriedPeopleInCityAction(tx, region, "female", dobOfAdults), reports);
             shuffle(womenEmails, random);
         }
 
         List<String> menEmails;
-        try (TX tx = session.newTransaction(region.tracker(), context.iteration(), isTracing())) {
+        try (TX tx = session.transaction(region.tracker(), context.iteration(), isTracing())) {
             menEmails = runAction(actionFactory().unmarriedPeopleInCityAction(tx, region, "male", dobOfAdults), reports);
             shuffle(menEmails, random);
         }
 
         int numMarriagesPossible = Math.min(context.world().getScaleFactor(), Math.min(womenEmails.size(), menEmails.size()));
-        try (TX tx = session.newTransaction(region.tracker(), context.iteration(), isTracing())) {
+        try (TX tx = session.transaction(region.tracker(), context.iteration(), isTracing())) {
             if (numMarriagesPossible > 0) {
                 for (int i = 0; i < numMarriagesPossible; i++) {
                     String wifeEmail = womenEmails.get(i);

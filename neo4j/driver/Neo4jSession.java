@@ -20,7 +20,7 @@ package grakn.benchmark.neo4j.driver;
 import grakn.benchmark.simulation.driver.Session;
 
 
-public class Neo4jSession extends Session<Neo4jTransaction> {
+public class Neo4jSession implements Session<Neo4jTransaction> {
 
     private final org.neo4j.driver.Session nativeSession;
 
@@ -33,8 +33,8 @@ public class Neo4jSession extends Session<Neo4jTransaction> {
     }
 
     @Override
-    public Neo4jTransaction newTransaction(String tracker, long iteration, boolean trace) {
-        return new Neo4jTransaction(nativeSession, tracker, iteration, trace);
+    public Neo4jTransaction transaction(String tracker, long iteration, boolean trace) {
+        return new Neo4jTransaction(nativeSession, tracker, iteration);
     }
 
     @Override

@@ -56,20 +56,20 @@ public class ParentshipAgent<TX extends Transaction> extends Agent<World.City, T
         List<Action<?, ?>.Report> reports = new ArrayList<>();
         List<String> childrenEmails;
 
-        try (TX tx = session.newTransaction(region.tracker(), context.iteration(), isTracing())) {
+        try (TX tx = session.transaction(region.tracker(), context.iteration(), isTracing())) {
             BirthsInCityAction<?> birthsInCityAction = actionFactory().birthsInCityAction(tx, region, context.today());
             childrenEmails = runAction(birthsInCityAction, reports);
         }
 
         List<HashMap<SpouseType, String>> marriedCouple;
 
-        try (TX tx = session.newTransaction(region.tracker(), context.iteration(), isTracing())) {
+        try (TX tx = session.transaction(region.tracker(), context.iteration(), isTracing())) {
             MarriedCoupleAction<?> marriedCoupleAction = actionFactory().marriedCoupleAction(tx, region, context.today());
             marriedCouple = runAction(marriedCoupleAction, reports);
         }
 
         if (marriedCouple.size() > 0 && childrenEmails.size() > 0) {
-            try (TX tx = session.newTransaction(region.tracker(), context.iteration(), isTracing())) {
+            try (TX tx = session.transaction(region.tracker(), context.iteration(), isTracing())) {
                 LinkedHashMap<Integer, List<Integer>> childrenPerMarriage = Allocation.allocateEvenlyToMap(childrenEmails.size(), marriedCouple.size());
                 for (Map.Entry<Integer, List<Integer>> childrenForMarriage : childrenPerMarriage.entrySet()) {
                     Integer marriageIndex = childrenForMarriage.getKey();

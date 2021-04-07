@@ -30,7 +30,7 @@ import static grakn.client.api.GraknTransaction.Type.READ;
 import static graql.lang.Graql.match;
 import static graql.lang.Graql.var;
 
-public class GraknClient extends Client<GraknSession, GraknTransaction> {
+public class GraknClient implements Client<GraknSession, GraknTransaction> {
 
     private final grakn.client.api.GraknClient nativeClient;
     private final String database;

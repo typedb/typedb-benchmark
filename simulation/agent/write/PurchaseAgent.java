@@ -55,14 +55,14 @@ public class PurchaseAgent<TX extends Transaction> extends Agent<World.Country, 
         List<Action<?, ?>.Report> reports = new ArrayList<>();
         List<Long> companyNumbers;
 
-        try (TX tx = session.newTransaction(region.tracker(), context.iteration(), isTracing())) {
+        try (TX tx = session.transaction(region.tracker(), context.iteration(), isTracing())) {
             CompaniesInCountryAction<TX> companiesInContinentAction = actionFactory().companiesInCountryAction(tx, region, 100);
             companyNumbers = runAction(companiesInContinentAction, reports);
         }
         shuffle(companyNumbers, random);
 
         List<Long> productBarcodes;
-        try (TX tx = session.newTransaction(region.tracker(), context.iteration(), isTracing())) {
+        try (TX tx = session.transaction(region.tracker(), context.iteration(), isTracing())) {
             ProductsInContinentAction<?> productsInContinentAction = actionFactory().productsInContinentAction(tx, region.continent());
             productBarcodes = runAction(productsInContinentAction, reports);
         }
@@ -80,7 +80,7 @@ public class PurchaseAgent<TX extends Transaction> extends Agent<World.Country, 
             Pair<Long, Long> buyerAndProduct = pair(companyNumber, productBarcode);
             transactions.add(buyerAndProduct);
         }
-        try (TX tx = session.newTransaction(region.tracker(), context.iteration(), isTracing())) {
+        try (TX tx = session.transaction(region.tracker(), context.iteration(), isTracing())) {
             Allocation.allocate(transactions, companyNumbers, (transaction, sellerCompanyNumber) -> {
                 double value = RandomValueGenerator.of(random).boundRandomDouble(0.01, 10000.00);
                 int productQuantity = RandomValueGenerator.of(random).boundRandomInt(1, 1000);

@@ -17,11 +17,10 @@
 
 package grakn.benchmark.simulation.driver;
 
-public abstract class Session<TX extends Transaction> implements AutoCloseable {
+public interface Session<TX extends Transaction> extends AutoCloseable {
 
-    public Session() {}
+    TX transaction(String tracker, long iteration, boolean trace);
 
-    public abstract TX newTransaction(String tracker, long iteration, boolean trace);
-
-    public abstract void close();
+    @Override
+    void close();
 }

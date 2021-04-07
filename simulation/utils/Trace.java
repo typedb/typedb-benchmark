@@ -25,12 +25,9 @@ import static grabl.tracing.client.GrablTracingThreadStatic.traceOnThread;
 
 public class Trace {
 
-    /**
-     * A wrapper to trace a method or not according to a supplied boolean
-     */
-    public static <T> T trace(Supplier<T> methodToTrace, String traceName, boolean trace) {
-        if (trace) {
-            try (GrablTracingThreadStatic.ThreadTrace ignored = traceOnThread(traceName)) {
+    public static <T> T trace(Supplier<T> methodToTrace, String trace, boolean isTracing) {
+        if (isTracing) {
+            try (GrablTracingThreadStatic.ThreadTrace ignored = traceOnThread(trace)) {
                 return methodToTrace.get();
             }
         } else {
