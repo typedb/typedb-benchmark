@@ -45,94 +45,94 @@ import grakn.benchmark.simulation.driver.Transaction;
 
 public class AgentFactory<TX extends Transaction, ACTION_FACTORY extends ActionFactory<TX, ?>> {
 
-    private final Client<TX> dbDriver;
+    private final Client<TX> client;
     private final ACTION_FACTORY actionFactory;
     private final SimulationContext benchmarkContext;
 
-    public AgentFactory(Client<TX> dbDriver, ACTION_FACTORY actionFactory, SimulationContext benchmarkContext) {
-        this.dbDriver = dbDriver;
+    public AgentFactory(Client<TX> client, ACTION_FACTORY actionFactory, SimulationContext benchmarkContext) {
+        this.client = client;
         this.actionFactory = actionFactory;
         this.benchmarkContext = benchmarkContext;
     }
 
     public MarriageAgent<TX> marriage() {
-        return new MarriageAgent<>(dbDriver, actionFactory, benchmarkContext);
+        return new MarriageAgent<>(client, actionFactory, benchmarkContext);
     }
 
     public PersonBirthAgent<TX> personBirth() {
-        return new PersonBirthAgent<>(dbDriver, actionFactory, benchmarkContext);
+        return new PersonBirthAgent<>(client, actionFactory, benchmarkContext);
     }
 
     public AgeUpdateAgent<TX> ageUpdate() {
-        return new AgeUpdateAgent<>(dbDriver, actionFactory, benchmarkContext);
+        return new AgeUpdateAgent<>(client, actionFactory, benchmarkContext);
     }
 
     public ParentshipAgent<TX> parentship() {
-        return new ParentshipAgent<>(dbDriver, actionFactory, benchmarkContext);
+        return new ParentshipAgent<>(client, actionFactory, benchmarkContext);
     }
 
     public RelocationAgent<TX> relocation() {
-        return new RelocationAgent<>(dbDriver, actionFactory, benchmarkContext);
+        return new RelocationAgent<>(client, actionFactory, benchmarkContext);
     }
 
     public CompanyAgent<TX> company() {
-        return new CompanyAgent<>(dbDriver, actionFactory, benchmarkContext);
+        return new CompanyAgent<>(client, actionFactory, benchmarkContext);
     }
 
     public EmploymentAgent<TX> employment() {
-        return new EmploymentAgent<>(dbDriver, actionFactory, benchmarkContext);
+        return new EmploymentAgent<>(client, actionFactory, benchmarkContext);
     }
 
     public ProductAgent<TX> product() {
-        return new ProductAgent<>(dbDriver, actionFactory, benchmarkContext);
+        return new ProductAgent<>(client, actionFactory, benchmarkContext);
     }
 
     public PurchaseAgent<TX> transaction() {
-        return new PurchaseAgent<>(dbDriver, actionFactory, benchmarkContext);
+        return new PurchaseAgent<>(client, actionFactory, benchmarkContext);
     }
 
     public FriendshipAgent<TX> friendship() {
-        return new FriendshipAgent<>(dbDriver, actionFactory, benchmarkContext);
+        return new FriendshipAgent<>(client, actionFactory, benchmarkContext);
     }
 
     public MeanWageAgent<TX> meanWage() {
-        return new MeanWageAgent<>(dbDriver, actionFactory, benchmarkContext);
+        return new MeanWageAgent<>(client, actionFactory, benchmarkContext);
     }
 
     public FindLivedInAgent<TX> findLivedIn() {
-        return new FindLivedInAgent<>(dbDriver, actionFactory, benchmarkContext);
+        return new FindLivedInAgent<>(client, actionFactory, benchmarkContext);
     }
 
     public FindCurrentResidentsAgent<TX> findCurrentResidents() {
-        return new FindCurrentResidentsAgent<>(dbDriver, actionFactory, benchmarkContext);
+        return new FindCurrentResidentsAgent<>(client, actionFactory, benchmarkContext);
     }
 
     public FindTransactionCurrencyAgent<TX> findTransactionCurrency() {
-        return new FindTransactionCurrencyAgent<>(dbDriver, actionFactory, benchmarkContext);
+        return new FindTransactionCurrencyAgent<>(client, actionFactory, benchmarkContext);
     }
 
     public ArbitraryOneHopAgent<TX> arbitraryOneHop() {
-        return new ArbitraryOneHopAgent<>(dbDriver, actionFactory, benchmarkContext);
+        return new ArbitraryOneHopAgent<>(client, actionFactory, benchmarkContext);
     }
 
     public TwoHopAgent<TX> twoHop() {
-        return new TwoHopAgent<>(dbDriver, actionFactory, benchmarkContext);
+        return new TwoHopAgent<>(client, actionFactory, benchmarkContext);
     }
 
     public ThreeHopAgent<TX> threeHop() {
-        return new ThreeHopAgent<>(dbDriver, actionFactory, benchmarkContext);
+        return new ThreeHopAgent<>(client, actionFactory, benchmarkContext);
     }
 
     public FourHopAgent<TX> fourHop() {
-        return new FourHopAgent<>(dbDriver, actionFactory, benchmarkContext);
+        return new FourHopAgent<>(client, actionFactory, benchmarkContext);
     }
 
     public FindSpecificMarriageAgent<TX> findSpecificMarriage() {
-        return new FindSpecificMarriageAgent<>(dbDriver, actionFactory, benchmarkContext);
+        return new FindSpecificMarriageAgent<>(client, actionFactory, benchmarkContext);
     }
 
     public FindSpecificPersonAgent<TX> findSpecificPerson() {
-        return new FindSpecificPersonAgent<>(dbDriver, actionFactory, benchmarkContext);
+        return new FindSpecificPersonAgent<>(client, actionFactory, benchmarkContext);
     }
 
     public Agent<?, TX> get(String agentName) {

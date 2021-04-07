@@ -29,8 +29,8 @@ import java.util.List;
 
 public abstract class WorldAgent<TX extends Transaction> extends Agent<World, TX> {
 
-    public WorldAgent(Client<TX> dbDriver, ActionFactory<TX, ?> actionFactory, SimulationContext context) {
-        super(dbDriver, actionFactory, context);
+    public WorldAgent(Client<TX> client, ActionFactory<TX, ?> actionFactory, SimulationContext context) {
+        super(client, actionFactory, context);
     }
 
     @Override

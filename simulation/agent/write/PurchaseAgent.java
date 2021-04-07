@@ -40,8 +40,8 @@ import static java.util.Collections.shuffle;
 
 public class PurchaseAgent<TX extends Transaction> extends CountryAgent<TX> {
 
-    public PurchaseAgent(Client<TX> dbDriver, ActionFactory<TX, ?> actionFactory, SimulationContext context) {
-        super(dbDriver, actionFactory, context);
+    public PurchaseAgent(Client<TX> client, ActionFactory<TX, ?> actionFactory, SimulationContext context) {
+        super(client, actionFactory, context);
     }
 
     @Override

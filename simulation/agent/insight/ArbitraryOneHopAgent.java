@@ -25,8 +25,8 @@ import grakn.benchmark.simulation.driver.Transaction;
 
 public class ArbitraryOneHopAgent<TX extends Transaction> extends WorldwideInsightAgent<TX> {
 
-    public ArbitraryOneHopAgent(Client<TX> dbDriver, ActionFactory<TX, ?> actionFactory, SimulationContext context) {
-        super(dbDriver, actionFactory, context);
+    public ArbitraryOneHopAgent(Client<TX> client, ActionFactory<TX, ?> actionFactory, SimulationContext context) {
+        super(client, actionFactory, context);
     }
 
     @Override

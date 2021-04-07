@@ -35,8 +35,8 @@ import static java.util.Collections.shuffle;
 
 public class FriendshipAgent<TX extends Transaction> extends CityAgent<TX> {
 
-    public FriendshipAgent(Client<TX> dbDriver, ActionFactory<TX, ?> actionFactory, SimulationContext context) {
-        super(dbDriver, actionFactory, context);
+    public FriendshipAgent(Client<TX> client, ActionFactory<TX, ?> actionFactory, SimulationContext context) {
+        super(client, actionFactory, context);
     }
 
     @Override

@@ -38,8 +38,8 @@ import static java.util.Collections.shuffle;
 
 public class RelocationAgent<TX extends Transaction> extends CityAgent<TX> {
 
-    public RelocationAgent(Client<TX> dbDriver, ActionFactory<TX, ?> actionFactory, SimulationContext context) {
-        super(dbDriver, actionFactory, context);
+    public RelocationAgent(Client<TX> client, ActionFactory<TX, ?> actionFactory, SimulationContext context) {
+        super(client, actionFactory, context);
     }
 
     @Override

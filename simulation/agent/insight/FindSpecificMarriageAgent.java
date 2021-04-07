@@ -25,8 +25,8 @@ import grakn.benchmark.simulation.driver.Transaction;
 
 public class FindSpecificMarriageAgent<TX extends Transaction> extends WorldwideInsightAgent<TX> {
 
-    public FindSpecificMarriageAgent(Client<TX> dbDriver, ActionFactory<TX, ?> actionFactory, SimulationContext context) {
-        super(dbDriver, actionFactory, context);
+    public FindSpecificMarriageAgent(Client<TX> client, ActionFactory<TX, ?> actionFactory, SimulationContext context) {
+        super(client, actionFactory, context);
     }
 
     @Override

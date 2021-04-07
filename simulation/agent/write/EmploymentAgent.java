@@ -45,8 +45,8 @@ public class EmploymentAgent<TX extends Transaction> extends CityAgent<TX> {
     private static final int MIN_CONTRACT_CHARACTER_LENGTH = 200;
     private static final int MAX_CONTRACT_CHARACTER_LENGTH = 600;
 
-    public EmploymentAgent(Client<TX> dbDriver, ActionFactory<TX, ?> actionFactory, SimulationContext context) {
-        super(dbDriver, actionFactory, context);
+    public EmploymentAgent(Client<TX> client, ActionFactory<TX, ?> actionFactory, SimulationContext context) {
+        super(client, actionFactory, context);
     }
 
     @Override

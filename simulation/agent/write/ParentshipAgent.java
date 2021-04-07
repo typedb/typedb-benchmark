@@ -39,8 +39,8 @@ import java.util.Random;
 
 public class ParentshipAgent<TX extends Transaction> extends CityAgent<TX> {
 
-    public ParentshipAgent(Client<TX> dbDriver, ActionFactory<TX, ?> actionFactory, SimulationContext context) {
-        super(dbDriver, actionFactory, context);
+    public ParentshipAgent(Client<TX> client, ActionFactory<TX, ?> actionFactory, SimulationContext context) {
+        super(client, actionFactory, context);
     }
 
     @Override

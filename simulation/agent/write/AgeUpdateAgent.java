@@ -33,8 +33,8 @@ import java.util.Random;
 
 public class AgeUpdateAgent<TX extends Transaction> extends CityAgent<TX> {
 
-    public AgeUpdateAgent(Client<TX> dbDriver, ActionFactory<TX, ?> actionFactory, SimulationContext context) {
-        super(dbDriver, actionFactory, context);
+    public AgeUpdateAgent(Client<TX> client, ActionFactory<TX, ?> actionFactory, SimulationContext context) {
+        super(client, actionFactory, context);
     }
 
     @Override

@@ -30,8 +30,8 @@ import static java.util.stream.Collectors.toList;
 
 public abstract class CountryAgent<TX extends Transaction> extends Agent<World.Country, TX> {
 
-    public CountryAgent(Client<TX> dbDriver, ActionFactory<TX, ?> actionFactory, SimulationContext context) {
-        super(dbDriver, actionFactory, context);
+    public CountryAgent(Client<TX> client, ActionFactory<TX, ?> actionFactory, SimulationContext context) {
+        super(client, actionFactory, context);
     }
 
     @Override

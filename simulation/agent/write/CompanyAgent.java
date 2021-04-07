@@ -33,8 +33,8 @@ import java.util.Random;
 
 public class CompanyAgent<TX extends Transaction> extends CountryAgent<TX> {
 
-    public CompanyAgent(Client<TX> dbDriver, ActionFactory<TX, ?> actionFactory, SimulationContext context) {
-        super(dbDriver, actionFactory, context);
+    public CompanyAgent(Client<TX> client, ActionFactory<TX, ?> actionFactory, SimulationContext context) {
+        super(client, actionFactory, context);
     }
 
     @Override

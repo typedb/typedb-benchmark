@@ -33,8 +33,8 @@ import java.util.Random;
 
 public class ProductAgent<TX extends Transaction> extends ContinentAgent<TX> {
 
-    public ProductAgent(Client<TX> dbDriver, ActionFactory<TX, ?> actionFactory, SimulationContext context) {
-        super(dbDriver, actionFactory, context);
+    public ProductAgent(Client<TX> client, ActionFactory<TX, ?> actionFactory, SimulationContext context) {
+        super(client, actionFactory, context);
     }
 
     @Override
