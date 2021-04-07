@@ -43,7 +43,7 @@ public abstract class ContinentAgent<TX extends Transaction> extends AgentManage
     protected abstract class ContinentRegion extends Agent {
 
         public ContinentRegion(World.Continent continent, Random random, SimulationContext context) {
-            super(continent, random, context);
+            super();
         }
     }
 }

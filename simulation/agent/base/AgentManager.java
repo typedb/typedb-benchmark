@@ -82,25 +82,32 @@ public abstract class AgentManager<REGION extends Region, TX extends Transaction
 
     public Map<String, List<Action<?, ?>.Report>> iterate(RandomSource randomSource) {
         List<REGION> regions = getRegions(context.world());
-        regions.parallelStream().forEach(region -> executeAgent(region, randomSource.next()));
+        regions.parallelStream().forEach(region -> execute(region, randomSource.next()));
         return reports;
     }
 
     protected abstract Agent getAgent(REGION region, Random random, SimulationContext context);
 
-    private void executeAgent(REGION region, RandomSource source) {
-        Agent agent = getAgent(region, source.next().get(), context);
-        Session<TX> session = client.session(region, logger);
+    private void execute(REGION region, RandomSource source) {
+        GrablTracingThreadStatic.ThreadContext tracingCtx = null;
+        try {
+            if (isTracing()) tracingCtx = contextOnThread(region.tracker(), context.iteration());
 
-        List<Action<?, ?>.Report> report = runWithReport(agent, session, region, agent.tracker(), agent.iteration());
-        reports.put(region.tracker(), report);
+            Random random = source.next().get();
+            Agent agent = getAgent(region, random, context);
+            Session<TX> session = client.session(region, logger);
+            List<Action<?, ?>.Report> result = new ArrayList<>();
+            trace(() -> {
+                agent.run(session, region, result, random);
+                return null;
+            }, className(getClass()), isTracing());
+            reports.put(region.tracker(), result);
+        } finally {
+            if (tracingCtx != null) tracingCtx.close();
+        }
     }
 
-    public String name() {
-        return className(getClass());
-    }
-
-    public <U> U pickOne(List<U> list, Random random) { // TODO can be a util
+    public <U> U pickOne(List<U> list, Random random) {
         return list.get(random.nextInt(list.size()));
     }
 
@@ -116,54 +123,8 @@ public abstract class AgentManager<REGION extends Region, TX extends Transaction
         return actionAnswer;
     }
 
-    private List<Action<?, ?>.Report> runWithReport(Agent agent, Session<TX> session, REGION region, String tracker, int iteration) {
-        GrablTracingThreadStatic.ThreadContext context = null;
-        try {
-            if (isTracing()) context = contextOnThread(tracker, iteration);
-            trace(() -> {
-                agent.run(session, region);
-                return null;
-            }, name(), isTracing());
-            return agent.actionReports();
-        } finally {
-            if (context != null) context.close();
-        }
-    }
-
     public abstract class Agent {
 
-        private final REGION region;
-        private final Random random;
-        private final SimulationContext context;
-        private final List<Action<?, ?>.Report> actionReports;
-
-        public Agent(REGION region, Random random, SimulationContext context) {
-            this.region = region;
-            this.random = random;
-            this.context = context;
-            this.actionReports = new ArrayList<>();
-        }
-
-        public int iteration() {
-            return context.iteration();
-        }
-
-        public String tracker() {
-            return region.tracker();
-        }
-
-        public Random random() {
-            return random;
-        }
-
-        public boolean isTest() {
-            return context.isTest();
-        }
-
-        public List<Action<?, ?>.Report> actionReports() {
-            return actionReports;
-        }
-
-        protected abstract void run(Session<TX> session, REGION region);
+        protected abstract void run(Session<TX> session, REGION region, List<Action<?, ?>.Report> reports, Random random);
     }
 }

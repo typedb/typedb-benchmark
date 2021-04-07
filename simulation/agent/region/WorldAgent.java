@@ -42,7 +42,7 @@ public abstract class WorldAgent<TX extends Transaction> extends AgentManager<Wo
     protected abstract class WorldRegion extends Agent {
 
         public WorldRegion(World world, Random random, SimulationContext context) {
-            super(world, random, context);
+            super();
         }
     }
 }

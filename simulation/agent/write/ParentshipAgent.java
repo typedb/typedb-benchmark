@@ -53,24 +53,24 @@ public class ParentshipAgent<TX extends Transaction> extends CityAgentManager<TX
         }
 
         @Override
-        protected void run(Session<TX> session, World.City city) {
+        protected void run(Session<TX> session, World.City region, List<Action<?, ?>.Report> reports, Random random) {
             // Query for married couples in the city who are not already in a parentship relation together
             List<String> childrenEmails;
 
-            try (TX dbOperation = session.newTransaction(tracker(), iteration(), isTracing())) {
-                BirthsInCityAction<?> birthsInCityAction = actionFactory().birthsInCityAction(dbOperation, city, context.today());
-                childrenEmails = runAction(birthsInCityAction, isTest(), actionReports());
+            try (TX dbOperation = session.newTransaction(region.tracker(), context.iteration(), isTracing())) {
+                BirthsInCityAction<?> birthsInCityAction = actionFactory().birthsInCityAction(dbOperation, region, context.today());
+                childrenEmails = runAction(birthsInCityAction, context.isTest(), reports);
             }
 
             List<HashMap<SpouseType, String>> marriedCouple;
 
-            try (TX dbOperation = session.newTransaction(tracker(), iteration(), isTracing())) {
-                MarriedCoupleAction<?> marriedCoupleAction = actionFactory().marriedCoupleAction(dbOperation, city, context.today());
-                marriedCouple = runAction(marriedCoupleAction, isTest(), actionReports());
+            try (TX dbOperation = session.newTransaction(region.tracker(), context.iteration(), isTracing())) {
+                MarriedCoupleAction<?> marriedCoupleAction = actionFactory().marriedCoupleAction(dbOperation, region, context.today());
+                marriedCouple = runAction(marriedCoupleAction, context.isTest(), reports);
             }
 
             if (marriedCouple.size() > 0 && childrenEmails.size() > 0) {
-                try (TX dbOperation = session.newTransaction(tracker(), iteration(), isTracing())) {
+                try (TX dbOperation = session.newTransaction(region.tracker(), context.iteration(), isTracing())) {
                     LinkedHashMap<Integer, List<Integer>> childrenPerMarriage = Allocation.allocateEvenlyToMap(childrenEmails.size(), marriedCouple.size());
                     for (Map.Entry<Integer, List<Integer>> childrenForMarriage : childrenPerMarriage.entrySet()) {
                         Integer marriageIndex = childrenForMarriage.getKey();
@@ -79,7 +79,7 @@ public class ParentshipAgent<TX extends Transaction> extends CityAgentManager<TX
 
                         for (Integer childIndex : children) {
                             String childEmail = childrenEmails.get(childIndex);
-                            runAction((Action<?, ?>) actionFactory().insertParentshipAction(dbOperation, marriage, childEmail), isTest(), actionReports());
+                            runAction((Action<?, ?>) actionFactory().insertParentshipAction(dbOperation, marriage, childEmail), context.isTest(), reports);
                         }
                     }
                     dbOperation.commit();

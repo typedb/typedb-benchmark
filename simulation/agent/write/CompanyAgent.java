@@ -27,6 +27,7 @@ import grakn.benchmark.simulation.driver.Session;
 import grakn.benchmark.simulation.world.World;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.List;
 import java.util.Random;
 
 public class CompanyAgent<TX extends Transaction> extends CountryAgent<TX> {
@@ -46,20 +47,20 @@ public class CompanyAgent<TX extends Transaction> extends CountryAgent<TX> {
         }
 
         @Override
-        protected void run(Session<TX> session, World.Country country) {
+        protected void run(Session<TX> session, World.Country region, List<Action<?, ?>.Report> reports, Random random) {
             int numCompanies = context.world().getScaleFactor();
 
-            try (TX dbOperation = session.newTransaction(tracker(), iteration(), isTracing())) {
+            try (TX dbOperation = session.newTransaction(region.tracker(), context.iteration(), isTracing())) {
 
                 for (int i = 0; i < numCompanies; i++) {
                     // TODO can be a util
-                    String adjective = pickOne(context.world().getAdjectives(), random());
+                    String adjective = pickOne(context.world().getAdjectives(), random);
                     // TODO can be a util
-                    String noun = pickOne(context.world().getNouns(), random());
+                    String noun = pickOne(context.world().getNouns(), random);
 
-                    int companyNumber = uniqueId(context, tracker(), i).hashCode();
+                    int companyNumber = uniqueId(context, region.tracker(), i).hashCode();
                     String companyName = StringUtils.capitalize(adjective) + StringUtils.capitalize(noun) + "-" + companyNumber;
-                    runAction((Action<?, ?>) actionFactory().insertCompanyAction(dbOperation, country, context.today(), companyNumber, companyName), isTest(), actionReports());
+                    runAction((Action<?, ?>) actionFactory().insertCompanyAction(dbOperation, region, context.today(), companyNumber, companyName), context.isTest(), reports);
                 }
                 dbOperation.commit();
             }

@@ -43,7 +43,7 @@ public abstract class CityAgentManager<TX extends Transaction> extends AgentMana
     protected abstract class CityAgent extends Agent {
 
         public CityAgent(World.City region, Random random, SimulationContext context) {
-            super(region, random, context);
+            super();
         }
     }
 }

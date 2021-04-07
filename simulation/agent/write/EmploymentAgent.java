@@ -60,28 +60,28 @@ public class EmploymentAgent<TX extends Transaction> extends CityAgentManager<TX
         }
 
         @Override
-        protected void run(Session<TX> session, World.City city) {
+        protected void run(Session<TX> session, World.City region, List<Action<?, ?>.Report> reports, Random random) {
             LocalDateTime employmentDate = context.today().minusYears(0);
             List<String> employeeEmails;
             List<Long> companyNumbers;
 
-            try (TX tx = session.newTransaction(tracker(), iteration(), isTracing())) {
-                ResidentsInCityAction<TX> employeeEmailsAction = actionFactory().residentsInCityAction(tx, city, context.world().getScaleFactor(), employmentDate);
-                employeeEmails = runAction(employeeEmailsAction, isTest(), actionReports());
+            try (TX tx = session.newTransaction(region.tracker(), context.iteration(), isTracing())) {
+                ResidentsInCityAction<TX> employeeEmailsAction = actionFactory().residentsInCityAction(tx, region, context.world().getScaleFactor(), employmentDate);
+                employeeEmails = runAction(employeeEmailsAction, context.isTest(), reports);
             }
 
-            try (TX tx = session.newTransaction(tracker(), iteration(), isTracing())) {
-                CompaniesInCountryAction<TX> companyNumbersAction = actionFactory().companiesInCountryAction(tx, city.country(), context.world().getScaleFactor());
-                companyNumbers = runAction(companyNumbersAction, isTest(), actionReports());
+            try (TX tx = session.newTransaction(region.tracker(), context.iteration(), isTracing())) {
+                CompaniesInCountryAction<TX> companyNumbersAction = actionFactory().companiesInCountryAction(tx, region.country(), context.world().getScaleFactor());
+                companyNumbers = runAction(companyNumbersAction, context.isTest(), reports);
             }
 
-            try (TX tx = session.newTransaction(tracker(), iteration(), isTracing())) {
+            try (TX tx = session.newTransaction(region.tracker(), context.iteration(), isTracing())) {
                 // A second transaction is being used to circumvent graknlabs/grakn issue #5585
                 boolean allocated = allocate(employeeEmails, companyNumbers, (employeeEmail, companyNumber) -> {
-                    double wageValue = RandomValueGenerator.of(random()).boundRandomDouble(MIN_ANNUAL_WAGE, MAX_ANNUAL_WAGE);
-                    String contractContent = RandomValueGenerator.of(random()).boundRandomLengthRandomString(MIN_CONTRACT_CHARACTER_LENGTH, MAX_CONTRACT_CHARACTER_LENGTH);
-                    double contractedHours = RandomValueGenerator.of(random()).boundRandomDouble(MIN_CONTRACTED_HOURS, MAX_CONTRACTED_HOURS);
-                    runAction((Action<?, ?>) actionFactory().insertEmploymentAction(tx, city, employeeEmail, companyNumber, employmentDate, wageValue, contractContent, contractedHours), isTest(), actionReports());
+                    double wageValue = RandomValueGenerator.of(random).boundRandomDouble(MIN_ANNUAL_WAGE, MAX_ANNUAL_WAGE);
+                    String contractContent = RandomValueGenerator.of(random).boundRandomLengthRandomString(MIN_CONTRACT_CHARACTER_LENGTH, MAX_CONTRACT_CHARACTER_LENGTH);
+                    double contractedHours = RandomValueGenerator.of(random).boundRandomDouble(MIN_CONTRACTED_HOURS, MAX_CONTRACTED_HOURS);
+                    runAction((Action<?, ?>) actionFactory().insertEmploymentAction(tx, region, employeeEmail, companyNumber, employmentDate, wageValue, contractContent, contractedHours), context.isTest(), reports);
                 });
                 if (allocated) {
                     tx.commit();

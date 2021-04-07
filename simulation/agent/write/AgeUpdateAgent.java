@@ -17,6 +17,7 @@
 
 package grakn.benchmark.simulation.agent.write;
 
+import grakn.benchmark.simulation.action.Action;
 import grakn.benchmark.simulation.action.ActionFactory;
 import grakn.benchmark.simulation.action.write.UpdateAgesOfPeopleInCityAction;
 import grakn.benchmark.simulation.agent.base.SimulationContext;
@@ -26,6 +27,7 @@ import grakn.benchmark.simulation.driver.Transaction;
 import grakn.benchmark.simulation.driver.Session;
 import grakn.benchmark.simulation.world.World;
 
+import java.util.List;
 import java.util.Random;
 
 public class AgeUpdateAgent<TX extends Transaction> extends CityAgentManager<TX> {
@@ -46,10 +48,10 @@ public class AgeUpdateAgent<TX extends Transaction> extends CityAgentManager<TX>
         }
 
         @Override
-        protected void run(Session<TX> session, World.City city) {
-            try (TX tx = session.newTransaction(tracker(), iteration(), isTracing())) {
-                UpdateAgesOfPeopleInCityAction<TX> updateAgesOfAllPeopleInCityAction = actionFactory().updateAgesOfPeopleInCityAction(tx, context.today(), city);
-                runAction(updateAgesOfAllPeopleInCityAction, isTest(), actionReports());
+        protected void run(Session<TX> session, World.City region, List<Action<?, ?>.Report> reports, Random random) {
+            try (TX tx = session.newTransaction(region.tracker(), context.iteration(), isTracing())) {
+                UpdateAgesOfPeopleInCityAction<TX> updateAgesOfAllPeopleInCityAction = actionFactory().updateAgesOfPeopleInCityAction(tx, context.today(), region);
+                runAction(updateAgesOfAllPeopleInCityAction, context.isTest(), reports);
                 tx.commit();
             }
         }

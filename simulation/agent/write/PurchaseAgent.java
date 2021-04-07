@@ -56,19 +56,19 @@ public class PurchaseAgent<TX extends Transaction> extends CountryAgent<TX> {
         }
 
         @Override
-        protected void run(Session<TX> session, World.Country country) {
+        protected void run(Session<TX> session, World.Country region, List<Action<?, ?>.Report> reports, Random random) {
             List<Long> companyNumbers;
 
-            try (TX dbOperation = session.newTransaction(tracker(), iteration(), isTracing())) {
-                CompaniesInCountryAction<TX> companiesInContinentAction = actionFactory().companiesInCountryAction(dbOperation, country, 100);
-                companyNumbers = runAction(companiesInContinentAction, isTest(), actionReports());
+            try (TX dbOperation = session.newTransaction(region.tracker(), context.iteration(), isTracing())) {
+                CompaniesInCountryAction<TX> companiesInContinentAction = actionFactory().companiesInCountryAction(dbOperation, region, 100);
+                companyNumbers = runAction(companiesInContinentAction, context.isTest(), reports);
             }
-            shuffle(companyNumbers, random());
+            shuffle(companyNumbers, random);
 
             List<Long> productBarcodes;
-            try (TX dbOperation = session.newTransaction(tracker(), iteration(), isTracing())) {
-                ProductsInContinentAction<?> productsInContinentAction = actionFactory().productsInContinentAction(dbOperation, country.continent());
-                productBarcodes = runAction(productsInContinentAction, isTest(), actionReports());
+            try (TX dbOperation = session.newTransaction(region.tracker(), context.iteration(), isTracing())) {
+                ProductsInContinentAction<?> productsInContinentAction = actionFactory().productsInContinentAction(dbOperation, region.continent());
+                productBarcodes = runAction(productsInContinentAction, context.isTest(), reports);
             }
 
             int numTransactions = context.world().getScaleFactor() * companyNumbers.size();
@@ -79,17 +79,17 @@ public class PurchaseAgent<TX extends Transaction> extends CountryAgent<TX> {
             // See if we can allocate with a Pair, which is the buyer and the product id
             List<Pair<Long, Long>> transactions = new ArrayList<>();
             for (int i = 0; i < numTransactions; i++) {
-                Long companyNumber = pickOne(companyNumbers, random());
-                Long productBarcode = pickOne(productBarcodes, random());
+                Long companyNumber = pickOne(companyNumbers, random);
+                Long productBarcode = pickOne(productBarcodes, random);
                 Pair<Long, Long> buyerAndProduct = pair(companyNumber, productBarcode);
                 transactions.add(buyerAndProduct);
             }
-            try (TX dbOperation = session.newTransaction(tracker(), iteration(), isTracing())) {
+            try (TX dbOperation = session.newTransaction(region.tracker(), context.iteration(), isTracing())) {
                 Allocation.allocate(transactions, companyNumbers, (transaction, sellerCompanyNumber) -> {
-                    double value = RandomValueGenerator.of(random()).boundRandomDouble(0.01, 10000.00);
-                    int productQuantity = RandomValueGenerator.of(random()).boundRandomInt(1, 1000);
-                    boolean isTaxable = RandomValueGenerator.of(random()).bool();
-                    runAction((Action<?, ?>) actionFactory().insertTransactionAction(dbOperation, country, transaction, sellerCompanyNumber, value, productQuantity, isTaxable), isTest(), actionReports());
+                    double value = RandomValueGenerator.of(random).boundRandomDouble(0.01, 10000.00);
+                    int productQuantity = RandomValueGenerator.of(random).boundRandomInt(1, 1000);
+                    boolean isTaxable = RandomValueGenerator.of(random).bool();
+                    runAction((Action<?, ?>) actionFactory().insertTransactionAction(dbOperation, region, transaction, sellerCompanyNumber, value, productQuantity, isTaxable), context.isTest(), reports);
                 });
                 dbOperation.commit();
             }

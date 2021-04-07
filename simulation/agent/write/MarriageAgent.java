@@ -50,34 +50,34 @@ public class MarriageAgent<TX extends Transaction> extends CityAgentManager<TX> 
         }
 
         @Override
-        protected void run(Session<TX> session, World.City city) {
+        protected void run(Session<TX> session, World.City region, List<Action<?, ?>.Report> reports, Random random) {
 
             // Find bachelors and bachelorettes who are considered adults and who are not in a marriage and pair them off randomly
             LocalDateTime dobOfAdults = context.today().minusYears(context.world().AGE_OF_ADULTHOOD);
             List<String> womenEmails;
-            try (TX dbOperation = session.newTransaction(tracker(), iteration(), isTracing())) {
-                womenEmails = runAction(actionFactory().unmarriedPeopleInCityAction(dbOperation, city, "female", dobOfAdults), isTest(), actionReports());
-                shuffle(womenEmails, random());
+            try (TX dbOperation = session.newTransaction(region.tracker(), context.iteration(), isTracing())) {
+                womenEmails = runAction(actionFactory().unmarriedPeopleInCityAction(dbOperation, region, "female", dobOfAdults), context.isTest(), reports);
+                shuffle(womenEmails, random);
             }
 
             List<String> menEmails;
-            try (TX dbOperation = session.newTransaction(tracker(), iteration(), isTracing())) {
-                menEmails = runAction(actionFactory().unmarriedPeopleInCityAction(dbOperation, city, "male", dobOfAdults), isTest(), actionReports());
-                shuffle(menEmails, random());
+            try (TX dbOperation = session.newTransaction(region.tracker(), context.iteration(), isTracing())) {
+                menEmails = runAction(actionFactory().unmarriedPeopleInCityAction(dbOperation, region, "male", dobOfAdults), context.isTest(), reports);
+                shuffle(menEmails, random);
             }
 
             int numMarriagesPossible = Math.min(context.world().getScaleFactor(), Math.min(womenEmails.size(), menEmails.size()));
-            if (iteration() >= 5) {
+            if (context.iteration() >= 5) {
                 System.out.println("asdf");
                 assert true;
             }
-            try (TX dbOperation = session.newTransaction(tracker(), iteration(), isTracing())) {
+            try (TX dbOperation = session.newTransaction(region.tracker(), context.iteration(), isTracing())) {
                 if (numMarriagesPossible > 0) {
                     for (int i = 0; i < numMarriagesPossible; i++) {
                         String wifeEmail = womenEmails.get(i);
                         String husbandEmail = menEmails.get(i);
-                        int marriageIdentifier = uniqueId(context, tracker(), i).hashCode();
-                        runAction((Action<?, ?>) actionFactory().insertMarriageAction(dbOperation, city, marriageIdentifier, wifeEmail, husbandEmail), isTest(), actionReports());
+                        int marriageIdentifier = uniqueId(context, region.tracker(), i).hashCode();
+                        runAction((Action<?, ?>) actionFactory().insertMarriageAction(dbOperation, region, marriageIdentifier, wifeEmail, husbandEmail), context.isTest(), reports);
                     }
                     dbOperation.commit();
                 }

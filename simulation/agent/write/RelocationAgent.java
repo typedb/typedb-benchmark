@@ -53,7 +53,7 @@ public class RelocationAgent<TX extends Transaction> extends CityAgentManager<TX
         }
 
         @Override
-        protected void run(Session<TX> session, World.City city) {
+        protected void run(Session<TX> session, World.City region, List<Action<?, ?>.Report> reports, Random random) {
         /*
         Find people currently resident the city
         Find other cities in the continent
@@ -66,20 +66,20 @@ public class RelocationAgent<TX extends Transaction> extends CityAgentManager<TX
             List<String> residentEmails;
             List<String> relocationCityNames;
 
-            try (TX dbOperation = session.newTransaction(tracker(), iteration(), isTracing())) {
-                ResidentsInCityAction<?> residentsInCityAction = actionFactory().residentsInCityAction(dbOperation, city, context.world().getScaleFactor(), earliestDateOfResidencyToRelocate);
-                residentEmails = runAction(residentsInCityAction, isTest(), actionReports());
+            try (TX dbOperation = session.newTransaction(region.tracker(), context.iteration(), isTracing())) {
+                ResidentsInCityAction<?> residentsInCityAction = actionFactory().residentsInCityAction(dbOperation, region, context.world().getScaleFactor(), earliestDateOfResidencyToRelocate);
+                residentEmails = runAction(residentsInCityAction, context.isTest(), reports);
             }
-            shuffle(residentEmails, random());
+            shuffle(residentEmails, random);
 
-            try (TX dbOperation = session.newTransaction(tracker(), iteration(), isTracing())) {
-                CitiesInContinentAction<?> citiesInContinentAction = actionFactory().citiesInContinentAction(dbOperation, city);
-                relocationCityNames = runAction(citiesInContinentAction, isTest(), actionReports());
+            try (TX dbOperation = session.newTransaction(region.tracker(), context.iteration(), isTracing())) {
+                CitiesInContinentAction<?> citiesInContinentAction = actionFactory().citiesInContinentAction(dbOperation, region);
+                relocationCityNames = runAction(citiesInContinentAction, context.isTest(), reports);
             }
 
-            try (TX dbOperation = session.newTransaction(tracker(), iteration(), isTracing())) {
+            try (TX dbOperation = session.newTransaction(region.tracker(), context.iteration(), isTracing())) {
                 Allocation.allocate(residentEmails, relocationCityNames, (residentEmail, relocationCityName) -> {
-                    runAction((Action<?, ?>) actionFactory().insertRelocationAction(dbOperation, city, context.today(), residentEmail, relocationCityName), isTest(), actionReports());
+                    runAction((Action<?, ?>) actionFactory().insertRelocationAction(dbOperation, region, context.today(), residentEmail, relocationCityName), context.isTest(), reports);
                 });
                 dbOperation.commit();
             }

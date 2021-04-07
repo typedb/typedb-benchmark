@@ -49,21 +49,21 @@ public class FriendshipAgent<TX extends Transaction> extends CityAgentManager<TX
         }
 
         @Override
-        protected void run(Session<TX> session, World.City city) {
+        protected void run(Session<TX> session, World.City region, List<Action<?, ?>.Report> reports, Random random) {
             List<String> residentEmails;
-            try (TX dbOperation = session.newTransaction(tracker(), iteration(), isTracing())) {
-                ResidentsInCityAction<?> residentEmailsAction = actionFactory().residentsInCityAction(dbOperation, city, context.world().getScaleFactor(), context.today());
-                residentEmails = runAction(residentEmailsAction, isTest(), actionReports());
+            try (TX dbOperation = session.newTransaction(region.tracker(), context.iteration(), isTracing())) {
+                ResidentsInCityAction<?> residentEmailsAction = actionFactory().residentsInCityAction(dbOperation, region, context.world().getScaleFactor(), context.today());
+                residentEmails = runAction(residentEmailsAction, context.isTest(), reports);
             } // TODO Closing and reopening the transaction here is a workaround for https://github.com/graknlabs/grakn/issues/5585
 
-            try (TX dbOperation = session.newTransaction(tracker(), iteration(), isTracing())) {
+            try (TX dbOperation = session.newTransaction(region.tracker(), context.iteration(), isTracing())) {
                 if (residentEmails.size() > 0) {
-                    shuffle(residentEmails, random());
+                    shuffle(residentEmails, random);
                     int numFriendships = context.world().getScaleFactor();
                     for (int i = 0; i < numFriendships; i++) {
                         // TODO can be a util
                         // TODO can be a util
-                        runAction((Action<?, ?>) actionFactory().insertFriendshipAction(dbOperation, context.today(), pickOne(residentEmails, random()), pickOne(residentEmails, random())), isTest(), actionReports());
+                        runAction((Action<?, ?>) actionFactory().insertFriendshipAction(dbOperation, context.today(), pickOne(residentEmails, random), pickOne(residentEmails, random)), context.isTest(), reports);
                     }
                     dbOperation.commit();
                 }
