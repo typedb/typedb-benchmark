@@ -17,19 +17,9 @@
 
 package grakn.benchmark.simulation.driver;
 
-import org.slf4j.Logger;
-
 public abstract class Session<TX extends Transaction> {
 
-    private final LogWrapper logWrapper;
-
-    Session(Logger logger) {
-        this.logWrapper = new LogWrapper(logger);
-    }
-
-    public LogWrapper logger() {
-        return logWrapper;
-    }
+    Session() {}
 
     public abstract TX transaction();
 

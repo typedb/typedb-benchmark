@@ -69,7 +69,7 @@ public abstract class Agent<REGION extends Region, TX extends Transaction> {
         return actionFactory;
     }
 
-    public void setTracing(boolean isTracing) {
+    public void overrideTracing(boolean isTracing) {
         this.isTracing = isTracing;
     }
 

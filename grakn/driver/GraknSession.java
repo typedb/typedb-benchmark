@@ -18,19 +18,17 @@
 package grakn.benchmark.grakn.driver;
 
 import grakn.benchmark.simulation.driver.TransactionalSession;
-import org.slf4j.Logger;
 
 public class GraknSession extends TransactionalSession<GraknTransaction> {
 
     private final grakn.client.api.GraknSession session;
 
-    public GraknSession(grakn.client.api.GraknSession session, Logger logger) {
-        super(logger);
+    public GraknSession(grakn.client.api.GraknSession session) {
         this.session = session;
     }
 
     @Override
     public GraknTransaction newTransaction(String tracker, long iteration, boolean trace) {
-        return new GraknTransaction(session, logger(), tracker, iteration, trace);
+        return new GraknTransaction(session, tracker, iteration, trace);
     }
 }

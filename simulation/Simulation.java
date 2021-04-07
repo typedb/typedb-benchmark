@@ -74,7 +74,7 @@ public abstract class Simulation<DB_DRIVER extends Client<TX>, TX extends Transa
         for (Config.Agent agentConfig : agentConfigs) {
             if (agentConfig.getAgentMode().getRun()) {
                 Agent<?, TX> agent = agentFactory.get(agentConfig.getName());
-                agent.setTracing(agentConfig.getAgentMode().getTrace());
+                agent.overrideTracing(agentConfig.getAgentMode().getTrace());
                 agents.add(agent);
             }
         }

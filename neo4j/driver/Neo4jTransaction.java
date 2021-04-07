@@ -17,12 +17,13 @@
 
 package grakn.benchmark.neo4j.driver;
 
-import grakn.benchmark.simulation.driver.LogWrapper;
 import grakn.benchmark.simulation.driver.TransactionalTransaction;
 import org.neo4j.driver.Query;
 import org.neo4j.driver.Record;
 import org.neo4j.driver.Result;
 import org.neo4j.driver.Session;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -30,13 +31,12 @@ import java.util.stream.Stream;
 
 public class Neo4jTransaction extends TransactionalTransaction {
 
+    private static final Logger LOG = LoggerFactory.getLogger(Neo4jTransaction.class);
     private final Session session;
-    private final LogWrapper log;
 
-    public Neo4jTransaction(Session session, LogWrapper log, String tracker, long iteration, boolean trace) {
+    public Neo4jTransaction(Session session, String tracker, long iteration, boolean trace) {
         super(tracker, iteration, trace);
         this.session = session;
-        this.log = log;
     }
 
     /**
@@ -52,7 +52,7 @@ public class Neo4jTransaction extends TransactionalTransaction {
     public void commit() {}
 
     public List<Record> execute(Query query) {
-        log.query(tracker, iteration, query);
+        LOG.debug("{}/{}:\n{}", iteration, tracker, query);
         return session.writeTransaction(tx -> {
             Result result = tx.run(query);
             return result.list();
@@ -60,7 +60,7 @@ public class Neo4jTransaction extends TransactionalTransaction {
     }
 
     public <T> List<T> sortedExecute(Query query, String attributeName, Integer limit) {
-        log.query(tracker, iteration, query);
+        LOG.debug("{}/{}:\n{}", iteration, tracker, query);
         Stream<T> answerStream = execute(query).stream()
                 .map(record -> (T) record.asMap().get(attributeName))
                 .sorted();

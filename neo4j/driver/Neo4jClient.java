@@ -99,6 +99,6 @@ public class Neo4jClient extends TransactionalClient<org.neo4j.driver.Session, N
 
     @Override
     public Session<Neo4jTransaction> session(Region region, Logger logger) {
-        return new Neo4jSession(session(region.name()), logger);
+        return new Neo4jSession(session(region.name()));
     }
 }

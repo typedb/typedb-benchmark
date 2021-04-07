@@ -17,14 +17,9 @@
 
 package grakn.benchmark.simulation.driver;
 
-import org.slf4j.Logger;
-
-
 public abstract class TransactionalSession<TX extends TransactionalTransaction> extends Session<TX> {
 
-    public TransactionalSession(Logger logger) {
-        super(logger);
-    }
+    public TransactionalSession() {}
 
     public TX transaction() { // Needed for now but will disappear once agents give the operations to the actions rather than the ActionFactory
         return null;
