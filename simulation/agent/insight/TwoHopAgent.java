@@ -24,12 +24,13 @@ import grakn.benchmark.simulation.driver.Client;
 import grakn.benchmark.simulation.driver.Transaction;
 
 public class TwoHopAgent<TX extends Transaction> extends WorldwideInsightAgent<TX> {
-    public TwoHopAgent(Client<TX> dbDriver, ActionFactory<TX, ?> actionFactory, SimulationContext benchmarkContext) {
-        super(dbDriver, actionFactory, benchmarkContext);
+
+    public TwoHopAgent(Client<TX> dbDriver, ActionFactory<TX, ?> actionFactory, SimulationContext context) {
+        super(dbDriver, actionFactory, context);
     }
 
     @Override
-    protected ReadAction<TX, ?> getAction(TX dbOperation) {
-        return actionFactory().twoHopAction(dbOperation);
+    protected ReadAction<TX, ?> getAction(TX tx) {
+        return actionFactory().twoHopAction(tx);
     }
 }

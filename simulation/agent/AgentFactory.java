@@ -18,7 +18,7 @@
 package grakn.benchmark.simulation.agent;
 
 import grakn.benchmark.simulation.action.ActionFactory;
-import grakn.benchmark.simulation.agent.base.AgentManager;
+import grakn.benchmark.simulation.agent.base.Agent;
 import grakn.benchmark.simulation.agent.base.SimulationContext;
 import grakn.benchmark.simulation.agent.insight.ArbitraryOneHopAgent;
 import grakn.benchmark.simulation.agent.insight.FindCurrentResidentsAgent;
@@ -135,7 +135,7 @@ public class AgentFactory<TX extends Transaction, ACTION_FACTORY extends ActionF
         return new FindSpecificPersonAgent<>(dbDriver, actionFactory, benchmarkContext);
     }
 
-    public AgentManager<?, TX> get(String agentName) {
+    public Agent<?, TX> get(String agentName) {
         switch (agentName) {
             case "marriage":
                 return marriage();

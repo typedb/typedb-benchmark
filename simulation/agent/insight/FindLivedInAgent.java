@@ -24,12 +24,13 @@ import grakn.benchmark.simulation.driver.Client;
 import grakn.benchmark.simulation.driver.Transaction;
 
 public class FindLivedInAgent<TX extends Transaction> extends WorldwideInsightAgent<TX> {
-    public FindLivedInAgent(Client<TX> dbDriver, ActionFactory<TX, ?> actionFactory, SimulationContext benchmarkContext) {
-        super(dbDriver, actionFactory, benchmarkContext);
+
+    public FindLivedInAgent(Client<TX> dbDriver, ActionFactory<TX, ?> actionFactory, SimulationContext context) {
+        super(dbDriver, actionFactory, context);
     }
 
     @Override
-    protected ReadAction<TX, ?> getAction(TX dbOperation) {
-        return actionFactory().findlivedInAction(dbOperation);
+    protected ReadAction<TX, ?> getAction(TX tx) {
+        return actionFactory().findlivedInAction(tx);
     }
 }

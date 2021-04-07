@@ -18,32 +18,24 @@
 package grakn.benchmark.simulation.agent.region;
 
 import grakn.benchmark.simulation.action.ActionFactory;
-import grakn.benchmark.simulation.agent.base.AgentManager;
+import grakn.benchmark.simulation.agent.base.Agent;
 import grakn.benchmark.simulation.agent.base.SimulationContext;
 import grakn.benchmark.simulation.driver.Client;
 import grakn.benchmark.simulation.driver.Transaction;
 import grakn.benchmark.simulation.world.World;
 
 import java.util.List;
-import java.util.Random;
 
 import static java.util.stream.Collectors.toList;
 
-public abstract class CityAgentManager<TX extends Transaction> extends AgentManager<World.City, TX> {
+public abstract class CityAgent<TX extends Transaction> extends Agent<World.City, TX> {
 
-    public CityAgentManager(Client<TX> dbDriver, ActionFactory<TX, ?> actionFactory, SimulationContext benchmarkContext) {
-        super(dbDriver, actionFactory, benchmarkContext);
+    public CityAgent(Client<TX> dbDriver, ActionFactory<TX, ?> actionFactory, SimulationContext context) {
+        super(dbDriver, actionFactory, context);
     }
 
     @Override
     protected List<World.City> getRegions(World world) {
         return world.getCities().collect(toList());
-    }
-
-    protected abstract class CityAgent extends Agent {
-
-        public CityAgent(World.City region, Random random, SimulationContext context) {
-            super();
-        }
     }
 }

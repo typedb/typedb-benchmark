@@ -50,16 +50,15 @@ import static grakn.common.util.Objects.className;
  * @param <REGION> The type of region used by the agent.
  * @param <TX>     The abstraction of database operations used by the agent.
  */
-public abstract class AgentManager<REGION extends Region, TX extends Transaction> {
+public abstract class Agent<REGION extends Region, TX extends Transaction> {
 
     protected final SimulationContext context;
     private final Logger logger;
     private final Client<TX> client;
     private final ActionFactory<TX, ?> actionFactory;
-    private final ConcurrentMap<String, List<Action<?, ?>.Report>> reports = new ConcurrentHashMap<>();
     private boolean isTracing = true;
 
-    protected AgentManager(Client<TX> client, ActionFactory<TX, ?> actionFactory, SimulationContext context) {
+    protected Agent(Client<TX> client, ActionFactory<TX, ?> actionFactory, SimulationContext context) {
         this.client = client;
         this.actionFactory = actionFactory;
         this.context = context;
@@ -78,41 +77,32 @@ public abstract class AgentManager<REGION extends Region, TX extends Transaction
         return context.trace() && isTracing;
     }
 
-    abstract protected List<REGION> getRegions(World world);
-
-    public Map<String, List<Action<?, ?>.Report>> iterate(RandomSource randomSource) {
+    public Map<String, List<Action<?, ?>.Report>> iterate(RandomSource randomSrc) {
+        ConcurrentMap<String, List<Action<?, ?>.Report>> reports = new ConcurrentHashMap<>();
         List<REGION> regions = getRegions(context.world());
-        regions.parallelStream().forEach(region -> execute(region, randomSource.next()));
+        regions.parallelStream().forEach(region -> runAgent(region, reports, randomSrc.next().get()));
         return reports;
     }
 
-    protected abstract Agent getAgent(REGION region, Random random, SimulationContext context);
+    abstract protected List<REGION> getRegions(World world);
 
-    private void execute(REGION region, RandomSource source) {
+    protected abstract void run(Session<TX> session, REGION region, List<Action<?, ?>.Report> reports, Random random);
+
+    private void runAgent(REGION region, ConcurrentMap<String, List<Action<?, ?>.Report>> reports, Random random) {
         GrablTracingThreadStatic.ThreadContext tracingCtx = null;
         try {
             if (isTracing()) tracingCtx = contextOnThread(region.tracker(), context.iteration());
 
-            Random random = source.next().get();
-            Agent agent = getAgent(region, random, context);
             Session<TX> session = client.session(region, logger);
-            List<Action<?, ?>.Report> result = new ArrayList<>();
+            List<Action<?, ?>.Report> actionReports = new ArrayList<>();
             trace(() -> {
-                agent.run(session, region, result, random);
+                run(session, region, actionReports, random);
                 return null;
             }, className(getClass()), isTracing());
-            reports.put(region.tracker(), result);
+            if (context.isTest()) reports.put(region.tracker(), actionReports);
         } finally {
             if (tracingCtx != null) tracingCtx.close();
         }
-    }
-
-    public <U> U pickOne(List<U> list, Random random) {
-        return list.get(random.nextInt(list.size()));
-    }
-
-    public String uniqueId(SimulationContext benchmarkContext, String tracker, int iterationScopeId) {
-        return benchmarkContext.iteration() + "/" + tracker + "/" + iterationScopeId;
     }
 
     public <ACTION_RETURN_TYPE> ACTION_RETURN_TYPE runAction(Action<?, ACTION_RETURN_TYPE> action, boolean isTest,
@@ -123,8 +113,11 @@ public abstract class AgentManager<REGION extends Region, TX extends Transaction
         return actionAnswer;
     }
 
-    public abstract class Agent {
+    public <U> U pickOne(List<U> list, Random random) {
+        return list.get(random.nextInt(list.size()));
+    }
 
-        protected abstract void run(Session<TX> session, REGION region, List<Action<?, ?>.Report> reports, Random random);
+    public String uniqueId(SimulationContext benchmarkContext, String tracker, int iterationScopeId) {
+        return benchmarkContext.iteration() + "/" + tracker + "/" + iterationScopeId;
     }
 }

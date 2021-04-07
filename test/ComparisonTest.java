@@ -17,7 +17,7 @@
 
 package grakn.benchmark.test;
 
-import grakn.benchmark.simulation.agent.base.AgentManager;
+import grakn.benchmark.simulation.agent.base.Agent;
 import grakn.benchmark.simulation.agent.write.CompanyAgent;
 import grakn.benchmark.simulation.agent.write.PersonBirthAgent;
 import grakn.benchmark.simulation.agent.write.ProductAgent;
@@ -33,7 +33,7 @@ import static org.junit.Assert.assertEquals;
 public class ComparisonTest {
 
     // TODO: raw usage of class
-    private void compareReports(Class<? extends AgentManager> agentClass) {
+    private void compareReports(Class<? extends Agent> agentClass) {
         assertEquals(graknCore.getReport(agentClass), neo4j.getReport(agentClass));
     }
 

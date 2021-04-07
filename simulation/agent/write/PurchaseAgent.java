@@ -26,8 +26,8 @@ import grakn.benchmark.simulation.agent.base.RandomValueGenerator;
 import grakn.benchmark.simulation.agent.base.SimulationContext;
 import grakn.benchmark.simulation.agent.region.CountryAgent;
 import grakn.benchmark.simulation.driver.Client;
-import grakn.benchmark.simulation.driver.Transaction;
 import grakn.benchmark.simulation.driver.Session;
+import grakn.benchmark.simulation.driver.Transaction;
 import grakn.benchmark.simulation.world.World;
 import grakn.common.collection.Pair;
 
@@ -40,59 +40,47 @@ import static java.util.Collections.shuffle;
 
 public class PurchaseAgent<TX extends Transaction> extends CountryAgent<TX> {
 
-    public PurchaseAgent(Client<TX> dbDriver, ActionFactory<TX, ?> actionFactory, SimulationContext benchmarkContext) {
-        super(dbDriver, actionFactory, benchmarkContext);
+    public PurchaseAgent(Client<TX> dbDriver, ActionFactory<TX, ?> actionFactory, SimulationContext context) {
+        super(dbDriver, actionFactory, context);
     }
 
     @Override
-    protected Agent getAgent(World.Country region, Random random, SimulationContext context) {
-        return new Country(region, random, context);
-    }
+    protected void run(Session<TX> session, World.Country region, List<Action<?, ?>.Report> reports, Random random) {
+        List<Long> companyNumbers;
 
-    public class Country extends CountryRegion {
+        try (TX dbOperation = session.newTransaction(region.tracker(), context.iteration(), isTracing())) {
+            CompaniesInCountryAction<TX> companiesInContinentAction = actionFactory().companiesInCountryAction(dbOperation, region, 100);
+            companyNumbers = runAction(companiesInContinentAction, context.isTest(), reports);
+        }
+        shuffle(companyNumbers, random);
 
-        public Country(World.Country region, Random random, SimulationContext context) {
-            super(region, random, context);
+        List<Long> productBarcodes;
+        try (TX dbOperation = session.newTransaction(region.tracker(), context.iteration(), isTracing())) {
+            ProductsInContinentAction<?> productsInContinentAction = actionFactory().productsInContinentAction(dbOperation, region.continent());
+            productBarcodes = runAction(productsInContinentAction, context.isTest(), reports);
         }
 
-        @Override
-        protected void run(Session<TX> session, World.Country region, List<Action<?, ?>.Report> reports, Random random) {
-            List<Long> companyNumbers;
+        int numTransactions = context.world().getScaleFactor() * companyNumbers.size();
+        // Company numbers is the list of sellers
+        // Company numbers picked randomly is the list of buyers
+        // Products randomly picked
 
-            try (TX dbOperation = session.newTransaction(region.tracker(), context.iteration(), isTracing())) {
-                CompaniesInCountryAction<TX> companiesInContinentAction = actionFactory().companiesInCountryAction(dbOperation, region, 100);
-                companyNumbers = runAction(companiesInContinentAction, context.isTest(), reports);
-            }
-            shuffle(companyNumbers, random);
-
-            List<Long> productBarcodes;
-            try (TX dbOperation = session.newTransaction(region.tracker(), context.iteration(), isTracing())) {
-                ProductsInContinentAction<?> productsInContinentAction = actionFactory().productsInContinentAction(dbOperation, region.continent());
-                productBarcodes = runAction(productsInContinentAction, context.isTest(), reports);
-            }
-
-            int numTransactions = context.world().getScaleFactor() * companyNumbers.size();
-            // Company numbers is the list of sellers
-            // Company numbers picked randomly is the list of buyers
-            // Products randomly picked
-
-            // See if we can allocate with a Pair, which is the buyer and the product id
-            List<Pair<Long, Long>> transactions = new ArrayList<>();
-            for (int i = 0; i < numTransactions; i++) {
-                Long companyNumber = pickOne(companyNumbers, random);
-                Long productBarcode = pickOne(productBarcodes, random);
-                Pair<Long, Long> buyerAndProduct = pair(companyNumber, productBarcode);
-                transactions.add(buyerAndProduct);
-            }
-            try (TX dbOperation = session.newTransaction(region.tracker(), context.iteration(), isTracing())) {
-                Allocation.allocate(transactions, companyNumbers, (transaction, sellerCompanyNumber) -> {
-                    double value = RandomValueGenerator.of(random).boundRandomDouble(0.01, 10000.00);
-                    int productQuantity = RandomValueGenerator.of(random).boundRandomInt(1, 1000);
-                    boolean isTaxable = RandomValueGenerator.of(random).bool();
-                    runAction((Action<?, ?>) actionFactory().insertTransactionAction(dbOperation, region, transaction, sellerCompanyNumber, value, productQuantity, isTaxable), context.isTest(), reports);
-                });
-                dbOperation.commit();
-            }
+        // See if we can allocate with a Pair, which is the buyer and the product id
+        List<Pair<Long, Long>> transactions = new ArrayList<>();
+        for (int i = 0; i < numTransactions; i++) {
+            Long companyNumber = pickOne(companyNumbers, random);
+            Long productBarcode = pickOne(productBarcodes, random);
+            Pair<Long, Long> buyerAndProduct = pair(companyNumber, productBarcode);
+            transactions.add(buyerAndProduct);
+        }
+        try (TX dbOperation = session.newTransaction(region.tracker(), context.iteration(), isTracing())) {
+            Allocation.allocate(transactions, companyNumbers, (transaction, sellerCompanyNumber) -> {
+                double value = RandomValueGenerator.of(random).boundRandomDouble(0.01, 10000.00);
+                int productQuantity = RandomValueGenerator.of(random).boundRandomInt(1, 1000);
+                boolean isTaxable = RandomValueGenerator.of(random).bool();
+                runAction((Action<?, ?>) actionFactory().insertTransactionAction(dbOperation, region, transaction, sellerCompanyNumber, value, productQuantity, isTaxable), context.isTest(), reports);
+            });
+            dbOperation.commit();
         }
     }
 }

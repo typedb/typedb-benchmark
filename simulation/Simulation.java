@@ -21,7 +21,7 @@ import grakn.benchmark.config.Config;
 import grakn.benchmark.simulation.action.Action;
 import grakn.benchmark.simulation.action.ActionFactory;
 import grakn.benchmark.simulation.agent.AgentFactory;
-import grakn.benchmark.simulation.agent.base.AgentManager;
+import grakn.benchmark.simulation.agent.base.Agent;
 import grakn.benchmark.simulation.agent.base.SimulationContext;
 import grakn.benchmark.simulation.driver.Client;
 import grakn.benchmark.simulation.driver.Transaction;
@@ -43,13 +43,13 @@ import java.util.function.Function;
 public abstract class Simulation<DB_DRIVER extends Client<TX>, TX extends Transaction> implements SimulationContext {
 
     final static Logger LOG = LoggerFactory.getLogger(Simulation.class);
-    private final List<AgentManager<?, TX>> agentMgrs;
+    private final List<Agent<?, TX>> agentMgrs;
     protected final DB_DRIVER driver;
     private final RandomSource randomSource;
     private final List<Config.Agent> agentConfigs;
     private final Function<Integer, Boolean> iterationSamplingFunction;
     private final World world;
-    private final Map<Class<? extends AgentManager>, Map<String, List<Action<?, ?>.Report>>> agentReports;
+    private final Map<Class<? extends Agent>, Map<String, List<Action<?, ?>.Report>>> agentReports;
     private final boolean test;
     private int iteration = 1;
 
@@ -66,14 +66,14 @@ public abstract class Simulation<DB_DRIVER extends Client<TX>, TX extends Transa
         this.agentMgrs = agentListFromConfigs();
     }
 
-    protected List<AgentManager<?, TX>> agentListFromConfigs() {
-        List<AgentManager<?, TX>> agents = new ArrayList<>();
+    protected List<Agent<?, TX>> agentListFromConfigs() {
+        List<Agent<?, TX>> agents = new ArrayList<>();
         ActionFactory<TX, ?> actionFactory = actionFactory();
         AgentFactory<TX, ?> agentFactory = new AgentFactory<>(driver, actionFactory, this);
 
         for (Config.Agent agentConfig : agentConfigs) {
             if (agentConfig.getAgentMode().getRun()) {
-                AgentManager<?, TX> agent = agentFactory.get(agentConfig.getName());
+                Agent<?, TX> agent = agentFactory.get(agentConfig.getName());
                 agent.setTracing(agentConfig.getAgentMode().getTrace());
                 agents.add(agent);
             }
@@ -87,7 +87,7 @@ public abstract class Simulation<DB_DRIVER extends Client<TX>, TX extends Transa
 
     public void iterate() {
         agentReports.clear();
-        for (AgentManager<?, ?> agentMgr : agentMgrs) {
+        for (Agent<?, ?> agentMgr : agentMgrs) {
             agentReports.put(agentMgr.getClass(), agentMgr.iterate(randomSource.next()));
         }
         closeIteration();  // We want to test opening new sessions each iteration.
@@ -121,7 +121,7 @@ public abstract class Simulation<DB_DRIVER extends Client<TX>, TX extends Transa
         return test;
     }
 
-    public Map<String, List<Action<?, ?>.Report>> getReport(Class<? extends AgentManager> agentName) {
+    public Map<String, List<Action<?, ?>.Report>> getReport(Class<? extends Agent> agentName) {
         return agentReports.get(agentName);
     }
 

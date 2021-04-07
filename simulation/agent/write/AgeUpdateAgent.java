@@ -21,39 +21,27 @@ import grakn.benchmark.simulation.action.Action;
 import grakn.benchmark.simulation.action.ActionFactory;
 import grakn.benchmark.simulation.action.write.UpdateAgesOfPeopleInCityAction;
 import grakn.benchmark.simulation.agent.base.SimulationContext;
-import grakn.benchmark.simulation.agent.region.CityAgentManager;
+import grakn.benchmark.simulation.agent.region.CityAgent;
 import grakn.benchmark.simulation.driver.Client;
-import grakn.benchmark.simulation.driver.Transaction;
 import grakn.benchmark.simulation.driver.Session;
+import grakn.benchmark.simulation.driver.Transaction;
 import grakn.benchmark.simulation.world.World;
 
 import java.util.List;
 import java.util.Random;
 
-public class AgeUpdateAgent<TX extends Transaction> extends CityAgentManager<TX> {
+public class AgeUpdateAgent<TX extends Transaction> extends CityAgent<TX> {
 
-    public AgeUpdateAgent(Client<TX> dbDriver, ActionFactory<TX, ?> actionFactory, SimulationContext benchmarkContext) {
-        super(dbDriver, actionFactory, benchmarkContext);
+    public AgeUpdateAgent(Client<TX> dbDriver, ActionFactory<TX, ?> actionFactory, SimulationContext context) {
+        super(dbDriver, actionFactory, context);
     }
 
     @Override
-    protected Agent getAgent(World.City region, Random random, SimulationContext context) {
-        return new City(region, random, context);
-    }
-
-    public class City extends CityAgent {
-
-        public City(World.City region, Random random, SimulationContext context) {
-            super(region, random, context);
-        }
-
-        @Override
-        protected void run(Session<TX> session, World.City region, List<Action<?, ?>.Report> reports, Random random) {
-            try (TX tx = session.newTransaction(region.tracker(), context.iteration(), isTracing())) {
-                UpdateAgesOfPeopleInCityAction<TX> updateAgesOfAllPeopleInCityAction = actionFactory().updateAgesOfPeopleInCityAction(tx, context.today(), region);
-                runAction(updateAgesOfAllPeopleInCityAction, context.isTest(), reports);
-                tx.commit();
-            }
+    protected void run(Session<TX> session, World.City region, List<Action<?, ?>.Report> reports, Random random) {
+        try (TX tx = session.newTransaction(region.tracker(), context.iteration(), isTracing())) {
+            UpdateAgesOfPeopleInCityAction<TX> updateAgesOfAllPeopleInCityAction = actionFactory().updateAgesOfPeopleInCityAction(tx, context.today(), region);
+            runAction(updateAgesOfAllPeopleInCityAction, context.isTest(), reports);
+            tx.commit();
         }
     }
 }

@@ -22,8 +22,8 @@ import grakn.benchmark.simulation.action.ActionFactory;
 import grakn.benchmark.simulation.agent.base.SimulationContext;
 import grakn.benchmark.simulation.agent.region.CountryAgent;
 import grakn.benchmark.simulation.driver.Client;
-import grakn.benchmark.simulation.driver.Transaction;
 import grakn.benchmark.simulation.driver.Session;
+import grakn.benchmark.simulation.driver.Transaction;
 import grakn.benchmark.simulation.world.World;
 import org.apache.commons.lang3.StringUtils;
 
@@ -32,38 +32,27 @@ import java.util.Random;
 
 public class CompanyAgent<TX extends Transaction> extends CountryAgent<TX> {
 
-    public CompanyAgent(Client<TX> dbDriver, ActionFactory<TX, ?> actionFactory, SimulationContext benchmarkContext) {
-        super(dbDriver, actionFactory, benchmarkContext);
+    public CompanyAgent(Client<TX> dbDriver, ActionFactory<TX, ?> actionFactory, SimulationContext context) {
+        super(dbDriver, actionFactory, context);
     }
 
     @Override
-    protected Agent getAgent(World.Country region, Random random, SimulationContext context) {
-        return new Country(region, random, context);
-    }
+    protected void run(Session<TX> session, World.Country region, List<Action<?, ?>.Report> reports, Random random) {
+        int numCompanies = context.world().getScaleFactor();
 
-    public class Country extends CountryRegion {
-        public Country(World.Country region, Random random, SimulationContext context) {
-            super(region, random, context);
-        }
+        try (TX dbOperation = session.newTransaction(region.tracker(), context.iteration(), isTracing())) {
 
-        @Override
-        protected void run(Session<TX> session, World.Country region, List<Action<?, ?>.Report> reports, Random random) {
-            int numCompanies = context.world().getScaleFactor();
+            for (int i = 0; i < numCompanies; i++) {
+                // TODO can be a util
+                String adjective = pickOne(context.world().getAdjectives(), random);
+                // TODO can be a util
+                String noun = pickOne(context.world().getNouns(), random);
 
-            try (TX dbOperation = session.newTransaction(region.tracker(), context.iteration(), isTracing())) {
-
-                for (int i = 0; i < numCompanies; i++) {
-                    // TODO can be a util
-                    String adjective = pickOne(context.world().getAdjectives(), random);
-                    // TODO can be a util
-                    String noun = pickOne(context.world().getNouns(), random);
-
-                    int companyNumber = uniqueId(context, region.tracker(), i).hashCode();
-                    String companyName = StringUtils.capitalize(adjective) + StringUtils.capitalize(noun) + "-" + companyNumber;
-                    runAction((Action<?, ?>) actionFactory().insertCompanyAction(dbOperation, region, context.today(), companyNumber, companyName), context.isTest(), reports);
-                }
-                dbOperation.commit();
+                int companyNumber = uniqueId(context, region.tracker(), i).hashCode();
+                String companyName = StringUtils.capitalize(adjective) + StringUtils.capitalize(noun) + "-" + companyNumber;
+                runAction((Action<?, ?>) actionFactory().insertCompanyAction(dbOperation, region, context.today(), companyNumber, companyName), context.isTest(), reports);
             }
+            dbOperation.commit();
         }
     }
 }

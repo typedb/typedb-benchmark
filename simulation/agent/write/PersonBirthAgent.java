@@ -20,55 +20,43 @@ package grakn.benchmark.simulation.agent.write;
 import grakn.benchmark.simulation.action.Action;
 import grakn.benchmark.simulation.action.ActionFactory;
 import grakn.benchmark.simulation.agent.base.SimulationContext;
-import grakn.benchmark.simulation.agent.region.CityAgentManager;
+import grakn.benchmark.simulation.agent.region.CityAgent;
 import grakn.benchmark.simulation.driver.Client;
-import grakn.benchmark.simulation.driver.Transaction;
 import grakn.benchmark.simulation.driver.Session;
+import grakn.benchmark.simulation.driver.Transaction;
 import grakn.benchmark.simulation.world.World;
 
 import java.util.List;
 import java.util.Random;
 
-public class PersonBirthAgent<TX extends Transaction> extends CityAgentManager<TX> {
+public class PersonBirthAgent<TX extends Transaction> extends CityAgent<TX> {
 
-    public PersonBirthAgent(Client<TX> dbDriver, ActionFactory<TX, ?> actionFactory, SimulationContext benchmarkContext) {
-        super(dbDriver, actionFactory, benchmarkContext);
+    public PersonBirthAgent(Client<TX> dbDriver, ActionFactory<TX, ?> actionFactory, SimulationContext context) {
+        super(dbDriver, actionFactory, context);
     }
 
     @Override
-    protected Agent getAgent(World.City region, Random random, SimulationContext context) {
-        return new City(region, random, context);
-    }
+    protected void run(Session<TX> session, World.City region, List<Action<?, ?>.Report> reports, Random random) {
+        // Find bachelors and bachelorettes who are considered adults and who are not in a marriage and pair them off randomly
+        int numBirths = context.world().getScaleFactor();
+        try (TX dbOperation = session.newTransaction(region.tracker(), context.iteration(), isTracing())) {
+            for (int i = 0; i < numBirths; i++) {
+                String gender;
+                String forename;
+                String surname = pickOne(context.world().getSurnames(), random);
 
-    public class City extends CityAgent {
-
-        public City(World.City region, Random random, SimulationContext context) {
-            super(region, random, context);
-        }
-
-        @Override
-        protected void run(Session<TX> session, World.City region, List<Action<?, ?>.Report> reports, Random random) {
-            // Find bachelors and bachelorettes who are considered adults and who are not in a marriage and pair them off randomly
-            int numBirths = context.world().getScaleFactor();
-            try (TX dbOperation = session.newTransaction(region.tracker(), context.iteration(), isTracing())) {
-                for (int i = 0; i < numBirths; i++) {
-                    String gender;
-                    String forename;
-                    String surname = pickOne(context.world().getSurnames(), random);
-
-                    boolean genderBool = random.nextBoolean();
-                    if (genderBool) {
-                        gender = "male";
-                        forename = pickOne(context.world().getMaleForenames(), random);
-                    } else {
-                        gender = "female";
-                        forename = pickOne(context.world().getFemaleForenames(), random);
-                    }
-                    String email = "email/" + uniqueId(context, region.tracker(), i);
-                    runAction((Action<?, ?>) actionFactory().insertPersonAction(dbOperation, region, context.today(), email, gender, forename, surname), context.isTest(), reports);
+                boolean genderBool = random.nextBoolean();
+                if (genderBool) {
+                    gender = "male";
+                    forename = pickOne(context.world().getMaleForenames(), random);
+                } else {
+                    gender = "female";
+                    forename = pickOne(context.world().getFemaleForenames(), random);
                 }
-                dbOperation.commit();
+                String email = "email/" + uniqueId(context, region.tracker(), i);
+                runAction((Action<?, ?>) actionFactory().insertPersonAction(dbOperation, region, context.today(), email, gender, forename, surname), context.isTest(), reports);
             }
+            dbOperation.commit();
         }
     }
 }

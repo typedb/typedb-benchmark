@@ -23,8 +23,8 @@ import grakn.benchmark.simulation.agent.base.RandomValueGenerator;
 import grakn.benchmark.simulation.agent.base.SimulationContext;
 import grakn.benchmark.simulation.agent.region.ContinentAgent;
 import grakn.benchmark.simulation.driver.Client;
-import grakn.benchmark.simulation.driver.Transaction;
 import grakn.benchmark.simulation.driver.Session;
+import grakn.benchmark.simulation.driver.Transaction;
 import grakn.benchmark.simulation.world.World;
 
 import java.util.List;
@@ -32,33 +32,21 @@ import java.util.Random;
 
 public class ProductAgent<TX extends Transaction> extends ContinentAgent<TX> {
 
-    public ProductAgent(Client<TX> dbDriver, ActionFactory<TX, ?> actionFactory, SimulationContext benchmarkContext) {
-        super(dbDriver, actionFactory, benchmarkContext);
+    public ProductAgent(Client<TX> dbDriver, ActionFactory<TX, ?> actionFactory, SimulationContext context) {
+        super(dbDriver, actionFactory, context);
     }
 
     @Override
-    protected Agent getAgent(World.Continent region, Random random, SimulationContext context) {
-        return new RegionalProductAgent(region, random, context);
-    }
-
-    public class RegionalProductAgent extends ContinentRegion {
-
-        public RegionalProductAgent(World.Continent region, Random random, SimulationContext context) {
-            super(region, random, context);
-        }
-
-        @Override
-        protected void run(Session<TX> session, World.Continent region, List<Action<?, ?>.Report> reports, Random random) {
-            int numProducts = context.world().getScaleFactor();
-            try (TX dbOperation = session.newTransaction(region.tracker(), context.iteration(), isTracing())) {
-                for (int i = 0; i < numProducts; i++) {
-                    String productName = RandomValueGenerator.of(random).boundRandomLengthRandomString(5, 20);
-                    String productDescription = RandomValueGenerator.of(random).boundRandomLengthRandomString(75, 100);
-                    long barcode = uniqueId(context, region.tracker(), i).hashCode();
-                    runAction((Action<?, ?>) actionFactory().insertProductAction(dbOperation, region, barcode, productName, productDescription), context.isTest(), reports);
-                }
-                dbOperation.commit();
+    protected void run(Session<TX> session, World.Continent region, List<Action<?, ?>.Report> reports, Random random) {
+        int numProducts = context.world().getScaleFactor();
+        try (TX dbOperation = session.newTransaction(region.tracker(), context.iteration(), isTracing())) {
+            for (int i = 0; i < numProducts; i++) {
+                String productName = RandomValueGenerator.of(random).boundRandomLengthRandomString(5, 20);
+                String productDescription = RandomValueGenerator.of(random).boundRandomLengthRandomString(75, 100);
+                long barcode = uniqueId(context, region.tracker(), i).hashCode();
+                runAction((Action<?, ?>) actionFactory().insertProductAction(dbOperation, region, barcode, productName, productDescription), context.isTest(), reports);
             }
+            dbOperation.commit();
         }
     }
 }

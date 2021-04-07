@@ -24,12 +24,13 @@ import grakn.benchmark.simulation.driver.Client;
 import grakn.benchmark.simulation.driver.Transaction;
 
 public class MeanWageAgent<TX extends Transaction> extends WorldwideInsightAgent<TX> {
-    public MeanWageAgent(Client<TX> dbDriver, ActionFactory<TX, ?> actionFactory, SimulationContext benchmarkContext) {
-        super(dbDriver, actionFactory, benchmarkContext);
+
+    public MeanWageAgent(Client<TX> dbDriver, ActionFactory<TX, ?> actionFactory, SimulationContext context) {
+        super(dbDriver, actionFactory, context);
     }
 
     @Override
-    protected ReadAction<TX, ?> getAction(TX dbOperation) {
-        return actionFactory().meanWageOfPeopleInWorldAction(dbOperation);
+    protected ReadAction<TX, ?> getAction(TX tx) {
+        return actionFactory().meanWageOfPeopleInWorldAction(tx);
     }
 }

@@ -36,29 +36,18 @@ import java.util.Random;
  * @param <TX>
  */
 public abstract class WorldwideInsightAgent<TX extends Transaction> extends WorldAgent<TX> {
-    public WorldwideInsightAgent(Client<TX> dbDriver, ActionFactory<TX, ?> actionFactory, SimulationContext benchmarkContext) {
-        super(dbDriver, actionFactory, benchmarkContext);
+
+    public WorldwideInsightAgent(Client<TX> client, ActionFactory<TX, ?> actionFactory, SimulationContext context) {
+        super(client, actionFactory, context);
     }
+
+    protected abstract ReadAction<TX, ?> getAction(TX tx);
 
     @Override
-    protected Agent getAgent(World region, Random random, SimulationContext context) {
-        return new WorldWideWorker(region, random, context);
-    }
-
-    protected abstract ReadAction<TX, ?> getAction(TX dbOperation);
-
-    public class WorldWideWorker extends WorldRegion {
-
-        public WorldWideWorker(World region, Random random, SimulationContext context) {
-            super(region, random, context);
-        }
-
-        @Override
-        protected void run(Session<TX> session, World region, List<Action<?, ?>.Report> reports, Random random) {
-            for (int i = 0; i <= context.world().getScaleFactor(); i++) {
-                try (TX dbOperation = session.newTransaction(region.tracker(), context.iteration(), isTracing())) {
-                    runAction((Action<?, ?>) getAction(dbOperation), context.isTest(), reports);
-                }
+    protected void run(Session<TX> session, World region, List<Action<?, ?>.Report> reports, Random random) {
+        for (int i = 0; i <= context.world().getScaleFactor(); i++) {
+            try (TX dbOperation = session.newTransaction(region.tracker(), context.iteration(), isTracing())) {
+                runAction((Action<?, ?>) getAction(dbOperation), context.isTest(), reports);
             }
         }
     }
