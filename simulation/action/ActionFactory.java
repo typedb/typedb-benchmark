@@ -45,7 +45,7 @@ import grakn.benchmark.simulation.action.write.InsertRelocationAction;
 import grakn.benchmark.simulation.action.write.InsertTransactionAction;
 import grakn.benchmark.simulation.action.write.UpdateAgesOfPeopleInCityAction;
 import grakn.benchmark.simulation.driver.Transaction;
-import grakn.benchmark.simulation.world.World;
+import grakn.benchmark.simulation.common.World;
 import grakn.common.collection.Pair;
 
 import java.time.LocalDateTime;

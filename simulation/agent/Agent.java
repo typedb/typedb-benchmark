@@ -24,9 +24,9 @@ import grakn.benchmark.simulation.agent.base.SimulationContext;
 import grakn.benchmark.simulation.driver.Client;
 import grakn.benchmark.simulation.driver.Session;
 import grakn.benchmark.simulation.driver.Transaction;
-import grakn.benchmark.simulation.utils.RandomSource;
-import grakn.benchmark.simulation.world.Region;
-import grakn.benchmark.simulation.world.World;
+import grakn.benchmark.simulation.common.RandomSource;
+import grakn.benchmark.simulation.common.Region;
+import grakn.benchmark.simulation.common.World;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,9 +35,10 @@ import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.function.Supplier;
 
 import static grabl.tracing.client.GrablTracingThreadStatic.contextOnThread;
-import static grakn.benchmark.simulation.utils.Trace.trace;
+import static grabl.tracing.client.GrablTracingThreadStatic.traceOnThread;
 import static grakn.common.util.Objects.className;
 
 /**
@@ -85,25 +86,25 @@ public abstract class Agent<REGION extends Region, TX extends Transaction> {
         ConcurrentMap<String, List<Action<?, ?>.Report>> reports = new ConcurrentHashMap<>();
         List<REGION> regions = getRegions(context.world());
         regions.parallelStream().forEach(region -> {
-            List<Action<?, ?>.Report> report = runWithTracing(region, randomSrc.next().get());
+            List<Action<?, ?>.Report> report = runWithMayTrace(region, randomSrc.next().get());
             if (context.isTest()) reports.put(region.tracker(), report);
         });
         return reports;
     }
 
-    private List<Action<?, ?>.Report> runWithTracing(REGION region, Random random) {
+    private List<Action<?, ?>.Report> runWithMayTrace(REGION region, Random random) {
         GrablTracingThreadStatic.ThreadContext tracingCtx = null;
         try {
             if (isTracing()) tracingCtx = contextOnThread(region.tracker(), context.iteration());
             Session<TX> session = client.session(region.sessionName());
-            return trace(() -> run(session, region, random), className(getClass()), isTracing());
+            return mayTrace(() -> run(session, region, random), className(getClass()));
         } finally {
             if (tracingCtx != null) tracingCtx.close();
         }
     }
 
     public <T> T runAction(Action<?, T> action, List<Action<?, ?>.Report> reports) {
-        T actionAnswer = trace(action::run, action.name(), isTracing());
+        T actionAnswer = mayTrace(action::run, action.name());
         if (context.isTest()) reports.add(action.report(actionAnswer));
         return actionAnswer;
     }
@@ -114,5 +115,15 @@ public abstract class Agent<REGION extends Region, TX extends Transaction> {
 
     public String uniqueId(SimulationContext benchmarkContext, String tracker, int iterationScopeId) {
         return benchmarkContext.iteration() + "/" + tracker + "/" + iterationScopeId;
+    }
+
+    public <T> T mayTrace(Supplier<T> methodToTrace, String trace) {
+        if (isTracing()) {
+            try (GrablTracingThreadStatic.ThreadTrace ignored = traceOnThread(trace)) {
+                return methodToTrace.get();
+            }
+        } else {
+            return methodToTrace.get();
+        }
     }
 }

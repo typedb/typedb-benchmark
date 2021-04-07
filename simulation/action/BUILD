@@ -19,17 +19,11 @@ load("@graknlabs_dependencies//tool/checkstyle:rules.bzl", "checkstyle_test")
 
 java_library(
     name = "action",
-    srcs = glob([
-        "*.java",
-        "read/*.java",
-        "write/*.java",
-        "insight/*.java",
-    ]),
+    srcs = glob(["*.java", "*/*.java"]),
     visibility = ["//visibility:public"],
     deps = [
+        "//simulation/common",
         "//simulation/driver",
-        "//simulation/utils",
-        "//simulation/world",
         "@graknlabs_common//:common",
         "@maven//:com_google_guava_guava",
         "@maven//:commons_cli_commons_cli",

@@ -19,7 +19,7 @@ package grakn.benchmark.grakn.action.read;
 
 import grakn.benchmark.grakn.driver.GraknTransaction;
 import grakn.benchmark.simulation.action.read.BirthsInCityAction;
-import grakn.benchmark.simulation.world.World;
+import grakn.benchmark.simulation.common.World;
 import graql.lang.query.GraqlMatch;
 
 import java.time.LocalDateTime;

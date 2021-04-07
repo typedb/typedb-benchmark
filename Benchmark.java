@@ -22,7 +22,7 @@ import grabl.tracing.client.GrablTracingThreadStatic;
 import grakn.benchmark.grakn.GraknSimulation;
 import grakn.benchmark.neo4j.Neo4JSimulation;
 import grakn.benchmark.simulation.Simulation;
-import grakn.benchmark.simulation.world.World;
+import grakn.benchmark.simulation.common.World;
 import grakn.benchmark.config.Config;
 import grakn.benchmark.config.ConfigLoader;
 import grakn.benchmark.grakn.driver.GraknClient;
@@ -47,7 +47,7 @@ import java.util.Optional;
 import static grabl.tracing.client.GrablTracing.tracing;
 import static grabl.tracing.client.GrablTracing.tracingNoOp;
 import static grabl.tracing.client.GrablTracing.withLogging;
-import static grakn.benchmark.simulation.world.World.initialise;
+import static grakn.benchmark.simulation.common.World.initialise;
 
 public class Benchmark {
 

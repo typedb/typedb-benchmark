@@ -47,7 +47,7 @@ java_test(
     deps = [
         "//simulation/action",
         "//simulation/agent",
-        "//simulation/world",
+        "//simulation/common",
         "//config",
         "//grakn",
         "//neo4j",

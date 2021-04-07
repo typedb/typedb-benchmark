@@ -23,9 +23,8 @@ java_library(
     visibility = ["//visibility:public"],
     deps = [
         "//simulation/action",
+        "//simulation/common",
         "//simulation/driver",
-        "//simulation/world",
-        "//simulation/utils",
         "@graknlabs_grabl_tracing//client",
         "@graknlabs_common//:common",
         "@maven//:commons_cli_commons_cli",

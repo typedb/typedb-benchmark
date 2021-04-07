@@ -18,10 +18,8 @@
 load("@graknlabs_dependencies//tool/checkstyle:rules.bzl", "checkstyle_test")
 
 java_library(
-    name = "world",
-    srcs = glob([
-        "*.java",
-    ]),
+    name = "common",
+    srcs = glob(["*.java"]),
     visibility = ["//visibility:public"],
     deps = [
         "@maven//:org_apache_commons_commons_csv",
@@ -30,7 +28,7 @@ java_library(
 
 checkstyle_test(
     name = "checkstyle",
-    include = [":world"],
+    include = [":common"],
     license_type = "agpl",
     size = "small",
 )

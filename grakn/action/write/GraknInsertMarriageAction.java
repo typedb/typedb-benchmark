@@ -20,7 +20,7 @@ package grakn.benchmark.grakn.action.write;
 import grakn.benchmark.grakn.driver.GraknTransaction;
 import grakn.benchmark.simulation.action.Action;
 import grakn.benchmark.simulation.action.write.InsertMarriageAction;
-import grakn.benchmark.simulation.world.World;
+import grakn.benchmark.simulation.common.World;
 import grakn.client.api.answer.ConceptMap;
 import graql.lang.pattern.variable.ThingVariable;
 import graql.lang.pattern.variable.UnboundVariable;

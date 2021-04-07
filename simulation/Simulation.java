@@ -25,8 +25,8 @@ import grakn.benchmark.simulation.agent.AgentFactory;
 import grakn.benchmark.simulation.agent.base.SimulationContext;
 import grakn.benchmark.simulation.driver.Client;
 import grakn.benchmark.simulation.driver.Transaction;
-import grakn.benchmark.simulation.utils.RandomSource;
-import grakn.benchmark.simulation.world.World;
+import grakn.benchmark.simulation.common.RandomSource;
+import grakn.benchmark.simulation.common.World;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

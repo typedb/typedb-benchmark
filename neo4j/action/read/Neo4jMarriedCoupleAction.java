@@ -20,7 +20,7 @@ package grakn.benchmark.neo4j.action.read;
 import grakn.benchmark.neo4j.driver.Neo4jTransaction;
 import grakn.benchmark.simulation.action.SpouseType;
 import grakn.benchmark.simulation.action.read.MarriedCoupleAction;
-import grakn.benchmark.simulation.world.World;
+import grakn.benchmark.simulation.common.World;
 import org.neo4j.driver.Query;
 import org.neo4j.driver.Record;
 

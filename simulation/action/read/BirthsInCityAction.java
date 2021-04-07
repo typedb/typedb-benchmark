@@ -18,7 +18,7 @@
 package grakn.benchmark.simulation.action.read;
 
 import grakn.benchmark.simulation.driver.Transaction;
-import grakn.benchmark.simulation.world.World;
+import grakn.benchmark.simulation.common.World;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;

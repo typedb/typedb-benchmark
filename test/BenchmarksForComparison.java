@@ -24,7 +24,7 @@ import grakn.benchmark.grakn.GraknSimulation;
 import grakn.benchmark.grakn.driver.GraknClient;
 import grakn.benchmark.neo4j.Neo4JSimulation;
 import grakn.benchmark.neo4j.driver.Neo4jClient;
-import grakn.benchmark.simulation.world.World;
+import grakn.benchmark.simulation.common.World;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
@@ -43,7 +43,7 @@ import java.util.Objects;
 import java.util.function.Function;
 
 import static grakn.benchmark.config.Config.Agent.ConstructAgentConfig;
-import static grakn.benchmark.simulation.world.World.initialise;
+import static grakn.benchmark.simulation.common.World.initialise;
 
 public class BenchmarksForComparison {
     static final Neo4JSimulation neo4j;

@@ -17,7 +17,7 @@
 
 package grakn.benchmark.simulation.agent.base;
 
-import grakn.benchmark.simulation.world.World;
+import grakn.benchmark.simulation.common.World;
 
 import java.time.LocalDateTime;
 

@@ -20,7 +20,7 @@ package grakn.benchmark.grakn.action.read;
 import grakn.benchmark.grakn.driver.GraknTransaction;
 import grakn.benchmark.simulation.action.SpouseType;
 import grakn.benchmark.simulation.action.read.MarriedCoupleAction;
-import grakn.benchmark.simulation.world.World;
+import grakn.benchmark.simulation.common.World;
 import graql.lang.Graql;
 import graql.lang.query.GraqlMatch;
 

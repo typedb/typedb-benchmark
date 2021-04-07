@@ -24,7 +24,7 @@ import grakn.benchmark.simulation.agent.base.SimulationContext;
 import grakn.benchmark.simulation.driver.Session;
 import grakn.benchmark.simulation.driver.Transaction;
 import grakn.benchmark.simulation.driver.Client;
-import grakn.benchmark.simulation.world.World;
+import grakn.benchmark.simulation.common.World;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;

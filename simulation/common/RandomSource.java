@@ -15,13 +15,25 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package grakn.benchmark.simulation.world;
+package grakn.benchmark.simulation.common;
 
-public interface Region {
+import java.util.Random;
 
-    String name();
+public class RandomSource {
 
-    String tracker();
+    private final long seed;
+    private Random random;
 
-    String sessionName(); // Used to assign session keys for Grakn model
+    public RandomSource(long seed) {
+        this.seed = seed;
+    }
+
+    public RandomSource next() {
+        return new RandomSource(get().nextLong());
+    }
+
+    public Random get() {
+        if (random == null) random = new Random(seed);
+        return random;
+    }
 }

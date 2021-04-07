@@ -15,23 +15,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package grakn.benchmark.simulation.utils;
+package grakn.benchmark.simulation.common;
 
-import grabl.tracing.client.GrablTracingThreadStatic;
+public interface Region {
 
-import java.util.function.Supplier;
+    String name();
 
-import static grabl.tracing.client.GrablTracingThreadStatic.traceOnThread;
+    String tracker();
 
-public class Trace {
-
-    public static <T> T trace(Supplier<T> methodToTrace, String trace, boolean isTracing) {
-        if (isTracing) {
-            try (GrablTracingThreadStatic.ThreadTrace ignored = traceOnThread(trace)) {
-                return methodToTrace.get();
-            }
-        } else {
-            return methodToTrace.get();
-        }
-    }
+    String sessionName(); // Used to assign session keys for Grakn model
 }
