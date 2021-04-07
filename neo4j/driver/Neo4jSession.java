@@ -17,11 +17,11 @@
 
 package grakn.benchmark.neo4j.driver;
 
-import grakn.benchmark.simulation.driver.TransactionalSession;
-import org.neo4j.driver.Session;
+import grakn.benchmark.simulation.driver.Session;
 
-public class Neo4jSession extends TransactionalSession<Neo4jTransaction> {
-    private final Session session;
+
+public class Neo4jSession extends Session<Neo4jTransaction> {
+    private final org.neo4j.driver.Session session;
 
     public Neo4jSession(org.neo4j.driver.Session session) {
         this.session = session;

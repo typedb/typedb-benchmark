@@ -56,6 +56,11 @@ public class Neo4jClient extends TransactionalClient<org.neo4j.driver.Session, N
     }
 
     @Override
+    public Session<Neo4jTransaction> session(Region region) {
+        return new Neo4jSession(session(region.name()));
+    }
+
+    @Override
     public void closeSessions() {
         for (org.neo4j.driver.Session session : sessionMap.values()) {
             session.close();
@@ -95,10 +100,5 @@ public class Neo4jClient extends TransactionalClient<org.neo4j.driver.Session, N
         LOG.info("Count 'node': {}", formatter.format(numberOfNodes));
         LOG.info("Count 'relationship': {}", formatter.format(numberOfRelationships));
         LOG.info("");
-    }
-
-    @Override
-    public Session<Neo4jTransaction> session(Region region, Logger logger) {
-        return new Neo4jSession(session(region.name()));
     }
 }

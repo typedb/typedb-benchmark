@@ -95,7 +95,7 @@ public abstract class Agent<REGION extends Region, TX extends Transaction> {
         GrablTracingThreadStatic.ThreadContext tracingCtx = null;
         try {
             if (isTracing()) tracingCtx = contextOnThread(region.tracker(), context.iteration());
-            Session<TX> session = client.session(region, logger);
+            Session<TX> session = client.session(region);
             return trace(() -> run(session, region, random), className(getClass()), isTracing());
         } finally {
             if (tracingCtx != null) tracingCtx.close();

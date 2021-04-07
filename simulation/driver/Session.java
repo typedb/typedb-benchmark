@@ -19,9 +19,7 @@ package grakn.benchmark.simulation.driver;
 
 public abstract class Session<TX extends Transaction> {
 
-    Session() {}
-
-    public abstract TX transaction();
+    public Session() {}
 
     public abstract TX newTransaction(String tracker, long iteration, boolean trace);
 }

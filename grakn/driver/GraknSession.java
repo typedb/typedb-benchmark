@@ -17,9 +17,9 @@
 
 package grakn.benchmark.grakn.driver;
 
-import grakn.benchmark.simulation.driver.TransactionalSession;
+import grakn.benchmark.simulation.driver.Session;
 
-public class GraknSession extends TransactionalSession<GraknTransaction> {
+public class GraknSession extends Session<GraknTransaction> {
 
     private final grakn.client.api.GraknSession session;
 
