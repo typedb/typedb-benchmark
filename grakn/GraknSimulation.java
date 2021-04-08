@@ -20,8 +20,10 @@ package grakn.benchmark.grakn;
 import grakn.benchmark.config.Config;
 import grakn.benchmark.grakn.action.GraknActionFactory;
 import grakn.benchmark.grakn.driver.GraknClient;
+import grakn.benchmark.grakn.driver.GraknSession;
 import grakn.benchmark.grakn.driver.GraknTransaction;
 import grakn.benchmark.grakn.loader.GraknYAMLLoader;
+import grakn.benchmark.simulation.Simulation;
 import grakn.benchmark.simulation.action.ActionFactory;
 import grakn.benchmark.simulation.common.World;
 import grakn.benchmark.simulation.loader.YAMLException;
@@ -42,7 +44,7 @@ import static grakn.benchmark.common.Util.printDuration;
 import static grakn.client.api.GraknSession.Type.DATA;
 import static grakn.client.api.GraknSession.Type.SCHEMA;
 
-public class GraknSimulation extends grakn.benchmark.simulation.Simulation<GraknClient, GraknTransaction> {
+public class GraknSimulation extends Simulation<GraknClient, GraknSession, GraknTransaction> {
 
     public static final String DATABASE_NAME = "simulation";
 

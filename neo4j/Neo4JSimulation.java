@@ -23,6 +23,7 @@ import grakn.benchmark.neo4j.driver.Neo4jClient;
 import grakn.benchmark.neo4j.driver.Neo4jSession;
 import grakn.benchmark.neo4j.driver.Neo4jTransaction;
 import grakn.benchmark.neo4j.loader.Neo4jYAMLLoader;
+import grakn.benchmark.simulation.Simulation;
 import grakn.benchmark.simulation.action.ActionFactory;
 import grakn.benchmark.simulation.common.World;
 import grakn.benchmark.simulation.loader.YAMLException;
@@ -38,7 +39,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
-public class Neo4JSimulation extends grakn.benchmark.simulation.Simulation<Neo4jClient, Neo4jTransaction> {
+public class Neo4JSimulation extends Simulation<Neo4jClient, Neo4jSession, Neo4jTransaction> {
 
     public Neo4JSimulation(Neo4jClient driver, Map<String, Path> initialisationDataPaths, int randomSeed, World world, List<Config.Agent> agentConfigs, Function<Integer, Boolean> iterationSamplingFunction, boolean test) {
         super(driver, initialisationDataPaths, randomSeed, world, agentConfigs, iterationSamplingFunction, test);
