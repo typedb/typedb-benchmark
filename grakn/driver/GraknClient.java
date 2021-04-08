@@ -27,6 +27,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import static grabl.tracing.client.GrablTracingThreadStatic.traceOnThread;
 import static grakn.benchmark.simulation.driver.Client.TracingLabel.OPEN_SESSION;
+import static grakn.client.api.GraknSession.Type.DATA;
 import static grakn.client.api.GraknTransaction.Type.READ;
 import static graql.lang.Graql.match;
 import static graql.lang.Graql.var;
@@ -34,8 +35,14 @@ import static graql.lang.Graql.var;
 public class GraknClient implements Client<GraknSession, GraknTransaction> {
 
     private final grakn.client.api.GraknClient nativeClient;
+    private final ConcurrentHashMap<String, GraknSession> sessionMap;
     private final String database;
-    private final ConcurrentHashMap<String, GraknSession> sessionMap = new ConcurrentHashMap<>();
+
+    private GraknClient(grakn.client.api.GraknClient nativeClient, String database) {
+        this.nativeClient = nativeClient;
+        this.database = database;
+        this.sessionMap = new ConcurrentHashMap<>();
+    }
 
     public static GraknClient core(String hostUri, String database) {
         return new GraknClient(Grakn.coreClient(hostUri), database);
@@ -45,34 +52,20 @@ public class GraknClient implements Client<GraknSession, GraknTransaction> {
         return new GraknClient(Grakn.clusterClient(hostUri), database);
     }
 
-    private GraknClient(grakn.client.api.GraknClient nativeClient, String database) {
-        this.nativeClient = nativeClient;
-        this.database = database;
-    }
-
-    public void createDatabase() {
-        if (nativeClient.databases().contains(database)) nativeClient.databases().get(database).delete();
-        nativeClient.databases().create(database);
+    public grakn.client.api.GraknClient unpack() {
+        return nativeClient;
     }
 
     @Override
-    public GraknSession session(String sessionKey) {
-        return sessionMap.computeIfAbsent(sessionKey, k -> {
-            try (GrablTracingThreadStatic.ThreadTrace ignored = traceOnThread(OPEN_SESSION.getName())) {
-                return new GraknSession(nativeClient.session(database, grakn.client.api.GraknSession.Type.DATA));
-            }
-        });
+    public GraknSession session(String sessionKey) { // TODO: remove
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public GraknSession session(Region region) {
-        return session(region.group());
-    }
-
-    public GraknSession schemaSession(String sessionKey) {
-        return sessionMap.computeIfAbsent(sessionKey, k -> {
+        return sessionMap.computeIfAbsent(region.group(), k -> {
             try (GrablTracingThreadStatic.ThreadTrace ignored = traceOnThread(OPEN_SESSION.getName())) {
-                return new GraknSession(nativeClient.session(database, grakn.client.api.GraknSession.Type.SCHEMA));
+                return new GraknSession(nativeClient.session(database, DATA));
             }
         });
     }
@@ -80,9 +73,8 @@ public class GraknClient implements Client<GraknSession, GraknTransaction> {
     @Override
     public String printStatistics() {
         StringBuilder str = new StringBuilder();
-        try (GraknSession session = session("statisticsDataSession")) {
-            grakn.client.api.GraknSession nativeSession = session.unpack();
-            try (grakn.client.api.GraknTransaction tx = nativeSession.transaction(READ)) {
+        try (grakn.client.api.GraknSession session = nativeClient.session(database, DATA)) {
+            try (grakn.client.api.GraknTransaction tx = session.transaction(READ)) {
                 DecimalFormat formatter = new DecimalFormat("#,###");
                 long numberOfEntities = tx.query().match(match(var("x").isa("entity")).count()).get().asLong();
                 long numberOfAttributes = tx.query().match(match(var("x").isa("attribute")).count()).get().asLong();
@@ -107,9 +99,7 @@ public class GraknClient implements Client<GraknSession, GraknTransaction> {
 
     @Override
     public void closeSessions() {
-        for (GraknSession session : sessionMap.values()) {
-            session.close();
-        }
+        sessionMap.values().forEach(GraknSession::close);
         sessionMap.clear();
     }
 

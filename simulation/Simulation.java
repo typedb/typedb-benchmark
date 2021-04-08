@@ -62,7 +62,9 @@ public abstract class Simulation<CLIENT extends Client<?, TX>, TX extends Transa
         this.world = world;
         this.test = test;
         this.agentReports = new ConcurrentHashMap<>();
-        initialise(initialisationDataPaths);
+        try {initialise(initialisationDataPaths);} catch (Exception exception) {
+            exception.printStackTrace();
+        }
         this.agents = agentListFromConfigs();
     }
 
@@ -83,7 +85,7 @@ public abstract class Simulation<CLIENT extends Client<?, TX>, TX extends Transa
 
     protected abstract ActionFactory<TX, ?> actionFactory();
 
-    protected abstract void initialise(Map<String, Path> initialisationDataPaths);
+    protected abstract void initialise(Map<String, Path> initialisationDataPaths) throws Exception;
 
     public void iterate() {
         agentReports.clear();

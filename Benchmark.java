@@ -52,7 +52,7 @@ import static grakn.benchmark.simulation.common.World.initialise;
 public class Benchmark {
 
     final static Logger LOG = LoggerFactory.getLogger(Benchmark.class);
-    public static final String DATABASE = "world";
+
 
     public static void main(String[] args) {
 
@@ -114,18 +114,13 @@ public class Benchmark {
                 if (dbName.toLowerCase().startsWith("grakn")) {
                     defaultUri = "localhost:48555";
                     if (hostUri == null) hostUri = defaultUri;
-                    GraknClient graknClient;
-                    if (dbName.toLowerCase().contains("core")) graknClient = GraknClient.core(hostUri, DATABASE);
-                    else if (dbName.toLowerCase().contains("cluster")) graknClient = GraknClient.cluster(hostUri, DATABASE);
-                    else throw new IllegalArgumentException("Unexpected database name: " + dbName);
-                    simulation = new GraknSimulation(
-                            graknClient,
-                            initialisationDataFiles,
-                            config.getRandomSeed(),
-                            world,
-                            config.getAgents(),
-                            config.getTraceSampling().getSamplingFunction(),
-                            false);
+                    if (dbName.toLowerCase().contains("core")) {
+                        simulation = GraknSimulation.core(hostUri, initialisationDataFiles, config.getRandomSeed(),
+                                world, config.getAgents(), config.getTraceSampling().getSamplingFunction(), false);
+                    } else if (dbName.toLowerCase().contains("cluster")) {
+                        simulation = GraknSimulation.cluster(hostUri, initialisationDataFiles, config.getRandomSeed(),
+                                world, config.getAgents(), config.getTraceSampling().getSamplingFunction(), false);
+                    } else throw new IllegalArgumentException("Unexpected database name: " + dbName);
                 } else if (dbName.toLowerCase().startsWith("neo4j")) {
                     defaultUri = "bolt://localhost:7687";
                     if (hostUri == null) hostUri = defaultUri;
@@ -165,7 +160,7 @@ public class Benchmark {
         }
     }
 
-    private static String printDuration(Instant start, Instant end) {
+    public static String printDuration(Instant start, Instant end) {
         return Duration.between(start, end).toString()
                 .substring(2)
                 .replaceAll("(\\d[HMS])(?!$)", "$1 ")

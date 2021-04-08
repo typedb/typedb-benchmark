@@ -50,7 +50,7 @@ public class Neo4JSimulation extends grakn.benchmark.simulation.Simulation<Neo4j
     }
 
     @Override
-    protected void initialise(Map<String, Path> initialisationDataPaths) {
+    protected void initialise(Map<String, Path> initialisationDataPaths) throws Exception {
         try (Neo4jSession session = client.session("initialise")) {
             addKeyConstraints(session.unpack());
             cleanDatabase(session.unpack());

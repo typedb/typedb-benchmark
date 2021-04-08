@@ -20,7 +20,6 @@ package grakn.benchmark.grakn;
 import grakn.benchmark.config.Config;
 import grakn.benchmark.grakn.action.GraknActionFactory;
 import grakn.benchmark.grakn.driver.GraknClient;
-import grakn.benchmark.grakn.driver.GraknSession;
 import grakn.benchmark.grakn.driver.GraknTransaction;
 import grakn.benchmark.grakn.loader.GraknYAMLLoader;
 import grakn.benchmark.simulation.action.ActionFactory;
@@ -32,20 +31,36 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
+import static grakn.benchmark.Benchmark.printDuration;
+import static grakn.client.api.GraknSession.Type.DATA;
+import static grakn.client.api.GraknSession.Type.SCHEMA;
+
 public class GraknSimulation extends grakn.benchmark.simulation.Simulation<GraknClient, GraknTransaction> {
+
+    public static final String DATABASE_NAME = "simulation";
 
     private static final Logger LOG = LoggerFactory.getLogger(GraknSimulation.class);
 
-    public GraknSimulation(GraknClient driver, Map<String, Path> initialisationDataPaths, int randomSeed, World world,
-                           List<Config.Agent> agentConfigs, Function<Integer, Boolean> iterationSamplingFunction, boolean test) {
-        super(driver, initialisationDataPaths, randomSeed, world, agentConfigs, iterationSamplingFunction, test);
+    private GraknSimulation(GraknClient client, Map<String, Path> initialisationDataPaths, int randomSeed, World world,
+                            List<Config.Agent> agentConfigs, Function<Integer, Boolean> iterationSamplingFunction, boolean isTest) {
+        super(client, initialisationDataPaths, randomSeed, world, agentConfigs, iterationSamplingFunction, isTest);
+    }
+
+    public static GraknSimulation core(String hostUri, Map<String, Path> initialisationDataPaths, int randomSeed, World world,
+                                       List<Config.Agent> agentConfigs, Function<Integer, Boolean> iterationSamplingFunction, boolean isTest) {
+        return new GraknSimulation(GraknClient.core(hostUri, DATABASE_NAME), initialisationDataPaths, randomSeed, world, agentConfigs, iterationSamplingFunction, isTest);
+    }
+
+    public static GraknSimulation cluster(String hostUri, Map<String, Path> initialisationDataPaths, int randomSeed, World world,
+                                          List<Config.Agent> agentConfigs, Function<Integer, Boolean> iterationSamplingFunction, boolean isTest) {
+        return new GraknSimulation(GraknClient.cluster(hostUri, DATABASE_NAME), initialisationDataPaths, randomSeed, world, agentConfigs, iterationSamplingFunction, isTest);
     }
 
     @Override
@@ -54,37 +69,39 @@ public class GraknSimulation extends grakn.benchmark.simulation.Simulation<Grakn
     }
 
     @Override
-    protected void initialise(Map<String, Path> initialisationDataPaths) {
-        client.createDatabase();
-        try (GraknSession schemaSession = client.schemaSession("initialiseSchema")) {
-            initialiseSchema(schemaSession.unpack(), initialisationDataPaths);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+    protected void initialise(Map<String, Path> initialisationDataPaths) throws Exception {
+        grakn.client.api.GraknClient nativeClient = client.unpack();
+        initialiseDatabase(nativeClient);
+        initialiseSchema(nativeClient, initialisationDataPaths.get("schema.gql"));
+        initialiseData(nativeClient, initialisationDataPaths);
+    }
 
-        try (GraknSession dataSession = client.session("initialiseData")) {
-            initialiseData(dataSession.unpack(), initialisationDataPaths);
-        } catch (IOException | YAMLException e) {
-            throw new RuntimeException(e);
+    private void initialiseDatabase(grakn.client.api.GraknClient nativeClient) {
+        if (nativeClient.databases().contains(DATABASE_NAME)) nativeClient.databases().get(DATABASE_NAME).delete();
+        nativeClient.databases().create(DATABASE_NAME);
+    }
+
+    private void initialiseSchema(grakn.client.api.GraknClient nativeClient, Path schemaFile) throws IOException {
+        try (grakn.client.api.GraknSession session = nativeClient.session(DATABASE_NAME, SCHEMA)) {
+            LOG.info("Grakn initialisation of world simulation schema started ...");
+            Instant start = Instant.now();
+            String schemaQuery = Files.readString(schemaFile);
+            try (grakn.client.api.GraknTransaction tx = session.transaction(grakn.client.api.GraknTransaction.Type.WRITE)) {
+                tx.query().define(Graql.parseQuery(schemaQuery));
+                tx.commit();
+            }
+            LOG.info("Grakn initialisation of world simulation schema ended in {}", printDuration(start, Instant.now()));
         }
     }
 
-    private static void initialiseSchema(grakn.client.api.GraknSession nativeSession,
-                                         Map<String, Path> initialisationDataPaths) throws IOException {
-        LOG.info(">>>> trace: initialiseSchema: start");
-        String schemaQuery = new String(Files.readAllBytes(initialisationDataPaths.get("schema.gql")), StandardCharsets.UTF_8);
-        try (grakn.client.api.GraknTransaction tx = nativeSession.transaction(grakn.client.api.GraknTransaction.Type.WRITE)) {
-            tx.query().define(Graql.parseQuery(schemaQuery));
-            tx.commit();
+    private void initialiseData(grakn.client.api.GraknClient nativeClient,
+                                Map<String, Path> initialisationDataPaths) throws IOException, YAMLException {
+        try (grakn.client.api.GraknSession session = nativeClient.session(DATABASE_NAME, DATA)) {
+            LOG.info("Grakn initialisation of world simulation data started ...");
+            Instant start = Instant.now();
+            YAMLLoader loader = new GraknYAMLLoader(session, initialisationDataPaths);
+            loader.loadFile(initialisationDataPaths.get("graql_templates.yml").toFile());
+            LOG.info("Grakn initialisation of world simulation data ended in {}", printDuration(start, Instant.now()));
         }
-        LOG.info(">>>> trace: initialiseSchema: end");
-    }
-
-    private static void initialiseData(grakn.client.api.GraknSession nativeSession,
-                                       Map<String, Path> initialisationDataPaths) throws IOException, YAMLException {
-        LOG.info(">>>> trace: initialiseData: start");
-        YAMLLoader loader = new GraknYAMLLoader(nativeSession, initialisationDataPaths);
-        loader.loadFile(initialisationDataPaths.get("graql_templates.yml").toFile());
-        LOG.info(">>>> trace: initialiseData: end");
     }
 }
