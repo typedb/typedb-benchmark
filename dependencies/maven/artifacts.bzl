@@ -18,6 +18,7 @@
 artifacts = [
   "ch.qos.logback:logback-classic",
   "commons-cli:commons-cli",
+  "com.google.code.findbugs:jsr305",
   "io.netty:netty-tcnative-boringssl-static",
   "org.apache.commons:commons-csv",
   "org.apache.commons:commons-lang3",

@@ -50,17 +50,17 @@ public class GraknSimulation extends Simulation<GraknClient, GraknSession, Grakn
     private static final Logger LOG = LoggerFactory.getLogger(GraknSimulation.class);
 
     private GraknSimulation(GraknClient client, Map<String, Path> initialisationDataPaths, int randomSeed,
-                            List<Config.Agent> agentConfigs, SimulationContext context) {
+                            List<Config.Agent> agentConfigs, SimulationContext context) throws Exception {
         super(client, initialisationDataPaths, randomSeed, agentConfigs, context);
     }
 
     public static GraknSimulation core(String hostUri, Map<String, Path> initialisationDataPaths, int randomSeed,
-                                       List<Config.Agent> agentConfigs, SimulationContext context) {
+                                       List<Config.Agent> agentConfigs, SimulationContext context) throws Exception {
         return new GraknSimulation(GraknClient.core(hostUri, DATABASE_NAME), initialisationDataPaths, randomSeed, agentConfigs, context);
     }
 
     public static GraknSimulation cluster(String hostUri, Map<String, Path> initialisationDataPaths, int randomSeed,
-                                          List<Config.Agent> agentConfigs, SimulationContext context) {
+                                          List<Config.Agent> agentConfigs, SimulationContext context) throws Exception {
         return new GraknSimulation(GraknClient.cluster(hostUri, DATABASE_NAME), initialisationDataPaths, randomSeed, agentConfigs, context);
     }
 
@@ -71,7 +71,7 @@ public class GraknSimulation extends Simulation<GraknClient, GraknSession, Grakn
 
     @Override
     protected void initialise(Map<String, Path> initialisationDataPaths) throws Exception {
-        grakn.client.api.GraknClient nativeClient = client.unpack();
+        grakn.client.api.GraknClient nativeClient = client().unpack();
         initialiseDatabase(nativeClient);
         initialiseSchema(nativeClient, initialisationDataPaths.get("schema.gql"));
         initialiseData(nativeClient, initialisationDataPaths);

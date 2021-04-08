@@ -40,11 +40,11 @@ import java.util.Map;
 
 public class Neo4JSimulation extends Simulation<Neo4jClient, Neo4jSession, Neo4jTransaction> {
 
-    private Neo4JSimulation(Neo4jClient driver, Map<String, Path> initialisationDataPaths, int randomSeed, List<Config.Agent> agentConfigs, SimulationContext context) {
+    private Neo4JSimulation(Neo4jClient driver, Map<String, Path> initialisationDataPaths, int randomSeed, List<Config.Agent> agentConfigs, SimulationContext context) throws Exception {
         super(driver, initialisationDataPaths, randomSeed, agentConfigs, context);
     }
 
-    public static Neo4JSimulation create(String hostUri, Map<String, Path> files, int randomSeed, List<Config.Agent> agentConfigs, SimulationContext context) {
+    public static Neo4JSimulation create(String hostUri, Map<String, Path> files, int randomSeed, List<Config.Agent> agentConfigs, SimulationContext context) throws Exception {
         return new Neo4JSimulation(new Neo4jClient(hostUri), files, randomSeed, agentConfigs, context);
     }
 
@@ -55,7 +55,7 @@ public class Neo4JSimulation extends Simulation<Neo4jClient, Neo4jSession, Neo4j
 
     @Override
     protected void initialise(Map<String, Path> initialisationDataPaths) throws Exception {
-        try (org.neo4j.driver.Session session = client.unpack().session()) {
+        try (org.neo4j.driver.Session session = client().unpack().session()) {
             addKeyConstraints(session);
             cleanDatabase(session);
             YAMLLoader loader = new Neo4jYAMLLoader(session, initialisationDataPaths);

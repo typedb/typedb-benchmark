@@ -29,6 +29,8 @@ import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -44,9 +46,11 @@ import static grakn.benchmark.config.Config.Agent.ConstructAgentConfig;
 import static grakn.benchmark.simulation.common.World.initialise;
 
 public class BenchmarksForComparison {
-    static final Neo4JSimulation neo4j;
-    static final GraknSimulation graknCore;
-    static final int numIterations = 30;
+
+    private static final Logger LOG = LoggerFactory.getLogger(BenchmarksForComparison.class);
+    public static Neo4JSimulation neo4j;
+    public static GraknSimulation graknCore;
+    public static final int numIterations = 30;
 
     static {
         String[] args = System.getProperty("sun.java.command").split(" ");
@@ -69,7 +73,7 @@ public class BenchmarksForComparison {
             graknUri = commandLine.getOptionValue("g");
             neo4jUri = commandLine.getOptionValue("n");
         } catch (ParseException e) {
-            System.err.println(e.getMessage());
+            LOG.error(e.getMessage(), e);
         }
 
         int scaleFactor = 5;
@@ -106,8 +110,12 @@ public class BenchmarksForComparison {
 
         ArrayList<Config.Agent> agentConfigs = new ArrayList<>();
         agentNames.forEach(name -> agentConfigs.add(ConstructAgentConfig(name, AgentMode.RUN)));
-        SimulationContext context  = SimulationContext.create(initialise(scaleFactor, files), true);
-        graknCore = GraknSimulation.core(graknUri, files, randomSeed, agentConfigs, context);
-        neo4j = Neo4JSimulation.create(neo4jUri, files, randomSeed, agentConfigs, context);
+        SimulationContext context = SimulationContext.create(initialise(scaleFactor, files), true);
+        try {
+            graknCore = GraknSimulation.core(graknUri, files, randomSeed, agentConfigs, context);
+            neo4j = Neo4JSimulation.create(neo4jUri, files, randomSeed, agentConfigs, context);
+        } catch (Exception e) {
+            LOG.error(e.getMessage(), e);
+        }
     }
 }
