@@ -57,7 +57,7 @@ java_binary(
 
 checkstyle_test(
     name = "checkstyle",
-    include = [":benchmark-lib"],
+    include = glob(["*", ".grabl/*"]),
+    exclude = glob(["docs/*"]),
     license_type = "agpl",
-    size = "small",
 )

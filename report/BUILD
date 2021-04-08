@@ -28,7 +28,7 @@ load("@io_bazel_rules_groovy//groovy:groovy.bzl", "groovy_and_java_library")
 load("@io_bazel_rules_groovy//groovy:groovy.bzl", "groovy_binary")
 
 groovy_and_java_library(
-    name = "benchmarklib",
+    name = "reportlib",
     srcs = glob([
         "*.groovy",
     ]),
@@ -47,8 +47,15 @@ groovy_and_java_library(
 )
 
 groovy_binary(
-    name = "benchmark",
+    name = "report",
     srcs = glob(["*.groovy"]),
     main_class = "grakn.benchmark.benchmark.Report",
-    deps = [":benchmarklib"],
+    deps = [":reportlib"],
+)
+
+checkstyle_test(
+    name = "checkstyle",
+    include = glob(["*", "plots/*.py"]),
+    exclude = glob(["templates/*", "plots/requirements.txt"]),
+    license_type = "agpl"
 )

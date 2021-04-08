@@ -36,7 +36,6 @@ java_library(
 
 checkstyle_test(
     name = "checkstyle",
-    include = [":agent"],
+    include = glob(["*", "*/*"]),
     license_type = "agpl",
-    size = "small",
 )

@@ -44,8 +44,6 @@ java_library(
 
 checkstyle_test(
     name = "checkstyle",
-    include = [":grakn"],
+    include = glob(["*", "*/*", "*/*/*"]),
     license_type = "agpl",
-    size = "small",
 )
-
