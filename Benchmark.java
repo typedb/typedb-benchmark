@@ -19,13 +19,13 @@ package grakn.benchmark;
 
 import grabl.tracing.client.GrablTracing;
 import grabl.tracing.client.GrablTracingThreadStatic;
+import grakn.benchmark.common.Util;
 import grakn.benchmark.grakn.GraknSimulation;
 import grakn.benchmark.neo4j.Neo4JSimulation;
 import grakn.benchmark.simulation.Simulation;
 import grakn.benchmark.simulation.common.World;
 import grakn.benchmark.config.Config;
 import grakn.benchmark.config.ConfigLoader;
-import grakn.benchmark.grakn.driver.GraknClient;
 import grakn.benchmark.neo4j.driver.Neo4jClient;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -38,7 +38,6 @@ import org.slf4j.LoggerFactory;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.Duration;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
@@ -144,27 +143,20 @@ public class Benchmark {
                     Instant iterStart = Instant.now();
                     simulation.iterate();
                     Instant iterEnd = Instant.now();
-                    LOG.info("Iteration {}: {}", i, printDuration(iterStart, iterEnd));
+                    LOG.info("Iteration {}: {}", i, Util.printDuration(iterStart, iterEnd));
                 }
                 Instant end = Instant.now();
-                LOG.info("Benchmark duration: " + printDuration(start, end));
+                LOG.info("Benchmark duration: " + Util.printDuration(start, end));
                 Instant statisticStart = Instant.now();
                 LOG.info(simulation.printStatistics());
                 Instant statisticEnd = Instant.now();
-                LOG.info("Statistics duration: " + printDuration(statisticStart, statisticEnd));
+                LOG.info("Statistics duration: " + Util.printDuration(statisticStart, statisticEnd));
                 simulation.close();
             }
         } catch (Exception ex) {
             ex.printStackTrace();
             System.exit(1);
         }
-    }
-
-    public static String printDuration(Instant start, Instant end) {
-        return Duration.between(start, end).toString()
-                .substring(2)
-                .replaceAll("(\\d[HMS])(?!$)", "$1 ")
-                .toLowerCase();
     }
 
 

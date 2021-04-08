@@ -38,7 +38,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
-import static grakn.benchmark.Benchmark.printDuration;
+import static grakn.benchmark.common.Util.printDuration;
 import static grakn.client.api.GraknSession.Type.DATA;
 import static grakn.client.api.GraknSession.Type.SCHEMA;
 

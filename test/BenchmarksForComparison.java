@@ -21,7 +21,6 @@ import grakn.benchmark.config.AgentMode;
 import grakn.benchmark.config.Config;
 import grakn.benchmark.config.SamplingFunction;
 import grakn.benchmark.grakn.GraknSimulation;
-import grakn.benchmark.grakn.driver.GraknClient;
 import grakn.benchmark.neo4j.Neo4JSimulation;
 import grakn.benchmark.neo4j.driver.Neo4jClient;
 import grakn.benchmark.simulation.common.World;
@@ -116,8 +115,8 @@ public class BenchmarksForComparison {
         // Grakn setup //
         /////////////////
 
-        graknCore = new GraknSimulation(
-                GraknClient.core(graknUri, "world"),
+        graknCore = GraknSimulation.core(
+                graknUri,
                 files,
                 randomSeed,
                 world,

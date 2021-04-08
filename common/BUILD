@@ -18,34 +18,16 @@
 load("@graknlabs_dependencies//tool/checkstyle:rules.bzl", "checkstyle_test")
 
 java_library(
-    name = "grakn",
-    srcs = glob(["*.java", "*/*.java", "*/*/*.java"]),
+    name = "common",
+    srcs = glob(["*.java"]),
     visibility = ["//visibility:public"],
     deps = [
-        "//common:common",
-        "//simulation:simulation",
-        "//simulation/action:action",
-        "//simulation/common:common",
-        "//simulation/driver:driver",
-        "//simulation/loader:loader",
-        "//config",
-        "@graknlabs_common//:common",
-        "@graknlabs_client_java//api:api",
-        "@graknlabs_client_java//:client-java",
-        "@graknlabs_grabl_tracing//client",
-        "@graknlabs_graql//java:graql",
-        "@graknlabs_graql//java/pattern",
-        "@graknlabs_graql//java/query",
-        "@maven//:com_google_guava_guava",
-        "@maven//:org_apache_commons_commons_csv",
-        "@maven//:org_slf4j_slf4j_api",
     ],
 )
 
 checkstyle_test(
     name = "checkstyle",
-    include = [":grakn"],
+    include = [":common"],
     license_type = "agpl",
     size = "small",
 )
-
