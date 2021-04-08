@@ -58,7 +58,7 @@ build:
             sleep 3
         done
         bazel test //test:comparison-test \
-          --test_output=errors \
+          --test_output=streamed \
           --test_arg=--grakn-uri=$GRABL_EXPORT_TEST_COMPARISON_GRAKN_URI \
           --test_arg=--neo4j-uri=bolt://$GRABL_EXPORT_TEST_COMPARISON_NEO4J_URI
   performance:
