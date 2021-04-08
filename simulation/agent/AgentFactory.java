@@ -18,7 +18,7 @@
 package grakn.benchmark.simulation.agent;
 
 import grakn.benchmark.simulation.action.ActionFactory;
-import grakn.benchmark.simulation.agent.base.SimulationContext;
+import grakn.benchmark.simulation.common.SimulationContext;
 import grakn.benchmark.simulation.agent.read.ArbitraryOneHopAgent;
 import grakn.benchmark.simulation.agent.read.FindCurrentResidentsAgent;
 import grakn.benchmark.simulation.agent.read.FindLivedInAgent;
@@ -39,7 +39,6 @@ import grakn.benchmark.simulation.agent.write.PersonBirthAgent;
 import grakn.benchmark.simulation.agent.write.ProductAgent;
 import grakn.benchmark.simulation.agent.write.RelocationAgent;
 import grakn.benchmark.simulation.agent.write.PurchaseAgent;
-import grakn.benchmark.simulation.driver.Session;
 import grakn.benchmark.simulation.driver.Transaction;
 import grakn.benchmark.simulation.driver.Client;
 

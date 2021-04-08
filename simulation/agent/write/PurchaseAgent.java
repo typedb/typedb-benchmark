@@ -24,7 +24,7 @@ import grakn.benchmark.simulation.action.read.ProductsInContinentAction;
 import grakn.benchmark.simulation.agent.Agent;
 import grakn.benchmark.simulation.agent.base.Allocation;
 import grakn.benchmark.simulation.agent.base.RandomValueGenerator;
-import grakn.benchmark.simulation.agent.base.SimulationContext;
+import grakn.benchmark.simulation.common.SimulationContext;
 import grakn.benchmark.simulation.driver.Session;
 import grakn.benchmark.simulation.driver.Transaction;
 import grakn.benchmark.simulation.driver.Client;

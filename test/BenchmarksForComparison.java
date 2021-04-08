@@ -22,8 +22,7 @@ import grakn.benchmark.config.Config;
 import grakn.benchmark.config.SamplingFunction;
 import grakn.benchmark.grakn.GraknSimulation;
 import grakn.benchmark.neo4j.Neo4JSimulation;
-import grakn.benchmark.neo4j.driver.Neo4jClient;
-import grakn.benchmark.simulation.common.World;
+import grakn.benchmark.simulation.common.SimulationContext;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
@@ -107,34 +106,8 @@ public class BenchmarksForComparison {
 
         ArrayList<Config.Agent> agentConfigs = new ArrayList<>();
         agentNames.forEach(name -> agentConfigs.add(ConstructAgentConfig(name, AgentMode.RUN)));
-
-        World world = initialise(scaleFactor, files);
-        boolean test = true;
-
-        /////////////////
-        // Grakn setup //
-        /////////////////
-
-        graknCore = GraknSimulation.core(
-                graknUri,
-                files,
-                randomSeed,
-                world,
-                agentConfigs,
-                samplingFunction,
-                test);
-
-        /////////////////
-        // Neo4j setup //
-        /////////////////
-
-        neo4j = new Neo4JSimulation(
-                new Neo4jClient(neo4jUri),
-                files,
-                randomSeed,
-                world,
-                agentConfigs,
-                samplingFunction,
-                test);
+        SimulationContext context  = SimulationContext.create(initialise(scaleFactor, files), true);
+        graknCore = GraknSimulation.core(graknUri, files, randomSeed, agentConfigs, context);
+        neo4j = Neo4JSimulation.create(neo4jUri, files, randomSeed, agentConfigs, context);
     }
 }

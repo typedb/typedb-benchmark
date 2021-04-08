@@ -23,6 +23,7 @@ import grakn.benchmark.common.Util;
 import grakn.benchmark.grakn.GraknSimulation;
 import grakn.benchmark.neo4j.Neo4JSimulation;
 import grakn.benchmark.simulation.Simulation;
+import grakn.benchmark.simulation.common.SimulationContext;
 import grakn.benchmark.simulation.common.World;
 import grakn.benchmark.config.Config;
 import grakn.benchmark.config.ConfigLoader;
@@ -109,29 +110,24 @@ public class Benchmark {
 
         try {
             try (GrablTracing tracingIgnored = grablTracing(grablTracingUri, grablTracingOrganisation, grablTracingRepository, grablTracingCommit, grablTracingUsername, grablTracingToken, disableTracing, dbName)) {
+                SimulationContext context = SimulationContext.create(world, false);
+                if (!disableTracing) context.enableTracing(config.getTraceSampling().getSamplingFunction());
+
                 Simulation<?, ?, ?> simulation;
                 if (dbName.toLowerCase().startsWith("grakn")) {
                     defaultUri = "localhost:48555";
                     if (hostUri == null) hostUri = defaultUri;
                     if (dbName.toLowerCase().contains("core")) {
                         simulation = GraknSimulation.core(hostUri, initialisationDataFiles, config.getRandomSeed(),
-                                world, config.getAgents(), config.getTraceSampling().getSamplingFunction(), false);
+                                config.getAgents(), context);
                     } else if (dbName.toLowerCase().contains("cluster")) {
                         simulation = GraknSimulation.cluster(hostUri, initialisationDataFiles, config.getRandomSeed(),
-                                world, config.getAgents(), config.getTraceSampling().getSamplingFunction(), false);
+                                config.getAgents(), context);
                     } else throw new IllegalArgumentException("Unexpected database name: " + dbName);
                 } else if (dbName.toLowerCase().startsWith("neo4j")) {
                     defaultUri = "bolt://localhost:7687";
                     if (hostUri == null) hostUri = defaultUri;
-
-                    simulation = new Neo4JSimulation(
-                            new Neo4jClient(hostUri),
-                            initialisationDataFiles,
-                            config.getRandomSeed(),
-                            world,
-                            config.getAgents(),
-                            config.getTraceSampling().getSamplingFunction(),
-                            false);
+                    simulation = Neo4JSimulation.create(hostUri, initialisationDataFiles, config.getRandomSeed(), config.getAgents(), context);
                 } else {
                     throw new IllegalArgumentException("Unexpected database name: " + dbName);
                 }

@@ -25,7 +25,7 @@ import grakn.benchmark.neo4j.driver.Neo4jTransaction;
 import grakn.benchmark.neo4j.loader.Neo4jYAMLLoader;
 import grakn.benchmark.simulation.Simulation;
 import grakn.benchmark.simulation.action.ActionFactory;
-import grakn.benchmark.simulation.common.World;
+import grakn.benchmark.simulation.common.SimulationContext;
 import grakn.benchmark.simulation.loader.YAMLException;
 import grakn.benchmark.simulation.loader.YAMLLoader;
 import org.neo4j.driver.Query;
@@ -37,12 +37,15 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 
 public class Neo4JSimulation extends Simulation<Neo4jClient, Neo4jSession, Neo4jTransaction> {
 
-    public Neo4JSimulation(Neo4jClient driver, Map<String, Path> initialisationDataPaths, int randomSeed, World world, List<Config.Agent> agentConfigs, Function<Integer, Boolean> iterationSamplingFunction, boolean test) {
-        super(driver, initialisationDataPaths, randomSeed, world, agentConfigs, iterationSamplingFunction, test);
+    private Neo4JSimulation(Neo4jClient driver, Map<String, Path> initialisationDataPaths, int randomSeed, List<Config.Agent> agentConfigs, SimulationContext context) {
+        super(driver, initialisationDataPaths, randomSeed, agentConfigs, context);
+    }
+
+    public static Neo4JSimulation create(String hostUri, Map<String, Path> files, int randomSeed, List<Config.Agent> agentConfigs, SimulationContext context) {
+        return new Neo4JSimulation(new Neo4jClient(hostUri), files, randomSeed, agentConfigs, context);
     }
 
     @Override

@@ -25,7 +25,7 @@ import grakn.benchmark.grakn.driver.GraknTransaction;
 import grakn.benchmark.grakn.loader.GraknYAMLLoader;
 import grakn.benchmark.simulation.Simulation;
 import grakn.benchmark.simulation.action.ActionFactory;
-import grakn.benchmark.simulation.common.World;
+import grakn.benchmark.simulation.common.SimulationContext;
 import grakn.benchmark.simulation.loader.YAMLException;
 import grakn.benchmark.simulation.loader.YAMLLoader;
 import graql.lang.Graql;
@@ -38,7 +38,6 @@ import java.nio.file.Path;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 
 import static grakn.benchmark.common.Util.printDuration;
 import static grakn.client.api.GraknSession.Type.DATA;
@@ -50,19 +49,19 @@ public class GraknSimulation extends Simulation<GraknClient, GraknSession, Grakn
 
     private static final Logger LOG = LoggerFactory.getLogger(GraknSimulation.class);
 
-    private GraknSimulation(GraknClient client, Map<String, Path> initialisationDataPaths, int randomSeed, World world,
-                            List<Config.Agent> agentConfigs, Function<Integer, Boolean> iterationSamplingFunction, boolean isTest) {
-        super(client, initialisationDataPaths, randomSeed, world, agentConfigs, iterationSamplingFunction, isTest);
+    private GraknSimulation(GraknClient client, Map<String, Path> initialisationDataPaths, int randomSeed,
+                            List<Config.Agent> agentConfigs, SimulationContext context) {
+        super(client, initialisationDataPaths, randomSeed, agentConfigs, context);
     }
 
-    public static GraknSimulation core(String hostUri, Map<String, Path> initialisationDataPaths, int randomSeed, World world,
-                                       List<Config.Agent> agentConfigs, Function<Integer, Boolean> iterationSamplingFunction, boolean isTest) {
-        return new GraknSimulation(GraknClient.core(hostUri, DATABASE_NAME), initialisationDataPaths, randomSeed, world, agentConfigs, iterationSamplingFunction, isTest);
+    public static GraknSimulation core(String hostUri, Map<String, Path> initialisationDataPaths, int randomSeed,
+                                       List<Config.Agent> agentConfigs, SimulationContext context) {
+        return new GraknSimulation(GraknClient.core(hostUri, DATABASE_NAME), initialisationDataPaths, randomSeed, agentConfigs, context);
     }
 
-    public static GraknSimulation cluster(String hostUri, Map<String, Path> initialisationDataPaths, int randomSeed, World world,
-                                          List<Config.Agent> agentConfigs, Function<Integer, Boolean> iterationSamplingFunction, boolean isTest) {
-        return new GraknSimulation(GraknClient.cluster(hostUri, DATABASE_NAME), initialisationDataPaths, randomSeed, world, agentConfigs, iterationSamplingFunction, isTest);
+    public static GraknSimulation cluster(String hostUri, Map<String, Path> initialisationDataPaths, int randomSeed,
+                                          List<Config.Agent> agentConfigs, SimulationContext context) {
+        return new GraknSimulation(GraknClient.cluster(hostUri, DATABASE_NAME), initialisationDataPaths, randomSeed, agentConfigs, context);
     }
 
     @Override

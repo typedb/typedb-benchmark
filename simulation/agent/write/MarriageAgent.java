@@ -20,7 +20,7 @@ package grakn.benchmark.simulation.agent.write;
 import grakn.benchmark.simulation.action.Action;
 import grakn.benchmark.simulation.action.ActionFactory;
 import grakn.benchmark.simulation.agent.Agent;
-import grakn.benchmark.simulation.agent.base.SimulationContext;
+import grakn.benchmark.simulation.common.SimulationContext;
 import grakn.benchmark.simulation.driver.Client;
 import grakn.benchmark.simulation.driver.Session;
 import grakn.benchmark.simulation.driver.Transaction;
