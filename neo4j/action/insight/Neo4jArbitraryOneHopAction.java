@@ -31,7 +31,7 @@ public class Neo4jArbitraryOneHopAction extends ArbitraryOneHopAction<Neo4jTrans
     }
 
     @Override
-    public Integer run() {
+    public Void run() {
         List<Record> results = tx.execute(new Query(query()));
         return null;
     }

@@ -87,7 +87,7 @@ public class GraknInsertTransactionAction extends InsertTransactionAction<GraknT
 
     @Override
     protected HashMap<ComparableField, Object> outputForReport(ConceptMap answer) {
-        return new HashMap<ComparableField, Object>() {{
+        return new HashMap<>() {{
             put(InsertTransactionActionField.SELLER, tx.getOnlyAttributeOfThing(answer, "c-seller", COMPANY_NUMBER));
             put(InsertTransactionActionField.BUYER, tx.getOnlyAttributeOfThing(answer, "c-buyer", COMPANY_NUMBER));
             put(InsertTransactionActionField.MERCHANDISE, tx.getOnlyAttributeOfThing(answer, PRODUCT, PRODUCT_BARCODE));

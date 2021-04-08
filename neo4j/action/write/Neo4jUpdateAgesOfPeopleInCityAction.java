@@ -33,7 +33,7 @@ public class Neo4jUpdateAgesOfPeopleInCityAction extends UpdateAgesOfPeopleInCit
     }
 
     @Override
-    public Integer run() {
+    public Void run() {
         HashMap<String, Object> parameters = new HashMap<String, Object>() {{
             put(Model.LOCATION_NAME, city.name());
             put("dateToday", today);

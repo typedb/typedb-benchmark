@@ -19,7 +19,7 @@ package grakn.benchmark.simulation.action.insight;
 
 import grakn.benchmark.simulation.driver.Transaction;
 
-public abstract class ArbitraryOneHopAction<TX extends Transaction> extends WorldwideInsightAction<TX, Integer> {
+public abstract class ArbitraryOneHopAction<TX extends Transaction> extends WorldwideInsightAction<TX, Void> {
 
     protected static String PERSON_EMAIL_FOR_QUERY = "email/0/World:Europe:United Kingdom:London/0";
 

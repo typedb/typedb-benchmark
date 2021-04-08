@@ -35,7 +35,7 @@ public class GraknArbitraryOneHopAction extends ArbitraryOneHopAction<GraknTrans
     }
 
     @Override
-    public Integer run() {
+    public Void run() {
         List<ConceptMap> results = tx.execute(query());
         return null;
     }

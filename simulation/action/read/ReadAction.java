@@ -22,15 +22,15 @@ import grakn.benchmark.simulation.driver.Transaction;
 
 import java.util.HashMap;
 
-public abstract class ReadAction<TX extends Transaction, ACTION_RETURN_TYPE> extends Action<TX, ACTION_RETURN_TYPE> {
+public abstract class ReadAction<TX extends Transaction, ANSWER> extends Action<TX, ANSWER> {
 
     public ReadAction(TX tx) {
         super(tx);
     }
 
     @Override
-    protected HashMap<ComparableField, Object> outputForReport(ACTION_RETURN_TYPE answer) {
-        return new HashMap<ComparableField, Object>() {{
+    protected HashMap<ComparableField, Object> outputForReport(ANSWER answer) {
+        return new HashMap<>() {{
             put(ReadActionField.SINGLE_FIELD_ANSWER, answer);
         }};
     }

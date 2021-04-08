@@ -48,7 +48,7 @@ public class GraknUpdateAgesOfPeopleInCityAction extends UpdateAgesOfPeopleInCit
     }
 
     @Override
-    public Integer run() {
+    public Void run() {
         getPeopleBornInCity(city).forEach(person -> {
             String email = person.first();
             LocalDateTime dob = person.second();
@@ -88,5 +88,4 @@ public class GraknUpdateAgesOfPeopleInCityAction extends UpdateAgesOfPeopleInCit
                         .insert(var(PERSON).has(AGE, newAge))
         );
     }
-
 }

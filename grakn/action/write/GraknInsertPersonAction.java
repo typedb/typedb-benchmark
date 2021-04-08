@@ -77,14 +77,12 @@ public class GraknInsertPersonAction extends InsertPersonAction<GraknTransaction
 
     @Override
     protected HashMap<ComparableField, Object> outputForReport(ConceptMap answer) {
-        return new HashMap<ComparableField, Object>() {
-            {
-                put(InsertPersonActionField.EMAIL, tx.getOnlyAttributeOfThing(answer, PERSON, EMAIL));
-                put(InsertPersonActionField.DATE_OF_BIRTH, tx.getOnlyAttributeOfThing(answer, PERSON, DATE_OF_BIRTH));
-                put(InsertPersonActionField.GENDER, tx.getOnlyAttributeOfThing(answer, PERSON, GENDER));
-                put(InsertPersonActionField.FORENAME, tx.getOnlyAttributeOfThing(answer, PERSON, FORENAME));
-                put(InsertPersonActionField.SURNAME, tx.getOnlyAttributeOfThing(answer, PERSON, SURNAME));
-            }
-        };
+        return new HashMap<>() {{
+            put(InsertPersonActionField.EMAIL, tx.getOnlyAttributeOfThing(answer, PERSON, EMAIL));
+            put(InsertPersonActionField.DATE_OF_BIRTH, tx.getOnlyAttributeOfThing(answer, PERSON, DATE_OF_BIRTH));
+            put(InsertPersonActionField.GENDER, tx.getOnlyAttributeOfThing(answer, PERSON, GENDER));
+            put(InsertPersonActionField.FORENAME, tx.getOnlyAttributeOfThing(answer, PERSON, FORENAME));
+            put(InsertPersonActionField.SURNAME, tx.getOnlyAttributeOfThing(answer, PERSON, SURNAME));
+        }};
     }
 }

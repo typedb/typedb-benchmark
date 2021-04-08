@@ -24,7 +24,7 @@ import grakn.common.collection.Pair;
 
 import java.util.ArrayList;
 
-public abstract class InsertTransactionAction<TX extends Transaction, ACTION_RETURN_TYPE> extends Action<TX, ACTION_RETURN_TYPE> {
+public abstract class InsertTransactionAction<TX extends Transaction, ANSWER> extends Action<TX, ANSWER> {
     protected final World.Country country;
     protected final Pair<Long, Long> transaction;
     protected final Long sellerCompanyNumber;

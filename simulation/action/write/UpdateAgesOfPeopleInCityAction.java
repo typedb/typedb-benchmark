@@ -17,15 +17,15 @@
 
 package grakn.benchmark.simulation.action.write;
 
-import grakn.benchmark.simulation.action.read.ReadAction;
-import grakn.benchmark.simulation.driver.Transaction;
+import grakn.benchmark.simulation.action.Action;
 import grakn.benchmark.simulation.common.World;
+import grakn.benchmark.simulation.driver.Transaction;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public abstract class UpdateAgesOfPeopleInCityAction<TX extends Transaction> extends ReadAction<TX, Integer> {
+public abstract class UpdateAgesOfPeopleInCityAction<TX extends Transaction> extends Action<TX, Void> {
     protected final LocalDateTime today;
     protected final World.City city;
 
@@ -36,12 +36,12 @@ public abstract class UpdateAgesOfPeopleInCityAction<TX extends Transaction> ext
     }
 
     @Override
-    public HashMap<ComparableField, Object> outputForReport(Integer answer) {
-        return new HashMap<>(); // Nothing to report for this action
+    protected ArrayList<Object> inputForReport() {
+        return argsList(today, city);
     }
 
     @Override
-    protected ArrayList<Object> inputForReport() {
-        return argsList(today, city);
+    public HashMap<ComparableField, Object> outputForReport(Void answer) {
+        return new HashMap<>(); // Nothing to report for this action
     }
 }
