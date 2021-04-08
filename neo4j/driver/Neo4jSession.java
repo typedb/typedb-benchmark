@@ -28,10 +28,6 @@ public class Neo4jSession implements Session<Neo4jTransaction> {
         this.nativeSession = nativeSession;
     }
 
-    public org.neo4j.driver.Session unpack() {
-        return nativeSession;
-    }
-
     @Override
     public Neo4jTransaction transaction(String tracker, long iteration, boolean trace) {
         return new Neo4jTransaction(nativeSession, tracker, iteration);

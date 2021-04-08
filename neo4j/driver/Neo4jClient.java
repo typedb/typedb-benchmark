@@ -44,9 +44,13 @@ public class Neo4jClient implements Client<Neo4jSession, Neo4jTransaction> {
         this.nativeDriver = GraphDatabase.driver(hostUri, AuthTokens.basic("neo4j", "admin"));
     }
 
+    public Driver unpack() {
+        return nativeDriver;
+    }
+
     @Override
-    public Neo4jSession session(String sessionKey) {
-        return sessionMap.computeIfAbsent(sessionKey, k -> {
+    public Neo4jSession session(Region region) {
+        return sessionMap.computeIfAbsent(region.name(), k -> {
             try (GrablTracingThreadStatic.ThreadTrace ignored = traceOnThread(OPEN_SESSION.getName())) {
                 return new Neo4jSession(nativeDriver.session());
             }
@@ -54,15 +58,9 @@ public class Neo4jClient implements Client<Neo4jSession, Neo4jTransaction> {
     }
 
     @Override
-    public Neo4jSession session(Region region) {
-        return session(region.name());
-    }
-
-    @Override
     public String printStatistics() {
         StringBuilder str = new StringBuilder();
-        try (Neo4jSession session = session("statisticsSession")) {
-            org.neo4j.driver.Session nativeSession = session.unpack();
+        try (org.neo4j.driver.Session nativeSession = nativeDriver.session()) {
             DecimalFormat formatter = new DecimalFormat("#,###");
 
             String numberOfNodesQ = "MATCH (n)\n RETURN count(n)";
@@ -91,9 +89,7 @@ public class Neo4jClient implements Client<Neo4jSession, Neo4jTransaction> {
 
     @Override
     public void closeSessions() {
-        for (Neo4jSession session : sessionMap.values()) {
-            session.close();
-        }
+        sessionMap.values().forEach(Neo4jSession::close);
         sessionMap.clear();
     }
 

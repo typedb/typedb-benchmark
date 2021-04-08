@@ -21,8 +21,6 @@ import grakn.benchmark.simulation.common.Region;
 
 public interface Client<SESSION extends Session<TX>, TX extends Transaction> extends AutoCloseable {
 
-    SESSION session(String sessionKey);
-
     SESSION session(Region region);
 
     void closeSessions();

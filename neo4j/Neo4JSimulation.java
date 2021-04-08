@@ -51,10 +51,10 @@ public class Neo4JSimulation extends grakn.benchmark.simulation.Simulation<Neo4j
 
     @Override
     protected void initialise(Map<String, Path> initialisationDataPaths) throws Exception {
-        try (Neo4jSession session = client.session("initialise")) {
-            addKeyConstraints(session.unpack());
-            cleanDatabase(session.unpack());
-            YAMLLoader loader = new Neo4jYAMLLoader(session.unpack(), initialisationDataPaths);
+        try (org.neo4j.driver.Session session = client.unpack().session()) {
+            addKeyConstraints(session);
+            cleanDatabase(session);
+            YAMLLoader loader = new Neo4jYAMLLoader(session, initialisationDataPaths);
             try {
                 loader.loadFile(initialisationDataPaths.get("cypher_templates.yml").toFile());
             } catch (YAMLException | FileNotFoundException e) {

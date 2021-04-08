@@ -57,11 +57,6 @@ public class GraknClient implements Client<GraknSession, GraknTransaction> {
     }
 
     @Override
-    public GraknSession session(String sessionKey) { // TODO: remove
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
     public GraknSession session(Region region) {
         return sessionMap.computeIfAbsent(region.group(), k -> {
             try (GrablTracingThreadStatic.ThreadTrace ignored = traceOnThread(OPEN_SESSION.getName())) {

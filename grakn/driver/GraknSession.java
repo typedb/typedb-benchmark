@@ -29,10 +29,6 @@ public class GraknSession implements Session<GraknTransaction> {
         this.nativeSession = nativeSession;
     }
 
-    public grakn.client.api.GraknSession unpack() {
-        return nativeSession;
-    }
-
     @Override
     public GraknTransaction transaction(String tracker, long iteration, boolean trace) {
         return new GraknTransaction(nativeSession.transaction(WRITE), tracker, iteration);
