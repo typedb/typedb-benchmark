@@ -21,9 +21,6 @@ java_library(
     name = "benchmark-lib",
     srcs = glob(["*.java"]),
     resource_strip_prefix = "config/",
-    resources = [
-        "//config:logback.xml",
-    ],
     visibility = ["//visibility:public"],
     deps = [
         "//config:config",
@@ -33,7 +30,6 @@ java_library(
         "//grakn:grakn",
         "//neo4j:neo4j",
         "@graknlabs_grabl_tracing//client",
-        "@graknlabs_client_java//:client-java",
         "@maven//:ch_qos_logback_logback_classic",
         "@maven//:commons_cli_commons_cli",
         "@maven//:org_slf4j_slf4j_api",
@@ -41,49 +37,22 @@ java_library(
 )
 
 java_binary(
-    name = "benchmark-big",
+    name = "benchmark",
+    runtime_deps = [":benchmark-lib"],
+    main_class = "grakn.benchmark.Benchmark",
+    classpath_resources = [
+        "//config:logback.xml",
+    ],
     args = [
-        "config/config_big.yml",
         "$(locations //simulation/data)",
         "$(locations //grakn/data)",
         "$(locations //neo4j/data)",
     ],
     data = [
-        "//config:config_big.yml",
         "//simulation/data",
         "//grakn/data",
         "//neo4j/data",
     ],
-    main_class = "grakn.benchmark.Benchmark",
-    runtime_deps = [":benchmark-lib"],
-)
-
-java_binary(
-    name = "benchmark-small",
-    args = [
-        "config/config_small.yml",
-        "$(locations //simulation/data)",
-        "$(locations //grakn/data)",
-        "$(locations //neo4j/data)",
-    ],
-    data = [
-        "//config:config_small.yml",
-        "//simulation/data",
-        "//grakn/data",
-        "//neo4j/data",
-    ],
-    main_class = "grakn.benchmark.Benchmark",
-    runtime_deps = [":benchmark-lib"],
-)
-
-java_binary(
-    name = "benchmark-debug",
-    jvm_flags = [
-        "-Xdebug",
-        "-Xrunjdwp:transport=dt_socket,server=y,address=5005",
-    ],
-    main_class = "grakn.benchmark.Benchmark",
-    runtime_deps = [":benchmark-lib"],
 )
 
 checkstyle_test(
@@ -91,14 +60,4 @@ checkstyle_test(
     include = [":benchmark-lib"],
     license_type = "agpl",
     size = "small",
-)
-
-# CI targets that are not declared in any BUILD file, but are called externally
-filegroup(
-    name = "ci",
-    data = [
-        "@graknlabs_dependencies//tool/bazelrun:rbe",
-        "@graknlabs_dependencies//distribution/artifact:create-netrc",
-        "@graknlabs_dependencies//tool/unuseddeps:unused-deps",
-    ],
 )

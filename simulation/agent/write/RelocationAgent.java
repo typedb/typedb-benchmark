@@ -22,7 +22,7 @@ import grakn.benchmark.simulation.action.ActionFactory;
 import grakn.benchmark.simulation.action.read.CitiesInContinentAction;
 import grakn.benchmark.simulation.action.read.ResidentsInCityAction;
 import grakn.benchmark.simulation.agent.Agent;
-import grakn.benchmark.simulation.agent.base.Allocation;
+import grakn.benchmark.simulation.common.Allocation;
 import grakn.benchmark.simulation.common.SimulationContext;
 import grakn.benchmark.simulation.driver.Session;
 import grakn.benchmark.simulation.driver.Transaction;

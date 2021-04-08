@@ -45,7 +45,6 @@ java_test(
     ],
     test_class = "grakn.benchmark.test.ComparisonTest",
     deps = [
-        "//simulation/action",
         "//simulation/agent",
         "//simulation/common",
         "//config",

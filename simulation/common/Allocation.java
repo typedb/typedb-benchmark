@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package grakn.benchmark.simulation.agent.base;
+package grakn.benchmark.simulation.common;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;

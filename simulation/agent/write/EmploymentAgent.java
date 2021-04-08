@@ -22,7 +22,7 @@ import grakn.benchmark.simulation.action.ActionFactory;
 import grakn.benchmark.simulation.action.read.CompaniesInCountryAction;
 import grakn.benchmark.simulation.action.read.ResidentsInCityAction;
 import grakn.benchmark.simulation.agent.Agent;
-import grakn.benchmark.simulation.agent.base.RandomValueGenerator;
+import grakn.benchmark.simulation.common.RandomValueGenerator;
 import grakn.benchmark.simulation.common.SimulationContext;
 import grakn.benchmark.simulation.driver.Session;
 import grakn.benchmark.simulation.driver.Transaction;
@@ -34,7 +34,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import static grakn.benchmark.simulation.agent.base.Allocation.allocate;
+import static grakn.benchmark.simulation.common.Allocation.allocate;
 import static java.util.stream.Collectors.toList;
 
 public class EmploymentAgent<TX extends Transaction> extends Agent<World.City, TX> {

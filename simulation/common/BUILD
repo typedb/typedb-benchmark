@@ -24,6 +24,7 @@ java_library(
     deps = [
         "@maven//:com_google_code_findbugs_jsr305",
         "@maven//:org_apache_commons_commons_csv",
+        "@maven//:org_apache_commons_commons_lang3",
     ],
 )
 

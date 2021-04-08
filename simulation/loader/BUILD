@@ -22,7 +22,6 @@ java_library(
     srcs = glob(["*.java"]),
     visibility = ["//visibility:public"],
     deps = [
-        "@graknlabs_graql//java:graql",
         "@graknlabs_graql//java/common",
         "@maven//:org_apache_commons_commons_csv",
         "@maven//:org_apache_commons_commons_lang3",
