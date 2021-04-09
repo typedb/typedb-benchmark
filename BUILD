@@ -45,11 +45,9 @@ java_binary(
     ],
     args = [
         "$(locations //simulation/data)",
-        "$(locations //grakn/data)",
     ],
     data = [
         "//simulation/data",
-        "//grakn/data",
     ],
 )
 

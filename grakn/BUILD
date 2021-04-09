@@ -40,6 +40,7 @@ java_library(
         "@maven//:org_apache_commons_commons_csv",
         "@maven//:org_slf4j_slf4j_api",
     ],
+    data = ["//grakn/data"],
 )
 
 checkstyle_test(

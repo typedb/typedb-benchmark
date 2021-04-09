@@ -69,7 +69,7 @@ public abstract class Simulation<CLIENT extends Client<SESSION, TX>, SESSION ext
     private final SimulationContext context;
     private final Map<Class<? extends Agent>, Map<String, List<Action<?, ?>.Report>>> agentReports;
 
-    public Simulation(CLIENT client, Map<String, Path> initialisationDataPaths, int randomSeed, List<Config.Agent> agentConfigs, SimulationContext context) throws Exception {
+    public Simulation(CLIENT client, Map<String, Path> dataFiles, int randomSeed, List<Config.Agent> agentConfigs, SimulationContext context) throws Exception {
         this.client = client;
         this.randomSource = new RandomSource(randomSeed);
         this.agentConfigs = agentConfigs;
@@ -77,10 +77,10 @@ public abstract class Simulation<CLIENT extends Client<SESSION, TX>, SESSION ext
         this.agentReports = new ConcurrentHashMap<>();
         this.agentBuilders = initialiseAgentBuilders();
         this.agents = agentListFromConfigs();
-        initialise(initialisationDataPaths);
+        initialise(dataFiles);
     }
 
-    protected abstract void initialise(Map<String, Path> initialisationDataPaths) throws Exception;
+    protected abstract void initialise(Map<String, Path> dataFiles) throws Exception;
 
     protected abstract ActionFactory<TX, ?> actionFactory();
 

@@ -44,8 +44,8 @@ public class Neo4JSimulation extends Simulation<Neo4jClient, Neo4jSession, Neo4j
 
     private static final File CYPHER_TEMPLATES = Paths.get("neo4j/data/cypher_templates.yml").toFile();
 
-    private Neo4JSimulation(Neo4jClient driver, Map<String, Path> initialisationDataPaths, int randomSeed, List<Config.Agent> agentConfigs, SimulationContext context) throws Exception {
-        super(driver, initialisationDataPaths, randomSeed, agentConfigs, context);
+    private Neo4JSimulation(Neo4jClient driver, Map<String, Path> dataFiles, int randomSeed, List<Config.Agent> agentConfigs, SimulationContext context) throws Exception {
+        super(driver, dataFiles, randomSeed, agentConfigs, context);
     }
 
     public static Neo4JSimulation create(String hostUri, Map<String, Path> files, int randomSeed, List<Config.Agent> agentConfigs, SimulationContext context) throws Exception {
@@ -58,11 +58,11 @@ public class Neo4JSimulation extends Simulation<Neo4jClient, Neo4jSession, Neo4j
     }
 
     @Override
-    protected void initialise(Map<String, Path> initialisationDataPaths) {
+    protected void initialise(Map<String, Path> dataFiles) {
         try (org.neo4j.driver.Session session = client().unpack().session()) {
             addKeyConstraints(session);
             cleanDatabase(session);
-            YAMLLoader loader = new Neo4jYAMLLoader(session, initialisationDataPaths);
+            YAMLLoader loader = new Neo4jYAMLLoader(session, dataFiles);
             try {
                 loader.loadFile(CYPHER_TEMPLATES);
             } catch (YAMLException | FileNotFoundException e) {

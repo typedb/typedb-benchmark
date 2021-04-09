@@ -32,9 +32,11 @@ import graql.lang.Graql;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
@@ -45,23 +47,25 @@ import static grakn.client.api.GraknSession.Type.SCHEMA;
 
 public class GraknSimulation extends Simulation<GraknClient, GraknSession, GraknTransaction> {
 
-    public static final String DATABASE_NAME = "simulation";
+    private static final String DATABASE_NAME = "simulation";
+    private static final File SCHEMA_FILE = Paths.get("grakn/data/schema.gql").toFile();
+    private static final File GRAQL_TEMPLATES_FILE = Paths.get("grakn/data/graql_templates.yml").toFile();
 
     private static final Logger LOG = LoggerFactory.getLogger(GraknSimulation.class);
 
-    private GraknSimulation(GraknClient client, Map<String, Path> initialisationDataPaths, int randomSeed,
+    private GraknSimulation(GraknClient client, Map<String, Path> dataFiles, int randomSeed,
                             List<Config.Agent> agentConfigs, SimulationContext context) throws Exception {
-        super(client, initialisationDataPaths, randomSeed, agentConfigs, context);
+        super(client, dataFiles, randomSeed, agentConfigs, context);
     }
 
-    public static GraknSimulation core(String hostUri, Map<String, Path> initialisationDataPaths, int randomSeed,
+    public static GraknSimulation core(String hostUri, Map<String, Path> dataFiles, int randomSeed,
                                        List<Config.Agent> agentConfigs, SimulationContext context) throws Exception {
-        return new GraknSimulation(GraknClient.core(hostUri, DATABASE_NAME), initialisationDataPaths, randomSeed, agentConfigs, context);
+        return new GraknSimulation(GraknClient.core(hostUri, DATABASE_NAME), dataFiles, randomSeed, agentConfigs, context);
     }
 
-    public static GraknSimulation cluster(String hostUri, Map<String, Path> initialisationDataPaths, int randomSeed,
+    public static GraknSimulation cluster(String hostUri, Map<String, Path> dataFiles, int randomSeed,
                                           List<Config.Agent> agentConfigs, SimulationContext context) throws Exception {
-        return new GraknSimulation(GraknClient.cluster(hostUri, DATABASE_NAME), initialisationDataPaths, randomSeed, agentConfigs, context);
+        return new GraknSimulation(GraknClient.cluster(hostUri, DATABASE_NAME), dataFiles, randomSeed, agentConfigs, context);
     }
 
     @Override
@@ -70,11 +74,11 @@ public class GraknSimulation extends Simulation<GraknClient, GraknSession, Grakn
     }
 
     @Override
-    protected void initialise(Map<String, Path> initialisationDataPaths) throws Exception {
+    protected void initialise(Map<String, Path> dataFiles) throws Exception {
         grakn.client.api.GraknClient nativeClient = client().unpack();
         initialiseDatabase(nativeClient);
-        initialiseSchema(nativeClient, initialisationDataPaths.get("schema.gql"));
-        initialiseData(nativeClient, initialisationDataPaths);
+        initialiseSchema(nativeClient);
+        initialiseData(nativeClient, dataFiles);
     }
 
     private void initialiseDatabase(grakn.client.api.GraknClient nativeClient) {
@@ -82,11 +86,11 @@ public class GraknSimulation extends Simulation<GraknClient, GraknSession, Grakn
         nativeClient.databases().create(DATABASE_NAME);
     }
 
-    private void initialiseSchema(grakn.client.api.GraknClient nativeClient, Path schemaFile) throws IOException {
+    private void initialiseSchema(grakn.client.api.GraknClient nativeClient) throws IOException {
         try (grakn.client.api.GraknSession session = nativeClient.session(DATABASE_NAME, SCHEMA)) {
             LOG.info("Grakn initialisation of world simulation schema started ...");
             Instant start = Instant.now();
-            String schemaQuery = Files.readString(schemaFile);
+            String schemaQuery = Files.readString(SCHEMA_FILE.toPath());
             try (grakn.client.api.GraknTransaction tx = session.transaction(grakn.client.api.GraknTransaction.Type.WRITE)) {
                 tx.query().define(Graql.parseQuery(schemaQuery));
                 tx.commit();
@@ -96,12 +100,12 @@ public class GraknSimulation extends Simulation<GraknClient, GraknSession, Grakn
     }
 
     private void initialiseData(grakn.client.api.GraknClient nativeClient,
-                                Map<String, Path> initialisationDataPaths) throws IOException, YAMLException {
+                                Map<String, Path> dataFiles) throws IOException, YAMLException {
         try (grakn.client.api.GraknSession session = nativeClient.session(DATABASE_NAME, DATA)) {
             LOG.info("Grakn initialisation of world simulation data started ...");
             Instant start = Instant.now();
-            YAMLLoader loader = new GraknYAMLLoader(session, initialisationDataPaths);
-            loader.loadFile(initialisationDataPaths.get("graql_templates.yml").toFile());
+            YAMLLoader loader = new GraknYAMLLoader(session, dataFiles);
+            loader.loadFile(GRAQL_TEMPLATES_FILE);
             LOG.info("Grakn initialisation of world simulation data ended in {}", printDuration(start, Instant.now()));
         }
     }
