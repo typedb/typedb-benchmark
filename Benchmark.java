@@ -84,11 +84,11 @@ public class Benchmark {
 
         boolean disableTracing = commandLine.hasOption("n");
 
-        Map<String, Path> initialisationDataFiles = new HashMap<>();
+        Map<String, Path> dataFiles = new HashMap<>();
         for (String filepath : commandLine.getArgList()) {
             Path path = Paths.get(filepath);
             String filename = path.getFileName().toString();
-            initialisationDataFiles.put(filename, path);
+            dataFiles.put(filename, path);
         }
 
         Path configPath = Paths.get(getOption(commandLine, "b").orElse(defaultConfigYaml));
@@ -103,7 +103,7 @@ public class Benchmark {
 
         LOG.info("Welcome to the Benchmark!");
         LOG.info("Parsing world data...");
-        World world = initialise(config.getScaleFactor(), initialisationDataFiles);
+        World world = initialise(config.getScaleFactor(), dataFiles);
         if (world == null) return;
 
         LOG.info(String.format("Connecting to %s...", dbName));
@@ -118,16 +118,16 @@ public class Benchmark {
                     defaultUri = "localhost:48555";
                     if (hostUri == null) hostUri = defaultUri;
                     if (dbName.toLowerCase().contains("core")) {
-                        simulation = GraknSimulation.core(hostUri, initialisationDataFiles, config.getRandomSeed(),
+                        simulation = GraknSimulation.core(hostUri, dataFiles, config.getRandomSeed(),
                                 config.getAgents(), context);
                     } else if (dbName.toLowerCase().contains("cluster")) {
-                        simulation = GraknSimulation.cluster(hostUri, initialisationDataFiles, config.getRandomSeed(),
+                        simulation = GraknSimulation.cluster(hostUri, dataFiles, config.getRandomSeed(),
                                 config.getAgents(), context);
                     } else throw new IllegalArgumentException("Unexpected database name: " + dbName);
                 } else if (dbName.toLowerCase().startsWith("neo4j")) {
                     defaultUri = "bolt://localhost:7687";
                     if (hostUri == null) hostUri = defaultUri;
-                    simulation = Neo4JSimulation.create(hostUri, initialisationDataFiles, config.getRandomSeed(), config.getAgents(), context);
+                    simulation = Neo4JSimulation.create(hostUri, dataFiles, config.getRandomSeed(), config.getAgents(), context);
                 } else {
                     throw new IllegalArgumentException("Unexpected database name: " + dbName);
                 }
