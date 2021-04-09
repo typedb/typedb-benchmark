@@ -105,7 +105,7 @@ public class BenchmarksForComparison {
         agentNames.add("company");
 //        agentNames.add("employment");
         agentNames.add("product");
-        agentNames.add("transaction");
+        agentNames.add("purchase");
 //        agentNames.add("friendship");
 
         ArrayList<Config.Agent> agentConfigs = new ArrayList<>();
