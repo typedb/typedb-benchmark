@@ -36,6 +36,7 @@ java_library(
         "@maven//:org_slf4j_slf4j_api",
         "@neo4j//:org_neo4j_driver_neo4j_java_driver",
     ],
+    data = ["//neo4j/data"],
 )
 
 checkstyle_test(

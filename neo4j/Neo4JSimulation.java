@@ -32,13 +32,17 @@ import org.neo4j.driver.Query;
 import org.neo4j.driver.Session;
 import org.neo4j.driver.Transaction;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 public class Neo4JSimulation extends Simulation<Neo4jClient, Neo4jSession, Neo4jTransaction> {
+
+    private static final File CYPHER_TEMPLATES = Paths.get("neo4j/data/cypher_templates.yml").toFile();
 
     private Neo4JSimulation(Neo4jClient driver, Map<String, Path> initialisationDataPaths, int randomSeed, List<Config.Agent> agentConfigs, SimulationContext context) throws Exception {
         super(driver, initialisationDataPaths, randomSeed, agentConfigs, context);
@@ -54,13 +58,13 @@ public class Neo4JSimulation extends Simulation<Neo4jClient, Neo4jSession, Neo4j
     }
 
     @Override
-    protected void initialise(Map<String, Path> initialisationDataPaths) throws Exception {
+    protected void initialise(Map<String, Path> initialisationDataPaths) {
         try (org.neo4j.driver.Session session = client().unpack().session()) {
             addKeyConstraints(session);
             cleanDatabase(session);
             YAMLLoader loader = new Neo4jYAMLLoader(session, initialisationDataPaths);
             try {
-                loader.loadFile(initialisationDataPaths.get("cypher_templates.yml").toFile());
+                loader.loadFile(CYPHER_TEMPLATES);
             } catch (YAMLException | FileNotFoundException e) {
                 throw new RuntimeException(e);
             }

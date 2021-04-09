@@ -46,12 +46,10 @@ java_binary(
     args = [
         "$(locations //simulation/data)",
         "$(locations //grakn/data)",
-        "$(locations //neo4j/data)",
     ],
     data = [
         "//simulation/data",
         "//grakn/data",
-        "//neo4j/data",
     ],
 )
 
