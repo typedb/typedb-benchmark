@@ -55,13 +55,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Function;
 
 public abstract class Simulation<CLIENT extends Client<SESSION, TX>, SESSION extends Session<TX>, TX extends Transaction> {
 
     private static final Logger LOG = LoggerFactory.getLogger(Simulation.class);
-    private static final String AGENT_PACKAGE = "grakn.benchmark.simulation.agent";
-    private final Map<Class<? extends Agent>, Function<SimulationContext, Agent<?, TX>>> agentBuilders;
+    private static final String AGENT_PACKAGE = Agent.class.getPackageName();
+    private final Map<Class<? extends Agent>, Agent<?, TX>> agentBuilders;
 
     private final CLIENT client;
     private final List<Agent<?, TX>> agents;
@@ -86,28 +85,28 @@ public abstract class Simulation<CLIENT extends Client<SESSION, TX>, SESSION ext
     protected abstract ActionFactory<TX, ?> actionFactory();
 
     // TODO: make this static
-    private Map<Class<? extends Agent>, Function<SimulationContext, Agent<?, TX>>> initialiseAgentBuilders() {
+    private Map<Class<? extends Agent>, Agent<?, TX>> initialiseAgentBuilders() {
         return new HashMap<>() {{
-            put(MarriageAgent.class, context -> new MarriageAgent<>(client(), actionFactory(), context));
-            put(PersonBirthAgent.class, context -> new PersonBirthAgent<>(client(), actionFactory(), context));
-            put(AgeUpdateAgent.class, context -> new AgeUpdateAgent<>(client(), actionFactory(), context));
-            put(ParentshipAgent.class, context -> new ParentshipAgent<>(client(), actionFactory(), context));
-            put(RelocationAgent.class, context -> new RelocationAgent<>(client(), actionFactory(), context));
-            put(CompanyAgent.class, context -> new CompanyAgent<>(client(), actionFactory(), context));
-            put(EmploymentAgent.class, context -> new EmploymentAgent<>(client(), actionFactory(), context));
-            put(ProductAgent.class, context -> new ProductAgent<>(client(), actionFactory(), context));
-            put(PurchaseAgent.class, context -> new PurchaseAgent<>(client(), actionFactory(), context));
-            put(FriendshipAgent.class, context -> new FriendshipAgent<>(client(), actionFactory(), context));
-            put(MeanWageAgent.class, context -> new MeanWageAgent<>(client(), actionFactory(), context));
-            put(FindLivedInAgent.class, context -> new FindLivedInAgent<>(client(), actionFactory(), context));
-            put(FindCurrentResidentsAgent.class, context -> new FindCurrentResidentsAgent<>(client(), actionFactory(), context));
-            put(FindTransactionCurrencyAgent.class, context -> new FindTransactionCurrencyAgent<>(client(), actionFactory(), context));
-            put(ArbitraryOneHopAgent.class, context -> new ArbitraryOneHopAgent<>(client(), actionFactory(), context));
-            put(TwoHopAgent.class, context -> new TwoHopAgent<>(client(), actionFactory(), context));
-            put(ThreeHopAgent.class, context -> new ThreeHopAgent<>(client(), actionFactory(), context));
-            put(FourHopAgent.class, context -> new FourHopAgent<>(client(), actionFactory(), context));
-            put(FindSpecificMarriageAgent.class, context -> new FindSpecificMarriageAgent<>(client(), actionFactory(), context));
-            put(FindSpecificPersonAgent.class, context -> new FindSpecificPersonAgent<>(client(), actionFactory(), context));
+            put(MarriageAgent.class, new MarriageAgent<>(client(), actionFactory(), context));
+            put(PersonBirthAgent.class, new PersonBirthAgent<>(client(), actionFactory(), context));
+            put(AgeUpdateAgent.class, new AgeUpdateAgent<>(client(), actionFactory(), context));
+            put(ParentshipAgent.class, new ParentshipAgent<>(client(), actionFactory(), context));
+            put(RelocationAgent.class, new RelocationAgent<>(client(), actionFactory(), context));
+            put(CompanyAgent.class, new CompanyAgent<>(client(), actionFactory(), context));
+            put(EmploymentAgent.class, new EmploymentAgent<>(client(), actionFactory(), context));
+            put(ProductAgent.class, new ProductAgent<>(client(), actionFactory(), context));
+            put(PurchaseAgent.class, new PurchaseAgent<>(client(), actionFactory(), context));
+            put(FriendshipAgent.class, new FriendshipAgent<>(client(), actionFactory(), context));
+            put(MeanWageAgent.class, new MeanWageAgent<>(client(), actionFactory(), context));
+            put(FindLivedInAgent.class, new FindLivedInAgent<>(client(), actionFactory(), context));
+            put(FindCurrentResidentsAgent.class, new FindCurrentResidentsAgent<>(client(), actionFactory(), context));
+            put(FindTransactionCurrencyAgent.class, new FindTransactionCurrencyAgent<>(client(), actionFactory(), context));
+            put(ArbitraryOneHopAgent.class, new ArbitraryOneHopAgent<>(client(), actionFactory(), context));
+            put(TwoHopAgent.class, new TwoHopAgent<>(client(), actionFactory(), context));
+            put(ThreeHopAgent.class, new ThreeHopAgent<>(client(), actionFactory(), context));
+            put(FourHopAgent.class, new FourHopAgent<>(client(), actionFactory(), context));
+            put(FindSpecificMarriageAgent.class, new FindSpecificMarriageAgent<>(client(), actionFactory(), context));
+            put(FindSpecificPersonAgent.class, new FindSpecificPersonAgent<>(client(), actionFactory(), context));
         }};
     }
 
@@ -120,7 +119,7 @@ public abstract class Simulation<CLIENT extends Client<SESSION, TX>, SESSION ext
                 String name = agentConfig.getName();
                 name = AGENT_PACKAGE + "." + name.substring(0, 1).toUpperCase() + name.substring(1) + "Agent";
                 Class<?> agentClass = Class.forName(name);
-                if (agentBuilders.containsKey(agentClass)) agent = agentBuilders.get(agentClass).apply(context);
+                if (agentBuilders.containsKey(agentClass)) agent = agentBuilders.get(agentClass);
                 else throw new IllegalArgumentException("Unrecognised agent name: " + agentClass);
                 agent.overrideTracing(agentConfig.getAgentMode().getTrace());
                 agents.add(agent);
