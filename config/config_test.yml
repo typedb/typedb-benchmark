@@ -33,7 +33,7 @@ agents:
     mode: OFF  # no
   - name: "product"
     mode: TRACE # yes
-  - name: "transaction"
+  - name: "purchase"
     mode: TRACE # yes
   - name: "friendship"
     mode: OFF # no

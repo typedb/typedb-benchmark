@@ -33,7 +33,7 @@ agents:
     mode: RUN
   - name: "product"
     mode: RUN
-  - name: "transaction"
+  - name: "purchase"
     mode: RUN
   - name: "friendship"
     mode: RUN
