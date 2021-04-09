@@ -115,7 +115,9 @@ public abstract class Simulation<CLIENT extends Client<SESSION, TX>, SESSION ext
         for (Config.Agent agentConfig : agentConfigs) {
             if (agentConfig.getAgentMode().getRun()) {
                 Agent<?, TX> agent;
-                Class<?> agentClass = Class.forName(agentConfig.getName() + "Agent"); // TODO: should the suffix not be included in the provided name?
+                String name = agentConfig.getName();
+                // TODO: should the agent names be identical to the class to begin with?
+                Class<?> agentClass = Class.forName(name.substring(0, 1).toUpperCase() + name.substring(1) + "Agent");
                 if (agentBuilders.containsKey(agentClass)) agent = agentBuilders.get(agentClass).apply(context);
                 else throw new IllegalArgumentException("Unrecognised agent name: " + agentClass);
                 agent.overrideTracing(agentConfig.getAgentMode().getTrace());
