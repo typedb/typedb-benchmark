@@ -15,10 +15,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package grakn.benchmark.simulation.agent.write;
+package grakn.benchmark.simulation.agent;
 
 import grakn.benchmark.simulation.action.Action;
 import grakn.benchmark.simulation.action.ActionFactory;
+import grakn.benchmark.simulation.action.write.UpdateAgesOfPeopleInCityAction;
 import grakn.benchmark.simulation.agent.Agent;
 import grakn.benchmark.simulation.common.SimulationContext;
 import grakn.benchmark.simulation.driver.Session;
@@ -32,9 +33,9 @@ import java.util.Random;
 
 import static java.util.stream.Collectors.toList;
 
-public class PersonBirthAgent<TX extends Transaction> extends Agent<World.City, TX> {
+public class AgeUpdateAgent<TX extends Transaction> extends Agent<World.City, TX> {
 
-    public PersonBirthAgent(Client<?, TX> client, ActionFactory<TX, ?> actionFactory, SimulationContext context) {
+    public AgeUpdateAgent(Client<?, TX> client, ActionFactory<TX, ?> actionFactory, SimulationContext context) {
         super(client, actionFactory, context);
     }
 
@@ -45,29 +46,12 @@ public class PersonBirthAgent<TX extends Transaction> extends Agent<World.City, 
 
     @Override
     protected List<Action<?, ?>.Report> run(Session<TX> session, World.City region, Random random) {
-        // Find bachelors and bachelorettes who are considered adults and who are not in a marriage and pair them off randomly
         List<Action<?, ?>.Report> reports = new ArrayList<>();
-        int numBirths = context.world().getScaleFactor();
         try (TX tx = session.transaction(region.tracker(), context.iteration(), isTracing())) {
-            for (int i = 0; i < numBirths; i++) {
-                String gender;
-                String forename;
-                String surname = pickOne(context.world().getSurnames(), random);
-
-                boolean genderBool = random.nextBoolean();
-                if (genderBool) {
-                    gender = "male";
-                    forename = pickOne(context.world().getMaleForenames(), random);
-                } else {
-                    gender = "female";
-                    forename = pickOne(context.world().getFemaleForenames(), random);
-                }
-                String email = "email/" + uniqueId(context, region.tracker(), i);
-                runAction(actionFactory().insertPersonAction(tx, region, context.today(), email, gender, forename, surname), reports);
-            }
+            UpdateAgesOfPeopleInCityAction<TX> updateAgesOfAllPeopleInCityAction = actionFactory().updateAgesOfPeopleInCityAction(tx, context.today(), region);
+            runAction(updateAgesOfAllPeopleInCityAction, reports);
             tx.commit();
         }
-
         return reports;
     }
 }

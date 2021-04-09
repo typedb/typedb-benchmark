@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package grakn.benchmark.simulation.agent.read;
+package grakn.benchmark.simulation.agent;
 
 import grakn.benchmark.simulation.action.ActionFactory;
 import grakn.benchmark.simulation.action.read.ReadAction;
@@ -23,14 +23,14 @@ import grakn.benchmark.simulation.common.SimulationContext;
 import grakn.benchmark.simulation.driver.Transaction;
 import grakn.benchmark.simulation.driver.Client;
 
-public class FindCurrentResidentsAgent<TX extends Transaction> extends ReadAgent<TX> {
+public class MeanWageAgent<TX extends Transaction> extends ReadAgent<TX> {
 
-    public FindCurrentResidentsAgent(Client<?, TX> client, ActionFactory<TX, ?> actionFactory, SimulationContext context) {
+    public MeanWageAgent(Client<?, TX> client, ActionFactory<TX, ?> actionFactory, SimulationContext context) {
         super(client, actionFactory, context);
     }
 
     @Override
     protected ReadAction<TX, ?> getAction(TX tx) {
-        return actionFactory().findCurrentResidentsAction(tx);
+        return actionFactory().meanWageOfPeopleInWorldAction(tx);
     }
 }

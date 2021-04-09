@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package grakn.benchmark.simulation.agent.read;
+package grakn.benchmark.simulation.agent;
 
 import grakn.benchmark.simulation.action.ActionFactory;
 import grakn.benchmark.simulation.action.read.ReadAction;
@@ -23,14 +23,14 @@ import grakn.benchmark.simulation.common.SimulationContext;
 import grakn.benchmark.simulation.driver.Transaction;
 import grakn.benchmark.simulation.driver.Client;
 
-public class FindSpecificMarriageAgent<TX extends Transaction> extends ReadAgent<TX> {
+public class FindTransactionCurrencyAgent<TX extends Transaction> extends ReadAgent<TX> {
 
-    public FindSpecificMarriageAgent(Client<?, TX> client, ActionFactory<TX, ?> actionFactory, SimulationContext context) {
+    public FindTransactionCurrencyAgent(Client<?, TX> client, ActionFactory<TX, ?> actionFactory, SimulationContext context) {
         super(client, actionFactory, context);
     }
 
     @Override
     protected ReadAction<TX, ?> getAction(TX tx) {
-        return actionFactory().findSpecificMarriageAction(tx);
+        return actionFactory().findTransactionCurrencyAction(tx);
     }
 }

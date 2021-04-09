@@ -15,18 +15,18 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package grakn.benchmark.simulation.agent.write;
+package grakn.benchmark.simulation.agent;
 
 import grakn.benchmark.simulation.action.Action;
 import grakn.benchmark.simulation.action.ActionFactory;
-import grakn.benchmark.simulation.action.read.ResidentsInCityAction;
 import grakn.benchmark.simulation.agent.Agent;
 import grakn.benchmark.simulation.common.SimulationContext;
+import grakn.benchmark.simulation.driver.Client;
 import grakn.benchmark.simulation.driver.Session;
 import grakn.benchmark.simulation.driver.Transaction;
-import grakn.benchmark.simulation.driver.Client;
 import grakn.benchmark.simulation.common.World;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -34,9 +34,9 @@ import java.util.Random;
 import static java.util.Collections.shuffle;
 import static java.util.stream.Collectors.toList;
 
-public class FriendshipAgent<TX extends Transaction> extends Agent<World.City, TX> {
+public class MarriageAgent<TX extends Transaction> extends Agent<World.City, TX> {
 
-    public FriendshipAgent(Client<?, TX> client, ActionFactory<TX, ?> actionFactory, SimulationContext context) {
+    public MarriageAgent(Client<?, TX> client, ActionFactory<TX, ?> actionFactory, SimulationContext context) {
         super(client, actionFactory, context);
     }
 
@@ -47,19 +47,29 @@ public class FriendshipAgent<TX extends Transaction> extends Agent<World.City, T
 
     @Override
     protected List<Action<?, ?>.Report> run(Session<TX> session, World.City region, Random random) {
+        // Find bachelors and bachelorettes who are considered adults and who are not in a marriage and pair them off randomly
         List<Action<?, ?>.Report> reports = new ArrayList<>();
-        List<String> residentEmails;
+        LocalDateTime dobOfAdults = context.today().minusYears(context.world().AGE_OF_ADULTHOOD);
+        List<String> womenEmails;
         try (TX tx = session.transaction(region.tracker(), context.iteration(), isTracing())) {
-            ResidentsInCityAction<?> residentEmailsAction = actionFactory().residentsInCityAction(tx, region, context.world().getScaleFactor(), context.today());
-            residentEmails = runAction(residentEmailsAction, reports);
-        } // TODO Closing and reopening the transaction here is a workaround for https://github.com/graknlabs/grakn/issues/5585
+            womenEmails = runAction(actionFactory().unmarriedPeopleInCityAction(tx, region, "female", dobOfAdults), reports);
+            shuffle(womenEmails, random);
+        }
 
+        List<String> menEmails;
         try (TX tx = session.transaction(region.tracker(), context.iteration(), isTracing())) {
-            if (residentEmails.size() > 0) {
-                shuffle(residentEmails, random);
-                int numFriendships = context.world().getScaleFactor();
-                for (int i = 0; i < numFriendships; i++) {
-                    runAction(actionFactory().insertFriendshipAction(tx, context.today(), pickOne(residentEmails, random), pickOne(residentEmails, random)), reports);
+            menEmails = runAction(actionFactory().unmarriedPeopleInCityAction(tx, region, "male", dobOfAdults), reports);
+            shuffle(menEmails, random);
+        }
+
+        int numMarriagesPossible = Math.min(context.world().getScaleFactor(), Math.min(womenEmails.size(), menEmails.size()));
+        try (TX tx = session.transaction(region.tracker(), context.iteration(), isTracing())) {
+            if (numMarriagesPossible > 0) {
+                for (int i = 0; i < numMarriagesPossible; i++) {
+                    String wifeEmail = womenEmails.get(i);
+                    String husbandEmail = menEmails.get(i);
+                    int marriageIdentifier = uniqueId(context, region.tracker(), i).hashCode();
+                    runAction(actionFactory().insertMarriageAction(tx, region, marriageIdentifier, wifeEmail, husbandEmail), reports);
                 }
                 tx.commit();
             }

@@ -18,10 +18,10 @@
 package grakn.benchmark.test;
 
 import grakn.benchmark.simulation.agent.Agent;
-import grakn.benchmark.simulation.agent.write.CompanyAgent;
-import grakn.benchmark.simulation.agent.write.PersonBirthAgent;
-import grakn.benchmark.simulation.agent.write.ProductAgent;
-import grakn.benchmark.simulation.agent.write.PurchaseAgent;
+import grakn.benchmark.simulation.agent.CompanyAgent;
+import grakn.benchmark.simulation.agent.PersonBirthAgent;
+import grakn.benchmark.simulation.agent.ProductAgent;
+import grakn.benchmark.simulation.agent.PurchaseAgent;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 

@@ -15,17 +15,17 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package grakn.benchmark.simulation.agent.write;
+package grakn.benchmark.simulation.agent;
 
 import grakn.benchmark.simulation.action.Action;
 import grakn.benchmark.simulation.action.ActionFactory;
-import grakn.benchmark.simulation.action.write.UpdateAgesOfPeopleInCityAction;
 import grakn.benchmark.simulation.agent.Agent;
 import grakn.benchmark.simulation.common.SimulationContext;
 import grakn.benchmark.simulation.driver.Session;
 import grakn.benchmark.simulation.driver.Transaction;
 import grakn.benchmark.simulation.driver.Client;
 import grakn.benchmark.simulation.common.World;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,25 +33,32 @@ import java.util.Random;
 
 import static java.util.stream.Collectors.toList;
 
-public class AgeUpdateAgent<TX extends Transaction> extends Agent<World.City, TX> {
+public class CompanyAgent<TX extends Transaction> extends Agent<World.Country, TX> {
 
-    public AgeUpdateAgent(Client<?, TX> client, ActionFactory<TX, ?> actionFactory, SimulationContext context) {
+    public CompanyAgent(Client<?, TX> client, ActionFactory<TX, ?> actionFactory, SimulationContext context) {
         super(client, actionFactory, context);
     }
 
     @Override
-    protected List<World.City> getRegions(World world) {
-        return world.getCities().collect(toList());
+    protected List<World.Country> getRegions(World world) {
+        return world.getCountries().collect(toList());
     }
 
     @Override
-    protected List<Action<?, ?>.Report> run(Session<TX> session, World.City region, Random random) {
+    protected List<Action<?, ?>.Report> run(Session<TX> session, World.Country region, Random random) {
         List<Action<?, ?>.Report> reports = new ArrayList<>();
+        int numCompanies = context.world().getScaleFactor();
         try (TX tx = session.transaction(region.tracker(), context.iteration(), isTracing())) {
-            UpdateAgesOfPeopleInCityAction<TX> updateAgesOfAllPeopleInCityAction = actionFactory().updateAgesOfPeopleInCityAction(tx, context.today(), region);
-            runAction(updateAgesOfAllPeopleInCityAction, reports);
+            for (int i = 0; i < numCompanies; i++) {
+                String adjective = pickOne(context.world().getAdjectives(), random);
+                String noun = pickOne(context.world().getNouns(), random);
+                int companyNumber = uniqueId(context, region.tracker(), i).hashCode();
+                String companyName = StringUtils.capitalize(adjective) + StringUtils.capitalize(noun) + "-" + companyNumber;
+                runAction(actionFactory().insertCompanyAction(tx, region, context.today(), companyNumber, companyName), reports);
+            }
             tx.commit();
         }
+
         return reports;
     }
 }

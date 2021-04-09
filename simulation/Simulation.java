@@ -20,27 +20,27 @@ package grakn.benchmark.simulation;
 import grakn.benchmark.config.Config;
 import grakn.benchmark.simulation.action.Action;
 import grakn.benchmark.simulation.action.ActionFactory;
+import grakn.benchmark.simulation.agent.AgeUpdateAgent;
 import grakn.benchmark.simulation.agent.Agent;
-import grakn.benchmark.simulation.agent.read.ArbitraryOneHopAgent;
-import grakn.benchmark.simulation.agent.read.FindCurrentResidentsAgent;
-import grakn.benchmark.simulation.agent.read.FindLivedInAgent;
-import grakn.benchmark.simulation.agent.read.FindSpecificMarriageAgent;
-import grakn.benchmark.simulation.agent.read.FindSpecificPersonAgent;
-import grakn.benchmark.simulation.agent.read.FindTransactionCurrencyAgent;
-import grakn.benchmark.simulation.agent.read.FourHopAgent;
-import grakn.benchmark.simulation.agent.read.MeanWageAgent;
-import grakn.benchmark.simulation.agent.read.ThreeHopAgent;
-import grakn.benchmark.simulation.agent.read.TwoHopAgent;
-import grakn.benchmark.simulation.agent.write.AgeUpdateAgent;
-import grakn.benchmark.simulation.agent.write.CompanyAgent;
-import grakn.benchmark.simulation.agent.write.EmploymentAgent;
-import grakn.benchmark.simulation.agent.write.FriendshipAgent;
-import grakn.benchmark.simulation.agent.write.MarriageAgent;
-import grakn.benchmark.simulation.agent.write.ParentshipAgent;
-import grakn.benchmark.simulation.agent.write.PersonBirthAgent;
-import grakn.benchmark.simulation.agent.write.ProductAgent;
-import grakn.benchmark.simulation.agent.write.PurchaseAgent;
-import grakn.benchmark.simulation.agent.write.RelocationAgent;
+import grakn.benchmark.simulation.agent.ArbitraryOneHopAgent;
+import grakn.benchmark.simulation.agent.CompanyAgent;
+import grakn.benchmark.simulation.agent.EmploymentAgent;
+import grakn.benchmark.simulation.agent.FindCurrentResidentsAgent;
+import grakn.benchmark.simulation.agent.FindLivedInAgent;
+import grakn.benchmark.simulation.agent.FindSpecificMarriageAgent;
+import grakn.benchmark.simulation.agent.FindSpecificPersonAgent;
+import grakn.benchmark.simulation.agent.FindTransactionCurrencyAgent;
+import grakn.benchmark.simulation.agent.FourHopAgent;
+import grakn.benchmark.simulation.agent.FriendshipAgent;
+import grakn.benchmark.simulation.agent.MarriageAgent;
+import grakn.benchmark.simulation.agent.MeanWageAgent;
+import grakn.benchmark.simulation.agent.ParentshipAgent;
+import grakn.benchmark.simulation.agent.PersonBirthAgent;
+import grakn.benchmark.simulation.agent.ProductAgent;
+import grakn.benchmark.simulation.agent.PurchaseAgent;
+import grakn.benchmark.simulation.agent.RelocationAgent;
+import grakn.benchmark.simulation.agent.ThreeHopAgent;
+import grakn.benchmark.simulation.agent.TwoHopAgent;
 import grakn.benchmark.simulation.common.RandomSource;
 import grakn.benchmark.simulation.common.SimulationContext;
 import grakn.benchmark.simulation.driver.Client;
@@ -60,6 +60,7 @@ import java.util.function.Function;
 public abstract class Simulation<CLIENT extends Client<SESSION, TX>, SESSION extends Session<TX>, TX extends Transaction> {
 
     private static final Logger LOG = LoggerFactory.getLogger(Simulation.class);
+    private static final String AGENT_PACKAGE = "grakn.benchmark.simulation.agent";
     private final Map<Class<? extends Agent>, Function<SimulationContext, Agent<?, TX>>> agentBuilders;
 
     private final CLIENT client;
@@ -115,9 +116,10 @@ public abstract class Simulation<CLIENT extends Client<SESSION, TX>, SESSION ext
         for (Config.Agent agentConfig : agentConfigs) {
             if (agentConfig.getAgentMode().getRun()) {
                 Agent<?, TX> agent;
-                String name = agentConfig.getName();
                 // TODO: should the agent names be identical to the class to begin with?
-                Class<?> agentClass = Class.forName(name.substring(0, 1).toUpperCase() + name.substring(1) + "Agent");
+                String name = agentConfig.getName();
+                name = AGENT_PACKAGE + "." + name.substring(0, 1).toUpperCase() + name.substring(1) + "Agent";
+                Class<?> agentClass = Class.forName(name);
                 if (agentBuilders.containsKey(agentClass)) agent = agentBuilders.get(agentClass).apply(context);
                 else throw new IllegalArgumentException("Unrecognised agent name: " + agentClass);
                 agent.overrideTracing(agentConfig.getAgentMode().getTrace());
