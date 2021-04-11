@@ -18,17 +18,17 @@
 package grakn.benchmark.simulation.action.read;
 
 import grakn.benchmark.simulation.driver.Transaction;
-import grakn.benchmark.simulation.common.World;
+import grakn.benchmark.simulation.common.GeoData;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public abstract class CompaniesInCountryAction<TX extends Transaction> extends ReadAction<TX, List<Long>> {
 
-    protected final World.Country country;
+    protected final GeoData.Country country;
     protected final int numCompanies;
 
-    public CompaniesInCountryAction(TX tx, World.Country country, int numCompanies) {
+    public CompaniesInCountryAction(TX tx, GeoData.Country country, int numCompanies) {
         super(tx);
         this.country = country;
         this.numCompanies = numCompanies;

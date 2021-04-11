@@ -64,12 +64,16 @@ public class Model {
 
     public static final String LOCATION_HIERARCHY = "location-hierarchy";
     public static final String LOCATION_NAME = "location-name";
+    public static final String SUPERIOR = "superior";
+    public static final String SUBORDINATE = "subordinate";
 
     public static final String LOCATES = "locates";
     public static final String LOCATES_LOCATED = "located";
     public static final String LOCATES_LOCATION = "location";
 
     public static final String CURRENCY = "currency";
+    public static final String CURRENCY_CODE = "currency-code";
+    public static final String LANGUAGE = "language";
     public static final String EMPLOYMENT = "employment";
     public static final String EMPLOYMENT_EMPLOYEE = "employee";
     public static final String EMPLOYMENT_EMPLOYER = "employer";

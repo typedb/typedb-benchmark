@@ -19,18 +19,18 @@ package grakn.benchmark.simulation.action.write;
 
 import grakn.benchmark.simulation.action.Action;
 import grakn.benchmark.simulation.driver.Transaction;
-import grakn.benchmark.simulation.common.World;
+import grakn.benchmark.simulation.common.GeoData;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 public abstract class InsertRelocationAction<TX extends Transaction, ACTION_RETURN_TYPE> extends Action<TX, ACTION_RETURN_TYPE> {
-    protected final World.City city;
+    protected final GeoData.City city;
     protected final LocalDateTime today;
     protected final String relocateeEmail;
     protected final String relocationCityName;
 
-    public InsertRelocationAction(TX tx, World.City city, LocalDateTime today, String relocateeEmail, String relocationCityName) {
+    public InsertRelocationAction(TX tx, GeoData.City city, LocalDateTime today, String relocateeEmail, String relocationCityName) {
         super(tx);
         this.city = city;
         this.today = today;

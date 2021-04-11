@@ -19,7 +19,7 @@ package grakn.benchmark.grakn.action.write;
 
 import grakn.benchmark.grakn.driver.GraknTransaction;
 import grakn.benchmark.simulation.action.write.InsertEmploymentAction;
-import grakn.benchmark.simulation.common.World;
+import grakn.benchmark.simulation.common.GeoData;
 import grakn.client.api.answer.ConceptMap;
 import graql.lang.Graql;
 import graql.lang.pattern.variable.UnboundVariable;
@@ -55,7 +55,7 @@ import static graql.lang.Graql.match;
 
 public class GraknInsertEmploymentAction extends InsertEmploymentAction<GraknTransaction, ConceptMap> {
 
-    public GraknInsertEmploymentAction(GraknTransaction tx, World.City worldCity, String employeeEmail, long companyNumber, LocalDateTime employmentDate, double wageValue, String contractContent, double contractedHours) {
+    public GraknInsertEmploymentAction(GraknTransaction tx, GeoData.City worldCity, String employeeEmail, long companyNumber, LocalDateTime employmentDate, double wageValue, String contractContent, double contractedHours) {
         super(tx, worldCity, employeeEmail, companyNumber, employmentDate, wageValue, contractContent, contractedHours);
     }
 

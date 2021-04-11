@@ -20,7 +20,7 @@ package grakn.benchmark.grakn.action.write;
 import grakn.benchmark.grakn.driver.GraknTransaction;
 import grakn.benchmark.simulation.action.Action;
 import grakn.benchmark.simulation.action.write.InsertRelocationAction;
-import grakn.benchmark.simulation.common.World;
+import grakn.benchmark.simulation.common.GeoData;
 import grakn.client.api.answer.ConceptMap;
 import graql.lang.query.GraqlInsert;
 
@@ -41,7 +41,7 @@ import static graql.lang.Graql.var;
 
 public class GraknInsertRelocationAction extends InsertRelocationAction<GraknTransaction, ConceptMap> {
 
-    public GraknInsertRelocationAction(GraknTransaction tx, World.City city, LocalDateTime today, String relocateeEmail, String relocationCityName) {
+    public GraknInsertRelocationAction(GraknTransaction tx, GeoData.City city, LocalDateTime today, String relocateeEmail, String relocationCityName) {
         super(tx, city, today, relocateeEmail, relocationCityName);
     }
 

@@ -40,15 +40,7 @@ java_binary(
     name = "benchmark",
     runtime_deps = [":benchmark-lib"],
     main_class = "grakn.benchmark.Benchmark",
-    classpath_resources = [
-        "//config:logback.xml",
-    ],
-    args = [
-        "$(locations //simulation/data)",
-    ],
-    data = [
-        "//simulation/data",
-    ],
+    classpath_resources = ["//config:logback.xml"],
 )
 
 checkstyle_test(

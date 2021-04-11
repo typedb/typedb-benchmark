@@ -19,7 +19,7 @@ package grakn.benchmark.neo4j.action.read;
 
 import grakn.benchmark.neo4j.driver.Neo4jTransaction;
 import grakn.benchmark.simulation.action.read.CompaniesInContinentAction;
-import grakn.benchmark.simulation.common.World;
+import grakn.benchmark.simulation.common.GeoData;
 import org.neo4j.driver.Query;
 
 import java.util.HashMap;
@@ -27,7 +27,7 @@ import java.util.List;
 
 public class Neo4jCompaniesInContinentAction extends CompaniesInContinentAction<Neo4jTransaction> {
 
-    public Neo4jCompaniesInContinentAction(Neo4jTransaction tx, World.Continent continent) {
+    public Neo4jCompaniesInContinentAction(Neo4jTransaction tx, GeoData.Continent continent) {
         super(tx, continent);
     }
 

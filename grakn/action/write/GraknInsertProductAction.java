@@ -19,7 +19,7 @@ package grakn.benchmark.grakn.action.write;
 
 import grakn.benchmark.grakn.driver.GraknTransaction;
 import grakn.benchmark.simulation.action.write.InsertProductAction;
-import grakn.benchmark.simulation.common.World;
+import grakn.benchmark.simulation.common.GeoData;
 import grakn.client.api.answer.ConceptMap;
 import graql.lang.query.GraqlInsert;
 
@@ -39,7 +39,7 @@ import static graql.lang.Graql.var;
 
 public class GraknInsertProductAction extends InsertProductAction<GraknTransaction, ConceptMap> {
 
-    public GraknInsertProductAction(GraknTransaction tx, World.Continent continent, Long barcode, String productName, String productDescription) {
+    public GraknInsertProductAction(GraknTransaction tx, GeoData.Continent continent, Long barcode, String productName, String productDescription) {
         super(tx, continent, barcode, productName, productDescription);
     }
 

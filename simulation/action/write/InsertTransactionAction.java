@@ -19,20 +19,20 @@ package grakn.benchmark.simulation.action.write;
 
 import grakn.benchmark.simulation.action.Action;
 import grakn.benchmark.simulation.driver.Transaction;
-import grakn.benchmark.simulation.common.World;
+import grakn.benchmark.simulation.common.GeoData;
 import grakn.common.collection.Pair;
 
 import java.util.ArrayList;
 
 public abstract class InsertTransactionAction<TX extends Transaction, ANSWER> extends Action<TX, ANSWER> {
-    protected final World.Country country;
+    protected final GeoData.Country country;
     protected final Pair<Long, Long> transaction;
     protected final Long sellerCompanyNumber;
     protected final double value;
     protected final int productQuantity;
     protected final boolean isTaxable;
 
-    public InsertTransactionAction(TX tx, World.Country country, Pair<Long, Long> transaction, Long sellerCompanyNumber, double value, int productQuantity, boolean isTaxable) {
+    public InsertTransactionAction(TX tx, GeoData.Country country, Pair<Long, Long> transaction, Long sellerCompanyNumber, double value, int productQuantity, boolean isTaxable) {
         super(tx);
         this.country = country;
         this.transaction = transaction;

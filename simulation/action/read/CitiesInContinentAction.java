@@ -18,15 +18,15 @@
 package grakn.benchmark.simulation.action.read;
 
 import grakn.benchmark.simulation.driver.Transaction;
-import grakn.benchmark.simulation.common.World;
+import grakn.benchmark.simulation.common.GeoData;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public abstract class CitiesInContinentAction<TX extends Transaction> extends ReadAction<TX, List<String>> {
-    protected final World.City city;
+    protected final GeoData.City city;
 
-    public CitiesInContinentAction(TX tx, World.City city) {
+    public CitiesInContinentAction(TX tx, GeoData.City city) {
         super(tx);
         this.city = city;
     }

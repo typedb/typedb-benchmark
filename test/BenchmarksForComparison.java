@@ -43,7 +43,6 @@ import java.util.Objects;
 import java.util.function.Function;
 
 import static grakn.benchmark.config.Config.Agent.ConstructAgentConfig;
-import static grakn.benchmark.simulation.common.World.initialise;
 
 public class BenchmarksForComparison {
 
@@ -110,10 +109,10 @@ public class BenchmarksForComparison {
 
         ArrayList<Config.Agent> agentConfigs = new ArrayList<>();
         agentNames.forEach(name -> agentConfigs.add(ConstructAgentConfig(name, AgentMode.RUN)));
-        SimulationContext context = SimulationContext.create(initialise(scaleFactor, files), true);
         try {
-            graknCore = GraknSimulation.core(graknUri, files, randomSeed, agentConfigs, context);
-            neo4j = Neo4JSimulation.create(neo4jUri, files, randomSeed, agentConfigs, context);
+            SimulationContext context = SimulationContext.create(scaleFactor, true);
+            graknCore = GraknSimulation.core(graknUri, randomSeed, agentConfigs, context);
+            neo4j = Neo4JSimulation.create(neo4jUri, randomSeed, agentConfigs, context);
         } catch (Exception e) {
             LOG.error(e.getMessage(), e);
         }

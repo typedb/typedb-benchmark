@@ -18,7 +18,7 @@
 package grakn.benchmark.simulation.action.write;
 
 import grakn.benchmark.simulation.action.Action;
-import grakn.benchmark.simulation.common.World;
+import grakn.benchmark.simulation.common.GeoData;
 import grakn.benchmark.simulation.driver.Transaction;
 
 import java.time.LocalDateTime;
@@ -27,9 +27,9 @@ import java.util.HashMap;
 
 public abstract class UpdateAgesOfPeopleInCityAction<TX extends Transaction> extends Action<TX, Void> {
     protected final LocalDateTime today;
-    protected final World.City city;
+    protected final GeoData.City city;
 
-    public UpdateAgesOfPeopleInCityAction(TX tx, LocalDateTime today, World.City city) {
+    public UpdateAgesOfPeopleInCityAction(TX tx, LocalDateTime today, GeoData.City city) {
         super(tx);
         this.today = today;
         this.city = city;

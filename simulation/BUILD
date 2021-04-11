@@ -19,10 +19,7 @@ load("@graknlabs_dependencies//tool/checkstyle:rules.bzl", "checkstyle_test")
 
 java_library(
     name = "simulation",
-    srcs = glob([
-        "*.java",
-    ]),
-    visibility = ["//visibility:public"],
+    srcs = glob(["*.java"]),
     deps = [
         "//simulation/action",
         "//simulation/agent",
@@ -33,6 +30,8 @@ java_library(
         "@maven//:commons_cli_commons_cli",
         "@maven//:org_slf4j_slf4j_api",
     ],
+    data = ["//simulation/data"],
+    visibility = ["//visibility:public"],
 )
 
 checkstyle_test(

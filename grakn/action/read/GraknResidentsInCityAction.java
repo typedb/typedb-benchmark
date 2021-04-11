@@ -19,7 +19,7 @@ package grakn.benchmark.grakn.action.read;
 
 import grakn.benchmark.grakn.driver.GraknTransaction;
 import grakn.benchmark.simulation.action.read.ResidentsInCityAction;
-import grakn.benchmark.simulation.common.World;
+import grakn.benchmark.simulation.common.GeoData;
 import graql.lang.pattern.variable.UnboundVariable;
 import graql.lang.query.GraqlMatch;
 
@@ -41,7 +41,7 @@ import static graql.lang.Graql.var;
 
 public class GraknResidentsInCityAction extends ResidentsInCityAction<GraknTransaction> {
 
-    public GraknResidentsInCityAction(GraknTransaction tx, World.City city, int numResidents, LocalDateTime earliestDate) {
+    public GraknResidentsInCityAction(GraknTransaction tx, GeoData.City city, int numResidents, LocalDateTime earliestDate) {
         super(tx, city, numResidents, earliestDate);
     }
 

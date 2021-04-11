@@ -19,41 +19,38 @@ package grakn.benchmark.simulation.agent;
 
 import grakn.benchmark.simulation.action.Action;
 import grakn.benchmark.simulation.action.ActionFactory;
-import grakn.benchmark.simulation.agent.Agent;
 import grakn.benchmark.simulation.common.SimulationContext;
 import grakn.benchmark.simulation.driver.Session;
 import grakn.benchmark.simulation.driver.Transaction;
 import grakn.benchmark.simulation.driver.Client;
-import grakn.benchmark.simulation.common.World;
+import grakn.benchmark.simulation.common.GeoData;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import static java.util.stream.Collectors.toList;
-
-public class CompanyAgent<TX extends Transaction> extends Agent<World.Country, TX> {
+public class CompanyAgent<TX extends Transaction> extends Agent<GeoData.Country, TX> {
 
     public CompanyAgent(Client<?, TX> client, ActionFactory<TX, ?> actionFactory, SimulationContext context) {
         super(client, actionFactory, context);
     }
 
     @Override
-    protected List<World.Country> getRegions(World world) {
-        return world.getCountries().collect(toList());
+    protected List<GeoData.Country> getRegions() {
+        return context.geoData().countries();
     }
 
     @Override
-    protected List<Action<?, ?>.Report> run(Session<TX> session, World.Country region, Random random) {
+    protected List<Action<?, ?>.Report> run(Session<TX> session, GeoData.Country region, Random random) {
         List<Action<?, ?>.Report> reports = new ArrayList<>();
-        int numCompanies = context.world().getScaleFactor();
+        int numCompanies = context.scaleFactor();
         try (TX tx = session.transaction(region.tracker(), context.iteration(), isTracing())) {
             for (int i = 0; i < numCompanies; i++) {
-                String adjective = pickOne(context.world().getAdjectives(), random);
-                String noun = pickOne(context.world().getNouns(), random);
+                String adjective = pickOne(context.wordData().getAdjectives(), random);
+                String noun = pickOne(context.wordData().getNouns(), random);
                 int companyNumber = uniqueId(context, region.tracker(), i).hashCode();
-                String companyName = StringUtils.capitalize(adjective) + StringUtils.capitalize(noun) + "-" + companyNumber;
+                String companyName = StringUtils.capitalize(adjective) + StringUtils.capitalize(noun) + "-" + companyNumber; // TODO: ???
                 runAction(actionFactory().insertCompanyAction(tx, region, context.today(), companyNumber, companyName), reports);
             }
             tx.commit();

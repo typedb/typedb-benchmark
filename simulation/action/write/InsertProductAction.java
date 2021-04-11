@@ -19,17 +19,17 @@ package grakn.benchmark.simulation.action.write;
 
 import grakn.benchmark.simulation.action.Action;
 import grakn.benchmark.simulation.driver.Transaction;
-import grakn.benchmark.simulation.common.World;
+import grakn.benchmark.simulation.common.GeoData;
 
 import java.util.ArrayList;
 
 public abstract class InsertProductAction<TX extends Transaction, ACTION_RETURN_TYPE> extends Action<TX, ACTION_RETURN_TYPE> {
-    protected final World.Continent continent;
+    protected final GeoData.Continent continent;
     protected final Long barcode;
     protected final String productName;
     protected final String productDescription;
 
-    public InsertProductAction(TX tx, World.Continent continent, Long barcode, String productName, String productDescription) {
+    public InsertProductAction(TX tx, GeoData.Continent continent, Long barcode, String productName, String productDescription) {
         super(tx);
         this.continent = continent;
         this.barcode = barcode;

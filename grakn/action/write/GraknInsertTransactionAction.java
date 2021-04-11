@@ -19,7 +19,7 @@ package grakn.benchmark.grakn.action.write;
 
 import grakn.benchmark.grakn.driver.GraknTransaction;
 import grakn.benchmark.simulation.action.write.InsertTransactionAction;
-import grakn.benchmark.simulation.common.World;
+import grakn.benchmark.simulation.common.GeoData;
 import grakn.client.api.answer.ConceptMap;
 import grakn.common.collection.Pair;
 import graql.lang.query.GraqlInsert;
@@ -47,7 +47,7 @@ import static graql.lang.Graql.var;
 
 public class GraknInsertTransactionAction extends InsertTransactionAction<GraknTransaction, ConceptMap> {
 
-    public GraknInsertTransactionAction(GraknTransaction tx, World.Country country, Pair<Long, Long> transaction, Long sellerCompanyNumber, double value, int productQuantity, boolean isTaxable) {
+    public GraknInsertTransactionAction(GraknTransaction tx, GeoData.Country country, Pair<Long, Long> transaction, Long sellerCompanyNumber, double value, int productQuantity, boolean isTaxable) {
         super(tx, country, transaction, sellerCompanyNumber, value, productQuantity, isTaxable);
     }
 

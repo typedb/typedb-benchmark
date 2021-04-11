@@ -19,7 +19,7 @@ package grakn.benchmark.grakn.action.write;
 
 import grakn.benchmark.grakn.driver.GraknTransaction;
 import grakn.benchmark.simulation.action.write.UpdateAgesOfPeopleInCityAction;
-import grakn.benchmark.simulation.common.World;
+import grakn.benchmark.simulation.common.GeoData;
 import grakn.common.collection.Pair;
 import graql.lang.pattern.variable.UnboundVariable;
 import graql.lang.query.GraqlMatch;
@@ -43,7 +43,7 @@ import static graql.lang.Graql.var;
 
 public class GraknUpdateAgesOfPeopleInCityAction extends UpdateAgesOfPeopleInCityAction<GraknTransaction> {
 
-    public GraknUpdateAgesOfPeopleInCityAction(GraknTransaction tx, LocalDateTime today, World.City city) {
+    public GraknUpdateAgesOfPeopleInCityAction(GraknTransaction tx, LocalDateTime today, GeoData.City city) {
         super(tx, today, city);
     }
 
@@ -58,7 +58,7 @@ public class GraknUpdateAgesOfPeopleInCityAction extends UpdateAgesOfPeopleInCit
         return null;
     }
 
-    private Stream<Pair<String, LocalDateTime>> getPeopleBornInCity(World.City worldCity) {
+    private Stream<Pair<String, LocalDateTime>> getPeopleBornInCity(GeoData.City worldCity) {
         GraqlMatch peopleQuery = getPeopleBornInCityQuery(worldCity.name());
         return tx.executeAsync(peopleQuery).map(personAnswer -> {
             LocalDateTime dob = (LocalDateTime) personAnswer.get(DATE_OF_BIRTH).asThing().asAttribute().getValue();

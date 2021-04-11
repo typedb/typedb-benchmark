@@ -19,7 +19,7 @@ package grakn.benchmark.neo4j.action.read;
 
 import grakn.benchmark.neo4j.driver.Neo4jTransaction;
 import grakn.benchmark.simulation.action.read.UnmarriedPeopleInCityAction;
-import grakn.benchmark.simulation.common.World;
+import grakn.benchmark.simulation.common.GeoData;
 import org.neo4j.driver.Query;
 
 import java.time.LocalDateTime;
@@ -31,7 +31,7 @@ import static grakn.benchmark.neo4j.action.Model.LOCATION_NAME;
 
 public class Neo4jUnmarriedPeopleInCityAction extends UnmarriedPeopleInCityAction<Neo4jTransaction> {
 
-    public Neo4jUnmarriedPeopleInCityAction(Neo4jTransaction tx, World.City city, String gender, LocalDateTime dobOfAdults) {
+    public Neo4jUnmarriedPeopleInCityAction(Neo4jTransaction tx, GeoData.City city, String gender, LocalDateTime dobOfAdults) {
         super(tx, city, gender, dobOfAdults);
     }
 

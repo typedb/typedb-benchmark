@@ -26,7 +26,6 @@ import grakn.benchmark.simulation.driver.Session;
 import grakn.benchmark.simulation.driver.Transaction;
 import grakn.benchmark.simulation.common.RandomSource;
 import grakn.benchmark.simulation.common.Region;
-import grakn.benchmark.simulation.common.World;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -66,7 +65,7 @@ public abstract class Agent<REGION extends Region, TX extends Transaction> {
         this.context = context;
     }
 
-    protected abstract List<REGION> getRegions(World world);
+    protected abstract List<REGION> getRegions();
 
     protected abstract List<Action<?, ?>.Report> run(Session<TX> session, REGION region, Random random);
 
@@ -84,7 +83,7 @@ public abstract class Agent<REGION extends Region, TX extends Transaction> {
 
     public Map<String, List<Action<?, ?>.Report>> iterate(RandomSource randomSrc) {
         ConcurrentMap<String, List<Action<?, ?>.Report>> reports = new ConcurrentHashMap<>();
-        List<REGION> regions = getRegions(context.world());
+        List<REGION> regions = getRegions();
         regions.parallelStream().forEach(region -> {
             List<Action<?, ?>.Report> report = runWithMayTrace(region, randomSrc.next().get());
             if (context.isTest()) reports.put(region.tracker(), report);

@@ -19,7 +19,7 @@ package grakn.benchmark.grakn.action.read;
 
 import grakn.benchmark.grakn.driver.GraknTransaction;
 import grakn.benchmark.simulation.action.read.BirthsInCityAction;
-import grakn.benchmark.simulation.common.World;
+import grakn.benchmark.simulation.common.GeoData;
 import graql.lang.query.GraqlMatch;
 
 import java.time.LocalDateTime;
@@ -37,7 +37,7 @@ import static graql.lang.Graql.match;
 import static graql.lang.Graql.var;
 
 public class GraknBirthsInCityAction extends BirthsInCityAction<GraknTransaction> {
-    public GraknBirthsInCityAction(GraknTransaction tx, World.City city, LocalDateTime today) {
+    public GraknBirthsInCityAction(GraknTransaction tx, GeoData.City city, LocalDateTime today) {
         super(tx, city, today);
     }
 

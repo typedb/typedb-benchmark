@@ -41,6 +41,7 @@ import grakn.benchmark.simulation.agent.PurchaseAgent;
 import grakn.benchmark.simulation.agent.RelocationAgent;
 import grakn.benchmark.simulation.agent.ThreeHopAgent;
 import grakn.benchmark.simulation.agent.TwoHopAgent;
+import grakn.benchmark.simulation.common.GeoData;
 import grakn.benchmark.simulation.common.RandomSource;
 import grakn.benchmark.simulation.common.SimulationContext;
 import grakn.benchmark.simulation.driver.Client;
@@ -49,6 +50,7 @@ import grakn.benchmark.simulation.driver.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -69,20 +71,23 @@ public abstract class Simulation<CLIENT extends Client<SESSION, TX>, SESSION ext
     private final SimulationContext context;
     private final Map<Class<? extends Agent>, Map<String, List<Action<?, ?>.Report>>> agentReports;
 
-    public Simulation(CLIENT client, Map<String, Path> dataFiles, int randomSeed, List<Config.Agent> agentConfigs, SimulationContext context) throws Exception {
+    public Simulation(CLIENT client, int seed, List<Config.Agent> agentConfigs, SimulationContext context) throws Exception {
         this.client = client;
-        this.randomSource = new RandomSource(randomSeed);
+        this.randomSource = new RandomSource(seed);
         this.agentConfigs = agentConfigs;
         this.context = context;
         this.agentReports = new ConcurrentHashMap<>();
         this.agentBuilders = initialiseAgentBuilders();
         this.agents = agentListFromConfigs();
-        initialise(dataFiles);
+        initialiseDatabase();
+        initialiseData(context.geoData());
     }
 
-    protected abstract void initialise(Map<String, Path> dataFiles) throws Exception;
-
     protected abstract ActionFactory<TX, ?> actionFactory();
+
+    protected abstract void initialiseDatabase() throws IOException;
+
+    protected abstract void initialiseData(GeoData geoData);
 
     // TODO: make this static
     private Map<Class<? extends Agent>, Agent<?, TX>> initialiseAgentBuilders() {

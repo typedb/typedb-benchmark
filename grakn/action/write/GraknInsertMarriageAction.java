@@ -20,7 +20,7 @@ package grakn.benchmark.grakn.action.write;
 import grakn.benchmark.grakn.driver.GraknTransaction;
 import grakn.benchmark.simulation.action.Action;
 import grakn.benchmark.simulation.action.write.InsertMarriageAction;
-import grakn.benchmark.simulation.common.World;
+import grakn.benchmark.simulation.common.GeoData;
 import grakn.client.api.answer.ConceptMap;
 import graql.lang.pattern.variable.ThingVariable;
 import graql.lang.pattern.variable.UnboundVariable;
@@ -44,7 +44,7 @@ import static graql.lang.Graql.var;
 
 public class GraknInsertMarriageAction extends InsertMarriageAction<GraknTransaction, ConceptMap> {
 
-    public GraknInsertMarriageAction(GraknTransaction tx, World.City city, int marriageIdentifier, String wifeEmail, String husbandEmail) {
+    public GraknInsertMarriageAction(GraknTransaction tx, GeoData.City city, int marriageIdentifier, String wifeEmail, String husbandEmail) {
         super(tx, city, marriageIdentifier, wifeEmail, husbandEmail);
     }
 

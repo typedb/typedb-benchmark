@@ -20,19 +20,18 @@ package grakn.benchmark.simulation.agent;
 import grakn.benchmark.simulation.action.Action;
 import grakn.benchmark.simulation.action.ActionFactory;
 import grakn.benchmark.simulation.action.read.ReadAction;
-import grakn.benchmark.simulation.agent.Agent;
+import grakn.benchmark.simulation.common.GeoData;
 import grakn.benchmark.simulation.common.SimulationContext;
+import grakn.benchmark.simulation.driver.Client;
 import grakn.benchmark.simulation.driver.Session;
 import grakn.benchmark.simulation.driver.Transaction;
-import grakn.benchmark.simulation.driver.Client;
-import grakn.benchmark.simulation.common.World;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
-public abstract class ReadAgent<TX extends Transaction> extends Agent<World, TX> {
+public abstract class ReadAgent<TX extends Transaction> extends Agent<GeoData.Global, TX> {
 
     public ReadAgent(Client<?, TX> client, ActionFactory<TX, ?> actionFactory, SimulationContext context) {
         super(client, actionFactory, context);
@@ -41,14 +40,14 @@ public abstract class ReadAgent<TX extends Transaction> extends Agent<World, TX>
     protected abstract ReadAction<TX, ?> getAction(TX tx);
 
     @Override
-    protected List<World> getRegions(World world) {
-        return Collections.singletonList(world);
+    protected List<GeoData.Global> getRegions() {
+        return Collections.singletonList(context.geoData().global());
     }
 
     @Override
-    protected List<Action<?, ?>.Report> run(Session<TX> session, World region, Random random) {
+    protected List<Action<?, ?>.Report> run(Session<TX> session, GeoData.Global region, Random random) {
         List<Action<?, ?>.Report> reports = new ArrayList<>();
-        for (int i = 0; i <= context.world().getScaleFactor(); i++) {
+        for (int i = 0; i <= context.scaleFactor(); i++) {
             try (TX tx = session.transaction(region.tracker(), context.iteration(), isTracing())) {
                 runAction(getAction(tx), reports);
             }

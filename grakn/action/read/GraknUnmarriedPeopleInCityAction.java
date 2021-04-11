@@ -19,7 +19,7 @@ package grakn.benchmark.grakn.action.read;
 
 import grakn.benchmark.grakn.driver.GraknTransaction;
 import grakn.benchmark.simulation.action.read.UnmarriedPeopleInCityAction;
-import grakn.benchmark.simulation.common.World;
+import grakn.benchmark.simulation.common.GeoData;
 import graql.lang.pattern.variable.UnboundVariable;
 import graql.lang.query.GraqlMatch;
 
@@ -45,7 +45,7 @@ import static graql.lang.Graql.var;
 
 public class GraknUnmarriedPeopleInCityAction extends UnmarriedPeopleInCityAction<GraknTransaction> {
 
-    public GraknUnmarriedPeopleInCityAction(GraknTransaction tx, World.City city, String gender, LocalDateTime dobOfAdults) {
+    public GraknUnmarriedPeopleInCityAction(GraknTransaction tx, GeoData.City city, String gender, LocalDateTime dobOfAdults) {
         super(tx, city, gender, dobOfAdults);
     }
 

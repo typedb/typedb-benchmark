@@ -36,11 +36,6 @@ java_test(
         "ComparisonTestSuite.java",
         "BenchmarksForComparison.java",
     ],
-    data = [
-        "//simulation/data",
-        "//grakn/data",
-        "//neo4j/data",
-    ],
     test_class = "grakn.benchmark.test.ComparisonTest",
     deps = [
         "//simulation/agent",

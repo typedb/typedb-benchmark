@@ -22,11 +22,11 @@ java_library(
     srcs = glob(["*.java", "*/*.java", "*/*/*.java"]),
     visibility = ["//visibility:public"],
     deps = [
+        "//common:common",
         "//simulation:simulation",
-        "//simulation/action",
-        "//simulation/common",
-        "//simulation/driver",
-        "//simulation/loader",
+        "//simulation/action:action",
+        "//simulation/common:common",
+        "//simulation/driver:driver",
         "//config",
         "@graknlabs_grabl_tracing//client",
         "@graknlabs_common//:common",
@@ -36,7 +36,6 @@ java_library(
         "@maven//:org_slf4j_slf4j_api",
         "@neo4j//:org_neo4j_driver_neo4j_java_driver",
     ],
-    data = ["//neo4j/data"],
 )
 
 checkstyle_test(

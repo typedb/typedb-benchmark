@@ -19,14 +19,14 @@ package grakn.benchmark.simulation.action.write;
 
 import grakn.benchmark.simulation.action.Action;
 import grakn.benchmark.simulation.driver.Transaction;
-import grakn.benchmark.simulation.common.World;
+import grakn.benchmark.simulation.common.GeoData;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 public abstract class InsertEmploymentAction<TX extends Transaction, ACTION_RETURN_TYPE> extends Action<TX, ACTION_RETURN_TYPE> {
 
-    protected final World.City worldCity;
+    protected final GeoData.City worldCity;
     protected final String employeeEmail;
     protected final long companyNumber;
     protected final LocalDateTime employmentDate;
@@ -34,7 +34,7 @@ public abstract class InsertEmploymentAction<TX extends Transaction, ACTION_RETU
     protected final String contractContent;
     protected final double contractedHours;
 
-    public InsertEmploymentAction(TX tx, World.City city, String employeeEmail, long companyNumber, LocalDateTime employmentDate, double wageValue, String contractContent, double contractedHours) {
+    public InsertEmploymentAction(TX tx, GeoData.City city, String employeeEmail, long companyNumber, LocalDateTime employmentDate, double wageValue, String contractContent, double contractedHours) {
         super(tx);
         this.worldCity = city;
         this.employeeEmail = employeeEmail;

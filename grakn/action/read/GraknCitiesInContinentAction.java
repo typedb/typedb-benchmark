@@ -19,7 +19,7 @@ package grakn.benchmark.grakn.action.read;
 
 import grakn.benchmark.grakn.driver.GraknTransaction;
 import grakn.benchmark.simulation.action.read.CitiesInContinentAction;
-import grakn.benchmark.simulation.common.World;
+import grakn.benchmark.simulation.common.GeoData;
 import graql.lang.query.GraqlMatch;
 
 import java.util.List;
@@ -33,7 +33,7 @@ import static graql.lang.Graql.var;
 
 public class GraknCitiesInContinentAction extends CitiesInContinentAction<GraknTransaction> {
 
-    public GraknCitiesInContinentAction(GraknTransaction tx, World.City city) {
+    public GraknCitiesInContinentAction(GraknTransaction tx, GeoData.City city) {
         super(tx, city);
     }
 

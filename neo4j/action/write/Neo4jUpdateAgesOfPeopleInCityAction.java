@@ -20,7 +20,7 @@ package grakn.benchmark.neo4j.action.write;
 import grakn.benchmark.neo4j.action.Model;
 import grakn.benchmark.neo4j.driver.Neo4jTransaction;
 import grakn.benchmark.simulation.action.write.UpdateAgesOfPeopleInCityAction;
-import grakn.benchmark.simulation.common.World;
+import grakn.benchmark.simulation.common.GeoData;
 import org.neo4j.driver.Query;
 
 import java.time.LocalDateTime;
@@ -28,7 +28,7 @@ import java.util.HashMap;
 
 public class Neo4jUpdateAgesOfPeopleInCityAction extends UpdateAgesOfPeopleInCityAction<Neo4jTransaction> {
 
-    public Neo4jUpdateAgesOfPeopleInCityAction(Neo4jTransaction tx, LocalDateTime today, World.City city) {
+    public Neo4jUpdateAgesOfPeopleInCityAction(Neo4jTransaction tx, LocalDateTime today, GeoData.City city) {
         super(tx, today, city);
     }
 

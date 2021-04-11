@@ -20,7 +20,7 @@ package grakn.benchmark.neo4j.action.write;
 import grakn.benchmark.neo4j.action.Model;
 import grakn.benchmark.neo4j.driver.Neo4jTransaction;
 import grakn.benchmark.simulation.action.write.InsertTransactionAction;
-import grakn.benchmark.simulation.common.World;
+import grakn.benchmark.simulation.common.GeoData;
 import grakn.common.collection.Pair;
 import org.neo4j.driver.Query;
 import org.neo4j.driver.Record;
@@ -29,7 +29,7 @@ import java.util.HashMap;
 
 public class Neo4jInsertTransactionAction extends InsertTransactionAction<Neo4jTransaction, Record> {
 
-    public Neo4jInsertTransactionAction(Neo4jTransaction tx, World.Country country, Pair<Long, Long> transaction, Long sellerCompanyNumber, double value, int productQuantity, boolean isTaxable) {
+    public Neo4jInsertTransactionAction(Neo4jTransaction tx, GeoData.Country country, Pair<Long, Long> transaction, Long sellerCompanyNumber, double value, int productQuantity, boolean isTaxable) {
         super(tx, country, transaction, sellerCompanyNumber, value, productQuantity, isTaxable);
     }
 

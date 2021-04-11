@@ -22,13 +22,12 @@ import grakn.benchmark.simulation.action.ActionFactory;
 import grakn.benchmark.simulation.action.SpouseType;
 import grakn.benchmark.simulation.action.read.BirthsInCityAction;
 import grakn.benchmark.simulation.action.read.MarriedCoupleAction;
-import grakn.benchmark.simulation.agent.Agent;
 import grakn.benchmark.simulation.common.Allocation;
 import grakn.benchmark.simulation.common.SimulationContext;
 import grakn.benchmark.simulation.driver.Session;
 import grakn.benchmark.simulation.driver.Transaction;
 import grakn.benchmark.simulation.driver.Client;
-import grakn.benchmark.simulation.common.World;
+import grakn.benchmark.simulation.common.GeoData;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -37,21 +36,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-import static java.util.stream.Collectors.toList;
-
-public class ParentshipAgent<TX extends Transaction> extends Agent<World.City, TX> {
+public class ParentshipAgent<TX extends Transaction> extends Agent<GeoData.City, TX> {
 
     public ParentshipAgent(Client<?, TX> client, ActionFactory<TX, ?> actionFactory, SimulationContext context) {
         super(client, actionFactory, context);
     }
 
     @Override
-    protected List<World.City> getRegions(World world) {
-        return world.getCities().collect(toList());
+    protected List<GeoData.City> getRegions() {
+        return context.geoData().cities();
     }
 
     @Override
-    protected List<Action<?, ?>.Report> run(Session<TX> session, World.City region, Random random) {
+    protected List<Action<?, ?>.Report> run(Session<TX> session, GeoData.City region, Random random) {
         // Query for married couples in the city who are not already in a parentship relation together
         List<Action<?, ?>.Report> reports = new ArrayList<>();
         List<String> childrenEmails;

@@ -19,17 +19,17 @@ package grakn.benchmark.simulation.action.write;
 
 import grakn.benchmark.simulation.action.Action;
 import grakn.benchmark.simulation.driver.Transaction;
-import grakn.benchmark.simulation.common.World;
+import grakn.benchmark.simulation.common.GeoData;
 
 import java.util.ArrayList;
 
 public abstract class InsertMarriageAction<TX extends Transaction, ACTION_RETURN_TYPE> extends Action<TX, ACTION_RETURN_TYPE> {
-    protected final World.City worldCity;
+    protected final GeoData.City worldCity;
     protected final int marriageIdentifier;
     protected final String wifeEmail;
     protected final String husbandEmail;
 
-    public InsertMarriageAction(TX tx, World.City city, int marriageIdentifier, String wifeEmail, String husbandEmail) {
+    public InsertMarriageAction(TX tx, GeoData.City city, int marriageIdentifier, String wifeEmail, String husbandEmail) {
         super(tx);
         this.worldCity = city;
         this.marriageIdentifier = marriageIdentifier;

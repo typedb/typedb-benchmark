@@ -24,7 +24,6 @@ filegroup(
         "cities.csv",
         "continents.csv",
         "countries.csv",
-        "country_currencies.csv",
         "country_languages.csv",
         "currencies.csv",
         "female_forenames.csv",

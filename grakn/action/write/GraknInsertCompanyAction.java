@@ -20,7 +20,7 @@ package grakn.benchmark.grakn.action.write;
 import grakn.benchmark.grakn.driver.GraknTransaction;
 import grakn.benchmark.simulation.action.Action;
 import grakn.benchmark.simulation.action.write.InsertCompanyAction;
-import grakn.benchmark.simulation.common.World;
+import grakn.benchmark.simulation.common.GeoData;
 import grakn.client.api.answer.ConceptMap;
 import graql.lang.Graql;
 import graql.lang.query.GraqlInsert;
@@ -41,7 +41,7 @@ import static graql.lang.Graql.var;
 
 public class GraknInsertCompanyAction extends InsertCompanyAction<GraknTransaction, ConceptMap> {
 
-    public GraknInsertCompanyAction(GraknTransaction tx, World.Country country, LocalDateTime today, int companyNumber, String companyName) {
+    public GraknInsertCompanyAction(GraknTransaction tx, GeoData.Country country, LocalDateTime today, int companyNumber, String companyName) {
         super(tx, country, today, companyNumber, companyName);
     }
 

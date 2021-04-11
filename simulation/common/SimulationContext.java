@@ -18,6 +18,7 @@
 package grakn.benchmark.simulation.common;
 
 import javax.annotation.Nullable;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -25,21 +26,29 @@ import java.util.function.Function;
 
 public class SimulationContext {
 
+    public static final int AGE_OF_ADULTHOOD = 1;
+
     @Nullable
     private Function<Integer, Boolean> samplingFunction;
 
-    private final World world;
+    private final GeoData geoData;
+    private final WordData wordData;
+    private final int scaleFactor;
     private final boolean isTest;
     private int iteration;
 
-    private SimulationContext(World world, boolean isTest) {
-        this.world = world;
+    private SimulationContext(GeoData geoData, WordData wordData, int scaleFactor, boolean isTest) {
+        this.geoData = geoData;
+        this.wordData = wordData;
+        this.scaleFactor = scaleFactor;
         this.isTest = isTest;
         this.iteration = 0;
     }
 
-    public static SimulationContext create(World world, boolean isTest) {
-        return new SimulationContext(world, isTest);
+    public static SimulationContext create(int scaleFactor, boolean isTest) throws IOException {
+        GeoData geoData = GeoData.initialise();
+        WordData wordData = WordData.initialise();
+        return new SimulationContext(geoData, wordData, scaleFactor, isTest);
     }
 
     public void enableTracing(Function<Integer, Boolean> samplingFunction) {
@@ -50,6 +59,10 @@ public class SimulationContext {
         iteration++;
     }
 
+    public int scaleFactor() {
+        return scaleFactor;
+    }
+
     public int iteration() {
         return iteration;
     }
@@ -58,8 +71,12 @@ public class SimulationContext {
         return LocalDateTime.of(LocalDate.ofYearDay(iteration, 1), LocalTime.of(0, 0, 0));
     }
 
-    public World world() {
-        return world;
+    public GeoData geoData() {
+        return geoData;
+    }
+
+    public WordData wordData() {
+        return wordData;
     }
 
     public boolean isTracing() {

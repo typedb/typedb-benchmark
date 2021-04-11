@@ -19,19 +19,19 @@ package grakn.benchmark.simulation.action.write;
 
 import grakn.benchmark.simulation.action.Action;
 import grakn.benchmark.simulation.driver.Transaction;
-import grakn.benchmark.simulation.common.World;
+import grakn.benchmark.simulation.common.GeoData;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 public abstract class InsertCompanyAction<TX extends Transaction, ACTION_RETURN_TYPE> extends Action<TX, ACTION_RETURN_TYPE> {
 
-    protected final World.Country country;
+    protected final GeoData.Country country;
     protected final LocalDateTime today;
     protected final int companyNumber;
     protected final String companyName;
 
-    public InsertCompanyAction(TX tx, World.Country country, LocalDateTime today, int companyNumber, String companyName) {
+    public InsertCompanyAction(TX tx, GeoData.Country country, LocalDateTime today, int companyNumber, String companyName) {
         super(tx);
         this.country = country;
         this.today = today;

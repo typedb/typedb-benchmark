@@ -18,15 +18,15 @@
 package grakn.benchmark.simulation.action.read;
 
 import grakn.benchmark.simulation.driver.Transaction;
-import grakn.benchmark.simulation.common.World;
+import grakn.benchmark.simulation.common.GeoData;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public abstract class CompaniesInContinentAction<TX extends Transaction> extends ReadAction<TX, List<Long>> {
-    protected final World.Continent continent;
+    protected final GeoData.Continent continent;
 
-    public CompaniesInContinentAction(TX tx, World.Continent continent) {
+    public CompaniesInContinentAction(TX tx, GeoData.Continent continent) {
         super(tx);
         this.continent = continent;
     }

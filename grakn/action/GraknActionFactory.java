@@ -72,7 +72,7 @@ import grakn.benchmark.simulation.action.write.InsertProductAction;
 import grakn.benchmark.simulation.action.write.InsertRelocationAction;
 import grakn.benchmark.simulation.action.write.InsertTransactionAction;
 import grakn.benchmark.simulation.action.write.UpdateAgesOfPeopleInCityAction;
-import grakn.benchmark.simulation.common.World;
+import grakn.benchmark.simulation.common.GeoData;
 import grakn.client.api.answer.ConceptMap;
 import grakn.common.collection.Pair;
 
@@ -82,22 +82,22 @@ import java.util.HashMap;
 public class GraknActionFactory extends ActionFactory<GraknTransaction, ConceptMap> {
 
     @Override
-    public GraknResidentsInCityAction residentsInCityAction(GraknTransaction tx, World.City city, int numResidents, LocalDateTime earliestDate) {
+    public GraknResidentsInCityAction residentsInCityAction(GraknTransaction tx, GeoData.City city, int numResidents, LocalDateTime earliestDate) {
         return new GraknResidentsInCityAction(tx, city, numResidents, earliestDate);
     }
 
     @Override
-    public GraknCompaniesInCountryAction companiesInCountryAction(GraknTransaction tx, World.Country country, int numCompanies) {
+    public GraknCompaniesInCountryAction companiesInCountryAction(GraknTransaction tx, GeoData.Country country, int numCompanies) {
         return new GraknCompaniesInCountryAction(tx, country, numCompanies);
     }
 
     @Override
-    public InsertEmploymentAction<GraknTransaction, ConceptMap> insertEmploymentAction(GraknTransaction tx, World.City city, String employeeEmail, long companyNumber, LocalDateTime employmentDate, double wageValue, String contractContent, double contractedHours) {
+    public InsertEmploymentAction<GraknTransaction, ConceptMap> insertEmploymentAction(GraknTransaction tx, GeoData.City city, String employeeEmail, long companyNumber, LocalDateTime employmentDate, double wageValue, String contractContent, double contractedHours) {
         return new GraknInsertEmploymentAction(tx, city, employeeEmail, companyNumber, employmentDate, wageValue, contractContent, contractedHours);
     }
 
     @Override
-    public InsertCompanyAction<GraknTransaction, ConceptMap> insertCompanyAction(GraknTransaction tx, World.Country country, LocalDateTime today, int companyNumber, String companyName) {
+    public InsertCompanyAction<GraknTransaction, ConceptMap> insertCompanyAction(GraknTransaction tx, GeoData.Country country, LocalDateTime today, int companyNumber, String companyName) {
         return new GraknInsertCompanyAction(tx, country, today, companyNumber, companyName);
     }
 
@@ -107,22 +107,22 @@ public class GraknActionFactory extends ActionFactory<GraknTransaction, ConceptM
     }
 
     @Override
-    public UnmarriedPeopleInCityAction<GraknTransaction> unmarriedPeopleInCityAction(GraknTransaction tx, World.City city, String gender, LocalDateTime dobOfAdults) {
+    public UnmarriedPeopleInCityAction<GraknTransaction> unmarriedPeopleInCityAction(GraknTransaction tx, GeoData.City city, String gender, LocalDateTime dobOfAdults) {
         return new GraknUnmarriedPeopleInCityAction(tx, city, gender, dobOfAdults);
     }
 
     @Override
-    public InsertMarriageAction<GraknTransaction, ConceptMap> insertMarriageAction(GraknTransaction tx, World.City city, int marriageIdentifier, String wifeEmail, String husbandEmail) {
+    public InsertMarriageAction<GraknTransaction, ConceptMap> insertMarriageAction(GraknTransaction tx, GeoData.City city, int marriageIdentifier, String wifeEmail, String husbandEmail) {
         return new GraknInsertMarriageAction(tx, city, marriageIdentifier, wifeEmail, husbandEmail);
     }
 
     @Override
-    public BirthsInCityAction<GraknTransaction> birthsInCityAction(GraknTransaction tx, World.City city, LocalDateTime today) {
+    public BirthsInCityAction<GraknTransaction> birthsInCityAction(GraknTransaction tx, GeoData.City city, LocalDateTime today) {
         return new GraknBirthsInCityAction(tx, city, today);
     }
 
     @Override
-    public MarriedCoupleAction<GraknTransaction> marriedCoupleAction(GraknTransaction tx, World.City city, LocalDateTime today) {
+    public MarriedCoupleAction<GraknTransaction> marriedCoupleAction(GraknTransaction tx, GeoData.City city, LocalDateTime today) {
         return new GraknMarriedCoupleAction(tx, city, today);
     }
 
@@ -132,37 +132,37 @@ public class GraknActionFactory extends ActionFactory<GraknTransaction, ConceptM
     }
 
     @Override
-    public InsertPersonAction<GraknTransaction, ConceptMap> insertPersonAction(GraknTransaction tx, World.City city, LocalDateTime today, String email, String gender, String forename, String surname) {
+    public InsertPersonAction<GraknTransaction, ConceptMap> insertPersonAction(GraknTransaction tx, GeoData.City city, LocalDateTime today, String email, String gender, String forename, String surname) {
         return new GraknInsertPersonAction(tx, city, today, email, gender, forename, surname);
     }
 
     @Override
-    public InsertProductAction<GraknTransaction, ConceptMap> insertProductAction(GraknTransaction tx, World.Continent continent, Long barcode, String productName, String productDescription) {
+    public InsertProductAction<GraknTransaction, ConceptMap> insertProductAction(GraknTransaction tx, GeoData.Continent continent, Long barcode, String productName, String productDescription) {
         return new GraknInsertProductAction(tx, continent, barcode, productName, productDescription);
     }
 
     @Override
-    public CitiesInContinentAction<GraknTransaction> citiesInContinentAction(GraknTransaction tx, World.City city) {
+    public CitiesInContinentAction<GraknTransaction> citiesInContinentAction(GraknTransaction tx, GeoData.City city) {
         return new GraknCitiesInContinentAction(tx, city);
     }
 
     @Override
-    public InsertRelocationAction<GraknTransaction, ConceptMap> insertRelocationAction(GraknTransaction tx, World.City city, LocalDateTime today, String residentEmail, String relocationCityName) {
+    public InsertRelocationAction<GraknTransaction, ConceptMap> insertRelocationAction(GraknTransaction tx, GeoData.City city, LocalDateTime today, String residentEmail, String relocationCityName) {
         return new GraknInsertRelocationAction(tx, city, today, residentEmail, relocationCityName);
     }
 
     @Override
-    public ProductsInContinentAction<GraknTransaction> productsInContinentAction(GraknTransaction tx, World.Continent continent) {
+    public ProductsInContinentAction<GraknTransaction> productsInContinentAction(GraknTransaction tx, GeoData.Continent continent) {
         return new GraknProductsInContinentAction(tx, continent);
     }
 
     @Override
-    public InsertTransactionAction<GraknTransaction, ConceptMap> insertTransactionAction(GraknTransaction tx, World.Country country, Pair<Long, Long> transaction, Long sellerCompanyNumber, double value, int productQuantity, boolean isTaxable) {
+    public InsertTransactionAction<GraknTransaction, ConceptMap> insertTransactionAction(GraknTransaction tx, GeoData.Country country, Pair<Long, Long> transaction, Long sellerCompanyNumber, double value, int productQuantity, boolean isTaxable) {
         return new GraknInsertTransactionAction(tx, country, transaction, sellerCompanyNumber, value, productQuantity, isTaxable);
     }
 
     @Override
-    public UpdateAgesOfPeopleInCityAction<GraknTransaction> updateAgesOfPeopleInCityAction(GraknTransaction tx, LocalDateTime today, World.City city) {
+    public UpdateAgesOfPeopleInCityAction<GraknTransaction> updateAgesOfPeopleInCityAction(GraknTransaction tx, LocalDateTime today, GeoData.City city) {
         return new GraknUpdateAgesOfPeopleInCityAction(tx, today, city);
     }
 

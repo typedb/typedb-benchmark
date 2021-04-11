@@ -18,17 +18,17 @@
 package grakn.benchmark.simulation.action.read;
 
 import grakn.benchmark.simulation.driver.Transaction;
-import grakn.benchmark.simulation.common.World;
+import grakn.benchmark.simulation.common.GeoData;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 public abstract class BirthsInCityAction<TX extends Transaction> extends ReadAction<TX, List<String>> {
-    protected final World.City worldCity;
+    protected final GeoData.City worldCity;
     protected final LocalDateTime today;
 
-    public BirthsInCityAction(TX tx, World.City city, LocalDateTime today) {
+    public BirthsInCityAction(TX tx, GeoData.City city, LocalDateTime today) {
         super(tx);
         this.worldCity = city;
         this.today = today;

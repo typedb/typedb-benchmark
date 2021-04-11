@@ -19,48 +19,45 @@ package grakn.benchmark.simulation.agent;
 
 import grakn.benchmark.simulation.action.Action;
 import grakn.benchmark.simulation.action.ActionFactory;
-import grakn.benchmark.simulation.agent.Agent;
 import grakn.benchmark.simulation.common.SimulationContext;
 import grakn.benchmark.simulation.driver.Session;
 import grakn.benchmark.simulation.driver.Transaction;
 import grakn.benchmark.simulation.driver.Client;
-import grakn.benchmark.simulation.common.World;
+import grakn.benchmark.simulation.common.GeoData;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import static java.util.stream.Collectors.toList;
-
-public class PersonBirthAgent<TX extends Transaction> extends Agent<World.City, TX> {
+public class PersonBirthAgent<TX extends Transaction> extends Agent<GeoData.City, TX> {
 
     public PersonBirthAgent(Client<?, TX> client, ActionFactory<TX, ?> actionFactory, SimulationContext context) {
         super(client, actionFactory, context);
     }
 
     @Override
-    protected List<World.City> getRegions(World world) {
-        return world.getCities().collect(toList());
+    protected List<GeoData.City> getRegions() {
+        return context.geoData().cities();
     }
 
     @Override
-    protected List<Action<?, ?>.Report> run(Session<TX> session, World.City region, Random random) {
+    protected List<Action<?, ?>.Report> run(Session<TX> session, GeoData.City region, Random random) {
         // Find bachelors and bachelorettes who are considered adults and who are not in a marriage and pair them off randomly
         List<Action<?, ?>.Report> reports = new ArrayList<>();
-        int numBirths = context.world().getScaleFactor();
+        int numBirths = context.scaleFactor();
         try (TX tx = session.transaction(region.tracker(), context.iteration(), isTracing())) {
             for (int i = 0; i < numBirths; i++) {
                 String gender;
                 String forename;
-                String surname = pickOne(context.world().getSurnames(), random);
+                String surname = pickOne(context.wordData().getSurnames(), random);
 
                 boolean genderBool = random.nextBoolean();
                 if (genderBool) {
                     gender = "male";
-                    forename = pickOne(context.world().getMaleForenames(), random);
+                    forename = pickOne(context.wordData().getMaleForenames(), random);
                 } else {
                     gender = "female";
-                    forename = pickOne(context.world().getFemaleForenames(), random);
+                    forename = pickOne(context.wordData().getFemaleForenames(), random);
                 }
                 String email = "email/" + uniqueId(context, region.tracker(), i);
                 runAction(actionFactory().insertPersonAction(tx, region, context.today(), email, gender, forename, surname), reports);

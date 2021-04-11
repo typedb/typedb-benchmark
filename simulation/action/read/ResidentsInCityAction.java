@@ -18,7 +18,7 @@
 package grakn.benchmark.simulation.action.read;
 
 import grakn.benchmark.simulation.driver.Transaction;
-import grakn.benchmark.simulation.common.World;
+import grakn.benchmark.simulation.common.GeoData;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -26,11 +26,11 @@ import java.util.List;
 
 public abstract class ResidentsInCityAction<TX extends Transaction> extends ReadAction<TX, List<String>> {
 
-    protected final World.City city;
+    protected final GeoData.City city;
     protected final int numResidents;
     protected final LocalDateTime earliestDate;
 
-    public ResidentsInCityAction(TX tx, World.City city, int numResidents, LocalDateTime earliestDate) {
+    public ResidentsInCityAction(TX tx, GeoData.City city, int numResidents, LocalDateTime earliestDate) {
         super(tx);
         this.city = city;
         this.numResidents = numResidents;

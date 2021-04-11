@@ -19,7 +19,7 @@ package grakn.benchmark.grakn.action.read;
 
 import grakn.benchmark.grakn.driver.GraknTransaction;
 import grakn.benchmark.simulation.action.read.CompaniesInCountryAction;
-import grakn.benchmark.simulation.common.World;
+import grakn.benchmark.simulation.common.GeoData;
 import graql.lang.query.GraqlMatch;
 
 import java.util.List;
@@ -36,7 +36,7 @@ import static graql.lang.Graql.var;
 
 public class GraknCompaniesInCountryAction extends CompaniesInCountryAction<GraknTransaction> {
 
-    public GraknCompaniesInCountryAction(GraknTransaction tx, World.Country country, int numCompanies) {
+    public GraknCompaniesInCountryAction(GraknTransaction tx, GeoData.Country country, int numCompanies) {
         super(tx, country, numCompanies);
     }
 

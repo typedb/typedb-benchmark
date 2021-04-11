@@ -20,7 +20,7 @@ package grakn.benchmark.neo4j.action.write;
 import grakn.benchmark.neo4j.driver.Neo4jTransaction;
 import grakn.benchmark.simulation.action.Action;
 import grakn.benchmark.simulation.action.write.InsertCompanyAction;
-import grakn.benchmark.simulation.common.World;
+import grakn.benchmark.simulation.common.GeoData;
 import org.neo4j.driver.Query;
 import org.neo4j.driver.Record;
 
@@ -34,7 +34,7 @@ import static grakn.benchmark.neo4j.action.Model.LOCATION_NAME;
 
 public class Neo4jInsertCompanyAction extends InsertCompanyAction<Neo4jTransaction, Record> {
 
-    public Neo4jInsertCompanyAction(Neo4jTransaction tx, World.Country country, LocalDateTime today, int companyNumber, String companyName) {
+    public Neo4jInsertCompanyAction(Neo4jTransaction tx, GeoData.Country country, LocalDateTime today, int companyNumber, String companyName) {
         super(tx, country, today, companyNumber, companyName);
     }
 

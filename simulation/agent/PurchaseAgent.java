@@ -21,14 +21,13 @@ import grakn.benchmark.simulation.action.Action;
 import grakn.benchmark.simulation.action.ActionFactory;
 import grakn.benchmark.simulation.action.read.CompaniesInCountryAction;
 import grakn.benchmark.simulation.action.read.ProductsInContinentAction;
-import grakn.benchmark.simulation.agent.Agent;
 import grakn.benchmark.simulation.common.Allocation;
 import grakn.benchmark.simulation.common.RandomValueGenerator;
 import grakn.benchmark.simulation.common.SimulationContext;
 import grakn.benchmark.simulation.driver.Session;
 import grakn.benchmark.simulation.driver.Transaction;
 import grakn.benchmark.simulation.driver.Client;
-import grakn.benchmark.simulation.common.World;
+import grakn.benchmark.simulation.common.GeoData;
 import grakn.common.collection.Pair;
 
 import java.util.ArrayList;
@@ -37,21 +36,20 @@ import java.util.Random;
 
 import static grakn.common.collection.Collections.pair;
 import static java.util.Collections.shuffle;
-import static java.util.stream.Collectors.toList;
 
-public class PurchaseAgent<TX extends Transaction> extends Agent<World.Country, TX> {
+public class PurchaseAgent<TX extends Transaction> extends Agent<GeoData.Country, TX> {
 
     public PurchaseAgent(Client<?, TX> client, ActionFactory<TX, ?> actionFactory, SimulationContext context) {
         super(client, actionFactory, context);
     }
 
     @Override
-    protected List<World.Country> getRegions(World world) {
-        return world.getCountries().collect(toList());
+    protected List<GeoData.Country> getRegions() {
+        return context.geoData().countries();
     }
 
     @Override
-    protected List<Action<?, ?>.Report> run(Session<TX> session, World.Country region, Random random) {
+    protected List<Action<?, ?>.Report> run(Session<TX> session, GeoData.Country region, Random random) {
         List<Action<?, ?>.Report> reports = new ArrayList<>();
         List<Long> companyNumbers;
 
@@ -67,7 +65,7 @@ public class PurchaseAgent<TX extends Transaction> extends Agent<World.Country, 
             productBarcodes = runAction(productsInContinentAction, reports);
         }
 
-        int numTransactions = context.world().getScaleFactor() * companyNumbers.size();
+        int numTransactions = context.scaleFactor() * companyNumbers.size();
         // Company numbers is the list of sellers
         // Company numbers picked randomly is the list of buyers
         // Products randomly picked

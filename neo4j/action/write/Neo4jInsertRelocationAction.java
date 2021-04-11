@@ -20,7 +20,7 @@ package grakn.benchmark.neo4j.action.write;
 import grakn.benchmark.neo4j.driver.Neo4jTransaction;
 import grakn.benchmark.simulation.action.Action;
 import grakn.benchmark.simulation.action.write.InsertRelocationAction;
-import grakn.benchmark.simulation.common.World;
+import grakn.benchmark.simulation.common.GeoData;
 import org.neo4j.driver.Query;
 import org.neo4j.driver.Record;
 
@@ -33,7 +33,7 @@ import static grakn.benchmark.neo4j.action.Model.RELOCATION_DATE;
 
 public class Neo4jInsertRelocationAction extends InsertRelocationAction<Neo4jTransaction, Record> {
 
-    public Neo4jInsertRelocationAction(Neo4jTransaction tx, World.City city, LocalDateTime today, String relocateeEmail, String relocationCityName) {
+    public Neo4jInsertRelocationAction(Neo4jTransaction tx, GeoData.City city, LocalDateTime today, String relocateeEmail, String relocationCityName) {
         super(tx, city, today, relocateeEmail, relocationCityName);
     }
 

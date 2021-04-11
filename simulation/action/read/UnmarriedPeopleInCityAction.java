@@ -18,18 +18,18 @@
 package grakn.benchmark.simulation.action.read;
 
 import grakn.benchmark.simulation.driver.Transaction;
-import grakn.benchmark.simulation.common.World;
+import grakn.benchmark.simulation.common.GeoData;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 public abstract class UnmarriedPeopleInCityAction<TX extends Transaction> extends ReadAction<TX, List<String>> {
-    protected final World.City city;
+    protected final GeoData.City city;
     protected final String gender;
     protected final LocalDateTime dobOfAdults;
 
-    public UnmarriedPeopleInCityAction(TX tx, World.City city, String gender, LocalDateTime dobOfAdults) {
+    public UnmarriedPeopleInCityAction(TX tx, GeoData.City city, String gender, LocalDateTime dobOfAdults) {
         super(tx);
         this.city = city;
         this.gender = gender;

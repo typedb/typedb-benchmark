@@ -27,7 +27,6 @@ java_library(
         "//simulation/action:action",
         "//simulation/common:common",
         "//simulation/driver:driver",
-        "//simulation/loader:loader",
         "//config",
         "@graknlabs_common//:common",
         "@graknlabs_client_java//api:api",
@@ -40,7 +39,7 @@ java_library(
         "@maven//:org_apache_commons_commons_csv",
         "@maven//:org_slf4j_slf4j_api",
     ],
-    data = ["//grakn/data"],
+    data = ["simulation.gql"],
 )
 
 checkstyle_test(

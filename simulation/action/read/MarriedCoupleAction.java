@@ -20,7 +20,7 @@ package grakn.benchmark.simulation.action.read;
 import grakn.benchmark.simulation.action.Action;
 import grakn.benchmark.simulation.action.SpouseType;
 import grakn.benchmark.simulation.driver.Transaction;
-import grakn.benchmark.simulation.common.World;
+import grakn.benchmark.simulation.common.GeoData;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -28,10 +28,10 @@ import java.util.HashMap;
 import java.util.List;
 
 public abstract class MarriedCoupleAction<TX extends Transaction> extends ReadAction<TX, List<HashMap<SpouseType, String>>> {
-    protected final World.City city;
+    protected final GeoData.City city;
     protected final LocalDateTime today;
 
-    public MarriedCoupleAction(TX tx, World.City city, LocalDateTime today) {
+    public MarriedCoupleAction(TX tx, GeoData.City city, LocalDateTime today) {
         super(tx);
         this.city = city;
         this.today = today;

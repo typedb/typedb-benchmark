@@ -21,13 +21,12 @@ import grakn.benchmark.simulation.action.Action;
 import grakn.benchmark.simulation.action.ActionFactory;
 import grakn.benchmark.simulation.action.read.CompaniesInCountryAction;
 import grakn.benchmark.simulation.action.read.ResidentsInCityAction;
-import grakn.benchmark.simulation.agent.Agent;
 import grakn.benchmark.simulation.common.RandomValueGenerator;
 import grakn.benchmark.simulation.common.SimulationContext;
 import grakn.benchmark.simulation.driver.Session;
 import grakn.benchmark.simulation.driver.Transaction;
 import grakn.benchmark.simulation.driver.Client;
-import grakn.benchmark.simulation.common.World;
+import grakn.benchmark.simulation.common.GeoData;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -35,9 +34,8 @@ import java.util.List;
 import java.util.Random;
 
 import static grakn.benchmark.simulation.common.Allocation.allocate;
-import static java.util.stream.Collectors.toList;
 
-public class EmploymentAgent<TX extends Transaction> extends Agent<World.City, TX> {
+public class EmploymentAgent<TX extends Transaction> extends Agent<GeoData.City, TX> {
 
     private static final double MIN_ANNUAL_WAGE = 18000.00;
     private static final double MAX_ANNUAL_WAGE = 80000.00;
@@ -51,24 +49,24 @@ public class EmploymentAgent<TX extends Transaction> extends Agent<World.City, T
     }
 
     @Override
-    protected List<World.City> getRegions(World world) {
-        return world.getCities().collect(toList());
+    protected List<GeoData.City> getRegions() {
+        return context.geoData().cities();
     }
 
     @Override
-    protected List<Action<?, ?>.Report> run(Session<TX> session, World.City region, Random random) {
+    protected List<Action<?, ?>.Report> run(Session<TX> session, GeoData.City region, Random random) {
         List<Action<?, ?>.Report> reports = new ArrayList<>();
         LocalDateTime employmentDate = context.today().minusYears(0);
         List<String> employeeEmails;
         List<Long> companyNumbers;
 
         try (TX tx = session.transaction(region.tracker(), context.iteration(), isTracing())) {
-            ResidentsInCityAction<TX> employeeEmailsAction = actionFactory().residentsInCityAction(tx, region, context.world().getScaleFactor(), employmentDate);
+            ResidentsInCityAction<TX> employeeEmailsAction = actionFactory().residentsInCityAction(tx, region, context.scaleFactor(), employmentDate);
             employeeEmails = runAction(employeeEmailsAction, reports);
         }
 
         try (TX tx = session.transaction(region.tracker(), context.iteration(), isTracing())) {
-            CompaniesInCountryAction<TX> companyNumbersAction = actionFactory().companiesInCountryAction(tx, region.country(), context.world().getScaleFactor());
+            CompaniesInCountryAction<TX> companyNumbersAction = actionFactory().companiesInCountryAction(tx, region.country(), context.scaleFactor());
             companyNumbers = runAction(companyNumbersAction, reports);
         }
 

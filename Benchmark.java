@@ -24,10 +24,8 @@ import grakn.benchmark.grakn.GraknSimulation;
 import grakn.benchmark.neo4j.Neo4JSimulation;
 import grakn.benchmark.simulation.Simulation;
 import grakn.benchmark.simulation.common.SimulationContext;
-import grakn.benchmark.simulation.common.World;
 import grakn.benchmark.config.Config;
 import grakn.benchmark.config.ConfigLoader;
-import grakn.benchmark.neo4j.driver.Neo4jClient;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
@@ -47,7 +45,6 @@ import java.util.Optional;
 import static grabl.tracing.client.GrablTracing.tracing;
 import static grabl.tracing.client.GrablTracing.tracingNoOp;
 import static grabl.tracing.client.GrablTracing.withLogging;
-import static grakn.benchmark.simulation.common.World.initialise;
 
 public class Benchmark {
 
@@ -84,13 +81,6 @@ public class Benchmark {
 
         boolean disableTracing = commandLine.hasOption("n");
 
-        Map<String, Path> dataFiles = new HashMap<>();
-        for (String filepath : commandLine.getArgList()) {
-            Path path = Paths.get(filepath);
-            String filename = path.getFileName().toString();
-            dataFiles.put(filename, path);
-        }
-
         Path configPath = Paths.get(getOption(commandLine, "b").orElse(defaultConfigYaml));
         Config config = ConfigLoader.loadConfigFromYaml(configPath.toFile());
 
@@ -98,36 +88,33 @@ public class Benchmark {
         // INITIALIZATION //
         ////////////////////
 
-        // Components customised based on the DB
-        String defaultUri;
+        String databaseAddress;
 
         LOG.info("Welcome to the Benchmark!");
         LOG.info("Parsing world data...");
-        World world = initialise(config.getScaleFactor(), dataFiles);
-        if (world == null) return;
 
         LOG.info(String.format("Connecting to %s...", dbName));
 
         try {
             try (GrablTracing tracingIgnored = grablTracing(grablTracingUri, grablTracingOrganisation, grablTracingRepository, grablTracingCommit, grablTracingUsername, grablTracingToken, disableTracing, dbName)) {
-                SimulationContext context = SimulationContext.create(world, false);
+                SimulationContext context = SimulationContext.create(config.getScaleFactor(), false);
                 if (!disableTracing) context.enableTracing(config.getTraceSampling().getSamplingFunction());
 
                 Simulation<?, ?, ?> simulation;
                 if (dbName.toLowerCase().startsWith("grakn")) {
-                    defaultUri = "localhost:48555";
-                    if (hostUri == null) hostUri = defaultUri;
+                    databaseAddress = "localhost:48555";
+                    if (hostUri == null) hostUri = databaseAddress;
                     if (dbName.toLowerCase().contains("core")) {
-                        simulation = GraknSimulation.core(hostUri, dataFiles, config.getRandomSeed(),
-                                config.getAgents(), context);
+                        simulation = GraknSimulation.core(hostUri, config.getRandomSeed(),
+                                                          config.getAgents(), context);
                     } else if (dbName.toLowerCase().contains("cluster")) {
-                        simulation = GraknSimulation.cluster(hostUri, dataFiles, config.getRandomSeed(),
-                                config.getAgents(), context);
+                        simulation = GraknSimulation.cluster(hostUri, config.getRandomSeed(),
+                                                             config.getAgents(), context);
                     } else throw new IllegalArgumentException("Unexpected database name: " + dbName);
                 } else if (dbName.toLowerCase().startsWith("neo4j")) {
-                    defaultUri = "bolt://localhost:7687";
-                    if (hostUri == null) hostUri = defaultUri;
-                    simulation = Neo4JSimulation.create(hostUri, dataFiles, config.getRandomSeed(), config.getAgents(), context);
+                    databaseAddress = "bolt://localhost:7687";
+                    if (hostUri == null) hostUri = databaseAddress;
+                    simulation = Neo4JSimulation.create(hostUri, config.getRandomSeed(), config.getAgents(), context);
                 } else {
                     throw new IllegalArgumentException("Unexpected database name: " + dbName);
                 }

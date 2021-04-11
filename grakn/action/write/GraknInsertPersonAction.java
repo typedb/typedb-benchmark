@@ -20,7 +20,7 @@ package grakn.benchmark.grakn.action.write;
 import grakn.benchmark.grakn.driver.GraknTransaction;
 import grakn.benchmark.simulation.action.Action;
 import grakn.benchmark.simulation.action.write.InsertPersonAction;
-import grakn.benchmark.simulation.common.World;
+import grakn.benchmark.simulation.common.GeoData;
 import grakn.client.api.answer.ConceptMap;
 import graql.lang.Graql;
 import graql.lang.pattern.variable.UnboundVariable;
@@ -44,7 +44,7 @@ import static graql.lang.Graql.var;
 
 public class GraknInsertPersonAction extends InsertPersonAction<GraknTransaction, ConceptMap> {
 
-    public GraknInsertPersonAction(GraknTransaction tx, World.City city, LocalDateTime today, String email, String gender, String forename, String surname) {
+    public GraknInsertPersonAction(GraknTransaction tx, GeoData.City city, LocalDateTime today, String email, String gender, String forename, String surname) {
         super(tx, city, today, email, gender, forename, surname);
     }
 

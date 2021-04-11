@@ -22,50 +22,58 @@ import grakn.benchmark.grakn.action.GraknActionFactory;
 import grakn.benchmark.grakn.driver.GraknClient;
 import grakn.benchmark.grakn.driver.GraknSession;
 import grakn.benchmark.grakn.driver.GraknTransaction;
-import grakn.benchmark.grakn.loader.GraknYAMLLoader;
 import grakn.benchmark.simulation.Simulation;
 import grakn.benchmark.simulation.action.ActionFactory;
+import grakn.benchmark.simulation.common.GeoData;
 import grakn.benchmark.simulation.common.SimulationContext;
-import grakn.benchmark.simulation.loader.YAMLException;
-import grakn.benchmark.simulation.loader.YAMLLoader;
 import graql.lang.Graql;
+import graql.lang.pattern.variable.ThingVariable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Instant;
 import java.util.List;
-import java.util.Map;
 
 import static grakn.benchmark.common.Util.printDuration;
+import static grakn.benchmark.grakn.action.Model.CONTINENT;
+import static grakn.benchmark.grakn.action.Model.COUNTRY;
+import static grakn.benchmark.grakn.action.Model.CURRENCY;
+import static grakn.benchmark.grakn.action.Model.CURRENCY_CODE;
+import static grakn.benchmark.grakn.action.Model.LANGUAGE;
+import static grakn.benchmark.grakn.action.Model.LOCATION_HIERARCHY;
+import static grakn.benchmark.grakn.action.Model.LOCATION_NAME;
+import static grakn.benchmark.grakn.action.Model.SUBORDINATE;
+import static grakn.benchmark.grakn.action.Model.SUPERIOR;
 import static grakn.client.api.GraknSession.Type.DATA;
 import static grakn.client.api.GraknSession.Type.SCHEMA;
+import static grakn.client.api.GraknTransaction.Type.WRITE;
+import static graql.lang.Graql.rel;
+import static graql.lang.Graql.var;
 
 public class GraknSimulation extends Simulation<GraknClient, GraknSession, GraknTransaction> {
 
-    private static final String DATABASE_NAME = "simulation";
-    private static final File SCHEMA_FILE = Paths.get("grakn/data/schema.gql").toFile();
-    private static final File GRAQL_TEMPLATES_FILE = Paths.get("grakn/data/graql_templates.yml").toFile();
-
     private static final Logger LOG = LoggerFactory.getLogger(GraknSimulation.class);
+    private static final File SCHEMA_FILE = Paths.get("grakn/simulation.gql").toFile();
+    private static final String DATABASE_NAME = "simulation";
 
-    private GraknSimulation(GraknClient client, Map<String, Path> dataFiles, int randomSeed,
-                            List<Config.Agent> agentConfigs, SimulationContext context) throws Exception {
-        super(client, dataFiles, randomSeed, agentConfigs, context);
+
+    private GraknSimulation(GraknClient client, int randomSeed, List<Config.Agent> agentConfigs,
+                            SimulationContext context) throws Exception {
+        super(client, randomSeed, agentConfigs, context);
     }
 
-    public static GraknSimulation core(String hostUri, Map<String, Path> dataFiles, int randomSeed,
-                                       List<Config.Agent> agentConfigs, SimulationContext context) throws Exception {
-        return new GraknSimulation(GraknClient.core(hostUri, DATABASE_NAME), dataFiles, randomSeed, agentConfigs, context);
+    public static GraknSimulation core(String hostUri, int randomSeed, List<Config.Agent> agentConfigs,
+                                       SimulationContext context) throws Exception {
+        return new GraknSimulation(GraknClient.core(hostUri, DATABASE_NAME), randomSeed, agentConfigs, context);
     }
 
-    public static GraknSimulation cluster(String hostUri, Map<String, Path> dataFiles, int randomSeed,
-                                          List<Config.Agent> agentConfigs, SimulationContext context) throws Exception {
-        return new GraknSimulation(GraknClient.cluster(hostUri, DATABASE_NAME), dataFiles, randomSeed, agentConfigs, context);
+    public static GraknSimulation cluster(String hostUri, int randomSeed, List<Config.Agent> agentConfigs,
+                                          SimulationContext context) throws Exception {
+        return new GraknSimulation(GraknClient.cluster(hostUri, DATABASE_NAME), randomSeed, agentConfigs, context);
     }
 
     @Override
@@ -74,11 +82,10 @@ public class GraknSimulation extends Simulation<GraknClient, GraknSession, Grakn
     }
 
     @Override
-    protected void initialise(Map<String, Path> dataFiles) throws Exception {
+    protected void initialiseDatabase() throws IOException {
         grakn.client.api.GraknClient nativeClient = client().unpack();
         initialiseDatabase(nativeClient);
         initialiseSchema(nativeClient);
-        initialiseData(nativeClient, dataFiles);
     }
 
     private void initialiseDatabase(grakn.client.api.GraknClient nativeClient) {
@@ -91,7 +98,7 @@ public class GraknSimulation extends Simulation<GraknClient, GraknSession, Grakn
             LOG.info("Grakn initialisation of world simulation schema started ...");
             Instant start = Instant.now();
             String schemaQuery = Files.readString(SCHEMA_FILE.toPath());
-            try (grakn.client.api.GraknTransaction tx = session.transaction(grakn.client.api.GraknTransaction.Type.WRITE)) {
+            try (grakn.client.api.GraknTransaction tx = session.transaction(WRITE)) {
                 tx.query().define(Graql.parseQuery(schemaQuery));
                 tx.commit();
             }
@@ -99,14 +106,66 @@ public class GraknSimulation extends Simulation<GraknClient, GraknSession, Grakn
         }
     }
 
-    private void initialiseData(grakn.client.api.GraknClient nativeClient,
-                                Map<String, Path> dataFiles) throws IOException, YAMLException {
+    @Override
+    protected void initialiseData(GeoData geoData) {
+        grakn.client.api.GraknClient nativeClient = client().unpack();
         try (grakn.client.api.GraknSession session = nativeClient.session(DATABASE_NAME, DATA)) {
             LOG.info("Grakn initialisation of world simulation data started ...");
             Instant start = Instant.now();
-            YAMLLoader loader = new GraknYAMLLoader(session, dataFiles);
-            loader.loadFile(GRAQL_TEMPLATES_FILE);
+            initialiseCurrencies(session, geoData.currencies());
+            initialiseContinents(session, geoData.continents());
+            initialiseCountries(session, geoData.countries());
+            initialiseCities(session, geoData.cities());
             LOG.info("Grakn initialisation of world simulation data ended in {}", printDuration(start, Instant.now()));
+        }
+    }
+
+    private void initialiseCurrencies(grakn.client.api.GraknSession session, List<GeoData.Currency> currencies) {
+        try (grakn.client.api.GraknTransaction tx = session.transaction(WRITE)) {
+            // TODO: Currency should be an entity, and 'code' should be renamed to 'symbol'
+            currencies.forEach(currency -> tx.query().insert(Graql.insert(
+                    var().eq(currency.name()).isa(CURRENCY).has(CURRENCY_CODE, currency.symbol())
+            )));
+            tx.commit();
+        }
+    }
+
+    private void initialiseContinents(grakn.client.api.GraknSession session, List<GeoData.Continent> continents) {
+        try (grakn.client.api.GraknTransaction tx = session.transaction(WRITE)) {
+            continents.forEach(continent -> tx.query().insert(Graql.insert(
+                    var().isa(CONTINENT).has(LOCATION_NAME, continent.name())
+            )));
+            tx.commit();
+        }
+    }
+
+    private void initialiseCountries(grakn.client.api.GraknSession session, List<GeoData.Country> countries) {
+        try (grakn.client.api.GraknTransaction tx = session.transaction(WRITE)) {
+            // TODO: Currency should be an entity we relate to by relation
+            countries.forEach(country -> {
+                ThingVariable.Thing countryVar = var("y").isa(COUNTRY)
+                        .has(LOCATION_NAME, country.name())
+                        .has(CURRENCY, country.currency().name());
+                for (String language : country.languages()) countryVar = countryVar.has(LANGUAGE, language);
+                tx.query().insert(Graql.match(
+                        var("x").isa(CONTINENT).has(LOCATION_NAME, country.continent().name())
+                ).insert(
+                        countryVar, rel(SUPERIOR, "x").rel(SUBORDINATE, "y").isa(LOCATION_HIERARCHY)
+                ));
+            });
+            tx.commit();
+        }
+    }
+
+    private void initialiseCities(grakn.client.api.GraknSession session, List<GeoData.City> cities) {
+        try (grakn.client.api.GraknTransaction tx = session.transaction(WRITE)) {
+            cities.forEach(city -> tx.query().insert(Graql.match(
+                    var("x").isa(COUNTRY).has(LOCATION_NAME, city.country().name())
+            ).insert(
+                    var("y").isa("city").has(LOCATION_NAME, city.name()),
+                    rel(SUPERIOR, "x").rel(SUBORDINATE, "y").isa(LOCATION_HIERARCHY)
+            )));
+            tx.commit();
         }
     }
 }
