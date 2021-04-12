@@ -17,7 +17,7 @@
 
 package grakn.benchmark.neo4j;
 
-import grakn.benchmark.config.Config;
+import grakn.benchmark.common.Config;
 import grakn.benchmark.neo4j.action.Neo4jActionFactory;
 import grakn.benchmark.neo4j.driver.Neo4jClient;
 import grakn.benchmark.neo4j.driver.Neo4jSession;
@@ -78,11 +78,11 @@ public class Neo4JSimulation extends Simulation<Neo4jClient, Neo4jSession, Neo4j
      */
     private void addKeyConstraints(Session session) {
         List<String> queries = new ArrayList<>() {{
-            add("CREATE CONSTRAINT unique_person_email IF NOT EXISTS ON (person:Person) ASSERT person.email IS UNIQUE");
-            add("CREATE CONSTRAINT unique_location_locationName IF NOT EXISTS ON (location:Location) ASSERT location.locationName IS UNIQUE");
-            add("CREATE CONSTRAINT unique_company_companyName IF NOT EXISTS ON (company:Company) ASSERT company.companyName IS UNIQUE");
-            add("CREATE CONSTRAINT unique_company_companyNumber IF NOT EXISTS ON (company:Company) ASSERT company.companyNumber IS UNIQUE");
-            add("CREATE CONSTRAINT unique_product_productBarcode IF NOT EXISTS ON (product:Product) ASSERT product.productBarcode IS UNIQUE");
+            add("CREATE CONSTRAINT unique_person_email ON (person:Person) ASSERT person.email IS UNIQUE");
+            add("CREATE CONSTRAINT unique_location_locationName ON (location:Location) ASSERT location.locationName IS UNIQUE");
+            add("CREATE CONSTRAINT unique_company_companyName ON (company:Company) ASSERT company.companyName IS UNIQUE");
+            add("CREATE CONSTRAINT unique_company_companyNumber ON (company:Company) ASSERT company.companyNumber IS UNIQUE");
+            add("CREATE CONSTRAINT unique_product_productBarcode ON (product:Product) ASSERT product.productBarcode IS UNIQUE");
         }};
         Transaction tx = session.beginTransaction();
         for (String query : queries) {

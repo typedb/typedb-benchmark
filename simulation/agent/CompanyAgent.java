@@ -45,7 +45,7 @@ public class CompanyAgent<TX extends Transaction> extends Agent<GeoData.Country,
     protected List<Action<?, ?>.Report> run(Session<TX> session, GeoData.Country region, Random random) {
         List<Action<?, ?>.Report> reports = new ArrayList<>();
         int numCompanies = context.scaleFactor();
-        try (TX tx = session.transaction(region.tracker(), context.iteration(), isTracing())) {
+        try (TX tx = session.transaction(region.tracker(), context.iterationNumber(), isTracing())) {
             for (int i = 0; i < numCompanies; i++) {
                 String adjective = pickOne(context.wordData().getAdjectives(), random);
                 String noun = pickOne(context.wordData().getNouns(), random);

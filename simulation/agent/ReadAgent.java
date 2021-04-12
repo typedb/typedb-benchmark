@@ -48,7 +48,7 @@ public abstract class ReadAgent<TX extends Transaction> extends Agent<GeoData.Gl
     protected List<Action<?, ?>.Report> run(Session<TX> session, GeoData.Global region, Random random) {
         List<Action<?, ?>.Report> reports = new ArrayList<>();
         for (int i = 0; i <= context.scaleFactor(); i++) {
-            try (TX tx = session.transaction(region.tracker(), context.iteration(), isTracing())) {
+            try (TX tx = session.transaction(region.tracker(), context.iterationNumber(), isTracing())) {
                 runAction(getAction(tx), reports);
             }
         }

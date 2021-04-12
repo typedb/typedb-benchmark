@@ -22,6 +22,9 @@ java_library(
     srcs = glob(["*.java"]),
     visibility = ["//visibility:public"],
     deps = [
+        "@maven//:com_google_code_findbugs_jsr305",
+        "@maven//:info_picocli_picocli",
+        "@maven//:org_yaml_snakeyaml",
     ],
 )
 

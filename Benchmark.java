@@ -19,184 +19,72 @@ package grakn.benchmark;
 
 import grabl.tracing.client.GrablTracing;
 import grabl.tracing.client.GrablTracingThreadStatic;
-import grakn.benchmark.common.Util;
+import grakn.benchmark.common.Options;
+import grakn.benchmark.common.Config;
 import grakn.benchmark.grakn.GraknSimulation;
 import grakn.benchmark.neo4j.Neo4JSimulation;
 import grakn.benchmark.simulation.Simulation;
 import grakn.benchmark.simulation.common.SimulationContext;
-import grakn.benchmark.config.Config;
-import grakn.benchmark.config.ConfigLoader;
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.DefaultParser;
-import org.apache.commons.cli.Option;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import javax.annotation.Nullable;
 import java.time.Instant;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 
-import static grabl.tracing.client.GrablTracing.tracing;
-import static grabl.tracing.client.GrablTracing.tracingNoOp;
-import static grabl.tracing.client.GrablTracing.withLogging;
+import static grakn.benchmark.common.Util.parseCommandLine;
+import static grakn.benchmark.common.Util.printDuration;
 
 public class Benchmark {
 
     final static Logger LOG = LoggerFactory.getLogger(Benchmark.class);
 
-
     public static void main(String[] args) {
-
-        ///////////////////
-        // CONFIGURATION //
-        ///////////////////
+        LOG.info("Welcome to the Benchmark!");
 
         Instant start = Instant.now();
-        String defaultConfigYaml = args[0];
-        Options options = cliOptions();
-        CommandLineParser parser = new DefaultParser();
-        CommandLine commandLine;
-        try {
-            commandLine = parser.parse(options, args);
-        } catch (ParseException e) {
-            System.err.println(e.getMessage());
-            System.exit(1);
-            return;
-        }
+        Optional<Options> optionsOpt = parseCommandLine(args);
+        if (optionsOpt.isEmpty()) System.exit(0);
+        Options options = optionsOpt.get();
 
-        String dbName = getOption(commandLine, "d").orElse("grakn");
-        String hostUri = getOption(commandLine, "s").orElse(null);
-        String grablTracingUri = getOption(commandLine, "t").orElse("localhost:7979");
-        String grablTracingOrganisation = commandLine.getOptionValue("o");
-        String grablTracingRepository = commandLine.getOptionValue("r");
-        String grablTracingCommit = commandLine.getOptionValue("c");
-        String grablTracingUsername = commandLine.getOptionValue("u");
-        String grablTracingToken = commandLine.getOptionValue("a");
-
-        boolean disableTracing = commandLine.hasOption("n");
-
-        Path configPath = Paths.get(getOption(commandLine, "b").orElse(defaultConfigYaml));
-        Config config = ConfigLoader.loadConfigFromYaml(configPath.toFile());
-
-        ////////////////////
-        // INITIALIZATION //
-        ////////////////////
-
-        String databaseAddress;
-
-        LOG.info("Welcome to the Benchmark!");
-        LOG.info("Parsing world data...");
-
-        LOG.info(String.format("Connecting to %s...", dbName));
-
-        try {
-            try (GrablTracing tracingIgnored = grablTracing(grablTracingUri, grablTracingOrganisation, grablTracingRepository, grablTracingCommit, grablTracingUsername, grablTracingToken, disableTracing, dbName)) {
-                SimulationContext context = SimulationContext.create(config.getScaleFactor(), false);
-                if (!disableTracing) context.enableTracing(config.getTraceSampling().getSamplingFunction());
-
-                Simulation<?, ?, ?> simulation;
-                if (dbName.toLowerCase().startsWith("grakn")) {
-                    databaseAddress = "localhost:48555";
-                    if (hostUri == null) hostUri = databaseAddress;
-                    if (dbName.toLowerCase().contains("core")) {
-                        simulation = GraknSimulation.core(hostUri, config.getRandomSeed(),
-                                                          config.getAgents(), context);
-                    } else if (dbName.toLowerCase().contains("cluster")) {
-                        simulation = GraknSimulation.cluster(hostUri, config.getRandomSeed(),
-                                                             config.getAgents(), context);
-                    } else throw new IllegalArgumentException("Unexpected database name: " + dbName);
-                } else if (dbName.toLowerCase().startsWith("neo4j")) {
-                    databaseAddress = "bolt://localhost:7687";
-                    if (hostUri == null) hostUri = databaseAddress;
-                    simulation = Neo4JSimulation.create(hostUri, config.getRandomSeed(), config.getAgents(), context);
-                } else {
-                    throw new IllegalArgumentException("Unexpected database name: " + dbName);
-                }
-
-                ///////////////
-                // MAIN LOOP //
-                ///////////////
-                for (int i = 0; i < config.getIterations(); i++) {
-                    Instant iterStart = Instant.now();
-                    simulation.iterate();
-                    Instant iterEnd = Instant.now();
-                    LOG.info("Iteration {}: {}", i, Util.printDuration(iterStart, iterEnd));
-                }
-                Instant end = Instant.now();
-                LOG.info("Benchmark duration: " + Util.printDuration(start, end));
-                Instant statisticStart = Instant.now();
+        try (GrablTracing ignore = initTracing(options.tracing().orElse(null), options.database().fullname())) {
+            Config config = Config.loadYML(options.config());
+            try (Simulation<?, ?, ?> simulation = initSimulation(options, config)) {
+                simulation.run();
+                LOG.info("Benchmark duration: " + printDuration(start, Instant.now()));
                 LOG.info(simulation.printStatistics());
-                Instant statisticEnd = Instant.now();
-                LOG.info("Statistics duration: " + Util.printDuration(statisticStart, statisticEnd));
-                simulation.close();
             }
-        } catch (Exception ex) {
-            ex.printStackTrace();
+        } catch (Exception e) {
+            LOG.error(e.getMessage(), e);
             System.exit(1);
         }
     }
 
-
-    private static Optional<String> getOption(CommandLine commandLine, String option) {
-        if (commandLine.hasOption(option)) {
-            return Optional.of(commandLine.getOptionValue(option));
+    private static Simulation<?, ?, ?> initSimulation(Options options, Config config) throws Exception {
+        SimulationContext context = SimulationContext.create(config, options.tracing().isPresent(), false);
+        Simulation<?, ?, ?> simulation;
+        if (options.database().isGraknCore()) {
+            simulation = GraknSimulation.core(options.address(), config.randomSeed(), config.agents(), context);
+        } else if (options.database().isGraknCluster()) {
+            simulation = GraknSimulation.cluster(options.address(), config.randomSeed(), config.agents(), context);
+        } else if (options.database().isNeo4j()) {
+            simulation = Neo4JSimulation.create(options.address(), config.randomSeed(), config.agents(), context);
         } else {
-            return Optional.empty();
+            throw new IllegalStateException();
         }
+        return simulation;
     }
 
-    private static Options cliOptions() {
-        Options options = new Options();
-        options.addOption(Option.builder("d")
-                .longOpt("database").desc("Database under test").hasArg().required().argName("database")
-                .build());
-        options.addOption(Option.builder("s")
-                .longOpt("database-uri").desc("Database server URI").hasArg().argName("uri")
-                .build());
-        options.addOption(Option.builder("t")
-                .longOpt("tracing-uri").desc("Grabl tracing server URI").hasArg().argName("uri")
-                .build());
-        options.addOption(Option.builder("o")
-                .longOpt("org").desc("Repository organisation").hasArg().argName("name")
-                .build());
-        options.addOption(Option.builder("r")
-                .longOpt("repo").desc("Grabl tracing repository").hasArg().argName("name")
-                .build());
-        options.addOption(Option.builder("c")
-                .longOpt("commit").desc("Grabl tracing commit").hasArg().argName("sha")
-                .build());
-        options.addOption(Option.builder("u")
-                .longOpt("username").desc("Grabl tracing username").hasArg().argName("username")
-                .build());
-        options.addOption(Option.builder("a")
-                .longOpt("api-token").desc("Grabl tracing API token").hasArg().argName("token")
-                .build());
-        options.addOption(Option.builder("b")
-                .longOpt("config-file").desc("Configuration file").hasArg().argName("config-file-path")
-                .build());
-        options.addOption(Option.builder("n")
-                .longOpt("disable-tracing").desc("Disable grabl tracing")
-                .build());
-        return options;
-    }
-
-    public static GrablTracing grablTracing(String grablTracingUri, String grablTracingOrganisation, String grablTracingRepository, String grablTracingCommit, String grablTracingUsername, String grablTracingToken, boolean disableTracing, String name) {
+    private static GrablTracing initTracing(@Nullable Options.GrablTracing options, String analysisName) {
         GrablTracing tracing;
-        if (disableTracing) {
-            tracing = withLogging(tracingNoOp());
-        } else if (grablTracingUsername == null) {
-            tracing = withLogging(tracing(grablTracingUri));
-        } else {
-            tracing = withLogging(tracing(grablTracingUri, grablTracingUsername, grablTracingToken));
+        if (options == null) return GrablTracing.createNoOp().withLogging();
+        else if (options.credentials().isEmpty()) tracing = GrablTracing.create(options.grabl()).withLogging();
+        else {
+            Options.GrablTracing.Credentials cred = options.credentials().get();
+            tracing = GrablTracing.create(options.grabl(), cred.username(), cred.token()).withLogging();
         }
         GrablTracingThreadStatic.setGlobalTracingClient(tracing);
-        GrablTracingThreadStatic.openGlobalAnalysis(grablTracingOrganisation, grablTracingRepository, grablTracingCommit, name);
+        GrablTracingThreadStatic.openGlobalAnalysis(options.org(), options.repo(), options.commit(), analysisName);
         return tracing;
     }
 }

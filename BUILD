@@ -23,15 +23,14 @@ java_library(
     resource_strip_prefix = "config/",
     visibility = ["//visibility:public"],
     deps = [
-        "//config:config",
         "//common:common",
         "//simulation:simulation",
         "//simulation/common:common",
         "//grakn:grakn",
         "//neo4j:neo4j",
         "@graknlabs_grabl_tracing//client",
+        "@maven//:com_google_code_findbugs_jsr305",
         "@maven//:ch_qos_logback_logback_classic",
-        "@maven//:commons_cli_commons_cli",
         "@maven//:org_slf4j_slf4j_api",
     ],
 )

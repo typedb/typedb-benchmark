@@ -44,7 +44,7 @@ public class AgeUpdateAgent<TX extends Transaction> extends Agent<GeoData.City, 
     @Override
     protected List<Action<?, ?>.Report> run(Session<TX> session, GeoData.City region, Random random) {
         List<Action<?, ?>.Report> reports = new ArrayList<>();
-        try (TX tx = session.transaction(region.tracker(), context.iteration(), isTracing())) {
+        try (TX tx = session.transaction(region.tracker(), context.iterationNumber(), isTracing())) {
             UpdateAgesOfPeopleInCityAction<TX> updateAgesOfAllPeopleInCityAction = actionFactory().updateAgesOfPeopleInCityAction(tx, context.today(), region);
             runAction(updateAgesOfAllPeopleInCityAction, reports);
             tx.commit();

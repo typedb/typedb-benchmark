@@ -32,19 +32,18 @@ java_test(
     name = "comparison-test",
     srcs = [
         "ComparisonTest.java",
-        "ComparisonTestRunner.java",
         "ComparisonTestSuite.java",
-        "BenchmarksForComparison.java",
     ],
     test_class = "grakn.benchmark.test.ComparisonTest",
     deps = [
+        "//common:common",
         "//simulation/agent",
         "//simulation/common",
-        "//config",
-        "//grakn",
-        "//neo4j",
+        "//grakn:grakn",
+        "//neo4j:neo4j",
         "@maven//:ch_qos_logback_logback_classic",
         "@maven//:commons_cli_commons_cli",
+        "@maven//:info_picocli_picocli",
         "@maven//:javax_annotation_javax_annotation_api",
         "@maven//:javax_annotation_javax_annotation_api_1_3_2",
         "@maven//:junit_junit",
@@ -52,9 +51,8 @@ java_test(
     ],
     size = "enormous",
     resource_strip_prefix = "config/",
-    resources = [
-        "//config:logback.xml",
-    ],
+    resources = ["//config:logback.xml"],
+    data = [":config.yml"],
 )
 
 checkstyle_test(

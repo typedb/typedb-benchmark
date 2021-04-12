@@ -17,56 +17,97 @@
 
 package grakn.benchmark.test;
 
-import org.junit.runner.Runner;
+import grakn.benchmark.common.Config;
+import grakn.benchmark.grakn.GraknSimulation;
+import grakn.benchmark.neo4j.Neo4JSimulation;
+import grakn.benchmark.simulation.common.SimulationContext;
 import org.junit.runner.notification.RunNotifier;
 import org.junit.runners.BlockJUnit4ClassRunner;
 import org.junit.runners.Suite;
+import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.InitializationError;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import picocli.CommandLine;
 
+import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
-import static grakn.benchmark.test.BenchmarksForComparison.graknCore;
-import static grakn.benchmark.test.BenchmarksForComparison.neo4j;
+import static grakn.benchmark.common.Util.parseCommandLine;
 
 public class ComparisonTestSuite extends Suite {
-    private static final List<Runner> NO_RUNNERS = Collections.emptyList();
-    private final List<Runner> runners;
-    private final Class<?> klass;
-    private static int iteration = 1;
 
-    public ComparisonTestSuite(Class<?> klass) throws Throwable {
-        super(klass, NO_RUNNERS);
-        this.klass = klass;
-        this.runners = Collections.unmodifiableList(createRunnersForIterations());
+    private static final Logger LOG = LoggerFactory.getLogger(ComparisonTestSuite.class);
+    private static final Config CONFIG = Config.loadYML(Paths.get("test/config.yml").toFile());
+    private static final Options OPTIONS = parseCommandLine(System.getProperty("sun.java.command").split(" "), new Options()).get();
+
+    public static GraknSimulation GRAKN_CORE;
+    public static Neo4JSimulation NEO4J;
+    private int iteration = 1;
+
+    public ComparisonTestSuite(Class<?> testClass) throws Throwable {
+        super(testClass, createRunners(testClass));
+        SimulationContext context = SimulationContext.create(CONFIG, false, true);
+        GRAKN_CORE = GraknSimulation.core(OPTIONS.graknAddress(), CONFIG.randomSeed(), CONFIG.agents(), context);
+        NEO4J = Neo4JSimulation.create(OPTIONS.neo4jAddress(), CONFIG.randomSeed(), CONFIG.agents(), context);
     }
 
-    private List<Runner> createRunnersForIterations() {
-        List<Runner> runners = new ArrayList<>();
-        for (int i = 1; i <= BenchmarksForComparison.numIterations; i++) {
-            try {
-                BlockJUnit4ClassRunner runner = new ComparisonTestRunner(klass, i);
-                runners.add(runner);
-            } catch (InitializationError initializationError) {
-                throw new RuntimeException(initializationError);
-            }
+    private static List<org.junit.runner.Runner> createRunners(Class<?> testClass) throws InitializationError {
+        List<org.junit.runner.Runner> runners = new ArrayList<>();
+        for (int i = 1; i <= CONFIG.iterations(); i++) {
+            BlockJUnit4ClassRunner runner = new Runner(testClass, i);
+            runners.add(runner);
         }
         return runners;
     }
 
-    protected void runChild(Runner runner, final RunNotifier notifier) {
+    @Override
+    protected void runChild(org.junit.runner.Runner runner, final RunNotifier notifier) {
         iteration++;
-        neo4j.iterate();
-        graknCore.iterate();
+        NEO4J.iterate();
+        GRAKN_CORE.iterate();
         super.runChild(runner, notifier);
-        if (iteration == BenchmarksForComparison.numIterations + 1) {
-            graknCore.close();
-            neo4j.close();
+        if (iteration == CONFIG.iterations() + 1) {
+            GRAKN_CORE.close();
+            NEO4J.close();
         }
     }
 
-    protected List<Runner> getChildren() {
-        return this.runners;
+    private static class Runner extends BlockJUnit4ClassRunner {
+        private final int iteration;
+
+        public Runner(Class<?> aClass, int iteration) throws InitializationError {
+            super(aClass);
+            this.iteration = iteration;
+        }
+
+        @Override
+        protected String testName(FrameworkMethod method) {
+            return method.getName() + "-iter-" + iteration;
+        }
+
+        @Override
+        protected String getName() {
+            return super.getName() + "-iter-" + iteration;
+        }
+    }
+
+    @CommandLine.Command(name = "benchmark-test", mixinStandardHelpOptions = true)
+    private static class Options {
+
+        @CommandLine.Option(names = {"--grakn"}, required = true, description = "Database address URI")
+        private String graknAddress;
+
+        @CommandLine.Option(names = {"--neo4j"}, required = true, description = "Database address URI")
+        private String neo4jAddress;
+
+        public String graknAddress() {
+            return graknAddress;
+        }
+
+        public String neo4jAddress() {
+            return neo4jAddress;
+        }
     }
 }

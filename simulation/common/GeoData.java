@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -134,10 +135,12 @@ public class GeoData {
 
         private final List<Continent> continents;
         private final List<Currency> currencies;
+        private final int hash;
 
         Global() {
             continents = new ArrayList<>();
             currencies = new ArrayList<>();
+            hash = Objects.hash(continents, currencies);
         }
 
         void addContinent(Continent continent) {
@@ -170,16 +173,37 @@ public class GeoData {
         public String group() {
             return name();
         }
+
+        @Override
+        public String toString() {
+            return name();
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+
+            Global that = (Global) o;
+            return continents.equals(that.continents) && currencies.equals(that.currencies);
+        }
+
+        @Override
+        public int hashCode() {
+            return hash;
+        }
     }
 
     public static class Continent implements Region {
 
         private final String name;
         private final List<Country> countries;
+        private final int hash;
 
         Continent(String name) {
             this.name = name;
             this.countries = new ArrayList<>();
+            hash = Objects.hash(this.name, this.countries);
         }
 
         void addCountry(Country country) {
@@ -209,6 +233,20 @@ public class GeoData {
         public String toString() {
             return name;
         }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+
+            Continent that = (Continent) o;
+            return this.name.equals(that.name) && this.countries.equals(that.countries);
+        }
+
+        @Override
+        public int hashCode() {
+            return hash;
+        }
     }
 
     public static class Country implements Region {
@@ -217,6 +255,7 @@ public class GeoData {
         private final Currency currency;
         private final List<City> cities;
         private final List<String> languages;
+        private final int hash;
 
         Country(String name, Continent continent, Currency currency) {
             this.name = name;
@@ -224,6 +263,7 @@ public class GeoData {
             this.currency = currency;
             this.languages = new ArrayList<>();
             this.cities = new ArrayList<>();
+            hash = Objects.hash(this.name, this.continent, this.currency, this.languages, this.cities);
         }
 
         void addLanguage(String language) {
@@ -269,16 +309,36 @@ public class GeoData {
         public String toString() {
             return name;
         }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+
+            Country that = (Country) o;
+            return (this.name.equals(that.name) &&
+                    this.continent.equals(that.continent) &&
+                    this.currency.equals(that.currency) &&
+                    this.languages.equals(that.languages) &&
+                    this.cities.equals(that.cities));
+        }
+
+        @Override
+        public int hashCode() {
+            return hash;
+        }
     }
 
     public static class City implements Region {
 
         private final String name;
         private final Country country;
+        private final int hash;
 
         City(String name, Country country) {
             this.name = name;
             this.country = country;
+            hash = Objects.hash(this.name, this.country);
         }
 
         public Country country() {
@@ -304,6 +364,20 @@ public class GeoData {
         public String toString() {
             return name;
         }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+
+            City that = (City) o;
+            return this.name.equals(that.name) && this.country.equals(that.country);
+        }
+
+        @Override
+        public int hashCode() {
+            return hash;
+        }
     }
 
     public static class Tracker {
@@ -317,10 +391,12 @@ public class GeoData {
 
         private final String symbol;
         private final String name;
+        private final int hash;
 
         public Currency(String name, String symbol) {
             this.name = name;
             this.symbol = symbol;
+            hash = Objects.hash(this.name, this.symbol);
         }
 
         public String name() {
@@ -329,6 +405,24 @@ public class GeoData {
 
         public String symbol() {
             return symbol;
+        }
+
+        @Override
+        public String toString() {
+            return name + " (" + symbol + ")";
+        }
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+
+            Currency that = (Currency) o;
+            return this.name.equals(that.name) && this.symbol.equals(that.symbol);
+        }
+
+        @Override
+        public int hashCode() {
+            return hash;
         }
     }
 }

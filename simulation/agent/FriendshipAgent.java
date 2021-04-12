@@ -47,12 +47,12 @@ public class FriendshipAgent<TX extends Transaction> extends Agent<GeoData.City,
     protected List<Action<?, ?>.Report> run(Session<TX> session, GeoData.City region, Random random) {
         List<Action<?, ?>.Report> reports = new ArrayList<>();
         List<String> residentEmails;
-        try (TX tx = session.transaction(region.tracker(), context.iteration(), isTracing())) {
+        try (TX tx = session.transaction(region.tracker(), context.iterationNumber(), isTracing())) {
             ResidentsInCityAction<?> residentEmailsAction = actionFactory().residentsInCityAction(tx, region, context.scaleFactor(), context.today());
             residentEmails = runAction(residentEmailsAction, reports);
         } // TODO Closing and reopening the transaction here is a workaround for https://github.com/graknlabs/grakn/issues/5585
 
-        try (TX tx = session.transaction(region.tracker(), context.iteration(), isTracing())) {
+        try (TX tx = session.transaction(region.tracker(), context.iterationNumber(), isTracing())) {
             if (residentEmails.size() > 0) {
                 shuffle(residentEmails, random);
                 int numFriendships = context.scaleFactor();

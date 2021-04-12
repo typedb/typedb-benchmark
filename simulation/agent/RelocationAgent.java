@@ -61,18 +61,18 @@ public class RelocationAgent<TX extends Transaction> extends Agent<GeoData.City,
         List<String> residentEmails;
         List<String> relocationCityNames;
 
-        try (TX tx = session.transaction(region.tracker(), context.iteration(), isTracing())) {
+        try (TX tx = session.transaction(region.tracker(), context.iterationNumber(), isTracing())) {
             ResidentsInCityAction<?> residentsInCityAction = actionFactory().residentsInCityAction(tx, region, context.scaleFactor(), earliestDateOfResidencyToRelocate);
             residentEmails = runAction(residentsInCityAction, reports);
         }
         shuffle(residentEmails, random);
 
-        try (TX tx = session.transaction(region.tracker(), context.iteration(), isTracing())) {
+        try (TX tx = session.transaction(region.tracker(), context.iterationNumber(), isTracing())) {
             CitiesInContinentAction<?> citiesInContinentAction = actionFactory().citiesInContinentAction(tx, region);
             relocationCityNames = runAction(citiesInContinentAction, reports);
         }
 
-        try (TX tx = session.transaction(region.tracker(), context.iteration(), isTracing())) {
+        try (TX tx = session.transaction(region.tracker(), context.iterationNumber(), isTracing())) {
             Allocation.allocate(residentEmails, relocationCityNames, (residentEmail, relocationCityName) -> {
                 runAction(actionFactory().insertRelocationAction(tx, region, context.today(), residentEmail, relocationCityName), reports);
             });

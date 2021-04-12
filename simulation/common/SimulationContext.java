@@ -17,58 +17,58 @@
 
 package grakn.benchmark.simulation.common;
 
-import javax.annotation.Nullable;
+import grakn.benchmark.common.Config;
+
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.function.Function;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class SimulationContext {
 
     public static final int AGE_OF_ADULTHOOD = 1;
 
-    @Nullable
-    private Function<Integer, Boolean> samplingFunction;
-
     private final GeoData geoData;
     private final WordData wordData;
-    private final int scaleFactor;
+    private final Config config;
+    private final boolean isTracing;
     private final boolean isTest;
-    private int iteration;
+    private final AtomicInteger iteration;
 
-    private SimulationContext(GeoData geoData, WordData wordData, int scaleFactor, boolean isTest) {
+    private SimulationContext(GeoData geoData, WordData wordData, Config config, boolean isTracing, boolean isTest) {
         this.geoData = geoData;
         this.wordData = wordData;
-        this.scaleFactor = scaleFactor;
+        this.config = config;
+        this.isTracing = isTracing;
         this.isTest = isTest;
-        this.iteration = 0;
+        this.iteration = new AtomicInteger(0);
     }
 
-    public static SimulationContext create(int scaleFactor, boolean isTest) throws IOException {
+    public static SimulationContext create(Config config, boolean isTracing, boolean isTest) throws IOException {
         GeoData geoData = GeoData.initialise();
         WordData wordData = WordData.initialise();
-        return new SimulationContext(geoData, wordData, scaleFactor, isTest);
-    }
-
-    public void enableTracing(Function<Integer, Boolean> samplingFunction) {
-        this.samplingFunction = samplingFunction;
+        return new SimulationContext(geoData, wordData, config, isTracing, isTest);
     }
 
     public void incrementIteration() {
-        iteration++;
+        iteration.incrementAndGet();
     }
 
     public int scaleFactor() {
-        return scaleFactor;
+        return config.scaleFactor();
     }
 
-    public int iteration() {
-        return iteration;
+    public int iterationNumber() {
+        return iteration.get();
+    }
+
+    public int iterationMax() {
+        return config.iterations();
     }
 
     public LocalDateTime today() {
-        return LocalDateTime.of(LocalDate.ofYearDay(iteration, 1), LocalTime.of(0, 0, 0));
+        return LocalDateTime.of(LocalDate.ofYearDay(iteration.get(), 1), LocalTime.of(0, 0, 0));
     }
 
     public GeoData geoData() {
@@ -80,7 +80,7 @@ public class SimulationContext {
     }
 
     public boolean isTracing() {
-        return samplingFunction != null && samplingFunction.apply(iteration());
+        return isTracing && config.traceSampling().samplingFunction().apply(iterationNumber());
     }
 
     public boolean isTest() {

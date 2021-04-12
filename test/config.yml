@@ -1,0 +1,62 @@
+#
+# Copyright (C) 2021 Grakn Labs
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+#
+
+agents:
+  # For each agent select a `mode`, `RUN` to run without tracing, `TRACE` to run with tracing, and `OFF` to not run at all
+  - name: "marriage"
+    mode: OFF # no because of not
+  - name: "personBirth"
+    mode: RUN
+  - name: "ageUpdate"
+    mode: OFF # until we have macro functions
+  - name: "parentship"
+    mode: OFF # no because of not
+  - name: "relocation"
+    mode: OFF
+  - name: "company"
+    mode: RUN
+  - name: "employment"
+    mode: OFF
+  - name: "product"
+    mode: RUN
+  - name: "purchase"
+    mode: RUN
+  - name: "friendship"
+    mode: OFF
+  - name: "meanWage"
+    mode: OFF
+  - name: "findLivedIn"
+    mode: OFF
+  - name: "findCurrentResidents"
+    mode: OFF
+  - name: "arbitraryOneHop"
+    mode: OFF
+  - name: "twoHop"
+    mode: OFF # no, because of parentship
+  - name: "threeHop"
+    mode: OFF # no because of employment
+  - name: "fourHop"
+    mode: OFF # no because of employment
+  - name: "findSpecificMarriage"
+    mode: OFF # no because of not
+  - name: "findSpecificPerson"
+    mode: OFF
+
+randomSeed: 1
+iterations: 5
+scaleFactor: 5
+databaseName: "world"

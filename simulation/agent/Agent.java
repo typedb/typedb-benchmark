@@ -20,12 +20,13 @@ package grakn.benchmark.simulation.agent;
 import grabl.tracing.client.GrablTracingThreadStatic;
 import grakn.benchmark.simulation.action.Action;
 import grakn.benchmark.simulation.action.ActionFactory;
+import grakn.benchmark.simulation.common.RandomSource;
+import grakn.benchmark.simulation.common.Region;
 import grakn.benchmark.simulation.common.SimulationContext;
 import grakn.benchmark.simulation.driver.Client;
 import grakn.benchmark.simulation.driver.Session;
 import grakn.benchmark.simulation.driver.Transaction;
-import grakn.benchmark.simulation.common.RandomSource;
-import grakn.benchmark.simulation.common.Region;
+import grakn.common.collection.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,6 +40,7 @@ import java.util.function.Supplier;
 import static grabl.tracing.client.GrablTracingThreadStatic.contextOnThread;
 import static grabl.tracing.client.GrablTracingThreadStatic.traceOnThread;
 import static grakn.common.util.Objects.className;
+import static java.util.stream.Collectors.toList;
 
 /**
  * Agent constructs regional agents of a given class and runs them in parallel, providing them with the appropriate
@@ -83,10 +85,12 @@ public abstract class Agent<REGION extends Region, TX extends Transaction> {
 
     public Map<String, List<Action<?, ?>.Report>> iterate(RandomSource randomSrc) {
         ConcurrentMap<String, List<Action<?, ?>.Report>> reports = new ConcurrentHashMap<>();
-        List<REGION> regions = getRegions();
-        regions.parallelStream().forEach(region -> {
-            List<Action<?, ?>.Report> report = runWithMayTrace(region, randomSrc.next().get());
-            if (context.isTest()) reports.put(region.tracker(), report);
+        // We need to generate pairs of Region and Random deterministically before passing them to a parallel stream
+        List<Pair<REGION, Random>> regionRandomPairs = getRegions().stream()
+                .map(region -> new Pair<>(region, randomSrc.next().get())).collect(toList());
+        regionRandomPairs.parallelStream().forEach(pair -> {
+            List<Action<?, ?>.Report> report = runWithMayTrace(pair.first(), pair.second());
+            if (context.isTest()) reports.put(pair.first().tracker(), report);
         });
         return reports;
     }
@@ -94,7 +98,7 @@ public abstract class Agent<REGION extends Region, TX extends Transaction> {
     private List<Action<?, ?>.Report> runWithMayTrace(REGION region, Random random) {
         GrablTracingThreadStatic.ThreadContext tracingCtx = null;
         try {
-            if (isTracing()) tracingCtx = contextOnThread(region.tracker(), context.iteration());
+            if (isTracing()) tracingCtx = contextOnThread(region.tracker(), context.iterationNumber());
             Session<TX> session = client.session(region);
             return mayTrace(() -> run(session, region, random), className(getClass()));
         } finally {
@@ -113,7 +117,7 @@ public abstract class Agent<REGION extends Region, TX extends Transaction> {
     }
 
     public String uniqueId(SimulationContext benchmarkContext, String tracker, int iterationScopeId) {
-        return benchmarkContext.iteration() + "/" + tracker + "/" + iterationScopeId;
+        return benchmarkContext.iterationNumber() + "/" + tracker + "/" + iterationScopeId;
     }
 
     public <T> T mayTrace(Supplier<T> methodToTrace, String trace) {

@@ -17,7 +17,7 @@
 
 package grakn.benchmark.simulation;
 
-import grakn.benchmark.config.Config;
+import grakn.benchmark.common.Config;
 import grakn.benchmark.simulation.action.Action;
 import grakn.benchmark.simulation.action.ActionFactory;
 import grakn.benchmark.simulation.agent.AgeUpdateAgent;
@@ -51,14 +51,19 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.nio.file.Path;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public abstract class Simulation<CLIENT extends Client<SESSION, TX>, SESSION extends Session<TX>, TX extends Transaction> {
+import static grakn.benchmark.common.Util.printDuration;
+
+public abstract class Simulation<
+        CLIENT extends Client<SESSION, TX>,
+        SESSION extends Session<TX>,
+        TX extends Transaction> implements AutoCloseable {
 
     private static final Logger LOG = LoggerFactory.getLogger(Simulation.class);
     private static final String AGENT_PACKAGE = Agent.class.getPackageName();
@@ -133,6 +138,15 @@ public abstract class Simulation<CLIENT extends Client<SESSION, TX>, SESSION ext
         return agents;
     }
 
+    public void run() {
+        for (int i = 0; i < context.iterationMax(); i++) {
+            Instant iterStart = Instant.now();
+            iterate();
+            Instant iterEnd = Instant.now();
+            LOG.info("Iteration {}: {}", i, printDuration(iterStart, iterEnd));
+        }
+    }
+
     public void iterate() {
         agentReports.clear();
         for (Agent<?, ?> agent : agents) {
@@ -155,6 +169,7 @@ public abstract class Simulation<CLIENT extends Client<SESSION, TX>, SESSION ext
         return client.printStatistics();
     }
 
+    @Override
     public void close() {
         client.close();
     }

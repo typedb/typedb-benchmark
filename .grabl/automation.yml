@@ -91,8 +91,8 @@ build:
         done
         bazel test //test:comparison-test \
           --test_output=streamed \
-          --test_arg=--grakn-uri=$GRABL_EXPORT_TEST_COMPARISON_GRAKN_URI \
-          --test_arg=--neo4j-uri=bolt://$GRABL_EXPORT_TEST_COMPARISON_NEO4J_URI
+          --test_arg=--grakn=$GRABL_EXPORT_TEST_COMPARISON_GRAKN_URI \
+          --test_arg=--neo4j=bolt://$GRABL_EXPORT_TEST_COMPARISON_NEO4J_URI
   performance:
     test-performance-small-grakn-cluster-bootstrapper-background:
       image: graknlabs-ubuntu-20.04

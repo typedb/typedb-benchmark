@@ -60,17 +60,17 @@ public class EmploymentAgent<TX extends Transaction> extends Agent<GeoData.City,
         List<String> employeeEmails;
         List<Long> companyNumbers;
 
-        try (TX tx = session.transaction(region.tracker(), context.iteration(), isTracing())) {
+        try (TX tx = session.transaction(region.tracker(), context.iterationNumber(), isTracing())) {
             ResidentsInCityAction<TX> employeeEmailsAction = actionFactory().residentsInCityAction(tx, region, context.scaleFactor(), employmentDate);
             employeeEmails = runAction(employeeEmailsAction, reports);
         }
 
-        try (TX tx = session.transaction(region.tracker(), context.iteration(), isTracing())) {
+        try (TX tx = session.transaction(region.tracker(), context.iterationNumber(), isTracing())) {
             CompaniesInCountryAction<TX> companyNumbersAction = actionFactory().companiesInCountryAction(tx, region.country(), context.scaleFactor());
             companyNumbers = runAction(companyNumbersAction, reports);
         }
 
-        try (TX tx = session.transaction(region.tracker(), context.iteration(), isTracing())) {
+        try (TX tx = session.transaction(region.tracker(), context.iterationNumber(), isTracing())) {
             // A second transaction is being used to circumvent graknlabs/grakn issue #5585
             boolean allocated = allocate(employeeEmails, companyNumbers, (employeeEmail, companyNumber) -> {
                 double wageValue = RandomValueGenerator.of(random).boundRandomDouble(MIN_ANNUAL_WAGE, MAX_ANNUAL_WAGE);

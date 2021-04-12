@@ -27,7 +27,6 @@ java_library(
         "//simulation/action:action",
         "//simulation/common:common",
         "//simulation/driver:driver",
-        "//config",
         "@graknlabs_common//:common",
         "@graknlabs_client_java//api:api",
         "@graknlabs_client_java//:client-java",

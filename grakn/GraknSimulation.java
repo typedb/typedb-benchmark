@@ -17,7 +17,7 @@
 
 package grakn.benchmark.grakn;
 
-import grakn.benchmark.config.Config;
+import grakn.benchmark.common.Config;
 import grakn.benchmark.grakn.action.GraknActionFactory;
 import grakn.benchmark.grakn.driver.GraknClient;
 import grakn.benchmark.grakn.driver.GraknSession;
@@ -59,7 +59,6 @@ public class GraknSimulation extends Simulation<GraknClient, GraknSession, Grakn
     private static final Logger LOG = LoggerFactory.getLogger(GraknSimulation.class);
     private static final File SCHEMA_FILE = Paths.get("grakn/simulation.gql").toFile();
     private static final String DATABASE_NAME = "simulation";
-
 
     private GraknSimulation(GraknClient client, int randomSeed, List<Config.Agent> agentConfigs,
                             SimulationContext context) throws Exception {
