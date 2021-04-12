@@ -59,4 +59,4 @@ agents:
 randomSeed: 1
 iterations: 5
 scaleFactor: 5
-databaseName: "world"
+databaseName: "simulation"

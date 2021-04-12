@@ -40,8 +40,8 @@ import static grakn.benchmark.common.Util.parseCommandLine;
 public class ComparisonTestSuite extends Suite {
 
     private static final Logger LOG = LoggerFactory.getLogger(ComparisonTestSuite.class);
-    private static final Config TEST_CONFIG = Config.loadYML(Paths.get("test/config.yml").toFile());
-    private static final TestOptions TEST_OPTIONS = parseCommandLine(args(), new TestOptions()).get();
+    private static final Config CONFIG = Config.loadYML(Paths.get("test/config.yml").toFile());
+    private static final TestOptions OPTIONS = parseCommandLine(args(), new TestOptions()).get();
 
     public static GraknSimulation GRAKN_CORE;
 
@@ -50,9 +50,9 @@ public class ComparisonTestSuite extends Suite {
 
     public ComparisonTestSuite(Class<?> testClass) throws Throwable {
         super(testClass, createRunners(testClass));
-        SimulationContext context = SimulationContext.create(TEST_CONFIG, false, true);
-        GRAKN_CORE = GraknSimulation.core(TEST_OPTIONS.graknAddress(), TEST_CONFIG.randomSeed(), TEST_CONFIG.agents(), context);
-        NEO4J = Neo4JSimulation.create(TEST_OPTIONS.neo4jAddress(), TEST_CONFIG.randomSeed(), TEST_CONFIG.agents(), context);
+        SimulationContext context = SimulationContext.create(CONFIG, false, true);
+        GRAKN_CORE = GraknSimulation.core(OPTIONS.graknAddress(), CONFIG.randomSeed(), CONFIG.agents(), context);
+        NEO4J = Neo4JSimulation.create(OPTIONS.neo4jAddress(), CONFIG.randomSeed(), CONFIG.agents(), context);
     }
 
     private static String[] args() {
@@ -62,7 +62,7 @@ public class ComparisonTestSuite extends Suite {
 
     private static List<org.junit.runner.Runner> createRunners(Class<?> testClass) throws InitializationError {
         List<org.junit.runner.Runner> runners = new ArrayList<>();
-        for (int i = 1; i <= TEST_CONFIG.iterations(); i++) {
+        for (int i = 1; i <= CONFIG.iterations(); i++) {
             BlockJUnit4ClassRunner runner = new Runner(testClass, i);
             runners.add(runner);
         }
@@ -75,7 +75,7 @@ public class ComparisonTestSuite extends Suite {
         NEO4J.iterate();
         GRAKN_CORE.iterate();
         super.runChild(runner, notifier);
-        if (iteration == TEST_CONFIG.iterations() + 1) {
+        if (iteration == CONFIG.iterations() + 1) {
             GRAKN_CORE.close();
             NEO4J.close();
         }
