@@ -32,6 +32,7 @@ import picocli.CommandLine;
 
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static grakn.benchmark.common.Util.parseCommandLine;
@@ -39,23 +40,29 @@ import static grakn.benchmark.common.Util.parseCommandLine;
 public class ComparisonTestSuite extends Suite {
 
     private static final Logger LOG = LoggerFactory.getLogger(ComparisonTestSuite.class);
-    private static final Config CONFIG = Config.loadYML(Paths.get("test/config.yml").toFile());
-    private static final Options OPTIONS = parseCommandLine(System.getProperty("sun.java.command").split(" "), new Options()).get();
+    private static final Config TEST_CONFIG = Config.loadYML(Paths.get("test/config.yml").toFile());
+    private static final TestOptions TEST_OPTIONS = parseCommandLine(args(), new TestOptions()).get();
 
     public static GraknSimulation GRAKN_CORE;
+
     public static Neo4JSimulation NEO4J;
     private int iteration = 1;
 
     public ComparisonTestSuite(Class<?> testClass) throws Throwable {
         super(testClass, createRunners(testClass));
-        SimulationContext context = SimulationContext.create(CONFIG, false, true);
-        GRAKN_CORE = GraknSimulation.core(OPTIONS.graknAddress(), CONFIG.randomSeed(), CONFIG.agents(), context);
-        NEO4J = Neo4JSimulation.create(OPTIONS.neo4jAddress(), CONFIG.randomSeed(), CONFIG.agents(), context);
+        SimulationContext context = SimulationContext.create(TEST_CONFIG, false, true);
+        GRAKN_CORE = GraknSimulation.core(TEST_OPTIONS.graknAddress(), TEST_CONFIG.randomSeed(), TEST_CONFIG.agents(), context);
+        NEO4J = Neo4JSimulation.create(TEST_OPTIONS.neo4jAddress(), TEST_CONFIG.randomSeed(), TEST_CONFIG.agents(), context);
+    }
+
+    private static String[] args() {
+        String[] input = System.getProperty("sun.java.command").split(" ");
+        return Arrays.copyOfRange(input, 1, input.length);
     }
 
     private static List<org.junit.runner.Runner> createRunners(Class<?> testClass) throws InitializationError {
         List<org.junit.runner.Runner> runners = new ArrayList<>();
-        for (int i = 1; i <= CONFIG.iterations(); i++) {
+        for (int i = 1; i <= TEST_CONFIG.iterations(); i++) {
             BlockJUnit4ClassRunner runner = new Runner(testClass, i);
             runners.add(runner);
         }
@@ -68,7 +75,7 @@ public class ComparisonTestSuite extends Suite {
         NEO4J.iterate();
         GRAKN_CORE.iterate();
         super.runChild(runner, notifier);
-        if (iteration == CONFIG.iterations() + 1) {
+        if (iteration == TEST_CONFIG.iterations() + 1) {
             GRAKN_CORE.close();
             NEO4J.close();
         }
@@ -94,7 +101,7 @@ public class ComparisonTestSuite extends Suite {
     }
 
     @CommandLine.Command(name = "benchmark-test", mixinStandardHelpOptions = true)
-    private static class Options {
+    private static class TestOptions {
 
         @CommandLine.Option(names = {"--grakn"}, required = true, description = "Database address URI")
         private String graknAddress;
