@@ -240,7 +240,7 @@ public class GeoData {
             if (o == null || getClass() != o.getClass()) return false;
 
             Continent that = (Continent) o;
-            return this.name.equals(that.name) && this.countries.equals(that.countries);
+            return this.name.equals(that.name);
         }
 
         @Override
@@ -319,8 +319,7 @@ public class GeoData {
             return (this.name.equals(that.name) &&
                     this.continent.equals(that.continent) &&
                     this.currency.equals(that.currency) &&
-                    this.languages.equals(that.languages) &&
-                    this.cities.equals(that.cities));
+                    this.languages.equals(that.languages));
         }
 
         @Override

@@ -50,9 +50,10 @@ public class ComparisonTestSuite extends Suite {
 
     public ComparisonTestSuite(Class<?> testClass) throws Throwable {
         super(testClass, createRunners(testClass));
-        SimulationContext context = SimulationContext.create(CONFIG, false, true);
-        GRAKN_CORE = GraknSimulation.core(OPTIONS.graknAddress(), CONFIG.randomSeed(), CONFIG.agents(), context);
-        NEO4J = Neo4JSimulation.create(OPTIONS.neo4jAddress(), CONFIG.randomSeed(), CONFIG.agents(), context);
+        GRAKN_CORE = GraknSimulation.core(OPTIONS.graknAddress(), CONFIG.randomSeed(), CONFIG.agents(),
+                                          SimulationContext.create(CONFIG, false, true));
+        NEO4J = Neo4JSimulation.create(OPTIONS.neo4jAddress(), CONFIG.randomSeed(), CONFIG.agents(),
+                                       SimulationContext.create(CONFIG, false, true));
     }
 
     private static String[] args() {

@@ -125,7 +125,7 @@ public class Neo4JSimulation extends Simulation<Neo4jClient, Neo4jSession, Neo4j
                 if (i + 1 < country.languages().size()) languageProps.append(", ");
             }
             Query query = new Query(String.format(
-                    "MATCH (c:Continent {locationName: '%s'}) CREATE (x:Continent:Location {locationName: '%s', currency: '%s', %s})-[:LOCATED_IN]->(c)",
+                    "MATCH (c:Continent {locationName: '%s'}) CREATE (x:Country:Location {locationName: '%s', currency: '%s', %s})-[:LOCATED_IN]->(c)",
                     country.continent().name(), country.name(), country.currency().name(), languageProps.toString()
             ));
             tx.run(query);
