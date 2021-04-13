@@ -20,14 +20,12 @@ package grakn.benchmark.simulation.agent;
 import grakn.benchmark.simulation.action.Action;
 import grakn.benchmark.simulation.action.ActionFactory;
 import grakn.benchmark.simulation.action.SpouseType;
-import grakn.benchmark.simulation.action.read.BirthsInCityAction;
-import grakn.benchmark.simulation.action.read.MarriedCoupleAction;
 import grakn.benchmark.simulation.common.Allocation;
+import grakn.benchmark.simulation.common.GeoData;
 import grakn.benchmark.simulation.common.SimulationContext;
+import grakn.benchmark.simulation.driver.Client;
 import grakn.benchmark.simulation.driver.Session;
 import grakn.benchmark.simulation.driver.Transaction;
-import grakn.benchmark.simulation.driver.Client;
-import grakn.benchmark.simulation.common.GeoData;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -54,15 +52,13 @@ public class ParentshipAgent<TX extends Transaction> extends Agent<GeoData.City,
         List<String> childrenEmails;
 
         try (TX tx = session.transaction(region.tracker(), context.iterationNumber(), isTracing())) {
-            BirthsInCityAction<?> birthsInCityAction = actionFactory().birthsInCityAction(tx, region, context.today());
-            childrenEmails = runAction(birthsInCityAction, reports);
+            childrenEmails = runAction(actionFactory().birthsInCityAction(tx, region, context.today()), reports);
         }
 
         List<HashMap<SpouseType, String>> marriedCouple;
 
         try (TX tx = session.transaction(region.tracker(), context.iterationNumber(), isTracing())) {
-            MarriedCoupleAction<?> marriedCoupleAction = actionFactory().marriedCoupleAction(tx, region, context.today());
-            marriedCouple = runAction(marriedCoupleAction, reports);
+            marriedCouple = runAction(actionFactory().marriedCoupleAction(tx, region, context.today()), reports);
         }
 
         if (marriedCouple.size() > 0 && childrenEmails.size() > 0) {

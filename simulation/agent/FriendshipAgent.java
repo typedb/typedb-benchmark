@@ -19,12 +19,11 @@ package grakn.benchmark.simulation.agent;
 
 import grakn.benchmark.simulation.action.Action;
 import grakn.benchmark.simulation.action.ActionFactory;
-import grakn.benchmark.simulation.action.read.ResidentsInCityAction;
+import grakn.benchmark.simulation.common.GeoData;
 import grakn.benchmark.simulation.common.SimulationContext;
+import grakn.benchmark.simulation.driver.Client;
 import grakn.benchmark.simulation.driver.Session;
 import grakn.benchmark.simulation.driver.Transaction;
-import grakn.benchmark.simulation.driver.Client;
-import grakn.benchmark.simulation.common.GeoData;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,8 +47,7 @@ public class FriendshipAgent<TX extends Transaction> extends Agent<GeoData.City,
         List<Action<?, ?>.Report> reports = new ArrayList<>();
         List<String> residentEmails;
         try (TX tx = session.transaction(region.tracker(), context.iterationNumber(), isTracing())) {
-            ResidentsInCityAction<?> residentEmailsAction = actionFactory().residentsInCityAction(tx, region, context.scaleFactor(), context.today());
-            residentEmails = runAction(residentEmailsAction, reports);
+            residentEmails = runAction(actionFactory().residentsInCityAction(tx, region, context.scaleFactor(), context.today()), reports);
         } // TODO Closing and reopening the transaction here is a workaround for https://github.com/graknlabs/grakn/issues/5585
 
         try (TX tx = session.transaction(region.tracker(), context.iterationNumber(), isTracing())) {

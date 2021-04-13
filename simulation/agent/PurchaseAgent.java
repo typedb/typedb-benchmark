@@ -19,15 +19,13 @@ package grakn.benchmark.simulation.agent;
 
 import grakn.benchmark.simulation.action.Action;
 import grakn.benchmark.simulation.action.ActionFactory;
-import grakn.benchmark.simulation.action.read.CompaniesInCountryAction;
-import grakn.benchmark.simulation.action.read.ProductsInContinentAction;
 import grakn.benchmark.simulation.common.Allocation;
+import grakn.benchmark.simulation.common.GeoData;
 import grakn.benchmark.simulation.common.RandomValueGenerator;
 import grakn.benchmark.simulation.common.SimulationContext;
+import grakn.benchmark.simulation.driver.Client;
 import grakn.benchmark.simulation.driver.Session;
 import grakn.benchmark.simulation.driver.Transaction;
-import grakn.benchmark.simulation.driver.Client;
-import grakn.benchmark.simulation.common.GeoData;
 import grakn.common.collection.Pair;
 
 import java.util.ArrayList;
@@ -54,15 +52,13 @@ public class PurchaseAgent<TX extends Transaction> extends Agent<GeoData.Country
         List<Long> companyNumbers;
 
         try (TX tx = session.transaction(region.tracker(), context.iterationNumber(), isTracing())) {
-            CompaniesInCountryAction<TX> companiesInContinentAction = actionFactory().companiesInCountryAction(tx, region, 100);
-            companyNumbers = runAction(companiesInContinentAction, reports);
+            companyNumbers = runAction(actionFactory().companiesInCountryAction(tx, region, 100), reports);
         }
         shuffle(companyNumbers, random);
 
         List<Long> productBarcodes;
         try (TX tx = session.transaction(region.tracker(), context.iterationNumber(), isTracing())) {
-            ProductsInContinentAction<?> productsInContinentAction = actionFactory().productsInContinentAction(tx, region.continent());
-            productBarcodes = runAction(productsInContinentAction, reports);
+            productBarcodes = runAction(actionFactory().productsInContinentAction(tx, region.continent()), reports);
         }
 
         int numTransactions = context.scaleFactor() * companyNumbers.size();

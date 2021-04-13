@@ -17,20 +17,38 @@
 
 package grakn.benchmark.simulation.agent;
 
+import grakn.benchmark.simulation.action.Action;
 import grakn.benchmark.simulation.action.ActionFactory;
-import grakn.benchmark.simulation.action.read.ReadAction;
+import grakn.benchmark.simulation.common.GeoData;
 import grakn.benchmark.simulation.common.SimulationContext;
-import grakn.benchmark.simulation.driver.Transaction;
 import grakn.benchmark.simulation.driver.Client;
+import grakn.benchmark.simulation.driver.Session;
+import grakn.benchmark.simulation.driver.Transaction;
 
-public class FourHopAgent<TX extends Transaction> extends ReadAgent<TX> {
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Random;
+
+public class FourHopAgent<TX extends Transaction> extends Agent<GeoData.Global, TX> {
 
     public FourHopAgent(Client<?, TX> client, ActionFactory<TX, ?> actionFactory, SimulationContext context) {
         super(client, actionFactory, context);
     }
 
     @Override
-    protected ReadAction<TX, ?> getAction(TX tx) {
-        return actionFactory().fourHopAction(tx);
+    protected List<GeoData.Global> getRegions() {
+        return Collections.singletonList(context.geoData().global());
+    }
+
+    @Override
+    protected List<Action<?, ?>.Report> run(Session<TX> session, GeoData.Global region, Random random) {
+        List<Action<?, ?>.Report> reports = new ArrayList<>();
+        for (int i = 0; i <= context.scaleFactor(); i++) {
+            try (TX tx = session.transaction(region.tracker(), context.iterationNumber(), isTracing())) {
+                runAction(actionFactory().fourHopAction(tx), reports);
+            }
+        }
+        return reports;
     }
 }

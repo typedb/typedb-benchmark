@@ -19,14 +19,12 @@ package grakn.benchmark.simulation.agent;
 
 import grakn.benchmark.simulation.action.Action;
 import grakn.benchmark.simulation.action.ActionFactory;
-import grakn.benchmark.simulation.action.read.CompaniesInCountryAction;
-import grakn.benchmark.simulation.action.read.ResidentsInCityAction;
+import grakn.benchmark.simulation.common.GeoData;
 import grakn.benchmark.simulation.common.RandomValueGenerator;
 import grakn.benchmark.simulation.common.SimulationContext;
+import grakn.benchmark.simulation.driver.Client;
 import grakn.benchmark.simulation.driver.Session;
 import grakn.benchmark.simulation.driver.Transaction;
-import grakn.benchmark.simulation.driver.Client;
-import grakn.benchmark.simulation.common.GeoData;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -61,13 +59,11 @@ public class EmploymentAgent<TX extends Transaction> extends Agent<GeoData.City,
         List<Long> companyNumbers;
 
         try (TX tx = session.transaction(region.tracker(), context.iterationNumber(), isTracing())) {
-            ResidentsInCityAction<TX> employeeEmailsAction = actionFactory().residentsInCityAction(tx, region, context.scaleFactor(), employmentDate);
-            employeeEmails = runAction(employeeEmailsAction, reports);
+            employeeEmails = runAction(actionFactory().residentsInCityAction(tx, region, context.scaleFactor(), employmentDate), reports);
         }
 
         try (TX tx = session.transaction(region.tracker(), context.iterationNumber(), isTracing())) {
-            CompaniesInCountryAction<TX> companyNumbersAction = actionFactory().companiesInCountryAction(tx, region.country(), context.scaleFactor());
-            companyNumbers = runAction(companyNumbersAction, reports);
+            companyNumbers = runAction(actionFactory().companiesInCountryAction(tx, region.country(), context.scaleFactor()), reports);
         }
 
         try (TX tx = session.transaction(region.tracker(), context.iterationNumber(), isTracing())) {

@@ -19,12 +19,11 @@ package grakn.benchmark.simulation.agent;
 
 import grakn.benchmark.simulation.action.Action;
 import grakn.benchmark.simulation.action.ActionFactory;
-import grakn.benchmark.simulation.action.write.UpdateAgesOfPeopleInCityAction;
+import grakn.benchmark.simulation.common.GeoData;
 import grakn.benchmark.simulation.common.SimulationContext;
+import grakn.benchmark.simulation.driver.Client;
 import grakn.benchmark.simulation.driver.Session;
 import grakn.benchmark.simulation.driver.Transaction;
-import grakn.benchmark.simulation.driver.Client;
-import grakn.benchmark.simulation.common.GeoData;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,8 +44,7 @@ public class AgeUpdateAgent<TX extends Transaction> extends Agent<GeoData.City, 
     protected List<Action<?, ?>.Report> run(Session<TX> session, GeoData.City region, Random random) {
         List<Action<?, ?>.Report> reports = new ArrayList<>();
         try (TX tx = session.transaction(region.tracker(), context.iterationNumber(), isTracing())) {
-            UpdateAgesOfPeopleInCityAction<TX> updateAgesOfAllPeopleInCityAction = actionFactory().updateAgesOfPeopleInCityAction(tx, context.today(), region);
-            runAction(updateAgesOfAllPeopleInCityAction, reports);
+            runAction(actionFactory().updateAgesOfPeopleInCityAction(tx, context.today(), region), reports);
             tx.commit();
         }
         return reports;

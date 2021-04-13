@@ -19,14 +19,12 @@ package grakn.benchmark.simulation.agent;
 
 import grakn.benchmark.simulation.action.Action;
 import grakn.benchmark.simulation.action.ActionFactory;
-import grakn.benchmark.simulation.action.read.CitiesInContinentAction;
-import grakn.benchmark.simulation.action.read.ResidentsInCityAction;
 import grakn.benchmark.simulation.common.Allocation;
+import grakn.benchmark.simulation.common.GeoData;
 import grakn.benchmark.simulation.common.SimulationContext;
+import grakn.benchmark.simulation.driver.Client;
 import grakn.benchmark.simulation.driver.Session;
 import grakn.benchmark.simulation.driver.Transaction;
-import grakn.benchmark.simulation.driver.Client;
-import grakn.benchmark.simulation.common.GeoData;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -62,14 +60,12 @@ public class RelocationAgent<TX extends Transaction> extends Agent<GeoData.City,
         List<String> relocationCityNames;
 
         try (TX tx = session.transaction(region.tracker(), context.iterationNumber(), isTracing())) {
-            ResidentsInCityAction<?> residentsInCityAction = actionFactory().residentsInCityAction(tx, region, context.scaleFactor(), earliestDateOfResidencyToRelocate);
-            residentEmails = runAction(residentsInCityAction, reports);
+            residentEmails = runAction(actionFactory().residentsInCityAction(tx, region, context.scaleFactor(), earliestDateOfResidencyToRelocate), reports);
         }
         shuffle(residentEmails, random);
 
         try (TX tx = session.transaction(region.tracker(), context.iterationNumber(), isTracing())) {
-            CitiesInContinentAction<?> citiesInContinentAction = actionFactory().citiesInContinentAction(tx, region);
-            relocationCityNames = runAction(citiesInContinentAction, reports);
+            relocationCityNames = runAction(actionFactory().citiesInContinentAction(tx, region), reports);
         }
 
         try (TX tx = session.transaction(region.tracker(), context.iterationNumber(), isTracing())) {
