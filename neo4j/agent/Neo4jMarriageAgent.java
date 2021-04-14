@@ -1,0 +1,68 @@
+/*
+ * Copyright (C) 2021 Grakn Labs
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+package grakn.benchmark.neo4j.agent;
+
+import grakn.benchmark.neo4j.driver.Neo4jTransaction;
+import grakn.benchmark.simulation.agent.MarriageAgent;
+import grakn.benchmark.simulation.common.GeoData;
+import grakn.benchmark.simulation.common.SimulationContext;
+import grakn.benchmark.simulation.driver.Client;
+import org.neo4j.driver.Query;
+
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.List;
+
+import static grakn.benchmark.neo4j.agent.Labels.LOCATION_NAME;
+import static grakn.benchmark.neo4j.agent.Labels.MARRIAGE_ID;
+
+public class Neo4jMarriageAgent extends MarriageAgent<Neo4jTransaction> {
+
+    public Neo4jMarriageAgent(Client<?, Neo4jTransaction> client, SimulationContext context) {
+        super(client, context);
+    }
+
+    @Override
+    protected List<String> matchUnmarriedPeopleInCity(Neo4jTransaction tx, GeoData.City city, String gender, LocalDateTime dobOfAdults) {
+        return Neo4jMatcher.matchUnmarriedPeopleInCity(tx, city, gender, dobOfAdults);
+    }
+
+    @Override
+    protected void insertMarriage(Neo4jTransaction tx, GeoData.City city, int marriageIdentifier, String wifeEmail, String husbandEmail) {
+        String query = "MATCH (wife:Person {email: $wifeEmail}), (husband:Person {email: $husbandEmail}), (city:City {locationName: $locationName})\n" +
+                "CREATE (husband)-[marriage:MARRIED_TO {marriageId: $marriageId, locationName: city.locationName}]->(wife)" +
+                "RETURN marriage.marriageId, husband.email, wife.email, city.locationName";
+        HashMap<String, Object> parameters = new HashMap<>() {{
+            put(MARRIAGE_ID, marriageIdentifier);
+            put("wifeEmail", wifeEmail);
+            put("husbandEmail", husbandEmail);
+            put(LOCATION_NAME, city.name());
+        }};
+        tx.execute(new Query(query, parameters));
+    }
+
+//    @Override
+//    protected HashMap<ComparableField, Object> outputForReport(Record answer) {
+//        return new HashMap<ComparableField, Object>() {{
+//            put(InsertMarriageActionField.MARRIAGE_IDENTIFIER, answer.asMap().get("marriage." + MARRIAGE_ID));
+//            put(InsertMarriageActionField.WIFE_EMAIL, answer.asMap().get("wife." + EMAIL));
+//            put(InsertMarriageActionField.HUSBAND_EMAIL, answer.asMap().get("husband." + EMAIL));
+//            put(InsertMarriageActionField.CITY_NAME, answer.asMap().get("city." + LOCATION_NAME));
+//        }};
+//    }
+}

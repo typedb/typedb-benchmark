@@ -1,0 +1,87 @@
+/*
+ * Copyright (C) 2021 Grakn Labs
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+package grakn.benchmark.neo4j.agent;
+
+import grakn.benchmark.neo4j.driver.Neo4jTransaction;
+import grakn.benchmark.simulation.agent.PurchaseAgent;
+import grakn.benchmark.simulation.common.GeoData;
+import grakn.benchmark.simulation.common.SimulationContext;
+import grakn.benchmark.simulation.driver.Client;
+import grakn.common.collection.Pair;
+import org.neo4j.driver.Query;
+
+import java.util.HashMap;
+import java.util.List;
+
+public class Neo4jPurchaseAgent extends PurchaseAgent<Neo4jTransaction> {
+
+    public Neo4jPurchaseAgent(Client<?, Neo4jTransaction> client, SimulationContext context) {
+        super(client, context);
+    }
+
+    @Override
+    protected List<Long> matchCompaniesInCountry(Neo4jTransaction tx, GeoData.Country country, int numCompanies) {
+        return Neo4jMatcher.matchCompaniesInCountry(tx, country, numCompanies);
+    }
+
+    @Override
+    protected List<Long> matchProductsInContinent(Neo4jTransaction tx, GeoData.Continent continent) {
+        return Neo4jMatcher.matchProductsInContinent(tx, continent);
+    }
+
+    @Override
+    protected void insertPurchase(Neo4jTransaction tx, GeoData.Country country, Pair<Long, Long> transaction, Long sellerCompanyNumber, double value, int productQuantity, boolean isTaxable) {
+        String query = "MATCH (product:Product {barcode: $barcode}),\n" +
+                "(buyer:Company {companyNumber: $buyerNumber}),\n" +
+                "(seller:Company {companyNumber: $sellerNumber}),\n" +
+                "(country:Country {locationName: $countryName})\n" +
+                "CREATE (transaction:Transaction{\n" +
+                "   value: $value,\n" +
+                "   productQuantity: $productQuantity,\n" +
+                "   isTaxable: $isTaxable,\n" +
+                "   locationName: country.locationName\n" + // This could be a relation, but would be inconsistent with how location is represented elsewhere
+                "}),\n" +
+                "(transaction)-[:SELLER]->(seller)," +
+                "(transaction)-[:BUYER]->(buyer)," +
+                "(transaction)-[:MERCHANDISE]->(product)\n" +
+                "RETURN seller.companyNumber, buyer.companyNumber, product.barcode, transaction.value, transaction.productQuantity, transaction.isTaxable, country.locationName";
+        HashMap<String, Object> parameters = new HashMap<>() {{
+            put("barcode", transaction.second());
+            put("buyerNumber", transaction.first());
+            put("sellerNumber", sellerCompanyNumber);
+            put("countryName", country.name());
+            put("value", value);
+            put("productQuantity", productQuantity);
+            put("isTaxable", isTaxable);
+        }};
+        tx.execute(new Query(query, parameters));
+    }
+
+//    @Override
+//    protected HashMap<ComparableField, Object> outputForReport(Record answer) {
+//        return new HashMap<ComparableField, Object>() {{
+//            put(InsertTransactionActionField.SELLER, answer.asMap().get("seller." + Model.COMPANY_NUMBER));
+//            put(InsertTransactionActionField.BUYER, answer.asMap().get("buyer." + Model.COMPANY_NUMBER));
+//            put(InsertTransactionActionField.MERCHANDISE, answer.asMap().get("product." + Model.PRODUCT_BARCODE));
+//            put(InsertTransactionActionField.VALUE, answer.asMap().get("transaction." + Model.VALUE));
+//            put(InsertTransactionActionField.PRODUCT_QUANTITY, answer.asMap().get("transaction." + Model.PRODUCT_QUANTITY));
+//            put(InsertTransactionActionField.IS_TAXABLE, answer.asMap().get("transaction." + Model.IS_TAXABLE));
+//            put(InsertTransactionActionField.COUNTRY, answer.asMap().get("country." + Model.LOCATION_NAME));
+//        }};
+//    }
+}

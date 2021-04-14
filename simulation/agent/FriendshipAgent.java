@@ -17,28 +17,27 @@
 
 package grakn.benchmark.simulation.agent;
 
-import grakn.benchmark.simulation.action.Action;
-import grakn.benchmark.simulation.action.ActionFactory;
 import grakn.benchmark.simulation.common.GeoData;
 import grakn.benchmark.simulation.common.SimulationContext;
 import grakn.benchmark.simulation.driver.Client;
 import grakn.benchmark.simulation.driver.Session;
 import grakn.benchmark.simulation.driver.Transaction;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
 import static java.util.Collections.shuffle;
 
-public class FriendshipAgent<TX extends Transaction> extends Agent<GeoData.City, TX> {
+public abstract class FriendshipAgent<TX extends Transaction> extends Agent<GeoData.City, TX> {
 
-    public FriendshipAgent(Client<?, TX> client, ActionFactory<TX, ?> actionFactory, SimulationContext context) {
-        super(client, actionFactory, context);
+    public FriendshipAgent(Client<?, TX> client, SimulationContext context) {
+        super(client, context);
     }
 
     @Override
-    protected List<GeoData.City> getRegions() {
+    protected List<GeoData.City> regions() {
         return context.geoData().cities();
     }
 
@@ -47,7 +46,7 @@ public class FriendshipAgent<TX extends Transaction> extends Agent<GeoData.City,
         List<Action<?, ?>.Report> reports = new ArrayList<>();
         List<String> residentEmails;
         try (TX tx = session.transaction(region.tracker(), context.iterationNumber(), isTracing())) {
-            residentEmails = runAction(actionFactory().residentsInCityAction(tx, region, context.scaleFactor(), context.today()), reports);
+            residentEmails = matchResidentsInCity(tx, region, context.scaleFactor(), context.today());
         } // TODO Closing and reopening the transaction here is a workaround for https://github.com/graknlabs/grakn/issues/5585
 
         try (TX tx = session.transaction(region.tracker(), context.iterationNumber(), isTracing())) {
@@ -55,7 +54,7 @@ public class FriendshipAgent<TX extends Transaction> extends Agent<GeoData.City,
                 shuffle(residentEmails, random);
                 int numFriendships = context.scaleFactor();
                 for (int i = 0; i < numFriendships; i++) {
-                    runAction(actionFactory().insertFriendshipAction(tx, context.today(), pickOne(residentEmails, random), pickOne(residentEmails, random)), reports);
+                    insertFriendship(tx, context.today(), pickOne(residentEmails, random), pickOne(residentEmails, random));
                 }
                 tx.commit();
             }
@@ -63,4 +62,8 @@ public class FriendshipAgent<TX extends Transaction> extends Agent<GeoData.City,
 
         return reports;
     }
+
+    protected abstract List<String> matchResidentsInCity(TX tx, GeoData.City region, int scaleFactor, LocalDateTime today);
+
+    protected abstract void insertFriendship(TX tx, LocalDateTime today, String email1, String email2);
 }

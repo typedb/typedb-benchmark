@@ -18,8 +18,6 @@
 package grakn.benchmark.simulation.agent;
 
 import grabl.tracing.client.GrablTracingThreadStatic;
-import grakn.benchmark.simulation.action.Action;
-import grakn.benchmark.simulation.action.ActionFactory;
 import grakn.benchmark.simulation.common.RandomSource;
 import grakn.benchmark.simulation.common.Region;
 import grakn.benchmark.simulation.common.SimulationContext;
@@ -58,22 +56,16 @@ public abstract class Agent<REGION extends Region, TX extends Transaction> {
 
     protected final SimulationContext context;
     private final Client<?, TX> client;
-    private final ActionFactory<TX, ?> actionFactory;
     private boolean isTracing = true;
 
-    protected Agent(Client<?, TX> client, ActionFactory<TX, ?> actionFactory, SimulationContext context) {
+    protected Agent(Client<?, TX> client, SimulationContext context) {
         this.client = client;
-        this.actionFactory = actionFactory;
         this.context = context;
     }
 
-    protected abstract List<REGION> getRegions();
+    protected abstract List<REGION> regions();
 
     protected abstract List<Action<?, ?>.Report> run(Session<TX> session, REGION region, Random random);
-
-    protected ActionFactory<TX, ?> actionFactory() {
-        return actionFactory;
-    }
 
     public void overrideTracing(boolean isTracing) {
         this.isTracing = isTracing;
@@ -86,7 +78,7 @@ public abstract class Agent<REGION extends Region, TX extends Transaction> {
     public Map<String, List<Action<?, ?>.Report>> iterate(RandomSource randomSrc) {
         ConcurrentMap<String, List<Action<?, ?>.Report>> reports = new ConcurrentHashMap<>();
         // We need to generate pairs of Region and Random deterministically before passing them to a parallel stream
-        List<Pair<REGION, Random>> regionRandomPairs = getRegions().stream()
+        List<Pair<REGION, Random>> regionRandomPairs = regions().stream()
                 .map(region -> new Pair<>(region, randomSrc.next().get())).collect(toList());
         regionRandomPairs.parallelStream().forEach(pair -> {
             List<Action<?, ?>.Report> report = runWithMayTrace(pair.first(), pair.second());

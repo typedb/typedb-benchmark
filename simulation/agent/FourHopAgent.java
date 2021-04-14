@@ -17,8 +17,6 @@
 
 package grakn.benchmark.simulation.agent;
 
-import grakn.benchmark.simulation.action.Action;
-import grakn.benchmark.simulation.action.ActionFactory;
 import grakn.benchmark.simulation.common.GeoData;
 import grakn.benchmark.simulation.common.SimulationContext;
 import grakn.benchmark.simulation.driver.Client;
@@ -30,14 +28,14 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
-public class FourHopAgent<TX extends Transaction> extends Agent<GeoData.Global, TX> {
+public abstract class FourHopAgent<TX extends Transaction> extends Agent<GeoData.Global, TX> {
 
-    public FourHopAgent(Client<?, TX> client, ActionFactory<TX, ?> actionFactory, SimulationContext context) {
-        super(client, actionFactory, context);
+    public FourHopAgent(Client<?, TX> client, SimulationContext context) {
+        super(client, context);
     }
 
     @Override
-    protected List<GeoData.Global> getRegions() {
+    protected List<GeoData.Global> regions() {
         return Collections.singletonList(context.geoData().global());
     }
 
@@ -46,9 +44,11 @@ public class FourHopAgent<TX extends Transaction> extends Agent<GeoData.Global, 
         List<Action<?, ?>.Report> reports = new ArrayList<>();
         for (int i = 0; i <= context.scaleFactor(); i++) {
             try (TX tx = session.transaction(region.tracker(), context.iterationNumber(), isTracing())) {
-                runAction(actionFactory().fourHopAction(tx), reports);
+                matchFourHop(tx);
             }
         }
         return reports;
     }
+
+    protected abstract void matchFourHop(TX tx);
 }

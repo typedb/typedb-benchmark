@@ -18,8 +18,7 @@
 package grakn.benchmark.simulation;
 
 import grakn.benchmark.common.Config;
-import grakn.benchmark.simulation.action.Action;
-import grakn.benchmark.simulation.action.ActionFactory;
+import grakn.benchmark.simulation.agent.Action;
 import grakn.benchmark.simulation.agent.AgeUpdateAgent;
 import grakn.benchmark.simulation.agent.Agent;
 import grakn.benchmark.simulation.agent.ArbitraryOneHopAgent;
@@ -57,6 +56,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Supplier;
 
 import static grakn.benchmark.common.Util.printDuration;
 
@@ -67,7 +67,7 @@ public abstract class Simulation<
 
     private static final Logger LOG = LoggerFactory.getLogger(Simulation.class);
     private static final String AGENT_PACKAGE = Agent.class.getPackageName();
-    private final Map<Class<? extends Agent>, Agent<?, TX>> agentBuilders;
+    private final Map<Class<? extends Agent>, Supplier<Agent<?, TX>>> agentBuilders;
 
     private final CLIENT client;
     private final List<Agent<?, TX>> agents;
@@ -88,35 +88,44 @@ public abstract class Simulation<
         initialiseData(context.geoData());
     }
 
-    protected abstract ActionFactory<TX, ?> actionFactory();
-
     protected abstract void initialiseDatabase() throws IOException;
 
     protected abstract void initialiseData(GeoData geoData);
 
-    // TODO: make this static
-    private Map<Class<? extends Agent>, Agent<?, TX>> initialiseAgentBuilders() {
+    public CLIENT client() {
+        return client;
+    }
+
+    public SimulationContext context() {
+        return context;
+    }
+
+    public Map<String, List<Action<?, ?>.Report>> getReport(Class<? extends Agent> agentName) {
+        return agentReports.get(agentName);
+    }
+
+    private Map<Class<? extends Agent>, Supplier<Agent<?, TX>>> initialiseAgentBuilders() {
         return new HashMap<>() {{
-            put(MarriageAgent.class, new MarriageAgent<>(client(), actionFactory(), context));
-            put(PersonBirthAgent.class, new PersonBirthAgent<>(client(), actionFactory(), context));
-            put(AgeUpdateAgent.class, new AgeUpdateAgent<>(client(), actionFactory(), context));
-            put(ParentshipAgent.class, new ParentshipAgent<>(client(), actionFactory(), context));
-            put(RelocationAgent.class, new RelocationAgent<>(client(), actionFactory(), context));
-            put(CompanyAgent.class, new CompanyAgent<>(client(), actionFactory(), context));
-            put(EmploymentAgent.class, new EmploymentAgent<>(client(), actionFactory(), context));
-            put(ProductAgent.class, new ProductAgent<>(client(), actionFactory(), context));
-            put(PurchaseAgent.class, new PurchaseAgent<>(client(), actionFactory(), context));
-            put(FriendshipAgent.class, new FriendshipAgent<>(client(), actionFactory(), context));
-            put(MeanWageAgent.class, new MeanWageAgent<>(client(), actionFactory(), context));
-            put(FindLivedInAgent.class, new FindLivedInAgent<>(client(), actionFactory(), context));
-            put(FindCurrentResidentsAgent.class, new FindCurrentResidentsAgent<>(client(), actionFactory(), context));
-            put(FindTransactionCurrencyAgent.class, new FindTransactionCurrencyAgent<>(client(), actionFactory(), context));
-            put(ArbitraryOneHopAgent.class, new ArbitraryOneHopAgent<>(client(), actionFactory(), context));
-            put(TwoHopAgent.class, new TwoHopAgent<>(client(), actionFactory(), context));
-            put(ThreeHopAgent.class, new ThreeHopAgent<>(client(), actionFactory(), context));
-            put(FourHopAgent.class, new FourHopAgent<>(client(), actionFactory(), context));
-            put(FindSpecificMarriageAgent.class, new FindSpecificMarriageAgent<>(client(), actionFactory(), context));
-            put(FindSpecificPersonAgent.class, new FindSpecificPersonAgent<>(client(), actionFactory(), context));
+            put(AgeUpdateAgent.class, () -> createAgeUpdateAgent());
+            put(ArbitraryOneHopAgent.class, () -> createArbitraryOneHopAgent());
+            put(CompanyAgent.class, () -> createCompanyAgent());
+            put(EmploymentAgent.class, () -> createEmploymentAgent());
+            put(FindCurrentResidentsAgent.class, () -> createFindCurrentResidentsAgent());
+            put(FindLivedInAgent.class, () -> createFindLivedInAgent());
+            put(FindSpecificMarriageAgent.class, () -> createFindSpecificMarriageAgent());
+            put(FindSpecificPersonAgent.class, () -> createFindSpecificPersonAgent());
+            put(FindTransactionCurrencyAgent.class, () -> createFindTransactionCurrencyAgent());
+            put(FourHopAgent.class, () -> createFourHopAgent());
+            put(FriendshipAgent.class, () -> createFriendshipAgent());
+            put(MarriageAgent.class, () -> createMarriageAgent());
+            put(MeanWageAgent.class, () -> createMeanWageAgent());
+            put(ParentshipAgent.class, () -> createParentshipAgent());
+            put(PersonBirthAgent.class, () -> createPersonBirthAgent());
+            put(ProductAgent.class, () -> createProductAgent());
+            put(PurchaseAgent.class, () -> createPurchaseAgent());
+            put(RelocationAgent.class, () -> createRelocationAgent());
+            put(ThreeHopAgent.class, () -> createThreeHopAgent());
+            put(TwoHopAgent.class, () -> createTwoHopAgent());
         }};
     }
 
@@ -129,7 +138,7 @@ public abstract class Simulation<
                 String name = agentConfig.getName();
                 name = AGENT_PACKAGE + "." + name.substring(0, 1).toUpperCase() + name.substring(1) + "Agent";
                 Class<?> agentClass = Class.forName(name);
-                if (agentBuilders.containsKey(agentClass)) agent = agentBuilders.get(agentClass);
+                if (agentBuilders.containsKey(agentClass)) agent = agentBuilders.get(agentClass).get();
                 else throw new IllegalArgumentException("Unrecognised agent name: " + agentClass);
                 agent.overrideTracing(agentConfig.getAgentMode().getTrace());
                 agents.add(agent);
@@ -139,12 +148,15 @@ public abstract class Simulation<
     }
 
     public void run() {
+        Instant start = Instant.now();
         for (int i = 0; i < context.iterationMax(); i++) {
             Instant iterStart = Instant.now();
             iterate();
             Instant iterEnd = Instant.now();
             LOG.info("Iteration {}: {}", i, printDuration(iterStart, iterEnd));
         }
+        LOG.info("Simulation run duration: " + printDuration(start, Instant.now()));
+        LOG.info(client.printStatistics());
     }
 
     public void iterate() {
@@ -152,25 +164,53 @@ public abstract class Simulation<
         for (Agent<?, ?> agent : agents) {
             agentReports.put(agent.getClass(), agent.iterate(randomSource.next()));
         }
-        // We want to test opening new sessions each iteration.
+        // We want to test.md opening new sessions each iteration.
         client.closeSessions();
         context.incrementIteration();
-    }
-
-    public CLIENT client() {
-        return client;
-    }
-
-    public Map<String, List<Action<?, ?>.Report>> getReport(Class<? extends Agent> agentName) {
-        return agentReports.get(agentName);
-    }
-
-    public String printStatistics() {
-        return client.printStatistics();
     }
 
     @Override
     public void close() {
         client.close();
     }
+
+    protected abstract Agent<?, TX> createAgeUpdateAgent();
+
+    protected abstract Agent<?, TX> createArbitraryOneHopAgent();
+
+    protected abstract Agent<?, TX> createCompanyAgent();
+
+    protected abstract Agent<?, TX> createEmploymentAgent();
+
+    protected abstract Agent<?, TX> createFindCurrentResidentsAgent();
+
+    protected abstract Agent<?, TX> createFindLivedInAgent();
+
+    protected abstract Agent<?, TX> createFindSpecificMarriageAgent();
+
+    protected abstract Agent<?, TX> createFindSpecificPersonAgent();
+
+    protected abstract Agent<?, TX> createFindTransactionCurrencyAgent();
+
+    protected abstract Agent<?, TX> createFourHopAgent();
+
+    protected abstract Agent<?, TX> createFriendshipAgent();
+
+    protected abstract Agent<?, TX> createMarriageAgent();
+
+    protected abstract Agent<?, TX> createMeanWageAgent();
+
+    protected abstract Agent<?, TX> createParentshipAgent();
+
+    protected abstract Agent<?, TX> createPersonBirthAgent();
+
+    protected abstract Agent<?, TX> createProductAgent();
+
+    protected abstract Agent<?, TX> createPurchaseAgent();
+
+    protected abstract Agent<?, TX> createRelocationAgent();
+
+    protected abstract Agent<?, TX> createThreeHopAgent();
+
+    protected abstract Agent<?, TX> createTwoHopAgent();
 }

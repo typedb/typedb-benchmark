@@ -17,8 +17,6 @@
 
 package grakn.benchmark.simulation.agent;
 
-import grakn.benchmark.simulation.action.Action;
-import grakn.benchmark.simulation.action.ActionFactory;
 import grakn.benchmark.simulation.common.GeoData;
 import grakn.benchmark.simulation.common.RandomValueGenerator;
 import grakn.benchmark.simulation.common.SimulationContext;
@@ -30,14 +28,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public class ProductAgent<TX extends Transaction> extends Agent<GeoData.Continent, TX> {
+public abstract class ProductAgent<TX extends Transaction> extends Agent<GeoData.Continent, TX> {
 
-    public ProductAgent(Client<?, TX> client, ActionFactory<TX, ?> actionFactory, SimulationContext context) {
-        super(client, actionFactory, context);
+    public ProductAgent(Client<?, TX> client, SimulationContext context) {
+        super(client, context);
     }
 
     @Override
-    protected List<GeoData.Continent> getRegions() {
+    protected List<GeoData.Continent> regions() {
         return context.geoData().continents();
     }
 
@@ -50,10 +48,12 @@ public class ProductAgent<TX extends Transaction> extends Agent<GeoData.Continen
                 String productName = RandomValueGenerator.of(random).boundRandomLengthRandomString(5, 20);
                 String productDescription = RandomValueGenerator.of(random).boundRandomLengthRandomString(75, 100);
                 long barcode = uniqueId(context, region.tracker(), i).hashCode();
-                runAction(actionFactory().insertProductAction(tx, region, barcode, productName, productDescription), reports);
+                insertProduct(tx, region, barcode, productName, productDescription);
             }
             tx.commit();
         }
         return reports;
     }
+
+    protected abstract void insertProduct(TX tx, GeoData.Continent region, long barcode, String productName, String productDescription);
 }

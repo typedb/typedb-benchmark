@@ -43,7 +43,7 @@ public class ComparisonTest {
         assertEquals(GRAKN_CORE.getReport(agentClass), NEO4J.getReport(agentClass));
     }
 
-    // TODO: all these test methods can be replaced with Simulation.agentBuilders.keySet()
+    // TODO: all these test.md methods can be replaced with Simulation.agentBuilders.keySet()
     @Test
     @Ignore
     public void testMarriageAgent() {

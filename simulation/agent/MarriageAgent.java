@@ -17,8 +17,6 @@
 
 package grakn.benchmark.simulation.agent;
 
-import grakn.benchmark.simulation.action.Action;
-import grakn.benchmark.simulation.action.ActionFactory;
 import grakn.benchmark.simulation.common.GeoData;
 import grakn.benchmark.simulation.common.SimulationContext;
 import grakn.benchmark.simulation.driver.Client;
@@ -32,14 +30,18 @@ import java.util.Random;
 
 import static java.util.Collections.shuffle;
 
-public class MarriageAgent<TX extends Transaction> extends Agent<GeoData.City, TX> {
+public abstract class MarriageAgent<TX extends Transaction> extends Agent<GeoData.City, TX> {
 
-    public MarriageAgent(Client<?, TX> client, ActionFactory<TX, ?> actionFactory, SimulationContext context) {
-        super(client, actionFactory, context);
+    public enum SpouseType {
+        WIFE, HUSBAND
+    }
+
+    public MarriageAgent(Client<?, TX> client, SimulationContext context) {
+        super(client, context);
     }
 
     @Override
-    protected List<GeoData.City> getRegions() {
+    protected List<GeoData.City> regions() {
         return context.geoData().cities();
     }
 
@@ -50,13 +52,14 @@ public class MarriageAgent<TX extends Transaction> extends Agent<GeoData.City, T
         LocalDateTime dobOfAdults = context.today().minusYears(SimulationContext.AGE_OF_ADULTHOOD);
         List<String> womenEmails;
         try (TX tx = session.transaction(region.tracker(), context.iterationNumber(), isTracing())) {
-            womenEmails = runAction(actionFactory().unmarriedPeopleInCityAction(tx, region, "female", dobOfAdults), reports);
+            womenEmails = matchUnmarriedPeopleInCity(tx, region, "female", dobOfAdults);
             shuffle(womenEmails, random);
         }
 
+
         List<String> menEmails;
         try (TX tx = session.transaction(region.tracker(), context.iterationNumber(), isTracing())) {
-            menEmails = runAction(actionFactory().unmarriedPeopleInCityAction(tx, region, "male", dobOfAdults), reports);
+            menEmails = matchUnmarriedPeopleInCity(tx, region, "male", dobOfAdults);
             shuffle(menEmails, random);
         }
 
@@ -67,7 +70,7 @@ public class MarriageAgent<TX extends Transaction> extends Agent<GeoData.City, T
                     String wifeEmail = womenEmails.get(i);
                     String husbandEmail = menEmails.get(i);
                     int marriageIdentifier = uniqueId(context, region.tracker(), i).hashCode();
-                    runAction(actionFactory().insertMarriageAction(tx, region, marriageIdentifier, wifeEmail, husbandEmail), reports);
+                    insertMarriage(tx, region, marriageIdentifier, wifeEmail, husbandEmail); // TODO: we should pass current date
                 }
                 tx.commit();
             }
@@ -75,4 +78,8 @@ public class MarriageAgent<TX extends Transaction> extends Agent<GeoData.City, T
 
         return reports;
     }
+
+    protected abstract List<String> matchUnmarriedPeopleInCity(TX tx, GeoData.City region, String female, LocalDateTime dobOfAdults);
+
+    protected abstract void insertMarriage(TX tx, GeoData.City region, int marriageIdentifier, String wifeEmail, String husbandEmail);
 }

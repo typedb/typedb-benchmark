@@ -40,7 +40,7 @@ import static grakn.benchmark.common.Util.parseCommandLine;
 public class ComparisonTestSuite extends Suite {
 
     private static final Logger LOG = LoggerFactory.getLogger(ComparisonTestSuite.class);
-    private static final Config CONFIG = Config.loadYML(Paths.get("test/config.yml").toFile());
+    private static final Config CONFIG = Config.loadYML(Paths.get("test.md/config.yml").toFile());
     private static final TestOptions OPTIONS = parseCommandLine(args(), new TestOptions()).get();
 
     public static GraknSimulation GRAKN_CORE;
@@ -101,7 +101,7 @@ public class ComparisonTestSuite extends Suite {
         }
     }
 
-    @CommandLine.Command(name = "benchmark-test", mixinStandardHelpOptions = true)
+    @CommandLine.Command(name = "benchmark-test.md", mixinStandardHelpOptions = true)
     private static class TestOptions {
 
         @CommandLine.Option(names = {"--grakn"}, required = true, description = "Database address URI")

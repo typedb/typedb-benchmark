@@ -17,8 +17,6 @@
 
 package grakn.benchmark.simulation.agent;
 
-import grakn.benchmark.simulation.action.Action;
-import grakn.benchmark.simulation.action.ActionFactory;
 import grakn.benchmark.simulation.common.Allocation;
 import grakn.benchmark.simulation.common.GeoData;
 import grakn.benchmark.simulation.common.SimulationContext;
@@ -33,14 +31,14 @@ import java.util.Random;
 
 import static java.util.Collections.shuffle;
 
-public class RelocationAgent<TX extends Transaction> extends Agent<GeoData.City, TX> {
+public abstract class RelocationAgent<TX extends Transaction> extends Agent<GeoData.City, TX> {
 
-    public RelocationAgent(Client<?, TX> client, ActionFactory<TX, ?> actionFactory, SimulationContext context) {
-        super(client, actionFactory, context);
+    public RelocationAgent(Client<?, TX> client, SimulationContext context) {
+        super(client, context);
     }
 
     @Override
-    protected List<GeoData.City> getRegions() {
+    protected List<GeoData.City> regions() {
         return context.geoData().cities();
     }
 
@@ -60,21 +58,27 @@ public class RelocationAgent<TX extends Transaction> extends Agent<GeoData.City,
         List<String> relocationCityNames;
 
         try (TX tx = session.transaction(region.tracker(), context.iterationNumber(), isTracing())) {
-            residentEmails = runAction(actionFactory().residentsInCityAction(tx, region, context.scaleFactor(), earliestDateOfResidencyToRelocate), reports);
+            residentEmails = matchResidentsInCity(tx, region, context.scaleFactor(), earliestDateOfResidencyToRelocate);
         }
         shuffle(residentEmails, random);
 
         try (TX tx = session.transaction(region.tracker(), context.iterationNumber(), isTracing())) {
-            relocationCityNames = runAction(actionFactory().citiesInContinentAction(tx, region), reports);
+            relocationCityNames = matchCitiesInContinent(tx, region);
         }
 
         try (TX tx = session.transaction(region.tracker(), context.iterationNumber(), isTracing())) {
             Allocation.allocate(residentEmails, relocationCityNames, (residentEmail, relocationCityName) -> {
-                runAction(actionFactory().insertRelocationAction(tx, region, context.today(), residentEmail, relocationCityName), reports);
+                insertRelocation(tx, region, context.today(), residentEmail, relocationCityName);
             });
             tx.commit();
         }
 
         return reports;
     }
+
+    protected abstract List<String> matchResidentsInCity(TX tx, GeoData.City region, int scaleFactor, LocalDateTime earliestDateOfResidencyToRelocate);
+
+    protected abstract List<String> matchCitiesInContinent(TX tx, GeoData.City region);
+
+    protected abstract void insertRelocation(TX tx, GeoData.City region, LocalDateTime today, String residentEmail, String relocationCityName);
 }

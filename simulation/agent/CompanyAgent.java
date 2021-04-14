@@ -17,8 +17,6 @@
 
 package grakn.benchmark.simulation.agent;
 
-import grakn.benchmark.simulation.action.Action;
-import grakn.benchmark.simulation.action.ActionFactory;
 import grakn.benchmark.simulation.common.GeoData;
 import grakn.benchmark.simulation.common.SimulationContext;
 import grakn.benchmark.simulation.driver.Client;
@@ -26,18 +24,19 @@ import grakn.benchmark.simulation.driver.Session;
 import grakn.benchmark.simulation.driver.Transaction;
 import org.apache.commons.lang3.StringUtils;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public class CompanyAgent<TX extends Transaction> extends Agent<GeoData.Country, TX> {
+public abstract class CompanyAgent<TX extends Transaction> extends Agent<GeoData.Country, TX> {
 
-    public CompanyAgent(Client<?, TX> client, ActionFactory<TX, ?> actionFactory, SimulationContext context) {
-        super(client, actionFactory, context);
+    public CompanyAgent(Client<?, TX> client, SimulationContext context) {
+        super(client, context);
     }
 
     @Override
-    protected List<GeoData.Country> getRegions() {
+    protected List<GeoData.Country> regions() {
         return context.geoData().countries();
     }
 
@@ -51,11 +50,12 @@ public class CompanyAgent<TX extends Transaction> extends Agent<GeoData.Country,
                 String noun = pickOne(context.wordData().getNouns(), random);
                 int companyNumber = uniqueId(context, region.tracker(), i).hashCode();
                 String companyName = StringUtils.capitalize(adjective) + StringUtils.capitalize(noun) + "-" + companyNumber; // TODO: ???
-                runAction(actionFactory().insertCompanyAction(tx, region, context.today(), companyNumber, companyName), reports);
+                insertCompany(tx, region, context.today(), companyNumber, companyName);
             }
             tx.commit();
         }
-
         return reports;
     }
+
+    protected abstract void insertCompany(TX tx, GeoData.Country region, LocalDateTime today, int companyNumber, String companyName);
 }

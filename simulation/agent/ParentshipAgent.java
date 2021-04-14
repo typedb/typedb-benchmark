@@ -17,9 +17,6 @@
 
 package grakn.benchmark.simulation.agent;
 
-import grakn.benchmark.simulation.action.Action;
-import grakn.benchmark.simulation.action.ActionFactory;
-import grakn.benchmark.simulation.action.SpouseType;
 import grakn.benchmark.simulation.common.Allocation;
 import grakn.benchmark.simulation.common.GeoData;
 import grakn.benchmark.simulation.common.SimulationContext;
@@ -27,6 +24,7 @@ import grakn.benchmark.simulation.driver.Client;
 import grakn.benchmark.simulation.driver.Session;
 import grakn.benchmark.simulation.driver.Transaction;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -34,14 +32,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-public class ParentshipAgent<TX extends Transaction> extends Agent<GeoData.City, TX> {
+public abstract class ParentshipAgent<TX extends Transaction> extends Agent<GeoData.City, TX> {
 
-    public ParentshipAgent(Client<?, TX> client, ActionFactory<TX, ?> actionFactory, SimulationContext context) {
-        super(client, actionFactory, context);
+    public ParentshipAgent(Client<?, TX> client, SimulationContext context) {
+        super(client, context);
     }
 
     @Override
-    protected List<GeoData.City> getRegions() {
+    protected List<GeoData.City> regions() {
         return context.geoData().cities();
     }
 
@@ -52,13 +50,13 @@ public class ParentshipAgent<TX extends Transaction> extends Agent<GeoData.City,
         List<String> childrenEmails;
 
         try (TX tx = session.transaction(region.tracker(), context.iterationNumber(), isTracing())) {
-            childrenEmails = runAction(actionFactory().birthsInCityAction(tx, region, context.today()), reports);
+            childrenEmails = matchBirthsInCity(tx, region, context.today());
         }
 
-        List<HashMap<SpouseType, String>> marriedCouple;
+        List<HashMap<MarriageAgent.SpouseType, String>> marriedCouple;
 
         try (TX tx = session.transaction(region.tracker(), context.iterationNumber(), isTracing())) {
-            marriedCouple = runAction(actionFactory().marriedCoupleAction(tx, region, context.today()), reports);
+            marriedCouple = matchMarriedCouple(tx, region);
         }
 
         if (marriedCouple.size() > 0 && childrenEmails.size() > 0) {
@@ -67,11 +65,11 @@ public class ParentshipAgent<TX extends Transaction> extends Agent<GeoData.City,
                 for (Map.Entry<Integer, List<Integer>> childrenForMarriage : childrenPerMarriage.entrySet()) {
                     Integer marriageIndex = childrenForMarriage.getKey();
                     List<Integer> children = childrenForMarriage.getValue();
-                    HashMap<SpouseType, String> marriage = marriedCouple.get(marriageIndex);
+                    HashMap<MarriageAgent.SpouseType, String> marriage = marriedCouple.get(marriageIndex);
 
                     for (Integer childIndex : children) {
                         String childEmail = childrenEmails.get(childIndex);
-                        runAction(actionFactory().insertParentshipAction(tx, marriage, childEmail), reports);
+                        insertParentship(tx, marriage, childEmail);
                     }
                 }
                 tx.commit();
@@ -80,4 +78,10 @@ public class ParentshipAgent<TX extends Transaction> extends Agent<GeoData.City,
 
         return reports;
     }
+
+    protected abstract List<String> matchBirthsInCity(TX tx, GeoData.City region, LocalDateTime today);
+
+    protected abstract List<HashMap<MarriageAgent.SpouseType, String>> matchMarriedCouple(TX tx, GeoData.City region);
+
+    protected abstract void insertParentship(TX tx, HashMap<MarriageAgent.SpouseType, String> marriage, String childEmail);
 }

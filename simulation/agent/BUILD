@@ -22,9 +22,8 @@ java_library(
     srcs = glob(["*.java"]),
     visibility = ["//visibility:public"],
     deps = [
-        "//simulation/action",
-        "//simulation/common",
-        "//simulation/driver",
+        "//simulation/common:common",
+        "//simulation/driver:driver",
         "@graknlabs_grabl_tracing//client",
         "@graknlabs_common//:common",
         "@maven//:commons_cli_commons_cli",

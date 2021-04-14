@@ -74,7 +74,7 @@ build:
       machine: 16-core-32-gb
       image: graknlabs-ubuntu-20.04
       timeout: "30m"
-      dependencies: [test-comparison-grakn-background, test-comparison-neo4j-background]
+      dependencies: [test.md-comparison-grakn-background, test.md-comparison-neo4j-background]
       command: |
         echo 'Trying to connect to Neo4j'
         attempt_counter=0
@@ -126,7 +126,7 @@ build:
         branch: grakn-cluster
       type: background
       timeout: "30m"
-      dependencies: [test-performance-small-grakn-cluster-bootstrapper-background]
+      dependencies: [test.md-performance-small-grakn-cluster-bootstrapper-background]
       command: |
         export ARTIFACT_USERNAME=$REPO_GRAKN_USERNAME
         export ARTIFACT_PASSWORD=$REPO_GRAKN_PASSWORD
@@ -158,7 +158,7 @@ build:
         branch: grakn-cluster
       type: background
       timeout: "30m"
-      dependencies: [test-performance-small-grakn-cluster-bootstrapper-background]
+      dependencies: [test.md-performance-small-grakn-cluster-bootstrapper-background]
       command: |
         export ARTIFACT_USERNAME=$REPO_GRAKN_USERNAME
         export ARTIFACT_PASSWORD=$REPO_GRAKN_PASSWORD
@@ -189,7 +189,7 @@ build:
         branch: grakn-cluster
       type: background
       timeout: "30m"
-      dependencies: [test-performance-small-grakn-cluster-bootstrapper-background]
+      dependencies: [test.md-performance-small-grakn-cluster-bootstrapper-background]
       command: |
         export ARTIFACT_USERNAME=$REPO_GRAKN_USERNAME
         export ARTIFACT_PASSWORD=$REPO_GRAKN_PASSWORD
@@ -218,7 +218,7 @@ build:
         owner: graknlabs
         branch: grakn-cluster
       timeout: "30m"
-      dependencies: [test-performance-small-grakn-cluster-1-background, test-performance-small-grakn-cluster-2-background, test-performance-small-grakn-cluster-3-background]
+      dependencies: [test.md-performance-small-grakn-cluster-1-background, test.md-performance-small-grakn-cluster-2-background, test.md-performance-small-grakn-cluster-3-background]
       command: |
         export ARTIFACT_USERNAME=$REPO_GRAKN_USERNAME
         export ARTIFACT_PASSWORD=$REPO_GRAKN_PASSWORD
@@ -273,7 +273,7 @@ build:
     test-performance-small-grakn-core:
       machine: 16-core-32-gb
       image: graknlabs-ubuntu-20.04
-      dependencies: [test-performance-small-grakn-core-background]
+      dependencies: [test.md-performance-small-grakn-core-background]
       timeout: "30m"
       filter:
         owner: graknlabs
@@ -315,7 +315,7 @@ build:
     test-performance-small-neo4j:
       machine: 16-core-32-gb
       image: graknlabs-ubuntu-20.04
-      dependencies: [test-performance-small-neo4j-background]
+      dependencies: [test.md-performance-small-neo4j-background]
       timeout: "30m"
       filter:
         owner: graknlabs

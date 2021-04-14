@@ -24,7 +24,7 @@ java_library(
     deps = [
         "//common:common",
         "//simulation:simulation",
-        "//simulation/action:action",
+        "//simulation/agent:agent",
         "//simulation/common:common",
         "//simulation/driver:driver",
         "@graknlabs_common//:common",

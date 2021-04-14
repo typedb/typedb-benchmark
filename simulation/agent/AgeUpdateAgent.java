@@ -17,26 +17,25 @@
 
 package grakn.benchmark.simulation.agent;
 
-import grakn.benchmark.simulation.action.Action;
-import grakn.benchmark.simulation.action.ActionFactory;
 import grakn.benchmark.simulation.common.GeoData;
 import grakn.benchmark.simulation.common.SimulationContext;
 import grakn.benchmark.simulation.driver.Client;
 import grakn.benchmark.simulation.driver.Session;
 import grakn.benchmark.simulation.driver.Transaction;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public class AgeUpdateAgent<TX extends Transaction> extends Agent<GeoData.City, TX> {
+public abstract class AgeUpdateAgent<TX extends Transaction> extends Agent<GeoData.City, TX> {
 
-    public AgeUpdateAgent(Client<?, TX> client, ActionFactory<TX, ?> actionFactory, SimulationContext context) {
-        super(client, actionFactory, context);
+    public AgeUpdateAgent(Client<?, TX> client, SimulationContext context) {
+        super(client, context);
     }
 
     @Override
-    protected List<GeoData.City> getRegions() {
+    protected List<GeoData.City> regions() {
         return context.geoData().cities();
     }
 
@@ -44,9 +43,11 @@ public class AgeUpdateAgent<TX extends Transaction> extends Agent<GeoData.City, 
     protected List<Action<?, ?>.Report> run(Session<TX> session, GeoData.City region, Random random) {
         List<Action<?, ?>.Report> reports = new ArrayList<>();
         try (TX tx = session.transaction(region.tracker(), context.iterationNumber(), isTracing())) {
-            runAction(actionFactory().updateAgesOfPeopleInCityAction(tx, context.today(), region), reports);
+            updateAgesOfPeopleInCity(tx, context.today(), region);
             tx.commit();
         }
         return reports;
     }
+
+    protected abstract void updateAgesOfPeopleInCity(TX tx, LocalDateTime today, GeoData.City region);
 }

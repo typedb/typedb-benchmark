@@ -17,8 +17,6 @@
 
 package grakn.benchmark.simulation.agent;
 
-import grakn.benchmark.simulation.action.Action;
-import grakn.benchmark.simulation.action.ActionFactory;
 import grakn.benchmark.simulation.common.Allocation;
 import grakn.benchmark.simulation.common.GeoData;
 import grakn.benchmark.simulation.common.RandomValueGenerator;
@@ -35,14 +33,14 @@ import java.util.Random;
 import static grakn.common.collection.Collections.pair;
 import static java.util.Collections.shuffle;
 
-public class PurchaseAgent<TX extends Transaction> extends Agent<GeoData.Country, TX> {
+public abstract class PurchaseAgent<TX extends Transaction> extends Agent<GeoData.Country, TX> {
 
-    public PurchaseAgent(Client<?, TX> client, ActionFactory<TX, ?> actionFactory, SimulationContext context) {
-        super(client, actionFactory, context);
+    public PurchaseAgent(Client<?, TX> client, SimulationContext context) {
+        super(client, context);
     }
 
     @Override
-    protected List<GeoData.Country> getRegions() {
+    protected List<GeoData.Country> regions() {
         return context.geoData().countries();
     }
 
@@ -52,13 +50,13 @@ public class PurchaseAgent<TX extends Transaction> extends Agent<GeoData.Country
         List<Long> companyNumbers;
 
         try (TX tx = session.transaction(region.tracker(), context.iterationNumber(), isTracing())) {
-            companyNumbers = runAction(actionFactory().companiesInCountryAction(tx, region, 100), reports);
+            companyNumbers = matchCompaniesInCountry(tx, region, 100);
         }
         shuffle(companyNumbers, random);
 
         List<Long> productBarcodes;
         try (TX tx = session.transaction(region.tracker(), context.iterationNumber(), isTracing())) {
-            productBarcodes = runAction(actionFactory().productsInContinentAction(tx, region.continent()), reports);
+            productBarcodes = matchProductsInContinent(tx, region.continent());
         }
 
         int numTransactions = context.scaleFactor() * companyNumbers.size();
@@ -79,11 +77,17 @@ public class PurchaseAgent<TX extends Transaction> extends Agent<GeoData.Country
                 double value = RandomValueGenerator.of(random).boundRandomDouble(0.01, 10000.00);
                 int productQuantity = RandomValueGenerator.of(random).boundRandomInt(1, 1000);
                 boolean isTaxable = RandomValueGenerator.of(random).bool();
-                runAction(actionFactory().insertTransactionAction(tx, region, transaction, sellerCompanyNumber, value, productQuantity, isTaxable), reports);
+                insertPurchase(tx, region, transaction, sellerCompanyNumber, value, productQuantity, isTaxable);
             });
             tx.commit();
         }
 
         return reports;
     }
+
+    protected abstract List<Long> matchCompaniesInCountry(TX tx, GeoData.Country region, int numCompanies);
+
+    protected abstract List<Long> matchProductsInContinent(TX tx, GeoData.Continent continent);
+
+    protected abstract void insertPurchase(TX tx, GeoData.Country region, Pair<Long, Long> transaction, Long sellerCompanyNumber, double value, int productQuantity, boolean isTaxable);
 }

@@ -21,24 +21,12 @@ define
 # Attributes
 #######################################################################
 
-name sub attribute, abstract,
-    value string;
-
-location-name sub name;
-
-organisation-name sub name, abstract;
-company-name sub organisation-name;
-#university-name sub organisation-name;
-#charity-name sub organisation-name;
-
-company-number sub attribute,
-    value long;
-
+name sub attribute, abstract, value string;
 forename sub name;
-
 surname sub name;
 
-product-name sub name;
+company-number sub attribute, value long;
+
 
 #service-name sub name;
 
@@ -110,25 +98,20 @@ identifier sub attribute, abstract,
 
 marriage-id sub identifier;
 
-#service-id sub identifier;
+service-id sub identifier;
 
 product-barcode sub identifier;
 
-description sub attribute, abstract,
-    value string;
+description sub attribute, abstract, value string;
 
 product-description sub description;
-
-product-quantity sub attribute,
-    value long;
+product-quantity sub attribute, value long;
 
 #service-description sub description;
 
-is-taxable sub attribute,
-    value boolean;
+is-taxable sub attribute, value boolean;
 
-is-current sub attribute,
-    value boolean;
+is-current sub attribute, value boolean;
 
 #######################################################################
 # Entities, Relations and Rules, by approximate category
@@ -167,39 +150,6 @@ locates sub relation,
     relates location,
     relates located;
 
-rule location-hierarchy-transitivity:
-when {
-    $lh1(superior: $a, subordinate: $b) isa location-hierarchy;
-    $lh2(superior: $b, subordinate: $c) isa location-hierarchy;
-} then {
-    (superior: $a, subordinate: $c) isa location-hierarchy;
-};
-
-# TODO: uncomment once reasoning is enabled
-# Transitive group2 membership
-# Here we realise that it's common to say that when something takes place in a location it also takes place in the superior places.
-# This will lead to many rules of this kind. Can this be generified, and should it be?
-#rule locates-transitive-with-location-hierarchy:
-#when {
-#    $loc(located: $thing, location: $a) isa locates;
-#    $lh2(superior: $b, subordinate: $a) isa location-hierarchy;
-#} then {
-#    (located: $thing, location: $b) isa locates;
-#};
-
-# --------------------------------------------------------
-# Currency
-# --------------------------------------------------------
-
-rule transaction-currency-is-that-of-the-country:
-when {
-    $transaction isa transaction;
-    $l(located: $transaction, location: $transaction-location) isa locates;
-    $transaction-location isa country, has currency $currency;
-} then {
-    $transaction has $currency;
-};
-
 # --------------------------------------------------------
 # Friends and Family
 # --------------------------------------------------------
@@ -212,8 +162,8 @@ person sub entity,
     owns date-of-birth,
     owns age,
     plays employment:employee,
-#    plays volunteering:volunteer,
-#    plays studentship:student,
+    plays volunteering:volunteer,
+    plays studentship:student,
     plays parentship:parent,
     plays parentship:child,
     plays marriage:husband,
@@ -259,64 +209,6 @@ relocation sub relation,
     relates previous-location,
     relates new-location,
     relates relocated-person;
-
-# Causes of residency
-# - born in a location
-# - move to a location
-# - can be inferred from where someone works or studies at school or university
-# TODO: uncomment once reasoning is enabled
-#rule born-in-location-implies-residency:
-#when {
-#    $bi(place-of-birth: $location, child: $person) isa born-in;
-#} then {
-#    (resident: $person, location: $location) isa residency;
-#};
-
-# TODO: uncomment once reasoning is enabled
-# This rule can be triggered by a person moving back to their hometown having moved away, and add an incorrect start-date
-#rule born-in-location-implies-residency-date:
-#when {
-#    $bi(place-of-birth: $location, child: $person) isa born-in;
-#    $person isa person, has date-of-birth $dob;
-#    $r(resident: $person, location: $location) isa residency;
-#} then {
-#    $r has $dob;
-#};
-
-# TODO: uncomment once reasoning is enabled
-#rule person-relocating-adds-new-residency:
-#when {
-#    $rel(relocated-person: $person, new-location: $location) isa relocation;
-#} then {
-#    (resident: $person, location: $location) isa residency;
-#};
-
-# TODO: uncomment once reasoning is enabled
-#rule person-relocating-ends-old-residency:
-#when {
-#    $rel(relocated-person: $person, previous-location: $location) isa relocation, has relocation-date $rel-date;
-#    $old-residency(resident: $person, location: $location) isa residency;
-#} then {
-#    $old-residency has $rel-date;
-#};
-
-# TODO: uncomment once reasoning is enabled
-#rule residency-without-end-date-is-current:
-#when {
-#    $res(resident: $person, location: $location) isa residency;
-#    not {
-#        $res has end-date $rel-date;
-#    };
-#} then {
-#    $res has is-current true;
-#};
-
-rule label-non-current-residency:
-when {
-    $res isa residency, has end-date $end-date;
-} then {
-    $res has is-current false;
-};
 
 # --------------------------------------------------------
 # Organisational Structure
@@ -444,26 +336,3 @@ employment-contract sub legal-document,
 
 wage sub entity,
     plays employment:wage;
-
-#contract-has-language-of-location-is-there-is-only-one-language sub rule,
-#when {
-#    $emp(employment_contract: $contract) isa employment;
-#    $contract isa employment-contract, has contract-content $content;
-#    ($emp, $location1) isa locates;
-#    $location1 has language $lang1;
-#    not {
-#        ($emp, $location2) isa locates;
-#        $location2 has language $lang2;
-#        $lang1 !== $lang2;
-#    };
-#}, then {
-#    $content has content-language $lang1;
-#};
-
-#rule contracted-hours-apply-to-employment:
-#when {
-#    $emp(contract: $c) isa employment;
-#    $c isa employment-contract, has contracted-hours $hours;
-#} then {
-#    $emp has $hours;
-#};

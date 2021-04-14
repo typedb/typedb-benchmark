@@ -22,7 +22,6 @@ java_library(
     srcs = glob(["*.java"]),
     deps = [
         "//common:common",
-        "//simulation/action:action",
         "//simulation/agent:agent",
         "//simulation/common:common",
         "//simulation/driver:driver",

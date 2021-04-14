@@ -163,14 +163,6 @@ public class Config {
         private Mode agentMode;
         private String name;
 
-        public static Agent ConstructAgentConfig(String name, Mode agentMode) {
-            // This method is needed because snakeyaml doesn't support declaring a constructor for this class
-            Agent agent = new Agent();
-            agent.setName(name);
-            agent.setMode(agentMode);
-            return agent;
-        }
-
         public void setName(String name) {
             this.name = name;
         }

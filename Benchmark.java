@@ -19,8 +19,8 @@ package grakn.benchmark;
 
 import grabl.tracing.client.GrablTracing;
 import grabl.tracing.client.GrablTracingThreadStatic;
-import grakn.benchmark.common.Options;
 import grakn.benchmark.common.Config;
+import grakn.benchmark.common.Options;
 import grakn.benchmark.grakn.GraknSimulation;
 import grakn.benchmark.neo4j.Neo4JSimulation;
 import grakn.benchmark.simulation.Simulation;
@@ -29,11 +29,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
-import java.time.Instant;
 import java.util.Optional;
 
 import static grakn.benchmark.common.Util.parseCommandLine;
-import static grakn.benchmark.common.Util.printDuration;
 
 public class Benchmark {
 
@@ -42,7 +40,6 @@ public class Benchmark {
     public static void main(String[] args) {
         LOG.info("Welcome to the Benchmark!");
 
-        Instant start = Instant.now();
         Optional<Options> optionsOpt = parseCommandLine(args);
         if (optionsOpt.isEmpty()) System.exit(0);
         Options options = optionsOpt.get();
@@ -51,8 +48,6 @@ public class Benchmark {
             Config config = Config.loadYML(options.config());
             try (Simulation<?, ?, ?> simulation = initSimulation(options, config)) {
                 simulation.run();
-                LOG.info("Benchmark duration: " + printDuration(start, Instant.now()));
-                LOG.info(simulation.printStatistics());
             }
         } catch (Exception e) {
             LOG.error(e.getMessage(), e);

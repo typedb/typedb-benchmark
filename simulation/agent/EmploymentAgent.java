@@ -17,8 +17,6 @@
 
 package grakn.benchmark.simulation.agent;
 
-import grakn.benchmark.simulation.action.Action;
-import grakn.benchmark.simulation.action.ActionFactory;
 import grakn.benchmark.simulation.common.GeoData;
 import grakn.benchmark.simulation.common.RandomValueGenerator;
 import grakn.benchmark.simulation.common.SimulationContext;
@@ -33,7 +31,7 @@ import java.util.Random;
 
 import static grakn.benchmark.simulation.common.Allocation.allocate;
 
-public class EmploymentAgent<TX extends Transaction> extends Agent<GeoData.City, TX> {
+public abstract class EmploymentAgent<TX extends Transaction> extends Agent<GeoData.City, TX> {
 
     private static final double MIN_ANNUAL_WAGE = 18000.00;
     private static final double MAX_ANNUAL_WAGE = 80000.00;
@@ -42,12 +40,12 @@ public class EmploymentAgent<TX extends Transaction> extends Agent<GeoData.City,
     private static final int MIN_CONTRACT_CHARACTER_LENGTH = 200;
     private static final int MAX_CONTRACT_CHARACTER_LENGTH = 600;
 
-    public EmploymentAgent(Client<?, TX> client, ActionFactory<TX, ?> actionFactory, SimulationContext context) {
-        super(client, actionFactory, context);
+    public EmploymentAgent(Client<?, TX> client, SimulationContext context) {
+        super(client, context);
     }
 
     @Override
-    protected List<GeoData.City> getRegions() {
+    protected List<GeoData.City> regions() {
         return context.geoData().cities();
     }
 
@@ -59,11 +57,11 @@ public class EmploymentAgent<TX extends Transaction> extends Agent<GeoData.City,
         List<Long> companyNumbers;
 
         try (TX tx = session.transaction(region.tracker(), context.iterationNumber(), isTracing())) {
-            employeeEmails = runAction(actionFactory().residentsInCityAction(tx, region, context.scaleFactor(), employmentDate), reports);
+            employeeEmails = matchResidentsInCity(tx, region, context.scaleFactor(), employmentDate);
         }
 
         try (TX tx = session.transaction(region.tracker(), context.iterationNumber(), isTracing())) {
-            companyNumbers = runAction(actionFactory().companiesInCountryAction(tx, region.country(), context.scaleFactor()), reports);
+            companyNumbers = matchCompaniesInCountry(tx, region.country(), context.scaleFactor());
         }
 
         try (TX tx = session.transaction(region.tracker(), context.iterationNumber(), isTracing())) {
@@ -72,7 +70,7 @@ public class EmploymentAgent<TX extends Transaction> extends Agent<GeoData.City,
                 double wageValue = RandomValueGenerator.of(random).boundRandomDouble(MIN_ANNUAL_WAGE, MAX_ANNUAL_WAGE);
                 String contractContent = RandomValueGenerator.of(random).boundRandomLengthRandomString(MIN_CONTRACT_CHARACTER_LENGTH, MAX_CONTRACT_CHARACTER_LENGTH);
                 double contractedHours = RandomValueGenerator.of(random).boundRandomDouble(MIN_CONTRACTED_HOURS, MAX_CONTRACTED_HOURS);
-                runAction(actionFactory().insertEmploymentAction(tx, region, employeeEmail, companyNumber, employmentDate, wageValue, contractContent, contractedHours), reports);
+                insertEmployment(tx, region, employeeEmail, companyNumber, employmentDate, wageValue, contractContent, contractedHours);
             });
             if (allocated) {
                 tx.commit();
@@ -81,4 +79,11 @@ public class EmploymentAgent<TX extends Transaction> extends Agent<GeoData.City,
 
         return reports;
     }
+
+    protected abstract List<String> matchResidentsInCity(TX tx, GeoData.City region, int scaleFactor, LocalDateTime employmentDate);
+
+    protected abstract List<Long> matchCompaniesInCountry(TX tx, GeoData.Country country, int scaleFactor);
+
+    protected abstract void insertEmployment(TX tx, GeoData.City region, String employeeEmail, Long companyNumber, LocalDateTime employmentDate, double wageValue, String contractContent, double contractedHours);
+
 }

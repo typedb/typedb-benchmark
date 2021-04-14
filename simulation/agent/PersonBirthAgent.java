@@ -17,26 +17,25 @@
 
 package grakn.benchmark.simulation.agent;
 
-import grakn.benchmark.simulation.action.Action;
-import grakn.benchmark.simulation.action.ActionFactory;
 import grakn.benchmark.simulation.common.GeoData;
 import grakn.benchmark.simulation.common.SimulationContext;
 import grakn.benchmark.simulation.driver.Client;
 import grakn.benchmark.simulation.driver.Session;
 import grakn.benchmark.simulation.driver.Transaction;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public class PersonBirthAgent<TX extends Transaction> extends Agent<GeoData.City, TX> {
+public abstract class PersonBirthAgent<TX extends Transaction> extends Agent<GeoData.City, TX> {
 
-    public PersonBirthAgent(Client<?, TX> client, ActionFactory<TX, ?> actionFactory, SimulationContext context) {
-        super(client, actionFactory, context);
+    public PersonBirthAgent(Client<?, TX> client, SimulationContext context) {
+        super(client, context);
     }
 
     @Override
-    protected List<GeoData.City> getRegions() {
+    protected List<GeoData.City> regions() {
         return context.geoData().cities();
     }
 
@@ -60,11 +59,13 @@ public class PersonBirthAgent<TX extends Transaction> extends Agent<GeoData.City
                     forename = pickOne(context.wordData().getFemaleForenames(), random);
                 }
                 String email = "email/" + uniqueId(context, region.tracker(), i);
-                runAction(actionFactory().insertPersonAction(tx, region, context.today(), email, gender, forename, surname), reports);
+                insertPerson(tx, region, context.today(), email, gender, forename, surname);
             }
             tx.commit();
         }
 
         return reports;
     }
+
+    protected abstract void insertPerson(TX tx, GeoData.City region, LocalDateTime today, String email, String gender, String forename, String surname);
 }
