@@ -17,32 +17,11 @@
 
 package grakn.benchmark.simulation;
 
-import grakn.benchmark.common.Config;
-import grakn.benchmark.simulation.agent.Action;
-import grakn.benchmark.simulation.agent.AgeUpdateAgent;
+import grakn.benchmark.common.params.Config;
 import grakn.benchmark.simulation.agent.Agent;
-import grakn.benchmark.simulation.agent.ArbitraryOneHopAgent;
-import grakn.benchmark.simulation.agent.CompanyAgent;
-import grakn.benchmark.simulation.agent.EmploymentAgent;
-import grakn.benchmark.simulation.agent.FindCurrentResidentsAgent;
-import grakn.benchmark.simulation.agent.FindLivedInAgent;
-import grakn.benchmark.simulation.agent.FindSpecificMarriageAgent;
-import grakn.benchmark.simulation.agent.FindSpecificPersonAgent;
-import grakn.benchmark.simulation.agent.FindTransactionCurrencyAgent;
-import grakn.benchmark.simulation.agent.FourHopAgent;
-import grakn.benchmark.simulation.agent.FriendshipAgent;
-import grakn.benchmark.simulation.agent.MarriageAgent;
-import grakn.benchmark.simulation.agent.MeanWageAgent;
-import grakn.benchmark.simulation.agent.ParentshipAgent;
-import grakn.benchmark.simulation.agent.PersonBirthAgent;
-import grakn.benchmark.simulation.agent.ProductAgent;
-import grakn.benchmark.simulation.agent.PurchaseAgent;
-import grakn.benchmark.simulation.agent.RelocationAgent;
-import grakn.benchmark.simulation.agent.ThreeHopAgent;
-import grakn.benchmark.simulation.agent.TwoHopAgent;
-import grakn.benchmark.simulation.common.GeoData;
-import grakn.benchmark.simulation.common.RandomSource;
-import grakn.benchmark.simulation.common.SimulationContext;
+import grakn.benchmark.common.seed.GeoData;
+import grakn.benchmark.common.seed.RandomSource;
+import grakn.benchmark.common.params.Context;
 import grakn.benchmark.simulation.driver.Client;
 import grakn.benchmark.simulation.driver.Session;
 import grakn.benchmark.simulation.driver.Transaction;
@@ -52,38 +31,38 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 
-import static grakn.benchmark.common.Util.printDuration;
+import static grakn.benchmark.common.params.Util.printDuration;
 
 public abstract class Simulation<
         CLIENT extends Client<SESSION, TX>,
         SESSION extends Session<TX>,
         TX extends Transaction> implements AutoCloseable {
 
+    public static final Set<Class<? extends Agent>> REGISTERED_AGENTS = new HashSet<>();
     private static final Logger LOG = LoggerFactory.getLogger(Simulation.class);
     private static final String AGENT_PACKAGE = Agent.class.getPackageName();
-    private final Map<Class<? extends Agent>, Supplier<Agent<?, TX>>> agentBuilders;
 
     private final CLIENT client;
     private final List<Agent<?, TX>> agents;
     private final RandomSource randomSource;
-    private final List<Config.Agent> agentConfigs;
-    private final SimulationContext context;
-    private final Map<Class<? extends Agent>, Map<String, List<Action<?, ?>.Report>>> agentReports;
+    private final Context context;
+    private final Map<Class<? extends Agent>, Map<String, List<Agent.Report>>> agentReports;
 
-    public Simulation(CLIENT client, int seed, List<Config.Agent> agentConfigs, SimulationContext context) throws Exception {
+    public Simulation(CLIENT client, Context context) throws Exception {
         this.client = client;
-        this.randomSource = new RandomSource(seed);
-        this.agentConfigs = agentConfigs;
+        this.randomSource = new RandomSource(context.seed());
         this.context = context;
         this.agentReports = new ConcurrentHashMap<>();
-        this.agentBuilders = initialiseAgentBuilders();
-        this.agents = agentListFromConfigs();
+        this.agents = initialiseAgents();
         initialiseDatabase();
         initialiseData(context.geoData());
     }
@@ -92,59 +71,39 @@ public abstract class Simulation<
 
     protected abstract void initialiseData(GeoData geoData);
 
+    @SuppressWarnings("unchecked")
+    protected List<Agent<?, TX>> initialiseAgents() throws ClassNotFoundException {
+        Map<Class<? extends Agent>, Supplier<Agent<?, TX>>> agentBuilders = initialiseAgentBuilders();
+        List<Agent<?, TX>> agents = new ArrayList<>();
+        for (Config.Agent agentConfig : context.agentConfigs()) {
+            if (agentConfig.isRun()) {
+                String className = AGENT_PACKAGE + "." + agentConfig.getName();
+                Class<? extends Agent> agentClass = (Class<? extends Agent>) Class.forName(className);
+                assert agentBuilders.containsKey(agentClass);
+                agents.add(agentBuilders.get(agentClass).get().setTracing(agentConfig.isTracing()));
+                REGISTERED_AGENTS.add(agentClass);
+            }
+        }
+        return agents;
+    }
+
+    private Map<Class<? extends Agent>, Supplier<Agent<?, TX>>> initialiseAgentBuilders() {
+        return Collections.emptyMap();
+//        return new HashMap<>() {{
+//            // TODO
+//        }};
+    }
+
     public CLIENT client() {
         return client;
     }
 
-    public SimulationContext context() {
+    public Context context() {
         return context;
     }
 
-    public Map<String, List<Action<?, ?>.Report>> getReport(Class<? extends Agent> agentName) {
+    public Map<String, List<Agent.Report>> getReport(Class<? extends Agent> agentName) {
         return agentReports.get(agentName);
-    }
-
-    private Map<Class<? extends Agent>, Supplier<Agent<?, TX>>> initialiseAgentBuilders() {
-        return new HashMap<>() {{
-            put(AgeUpdateAgent.class, () -> createAgeUpdateAgent());
-            put(ArbitraryOneHopAgent.class, () -> createArbitraryOneHopAgent());
-            put(CompanyAgent.class, () -> createCompanyAgent());
-            put(EmploymentAgent.class, () -> createEmploymentAgent());
-            put(FindCurrentResidentsAgent.class, () -> createFindCurrentResidentsAgent());
-            put(FindLivedInAgent.class, () -> createFindLivedInAgent());
-            put(FindSpecificMarriageAgent.class, () -> createFindSpecificMarriageAgent());
-            put(FindSpecificPersonAgent.class, () -> createFindSpecificPersonAgent());
-            put(FindTransactionCurrencyAgent.class, () -> createFindTransactionCurrencyAgent());
-            put(FourHopAgent.class, () -> createFourHopAgent());
-            put(FriendshipAgent.class, () -> createFriendshipAgent());
-            put(MarriageAgent.class, () -> createMarriageAgent());
-            put(MeanWageAgent.class, () -> createMeanWageAgent());
-            put(ParentshipAgent.class, () -> createParentshipAgent());
-            put(PersonBirthAgent.class, () -> createPersonBirthAgent());
-            put(ProductAgent.class, () -> createProductAgent());
-            put(PurchaseAgent.class, () -> createPurchaseAgent());
-            put(RelocationAgent.class, () -> createRelocationAgent());
-            put(ThreeHopAgent.class, () -> createThreeHopAgent());
-            put(TwoHopAgent.class, () -> createTwoHopAgent());
-        }};
-    }
-
-    protected List<Agent<?, TX>> agentListFromConfigs() throws ClassNotFoundException {
-        List<Agent<?, TX>> agents = new ArrayList<>();
-        for (Config.Agent agentConfig : agentConfigs) {
-            if (agentConfig.getAgentMode().getRun()) {
-                Agent<?, TX> agent;
-                // TODO: should the agent names be identical to the class to begin with?
-                String name = agentConfig.getName();
-                name = AGENT_PACKAGE + "." + name.substring(0, 1).toUpperCase() + name.substring(1) + "Agent";
-                Class<?> agentClass = Class.forName(name);
-                if (agentBuilders.containsKey(agentClass)) agent = agentBuilders.get(agentClass).get();
-                else throw new IllegalArgumentException("Unrecognised agent name: " + agentClass);
-                agent.overrideTracing(agentConfig.getAgentMode().getTrace());
-                agents.add(agent);
-            }
-        }
-        return agents;
     }
 
     public void run() {
@@ -173,44 +132,4 @@ public abstract class Simulation<
     public void close() {
         client.close();
     }
-
-    protected abstract Agent<?, TX> createAgeUpdateAgent();
-
-    protected abstract Agent<?, TX> createArbitraryOneHopAgent();
-
-    protected abstract Agent<?, TX> createCompanyAgent();
-
-    protected abstract Agent<?, TX> createEmploymentAgent();
-
-    protected abstract Agent<?, TX> createFindCurrentResidentsAgent();
-
-    protected abstract Agent<?, TX> createFindLivedInAgent();
-
-    protected abstract Agent<?, TX> createFindSpecificMarriageAgent();
-
-    protected abstract Agent<?, TX> createFindSpecificPersonAgent();
-
-    protected abstract Agent<?, TX> createFindTransactionCurrencyAgent();
-
-    protected abstract Agent<?, TX> createFourHopAgent();
-
-    protected abstract Agent<?, TX> createFriendshipAgent();
-
-    protected abstract Agent<?, TX> createMarriageAgent();
-
-    protected abstract Agent<?, TX> createMeanWageAgent();
-
-    protected abstract Agent<?, TX> createParentshipAgent();
-
-    protected abstract Agent<?, TX> createPersonBirthAgent();
-
-    protected abstract Agent<?, TX> createProductAgent();
-
-    protected abstract Agent<?, TX> createPurchaseAgent();
-
-    protected abstract Agent<?, TX> createRelocationAgent();
-
-    protected abstract Agent<?, TX> createThreeHopAgent();
-
-    protected abstract Agent<?, TX> createTwoHopAgent();
 }

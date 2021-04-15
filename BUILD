@@ -25,12 +25,10 @@ java_library(
     deps = [
         "//common:common",
         "//simulation:simulation",
-        "//simulation/common:common",
         "//grakn:grakn",
         "//neo4j:neo4j",
         "@graknlabs_grabl_tracing//client",
         "@maven//:com_google_code_findbugs_jsr305",
-        "@maven//:ch_qos_logback_logback_classic",
         "@maven//:org_slf4j_slf4j_api",
     ],
 )

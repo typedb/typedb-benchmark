@@ -17,34 +17,12 @@
 
 package grakn.benchmark.grakn;
 
-import grakn.benchmark.common.Config;
-import grakn.benchmark.grakn.agent.GraknAgeUpdateAgent;
-import grakn.benchmark.grakn.agent.GraknArbitraryOneHopAgent;
-import grakn.benchmark.grakn.agent.GraknCompanyAgent;
-import grakn.benchmark.grakn.agent.GraknEmploymentAgent;
-import grakn.benchmark.grakn.agent.GraknFindCurrentResidentsAgent;
-import grakn.benchmark.grakn.agent.GraknFindLivedInAgent;
-import grakn.benchmark.grakn.agent.GraknFindSpecificMarriageAgent;
-import grakn.benchmark.grakn.agent.GraknFindSpecificPersonAgent;
-import grakn.benchmark.grakn.agent.GraknFindTransactionCurrencyAgent;
-import grakn.benchmark.grakn.agent.GraknFourHopAgent;
-import grakn.benchmark.grakn.agent.GraknFriendshipAgent;
-import grakn.benchmark.grakn.agent.GraknMarriageAgent;
-import grakn.benchmark.grakn.agent.GraknMeanWageAgent;
-import grakn.benchmark.grakn.agent.GraknParentshipAgent;
-import grakn.benchmark.grakn.agent.GraknPersonBirthAgent;
-import grakn.benchmark.grakn.agent.GraknProductAgent;
-import grakn.benchmark.grakn.agent.GraknPurchaseAgent;
-import grakn.benchmark.grakn.agent.GraknRelocationAgent;
-import grakn.benchmark.grakn.agent.GraknThreeHopAgent;
-import grakn.benchmark.grakn.agent.GraknTwoHopAgent;
+import grakn.benchmark.common.params.Context;
+import grakn.benchmark.common.seed.GeoData;
 import grakn.benchmark.grakn.driver.GraknClient;
 import grakn.benchmark.grakn.driver.GraknSession;
 import grakn.benchmark.grakn.driver.GraknTransaction;
 import grakn.benchmark.simulation.Simulation;
-import grakn.benchmark.simulation.agent.Agent;
-import grakn.benchmark.simulation.common.GeoData;
-import grakn.benchmark.simulation.common.SimulationContext;
 import graql.lang.Graql;
 import graql.lang.pattern.variable.ThingVariable;
 import org.slf4j.Logger;
@@ -57,16 +35,17 @@ import java.nio.file.Paths;
 import java.time.Instant;
 import java.util.List;
 
-import static grakn.benchmark.common.Util.printDuration;
-import static grakn.benchmark.grakn.agent.Types.CONTINENT;
-import static grakn.benchmark.grakn.agent.Types.COUNTRY;
-import static grakn.benchmark.grakn.agent.Types.CURRENCY;
-import static grakn.benchmark.grakn.agent.Types.CURRENCY_CODE;
-import static grakn.benchmark.grakn.agent.Types.LANGUAGE;
-import static grakn.benchmark.grakn.agent.Types.LOCATION_HIERARCHY;
-import static grakn.benchmark.grakn.agent.Types.LOCATION_NAME;
-import static grakn.benchmark.grakn.agent.Types.SUBORDINATE;
-import static grakn.benchmark.grakn.agent.Types.SUPERIOR;
+import static grakn.benchmark.common.params.Util.printDuration;
+import static grakn.benchmark.grakn.agent.Label.CITY;
+import static grakn.benchmark.grakn.agent.Label.CONTINENT;
+import static grakn.benchmark.grakn.agent.Label.COUNTRY;
+import static grakn.benchmark.grakn.agent.Label.CURRENCY;
+import static grakn.benchmark.grakn.agent.Label.CURRENCY_CODE;
+import static grakn.benchmark.grakn.agent.Label.LANGUAGE;
+import static grakn.benchmark.grakn.agent.Label.LOCATION_HIERARCHY;
+import static grakn.benchmark.grakn.agent.Label.LOCATION_NAME;
+import static grakn.benchmark.grakn.agent.Label.SUBORDINATE;
+import static grakn.benchmark.grakn.agent.Label.SUPERIOR;
 import static grakn.client.api.GraknSession.Type.DATA;
 import static grakn.client.api.GraknSession.Type.SCHEMA;
 import static grakn.client.api.GraknTransaction.Type.WRITE;
@@ -79,19 +58,16 @@ public class GraknSimulation extends Simulation<GraknClient, GraknSession, Grakn
     private static final File SCHEMA_FILE = Paths.get("grakn/simulation.gql").toFile();
     private static final String DATABASE_NAME = "simulation";
 
-    private GraknSimulation(GraknClient client, int randomSeed, List<Config.Agent> agentConfigs,
-                            SimulationContext context) throws Exception {
-        super(client, randomSeed, agentConfigs, context);
+    private GraknSimulation(GraknClient client, Context context) throws Exception {
+        super(client, context);
     }
 
-    public static GraknSimulation core(String hostUri, int randomSeed, List<Config.Agent> agentConfigs,
-                                       SimulationContext context) throws Exception {
-        return new GraknSimulation(GraknClient.core(hostUri, DATABASE_NAME), randomSeed, agentConfigs, context);
+    public static GraknSimulation core(String address, Context context) throws Exception {
+        return new GraknSimulation(GraknClient.core(address, DATABASE_NAME), context);
     }
 
-    public static GraknSimulation cluster(String hostUri, int randomSeed, List<Config.Agent> agentConfigs,
-                                          SimulationContext context) throws Exception {
-        return new GraknSimulation(GraknClient.cluster(hostUri, DATABASE_NAME), randomSeed, agentConfigs, context);
+    public static GraknSimulation cluster(String address, Context context) throws Exception {
+        return new GraknSimulation(GraknClient.cluster(address, DATABASE_NAME), context);
     }
 
     @Override
@@ -175,110 +151,10 @@ public class GraknSimulation extends Simulation<GraknClient, GraknSession, Grakn
             cities.forEach(city -> tx.query().insert(Graql.match(
                     var("x").isa(COUNTRY).has(LOCATION_NAME, city.country().name())
             ).insert(
-                    var("y").isa("city").has(LOCATION_NAME, city.name()),
+                    var("y").isa(CITY).has(LOCATION_NAME, city.name()),
                     rel(SUPERIOR, "x").rel(SUBORDINATE, "y").isa(LOCATION_HIERARCHY)
             )));
             tx.commit();
         }
-    }
-
-    @Override
-    protected Agent<?, GraknTransaction> createAgeUpdateAgent() {
-        return new GraknAgeUpdateAgent(client(), context());
-    }
-
-    @Override
-    protected Agent<?, GraknTransaction> createArbitraryOneHopAgent() {
-        return new GraknArbitraryOneHopAgent(client(), context());
-    }
-
-    @Override
-    protected Agent<?, GraknTransaction> createCompanyAgent() {
-        return new GraknCompanyAgent(client(), context());
-    }
-
-    @Override
-    protected Agent<?, GraknTransaction> createEmploymentAgent() {
-        return new GraknEmploymentAgent(client(), context());
-    }
-
-    @Override
-    protected Agent<?, GraknTransaction> createFindCurrentResidentsAgent() {
-        return new GraknFindCurrentResidentsAgent(client(), context());
-    }
-
-    @Override
-    protected Agent<?, GraknTransaction> createFindLivedInAgent() {
-        return new GraknFindLivedInAgent(client(), context());
-    }
-
-    @Override
-    protected Agent<?, GraknTransaction> createFindSpecificMarriageAgent() {
-        return new GraknFindSpecificMarriageAgent(client(), context());
-    }
-
-    @Override
-    protected Agent<?, GraknTransaction> createFindSpecificPersonAgent() {
-        return new GraknFindSpecificPersonAgent(client(), context());
-    }
-
-    @Override
-    protected Agent<?, GraknTransaction> createFindTransactionCurrencyAgent() {
-        return new GraknFindTransactionCurrencyAgent(client(), context());
-    }
-
-    @Override
-    protected Agent<?, GraknTransaction> createFourHopAgent() {
-        return new GraknFourHopAgent(client(), context());
-    }
-
-    @Override
-    protected Agent<?, GraknTransaction> createFriendshipAgent() {
-        return new GraknFriendshipAgent(client(), context());
-    }
-
-    @Override
-    protected Agent<?, GraknTransaction> createMarriageAgent() {
-        return new GraknMarriageAgent(client(), context());
-    }
-
-    @Override
-    protected Agent<?, GraknTransaction> createMeanWageAgent() {
-        return new GraknMeanWageAgent(client(), context());
-    }
-
-    @Override
-    protected Agent<?, GraknTransaction> createParentshipAgent() {
-        return new GraknParentshipAgent(client(), context());
-    }
-
-    @Override
-    protected Agent<?, GraknTransaction> createPersonBirthAgent() {
-        return new GraknPersonBirthAgent(client(), context());
-    }
-
-    @Override
-    protected Agent<?, GraknTransaction> createProductAgent() {
-        return new GraknProductAgent(client(), context());
-    }
-
-    @Override
-    protected Agent<?, GraknTransaction> createPurchaseAgent() {
-        return new GraknPurchaseAgent(client(), context());
-    }
-
-    @Override
-    protected Agent<?, GraknTransaction> createRelocationAgent() {
-        return new GraknRelocationAgent(client(), context());
-    }
-
-    @Override
-    protected Agent<?, GraknTransaction> createThreeHopAgent() {
-        return new GraknThreeHopAgent(client(), context());
-    }
-
-    @Override
-    protected Agent<?, GraknTransaction> createTwoHopAgent() {
-        return new GraknTwoHopAgent(client(), context());
     }
 }

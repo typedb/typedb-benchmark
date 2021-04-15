@@ -19,19 +19,19 @@ package grakn.benchmark;
 
 import grabl.tracing.client.GrablTracing;
 import grabl.tracing.client.GrablTracingThreadStatic;
-import grakn.benchmark.common.Config;
-import grakn.benchmark.common.Options;
+import grakn.benchmark.common.params.Config;
+import grakn.benchmark.common.params.Options;
 import grakn.benchmark.grakn.GraknSimulation;
 import grakn.benchmark.neo4j.Neo4JSimulation;
 import grakn.benchmark.simulation.Simulation;
-import grakn.benchmark.simulation.common.SimulationContext;
+import grakn.benchmark.common.params.Context;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import java.util.Optional;
 
-import static grakn.benchmark.common.Util.parseCommandLine;
+import static grakn.benchmark.common.params.Util.parseCommandLine;
 
 public class Benchmark {
 
@@ -56,17 +56,12 @@ public class Benchmark {
     }
 
     private static Simulation<?, ?, ?> initSimulation(Options options, Config config) throws Exception {
-        SimulationContext context = SimulationContext.create(config, options.tracing().isPresent(), false);
+        Context context = Context.create(config, options.tracing().isPresent(), false);
         Simulation<?, ?, ?> simulation;
-        if (options.database().isGraknCore()) {
-            simulation = GraknSimulation.core(options.address(), config.randomSeed(), config.agents(), context);
-        } else if (options.database().isGraknCluster()) {
-            simulation = GraknSimulation.cluster(options.address(), config.randomSeed(), config.agents(), context);
-        } else if (options.database().isNeo4j()) {
-            simulation = Neo4JSimulation.create(options.address(), config.randomSeed(), config.agents(), context);
-        } else {
-            throw new IllegalStateException();
-        }
+        if (options.database().isGraknCore()) simulation = GraknSimulation.core(options.address(), context);
+        else if (options.database().isGraknCluster()) simulation = GraknSimulation.cluster(options.address(), context);
+        else if (options.database().isNeo4j()) simulation = Neo4JSimulation.create(options.address(), context);
+        else throw new IllegalStateException();
         return simulation;
     }
 

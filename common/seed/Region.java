@@ -15,27 +15,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package grakn.benchmark.grakn.driver;
+package grakn.benchmark.common.seed;
 
-import grakn.benchmark.simulation.driver.Session;
+public interface Region {
 
-import static grakn.client.api.GraknTransaction.Type.WRITE;
+    String name();
 
-public class GraknSession implements Session<GraknTransaction> {
+    String tracker();
 
-    private final grakn.client.api.GraknSession nativeSession;
-
-    public GraknSession(grakn.client.api.GraknSession nativeSession) {
-        this.nativeSession = nativeSession;
-    }
-
-    @Override
-    public GraknTransaction transaction(String tracker, long iteration) {
-        return new GraknTransaction(nativeSession.transaction(WRITE), tracker, iteration);
-    }
-
-    @Override
-    public void close() {
-        nativeSession.close();
-    }
+    String group(); // Used to assign session keys for Grakn model
 }

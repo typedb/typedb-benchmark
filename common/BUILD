@@ -19,17 +19,19 @@ load("@graknlabs_dependencies//tool/checkstyle:rules.bzl", "checkstyle_test")
 
 java_library(
     name = "common",
-    srcs = glob(["*.java"]),
+    srcs = glob(["*.java", "*/*.java"]),
     visibility = ["//visibility:public"],
     deps = [
         "@maven//:com_google_code_findbugs_jsr305",
         "@maven//:info_picocli_picocli",
+        "@maven//:org_apache_commons_commons_csv",
         "@maven//:org_yaml_snakeyaml",
     ],
+    data = ["//data:data"],
 )
 
 checkstyle_test(
     name = "checkstyle",
-    include = glob(["*"]),
+    include = glob(["*", "*/*"]),
     license_type = "agpl"
 )

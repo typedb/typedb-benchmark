@@ -18,7 +18,7 @@
 package grakn.benchmark.neo4j.driver;
 
 import grabl.tracing.client.GrablTracingThreadStatic;
-import grakn.benchmark.simulation.common.Region;
+import grakn.benchmark.common.seed.Region;
 import grakn.benchmark.simulation.driver.Client;
 import org.neo4j.driver.AuthTokens;
 import org.neo4j.driver.Driver;
@@ -31,7 +31,6 @@ import java.text.DecimalFormat;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static com.google.common.collect.Iterables.getOnlyElement;
 import static grabl.tracing.client.GrablTracingThreadStatic.traceOnThread;
 import static grakn.benchmark.simulation.driver.Client.TracingLabel.OPEN_SESSION;
 
@@ -68,14 +67,14 @@ public class Neo4jClient implements Client<Neo4jSession, Neo4jTransaction> {
                 Result result = tx.run(new Query(numberOfNodesQ));
                 return result.list();
             });
-            long numberOfNodes = (long) getOnlyElement(numberOfNodesList).asMap().get("count(n)");
+            long numberOfNodes = (long) numberOfNodesList.get(0).asMap().get("count(n)");
 
             String numberOfRelationshipsQ = "MATCH ()-->()\n RETURN count(*)";
             List<Record> numberOfRelationshipsList = nativeSession.writeTransaction(tx -> {
                 Result result = tx.run(new Query(numberOfRelationshipsQ));
                 return result.list();
             });
-            long numberOfRelationships = (long) getOnlyElement(numberOfRelationshipsList).asMap().get("count(*)");
+            long numberOfRelationships = (long) numberOfRelationshipsList.get(0).asMap().get("count(*)");
 
             str.append("Benchmark statistic:");
             str.append("\n");

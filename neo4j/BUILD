@@ -24,17 +24,9 @@ java_library(
     deps = [
         "//common:common",
         "//simulation:simulation",
-        "//simulation/agent:agent",
-        "//simulation/common:common",
-        "//simulation/driver:driver",
         "@graknlabs_grabl_tracing//client",
-        "@graknlabs_common//:common",
-        "@maven//:com_google_code_findbugs_jsr305",
-        "@maven//:com_google_guava_guava",
-        "@maven//:org_apache_commons_commons_csv",
-        "@maven//:org_apache_commons_commons_lang3",
-        "@maven//:org_slf4j_slf4j_api",
         "@neo4j//:org_neo4j_driver_neo4j_java_driver",
+        "@maven//:org_slf4j_slf4j_api",
     ],
 )
 

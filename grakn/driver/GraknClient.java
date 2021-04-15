@@ -18,7 +18,7 @@
 package grakn.benchmark.grakn.driver;
 
 import grabl.tracing.client.GrablTracingThreadStatic;
-import grakn.benchmark.simulation.common.Region;
+import grakn.benchmark.common.seed.Region;
 import grakn.benchmark.simulation.driver.Client;
 import grakn.client.Grakn;
 

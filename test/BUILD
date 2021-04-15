@@ -29,25 +29,15 @@ artifact_extractor(
 )
 
 java_test(
-    name = "comparison-test",
-    srcs = [
-        "ComparisonTest.java",
-        "ComparisonTestSuite.java",
-    ],
+    name = "test",
+    srcs = ["ComparisonTest.java"],
     test_class = "grakn.benchmark.test.ComparisonTest",
     deps = [
         "//common:common",
-        "//simulation/agent",
-        "//simulation/common",
+        "//simulation:simulation",
         "//grakn:grakn",
         "//neo4j:neo4j",
-        "@maven//:ch_qos_logback_logback_classic",
-        "@maven//:commons_cli_commons_cli",
         "@maven//:info_picocli_picocli",
-        "@maven//:javax_annotation_javax_annotation_api",
-        "@maven//:javax_annotation_javax_annotation_api_1_3_2",
-        "@maven//:junit_junit",
-        "@maven//:org_slf4j_slf4j_api",
     ],
     size = "enormous",
     resource_strip_prefix = "config/",

@@ -15,27 +15,25 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package grakn.benchmark.grakn.driver;
+package grakn.benchmark.common.seed;
 
-import grakn.benchmark.simulation.driver.Session;
+import java.util.Random;
 
-import static grakn.client.api.GraknTransaction.Type.WRITE;
+public class RandomSource {
 
-public class GraknSession implements Session<GraknTransaction> {
+    private final long seed;
+    private Random random;
 
-    private final grakn.client.api.GraknSession nativeSession;
-
-    public GraknSession(grakn.client.api.GraknSession nativeSession) {
-        this.nativeSession = nativeSession;
+    public RandomSource(long seed) {
+        this.seed = seed;
     }
 
-    @Override
-    public GraknTransaction transaction(String tracker, long iteration) {
-        return new GraknTransaction(nativeSession.transaction(WRITE), tracker, iteration);
+    public RandomSource next() {
+        return new RandomSource(get().nextLong());
     }
 
-    @Override
-    public void close() {
-        nativeSession.close();
+    public Random get() {
+        if (random == null) random = new Random(seed);
+        return random;
     }
 }

@@ -17,85 +17,114 @@
 
 package grakn.benchmark.test;
 
-import grakn.benchmark.simulation.agent.Agent;
-import grakn.benchmark.simulation.agent.CompanyAgent;
-import grakn.benchmark.simulation.agent.EmploymentAgent;
-import grakn.benchmark.simulation.agent.FriendshipAgent;
-import grakn.benchmark.simulation.agent.MarriageAgent;
-import grakn.benchmark.simulation.agent.ParentshipAgent;
-import grakn.benchmark.simulation.agent.PersonBirthAgent;
-import grakn.benchmark.simulation.agent.ProductAgent;
-import grakn.benchmark.simulation.agent.PurchaseAgent;
-import grakn.benchmark.simulation.agent.RelocationAgent;
-import org.junit.Ignore;
+import grakn.benchmark.common.params.Config;
+import grakn.benchmark.grakn.GraknSimulation;
+import grakn.benchmark.neo4j.Neo4JSimulation;
+import grakn.benchmark.simulation.Simulation;
+import grakn.benchmark.common.params.Context;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.junit.runner.notification.RunNotifier;
+import org.junit.runners.BlockJUnit4ClassRunner;
+import org.junit.runners.model.FrameworkMethod;
+import org.junit.runners.model.InitializationError;
+import picocli.CommandLine;
 
-import static grakn.benchmark.test.ComparisonTestSuite.GRAKN_CORE;
-import static grakn.benchmark.test.ComparisonTestSuite.NEO4J;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import static grakn.benchmark.common.params.Util.parseCommandLine;
+import static grakn.benchmark.test.ComparisonTest.Suite.GRAKN_CORE;
+import static grakn.benchmark.test.ComparisonTest.Suite.NEO4J;
 import static org.junit.Assert.assertEquals;
 
-@RunWith(ComparisonTestSuite.class)
+@RunWith(ComparisonTest.Suite.class)
 public class ComparisonTest {
 
-    // TODO: raw usage of class
-    private void compareReports(Class<? extends Agent> agentClass) {
-        assertEquals(GRAKN_CORE.getReport(agentClass), NEO4J.getReport(agentClass));
+    @Test
+    public void test_agents_have_equal_reports() {
+        Simulation.REGISTERED_AGENTS.forEach(agent -> assertEquals(GRAKN_CORE.getReport(agent), NEO4J.getReport(agent)));
     }
 
-    // TODO: all these test.md methods can be replaced with Simulation.agentBuilders.keySet()
-    @Test
-    @Ignore
-    public void testMarriageAgent() {
-        compareReports(MarriageAgent.class);
-    }
+    public static class Suite extends org.junit.runners.Suite {
 
-    @Test
-    public void testPersonBirthAgent() {
-        compareReports(PersonBirthAgent.class);
-    }
+        private static final Config CONFIG = Config.loadYML(Paths.get("test.md/config.yml").toFile());
+        private static final TestOptions OPTIONS = parseCommandLine(args(), new TestOptions()).get();
 
-    @Test
-    @Ignore
-    public void testAgeUpdateAgent() {
-//    Comparing results of this agent will require sending a set equal to the size of the number of people in each city,
-//    which doesn't scale well. So this is skipped in favour of spot-testing
-    }
+        public static GraknSimulation GRAKN_CORE;
 
-    @Test
-    public void testParentshipAgent() {
-        compareReports(ParentshipAgent.class);
-    }
+        public static Neo4JSimulation NEO4J;
+        private int iteration = 1;
 
-    @Test
-    public void testRelocationAgent() {
-        compareReports(RelocationAgent.class);
-    }
+        public Suite(Class<?> testClass) throws Throwable {
+            super(testClass, createRunners(testClass));
+            GRAKN_CORE = GraknSimulation.core(OPTIONS.graknAddress(), Context.create(CONFIG, false, true));
+            NEO4J = Neo4JSimulation.create(OPTIONS.neo4jAddress(), Context.create(CONFIG, false, true));
+        }
 
-    @Test
-    public void testCompanyAgent() {
-        compareReports(CompanyAgent.class);
-    }
+        private static String[] args() {
+            String[] input = System.getProperty("sun.java.command").split(" ");
+            return Arrays.copyOfRange(input, 1, input.length);
+        }
 
-    @Test
-    @Ignore
-    public void testEmploymentAgent() {
-        compareReports(EmploymentAgent.class);
-    }
+        private static List<org.junit.runner.Runner> createRunners(Class<?> testClass) throws InitializationError {
+            List<org.junit.runner.Runner> runners = new ArrayList<>();
+            for (int i = 1; i <= CONFIG.iterations(); i++) {
+                BlockJUnit4ClassRunner runner = new Runner(testClass, i);
+                runners.add(runner);
+            }
+            return runners;
+        }
 
-    @Test
-    public void testProductAgent() {
-        compareReports(ProductAgent.class);
-    }
+        @Override
+        protected void runChild(org.junit.runner.Runner runner, final RunNotifier notifier) {
+            iteration++;
+            NEO4J.iterate();
+            GRAKN_CORE.iterate();
+            super.runChild(runner, notifier);
+            if (iteration == CONFIG.iterations() + 1) {
+                GRAKN_CORE.close();
+                NEO4J.close();
+            }
+        }
 
-    @Test
-    public void testPurchaseAgent() {
-        compareReports(PurchaseAgent.class);
-    }
+        private static class Runner extends BlockJUnit4ClassRunner {
+            private final int iteration;
 
-    @Test
-    @Ignore
-    public void testFriendshipAgent() {
-        compareReports(FriendshipAgent.class);
+            public Runner(Class<?> aClass, int iteration) throws InitializationError {
+                super(aClass);
+                this.iteration = iteration;
+            }
+
+            @Override
+            protected String testName(FrameworkMethod method) {
+                return method.getName() + "-iter-" + iteration;
+            }
+
+            @Override
+            protected String getName() {
+                return super.getName() + "-iter-" + iteration;
+            }
+        }
+
+        @CommandLine.Command(name = "benchmark-test.md", mixinStandardHelpOptions = true)
+        private static class TestOptions {
+
+            @CommandLine.Option(names = {"--grakn"}, required = true, description = "Database address URI")
+            private String graknAddress;
+
+            @CommandLine.Option(names = {"--neo4j"}, required = true, description = "Database address URI")
+            private String neo4jAddress;
+
+            public String graknAddress() {
+                return graknAddress;
+            }
+
+            public String neo4jAddress() {
+                return neo4jAddress;
+            }
+        }
     }
 }

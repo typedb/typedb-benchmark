@@ -34,9 +34,9 @@ groovy_and_java_library(
     ]),
     visibility = ["//visibility:public"],
     deps = [
-        "//grakn",
-        "//neo4j",
-        "//simulation/agent",
+        "//grakn:grakn",
+        "//neo4j:neo4j",
+        "//simulation:simulation",
     ],
     data = [
         "templates/agent_section.tex",

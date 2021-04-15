@@ -30,7 +30,6 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 import java.util.stream.Stream;
 
-import static com.google.common.collect.Iterables.getOnlyElement;
 import static java.util.stream.Collectors.toList;
 
 public class GraknTransaction implements Transaction {
@@ -120,9 +119,9 @@ public class GraknTransaction implements Transaction {
     }
 
     public Object getOnlyAttributeOfThing(ConceptMap answer, String var, String attributeType) {
-        return getOnlyElement(answer.get(var).asThing().asRemote(tx).asThing()
-                                      .getHas(tx.concepts().getAttributeType(attributeType))
-                                      .collect(toList())).getValue();
+        return answer.get(var).asThing().asRemote(tx).asThing()
+                .getHas(tx.concepts().getAttributeType(attributeType))
+                .collect(toList()).get(0).getValue();
     }
 
     public Object getValueOfAttribute(ConceptMap answer, String varName) {

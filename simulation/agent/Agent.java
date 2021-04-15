@@ -18,9 +18,9 @@
 package grakn.benchmark.simulation.agent;
 
 import grabl.tracing.client.GrablTracingThreadStatic;
-import grakn.benchmark.simulation.common.RandomSource;
-import grakn.benchmark.simulation.common.Region;
-import grakn.benchmark.simulation.common.SimulationContext;
+import grakn.benchmark.common.seed.RandomSource;
+import grakn.benchmark.common.seed.Region;
+import grakn.benchmark.common.params.Context;
 import grakn.benchmark.simulation.driver.Client;
 import grakn.benchmark.simulation.driver.Session;
 import grakn.benchmark.simulation.driver.Transaction;
@@ -28,8 +28,10 @@ import grakn.common.collection.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -54,40 +56,41 @@ public abstract class Agent<REGION extends Region, TX extends Transaction> {
 
     private static final Logger LOG = LoggerFactory.getLogger(Agent.class);
 
-    protected final SimulationContext context;
+    protected final Context context;
     private final Client<?, TX> client;
     private boolean isTracing = true;
 
-    protected Agent(Client<?, TX> client, SimulationContext context) {
+    protected Agent(Client<?, TX> client, Context context) {
         this.client = client;
         this.context = context;
     }
 
     protected abstract List<REGION> regions();
 
-    protected abstract List<Action<?, ?>.Report> run(Session<TX> session, REGION region, Random random);
+    protected abstract List<Report> run(Session<TX> session, REGION region, Random random);
 
-    public void overrideTracing(boolean isTracing) {
+    public Agent<REGION, TX> setTracing(boolean isTracing) {
         this.isTracing = isTracing;
+        return this;
     }
 
     public boolean isTracing() {
         return context.isTracing() && isTracing;
     }
 
-    public Map<String, List<Action<?, ?>.Report>> iterate(RandomSource randomSrc) {
-        ConcurrentMap<String, List<Action<?, ?>.Report>> reports = new ConcurrentHashMap<>();
+    public Map<String, List<Report>> iterate(RandomSource randomSrc) {
+        ConcurrentMap<String, List<Report>> reports = new ConcurrentHashMap<>();
         // We need to generate pairs of Region and Random deterministically before passing them to a parallel stream
         List<Pair<REGION, Random>> regionRandomPairs = regions().stream()
                 .map(region -> new Pair<>(region, randomSrc.next().get())).collect(toList());
         regionRandomPairs.parallelStream().forEach(pair -> {
-            List<Action<?, ?>.Report> report = runWithMayTrace(pair.first(), pair.second());
+            List<Report> report = runWithMayTrace(pair.first(), pair.second());
             if (context.isTest()) reports.put(pair.first().tracker(), report);
         });
         return reports;
     }
 
-    private List<Action<?, ?>.Report> runWithMayTrace(REGION region, Random random) {
+    private List<Report> runWithMayTrace(REGION region, Random random) {
         GrablTracingThreadStatic.ThreadContext tracingCtx = null;
         try {
             if (isTracing()) tracingCtx = contextOnThread(region.tracker(), context.iterationNumber());
@@ -98,17 +101,11 @@ public abstract class Agent<REGION extends Region, TX extends Transaction> {
         }
     }
 
-    public <T> T runAction(Action<?, T> action, List<Action<?, ?>.Report> reports) {
-        T answer = mayTrace(action::run, action.name());
-        if (context.isTest()) reports.add(action.report(answer));
-        return answer;
-    }
-
     public <U> U pickOne(List<U> list, Random random) {
         return list.get(random.nextInt(list.size()));
     }
 
-    public String uniqueId(SimulationContext benchmarkContext, String tracker, int iterationScopeId) {
+    public String uniqueId(Context benchmarkContext, String tracker, int iterationScopeId) {
         return benchmarkContext.iterationNumber() + "/" + tracker + "/" + iterationScopeId;
     }
 
@@ -119,6 +116,39 @@ public abstract class Agent<REGION extends Region, TX extends Transaction> {
             }
         } else {
             return methodToTrace.get();
+        }
+    }
+
+    public static class Report {
+
+        private final Collection<Object> input;
+        private final Collection<Object> output;
+        private final int hash;
+
+        private Report(Collection<Object> input, Collection<Object> output) {
+            this.input = input;
+            this.output = output;
+            this.hash = Objects.hash(this.input, this.output);
+        }
+
+        public static Report create(Collection<Object> input, Collection<Object> output) {
+            return new Report(input, output);
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+
+            Report report = (Report) o;
+
+            if (!input.equals(report.input)) return false;
+            return output.equals(report.output);
+        }
+
+        @Override
+        public int hashCode() {
+            return hash;
         }
     }
 }

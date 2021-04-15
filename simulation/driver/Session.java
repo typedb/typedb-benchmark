@@ -19,7 +19,7 @@ package grakn.benchmark.simulation.driver;
 
 public interface Session<TX extends Transaction> extends AutoCloseable {
 
-    TX transaction(String tracker, long iteration, boolean trace);
+    TX transaction(String tracker, long iteration);
 
     @Override
     void close();

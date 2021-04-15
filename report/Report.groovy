@@ -17,39 +17,7 @@
 
 package grakn.benchmark.report
 
-import grakn.benchmark.grakn.agent.GraknAgeUpdateAgent
-import grakn.benchmark.grakn.agent.GraknArbitraryOneHopAgent
-import grakn.benchmark.grakn.agent.GraknFindCurrentResidentsAgent
-import grakn.benchmark.grakn.agent.GraknFindLivedInAgent
-import grakn.benchmark.grakn.agent.GraknFindSpecificMarriageAgent
-import grakn.benchmark.grakn.agent.GraknFindSpecificPersonAgent
-import grakn.benchmark.grakn.agent.GraknFourHopAgent
-import grakn.benchmark.grakn.agent.GraknMeanWageAgent
-import grakn.benchmark.grakn.agent.GraknPersonBirthAgent
-import grakn.benchmark.grakn.agent.GraknThreeHopAgent
-import grakn.benchmark.grakn.agent.GraknTwoHopAgent
-import grakn.benchmark.neo4j.agent.Neo4jAgeUpdateAgent
-import grakn.benchmark.neo4j.agent.Neo4jArbitraryOneHopAgent
-import grakn.benchmark.neo4j.agent.Neo4jFindCurrentResidentsAgent
-import grakn.benchmark.neo4j.agent.Neo4jFindLivedInAgent
-import grakn.benchmark.neo4j.agent.Neo4jFindSpecificMarriageAgent
-import grakn.benchmark.neo4j.agent.Neo4jFindSpecificPersonAgent
-import grakn.benchmark.neo4j.agent.Neo4jFourHopAgent
-import grakn.benchmark.neo4j.agent.Neo4jMeanWageAgent
-import grakn.benchmark.neo4j.agent.Neo4jPersonBirthAgent
-import grakn.benchmark.neo4j.agent.Neo4jThreeHopAgent
-import grakn.benchmark.neo4j.agent.Neo4jTwoHopAgent
-import grakn.benchmark.simulation.agent.AgeUpdateAgent
-import grakn.benchmark.simulation.agent.ArbitraryOneHopAgent
-import grakn.benchmark.simulation.agent.FindCurrentResidentsAgent
-import grakn.benchmark.simulation.agent.FindLivedInAgent
-import grakn.benchmark.simulation.agent.FindSpecificMarriageAgent
-import grakn.benchmark.simulation.agent.FindSpecificPersonAgent
-import grakn.benchmark.simulation.agent.FourHopAgent
-import grakn.benchmark.simulation.agent.MeanWageAgent
-import grakn.benchmark.simulation.agent.PersonBirthAgent
-import grakn.benchmark.simulation.agent.ThreeHopAgent
-import grakn.benchmark.simulation.agent.TwoHopAgent
+
 import groovy.text.GStringTemplateEngine
 
 import java.time.LocalDateTime

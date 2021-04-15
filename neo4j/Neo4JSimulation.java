@@ -17,34 +17,12 @@
 
 package grakn.benchmark.neo4j;
 
-import grakn.benchmark.common.Config;
-import grakn.benchmark.neo4j.agent.Neo4jAgeUpdateAgent;
-import grakn.benchmark.neo4j.agent.Neo4jArbitraryOneHopAgent;
-import grakn.benchmark.neo4j.agent.Neo4jCompanyAgent;
-import grakn.benchmark.neo4j.agent.Neo4jEmploymentAgent;
-import grakn.benchmark.neo4j.agent.Neo4jFindCurrentResidentsAgent;
-import grakn.benchmark.neo4j.agent.Neo4jFindLivedInAgent;
-import grakn.benchmark.neo4j.agent.Neo4jFindSpecificMarriageAgent;
-import grakn.benchmark.neo4j.agent.Neo4jFindSpecificPersonAgent;
-import grakn.benchmark.neo4j.agent.Neo4jFindTransactionCurrencyAgent;
-import grakn.benchmark.neo4j.agent.Neo4jFourHopAgent;
-import grakn.benchmark.neo4j.agent.Neo4jFriendshipAgent;
-import grakn.benchmark.neo4j.agent.Neo4jMarriageAgent;
-import grakn.benchmark.neo4j.agent.Neo4jMeanWageAgent;
-import grakn.benchmark.neo4j.agent.Neo4jParentshipAgent;
-import grakn.benchmark.neo4j.agent.Neo4jPersonBirthAgent;
-import grakn.benchmark.neo4j.agent.Neo4jProductAgent;
-import grakn.benchmark.neo4j.agent.Neo4jPurchaseAgent;
-import grakn.benchmark.neo4j.agent.Neo4jRelocationAgent;
-import grakn.benchmark.neo4j.agent.Neo4jThreeHopAgent;
-import grakn.benchmark.neo4j.agent.Neo4jTwoHopAgent;
 import grakn.benchmark.neo4j.driver.Neo4jClient;
 import grakn.benchmark.neo4j.driver.Neo4jSession;
 import grakn.benchmark.neo4j.driver.Neo4jTransaction;
 import grakn.benchmark.simulation.Simulation;
-import grakn.benchmark.simulation.agent.Agent;
-import grakn.benchmark.simulation.common.GeoData;
-import grakn.benchmark.simulation.common.SimulationContext;
+import grakn.benchmark.common.seed.GeoData;
+import grakn.benchmark.common.params.Context;
 import org.neo4j.driver.Query;
 import org.neo4j.driver.Session;
 import org.neo4j.driver.Transaction;
@@ -55,18 +33,18 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
-import static grakn.benchmark.common.Util.printDuration;
+import static grakn.benchmark.common.params.Util.printDuration;
 
 public class Neo4JSimulation extends Simulation<Neo4jClient, Neo4jSession, Neo4jTransaction> {
 
     private static final Logger LOG = LoggerFactory.getLogger(Neo4JSimulation.class);
 
-    private Neo4JSimulation(Neo4jClient driver, int randomSeed, List<Config.Agent> agentConfigs, SimulationContext context) throws Exception {
-        super(driver, randomSeed, agentConfigs, context);
+    private Neo4JSimulation(Neo4jClient driver, Context context) throws Exception {
+        super(driver, context);
     }
 
-    public static Neo4JSimulation create(String hostUri, int randomSeed, List<Config.Agent> agentConfigs, SimulationContext context) throws Exception {
-        return new Neo4JSimulation(new Neo4jClient(hostUri), randomSeed, agentConfigs, context);
+    public static Neo4JSimulation create(String hostUri, Context context) throws Exception {
+        return new Neo4JSimulation(new Neo4jClient(hostUri), context);
     }
 
     @Override
@@ -157,105 +135,5 @@ public class Neo4JSimulation extends Simulation<Neo4jClient, Neo4jSession, Neo4j
             tx.run(query);
         });
         tx.commit();
-    }
-
-    @Override
-    protected Agent<?, Neo4jTransaction> createAgeUpdateAgent() {
-        return new Neo4jAgeUpdateAgent(client(), context());
-    }
-
-    @Override
-    protected Agent<?, Neo4jTransaction> createArbitraryOneHopAgent() {
-        return new Neo4jArbitraryOneHopAgent(client(), context());
-    }
-
-    @Override
-    protected Agent<?, Neo4jTransaction> createCompanyAgent() {
-        return new Neo4jCompanyAgent(client(), context());
-    }
-
-    @Override
-    protected Agent<?, Neo4jTransaction> createEmploymentAgent() {
-        return new Neo4jEmploymentAgent(client(), context());
-    }
-
-    @Override
-    protected Agent<?, Neo4jTransaction> createFindCurrentResidentsAgent() {
-        return new Neo4jFindCurrentResidentsAgent(client(), context());
-    }
-
-    @Override
-    protected Agent<?, Neo4jTransaction> createFindLivedInAgent() {
-        return new Neo4jFindLivedInAgent(client(), context());
-    }
-
-    @Override
-    protected Agent<?, Neo4jTransaction> createFindSpecificMarriageAgent() {
-        return new Neo4jFindSpecificMarriageAgent(client(), context());
-    }
-
-    @Override
-    protected Agent<?, Neo4jTransaction> createFindSpecificPersonAgent() {
-        return new Neo4jFindSpecificPersonAgent(client(), context());
-    }
-
-    @Override
-    protected Agent<?, Neo4jTransaction> createFindTransactionCurrencyAgent() {
-        return new Neo4jFindTransactionCurrencyAgent(client(), context());
-    }
-
-    @Override
-    protected Agent<?, Neo4jTransaction> createFourHopAgent() {
-        return new Neo4jFourHopAgent(client(), context());
-    }
-
-    @Override
-    protected Agent<?, Neo4jTransaction> createFriendshipAgent() {
-        return new Neo4jFriendshipAgent(client(), context());
-    }
-
-    @Override
-    protected Agent<?, Neo4jTransaction> createMarriageAgent() {
-        return new Neo4jMarriageAgent(client(), context());
-    }
-
-    @Override
-    protected Agent<?, Neo4jTransaction> createMeanWageAgent() {
-        return new Neo4jMeanWageAgent(client(), context());
-    }
-
-    @Override
-    protected Agent<?, Neo4jTransaction> createParentshipAgent() {
-        return new Neo4jParentshipAgent(client(), context());
-    }
-
-    @Override
-    protected Agent<?, Neo4jTransaction> createPersonBirthAgent() {
-        return new Neo4jPersonBirthAgent(client(), context());
-    }
-
-    @Override
-    protected Agent<?, Neo4jTransaction> createProductAgent() {
-        return new Neo4jProductAgent(client(), context());
-    }
-
-    @Override
-    protected Agent<?, Neo4jTransaction> createPurchaseAgent() {
-        return new Neo4jPurchaseAgent(client(), context());
-    }
-
-    @Override
-    protected Agent<?, Neo4jTransaction> createRelocationAgent() {
-        return new Neo4jRelocationAgent(client(), context());
-    }
-
-    @Override
-    protected Agent<?, Neo4jTransaction> createThreeHopAgent() {
-        return new Neo4jThreeHopAgent(client(), context());
-    }
-
-    @Override
-    protected Agent<?, Neo4jTransaction> createTwoHopAgent() {
-        return new Neo4jTwoHopAgent(client(), context());
     }
 }
