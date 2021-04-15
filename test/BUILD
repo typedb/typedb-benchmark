@@ -29,7 +29,7 @@ artifact_extractor(
 )
 
 java_test(
-    name = "test",
+    name = "comparison-test",
     srcs = ["ComparisonTest.java"],
     test_class = "grakn.benchmark.test.ComparisonTest",
     deps = [
