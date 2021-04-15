@@ -19,10 +19,12 @@ package grakn.benchmark.neo4j;
 
 import grakn.benchmark.common.params.Context;
 import grakn.benchmark.common.seed.GeoData;
+import grakn.benchmark.neo4j.agent.Neo4jPersonAgent;
 import grakn.benchmark.neo4j.driver.Neo4jClient;
 import grakn.benchmark.neo4j.driver.Neo4jSession;
 import grakn.benchmark.neo4j.driver.Neo4jTransaction;
 import grakn.benchmark.simulation.Simulation;
+import grakn.benchmark.simulation.agent.PersonAgent;
 import org.neo4j.driver.Driver;
 import org.neo4j.driver.Query;
 import org.neo4j.driver.Session;
@@ -142,5 +144,10 @@ public class Neo4JSimulation extends Simulation<Neo4jClient, Neo4jSession, Neo4j
             tx.run(query);
         });
         tx.commit();
+    }
+
+    @Override
+    protected PersonAgent<Neo4jTransaction> createPersonAgent(Neo4jClient client, Context context) {
+        return new Neo4jPersonAgent(client, context);
     }
 }

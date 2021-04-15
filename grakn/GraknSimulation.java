@@ -19,10 +19,12 @@ package grakn.benchmark.grakn;
 
 import grakn.benchmark.common.params.Context;
 import grakn.benchmark.common.seed.GeoData;
+import grakn.benchmark.grakn.agent.GraknPersonAgent;
 import grakn.benchmark.grakn.driver.GraknClient;
 import grakn.benchmark.grakn.driver.GraknSession;
 import grakn.benchmark.grakn.driver.GraknTransaction;
 import grakn.benchmark.simulation.Simulation;
+import grakn.benchmark.simulation.agent.PersonAgent;
 import graql.lang.Graql;
 import graql.lang.pattern.variable.ThingVariable;
 import org.slf4j.Logger;
@@ -157,5 +159,10 @@ public class GraknSimulation extends Simulation<GraknClient, GraknSession, Grakn
             )));
             tx.commit();
         }
+    }
+
+    @Override
+    protected PersonAgent<GraknTransaction> createPersonAgent(GraknClient client, Context context) {
+        return new GraknPersonAgent(client, context);
     }
 }

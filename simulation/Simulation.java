@@ -22,6 +22,7 @@ import grakn.benchmark.common.params.Context;
 import grakn.benchmark.common.seed.GeoData;
 import grakn.benchmark.common.seed.RandomSource;
 import grakn.benchmark.simulation.agent.Agent;
+import grakn.benchmark.simulation.agent.PersonAgent;
 import grakn.benchmark.simulation.driver.Client;
 import grakn.benchmark.simulation.driver.Session;
 import grakn.benchmark.simulation.driver.Transaction;
@@ -31,7 +32,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -84,10 +85,9 @@ public abstract class Simulation<
     }
 
     private Map<Class<? extends Agent>, Supplier<Agent<?, TX>>> initialiseAgentBuilders() {
-        return Collections.emptyMap();
-//        return new HashMap<>() {{
-//            // TODO
-//        }};
+        return new HashMap<>() {{
+            put(PersonAgent.class, () -> createPersonAgent(client, context));
+        }};
     }
 
     public Map<String, List<Agent.Report>> getReport(Class<? extends Agent> agentName) {
@@ -111,7 +111,7 @@ public abstract class Simulation<
         for (Agent<?, ?> agent : agents) {
             agentReports.put(agent.getClass(), agent.iterate(randomSource.next()));
         }
-        // We want to test.md opening new sessions each iteration.
+        // We want to test opening new sessions each iteration.
         client.closeSessions();
         context.incrementIteration();
     }
@@ -120,4 +120,6 @@ public abstract class Simulation<
     public void close() {
         client.close();
     }
+
+    protected abstract PersonAgent<TX> createPersonAgent(CLIENT client, Context context);
 }
