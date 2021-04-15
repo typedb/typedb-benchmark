@@ -58,8 +58,11 @@ public class GraknSimulation extends Simulation<GraknClient, GraknSession, Grakn
     private static final File SCHEMA_FILE = Paths.get("grakn/simulation.gql").toFile();
     private static final String DATABASE_NAME = "simulation";
 
+    private final grakn.client.api.GraknClient nativeClient;
+
     private GraknSimulation(GraknClient client, Context context) throws Exception {
         super(client, context);
+        this.nativeClient = client.unpack();
     }
 
     public static GraknSimulation core(String address, Context context) throws Exception {
@@ -71,18 +74,18 @@ public class GraknSimulation extends Simulation<GraknClient, GraknSession, Grakn
     }
 
     @Override
-    protected void initialiseDatabase() throws IOException {
-        grakn.client.api.GraknClient nativeClient = client().unpack();
-        initialiseDatabase(nativeClient);
-        initialiseSchema(nativeClient);
+    protected void initialise(GeoData geoData) throws IOException {
+        initDatabase();
+        initSchema();
+        initData(geoData);
     }
 
-    private void initialiseDatabase(grakn.client.api.GraknClient nativeClient) {
+    private void initDatabase() {
         if (nativeClient.databases().contains(DATABASE_NAME)) nativeClient.databases().get(DATABASE_NAME).delete();
         nativeClient.databases().create(DATABASE_NAME);
     }
 
-    private void initialiseSchema(grakn.client.api.GraknClient nativeClient) throws IOException {
+    private void initSchema() throws IOException {
         try (grakn.client.api.GraknSession session = nativeClient.session(DATABASE_NAME, SCHEMA)) {
             LOG.info("Grakn initialisation of world simulation schema started ...");
             Instant start = Instant.now();
@@ -95,9 +98,7 @@ public class GraknSimulation extends Simulation<GraknClient, GraknSession, Grakn
         }
     }
 
-    @Override
-    protected void initialiseData(GeoData geoData) {
-        grakn.client.api.GraknClient nativeClient = client().unpack();
+    private void initData(GeoData geoData) {
         try (grakn.client.api.GraknSession session = nativeClient.session(DATABASE_NAME, DATA)) {
             LOG.info("Grakn initialisation of world simulation data started ...");
             Instant start = Instant.now();

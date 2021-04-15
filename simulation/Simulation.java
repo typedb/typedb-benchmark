@@ -18,10 +18,10 @@
 package grakn.benchmark.simulation;
 
 import grakn.benchmark.common.params.Config;
-import grakn.benchmark.simulation.agent.Agent;
+import grakn.benchmark.common.params.Context;
 import grakn.benchmark.common.seed.GeoData;
 import grakn.benchmark.common.seed.RandomSource;
-import grakn.benchmark.common.params.Context;
+import grakn.benchmark.simulation.agent.Agent;
 import grakn.benchmark.simulation.driver.Client;
 import grakn.benchmark.simulation.driver.Session;
 import grakn.benchmark.simulation.driver.Transaction;
@@ -51,24 +51,21 @@ public abstract class Simulation<
     private static final String AGENT_PACKAGE = Agent.class.getPackageName();
 
     private final CLIENT client;
-    private final List<Agent<?, TX>> agents;
-    private final RandomSource randomSource;
     private final Context context;
+    private final RandomSource randomSource;
+    private final List<Agent<?, TX>> agents;
     private final Map<Class<? extends Agent>, Map<String, List<Agent.Report>>> agentReports;
 
     public Simulation(CLIENT client, Context context) throws Exception {
         this.client = client;
-        this.randomSource = new RandomSource(context.seed());
         this.context = context;
-        this.agentReports = new ConcurrentHashMap<>();
+        this.randomSource = new RandomSource(context.seed());
         this.agents = initialiseAgents();
-        initialiseDatabase();
-        initialiseData(context.geoData());
+        this.agentReports = new ConcurrentHashMap<>();
+        initialise(context.geoData());
     }
 
-    protected abstract void initialiseDatabase() throws IOException;
-
-    protected abstract void initialiseData(GeoData geoData);
+    protected abstract void initialise(GeoData geoData) throws IOException;
 
     @SuppressWarnings("unchecked")
     protected List<Agent<?, TX>> initialiseAgents() throws ClassNotFoundException {
@@ -91,14 +88,6 @@ public abstract class Simulation<
 //        return new HashMap<>() {{
 //            // TODO
 //        }};
-    }
-
-    public CLIENT client() {
-        return client;
-    }
-
-    public Context context() {
-        return context;
     }
 
     public Map<String, List<Agent.Report>> getReport(Class<? extends Agent> agentName) {

@@ -23,6 +23,7 @@ import grakn.benchmark.neo4j.driver.Neo4jClient;
 import grakn.benchmark.neo4j.driver.Neo4jSession;
 import grakn.benchmark.neo4j.driver.Neo4jTransaction;
 import grakn.benchmark.simulation.Simulation;
+import org.neo4j.driver.Driver;
 import org.neo4j.driver.Query;
 import org.neo4j.driver.Session;
 import org.neo4j.driver.Transaction;
@@ -38,9 +39,11 @@ import static grakn.benchmark.common.Util.printDuration;
 public class Neo4JSimulation extends Simulation<Neo4jClient, Neo4jSession, Neo4jTransaction> {
 
     private static final Logger LOG = LoggerFactory.getLogger(Neo4JSimulation.class);
+    private final Driver nativeDriver;
 
-    private Neo4JSimulation(Neo4jClient driver, Context context) throws Exception {
-        super(driver, context);
+    private Neo4JSimulation(Neo4jClient client, Context context) throws Exception {
+        super(client, context);
+        this.nativeDriver = client.unpack();
     }
 
     public static Neo4JSimulation create(String hostUri, Context context) throws Exception {
@@ -48,17 +51,16 @@ public class Neo4JSimulation extends Simulation<Neo4jClient, Neo4jSession, Neo4j
     }
 
     @Override
-    protected void initialiseDatabase() {
-        try (org.neo4j.driver.Session session = client().unpack().session()) {
+    protected void initialise(GeoData geoData) {
+        initDatabase();
+        initData(geoData);
+    }
+
+    private void initDatabase() {
+        try (Session session = nativeDriver.session()) {
             addKeyConstraints(session);
             cleanDatabase(session);
         }
-    }
-
-    private void cleanDatabase(Session session) {
-        Transaction tx = session.beginTransaction();
-        tx.run(new Query("MATCH (n) DETACH DELETE n"));
-        tx.commit();
     }
 
     /**
@@ -83,9 +85,14 @@ public class Neo4JSimulation extends Simulation<Neo4jClient, Neo4jSession, Neo4j
         tx.commit();
     }
 
-    @Override
-    protected void initialiseData(GeoData geoData) {
-        try (org.neo4j.driver.Session session = client().unpack().session()) {
+    private void cleanDatabase(Session session) {
+        Transaction tx = session.beginTransaction();
+        tx.run(new Query("MATCH (n) DETACH DELETE n"));
+        tx.commit();
+    }
+
+    private void initData(GeoData geoData) {
+        try (Session session = nativeDriver.session()) {
             LOG.info("Neo4j initialisation of world simulation data started ...");
             Instant start = Instant.now();
             // TODO: we don't initialise currencies?
