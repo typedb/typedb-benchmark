@@ -32,7 +32,6 @@ import java.io.IOException;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -40,7 +39,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 
-import static grakn.benchmark.common.params.Util.printDuration;
+import static grakn.benchmark.common.Util.printDuration;
 
 public abstract class Simulation<
         CLIENT extends Client<SESSION, TX>,

@@ -31,7 +31,7 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nullable;
 import java.util.Optional;
 
-import static grakn.benchmark.common.params.Util.parseCommandLine;
+import static grakn.benchmark.common.Util.parseCommandLine;
 
 public class Benchmark {
 

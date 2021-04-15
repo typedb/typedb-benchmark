@@ -33,7 +33,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
-import static grakn.benchmark.common.params.Util.printDuration;
+import static grakn.benchmark.common.Util.printDuration;
 
 public class Neo4JSimulation extends Simulation<Neo4jClient, Neo4jSession, Neo4jTransaction> {
 

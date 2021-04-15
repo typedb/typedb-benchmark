@@ -15,8 +15,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package grakn.benchmark.common.params;
+package grakn.benchmark.common;
 
+import grakn.benchmark.common.params.Options;
 import picocli.CommandLine;
 
 import java.time.Duration;

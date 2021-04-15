@@ -35,7 +35,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static grakn.benchmark.common.params.Util.parseCommandLine;
+import static grakn.benchmark.common.Util.parseCommandLine;
 import static grakn.benchmark.test.ComparisonTest.Suite.GRAKN_CORE;
 import static grakn.benchmark.test.ComparisonTest.Suite.NEO4J;
 import static org.junit.Assert.assertEquals;

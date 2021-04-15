@@ -35,7 +35,7 @@ import java.nio.file.Paths;
 import java.time.Instant;
 import java.util.List;
 
-import static grakn.benchmark.common.params.Util.printDuration;
+import static grakn.benchmark.common.Util.printDuration;
 import static grakn.benchmark.grakn.agent.Label.CITY;
 import static grakn.benchmark.grakn.agent.Label.CONTINENT;
 import static grakn.benchmark.grakn.agent.Label.COUNTRY;
