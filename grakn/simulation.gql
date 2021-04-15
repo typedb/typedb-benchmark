@@ -17,322 +17,109 @@
 
 define
 
-#######################################################################
-# Attributes
-#######################################################################
+email sub attribute, value string;
+person-name sub attribute, abstract, value string;
+first-name sub person-name;
+last-name sub person-name;
+birth-date sub attribute, value datetime;
+name sub attribute, value string;
+address sub attribute, value string;
+company-number sub attribute, value string;
+incorporation-date sub attribute, value datetime;
+currency sub attribute, value string;
+marriage-license sub attribute, value string;
+start-date sub attribute, value datetime;
+end-date sub attribute, value datetime;
+id sub attribute, value long;
+price sub attribute, value double;
 
-name sub attribute, abstract, value string;
-forename sub name;
-surname sub name;
+person sub entity,
+    owns email @key,
+    owns first-name,
+    owns last-name,
+    owns birth-date,
+    owns address,
+    plays residentship:resident,
+    plays marriage:husband,
+    plays marriage:wife,
+    plays friendship:friend,
+    plays employment:employee,
+    plays studentship:student,
+    plays purchase:buyer,
+    plays purchase:seller;
 
-company-number sub attribute, value long;
+organisation sub entity,
+    owns name,
+    owns address,
+    plays locates:located;
 
+company sub organisation,
+    owns company-number @key,
+    owns incorporation-date,
+    plays employment:employer,
+    plays purchase:buyer,
+    plays purchase:seller;
 
-#service-name sub name;
+school sub organisation,
+    plays studentship:school;
 
-date-of-event sub attribute,
-    abstract,
-    value datetime;
+primary-school sub school;
+secondary-school sub school;
+university sub school;
 
-date-of-incorporation sub date-of-event;
-
-start-date sub date-of-event;
-
-end-date sub date-of-event;
-
-date-of-birth sub date-of-event;
-
-date-of-marriage sub date-of-event;  # TODO unused
-
-relocation-date sub date-of-event;
-
-gender sub attribute,
-    value string;
-
-age sub attribute,
-    value long;
-
-language sub attribute,
-    value string,
-    regex "^(English|German|Portugese|Afrikaans|Mandarin)$";
-
-#content-language sub attribute,
-#    value string;
-
-#num-characters sub attribute,
-#    value long;
-
-text-content sub attribute, abstract,
-    value string;
-#    owns content-language, # Seems to break grakn when querying for this
-#    owns num-characters;
-
-contract-content sub text-content;
-
-contracted-hours sub attribute,
-    value double;
-
-wage-value sub attribute,
-    value double;
-
-currency-code sub attribute,
-    value string,
-    regex "^(USD|GBP|EUR|BRL|ZAR|RMB|AUD)$";
-
-currency sub attribute,
-    value string,
-    regex "^(American Dollar|Great British Pound|Euro|Brazilian Real|South African Rand|Renminbi|Australian Dollar)$",
-    owns currency-code;
-
-value sub attribute,
-    value double;
-
-date-signed sub attribute,
-    value datetime;
-
-email sub attribute,
-    value string;
-
-identifier sub attribute, abstract,
-    value long;
-
-marriage-id sub identifier;
-
-service-id sub identifier;
-
-product-barcode sub identifier;
-
-description sub attribute, abstract, value string;
-
-product-description sub description;
-product-quantity sub attribute, value long;
-
-#service-description sub description;
-
-is-taxable sub attribute, value boolean;
-
-is-current sub attribute, value boolean;
-
-#######################################################################
-# Entities, Relations and Rules, by approximate category
-#######################################################################
-
-# --------------------------------------------------------
-# Locations
-# --------------------------------------------------------
-
-location sub entity,
-    abstract,
-    owns location-name @key,
-    plays location-hierarchy:superior,
-    plays location-hierarchy:subordinate,
-    plays relocation:previous-location,
-    plays relocation:new-location,
+region sub entity,
+    owns name,
     plays locates:location,
-    plays born-in:place-of-birth;  # TODO Can we avoid using this but also avoid validation errors?
+    plays residentship:residence,
+    plays contains:container,
+    plays contains:contained;
 
-city sub location,
-    plays residency:location;
+continent sub region;
+city sub region;
+country sub region,
+    owns currency;
 
-country sub location,
-    owns currency,
-    owns language,
-    plays incorporation:incorporating;
-
-continent sub location,
-    plays produced-in:continent;
-
-location-hierarchy sub relation,
-    relates superior,
-    relates subordinate;
+product sub entity,
+    owns id @key,
+    owns name,
+    plays purchase:product;
 
 locates sub relation,
     relates location,
     relates located;
 
-# --------------------------------------------------------
-# Friends and Family
-# --------------------------------------------------------
-
-person sub entity,
-    owns email @key,
-    owns forename,
-    owns surname,
-    owns gender,
-    owns date-of-birth,
-    owns age,
-    plays employment:employee,
-    plays volunteering:volunteer,
-    plays studentship:student,
-    plays parentship:parent,
-    plays parentship:child,
-    plays marriage:husband,
-    plays marriage:wife,
-    plays friendship:friend,
-    plays born-in:child,
-    plays residency:resident,
-    plays relocation:relocated-person;
-
-parentship sub relation,
-    relates parent,  # Could have two parents playing parent in a single parentship for interesting cardinality
-    relates child;
-
-friendship sub relation,
-    owns start-date,
-    owns end-date,
-    relates friend; # Could be N-ary, though in a real-world context this is imperfect
+residentship sub locates,
+    relates residence as location,
+    relates resident as located;
 
 marriage sub relation,
-    owns marriage-id @key,
-    owns date-of-marriage,  # TODO unused
+    owns marriage-license @key,
+    plays locates:located,
     relates husband,
-    relates wife,
-    plays locates:located;
+    relates wife;
 
-# --------------------------------------------------------
-# Individuals
-# --------------------------------------------------------
+friendship sub relation,
+    relates friend;
 
-born-in sub locates,
-    relates place-of-birth as location,
-    relates child as located;
+employment sub relation,
+    plays locates:located,
+    relates employer,
+    relates employee;
 
-residency sub relation,
+studentship sub relation,
     owns start-date,
     owns end-date,
-    owns is-current,
-    relates resident,
-    relates location;
+    relates school,
+    relates student;
 
-relocation sub relation,
-    owns relocation-date,
-    relates previous-location,
-    relates new-location,
-    relates relocated-person;
-
-# --------------------------------------------------------
-# Organisational Structure
-# --------------------------------------------------------
-
-organisation sub entity;
-
-company sub organisation,
-    # We may want to say `owns company-name as organisation-name;`
-    owns company-name @key,
-    owns company-number @key,
-    plays employment:employer,
-    plays transaction:seller,
-    plays transaction:buyer,
-    plays incorporation:incorporated;
-
-incorporation sub relation,
-    owns date-of-incorporation,
-    relates incorporated,
-    relates incorporating;
-
-#university sub organisation,
-#    owns university-name,
-#    plays employment:employer,
-#    plays studentship:school,
-#    plays transaction:seller,
-#    plays transaction:buyer;
-
-#charity sub organisation,
-#    owns charity-name,
-#    plays volunteering:cause,
-#    plays transaction:buyer;
-
-membership sub relation,
-#    owns identifier @key,
-    owns start-date,
-    owns end-date,
-    relates member,
-    relates group2;
-
-employment sub membership,
-    # owns employment-id as membership-id @key, # We might want to say this?
-    relates employee as member,
-    relates employer as group2,
-    # relates contract,
-    # relates profession,
-    # relates wage,  # https://github.com/graknlabs/grakn/issues/5553
-    # For wages in different currencies, either:
-    # - subtype for the different currencies,
-    # - add currency as attribute to implicit relation,
-    # - model the wage as an entity,
-    # The attribute on an implicit relation is a pattern we would like to stress-test
-
-    owns contracted-hours,
-    # Nested relation
-    plays locates:located;
-
-wage sub entity,
-#    plays employment:wage,
-    owns wage-value,
-    owns currency;
-
-#studentship sub membership,
-#    relates student as member,
-#    relates school as group2;
-
-#volunteering sub membership,
-#    relates volunteer as member,
-#    relates cause as group2;
-
-#occupation sub entity,
-#    owns name @key;
-#    plays employment:profession;
-
-legal-document sub entity, abstract,
-    owns date-signed,  # TODO unused
-    owns text-content;
-
-employment-contract sub legal-document, abstract,
-    # plays employment:contract,
-    owns contract-content,
-    owns contracted-hours;
-
-# --------------------------------------------------------
-# Organisational Trade
-# --------------------------------------------------------
-
-transaction sub relation,
+purchase sub relation,
+    owns id @key,
+    owns price,
+    owns currency,
     relates buyer,
     relates seller,
-    relates merchandise,
-    owns currency,
-    owns value,
-    owns product-quantity,
-    owns is-taxable,
-    plays locates:located;
+    relates product;
 
-product sub entity,
-    owns product-barcode @key,
-    owns product-name,
-    owns product-description,
-    plays transaction:merchandise,
-    plays produced-in:product;
-
-produced-in sub relation,
-    relates product,
-    relates continent;
-
-#service sub entity,
-#    owns service-id @key,
-#    owns service-name,
-#    owns service-description,
-#    plays transaction:merchandise;
-
-employment sub membership,
-    relates contract,
-#    relates employment_profession,
-    relates wage;
-
-#occupation sub entity,
-#   plays employment_profession;
-
-employment-contract sub legal-document,
-    plays employment:contract;
-
-wage sub entity,
-    plays employment:wage;
+contains sub relation,
+    relates container,
+    relates contained;
