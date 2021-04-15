@@ -26,7 +26,6 @@ import grakn.benchmark.grakn.driver.GraknTransaction;
 import grakn.benchmark.simulation.Simulation;
 import grakn.benchmark.simulation.agent.PersonAgent;
 import graql.lang.Graql;
-import graql.lang.pattern.variable.ThingVariable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,7 +42,6 @@ import static grakn.benchmark.grakn.agent.Label.CONTINENT;
 import static grakn.benchmark.grakn.agent.Label.COUNTRY;
 import static grakn.benchmark.grakn.agent.Label.CURRENCY;
 import static grakn.benchmark.grakn.agent.Label.CURRENCY_CODE;
-import static grakn.benchmark.grakn.agent.Label.LANGUAGE;
 import static grakn.benchmark.grakn.agent.Label.LOCATION_HIERARCHY;
 import static grakn.benchmark.grakn.agent.Label.LOCATION_NAME;
 import static grakn.benchmark.grakn.agent.Label.SUBORDINATE;
@@ -135,14 +133,13 @@ public class GraknSimulation extends Simulation<GraknClient, GraknSession, Grakn
         try (grakn.client.api.GraknTransaction tx = session.transaction(WRITE)) {
             // TODO: Currency should be an entity we relate to by relation
             countries.forEach(country -> {
-                ThingVariable.Thing countryVar = var("y").isa(COUNTRY)
-                        .has(LOCATION_NAME, country.name())
-                        .has(CURRENCY, country.currency().name());
-                for (String language : country.languages()) countryVar = countryVar.has(LANGUAGE, language);
                 tx.query().insert(Graql.match(
                         var("x").isa(CONTINENT).has(LOCATION_NAME, country.continent().name())
                 ).insert(
-                        countryVar, rel(SUPERIOR, "x").rel(SUBORDINATE, "y").isa(LOCATION_HIERARCHY)
+                        var("y").isa(COUNTRY)
+                                .has(LOCATION_NAME, country.name())
+                                .has(CURRENCY, country.currency().name()),
+                        rel(SUPERIOR, "x").rel(SUBORDINATE, "y").isa(LOCATION_HIERARCHY)
                 ));
             });
             tx.commit();

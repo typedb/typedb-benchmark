@@ -36,11 +36,10 @@ import static java.util.stream.Collectors.toList;
 
 public class GeoData {
 
-    private static final File CURRENCIES_FILE = Paths.get("simulation/data/currencies.csv").toFile();
-    private static final File CONTINENTS_FILE = Paths.get("simulation/data/continents.csv").toFile();
-    private static final File COUNTRIES_FILE = Paths.get("simulation/data/countries.csv").toFile();
-    private static final File COUNTY_LANGUAGES_FILE = Paths.get("simulation/data/country_languages.csv").toFile();
-    private static final File CITIES_FILE = Paths.get("simulation/data/cities.csv").toFile();
+    private static final File CURRENCIES_FILE = Paths.get("simulation/data/geo/currencies.csv").toFile();
+    private static final File CONTINENTS_FILE = Paths.get("simulation/data/geo/continents.csv").toFile();
+    private static final File COUNTRIES_FILE = Paths.get("simulation/data/geo/countries.csv").toFile();
+    private static final File CITIES_FILE = Paths.get("simulation/data/geo/cities.csv").toFile();
     private static final CSVFormat CSV_FORMAT = CSVFormat.DEFAULT.withEscape('\\').withIgnoreSurroundingSpaces().withNullString("");
 
     private final Global global;
@@ -90,11 +89,6 @@ public class GeoData {
             Country country = new Country(name, continent, currency);
             continent.addCountry(country);
             countries.put(name, country);
-        });
-        parse(COUNTY_LANGUAGES_FILE).forEach(record -> {
-            Country country = countries.get(record.get(0));
-            String language = record.get(1);
-            country.addLanguage(language);
         });
     }
 
@@ -254,20 +248,14 @@ public class GeoData {
         private final Continent continent;
         private final Currency currency;
         private final List<City> cities;
-        private final List<String> languages;
         private final int hash;
 
         Country(String name, Continent continent, Currency currency) {
             this.name = name;
             this.continent = continent;
             this.currency = currency;
-            this.languages = new ArrayList<>();
             this.cities = new ArrayList<>();
-            hash = Objects.hash(this.name, this.continent, this.currency, this.languages, this.cities);
-        }
-
-        void addLanguage(String language) {
-            languages.add(language);
+            hash = Objects.hash(this.name, this.continent, this.currency, this.cities);
         }
 
         void addCity(City city) {
@@ -280,10 +268,6 @@ public class GeoData {
 
         public Currency currency() {
             return currency;
-        }
-
-        public List<String> languages() {
-            return languages;
         }
 
         public List<City> cities() {
@@ -318,8 +302,7 @@ public class GeoData {
             Country that = (Country) o;
             return (this.name.equals(that.name) &&
                     this.continent.equals(that.continent) &&
-                    this.currency.equals(that.currency) &&
-                    this.languages.equals(that.languages));
+                    this.currency.equals(that.currency));
         }
 
         @Override

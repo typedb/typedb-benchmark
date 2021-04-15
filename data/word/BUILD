@@ -21,15 +21,10 @@ filegroup(
     name = "data",
     srcs = [
         "adjectives.csv",
-        "cities.csv",
-        "continents.csv",
-        "countries.csv",
-        "country_languages.csv",
-        "currencies.csv",
-        "female_forenames.csv",
-        "male_forenames.csv",
+        "first-names-female.csv",
+        "first-names-male.csv",
+        "last-names.csv",
         "nouns.csv",
-        "surnames.csv",
     ],
     visibility = ["//visibility:public"],
 )

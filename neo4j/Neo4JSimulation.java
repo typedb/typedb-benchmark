@@ -119,15 +119,9 @@ public class Neo4JSimulation extends Simulation<Neo4jClient, Neo4jSession, Neo4j
     private void initCountries(Session session, List<GeoData.Country> countries) {
         Transaction tx = session.beginTransaction();
         countries.forEach(country -> {
-            StringBuilder languageProps = new StringBuilder();
-            for (int i = 0; i < country.languages().size(); i++) {
-                String language = country.languages().get(i);
-                languageProps.append("language").append(i + 1).append(": '").append(language).append("'");
-                if (i + 1 < country.languages().size()) languageProps.append(", ");
-            }
             Query query = new Query(String.format(
-                    "MATCH (c:Continent {locationName: '%s'}) CREATE (x:Country:Location {locationName: '%s', currency: '%s', %s})-[:LOCATED_IN]->(c)",
-                    country.continent().name(), country.name(), country.currency().name(), languageProps.toString()
+                    "MATCH (c:Continent {locationName: '%s'}) CREATE (x:Country:Location {locationName: '%s', currency: '%s'})-[:LOCATED_IN]->(c)",
+                    country.continent().name(), country.name(), country.currency().name()
             ));
             tx.run(query);
         });

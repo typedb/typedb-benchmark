@@ -30,11 +30,11 @@ import java.util.List;
 
 public class WordData {
 
-    private static final File FEMALE_FORENAMES_FILE = Paths.get("simulation/data/female_forenames.csv").toFile();
-    private static final File MALE_FORENAMES_FILE = Paths.get("simulation/data/male_forenames.csv").toFile();
-    private static final File SURNAMES_FILE = Paths.get("simulation/data/surnames.csv").toFile();
-    private static final File ADJECTIVES_FILE = Paths.get("simulation/data/adjectives.csv").toFile();
-    private static final File NOUNS_FILE = Paths.get("simulation/data/nouns.csv").toFile();
+    private static final File FIRST_NAMES_FEMALE_FILE = Paths.get("simulation/data/word/first-names-female.csv").toFile();
+    private static final File FIRST_NAMES_MALE_FILE = Paths.get("simulation/data/word/first-names-male.csv").toFile();
+    private static final File LAST_NAMES_FILE = Paths.get("simulation/data/word/last-names.csv").toFile();
+    private static final File ADJECTIVES_FILE = Paths.get("simulation/data/word/adjectives.csv").toFile();
+    private static final File NOUNS_FILE = Paths.get("simulation/data/word/nouns.csv").toFile();
 
     private final List<String> femaleForenames;
     private final List<String> maleForenames;
@@ -42,21 +42,22 @@ public class WordData {
     private final List<String> adjectives;
     private final List<String> nouns;
 
-    private WordData(List<String> femaleForenames, List<String> maleForenames, List<String> surnames, List<String> adjectives, List<String> nouns) {
-        this.femaleForenames = Collections.unmodifiableList(femaleForenames);
-        this.maleForenames = Collections.unmodifiableList(maleForenames);
-        this.surnames = Collections.unmodifiableList(surnames);
+    private WordData(List<String> femaleFirstNames, List<String> maleFirstNames,
+                     List<String> lastNames, List<String> adjectives, List<String> nouns) {
+        this.femaleForenames = Collections.unmodifiableList(femaleFirstNames);
+        this.maleForenames = Collections.unmodifiableList(maleFirstNames);
+        this.surnames = Collections.unmodifiableList(lastNames);
         this.adjectives = Collections.unmodifiableList(adjectives);
         this.nouns = Collections.unmodifiableList(nouns);
     }
 
     public static WordData initialise() throws IOException {
-        List<String> femaleForenames = parse(FEMALE_FORENAMES_FILE);
-        List<String> maleForenames = parse(MALE_FORENAMES_FILE);
-        List<String> surnames = parse(SURNAMES_FILE);
+        List<String> femaleFirstNames = parse(FIRST_NAMES_FEMALE_FILE);
+        List<String> maleFirstNames = parse(FIRST_NAMES_MALE_FILE);
+        List<String> lastNames = parse(LAST_NAMES_FILE);
         List<String> adjectives = parse(ADJECTIVES_FILE);
         List<String> nouns = parse(NOUNS_FILE);
-        return new WordData(femaleForenames, maleForenames, surnames, adjectives, nouns);
+        return new WordData(femaleFirstNames, maleFirstNames, lastNames, adjectives, nouns);
     }
 
     private static List<String> parse(File csvFile) throws IOException {
@@ -65,23 +66,23 @@ public class WordData {
         return list;
     }
 
-    public List<String> getFemaleForenames() {
+    public List<String> femaleFirstNames() {
         return femaleForenames;
     }
 
-    public List<String> getMaleForenames() {
+    public List<String> maleFirstNames() {
         return maleForenames;
     }
 
-    public List<String> getSurnames() {
+    public List<String> lastNames() {
         return surnames;
     }
 
-    public List<String> getAdjectives() {
+    public List<String> adjectives() {
         return adjectives;
     }
 
-    public List<String> getNouns() {
+    public List<String> nouns() {
         return nouns;
     }
 }

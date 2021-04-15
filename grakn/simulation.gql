@@ -74,10 +74,13 @@ region sub entity,
     plays contains:container,
     plays contains:contained;
 
-continent sub region;
-city sub region;
+continent sub region,
+    owns code @key;
 country sub region,
+    owns code @key,
     owns currency;
+city sub region,
+    owns id;
 
 product sub entity,
     owns id @key,
