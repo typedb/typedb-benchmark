@@ -102,15 +102,15 @@ public class GraknSimulation extends Simulation<GraknClient, GraknSession, Grakn
         try (grakn.client.api.GraknSession session = nativeClient.session(DATABASE_NAME, DATA)) {
             LOG.info("Grakn initialisation of world simulation data started ...");
             Instant start = Instant.now();
-            initialiseCurrencies(session, geoData.currencies());
-            initialiseContinents(session, geoData.continents());
-            initialiseCountries(session, geoData.countries());
-            initialiseCities(session, geoData.cities());
+            initCurrencies(session, geoData.currencies());
+            initContinents(session, geoData.continents());
+            initCountries(session, geoData.countries());
+            initCities(session, geoData.cities());
             LOG.info("Grakn initialisation of world simulation data ended in {}", printDuration(start, Instant.now()));
         }
     }
 
-    private void initialiseCurrencies(grakn.client.api.GraknSession session, List<GeoData.Currency> currencies) {
+    private void initCurrencies(grakn.client.api.GraknSession session, List<GeoData.Currency> currencies) {
         try (grakn.client.api.GraknTransaction tx = session.transaction(WRITE)) {
             // TODO: Currency should be an entity, and 'code' should be renamed to 'symbol'
             currencies.forEach(currency -> tx.query().insert(Graql.insert(
@@ -120,7 +120,7 @@ public class GraknSimulation extends Simulation<GraknClient, GraknSession, Grakn
         }
     }
 
-    private void initialiseContinents(grakn.client.api.GraknSession session, List<GeoData.Continent> continents) {
+    private void initContinents(grakn.client.api.GraknSession session, List<GeoData.Continent> continents) {
         try (grakn.client.api.GraknTransaction tx = session.transaction(WRITE)) {
             continents.forEach(continent -> tx.query().insert(Graql.insert(
                     var().isa(CONTINENT).has(LOCATION_NAME, continent.name())
@@ -129,7 +129,7 @@ public class GraknSimulation extends Simulation<GraknClient, GraknSession, Grakn
         }
     }
 
-    private void initialiseCountries(grakn.client.api.GraknSession session, List<GeoData.Country> countries) {
+    private void initCountries(grakn.client.api.GraknSession session, List<GeoData.Country> countries) {
         try (grakn.client.api.GraknTransaction tx = session.transaction(WRITE)) {
             // TODO: Currency should be an entity we relate to by relation
             countries.forEach(country -> {
@@ -147,7 +147,7 @@ public class GraknSimulation extends Simulation<GraknClient, GraknSession, Grakn
         }
     }
 
-    private void initialiseCities(grakn.client.api.GraknSession session, List<GeoData.City> cities) {
+    private void initCities(grakn.client.api.GraknSession session, List<GeoData.City> cities) {
         try (grakn.client.api.GraknTransaction tx = session.transaction(WRITE)) {
             cities.forEach(city -> tx.query().insert(Graql.match(
                     var("x").isa(COUNTRY).has(LOCATION_NAME, city.country().name())

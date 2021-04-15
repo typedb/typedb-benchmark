@@ -96,14 +96,14 @@ public class Neo4JSimulation extends Simulation<Neo4jClient, Neo4jSession, Neo4j
             LOG.info("Neo4j initialisation of world simulation data started ...");
             Instant start = Instant.now();
             // TODO: we don't initialise currencies?
-            initialiseContinents(session, geoData.continents());
-            initialiseCountries(session, geoData.countries());
-            initialiseCities(session, geoData.cities());
+            initContinents(session, geoData.continents());
+            initCountries(session, geoData.countries());
+            initCities(session, geoData.cities());
             LOG.info("Neo4j initialisation of world simulation data ended in {}", printDuration(start, Instant.now()));
         }
     }
 
-    private void initialiseContinents(Session session, List<GeoData.Continent> continents) {
+    private void initContinents(Session session, List<GeoData.Continent> continents) {
         Transaction tx = session.beginTransaction();
         continents.forEach(continent -> {
             Query interpolatedQuery = new Query(String.format(
@@ -114,7 +114,7 @@ public class Neo4JSimulation extends Simulation<Neo4jClient, Neo4jSession, Neo4j
         tx.commit();
     }
 
-    private void initialiseCountries(Session session, List<GeoData.Country> countries) {
+    private void initCountries(Session session, List<GeoData.Country> countries) {
         Transaction tx = session.beginTransaction();
         countries.forEach(country -> {
             StringBuilder languageProps = new StringBuilder();
@@ -132,7 +132,7 @@ public class Neo4JSimulation extends Simulation<Neo4jClient, Neo4jSession, Neo4j
         tx.commit();
     }
 
-    private void initialiseCities(Session session, List<GeoData.City> cities) {
+    private void initCities(Session session, List<GeoData.City> cities) {
         Transaction tx = session.beginTransaction();
         cities.forEach(city -> {
             Query query = new Query(String.format(
