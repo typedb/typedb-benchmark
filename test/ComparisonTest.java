@@ -51,7 +51,7 @@ public class ComparisonTest {
     public static class Suite extends org.junit.runners.Suite {
 
         private static final Config CONFIG = Config.loadYML(Paths.get("test/config.yml").toFile());
-        private static final TestOptions OPTIONS = parseCommandLine(args(), new TestOptions()).get();
+        private static final Options OPTIONS = parseCommandLine(args(), new Options()).get();
 
         public static GraknSimulation GRAKN_CORE;
 
@@ -110,7 +110,7 @@ public class ComparisonTest {
         }
 
         @CommandLine.Command(name = "benchmark-test", mixinStandardHelpOptions = true)
-        private static class TestOptions {
+        private static class Options {
 
             @CommandLine.Option(names = {"--grakn"}, required = true, description = "Database address URI")
             private String graknAddress;

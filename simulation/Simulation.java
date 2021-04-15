@@ -60,17 +60,17 @@ public abstract class Simulation<
     public Simulation(CLIENT client, Context context) throws Exception {
         this.client = client;
         this.context = context;
-        this.randomSource = new RandomSource(context.seed());
-        this.agents = initialiseAgents();
+        this.agents = initAgents();
         this.agentReports = new ConcurrentHashMap<>();
+        this.randomSource = new RandomSource(context.seed());
         initialise(context.geoData());
     }
 
     protected abstract void initialise(GeoData geoData) throws IOException;
 
     @SuppressWarnings("unchecked")
-    protected List<Agent<?, TX>> initialiseAgents() throws ClassNotFoundException {
-        Map<Class<? extends Agent>, Supplier<Agent<?, TX>>> agentBuilders = initialiseAgentBuilders();
+    protected List<Agent<?, TX>> initAgents() throws ClassNotFoundException {
+        Map<Class<? extends Agent>, Supplier<Agent<?, TX>>> agentBuilders = initAgentBuilders();
         List<Agent<?, TX>> agents = new ArrayList<>();
         for (Config.Agent agentConfig : context.agentConfigs()) {
             if (agentConfig.isRun()) {
@@ -84,7 +84,7 @@ public abstract class Simulation<
         return agents;
     }
 
-    private Map<Class<? extends Agent>, Supplier<Agent<?, TX>>> initialiseAgentBuilders() {
+    private Map<Class<? extends Agent>, Supplier<Agent<?, TX>>> initAgentBuilders() {
         return new HashMap<>() {{
             put(PersonAgent.class, () -> createPersonAgent(client, context));
         }};
