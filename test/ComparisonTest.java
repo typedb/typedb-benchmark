@@ -18,10 +18,10 @@
 package grakn.benchmark.test;
 
 import grakn.benchmark.common.params.Config;
+import grakn.benchmark.common.params.Context;
 import grakn.benchmark.grakn.GraknSimulation;
 import grakn.benchmark.neo4j.Neo4JSimulation;
 import grakn.benchmark.simulation.Simulation;
-import grakn.benchmark.common.params.Context;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runner.notification.RunNotifier;

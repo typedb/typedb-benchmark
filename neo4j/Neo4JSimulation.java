@@ -17,12 +17,12 @@
 
 package grakn.benchmark.neo4j;
 
+import grakn.benchmark.common.params.Context;
+import grakn.benchmark.common.seed.GeoData;
 import grakn.benchmark.neo4j.driver.Neo4jClient;
 import grakn.benchmark.neo4j.driver.Neo4jSession;
 import grakn.benchmark.neo4j.driver.Neo4jTransaction;
 import grakn.benchmark.simulation.Simulation;
-import grakn.benchmark.common.seed.GeoData;
-import grakn.benchmark.common.params.Context;
 import org.neo4j.driver.Query;
 import org.neo4j.driver.Session;
 import org.neo4j.driver.Transaction;
