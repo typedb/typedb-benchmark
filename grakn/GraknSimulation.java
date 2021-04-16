@@ -18,7 +18,7 @@
 package grakn.benchmark.grakn;
 
 import grakn.benchmark.common.params.Context;
-import grakn.benchmark.common.seed.GeoData;
+import grakn.benchmark.common.seed.SeedData;
 import grakn.benchmark.grakn.agent.GraknPersonAgent;
 import grakn.benchmark.grakn.driver.GraknClient;
 import grakn.benchmark.grakn.driver.GraknSession;
@@ -78,7 +78,7 @@ public class GraknSimulation extends Simulation<GraknClient, GraknSession, Grakn
     }
 
     @Override
-    protected void initialise(GeoData geoData) throws IOException {
+    protected void initialise(SeedData geoData) throws IOException {
         initDatabase();
         initSchema();
         initData(geoData);
@@ -102,7 +102,7 @@ public class GraknSimulation extends Simulation<GraknClient, GraknSession, Grakn
         }
     }
 
-    private void initData(GeoData geoData) {
+    private void initData(SeedData geoData) {
         try (grakn.client.api.GraknSession session = nativeClient.session(DATABASE_NAME, DATA)) {
             LOG.info("Grakn initialisation of world simulation data started ...");
             Instant start = Instant.now();
@@ -111,7 +111,7 @@ public class GraknSimulation extends Simulation<GraknClient, GraknSession, Grakn
         }
     }
 
-    private void initContinents(grakn.client.api.GraknSession session, GeoData.Global global) {
+    private void initContinents(grakn.client.api.GraknSession session, SeedData.Global global) {
         global.continents().parallelStream().forEach(continent -> {
             try (grakn.client.api.GraknTransaction tx = session.transaction(WRITE)) {
                 tx.query().insert(insert(var().isa(CONTINENT).has(CODE, continent.code()).has(NAME, continent.name())));
@@ -121,7 +121,7 @@ public class GraknSimulation extends Simulation<GraknClient, GraknSession, Grakn
         });
     }
 
-    private void initCountries(grakn.client.api.GraknSession session, GeoData.Continent continent) {
+    private void initCountries(grakn.client.api.GraknSession session, SeedData.Continent continent) {
         continent.countries().forEach(country -> {
             try (grakn.client.api.GraknTransaction tx = session.transaction(WRITE)) {
                 ThingVariable.Thing countryVar = var(Y).isa(COUNTRY).has(CODE, country.code()).has(NAME, country.name());
@@ -139,7 +139,7 @@ public class GraknSimulation extends Simulation<GraknClient, GraknSession, Grakn
         });
     }
 
-    private void initCities(grakn.client.api.GraknSession session, GeoData.Country country) {
+    private void initCities(grakn.client.api.GraknSession session, SeedData.Country country) {
         try (grakn.client.api.GraknTransaction tx = session.transaction(WRITE)) {
             country.cities().forEach(city -> tx.query().insert(match(
                     var(X).isa(COUNTRY).has(CODE, country.code())
@@ -151,7 +151,7 @@ public class GraknSimulation extends Simulation<GraknClient, GraknSession, Grakn
         }
     }
 
-    private void initUniversities(grakn.client.api.GraknSession session, GeoData.Country country) {
+    private void initUniversities(grakn.client.api.GraknSession session, SeedData.Country country) {
         try (grakn.client.api.GraknTransaction tx = session.transaction(WRITE)) {
             country.universities().forEach(university -> tx.query().insert(match(
                     var(X).isa(COUNTRY).has(CODE, country.code())

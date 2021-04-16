@@ -19,7 +19,7 @@ package grakn.benchmark.simulation;
 
 import grakn.benchmark.common.params.Config;
 import grakn.benchmark.common.params.Context;
-import grakn.benchmark.common.seed.GeoData;
+import grakn.benchmark.common.seed.SeedData;
 import grakn.benchmark.common.seed.RandomSource;
 import grakn.benchmark.simulation.agent.Agent;
 import grakn.benchmark.simulation.agent.PersonAgent;
@@ -63,10 +63,10 @@ public abstract class Simulation<
         this.agents = initAgents();
         this.agentReports = new ConcurrentHashMap<>();
         this.randomSource = new RandomSource(context.seed());
-        initialise(context.geoData());
+        initialise(context.seedData());
     }
 
-    protected abstract void initialise(GeoData geoData) throws IOException;
+    protected abstract void initialise(SeedData geoData) throws IOException;
 
     @SuppressWarnings("unchecked")
     protected List<Agent<?, TX>> initAgents() throws ClassNotFoundException {

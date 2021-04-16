@@ -73,7 +73,7 @@ primary-school sub school;
 secondary-school sub school;
 university sub school;
 
-region sub entity,
+region sub entity, abstract,
     owns code @key,
     owns name,
     plays birth-place:place,

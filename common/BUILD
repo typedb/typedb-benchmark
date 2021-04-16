@@ -28,8 +28,7 @@ java_library(
         "@maven//:org_yaml_snakeyaml",
     ],
     data = [
-        "//data/geo:data",
-        "//data/word:data",
+        "//data:data",
     ],
 )
 

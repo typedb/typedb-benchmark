@@ -18,7 +18,7 @@
 package grakn.benchmark.simulation.agent;
 
 import grakn.benchmark.common.params.Context;
-import grakn.benchmark.common.seed.GeoData;
+import grakn.benchmark.common.seed.SeedData;
 import grakn.benchmark.simulation.driver.Client;
 import grakn.benchmark.simulation.driver.Session;
 import grakn.benchmark.simulation.driver.Transaction;
@@ -26,19 +26,19 @@ import grakn.benchmark.simulation.driver.Transaction;
 import java.util.List;
 import java.util.Random;
 
-public abstract class PersonAgent<TX extends Transaction> extends Agent<GeoData.City, TX>{
+public abstract class PersonAgent<TX extends Transaction> extends Agent<SeedData.City, TX>{
 
     protected PersonAgent(Client<?, TX> client, Context context) {
         super(client, context);
     }
 
     @Override
-    protected List<GeoData.City> regions() {
-        return context.geoData().cities();
+    protected List<SeedData.City> regions() {
+        return context.seedData().cities();
     }
 
     @Override
-    protected List<Report> run(Session<TX> session, GeoData.City city, Random random) {
+    protected List<Report> run(Session<TX> session, SeedData.City city, Random random) {
         return null;
     }
 

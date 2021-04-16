@@ -34,22 +34,29 @@ import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
 
-public class GeoData {
+public class SeedData {
 
-    private static final File CONTINENTS_FILE = Paths.get("simulation/data/geo/continents.csv").toFile();
-    private static final File COUNTRIES_FILE = Paths.get("simulation/data/geo/countries.csv").toFile();
-    private static final File CURRENCIES_FILE = Paths.get("simulation/data/geo/currencies.csv").toFile();
-    private static final File CITIES_FILE = Paths.get("simulation/data/geo/cities.csv").toFile();
-    private static final File UNIVERSITIES_FILE = Paths.get("simulation/data/geo/universities.csv").toFile();
+    private static final File ADJECTIVES_FILE = Paths.get("simulation/data/adjectives.csv").toFile();
+    private static final File CITIES_FILE = Paths.get("simulation/data/cities.csv").toFile();
+    private static final File CONTINENTS_FILE = Paths.get("simulation/data/continents.csv").toFile();
+    private static final File COUNTRIES_FILE = Paths.get("simulation/data/countries.csv").toFile();
+    private static final File CURRENCIES_FILE = Paths.get("simulation/data/currencies.csv").toFile();
+    private static final File FIRST_NAMES_FEMALE_FILE = Paths.get("simulation/data/first-names-female.csv").toFile();
+    private static final File FIRST_NAMES_MALE_FILE = Paths.get("simulation/data/first-names-male.csv").toFile();
+    private static final File LAST_NAMES_FILE = Paths.get("simulation/data/last-names.csv").toFile();
+    private static final File NOUNS_FILE = Paths.get("simulation/data/nouns.csv").toFile();
+    private static final File UNIVERSITIES_FILE = Paths.get("simulation/data/universities.csv").toFile();
     private static final CSVFormat CSV_FORMAT = CSVFormat.DEFAULT.withEscape('\\').withIgnoreSurroundingSpaces().withNullString("");
 
     private final Global global;
+    private final Words words;
 
-    public GeoData(Global global) {
+    public SeedData(Global global, Words words) {
         this.global = global;
+        this.words = words;
     }
 
-    public static GeoData initialise() throws IOException {
+    public static SeedData initialise() throws IOException {
         Global global = new Global();
         Map<String, Continent> continents = new HashMap<>();
         Map<String, Country> countries = new HashMap<>();
@@ -58,8 +65,15 @@ public class GeoData {
         initialiseCurrencies(countries);
         initialiseCities(countries);
         initialiseUniversities(countries);
+        initialiseLastNames(continents);
+        initialiseFemaleFirstNames(continents);
+        initialiseMaleFirstNames(continents);
 
-        return new GeoData(global);
+        Words words = new Words();
+        initialiseAdjectives(words);
+        initialiseNouns(words);
+
+        return new SeedData(global, words);
     }
 
     private static void initialiseContinents(Global global, Map<String, Continent> continents) throws IOException {
@@ -113,12 +127,54 @@ public class GeoData {
         });
     }
 
+    private static void initialiseLastNames(Map<String, Continent> continents) throws IOException {
+        parse(LAST_NAMES_FILE).forEach(record -> {
+            String name = record.get(0);
+            Continent continent = continents.get(record.get(1));
+            continent.addCommonLastName(name);
+        });
+    }
+
+    private static void initialiseFemaleFirstNames(Map<String, Continent> continents) throws IOException {
+        parse(FIRST_NAMES_FEMALE_FILE).forEach(record -> {
+            String name = record.get(0);
+            Continent continent = continents.get(record.get(1));
+            continent.addCommonFemaleFirstName(name);
+        });
+    }
+
+    private static void initialiseMaleFirstNames(Map<String, Continent> continents) throws IOException {
+        parse(FIRST_NAMES_MALE_FILE).forEach(record -> {
+            String name = record.get(0);
+            Continent continent = continents.get(record.get(1));
+            continent.addCommonMaleFirstName(name);
+        });
+    }
+
+    private static void initialiseAdjectives(Words words) throws IOException {
+        parse(ADJECTIVES_FILE).forEach(record -> {
+            String adjective = record.get(0);
+            words.addAjective(adjective);
+        });
+    }
+
+    private static void initialiseNouns(Words words) throws IOException {
+        parse(NOUNS_FILE).forEach(record -> {
+            String adjective = record.get(0);
+            words.addNoun(adjective);
+        });
+    }
+
     private static CSVParser parse(File csvFile) throws IOException {
         return CSVParser.parse(csvFile, StandardCharsets.UTF_8, CSV_FORMAT);
     }
 
     public static String buildTracker(Object... items) {
         return Stream.of(items).map(Object::toString).collect(Collectors.joining(":"));
+    }
+
+    public Words words() {
+        return words;
     }
 
     public Global global() {
@@ -203,11 +259,17 @@ public class GeoData {
         private final String name;
         private final List<Country> countries;
         private final int hash;
+        private final ArrayList<String> commonLastNames;
+        private final ArrayList<String> commonFemaleFirstNames;
+        private final ArrayList<String> commonMaleFirstNames;
 
         Continent(String code, String name) {
             this.code = code;
             this.name = name;
             this.countries = new ArrayList<>();
+            this.commonLastNames = new ArrayList<>();
+            this.commonFemaleFirstNames = new ArrayList<>();
+            this.commonMaleFirstNames = new ArrayList<>();
             this.hash = this.code.hashCode();
         }
 
@@ -215,8 +277,32 @@ public class GeoData {
             countries.add(country);
         }
 
+        void addCommonLastName(String name) {
+            commonLastNames.add(name);
+        }
+
+        void addCommonFemaleFirstName(String name) {
+            commonFemaleFirstNames.add(name);
+        }
+
+        void addCommonMaleFirstName(String name) {
+            commonMaleFirstNames.add(name);
+        }
+
         public List<Country> countries() {
             return countries;
+        }
+
+        public ArrayList<String> commonLastNames() {
+            return commonLastNames;
+        }
+
+        public ArrayList<String> commonFemaleFirstNames() {
+            return commonFemaleFirstNames;
+        }
+
+        public ArrayList<String> commonMaleFirstNames() {
+            return commonMaleFirstNames;
         }
 
         @Override
@@ -462,6 +548,33 @@ public class GeoData {
         @Override
         public int hashCode() {
             return hash;
+        }
+    }
+
+    private static class Words {
+
+        private final ArrayList<String> adjectives;
+        private final ArrayList<String> nouns;
+
+        private Words() {
+            adjectives = new ArrayList<>();
+            nouns = new ArrayList<>();
+        }
+
+        void addAjective(String adjective) {
+            adjectives.add(adjective);
+        }
+
+        void addNoun(String noun) {
+            nouns.add(noun);
+        }
+
+        public ArrayList<String> adjectives() {
+            return adjectives;
+        }
+
+        public ArrayList<String> nouns() {
+            return nouns;
         }
     }
 }

@@ -17,8 +17,7 @@
 
 package grakn.benchmark.common.params;
 
-import grakn.benchmark.common.seed.GeoData;
-import grakn.benchmark.common.seed.WordData;
+import grakn.benchmark.common.seed.SeedData;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -31,16 +30,14 @@ public class Context {
 
     public static final int AGE_OF_ADULTHOOD = 21;
 
-    private final GeoData geoData;
-    private final WordData wordData;
+    private final SeedData seedData;
     private final Config config;
     private final boolean isTracing;
     private final boolean isTest;
     private final AtomicInteger iteration;
 
-    private Context(GeoData geoData, WordData wordData, Config config, boolean isTracing, boolean isTest) {
-        this.geoData = geoData;
-        this.wordData = wordData;
+    private Context(SeedData seedData, Config config, boolean isTracing, boolean isTest) {
+        this.seedData = seedData;
         this.config = config;
         this.isTracing = isTracing;
         this.isTest = isTest;
@@ -48,9 +45,8 @@ public class Context {
     }
 
     public static Context create(Config config, boolean isTracing, boolean isTest) throws IOException {
-        GeoData geoData = GeoData.initialise();
-        WordData wordData = WordData.initialise();
-        return new Context(geoData, wordData, config, isTracing, isTest);
+        SeedData geoData = SeedData.initialise();
+        return new Context(geoData, config, isTracing, isTest);
     }
 
     public List<Config.Agent> agentConfigs() {
@@ -81,12 +77,8 @@ public class Context {
         return LocalDateTime.of(LocalDate.ofYearDay(iteration.get(), 1), LocalTime.of(0, 0, 0));
     }
 
-    public GeoData geoData() {
-        return geoData;
-    }
-
-    public WordData wordData() {
-        return wordData;
+    public SeedData seedData() {
+        return seedData;
     }
 
     public boolean isTracing() {

@@ -28,7 +28,7 @@ public class Labels {
     public static final String ADDRESS = "address";
     public static final String CODE = "code";
     public static final String NAME = "name";
-    public static final String COMPANY_NUMBER = "company-number";
+    public static final String NUMBER = "number";
     public static final String INCORPORATION_DATE = "incorporation-date";
     public static final String CURRENCY = "currency";
     public static final String MARRIAGE_LICENSE = "marriage-license";

@@ -18,7 +18,7 @@
 package grakn.benchmark.neo4j;
 
 import grakn.benchmark.common.params.Context;
-import grakn.benchmark.common.seed.GeoData;
+import grakn.benchmark.common.seed.SeedData;
 import grakn.benchmark.neo4j.agent.Neo4jPersonAgent;
 import grakn.benchmark.neo4j.driver.Neo4jClient;
 import grakn.benchmark.neo4j.driver.Neo4jSession;
@@ -53,7 +53,7 @@ public class Neo4JSimulation extends Simulation<Neo4jClient, Neo4jSession, Neo4j
     }
 
     @Override
-    protected void initialise(GeoData geoData) {
+    protected void initialise(SeedData geoData) {
         initDatabase();
         initData(geoData);
     }
@@ -75,10 +75,13 @@ public class Neo4JSimulation extends Simulation<Neo4jClient, Neo4jSession, Neo4j
     private void addKeyConstraints(Session session) {
         List<String> queries = new ArrayList<>() {{
             add("CREATE CONSTRAINT unique_person_email ON (person:Person) ASSERT person.email IS UNIQUE");
-            add("CREATE CONSTRAINT unique_location_locationName ON (location:Location) ASSERT location.locationName IS UNIQUE");
-            add("CREATE CONSTRAINT unique_company_companyName ON (company:Company) ASSERT company.companyName IS UNIQUE");
-            add("CREATE CONSTRAINT unique_company_companyNumber ON (company:Company) ASSERT company.companyNumber IS UNIQUE");
-            add("CREATE CONSTRAINT unique_product_productBarcode ON (product:Product) ASSERT product.productBarcode IS UNIQUE");
+            add("CREATE CONSTRAINT unique_continent_code ON (continent:Continent) ASSERT continent.code IS UNIQUE");
+            add("CREATE CONSTRAINT unique_country_code ON (country:Country) ASSERT country.code IS UNIQUE");
+            add("CREATE CONSTRAINT unique_city_code ON (city:City) ASSERT city.code IS UNIQUE");
+            add("CREATE CONSTRAINT unique_company_number ON (company:Company) ASSERT company.number IS UNIQUE");
+            add("CREATE CONSTRAINT unique_product_id ON (product:Product) ASSERT product.id IS UNIQUE");
+            add("CREATE CONSTRAINT unique_purchase_id ON (purchase:Purchase) ASSERT purchase.id IS UNIQUE");
+            add("CREATE CONSTRAINT unique_marriage_license ON (marriage:Marriage) ASSERT marriage.license IS UNIQUE");
         }};
         Transaction tx = session.beginTransaction();
         for (String query : queries) {
@@ -93,14 +96,14 @@ public class Neo4JSimulation extends Simulation<Neo4jClient, Neo4jSession, Neo4j
         tx.commit();
     }
 
-    private void initData(GeoData geoData) {
+    private void initData(SeedData geoData) {
         LOG.info("Neo4j initialisation of world simulation data started ...");
         Instant start = Instant.now();
         initContinents(geoData.global());
         LOG.info("Neo4j initialisation of world simulation data ended in {}", printDuration(start, Instant.now()));
     }
 
-    private void initContinents(GeoData.Global global) {
+    private void initContinents(SeedData.Global global) {
         global.continents().parallelStream().forEach(continent -> {
             try (Session session = nativeDriver.session()) {
                 Transaction tx = session.beginTransaction();
@@ -114,12 +117,12 @@ public class Neo4JSimulation extends Simulation<Neo4jClient, Neo4jSession, Neo4j
         });
     }
 
-    private void initCountries(Session session, GeoData.Continent continent) {
+    private void initCountries(Session session, SeedData.Continent continent) {
         continent.countries().forEach(country -> {
             Transaction tx = session.beginTransaction();
             StringBuilder currencyProps = new StringBuilder();
             for (int i = 0; i < country.currencies().size(); i++) {
-                GeoData.Currency currency = country.currencies().get(i);
+                SeedData.Currency currency = country.currencies().get(i);
                 currencyProps.append("currency").append(i + 1).append(": '").append(currency.code()).append("'");
                 if (i + 1 < country.currencies().size()) currencyProps.append(", ");
             }
@@ -134,7 +137,7 @@ public class Neo4JSimulation extends Simulation<Neo4jClient, Neo4jSession, Neo4j
         });
     }
 
-    private void initCities(Session session, GeoData.Country country) {
+    private void initCities(Session session, SeedData.Country country) {
         Transaction tx = session.beginTransaction();
         country.cities().forEach(city -> {
             Query query = new Query(String.format(
@@ -146,7 +149,7 @@ public class Neo4JSimulation extends Simulation<Neo4jClient, Neo4jSession, Neo4j
         tx.commit();
     }
 
-    private void initUniversities(Session session, GeoData.Country country) {
+    private void initUniversities(Session session, SeedData.Country country) {
         Transaction tx = session.beginTransaction();
         country.universities().forEach(university -> {
             Query query = new Query(String.format(
