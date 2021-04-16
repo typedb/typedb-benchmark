@@ -22,8 +22,10 @@ person-name sub attribute, abstract, value string;
 first-name sub person-name;
 last-name sub person-name;
 birth-date sub attribute, value datetime;
-name sub attribute, value string;
+gender sub attribute, value string;
 address sub attribute, value string;
+code sub attribute, value string;
+name sub attribute, value string;
 company-number sub attribute, value string;
 incorporation-date sub attribute, value datetime;
 currency sub attribute, value string;
@@ -38,10 +40,14 @@ person sub entity,
     owns first-name,
     owns last-name,
     owns birth-date,
+    owns gender,
     owns address,
+    plays birth-place:child,
     plays residentship:resident,
     plays marriage:husband,
     plays marriage:wife,
+    plays parentship:parent,
+    plays parentship:child,
     plays friendship:friend,
     plays employment:employee,
     plays studentship:student,
@@ -68,24 +74,27 @@ secondary-school sub school;
 university sub school;
 
 region sub entity,
+    owns code @key,
     owns name,
+    plays birth-place:place,
     plays locates:location,
     plays residentship:residence,
     plays contains:container,
     plays contains:contained;
 
-continent sub region,
-    owns code @key;
+continent sub region;
 country sub region,
-    owns code @key,
     owns currency;
-city sub region,
-    owns id;
+city sub region;
 
 product sub entity,
     owns id @key,
     owns name,
     plays purchase:product;
+
+birth-place sub relation,
+    relates place,
+    relates child;
 
 locates sub relation,
     relates location,
@@ -100,6 +109,10 @@ marriage sub relation,
     plays locates:located,
     relates husband,
     relates wife;
+
+parentship sub relation,
+    relates parent,
+    relates child;
 
 friendship sub relation,
     relates friend;

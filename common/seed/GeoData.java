@@ -36,10 +36,11 @@ import static java.util.stream.Collectors.toList;
 
 public class GeoData {
 
-    private static final File CURRENCIES_FILE = Paths.get("simulation/data/geo/currencies.csv").toFile();
     private static final File CONTINENTS_FILE = Paths.get("simulation/data/geo/continents.csv").toFile();
     private static final File COUNTRIES_FILE = Paths.get("simulation/data/geo/countries.csv").toFile();
+    private static final File CURRENCIES_FILE = Paths.get("simulation/data/geo/currencies.csv").toFile();
     private static final File CITIES_FILE = Paths.get("simulation/data/geo/cities.csv").toFile();
+    private static final File UNIVERSITIES_FILE = Paths.get("simulation/data/geo/universities.csv").toFile();
     private static final CSVFormat CSV_FORMAT = CSVFormat.DEFAULT.withEscape('\\').withIgnoreSurroundingSpaces().withNullString("");
 
     private final Global global;
@@ -50,54 +51,65 @@ public class GeoData {
 
     public static GeoData initialise() throws IOException {
         Global global = new Global();
-        Map<String, Currency> currencies = new HashMap<>();
         Map<String, Continent> continents = new HashMap<>();
         Map<String, Country> countries = new HashMap<>();
-        initialiseCurrencies(global, currencies); // TODO: we won't need this if we use java.util.Currency
         initialiseContinents(global, continents);
-        initialiseCountries(continents, countries, currencies);
+        initialiseCountries(continents, countries);
+        initialiseCurrencies(countries);
         initialiseCities(countries);
+        initialiseUniversities(countries);
 
         return new GeoData(global);
     }
 
-    private static void initialiseCurrencies(Global global, Map<String, Currency> currencies) throws IOException {
-        parse(CURRENCIES_FILE).forEach(record -> {
-            String name = record.get(0);
-            String symbol = record.get(1);
-            Currency currency = new Currency(name, symbol);
-            global.addCurrency(currency);
-            currencies.put(name, currency);
-        });
-    }
-
     private static void initialiseContinents(Global global, Map<String, Continent> continents) throws IOException {
         parse(CONTINENTS_FILE).forEach(record -> {
-            String name = record.get(0);
-            Continent continent = new Continent(name);
+            String code = record.get(0);
+            String name = record.get(1);
+            Continent continent = new Continent(code, name);
             global.addContinent(continent);
-            continents.put(name, continent);
+            continents.put(code, continent);
         });
     }
 
-    private static void initialiseCountries(Map<String, Continent> continents, Map<String, Country> countries,
-                                            Map<String, Currency> currencies) throws IOException {
+    private static void initialiseCountries(Map<String, Continent> continents, Map<String, Country> countries) throws IOException {
         parse(COUNTRIES_FILE).forEach(record -> {
-            String name = record.get(0);
-            Continent continent = continents.get(record.get(1));
-            Currency currency = currencies.get(record.get(2));
-            Country country = new Country(name, continent, currency);
+            String code = record.get(0);
+            String name = record.get(1);
+            Continent continent = continents.get(record.get(2));
+            Country country = new Country(code, name, continent);
             continent.addCountry(country);
-            countries.put(name, country);
+            countries.put(code, country);
+        });
+    }
+
+    private static void initialiseCurrencies(Map<String, Country> countries) throws IOException {
+        Map<String, Currency> currencies = new HashMap<>();
+        parse(CURRENCIES_FILE).forEach(record -> {
+            String code = record.get(0);
+            String name = record.get(1);
+            Country country = countries.get(record.get(2));
+            Currency currency = currencies.computeIfAbsent(code, c -> new Currency(c, name));
+            country.addCurrency(currency);
         });
     }
 
     private static void initialiseCities(Map<String, Country> countries) throws IOException {
         parse(CITIES_FILE).forEach(record -> {
+            String code = record.get(0);
+            String name = record.get(1);
+            Country country = countries.get(record.get(2));
+            City city = new City(code, name, country);
+            country.addCity(city);
+        });
+    }
+
+    private static void initialiseUniversities(Map<String, Country> countries) throws IOException {
+        parse(UNIVERSITIES_FILE).forEach(record -> {
             String name = record.get(0);
             Country country = countries.get(record.get(1));
-            City city = new City(name, country);
-            country.addCity(city);
+            University university = new University(name, country);
+            country.addUniversity(university);
         });
     }
 
@@ -105,12 +117,12 @@ public class GeoData {
         return CSVParser.parse(csvFile, StandardCharsets.UTF_8, CSV_FORMAT);
     }
 
-    public Global global() {
-        return global;
+    public static String buildTracker(Object... items) {
+        return Stream.of(items).map(Object::toString).collect(Collectors.joining(":"));
     }
 
-    public List<Currency> currencies() {
-        return global.currencies();
+    public Global global() {
+        return global;
     }
 
     public List<Continent> continents() {
@@ -141,16 +153,13 @@ public class GeoData {
             continents.add(continent);
         }
 
-        void addCurrency(Currency currency) {
-            currencies.add(currency);
-        }
-
-        public List<Currency> currencies() {
-            return currencies;
-        }
-
         public List<Continent> continents() {
             return continents;
+        }
+
+        @Override
+        public String code() {
+            return "G";
         }
 
         @Override
@@ -190,14 +199,16 @@ public class GeoData {
 
     public static class Continent implements Region {
 
+        private final String code;
         private final String name;
         private final List<Country> countries;
         private final int hash;
 
-        Continent(String name) {
+        Continent(String code, String name) {
+            this.code = code;
             this.name = name;
             this.countries = new ArrayList<>();
-            hash = Objects.hash(this.name, this.countries);
+            this.hash = this.code.hashCode();
         }
 
         void addCountry(Country country) {
@@ -209,13 +220,18 @@ public class GeoData {
         }
 
         @Override
+        public String code() {
+            return code;
+        }
+
+        @Override
         public String name() {
             return name;
         }
 
         @Override
         public String tracker() {
-            return Tracker.of(this);
+            return buildTracker(name);
         }
 
         @Override
@@ -234,7 +250,7 @@ public class GeoData {
             if (o == null || getClass() != o.getClass()) return false;
 
             Continent that = (Continent) o;
-            return this.name.equals(that.name);
+            return this.code.equals(that.code);
         }
 
         @Override
@@ -244,34 +260,56 @@ public class GeoData {
     }
 
     public static class Country implements Region {
+
+        private final String code;
         private final String name;
         private final Continent continent;
-        private final Currency currency;
+        private final List<Currency> currencies;
         private final List<City> cities;
         private final int hash;
+        private final List<University> universities;
 
-        Country(String name, Continent continent, Currency currency) {
+        Country(String code, String name, Continent continent) {
+            this.code = code;
             this.name = name;
             this.continent = continent;
-            this.currency = currency;
+            this.currencies = new ArrayList<>();
             this.cities = new ArrayList<>();
-            hash = Objects.hash(this.name, this.continent, this.currency, this.cities);
+            this.universities = new ArrayList<>();
+            this.hash = this.code.hashCode();
+        }
+
+        void addCurrency(Currency currency) {
+            currencies.add(currency);
         }
 
         void addCity(City city) {
             cities.add(city);
         }
 
+        void addUniversity(University university) {
+            universities.add(university);
+        }
+
         public Continent continent() {
             return continent;
         }
 
-        public Currency currency() {
-            return currency;
+        public List<Currency> currencies() {
+            return currencies;
         }
 
         public List<City> cities() {
             return cities;
+        }
+
+        public List<University> universities() {
+            return universities;
+        }
+
+        @Override
+        public String code() {
+            return code;
         }
 
         @Override
@@ -281,7 +319,7 @@ public class GeoData {
 
         @Override
         public String tracker() {
-            return Tracker.of(this.continent(), this);
+            return buildTracker(continent.tracker(), name);
         }
 
         @Override
@@ -300,9 +338,7 @@ public class GeoData {
             if (o == null || getClass() != o.getClass()) return false;
 
             Country that = (Country) o;
-            return (this.name.equals(that.name) &&
-                    this.continent.equals(that.continent) &&
-                    this.currency.equals(that.currency));
+            return this.code.equals(that.code);
         }
 
         @Override
@@ -316,15 +352,22 @@ public class GeoData {
         private final String name;
         private final Country country;
         private final int hash;
+        private final String code;
 
-        City(String name, Country country) {
+        City(String code, String name, Country country) {
+            this.code = code;
             this.name = name;
             this.country = country;
-            hash = Objects.hash(this.name, this.country);
+            this.hash = this.code.hashCode();
         }
 
         public Country country() {
             return country;
+        }
+
+        @Override
+        public String code() {
+            return code;
         }
 
         @Override
@@ -334,7 +377,7 @@ public class GeoData {
 
         @Override
         public String tracker() {
-            return Tracker.of(country().continent(), country(), this);
+            return buildTracker(country.tracker(), name);
         }
 
         @Override
@@ -353,7 +396,7 @@ public class GeoData {
             if (o == null || getClass() != o.getClass()) return false;
 
             City that = (City) o;
-            return this.name.equals(that.name) && this.country.equals(that.country);
+            return this.code.equals(that.code);
         }
 
         @Override
@@ -362,36 +405,49 @@ public class GeoData {
         }
     }
 
-    public static class Tracker {
-        public static String of(Object... items) {
-            return Stream.of(items).map(Object::toString).collect(Collectors.joining(":"));
-        }
-    }
+    public static class University {
 
-    public static class Currency {
-        // TODO: should we should replace this class with java.util.Currency ?
-
-        private final String symbol;
         private final String name;
-        private final int hash;
+        private final Country country;
 
-        public Currency(String name, String symbol) {
+        University(String name, Country country) {
             this.name = name;
-            this.symbol = symbol;
-            hash = Objects.hash(this.name, this.symbol);
+            this.country = country;
         }
 
         public String name() {
             return name;
         }
 
-        public String symbol() {
-            return symbol;
+        public Country country() {
+            return country;
+        }
+    }
+
+    public static class Currency {
+        // TODO: should we should replace this class with java.util.Currency ?
+
+        private final String code;
+        private final String name;
+        private final int hash;
+
+        Currency(String code, String name) {
+            this.code = code;
+            this.name = name;
+            this.hash = this.code.hashCode();
+        }
+
+        public String code() {
+            return code;
+        }
+
+        public String name() {
+            return name;
         }
 
         @Override
         public String toString() {
-            return name + " (" + symbol + ")";
+            return code + " (" + name + ")";
         }
 
         @Override
@@ -400,7 +456,7 @@ public class GeoData {
             if (o == null || getClass() != o.getClass()) return false;
 
             Currency that = (Currency) o;
-            return this.name.equals(that.name) && this.symbol.equals(that.symbol);
+            return this.code.equals(that.code);
         }
 
         @Override

@@ -26,6 +26,7 @@ import grakn.benchmark.grakn.driver.GraknTransaction;
 import grakn.benchmark.simulation.Simulation;
 import grakn.benchmark.simulation.agent.PersonAgent;
 import graql.lang.Graql;
+import graql.lang.pattern.variable.ThingVariable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,21 +35,23 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.Instant;
-import java.util.List;
 
 import static grakn.benchmark.common.Util.printDuration;
-import static grakn.benchmark.grakn.agent.Label.CITY;
-import static grakn.benchmark.grakn.agent.Label.CONTINENT;
-import static grakn.benchmark.grakn.agent.Label.COUNTRY;
-import static grakn.benchmark.grakn.agent.Label.CURRENCY;
-import static grakn.benchmark.grakn.agent.Label.CURRENCY_CODE;
-import static grakn.benchmark.grakn.agent.Label.LOCATION_HIERARCHY;
-import static grakn.benchmark.grakn.agent.Label.LOCATION_NAME;
-import static grakn.benchmark.grakn.agent.Label.SUBORDINATE;
-import static grakn.benchmark.grakn.agent.Label.SUPERIOR;
+import static grakn.benchmark.common.params.Labels.CITY;
+import static grakn.benchmark.common.params.Labels.CODE;
+import static grakn.benchmark.common.params.Labels.CONTAINED;
+import static grakn.benchmark.common.params.Labels.CONTAINER;
+import static grakn.benchmark.common.params.Labels.CONTAINS;
+import static grakn.benchmark.common.params.Labels.CONTINENT;
+import static grakn.benchmark.common.params.Labels.COUNTRY;
+import static grakn.benchmark.common.params.Labels.CURRENCY;
+import static grakn.benchmark.common.params.Labels.NAME;
+import static grakn.benchmark.common.params.Labels.UNIVERSITY;
 import static grakn.client.api.GraknSession.Type.DATA;
 import static grakn.client.api.GraknSession.Type.SCHEMA;
 import static grakn.client.api.GraknTransaction.Type.WRITE;
+import static graql.lang.Graql.insert;
+import static graql.lang.Graql.match;
 import static graql.lang.Graql.rel;
 import static graql.lang.Graql.var;
 
@@ -57,6 +60,7 @@ public class GraknSimulation extends Simulation<GraknClient, GraknSession, Grakn
     private static final Logger LOG = LoggerFactory.getLogger(GraknSimulation.class);
     private static final File SCHEMA_FILE = Paths.get("grakn/simulation.gql").toFile();
     private static final String DATABASE_NAME = "simulation";
+    private static final String X = "x", Y = "y";
 
     private final grakn.client.api.GraknClient nativeClient;
 
@@ -102,55 +106,58 @@ public class GraknSimulation extends Simulation<GraknClient, GraknSession, Grakn
         try (grakn.client.api.GraknSession session = nativeClient.session(DATABASE_NAME, DATA)) {
             LOG.info("Grakn initialisation of world simulation data started ...");
             Instant start = Instant.now();
-            initCurrencies(session, geoData.currencies());
-            initContinents(session, geoData.continents());
-            initCountries(session, geoData.countries());
-            initCities(session, geoData.cities());
+            initContinents(session, geoData.global());
             LOG.info("Grakn initialisation of world simulation data ended in {}", printDuration(start, Instant.now()));
         }
     }
 
-    private void initCurrencies(grakn.client.api.GraknSession session, List<GeoData.Currency> currencies) {
-        try (grakn.client.api.GraknTransaction tx = session.transaction(WRITE)) {
-            // TODO: Currency should be an entity, and 'code' should be renamed to 'symbol'
-            currencies.forEach(currency -> tx.query().insert(Graql.insert(
-                    var().eq(currency.name()).isa(CURRENCY).has(CURRENCY_CODE, currency.symbol())
-            )));
-            tx.commit();
-        }
+    private void initContinents(grakn.client.api.GraknSession session, GeoData.Global global) {
+        global.continents().parallelStream().forEach(continent -> {
+            try (grakn.client.api.GraknTransaction tx = session.transaction(WRITE)) {
+                tx.query().insert(insert(var().isa(CONTINENT).has(CODE, continent.code()).has(NAME, continent.name())));
+                tx.commit();
+            }
+            initCountries(session, continent);
+        });
     }
 
-    private void initContinents(grakn.client.api.GraknSession session, List<GeoData.Continent> continents) {
-        try (grakn.client.api.GraknTransaction tx = session.transaction(WRITE)) {
-            continents.forEach(continent -> tx.query().insert(Graql.insert(
-                    var().isa(CONTINENT).has(LOCATION_NAME, continent.name())
-            )));
-            tx.commit();
-        }
-    }
-
-    private void initCountries(grakn.client.api.GraknSession session, List<GeoData.Country> countries) {
-        try (grakn.client.api.GraknTransaction tx = session.transaction(WRITE)) {
-            // TODO: Currency should be an entity we relate to by relation
-            countries.forEach(country -> {
-                tx.query().insert(Graql.match(
-                        var("x").isa(CONTINENT).has(LOCATION_NAME, country.continent().name())
+    private void initCountries(grakn.client.api.GraknSession session, GeoData.Continent continent) {
+        continent.countries().forEach(country -> {
+            try (grakn.client.api.GraknTransaction tx = session.transaction(WRITE)) {
+                ThingVariable.Thing countryVar = var(Y).isa(COUNTRY).has(CODE, country.code()).has(NAME, country.name());
+                country.currencies().forEach(currency -> countryVar.has(CURRENCY, currency.code()));
+                tx.query().insert(match(
+                        var(X).isa(CONTINENT).has(CODE, continent.code())
                 ).insert(
-                        var("y").isa(COUNTRY).has(LOCATION_NAME, country.name()).has(CURRENCY, country.currency().name()),
-                        rel(SUPERIOR, "x").rel(SUBORDINATE, "y").isa(LOCATION_HIERARCHY)
+                        countryVar, rel(CONTAINER, X).rel(CONTAINED, Y).isa(CONTAINS)
                 ));
-            });
+                // TODO: Currency should be an entity we relate to by relation
+                tx.commit();
+            }
+            initCities(session, country);
+            initUniversities(session, country);
+        });
+    }
+
+    private void initCities(grakn.client.api.GraknSession session, GeoData.Country country) {
+        try (grakn.client.api.GraknTransaction tx = session.transaction(WRITE)) {
+            country.cities().forEach(city -> tx.query().insert(match(
+                    var(X).isa(COUNTRY).has(CODE, country.code())
+            ).insert(
+                    var(Y).isa(CITY).has(CODE, city.code()).has(NAME, city.name()),
+                    rel(CONTAINER, X).rel(CONTAINED, Y).isa(CONTAINS)
+            )));
             tx.commit();
         }
     }
 
-    private void initCities(grakn.client.api.GraknSession session, List<GeoData.City> cities) {
+    private void initUniversities(grakn.client.api.GraknSession session, GeoData.Country country) {
         try (grakn.client.api.GraknTransaction tx = session.transaction(WRITE)) {
-            cities.forEach(city -> tx.query().insert(Graql.match(
-                    var("x").isa(COUNTRY).has(LOCATION_NAME, city.country().name())
+            country.universities().forEach(university -> tx.query().insert(match(
+                    var(X).isa(COUNTRY).has(CODE, country.code())
             ).insert(
-                    var("y").isa(CITY).has(LOCATION_NAME, city.name()),
-                    rel(SUPERIOR, "x").rel(SUBORDINATE, "y").isa(LOCATION_HIERARCHY)
+                    var(Y).isa(UNIVERSITY).has(NAME, university.name()),
+                    rel(CONTAINER, X).rel(CONTAINED, Y).isa(CONTAINS)
             )));
             tx.commit();
         }

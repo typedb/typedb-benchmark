@@ -94,46 +94,64 @@ public class Neo4JSimulation extends Simulation<Neo4jClient, Neo4jSession, Neo4j
     }
 
     private void initData(GeoData geoData) {
-        try (Session session = nativeDriver.session()) {
-            LOG.info("Neo4j initialisation of world simulation data started ...");
-            Instant start = Instant.now();
-            // TODO: we don't initialise currencies?
-            initContinents(session, geoData.continents());
-            initCountries(session, geoData.countries());
-            initCities(session, geoData.cities());
-            LOG.info("Neo4j initialisation of world simulation data ended in {}", printDuration(start, Instant.now()));
-        }
+        LOG.info("Neo4j initialisation of world simulation data started ...");
+        Instant start = Instant.now();
+        initContinents(geoData.global());
+        LOG.info("Neo4j initialisation of world simulation data ended in {}", printDuration(start, Instant.now()));
     }
 
-    private void initContinents(Session session, List<GeoData.Continent> continents) {
-        Transaction tx = session.beginTransaction();
-        continents.forEach(continent -> {
-            Query interpolatedQuery = new Query(String.format(
-                    "CREATE (x:Continent:Location {locationName: '%s'})", continent.name()
-            ));
-            tx.run(interpolatedQuery);
+    private void initContinents(GeoData.Global global) {
+        global.continents().parallelStream().forEach(continent -> {
+            try (Session session = nativeDriver.session()) {
+                Transaction tx = session.beginTransaction();
+                Query interpolatedQuery = new Query(String.format(
+                        "CREATE (x:Continent:Region {code: '%s', name: '%s'})", continent.code(), continent.name()
+                ));
+                tx.run(interpolatedQuery);
+                tx.commit();
+                initCountries(session, continent);
+            }
         });
-        tx.commit();
     }
 
-    private void initCountries(Session session, List<GeoData.Country> countries) {
-        Transaction tx = session.beginTransaction();
-        countries.forEach(country -> {
+    private void initCountries(Session session, GeoData.Continent continent) {
+        continent.countries().forEach(country -> {
+            Transaction tx = session.beginTransaction();
+            StringBuilder currencyProps = new StringBuilder();
+            for (int i = 0; i < country.currencies().size(); i++) {
+                GeoData.Currency currency = country.currencies().get(i);
+                currencyProps.append("currency").append(i + 1).append(": '").append(currency.code()).append("'");
+                if (i + 1 < country.currencies().size()) currencyProps.append(", ");
+            }
             Query query = new Query(String.format(
-                    "MATCH (c:Continent {locationName: '%s'}) CREATE (x:Country:Location {locationName: '%s', currency: '%s'})-[:LOCATED_IN]->(c)",
-                    country.continent().name(), country.name(), country.currency().name()
+                    "MATCH (c:Continent {code: '%s'}) CREATE (x:Country:Region {code: '%s', name: '%s', %s})-[:LOCATED_IN]->(c)",
+                    continent.code(), country.code(), country.name(), currencyProps
+            ));
+            tx.run(query);
+            tx.commit();
+            initCities(session, country);
+            initUniversities(session, country);
+        });
+    }
+
+    private void initCities(Session session, GeoData.Country country) {
+        Transaction tx = session.beginTransaction();
+        country.cities().forEach(city -> {
+            Query query = new Query(String.format(
+                    "MATCH (c:Country {code: '%s'}) CREATE (x:City:Region {code: '%s', name: '%s'})-[:LOCATED_IN]->(c)",
+                    country.code(), city.code(), city.name()
             ));
             tx.run(query);
         });
         tx.commit();
     }
 
-    private void initCities(Session session, List<GeoData.City> cities) {
+    private void initUniversities(Session session, GeoData.Country country) {
         Transaction tx = session.beginTransaction();
-        cities.forEach(city -> {
+        country.universities().forEach(university -> {
             Query query = new Query(String.format(
-                    "MATCH (c:Country {locationName: '%s'}) CREATE (x:City:Location {locationName: '%s'})-[:LOCATED_IN]->(c)",
-                    city.country().name(), city.name()
+                    "MATCH (c:Country {code: '%s'}) CREATE (x:University {name: '%s'})-[:LOCATED_IN]->(c)",
+                    country.code(), university.name()
             ));
             tx.run(query);
         });

@@ -19,6 +19,8 @@ package grakn.benchmark.common.seed;
 
 public interface Region {
 
+    String code();
+
     String name();
 
     String tracker();
