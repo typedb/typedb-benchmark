@@ -136,9 +136,7 @@ public class GraknSimulation extends Simulation<GraknClient, GraknSession, Grakn
                 tx.query().insert(Graql.match(
                         var("x").isa(CONTINENT).has(LOCATION_NAME, country.continent().name())
                 ).insert(
-                        var("y").isa(COUNTRY)
-                                .has(LOCATION_NAME, country.name())
-                                .has(CURRENCY, country.currency().name()),
+                        var("y").isa(COUNTRY).has(LOCATION_NAME, country.name()).has(CURRENCY, country.currency().name()),
                         rel(SUPERIOR, "x").rel(SUBORDINATE, "y").isa(LOCATION_HIERARCHY)
                 ));
             });
