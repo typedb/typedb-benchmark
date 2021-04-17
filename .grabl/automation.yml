@@ -95,7 +95,7 @@ build:
           --test_arg=--grakn=$GRABL_EXPORT_TEST_COMPARISON_GRAKN_URI \
           --test_arg=--neo4j=bolt://$GRABL_EXPORT_TEST_COMPARISON_NEO4J_URI
   performance:
-    test-performance-small-grakn-cluster-bootstrapper-background:
+    test-performance-grakn-cluster-bootstrapper-background:
       image: graknlabs-ubuntu-20.04
       filter:
         owner: graknlabs
@@ -118,7 +118,7 @@ build:
 
         sleep 1800
 
-    test-performance-small-grakn-cluster-1-background:
+    test-performance-grakn-cluster-1-background:
       machine: 16-core-32-gb
       image: graknlabs-ubuntu-20.04
       filter:
@@ -126,7 +126,7 @@ build:
         branch: grakn-cluster
       type: background
       timeout: "30m"
-      dependencies: [test-performance-small-grakn-cluster-bootstrapper-background]
+      dependencies: [test-performance-grakn-cluster-bootstrapper-background]
       command: |
         export ARTIFACT_USERNAME=$REPO_GRAKN_USERNAME
         export ARTIFACT_PASSWORD=$REPO_GRAKN_PASSWORD
@@ -150,7 +150,7 @@ build:
       monitor: |
         sleep 20s
         tail -f -n +1 ./dist/grakn-cluster-all-linux/server/logs/grakn.log
-    test-performance-small-grakn-cluster-2-background:
+    test-performance-grakn-cluster-2-background:
       machine: 16-core-32-gb
       image: graknlabs-ubuntu-20.04
       filter:
@@ -158,7 +158,7 @@ build:
         branch: grakn-cluster
       type: background
       timeout: "30m"
-      dependencies: [test-performance-small-grakn-cluster-bootstrapper-background]
+      dependencies: [test-performance-grakn-cluster-bootstrapper-background]
       command: |
         export ARTIFACT_USERNAME=$REPO_GRAKN_USERNAME
         export ARTIFACT_PASSWORD=$REPO_GRAKN_PASSWORD
@@ -181,7 +181,7 @@ build:
       monitor: |
         sleep 20s
         tail -f -n +1 ./dist/grakn-cluster-all-linux/server/logs/grakn.log
-    test-performance-small-grakn-cluster-3-background:
+    test-performance-grakn-cluster-3-background:
       machine: 16-core-32-gb
       image: graknlabs-ubuntu-20.04
       filter:
@@ -189,7 +189,7 @@ build:
         branch: grakn-cluster
       type: background
       timeout: "30m"
-      dependencies: [test-performance-small-grakn-cluster-bootstrapper-background]
+      dependencies: [test-performance-grakn-cluster-bootstrapper-background]
       command: |
         export ARTIFACT_USERNAME=$REPO_GRAKN_USERNAME
         export ARTIFACT_PASSWORD=$REPO_GRAKN_PASSWORD
@@ -212,36 +212,34 @@ build:
       monitor: |
         sleep 20s
         tail -f -n +1 ./dist/grakn-cluster-all-linux/server/logs/grakn.log
-    test-performance-small-grakn-cluster:
+    test-performance-grakn-cluster:
       image: graknlabs-ubuntu-20.04
       filter:
         owner: graknlabs
         branch: grakn-cluster
       timeout: "30m"
-      dependencies: [test-performance-small-grakn-cluster-1-background, test-performance-small-grakn-cluster-2-background, test-performance-small-grakn-cluster-3-background]
+      dependencies: [test-performance-grakn-cluster-1-background, test-performance-grakn-cluster-2-background, test-performance-grakn-cluster-3-background]
       command: |
         export ARTIFACT_USERNAME=$REPO_GRAKN_USERNAME
         export ARTIFACT_PASSWORD=$REPO_GRAKN_PASSWORD
         bazel run @graknlabs_dependencies//distribution/artifact:create-netrc
 
         bazel run //:benchmark -- \
-          --database "Grakn Cluster 2.0" \
-          --database-uri $GRABL_EXPORT_PERFORMANCE_SMALL_GRAKN_CLUSTER_1_HOSTNAME:1729 \
-          --tracing-uri $GRABL_TRACING_URI \
+          --database grakn-cluster \
+          --address $GRABL_EXPORT_PERFORMANCE_SMALL_GRAKN_CLUSTER_1_HOSTNAME:1729 \
+          --config-file /home/grabl/$GRABL_REPO/config/simulation.yml \
+          --grabl $GRABL_TRACING_URI \
           --org $GRABL_OWNER \
           --repo $GRABL_REPO \
           --commit $GRABL_COMMIT \
           --username $GRABL_OWNER \
-          --api-token $GRABL_TOKEN \
-          --config-file /home/grabl/$GRABL_REPO/config/config_test.yml
+          --token $GRABL_TOKEN
 
-    test-performance-small-grakn-core-background:
+    test-performance-grakn-core-background:
       machine: 16-core-32-gb
       image: graknlabs-ubuntu-20.04
       type: background
       timeout: "30m"
-      filter:
-        owner: graknlabs
       command: |
         cat > grakn-core.service <<- EOM
         [Unit]
@@ -270,25 +268,25 @@ build:
       monitor: |
         sleep 10s
         tail -f -n +1 /home/grabl/$GRABL_REPO/dist/grakn-core-all-linux/server/logs/grakn.log
-    test-performance-small-grakn-core:
+    test-performance-grakn-core:
       machine: 16-core-32-gb
       image: graknlabs-ubuntu-20.04
-      dependencies: [test-performance-small-grakn-core-background]
+      dependencies: [test-performance-grakn-core-background]
       timeout: "30m"
       filter:
         owner: graknlabs
       command: |
         bazel run //:benchmark -- \
-          --database "Grakn Core 2.0" \
-          --database-uri $GRABL_EXPORT_PERFORMANCE_SMALL_GRAKN_CORE_URI \
-          --tracing-uri $GRABL_TRACING_URI \
+          --database grakn-core \
+          --address $GRABL_EXPORT_PERFORMANCE_SMALL_GRAKN_CLUSTER_1_HOSTNAME:1729 \
+          --config-file /home/grabl/$GRABL_REPO/config/simulation.yml \
+          --grabl $GRABL_TRACING_URI \
           --org $GRABL_OWNER \
           --repo $GRABL_REPO \
           --commit $GRABL_COMMIT \
           --username $GRABL_OWNER \
-          --api-token $GRABL_TOKEN \
-          --config-file /home/grabl/$GRABL_REPO/config/config_test.yml
-    test-performance-small-neo4j-background:
+          --token $GRABL_TOKEN
+    test-performance-neo4j-background:
       machine: 16-core-32-gb
       image: graknlabs-ubuntu-20.04
       type: background
@@ -312,10 +310,10 @@ build:
         echo 'dbms.memory.heap.max_size=24G' | sudo tee -a /etc/neo4j/neo4j.conf
         sudo systemctl restart neo4j
         export GRABL_EXPORT_PERFORMANCE_SMALL_NEO4J_URI="${HOSTNAME}:7687"
-    test-performance-small-neo4j:
+    test-performance-neo4j:
       machine: 16-core-32-gb
       image: graknlabs-ubuntu-20.04
-      dependencies: [test-performance-small-neo4j-background]
+      dependencies: [test-performance-neo4j-background]
       timeout: "30m"
       filter:
         owner: graknlabs
@@ -335,12 +333,12 @@ build:
             sleep 3
         done
         bazel run //:benchmark -- \
-          --database Neo4j \
-          --database-uri bolt://$GRABL_EXPORT_PERFORMANCE_SMALL_NEO4J_URI \
-          --tracing-uri $GRABL_TRACING_URI \
+          --database neo4j \
+          --address bolt://$GRABL_EXPORT_PERFORMANCE_SMALL_NEO4J_URI \
+          --config-file /home/grabl/$GRABL_REPO/config/simulation.yml \
+          --grabl $GRABL_TRACING_URI \
           --org $GRABL_OWNER \
           --repo $GRABL_REPO \
           --commit $GRABL_COMMIT \
           --username $GRABL_OWNER \
-          --api-token $GRABL_TOKEN \
-          --config-file /home/grabl/$GRABL_REPO/config/config_test.yml
+          --token $GRABL_TOKEN
