@@ -120,13 +120,17 @@ public class Neo4JSimulation extends Simulation<Neo4jClient, Neo4jSession, Neo4j
         continent.countries().forEach(country -> {
             Transaction tx = session.beginTransaction();
             StringBuilder currencyProps = new StringBuilder();
-            for (int i = 0; i < country.currencies().size(); i++) {
-                SeedData.Currency currency = country.currencies().get(i);
-                currencyProps.append("currency").append(i + 1).append(": '").append(currency.code()).append("'");
-                if (i + 1 < country.currencies().size()) currencyProps.append(", ");
+            if (!country.currencies().isEmpty()) {
+                currencyProps.append(", ");
+                for (int i = 0; i < country.currencies().size(); i++) {
+                    SeedData.Currency currency = country.currencies().get(i);
+                    currencyProps.append("currency").append(i + 1).append(": '").append(currency.code()).append("'");
+                    if (i + 1 < country.currencies().size()) currencyProps.append(", ");
+                }
+
             }
             Query query = new Query(String.format(
-                    "MATCH (c:Continent {code: '%s'}) CREATE (x:Country:Region {code: '%s', name: '%s', %s})-[:LOCATED_IN]->(c)",
+                    "MATCH (c:Continent {code: '%s'}) CREATE (x:Country:Region {code: '%s', name: '%s'%s})-[:LOCATED_IN]->(c)",
                     continent.code(), country.code(), country.name(), currencyProps
             ));
             tx.run(query);
