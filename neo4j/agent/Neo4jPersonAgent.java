@@ -53,8 +53,8 @@ public class Neo4jPersonAgent extends PersonAgent<Neo4jTransaction> {
                 "CREATE (person:Person {" +
                 "email: $email, " +
                 "firstName: $firstName, " +
-                "lastName: $lastName" +
-                "address: $address" +
+                "lastName: $lastName, " +
+                "address: $address, " +
                 "gender: $gender, " +
                 "birthDate: $birthDate, " +
                 "})-[:BORN_IN]->(c), " +
