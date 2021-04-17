@@ -56,7 +56,7 @@ public class Neo4jPersonAgent extends PersonAgent<Neo4jTransaction> {
                 "lastName: $lastName, " +
                 "address: $address, " +
                 "gender: $gender, " +
-                "birthDate: $birthDate, " +
+                "birthDate: $birthDate" +
                 "})-[:BORN_IN]->(c), " +
                 "(person)-[:RESIDES_IN]->(c)";
         HashMap<String, Object> parameters = new HashMap<>() {{
