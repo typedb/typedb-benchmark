@@ -32,7 +32,7 @@ build:
         dependencies/maven/update.sh
         git diff --exit-code dependencies/maven/artifacts.snapshot
         bazel run @graknlabs_dependencies//tool/unuseddeps:unused-deps -- list
-    test-comparison-grakn-background:
+    test-comparison-grakn-core-server:
       machine: 16-core-32-gb
       image: graknlabs-ubuntu-20.04
       type: background
@@ -48,7 +48,7 @@ build:
       monitor: |
         sleep 10s
         tail -f -n +1 /home/grabl/$GRABL_REPO/dist/grakn-core-all-linux/server/logs/grakn.log
-    test-comparison-neo4j-background:
+    test-comparison-neo4j-server:
       machine: 16-core-32-gb
       image: graknlabs-ubuntu-20.04
       type: background
@@ -70,11 +70,11 @@ build:
         export GRABL_EXPORT_TEST_COMPARISON_NEO4J_URI="${HOSTNAME}:7687"
       monitor: |
         journalctl -fu neo4j
-    test-comparison-grakn-and-neo4j:
+    test-comparison:
       machine: 16-core-32-gb
       image: graknlabs-ubuntu-20.04
       timeout: "30m"
-      dependencies: [test-comparison-grakn-background, test-comparison-neo4j-background]
+      dependencies: [test-comparison-grakn-core-server, test-comparison-neo4j-server]
       command: |
         echo 'Trying to connect to Neo4j'
         attempt_counter=0
@@ -95,7 +95,7 @@ build:
           --test_arg=--grakn=$GRABL_EXPORT_TEST_COMPARISON_GRAKN_URI \
           --test_arg=--neo4j=bolt://$GRABL_EXPORT_TEST_COMPARISON_NEO4J_URI
   performance:
-    test-performance-grakn-cluster-bootstrapper-background:
+    test-performance-grakn-cluster-bootstrapper:
       image: graknlabs-ubuntu-20.04
       filter:
         owner: graknlabs
@@ -118,7 +118,7 @@ build:
 
         sleep 1800
 
-    test-performance-grakn-cluster-1-background:
+    test-performance-grakn-cluster-1-server:
       machine: 16-core-32-gb
       image: graknlabs-ubuntu-20.04
       filter:
@@ -126,7 +126,7 @@ build:
         branch: grakn-cluster
       type: background
       timeout: "30m"
-      dependencies: [test-performance-grakn-cluster-bootstrapper-background]
+      dependencies: [test-performance-grakn-cluster-bootstrapper]
       command: |
         export ARTIFACT_USERNAME=$REPO_GRAKN_USERNAME
         export ARTIFACT_PASSWORD=$REPO_GRAKN_PASSWORD
@@ -150,7 +150,7 @@ build:
       monitor: |
         sleep 20s
         tail -f -n +1 ./dist/grakn-cluster-all-linux/server/logs/grakn.log
-    test-performance-grakn-cluster-2-background:
+    test-performance-grakn-cluster-2-server:
       machine: 16-core-32-gb
       image: graknlabs-ubuntu-20.04
       filter:
@@ -158,7 +158,7 @@ build:
         branch: grakn-cluster
       type: background
       timeout: "30m"
-      dependencies: [test-performance-grakn-cluster-bootstrapper-background]
+      dependencies: [test-performance-grakn-cluster-bootstrapper]
       command: |
         export ARTIFACT_USERNAME=$REPO_GRAKN_USERNAME
         export ARTIFACT_PASSWORD=$REPO_GRAKN_PASSWORD
@@ -181,7 +181,7 @@ build:
       monitor: |
         sleep 20s
         tail -f -n +1 ./dist/grakn-cluster-all-linux/server/logs/grakn.log
-    test-performance-grakn-cluster-3-background:
+    test-performance-grakn-cluster-3-server:
       machine: 16-core-32-gb
       image: graknlabs-ubuntu-20.04
       filter:
@@ -189,7 +189,7 @@ build:
         branch: grakn-cluster
       type: background
       timeout: "30m"
-      dependencies: [test-performance-grakn-cluster-bootstrapper-background]
+      dependencies: [test-performance-grakn-cluster-bootstrapper]
       command: |
         export ARTIFACT_USERNAME=$REPO_GRAKN_USERNAME
         export ARTIFACT_PASSWORD=$REPO_GRAKN_PASSWORD
@@ -212,13 +212,13 @@ build:
       monitor: |
         sleep 20s
         tail -f -n +1 ./dist/grakn-cluster-all-linux/server/logs/grakn.log
-    test-performance-grakn-cluster:
+    test-performance-grakn-cluster-benchmark:
       image: graknlabs-ubuntu-20.04
       filter:
         owner: graknlabs
         branch: grakn-cluster
       timeout: "30m"
-      dependencies: [test-performance-grakn-cluster-1-background, test-performance-grakn-cluster-2-background, test-performance-grakn-cluster-3-background]
+      dependencies: [test-performance-grakn-cluster-1-server, test-performance-grakn-cluster-2-server, test-performance-grakn-cluster-3-server]
       command: |
         export ARTIFACT_USERNAME=$REPO_GRAKN_USERNAME
         export ARTIFACT_PASSWORD=$REPO_GRAKN_PASSWORD
@@ -235,7 +235,7 @@ build:
           --username $GRABL_OWNER \
           --token $GRABL_TOKEN
 
-    test-performance-grakn-core-background:
+    test-performance-grakn-core-server:
       machine: 16-core-32-gb
       image: graknlabs-ubuntu-20.04
       type: background
@@ -268,13 +268,11 @@ build:
       monitor: |
         sleep 10s
         tail -f -n +1 /home/grabl/$GRABL_REPO/dist/grakn-core-all-linux/server/logs/grakn.log
-    test-performance-grakn-core:
+    test-performance-grakn-core-benchmark:
       machine: 16-core-32-gb
       image: graknlabs-ubuntu-20.04
-      dependencies: [test-performance-grakn-core-background]
+      dependencies: [test-performance-grakn-core-server]
       timeout: "30m"
-      filter:
-        owner: graknlabs
       command: |
         bazel run //:benchmark -- \
           --database grakn-core \
@@ -286,13 +284,11 @@ build:
           --commit $GRABL_COMMIT \
           --username $GRABL_OWNER \
           --token $GRABL_TOKEN
-    test-performance-neo4j-background:
+    test-performance-neo4j-server:
       machine: 16-core-32-gb
       image: graknlabs-ubuntu-20.04
       type: background
       timeout: "30m"
-      filter:
-        owner: graknlabs
       monitor: |
         journalctl -fu neo4j
       command: |
@@ -310,13 +306,11 @@ build:
         echo 'dbms.memory.heap.max_size=24G' | sudo tee -a /etc/neo4j/neo4j.conf
         sudo systemctl restart neo4j
         export GRABL_EXPORT_PERFORMANCE_SMALL_NEO4J_URI="${HOSTNAME}:7687"
-    test-performance-neo4j:
+    test-performance-neo4j-benchmark:
       machine: 16-core-32-gb
       image: graknlabs-ubuntu-20.04
-      dependencies: [test-performance-neo4j-background]
+      dependencies: [test-performance-neo4j-server]
       timeout: "30m"
-      filter:
-        owner: graknlabs
       command: |
         echo 'Trying to connect to Neo4j'
         attempt_counter=0
