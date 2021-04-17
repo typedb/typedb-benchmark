@@ -227,7 +227,7 @@ build:
         bazel run //:benchmark -- \
           --database grakn-cluster \
           --address $GRABL_EXPORT_PERFORMANCE_SMALL_GRAKN_CLUSTER_1_HOSTNAME:1729 \
-          --config-file /home/grabl/$GRABL_REPO/config/simulation.yml \
+          --config /home/grabl/$GRABL_REPO/config/simulation.yml \
           --grabl $GRABL_TRACING_URI \
           --org $GRABL_OWNER \
           --repo $GRABL_REPO \
@@ -277,7 +277,7 @@ build:
         bazel run //:benchmark -- \
           --database grakn-core \
           --address $GRABL_EXPORT_PERFORMANCE_SMALL_GRAKN_CLUSTER_1_HOSTNAME:1729 \
-          --config-file /home/grabl/$GRABL_REPO/config/simulation.yml \
+          --config /home/grabl/$GRABL_REPO/config/simulation.yml \
           --grabl $GRABL_TRACING_URI \
           --org $GRABL_OWNER \
           --repo $GRABL_REPO \
@@ -329,7 +329,7 @@ build:
         bazel run //:benchmark -- \
           --database neo4j \
           --address bolt://$GRABL_EXPORT_PERFORMANCE_SMALL_NEO4J_URI \
-          --config-file /home/grabl/$GRABL_REPO/config/simulation.yml \
+          --config /home/grabl/$GRABL_REPO/config/simulation.yml \
           --grabl $GRABL_TRACING_URI \
           --org $GRABL_OWNER \
           --repo $GRABL_REPO \
