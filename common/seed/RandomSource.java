@@ -44,7 +44,7 @@ public class RandomSource {
     }
 
     public int nextInt() {
-        return random.nextInt();
+        return random.nextInt(Integer.MAX_VALUE);
     }
 
     public String address(City city) {

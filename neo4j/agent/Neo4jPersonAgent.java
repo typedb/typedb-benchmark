@@ -80,7 +80,7 @@ public class Neo4jPersonAgent extends PersonAgent<Neo4jTransaction> {
 
     private Optional<Pair<Person, City>> report(Neo4jTransaction tx, String email) {
         List<Record> answer = tx.execute(new Query(
-                "MATCH (person:Person {email: " + email + "})-[:BORN_IN]->(city:City), " +
+                "MATCH (person:Person {email: '" + email + "'})-[:BORN_IN]->(city:City), " +
                         "(person)-[:RESIDES_IN]->(city) " +
                         "RETURN person.email, person.firstName, person.lastName, person.address, " +
                         "person.gender, person.birthDate, city.code"
