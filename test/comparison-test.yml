@@ -17,44 +17,8 @@
 
 agents:
   # For each agent select a `mode`, `RUN` to run without tracing, `TRACE` to run with tracing, and `OFF` to not run at all
-  - name: "marriage"
-    mode: OFF # no because of not
-  - name: "personBirth"
+  - name: "PersonAgent"
     mode: RUN
-  - name: "ageUpdate"
-    mode: OFF # until we have macro functions
-  - name: "parentship"
-    mode: OFF # no because of not
-  - name: "relocation"
-    mode: OFF
-  - name: "company"
-    mode: RUN
-  - name: "employment"
-    mode: OFF
-  - name: "product"
-    mode: RUN
-  - name: "purchase"
-    mode: RUN
-  - name: "friendship"
-    mode: OFF
-  - name: "meanWage"
-    mode: OFF
-  - name: "findLivedIn"
-    mode: OFF
-  - name: "findCurrentResidents"
-    mode: OFF
-  - name: "arbitraryOneHop"
-    mode: OFF
-  - name: "twoHop"
-    mode: OFF # no, because of parentship
-  - name: "threeHop"
-    mode: OFF # no because of employment
-  - name: "fourHop"
-    mode: OFF # no because of employment
-  - name: "findSpecificMarriage"
-    mode: OFF # no because of not
-  - name: "findSpecificPerson"
-    mode: OFF
 
 randomSeed: 1
 iterations: 5
