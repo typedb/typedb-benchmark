@@ -103,7 +103,7 @@ build:
       type: background
       command: |
         bazel run //ci:install-ssh-credential
-        export GRABL_EXPORT_PERFORMANCE_SMALL_GRAKN_CLUSTER_BOOTSTRAPPER_URI="${HOSTNAME}"
+        export GRABL_EXPORT_PERFORMANCE_GRAKN_CLUSTER_BOOTSTRAPPER_URI="${HOSTNAME}"
 
       monitor: |
         bazel run //ci:wait-for-file -- /tmp/grakn-cluster-1.txt
@@ -136,7 +136,7 @@ build:
 
         echo -n "${HOSTNAME}" > /tmp/hostname.txt
         bazel run //ci:transfer-file -- /tmp/hostname.txt \
-          grabl@$GRABL_EXPORT_PERFORMANCE_SMALL_GRAKN_CLUSTER_BOOTSTRAPPER_URI:/tmp/grakn-cluster-1.txt
+          grabl@$GRABL_EXPORT_PERFORMANCE_GRAKN_CLUSTER_BOOTSTRAPPER_URI:/tmp/grakn-cluster-1.txt
 
         bazel run //ci:wait-for-file -- /tmp/grakn-cluster-peers.txt
 
@@ -146,7 +146,7 @@ build:
 
         sudo systemctl daemon-reload
         sudo systemctl start grakn-cluster
-        export GRABL_EXPORT_PERFORMANCE_SMALL_GRAKN_CLUSTER_1_HOSTNAME="${HOSTNAME}"
+        export GRABL_EXPORT_PERFORMANCE_GRAKN_CLUSTER_1_HOSTNAME="${HOSTNAME}"
       monitor: |
         sleep 20s
         tail -f -n +1 ./dist/grakn-cluster-all-linux/server/logs/grakn.log
@@ -168,7 +168,7 @@ build:
 
         echo -n "${HOSTNAME}" > /tmp/hostname.txt
         bazel run //ci:transfer-file -- /tmp/hostname.txt \
-          grabl@$GRABL_EXPORT_PERFORMANCE_SMALL_GRAKN_CLUSTER_BOOTSTRAPPER_URI:/tmp/grakn-cluster-2.txt
+          grabl@$GRABL_EXPORT_PERFORMANCE_GRAKN_CLUSTER_BOOTSTRAPPER_URI:/tmp/grakn-cluster-2.txt
 
         bazel run //ci:wait-for-file -- /tmp/grakn-cluster-peers.txt
 
@@ -199,7 +199,7 @@ build:
 
         echo -n "${HOSTNAME}" > /tmp/hostname.txt
         bazel run //ci:transfer-file -- /tmp/hostname.txt \
-          grabl@$GRABL_EXPORT_PERFORMANCE_SMALL_GRAKN_CLUSTER_BOOTSTRAPPER_URI:/tmp/grakn-cluster-3.txt
+          grabl@$GRABL_EXPORT_PERFORMANCE_GRAKN_CLUSTER_BOOTSTRAPPER_URI:/tmp/grakn-cluster-3.txt
 
         bazel run //ci:wait-for-file -- /tmp/grakn-cluster-peers.txt
 
@@ -226,7 +226,7 @@ build:
 
         bazel run //:benchmark -- \
           --database grakn-cluster \
-          --address $GRABL_EXPORT_PERFORMANCE_SMALL_GRAKN_CLUSTER_1_HOSTNAME:1729 \
+          --address $GRABL_EXPORT_PERFORMANCE_GRAKN_CLUSTER_1_HOSTNAME:1729 \
           --config /home/grabl/$GRABL_REPO/config/simulation.yml \
           --grabl $GRABL_TRACING_URI \
           --org $GRABL_OWNER \
@@ -264,7 +264,7 @@ build:
 
         sudo systemctl daemon-reload
         sudo systemctl start grakn-core
-        export GRABL_EXPORT_PERFORMANCE_SMALL_GRAKN_CORE_URI="${HOSTNAME}:1729"
+        export GRABL_EXPORT_PERFORMANCE_GRAKN_CORE_URI="${HOSTNAME}:1729"
       monitor: |
         sleep 10s
         tail -f -n +1 /home/grabl/$GRABL_REPO/dist/grakn-core-all-linux/server/logs/grakn.log
@@ -276,7 +276,7 @@ build:
       command: |
         bazel run //:benchmark -- \
           --database grakn-core \
-          --address $GRABL_EXPORT_PERFORMANCE_SMALL_GRAKN_CLUSTER_1_HOSTNAME:1729 \
+          --address $GRABL_EXPORT_PERFORMANCE_GRAKN_CORE_URI:1729 \
           --config /home/grabl/$GRABL_REPO/config/simulation.yml \
           --grabl $GRABL_TRACING_URI \
           --org $GRABL_OWNER \
@@ -305,7 +305,7 @@ build:
         echo 'dbms.security.auth_enabled=false' | sudo tee -a /etc/neo4j/neo4j.conf
         echo 'dbms.memory.heap.max_size=24G' | sudo tee -a /etc/neo4j/neo4j.conf
         sudo systemctl restart neo4j
-        export GRABL_EXPORT_PERFORMANCE_SMALL_NEO4J_URI="${HOSTNAME}:7687"
+        export GRABL_EXPORT_PERFORMANCE_NEO4J_URI="${HOSTNAME}:7687"
     test-performance-neo4j-benchmark:
       machine: 16-core-32-gb
       image: graknlabs-ubuntu-20.04
@@ -316,7 +316,7 @@ build:
         attempt_counter=0
         max_attempts=50
         expected_exit_code=52
-        until curl --output /dev/null --silent --head --fail $GRABL_EXPORT_PERFORMANCE_SMALL_NEO4J_URI || [[ $? == $expected_exit_code ]]; do
+        until curl --output /dev/null --silent --head --fail $GRABL_EXPORT_PERFORMANCE_NEO4J_URI || [[ $? == $expected_exit_code ]]; do
             if [ ${attempt_counter} -eq ${max_attempts} ];then
               echo "Max attempts reached"
               exit 1
@@ -328,7 +328,7 @@ build:
         done
         bazel run //:benchmark -- \
           --database neo4j \
-          --address bolt://$GRABL_EXPORT_PERFORMANCE_SMALL_NEO4J_URI \
+          --address bolt://$GRABL_EXPORT_PERFORMANCE_NEO4J_URI \
           --config /home/grabl/$GRABL_REPO/config/simulation.yml \
           --grabl $GRABL_TRACING_URI \
           --org $GRABL_OWNER \
