@@ -20,28 +20,28 @@ package grakn.benchmark.neo4j;
 public class Labels {
 
     public static final String EMAIL = "email";
-    public static final String PERSON_NAME = "person-name";
-    public static final String FIRST_NAME = "first-name";
-    public static final String LAST_NAME = "last-name";
-    public static final String BIRTH_DATE = "birth-date";
+    public static final String PERSON_NAME = "personName";
+    public static final String FIRST_NAME = "firstName";
+    public static final String LAST_NAME = "lastName";
+    public static final String BIRTH_DATE = "birthDate";
     public static final String GENDER = "gender";
     public static final String ADDRESS = "address";
     public static final String CODE = "code";
     public static final String NAME = "name";
     public static final String NUMBER = "number";
-    public static final String INCORPORATION_DATE = "incorporation-date";
+    public static final String INCORPORATION_DATE = "incorporationDate";
     public static final String CURRENCY = "currency";
-    public static final String MARRIAGE_LICENSE = "marriage-license";
-    public static final String START_DATE = "start-date";
-    public static final String END_DATE = "end-date";
+    public static final String MARRIAGE_LICENSE = "marriageLicense";
+    public static final String START_DATE = "startDate";
+    public static final String END_DATE = "endDate";
     public static final String ID = "id";
     public static final String PRICE = "price";
     public static final String PERSON = "person";
     public static final String ORGANISATION = "organisation";
     public static final String COMPANY = "company";
     public static final String SCHOOL = "school";
-    public static final String PRIMARY_SCHOOL = "primary-school";
-    public static final String SECONDARY_SCHOOL = "secondary-school";
+    public static final String PRIMARY_SCHOOL = "primarySchool";
+    public static final String SECONDARY_SCHOOL = "secondarySchool";
     public static final String UNIVERSITY = "university";
     public static final String REGION = "region";
     public static final String CONTINENT = "continent";
@@ -55,13 +55,13 @@ public class Labels {
     public static final String BUYER = "buyer";
     public static final String SELLER = "seller";
 
-    public static final String BORN_IN = "born-in";
-    public static final String LOCATED_IN = "located-in";
-    public static final String RESIDES_IN = "resides-in";
+    public static final String BORN_IN = "BORN_IN";
+    public static final String LOCATED_IN = "LOCATED_IN";
+    public static final String RESIDES_IN = "RESIDES_IN";
     public static final String PARENTS = "parents";
-    public static final String FRIENDS_WITH = "friends-with";
-    public static final String EMPLOYED_BY = "employed-by";
-    public static final String STUDIES_AT = "studies-at";
-    public static final String CONTAINED_IN = "contained-in";
+    public static final String FRIENDS_WITH = "FRIENDS_WITH";
+    public static final String EMPLOYED_BY = "EMPLOYED_BY";
+    public static final String STUDIES_AT = "STUDIES_AT";
+    public static final String CONTAINED_IN = "CONTAINED_IN";
 
 }

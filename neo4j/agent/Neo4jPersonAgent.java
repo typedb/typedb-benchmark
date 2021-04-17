@@ -49,16 +49,16 @@ public class Neo4jPersonAgent extends PersonAgent<Neo4jTransaction> {
     @Override
     protected Optional<Person> insertPerson(Neo4jTransaction tx, String email, String firstName, String lastName,
                                             String address, Gender gender, LocalDateTime birthDate, City city) {
-        String query = "MATCH (c:City {code: $code})" +
+        String query = "MATCH (c:City {code: $code}) " +
                 "CREATE (person:Person {" +
                 "email: $email, " +
-                "first-name: $first-name, " +
-                "last-name: $last-name" +
+                "firstName: $firstName, " +
+                "lastName: $lastName" +
                 "address: $address" +
                 "gender: $gender, " +
-                "birth-date: $birth-date, " +
-                "})-[:born-in]->(c)," +
-                "(person)-[:resides-in]->(c)";
+                "birthDate: $birthDate, " +
+                "})-[:BORN_IN]->(c), " +
+                "(person)-[:RESIDES_IN]->(c)";
         HashMap<String, Object> parameters = new HashMap<>() {{
             put(CODE, city.code());
             put(EMAIL, email);
