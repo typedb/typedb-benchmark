@@ -25,11 +25,12 @@ import grakn.benchmark.grakn.driver.GraknClient;
 import grakn.benchmark.grakn.driver.GraknTransaction;
 import grakn.benchmark.simulation.agent.PersonAgent;
 import grakn.client.api.answer.ConceptMap;
+import grakn.common.collection.Pair;
 import graql.lang.Graql;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
-import java.util.stream.Stream;
 
 import static grakn.benchmark.grakn.Labels.ADDRESS;
 import static grakn.benchmark.grakn.Labels.BIRTH_DATE;
@@ -46,7 +47,10 @@ import static grakn.benchmark.grakn.Labels.PLACE;
 import static grakn.benchmark.grakn.Labels.RESIDENCE;
 import static grakn.benchmark.grakn.Labels.RESIDENT;
 import static grakn.benchmark.grakn.Labels.RESIDENTSHIP;
+import static grakn.common.collection.Collections.pair;
+import static graql.lang.Graql.rel;
 import static graql.lang.Graql.var;
+import static java.util.stream.Collectors.toList;
 
 public class GraknPersonAgent extends PersonAgent<GraknTransaction> {
 
@@ -55,9 +59,9 @@ public class GraknPersonAgent extends PersonAgent<GraknTransaction> {
     }
 
     @Override
-    protected Optional<Person> insertPerson(GraknTransaction tx, String email, String firstName, String lastName,
-                                            String address, Gender gender, LocalDateTime birthDate, City city) {
-        Stream<ConceptMap> inserted = tx.query().insert(Graql.match(
+    protected Optional<Pair<Person, City>> insertPerson(GraknTransaction tx, String email, String firstName, String lastName,
+                                                        String address, Gender gender, LocalDateTime birthDate, City city) {
+        tx.query().insert(Graql.match(
                 var(CITY).isa(CITY).has(CODE, city.code())
         ).insert(
                 var("p").isa(PERSON).has(EMAIL, email).has(FIRST_NAME, firstName).has(LAST_NAME, lastName)
@@ -65,11 +69,27 @@ public class GraknPersonAgent extends PersonAgent<GraknTransaction> {
                 var().rel(PLACE, var(CITY)).rel(CHILD, var("p")).isa(BIRTH_PLACE),
                 var().rel(RESIDENCE, var(CITY)).rel(RESIDENT, var("p")).isa(RESIDENTSHIP)
         ));
-        if (context.isTest()) return report(inserted);
+        if (context.isTest()) return report(tx, email);
         else return Optional.empty();
     }
 
-    private Optional<Person> report(Stream<ConceptMap> inserted) {
-        return Optional.empty(); // TODO
+    private Optional<Pair<Person, City>> report(GraknTransaction tx, String email) {
+        List<ConceptMap> answers = tx.query().match(Graql.match(
+                var(PERSON).isa(PERSON).has(EMAIL, email).has(FIRST_NAME, var(FIRST_NAME)).has(LAST_NAME, var(LAST_NAME))
+                        .has(ADDRESS, var(ADDRESS)).has(GENDER, var(GENDER)).has(BIRTH_DATE, var(BIRTH_DATE)),
+                var(CITY).has(CODE, var(CODE)),
+                rel(CHILD, var(PERSON)).rel(PLACE, var(CITY)).isa(BIRTH_PLACE),
+                rel(RESIDENT, var(PERSON)).rel(RESIDENCE, var(CITY)).isa(RESIDENTSHIP)
+        )).collect(toList());
+        assert answers.size() == 1;
+        ConceptMap inserted = answers.get(0);
+        Person person = new Person(inserted.get(EMAIL).asAttribute().asString().getValue(),
+                                   inserted.get(FIRST_NAME).asAttribute().asString().getValue(),
+                                   inserted.get(LAST_NAME).asAttribute().asString().getValue(),
+                                   inserted.get(ADDRESS).asAttribute().asString().getValue(),
+                                   Gender.of(inserted.get(GENDER).asAttribute().asString().getValue()),
+                                   inserted.get(BIRTH_DATE).asAttribute().asDateTime().getValue());
+        City city = new City(inserted.get(CODE).asAttribute().asString().getValue());
+        return Optional.of(pair(person, city));
     }
 }

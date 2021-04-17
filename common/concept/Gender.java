@@ -33,6 +33,12 @@ public enum Gender {
         return isMale ? MALE : FEMALE;
     }
 
+    public static Gender of(String gender) {
+        if (gender.equals(MALE.name)) return MALE;
+        else if (gender.equals(FEMALE.name)) return FEMALE;
+        else throw new IllegalArgumentException("Unrecognised Gender: " + gender);
+    }
+
     public String value() {
         return name;
     }

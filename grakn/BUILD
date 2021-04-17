@@ -26,6 +26,7 @@ java_library(
         "//simulation:simulation",
         "@graknlabs_client_java//api:api",
         "@graknlabs_client_java//:client-java",
+        "@graknlabs_common//:common",
         "@graknlabs_grabl_tracing//client:client",
         "@graknlabs_graql//java:graql",
         "@graknlabs_graql//java/pattern:pattern",

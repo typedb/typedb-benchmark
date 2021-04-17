@@ -26,6 +26,7 @@ import grakn.benchmark.common.seed.RandomSource;
 import grakn.benchmark.simulation.driver.Client;
 import grakn.benchmark.simulation.driver.Session;
 import grakn.benchmark.simulation.driver.Transaction;
+import grakn.common.collection.Pair;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -58,10 +59,11 @@ public abstract class PersonAgent<TX extends Transaction> extends Agent<Country,
                 City city = random.choose(country.cities());
                 String email = String.format("%s.%s.%s.%s@email.com", firstName, lastName, city.code(), random.nextInt());
                 String address = random.address(city);
-                Optional<Person> inserted = insertPerson(tx, email, firstName, lastName, address, gender, context.today(), city);
+                Optional<Pair<Person, City>> inserted = insertPerson(tx, email, firstName, lastName, address, gender, context.today(), city);
                 if (context.isTest()) {
                     assert inserted.isPresent();
-                    reports.add(new Report(list(email, firstName, lastName, address, gender, context.today(), city), list(inserted.get())));
+                    reports.add(new Report(list(email, firstName, lastName, address, gender, context.today(), city),
+                                           list(inserted.get().first(), inserted.get().second())));
                 }
             }
             tx.commit();
@@ -69,6 +71,6 @@ public abstract class PersonAgent<TX extends Transaction> extends Agent<Country,
         return reports;
     }
 
-    protected abstract Optional<Person> insertPerson(TX tx, String email, String firstName, String lastName, String address,
-                                                     Gender gender, LocalDateTime birthDate, City city);
+    protected abstract Optional<Pair<Person, City>> insertPerson(TX tx, String email, String firstName, String lastName, String address,
+                                                                 Gender gender, LocalDateTime birthDate, City city);
 }

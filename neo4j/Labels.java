@@ -20,7 +20,6 @@ package grakn.benchmark.neo4j;
 public class Labels {
 
     public static final String EMAIL = "email";
-    public static final String PERSON_NAME = "personName";
     public static final String FIRST_NAME = "firstName";
     public static final String LAST_NAME = "lastName";
     public static final String BIRTH_DATE = "birthDate";
