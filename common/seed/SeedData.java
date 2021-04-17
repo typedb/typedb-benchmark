@@ -183,6 +183,11 @@ public class SeedData {
             if (continent.countries().isEmpty()) {
                 continents.remove();
                 LOG.warn("The continent '{}' is excluded as it has no countries in the seed dataset", continent);
+            } else if (continent.commonLastNames().isEmpty() ||
+                    continent.commonFemaleFirstNames().isEmpty() ||
+                    continent.commonMaleFirstNames().isEmpty()) {
+                continents.remove();
+                LOG.warn("The continent '{}' is excluded as it has no first/last names in the seed dataset", continent);
             } else prune(continent);
         }
     }
