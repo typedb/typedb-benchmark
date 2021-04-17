@@ -83,8 +83,7 @@ public class GraknPersonAgent extends PersonAgent<GraknTransaction> {
         )).collect(toList());
         assert answers.size() == 1;
         ConceptMap inserted = answers.get(0);
-        Person person = new Person(inserted.get(EMAIL).asAttribute().asString().getValue(),
-                                   inserted.get(FIRST_NAME).asAttribute().asString().getValue(),
+        Person person = new Person(email, inserted.get(FIRST_NAME).asAttribute().asString().getValue(),
                                    inserted.get(LAST_NAME).asAttribute().asString().getValue(),
                                    inserted.get(ADDRESS).asAttribute().asString().getValue(),
                                    Gender.of(inserted.get(GENDER).asAttribute().asString().getValue()),
