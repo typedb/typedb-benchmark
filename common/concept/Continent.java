@@ -104,7 +104,7 @@ public class Continent implements Region {
 
     @Override
     public String toString() {
-        return name;
+        return name + "(" + code + ")";
     }
 
     @Override

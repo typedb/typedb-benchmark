@@ -18,6 +18,8 @@
 package grakn.benchmark.common.params;
 
 import grakn.benchmark.common.seed.SeedData;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -29,6 +31,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class Context {
 
     public static final int AGE_OF_ADULTHOOD = 21;
+    private static final Logger LOG = LoggerFactory.getLogger(Context.class);
 
     private final SeedData seedData;
     private final Config config;
@@ -45,8 +48,13 @@ public class Context {
     }
 
     public static Context create(Config config, boolean isTracing, boolean isTest) throws IOException {
-        SeedData geoData = SeedData.initialise();
-        return new Context(geoData, config, isTracing, isTest);
+        SeedData seedData = SeedData.initialise();
+        LOG.info("Total number of continents in seed: {}", seedData.continents().size());
+        LOG.info("Total number of countries in seed: {}", seedData.countries().size());
+        LOG.info("Total number of cities in seed: {}", seedData.cities().size());
+        LOG.info("Total number of universities in seed: {}", seedData.universities().size());
+
+        return new Context(seedData, config, isTracing, isTest);
     }
 
     public List<Config.Agent> agentConfigs() {

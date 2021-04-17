@@ -25,6 +25,7 @@ java_library(
         "@maven//:com_google_code_findbugs_jsr305",
         "@maven//:info_picocli_picocli",
         "@maven//:org_apache_commons_commons_csv",
+        "@maven//:org_slf4j_slf4j_api",
         "@maven//:org_yaml_snakeyaml",
     ],
     data = [

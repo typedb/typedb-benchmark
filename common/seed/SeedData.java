@@ -25,6 +25,8 @@ import grakn.benchmark.common.concept.Global;
 import grakn.benchmark.common.concept.University;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -33,6 +35,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -41,6 +44,7 @@ import static java.util.stream.Collectors.toList;
 
 public class SeedData {
 
+    private static final Logger LOG = LoggerFactory.getLogger(SeedData.class);
     private static final File ADJECTIVES_FILE = Paths.get("data/adjectives.csv").toFile();
     private static final File CITIES_FILE = Paths.get("data/cities.csv").toFile();
     private static final File CONTINENTS_FILE = Paths.get("data/continents.csv").toFile();
@@ -77,6 +81,8 @@ public class SeedData {
         Words words = new Words();
         initialiseAdjectives(words);
         initialiseNouns(words);
+
+        prune(global);
 
         return new SeedData(global, words);
     }
@@ -170,6 +176,28 @@ public class SeedData {
         });
     }
 
+    private static void prune(Global global) {
+        ListIterator<Continent> continents = global.continents().listIterator();
+        while (continents.hasNext()) {
+            Continent continent = continents.next();
+            if (continent.countries().isEmpty()) {
+                continents.remove();
+                LOG.warn("The continent '{}' is excluded as it has no countries in the seed dataset", continent);
+            } else prune(continent);
+        }
+    }
+
+    private static void prune(Continent continent) {
+        ListIterator<Country> countries = continent.countries().listIterator();
+        while (countries.hasNext()) {
+            Country country = countries.next();
+            if (country.cities().isEmpty()) {
+                countries.remove();
+                LOG.warn("The country {} is excluded as has no cities in the seed dataset", country);
+            }
+        }
+    }
+
     private static CSVParser parse(File csvFile) throws IOException {
         return CSVParser.parse(csvFile, StandardCharsets.UTF_8, CSV_FORMAT);
     }
@@ -196,6 +224,10 @@ public class SeedData {
 
     public List<City> cities() {
         return countries().stream().flatMap(country -> country.cities().stream()).collect(toList());
+    }
+
+    public List<University> universities() {
+        return countries().stream().flatMap(country -> country.universities().stream()).collect(toList());
     }
 
     public static class Words {
