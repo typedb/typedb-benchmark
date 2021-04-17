@@ -49,6 +49,32 @@ public class Options {
             heading = "Grabl tracing options to run this benchmark with")
     private GrablTracing tracing;
 
+    public static Optional<Options> parseCLIOptions(String[] args) {
+        return parseCLIOptions(args, new Options());
+    }
+
+    public static <T> Optional<T> parseCLIOptions(String[] args, T options) {
+        CommandLine commandLine = new CommandLine(options);
+        try {
+            CommandLine.ParseResult parseResult = commandLine.parseArgs(args);
+            if (commandLine.isUsageHelpRequested()) {
+                commandLine.usage(commandLine.getOut());
+                return Optional.empty();
+            } else if (commandLine.isVersionHelpRequested()) {
+                commandLine.printVersionHelp(commandLine.getOut());
+                return Optional.empty();
+            } else {
+                return Optional.of(parseResult.asCommandLineList().get(0).getCommand());
+            }
+        } catch (CommandLine.ParameterException ex) {
+            commandLine.getErr().println(ex.getMessage());
+            if (!CommandLine.UnmatchedArgumentException.printSuggestions(ex, commandLine.getErr())) {
+                ex.getCommandLine().usage(commandLine.getErr());
+            }
+            return Optional.empty();
+        }
+    }
+
     public DatabaseType database() {
         return database;
     }

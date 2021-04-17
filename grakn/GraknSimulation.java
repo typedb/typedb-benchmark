@@ -124,7 +124,7 @@ public class GraknSimulation extends Simulation<GraknClient, GraknSession, Grakn
     }
 
     private void initCountries(grakn.client.api.GraknSession session, SeedData.Continent continent) {
-        continent.countries().forEach(country -> {
+        continent.countries().parallelStream().forEach(country -> {
             try (grakn.client.api.GraknTransaction tx = session.transaction(WRITE)) {
                 ThingVariable.Thing countryVar = var(Y).isa(COUNTRY).has(CODE, country.code()).has(NAME, country.name());
                 country.currencies().forEach(currency -> countryVar.has(CURRENCY, currency.code()));

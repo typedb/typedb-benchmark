@@ -111,32 +111,34 @@ public class Neo4JSimulation extends Simulation<Neo4jClient, Neo4jSession, Neo4j
                 ));
                 tx.run(interpolatedQuery);
                 tx.commit();
-                initCountries(session, continent);
+                initCountries(nativeDriver, continent);
             }
         });
     }
 
-    private void initCountries(Session session, SeedData.Continent continent) {
-        continent.countries().forEach(country -> {
-            Transaction tx = session.beginTransaction();
-            StringBuilder currencyProps = new StringBuilder();
-            if (!country.currencies().isEmpty()) {
-                currencyProps.append(", ");
-                for (int i = 0; i < country.currencies().size(); i++) {
-                    SeedData.Currency currency = country.currencies().get(i);
-                    currencyProps.append("currency").append(i + 1).append(": '").append(currency.code()).append("'");
-                    if (i + 1 < country.currencies().size()) currencyProps.append(", ");
-                }
+    private void initCountries(Driver nativeDriver, SeedData.Continent continent) {
+        continent.countries().parallelStream().forEach(country -> {
+            try (Session session = nativeDriver.session()) {
+                Transaction tx = session.beginTransaction();
+                StringBuilder currencyProps = new StringBuilder();
+                if (!country.currencies().isEmpty()) {
+                    currencyProps.append(", ");
+                    for (int i = 0; i < country.currencies().size(); i++) {
+                        SeedData.Currency currency = country.currencies().get(i);
+                        currencyProps.append("currency").append(i + 1).append(": '").append(currency.code()).append("'");
+                        if (i + 1 < country.currencies().size()) currencyProps.append(", ");
+                    }
 
+                }
+                Query query = new Query(String.format(
+                        "MATCH (c:Continent {code: '%s'}) CREATE (x:Country:Region {code: '%s', name: '%s'%s})-[:LOCATED_IN]->(c)",
+                        continent.code(), country.code(), escapeQuotes(country.name()), currencyProps
+                ));
+                tx.run(query);
+                tx.commit();
+                initCities(session, country);
+                initUniversities(session, country);
             }
-            Query query = new Query(String.format(
-                    "MATCH (c:Continent {code: '%s'}) CREATE (x:Country:Region {code: '%s', name: '%s'%s})-[:LOCATED_IN]->(c)",
-                    continent.code(), country.code(), escapeQuotes(country.name()), currencyProps
-            ));
-            tx.run(query);
-            tx.commit();
-            initCities(session, country);
-            initUniversities(session, country);
         });
     }
 

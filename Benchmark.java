@@ -31,7 +31,7 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nullable;
 import java.util.Optional;
 
-import static grakn.benchmark.common.Util.parseCommandLine;
+import static grakn.benchmark.common.params.Options.parseCLIOptions;
 
 public class Benchmark {
 
@@ -40,7 +40,7 @@ public class Benchmark {
     public static void main(String[] args) {
         LOG.info("Welcome to the Benchmark!");
 
-        Optional<Options> optionsOpt = parseCommandLine(args);
+        Optional<Options> optionsOpt = Options.parseCLIOptions(args);
         if (optionsOpt.isEmpty()) System.exit(0);
         Options options = optionsOpt.get();
 

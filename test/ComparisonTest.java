@@ -35,7 +35,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static grakn.benchmark.common.Util.parseCommandLine;
+import static grakn.benchmark.common.params.Options.parseCLIOptions;
 import static grakn.benchmark.test.ComparisonTest.Suite.GRAKN_CORE;
 import static grakn.benchmark.test.ComparisonTest.Suite.NEO4J;
 import static org.junit.Assert.assertEquals;
@@ -51,7 +51,7 @@ public class ComparisonTest {
     public static class Suite extends org.junit.runners.Suite {
 
         private static final Config CONFIG = Config.loadYML(Paths.get("test/comparison-test.yml").toFile());
-        private static final Options OPTIONS = parseCommandLine(args(), new Options()).get();
+        private static final Options OPTIONS = parseCLIOptions(args(), new Options()).get();
 
         public static GraknSimulation GRAKN_CORE;
 
