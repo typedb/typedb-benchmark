@@ -65,7 +65,7 @@ public class Neo4jPersonAgent extends PersonAgent<Neo4jTransaction> {
             put(FIRST_NAME, firstName);
             put(LAST_NAME, lastName);
             put(ADDRESS, address);
-            put(GENDER, gender);
+            put(GENDER, gender.value());
             put(BIRTH_DATE, birthDate);
         }};
         List<Record> inserted = tx.execute(new Query(query, parameters));
