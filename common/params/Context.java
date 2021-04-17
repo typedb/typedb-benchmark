@@ -78,7 +78,7 @@ public class Context {
     }
 
     public LocalDateTime today() {
-        return LocalDateTime.of(LocalDate.ofYearDay(iteration.get(), 1), LocalTime.of(0, 0, 0));
+        return LocalDateTime.of(LocalDate.ofYearDay(2000 + iteration.get(), 1), LocalTime.of(0, 0, 0));
     }
 
     public SeedData seedData() {

@@ -17,23 +17,39 @@
 
 package grakn.benchmark.common.seed;
 
+import grakn.benchmark.common.concept.City;
+import grakn.benchmark.common.concept.Gender;
+
+import java.util.ArrayList;
 import java.util.Random;
 
 public class RandomSource {
 
-    private final long seed;
-    private Random random;
+    private final Random random;
 
     public RandomSource(long seed) {
-        this.seed = seed;
+        this.random = new Random(seed);
     }
 
-    public RandomSource next() {
-        return new RandomSource(get().nextLong());
+    public RandomSource nextSource() {
+        return new RandomSource(random.nextLong());
     }
 
-    public Random get() {
-        if (random == null) random = new Random(seed);
-        return random;
+    public boolean nextBoolean() {
+        return random.nextBoolean();
+    }
+
+    public <T> T choose(ArrayList<T> list) {
+        return list.get(random.nextInt(list.size()));
+    }
+
+    public int nextInt() {
+        return random.nextInt();
+    }
+
+    public String address(City city) {
+        return String.format("%s %s Street, %s, %s %s", random.nextInt(1000),
+                             choose(city.country().continent().commonFirstNames(Gender.of(nextBoolean()))),
+                             city.name(), random.nextInt(10_000), city.country().name());
     }
 }

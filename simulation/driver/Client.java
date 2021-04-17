@@ -17,7 +17,7 @@
 
 package grakn.benchmark.simulation.driver;
 
-import grakn.benchmark.common.seed.Region;
+import grakn.benchmark.common.concept.Region;
 
 public interface Client<SESSION extends Session<TX>, TX extends Transaction> extends AutoCloseable {
 

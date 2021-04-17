@@ -17,10 +17,28 @@
 
 package grakn.benchmark.neo4j.agent;
 
+import grakn.benchmark.common.concept.City;
+import grakn.benchmark.common.concept.Gender;
+import grakn.benchmark.common.concept.Person;
 import grakn.benchmark.common.params.Context;
 import grakn.benchmark.neo4j.driver.Neo4jClient;
 import grakn.benchmark.neo4j.driver.Neo4jTransaction;
 import grakn.benchmark.simulation.agent.PersonAgent;
+import org.neo4j.driver.Query;
+import org.neo4j.driver.Record;
+
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Optional;
+
+import static grakn.benchmark.neo4j.Labels.ADDRESS;
+import static grakn.benchmark.neo4j.Labels.BIRTH_DATE;
+import static grakn.benchmark.neo4j.Labels.CODE;
+import static grakn.benchmark.neo4j.Labels.EMAIL;
+import static grakn.benchmark.neo4j.Labels.FIRST_NAME;
+import static grakn.benchmark.neo4j.Labels.GENDER;
+import static grakn.benchmark.neo4j.Labels.LAST_NAME;
 
 public class Neo4jPersonAgent extends PersonAgent<Neo4jTransaction> {
 
@@ -29,7 +47,33 @@ public class Neo4jPersonAgent extends PersonAgent<Neo4jTransaction> {
     }
 
     @Override
-    protected void insertPerson(Neo4jTransaction tx) {
+    protected Optional<Person> insertPerson(Neo4jTransaction tx, String email, String firstName, String lastName,
+                                            String address, Gender gender, LocalDateTime birthDate, City city) {
+        String query = "MATCH (c:City {code: $code})" +
+                "CREATE (person:Person {" +
+                "email: $email, " +
+                "first-name: $first-name, " +
+                "last-name: $last-name" +
+                "address: $address" +
+                "gender: $gender, " +
+                "birth-date: $birth-date, " +
+                "})-[:born-in]->(c)," +
+                "(person)-[:resides-in]->(c)";
+        HashMap<String, Object> parameters = new HashMap<>() {{
+            put(CODE, city.code());
+            put(EMAIL, email);
+            put(FIRST_NAME, firstName);
+            put(LAST_NAME, lastName);
+            put(ADDRESS, address);
+            put(GENDER, gender);
+            put(BIRTH_DATE, birthDate);
+        }};
+        List<Record> inserted = tx.execute(new Query(query, parameters));
+        if (context.isTest()) return report(inserted);
+        else return Optional.empty();
+    }
 
+    private Optional<Person> report(List<Record> inserted) {
+        return Optional.empty(); // TODO
     }
 }

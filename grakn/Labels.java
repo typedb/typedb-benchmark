@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package grakn.benchmark.common.params;
+package grakn.benchmark.grakn;
 
 public class Labels {
 

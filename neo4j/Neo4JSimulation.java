@@ -17,6 +17,10 @@
 
 package grakn.benchmark.neo4j;
 
+import grakn.benchmark.common.concept.Continent;
+import grakn.benchmark.common.concept.Country;
+import grakn.benchmark.common.concept.Currency;
+import grakn.benchmark.common.concept.Global;
 import grakn.benchmark.common.params.Context;
 import grakn.benchmark.common.seed.SeedData;
 import grakn.benchmark.neo4j.agent.Neo4jPersonAgent;
@@ -99,10 +103,10 @@ public class Neo4JSimulation extends Simulation<Neo4jClient, Neo4jSession, Neo4j
         LOG.info("Neo4j initialisation of world simulation data started ...");
         Instant start = Instant.now();
         initContinents(nativeDriver, geoData.global());
-        LOG.info("Neo4j initialisation of world simulation data ended in {}", printDuration(start, Instant.now()));
+        LOG.info("Neo4j initialisation of world simulation data ended in: {}", printDuration(start, Instant.now()));
     }
 
-    private void initContinents(Driver nativeDriver, SeedData.Global global) {
+    private void initContinents(Driver nativeDriver, Global global) {
         global.continents().parallelStream().forEach(continent -> {
             try (Session session = nativeDriver.session()) {
                 Transaction tx = session.beginTransaction();
@@ -116,7 +120,7 @@ public class Neo4JSimulation extends Simulation<Neo4jClient, Neo4jSession, Neo4j
         });
     }
 
-    private void initCountries(Driver nativeDriver, SeedData.Continent continent) {
+    private void initCountries(Driver nativeDriver, Continent continent) {
         continent.countries().parallelStream().forEach(country -> {
             try (Session session = nativeDriver.session()) {
                 Transaction tx = session.beginTransaction();
@@ -124,7 +128,7 @@ public class Neo4JSimulation extends Simulation<Neo4jClient, Neo4jSession, Neo4j
                 if (!country.currencies().isEmpty()) {
                     currencyProps.append(", ");
                     for (int i = 0; i < country.currencies().size(); i++) {
-                        SeedData.Currency currency = country.currencies().get(i);
+                        Currency currency = country.currencies().get(i);
                         currencyProps.append("currency").append(i + 1).append(": '").append(currency.code()).append("'");
                         if (i + 1 < country.currencies().size()) currencyProps.append(", ");
                     }
@@ -142,7 +146,7 @@ public class Neo4JSimulation extends Simulation<Neo4jClient, Neo4jSession, Neo4j
         });
     }
 
-    private void initCities(Session session, SeedData.Country country) {
+    private void initCities(Session session, Country country) {
         Transaction tx = session.beginTransaction();
         country.cities().forEach(city -> {
             Query query = new Query(String.format(
@@ -154,7 +158,7 @@ public class Neo4JSimulation extends Simulation<Neo4jClient, Neo4jSession, Neo4j
         tx.commit();
     }
 
-    private void initUniversities(Session session, SeedData.Country country) {
+    private void initUniversities(Session session, Country country) {
         Transaction tx = session.beginTransaction();
         country.universities().forEach(university -> {
             Query query = new Query(String.format(

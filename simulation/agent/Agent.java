@@ -18,9 +18,9 @@
 package grakn.benchmark.simulation.agent;
 
 import grabl.tracing.client.GrablTracingThreadStatic;
-import grakn.benchmark.common.seed.RandomSource;
-import grakn.benchmark.common.seed.Region;
 import grakn.benchmark.common.params.Context;
+import grakn.benchmark.common.seed.RandomSource;
+import grakn.benchmark.common.concept.Region;
 import grakn.benchmark.simulation.driver.Client;
 import grakn.benchmark.simulation.driver.Session;
 import grakn.benchmark.simulation.driver.Transaction;
@@ -67,7 +67,7 @@ public abstract class Agent<REGION extends Region, TX extends Transaction> {
 
     protected abstract List<REGION> regions();
 
-    protected abstract List<Report> run(Session<TX> session, REGION region, Random random);
+    protected abstract List<Report> run(Session<TX> session, REGION region, RandomSource random);
 
     public Agent<REGION, TX> setTracing(boolean isTracing) {
         this.isTracing = isTracing;
@@ -81,16 +81,19 @@ public abstract class Agent<REGION extends Region, TX extends Transaction> {
     public Map<String, List<Report>> iterate(RandomSource randomSrc) {
         ConcurrentMap<String, List<Report>> reports = new ConcurrentHashMap<>();
         // We need to generate pairs of Region and Random deterministically before passing them to a parallel stream
-        List<Pair<REGION, Random>> regionRandomPairs = regions().stream()
-                .map(region -> new Pair<>(region, randomSrc.next().get())).collect(toList());
+        List<Pair<REGION, RandomSource>> regionRandomPairs = regions().stream()
+                .map(region -> new Pair<>(region, randomSrc.nextSource())).collect(toList());
         regionRandomPairs.parallelStream().forEach(pair -> {
             List<Report> report = runWithMayTrace(pair.first(), pair.second());
-            if (context.isTest()) reports.put(pair.first().tracker(), report);
+            if (context.isTest()) {
+                assert !report.isEmpty();
+                reports.put(pair.first().tracker(), report);
+            } else assert report.isEmpty();
         });
         return reports;
     }
 
-    private List<Report> runWithMayTrace(REGION region, Random random) {
+    private List<Report> runWithMayTrace(REGION region, RandomSource random) {
         GrablTracingThreadStatic.ThreadContext tracingCtx = null;
         try {
             if (isTracing()) tracingCtx = contextOnThread(region.tracker(), context.iterationNumber());
@@ -125,7 +128,7 @@ public abstract class Agent<REGION extends Region, TX extends Transaction> {
         private final Collection<Object> output;
         private final int hash;
 
-        private Report(Collection<Object> input, Collection<Object> output) {
+        public Report(Collection<Object> input, Collection<Object> output) {
             this.input = input;
             this.output = output;
             this.hash = Objects.hash(this.input, this.output);

@@ -15,15 +15,33 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package grakn.benchmark.common.seed;
+package grakn.benchmark.common.concept;
 
-public interface Region {
+public enum Gender {
+    MALE(true, "male"),
+    FEMALE(false, "female");
 
-    String code();
+    boolean isMale;
+    private final String name;
 
-    String name();
+    Gender(boolean isMale, String name) {
+        this.isMale = isMale;
+        this.name = name;
+    }
 
-    String tracker();
+    public static Gender of(boolean isMale) {
+        return isMale ? MALE : FEMALE;
+    }
 
-    String group(); // Used to assign session keys for Grakn model
+    public String value() {
+        return name;
+    }
+
+    public boolean isMale() {
+        return isMale;
+    }
+
+    public boolean isFemale() {
+        return !isMale;
+    }
 }

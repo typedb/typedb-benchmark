@@ -17,36 +17,58 @@
 
 package grakn.benchmark.simulation.agent;
 
+import grakn.benchmark.common.concept.City;
+import grakn.benchmark.common.concept.Country;
+import grakn.benchmark.common.concept.Gender;
+import grakn.benchmark.common.concept.Person;
 import grakn.benchmark.common.params.Context;
-import grakn.benchmark.common.seed.SeedData;
+import grakn.benchmark.common.seed.RandomSource;
 import grakn.benchmark.simulation.driver.Client;
 import grakn.benchmark.simulation.driver.Session;
 import grakn.benchmark.simulation.driver.Transaction;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
+import java.util.Optional;
 
-public abstract class PersonAgent<TX extends Transaction> extends Agent<SeedData.Country, TX>{
+import static grakn.benchmark.common.concept.Gender.FEMALE;
+import static grakn.benchmark.common.concept.Gender.MALE;
+import static grakn.common.collection.Collections.list;
+
+public abstract class PersonAgent<TX extends Transaction> extends Agent<Country, TX> {
 
     protected PersonAgent(Client<?, TX> client, Context context) {
         super(client, context);
     }
 
     @Override
-    protected List<SeedData.Country> regions() {
+    protected List<Country> regions() {
         return context.seedData().countries();
     }
 
     @Override
-    protected List<Report> run(Session<TX> session, SeedData.Country country, Random random) {
+    protected List<Report> run(Session<TX> session, Country country, RandomSource random) {
         List<Report> reports = new ArrayList<>();
         try (TX tx = session.transaction(country.tracker(), context.iterationNumber())) {
-            insertPerson(tx);
+            for (int i = 0; i < context.scaleFactor(); i++) {
+                Gender gender = random.nextBoolean() ? MALE : FEMALE;
+                String firstName = random.choose(country.continent().commonFirstNames(gender));
+                String lastName = random.choose(country.continent().commonLastNames());
+                City city = random.choose(country.cities());
+                String email = String.format("%s.%s.%s.%s@email.com", firstName, lastName, city.code(), random.nextInt());
+                String address = random.address(city);
+                Optional<Person> inserted = insertPerson(tx, email, firstName, lastName, address, gender, context.today(), city);
+                if (context.isTest()) {
+                    assert inserted.isPresent();
+                    reports.add(new Report(list(email, firstName, lastName, address, gender, context.today(), city), list(inserted.get())));
+                }
+            }
             tx.commit();
         }
         return reports;
     }
 
-    protected abstract void insertPerson(TX tx);
+    protected abstract Optional<Person> insertPerson(TX tx, String email, String firstName, String lastName, String address,
+                                                     Gender gender, LocalDateTime birthDate, City city);
 }

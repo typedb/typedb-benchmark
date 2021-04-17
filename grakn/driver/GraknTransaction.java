@@ -20,6 +20,7 @@ package grakn.benchmark.grakn.driver;
 import grakn.benchmark.simulation.driver.Transaction;
 import grakn.client.api.answer.ConceptMap;
 import grakn.client.api.answer.Numeric;
+import grakn.client.api.query.QueryManager;
 import graql.lang.query.GraqlDelete;
 import graql.lang.query.GraqlInsert;
 import graql.lang.query.GraqlMatch;
@@ -45,6 +46,10 @@ public class GraknTransaction implements Transaction {
         this.tx = tx;
         this.tracker = tracker;
         this.iteration = iteration;
+    }
+
+    public QueryManager query() {
+        return tx.query();
     }
 
     @Override

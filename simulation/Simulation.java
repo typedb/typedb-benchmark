@@ -109,7 +109,7 @@ public abstract class Simulation<
     public void iterate() {
         agentReports.clear();
         for (Agent<?, ?> agent : agents) {
-            agentReports.put(agent.getClass(), agent.iterate(randomSource.next()));
+            agentReports.put(agent.getClass(), agent.iterate(randomSource.nextSource()));
         }
         // We want to test opening new sessions each iteration.
         client.closeSessions();

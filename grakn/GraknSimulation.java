@@ -17,6 +17,9 @@
 
 package grakn.benchmark.grakn;
 
+import grakn.benchmark.common.concept.Continent;
+import grakn.benchmark.common.concept.Country;
+import grakn.benchmark.common.concept.Global;
 import grakn.benchmark.common.params.Context;
 import grakn.benchmark.common.seed.SeedData;
 import grakn.benchmark.grakn.agent.GraknPersonAgent;
@@ -37,19 +40,19 @@ import java.nio.file.Paths;
 import java.time.Instant;
 
 import static grakn.benchmark.common.Util.printDuration;
-import static grakn.benchmark.common.params.Labels.CITY;
-import static grakn.benchmark.common.params.Labels.CODE;
-import static grakn.benchmark.common.params.Labels.CONTAINED;
-import static grakn.benchmark.common.params.Labels.CONTAINER;
-import static grakn.benchmark.common.params.Labels.CONTAINS;
-import static grakn.benchmark.common.params.Labels.CONTINENT;
-import static grakn.benchmark.common.params.Labels.COUNTRY;
-import static grakn.benchmark.common.params.Labels.CURRENCY;
-import static grakn.benchmark.common.params.Labels.LOCATED;
-import static grakn.benchmark.common.params.Labels.LOCATES;
-import static grakn.benchmark.common.params.Labels.LOCATION;
-import static grakn.benchmark.common.params.Labels.NAME;
-import static grakn.benchmark.common.params.Labels.UNIVERSITY;
+import static grakn.benchmark.grakn.Labels.CITY;
+import static grakn.benchmark.grakn.Labels.CODE;
+import static grakn.benchmark.grakn.Labels.CONTAINED;
+import static grakn.benchmark.grakn.Labels.CONTAINER;
+import static grakn.benchmark.grakn.Labels.CONTAINS;
+import static grakn.benchmark.grakn.Labels.CONTINENT;
+import static grakn.benchmark.grakn.Labels.COUNTRY;
+import static grakn.benchmark.grakn.Labels.CURRENCY;
+import static grakn.benchmark.grakn.Labels.LOCATED;
+import static grakn.benchmark.grakn.Labels.LOCATES;
+import static grakn.benchmark.grakn.Labels.LOCATION;
+import static grakn.benchmark.grakn.Labels.NAME;
+import static grakn.benchmark.grakn.Labels.UNIVERSITY;
 import static grakn.client.api.GraknSession.Type.DATA;
 import static grakn.client.api.GraknSession.Type.SCHEMA;
 import static grakn.client.api.GraknTransaction.Type.WRITE;
@@ -100,7 +103,7 @@ public class GraknSimulation extends Simulation<GraknClient, GraknSession, Grakn
                 tx.query().define(Graql.parseQuery(schemaQuery));
                 tx.commit();
             }
-            LOG.info("Grakn initialisation of world simulation schema ended in {}", printDuration(start, Instant.now()));
+            LOG.info("Grakn initialisation of world simulation schema ended in: {}", printDuration(start, Instant.now()));
         }
     }
 
@@ -109,11 +112,11 @@ public class GraknSimulation extends Simulation<GraknClient, GraknSession, Grakn
             LOG.info("Grakn initialisation of world simulation data started ...");
             Instant start = Instant.now();
             initContinents(session, geoData.global());
-            LOG.info("Grakn initialisation of world simulation data ended in {}", printDuration(start, Instant.now()));
+            LOG.info("Grakn initialisation of world simulation data ended in: {}", printDuration(start, Instant.now()));
         }
     }
 
-    private void initContinents(grakn.client.api.GraknSession session, SeedData.Global global) {
+    private void initContinents(grakn.client.api.GraknSession session, Global global) {
         global.continents().parallelStream().forEach(continent -> {
             try (grakn.client.api.GraknTransaction tx = session.transaction(WRITE)) {
                 tx.query().insert(insert(var().isa(CONTINENT).has(CODE, continent.code()).has(NAME, continent.name())));
@@ -123,7 +126,7 @@ public class GraknSimulation extends Simulation<GraknClient, GraknSession, Grakn
         });
     }
 
-    private void initCountries(grakn.client.api.GraknSession session, SeedData.Continent continent) {
+    private void initCountries(grakn.client.api.GraknSession session, Continent continent) {
         continent.countries().parallelStream().forEach(country -> {
             try (grakn.client.api.GraknTransaction tx = session.transaction(WRITE)) {
                 ThingVariable.Thing countryVar = var(Y).isa(COUNTRY).has(CODE, country.code()).has(NAME, country.name());
@@ -141,7 +144,7 @@ public class GraknSimulation extends Simulation<GraknClient, GraknSession, Grakn
         });
     }
 
-    private void initCities(grakn.client.api.GraknSession session, SeedData.Country country) {
+    private void initCities(grakn.client.api.GraknSession session, Country country) {
         try (grakn.client.api.GraknTransaction tx = session.transaction(WRITE)) {
             country.cities().forEach(city -> tx.query().insert(match(
                     var(X).isa(COUNTRY).has(CODE, country.code())
@@ -153,7 +156,7 @@ public class GraknSimulation extends Simulation<GraknClient, GraknSession, Grakn
         }
     }
 
-    private void initUniversities(grakn.client.api.GraknSession session, SeedData.Country country) {
+    private void initUniversities(grakn.client.api.GraknSession session, Country country) {
         try (grakn.client.api.GraknTransaction tx = session.transaction(WRITE)) {
             country.universities().forEach(university -> tx.query().insert(match(
                     var(X).isa(COUNTRY).has(CODE, country.code())

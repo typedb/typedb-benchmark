@@ -18,7 +18,7 @@
 package grakn.benchmark.neo4j.driver;
 
 import grabl.tracing.client.GrablTracingThreadStatic;
-import grakn.benchmark.common.seed.Region;
+import grakn.benchmark.common.concept.Region;
 import grakn.benchmark.simulation.driver.Client;
 import org.neo4j.driver.AuthTokens;
 import org.neo4j.driver.Driver;
