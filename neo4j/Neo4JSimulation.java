@@ -41,11 +41,9 @@ import static grakn.benchmark.common.Util.printDuration;
 public class Neo4JSimulation extends Simulation<Neo4jClient, Neo4jSession, Neo4jTransaction> {
 
     private static final Logger LOG = LoggerFactory.getLogger(Neo4JSimulation.class);
-    private final Driver nativeDriver;
 
     private Neo4JSimulation(Neo4jClient client, Context context) throws Exception {
         super(client, context);
-        this.nativeDriver = client.unpack();
     }
 
     public static Neo4JSimulation create(String hostUri, Context context) throws Exception {
@@ -54,11 +52,12 @@ public class Neo4JSimulation extends Simulation<Neo4jClient, Neo4jSession, Neo4j
 
     @Override
     protected void initialise(SeedData geoData) {
-        initDatabase();
-        initData(geoData);
+        Driver nativeDriver = client.unpack();
+        initDatabase(nativeDriver);
+        initData(nativeDriver, geoData);
     }
 
-    private void initDatabase() {
+    private void initDatabase(Driver nativeDriver) {
         try (Session session = nativeDriver.session()) {
             addKeyConstraints(session);
             cleanDatabase(session);
@@ -96,14 +95,14 @@ public class Neo4JSimulation extends Simulation<Neo4jClient, Neo4jSession, Neo4j
         tx.commit();
     }
 
-    private void initData(SeedData geoData) {
+    private void initData(Driver nativeDriver, SeedData geoData) {
         LOG.info("Neo4j initialisation of world simulation data started ...");
         Instant start = Instant.now();
-        initContinents(geoData.global());
+        initContinents(nativeDriver, geoData.global());
         LOG.info("Neo4j initialisation of world simulation data ended in {}", printDuration(start, Instant.now()));
     }
 
-    private void initContinents(SeedData.Global global) {
+    private void initContinents(Driver nativeDriver, SeedData.Global global) {
         global.continents().parallelStream().forEach(continent -> {
             try (Session session = nativeDriver.session()) {
                 Transaction tx = session.beginTransaction();

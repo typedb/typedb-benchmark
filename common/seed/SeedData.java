@@ -36,16 +36,16 @@ import static java.util.stream.Collectors.toList;
 
 public class SeedData {
 
-    private static final File ADJECTIVES_FILE = Paths.get("simulation/data/adjectives.csv").toFile();
-    private static final File CITIES_FILE = Paths.get("simulation/data/cities.csv").toFile();
-    private static final File CONTINENTS_FILE = Paths.get("simulation/data/continents.csv").toFile();
-    private static final File COUNTRIES_FILE = Paths.get("simulation/data/countries.csv").toFile();
-    private static final File CURRENCIES_FILE = Paths.get("simulation/data/currencies.csv").toFile();
-    private static final File FIRST_NAMES_FEMALE_FILE = Paths.get("simulation/data/first-names-female.csv").toFile();
-    private static final File FIRST_NAMES_MALE_FILE = Paths.get("simulation/data/first-names-male.csv").toFile();
-    private static final File LAST_NAMES_FILE = Paths.get("simulation/data/last-names.csv").toFile();
-    private static final File NOUNS_FILE = Paths.get("simulation/data/nouns.csv").toFile();
-    private static final File UNIVERSITIES_FILE = Paths.get("simulation/data/universities.csv").toFile();
+    private static final File ADJECTIVES_FILE = Paths.get("data/adjectives.csv").toFile();
+    private static final File CITIES_FILE = Paths.get("data/cities.csv").toFile();
+    private static final File CONTINENTS_FILE = Paths.get("data/continents.csv").toFile();
+    private static final File COUNTRIES_FILE = Paths.get("data/countries.csv").toFile();
+    private static final File CURRENCIES_FILE = Paths.get("data/currencies.csv").toFile();
+    private static final File FIRST_NAMES_FEMALE_FILE = Paths.get("data/first-names-female.csv").toFile();
+    private static final File FIRST_NAMES_MALE_FILE = Paths.get("data/first-names-male.csv").toFile();
+    private static final File LAST_NAMES_FILE = Paths.get("data/last-names.csv").toFile();
+    private static final File NOUNS_FILE = Paths.get("data/nouns.csv").toFile();
+    private static final File UNIVERSITIES_FILE = Paths.get("data/universities.csv").toFile();
     private static final CSVFormat CSV_FORMAT = CSVFormat.DEFAULT.withEscape('\\').withIgnoreSurroundingSpaces().withNullString("");
 
     private final Global global;

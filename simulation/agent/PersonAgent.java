@@ -23,6 +23,7 @@ import grakn.benchmark.simulation.driver.Client;
 import grakn.benchmark.simulation.driver.Session;
 import grakn.benchmark.simulation.driver.Transaction;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -39,7 +40,12 @@ public abstract class PersonAgent<TX extends Transaction> extends Agent<SeedData
 
     @Override
     protected List<Report> run(Session<TX> session, SeedData.City city, Random random) {
-        return null;
+        List<Report> reports = new ArrayList<>();
+        try (TX tx = session.transaction(city.tracker(), context.iterationNumber())) {
+            insertPerson(tx);
+            tx.commit();
+        }
+        return reports;
     }
 
     protected abstract void insertPerson(TX tx);

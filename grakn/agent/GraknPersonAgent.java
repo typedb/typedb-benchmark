@@ -29,7 +29,7 @@ public class GraknPersonAgent extends PersonAgent<GraknTransaction> {
     }
 
     @Override
-    protected void insertPerson(GraknTransaction graknTransaction) {
+    protected void insertPerson(GraknTransaction tx) {
 
     }
 }

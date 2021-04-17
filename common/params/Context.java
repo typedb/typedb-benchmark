@@ -65,6 +65,10 @@ public class Context {
         return config.scaleFactor();
     }
 
+    public String databaseName() {
+        return config.databaseName();
+    }
+
     public int iterationNumber() {
         return iteration.get();
     }

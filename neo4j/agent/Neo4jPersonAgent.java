@@ -29,7 +29,7 @@ public class Neo4jPersonAgent extends PersonAgent<Neo4jTransaction> {
     }
 
     @Override
-    protected void insertPerson(Neo4jTransaction neo4jTransaction) {
+    protected void insertPerson(Neo4jTransaction tx) {
 
     }
 }

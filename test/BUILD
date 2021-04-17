@@ -42,7 +42,7 @@ java_test(
     size = "enormous",
     resource_strip_prefix = "config/",
     resources = ["//config:logback.xml"],
-    data = [":config.yml"],
+    data = [":comparison-test.yml"],
 )
 
 checkstyle_test(

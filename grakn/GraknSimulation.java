@@ -45,6 +45,9 @@ import static grakn.benchmark.common.params.Labels.CONTAINS;
 import static grakn.benchmark.common.params.Labels.CONTINENT;
 import static grakn.benchmark.common.params.Labels.COUNTRY;
 import static grakn.benchmark.common.params.Labels.CURRENCY;
+import static grakn.benchmark.common.params.Labels.LOCATED;
+import static grakn.benchmark.common.params.Labels.LOCATES;
+import static grakn.benchmark.common.params.Labels.LOCATION;
 import static grakn.benchmark.common.params.Labels.NAME;
 import static grakn.benchmark.common.params.Labels.UNIVERSITY;
 import static grakn.client.api.GraknSession.Type.DATA;
@@ -59,38 +62,37 @@ public class GraknSimulation extends Simulation<GraknClient, GraknSession, Grakn
 
     private static final Logger LOG = LoggerFactory.getLogger(GraknSimulation.class);
     private static final File SCHEMA_FILE = Paths.get("grakn/simulation.gql").toFile();
-    private static final String DATABASE_NAME = "simulation";
     private static final String X = "x", Y = "y";
-
-    private final grakn.client.api.GraknClient nativeClient;
 
     private GraknSimulation(GraknClient client, Context context) throws Exception {
         super(client, context);
-        this.nativeClient = client.unpack();
     }
 
     public static GraknSimulation core(String address, Context context) throws Exception {
-        return new GraknSimulation(GraknClient.core(address, DATABASE_NAME), context);
+        return new GraknSimulation(GraknClient.core(address, context.databaseName()), context);
     }
 
     public static GraknSimulation cluster(String address, Context context) throws Exception {
-        return new GraknSimulation(GraknClient.cluster(address, DATABASE_NAME), context);
+        return new GraknSimulation(GraknClient.cluster(address, context.databaseName()), context);
     }
 
     @Override
     protected void initialise(SeedData geoData) throws IOException {
-        initDatabase();
-        initSchema();
-        initData(geoData);
+        grakn.client.api.GraknClient nativeClient = client.unpack();
+        initDatabase(nativeClient);
+        initSchema(nativeClient);
+        initData(nativeClient, geoData);
     }
 
-    private void initDatabase() {
-        if (nativeClient.databases().contains(DATABASE_NAME)) nativeClient.databases().get(DATABASE_NAME).delete();
-        nativeClient.databases().create(DATABASE_NAME);
+    private void initDatabase(grakn.client.api.GraknClient nativeClient) {
+        if (nativeClient.databases().contains(context.databaseName())) {
+            nativeClient.databases().get(context.databaseName()).delete();
+        }
+        nativeClient.databases().create(context.databaseName());
     }
 
-    private void initSchema() throws IOException {
-        try (grakn.client.api.GraknSession session = nativeClient.session(DATABASE_NAME, SCHEMA)) {
+    private void initSchema(grakn.client.api.GraknClient nativeClient) throws IOException {
+        try (grakn.client.api.GraknSession session = nativeClient.session(context.databaseName(), SCHEMA)) {
             LOG.info("Grakn initialisation of world simulation schema started ...");
             Instant start = Instant.now();
             String schemaQuery = Files.readString(SCHEMA_FILE.toPath());
@@ -102,8 +104,8 @@ public class GraknSimulation extends Simulation<GraknClient, GraknSession, Grakn
         }
     }
 
-    private void initData(SeedData geoData) {
-        try (grakn.client.api.GraknSession session = nativeClient.session(DATABASE_NAME, DATA)) {
+    private void initData(grakn.client.api.GraknClient nativeClient, SeedData geoData) {
+        try (grakn.client.api.GraknSession session = nativeClient.session(context.databaseName(), DATA)) {
             LOG.info("Grakn initialisation of world simulation data started ...");
             Instant start = Instant.now();
             initContinents(session, geoData.global());
@@ -157,7 +159,7 @@ public class GraknSimulation extends Simulation<GraknClient, GraknSession, Grakn
                     var(X).isa(COUNTRY).has(CODE, country.code())
             ).insert(
                     var(Y).isa(UNIVERSITY).has(NAME, university.name()),
-                    rel(CONTAINER, X).rel(CONTAINED, Y).isa(CONTAINS)
+                    rel(LOCATION, X).rel(LOCATED, Y).isa(LOCATES)
             )));
             tx.commit();
         }

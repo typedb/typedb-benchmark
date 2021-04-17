@@ -51,8 +51,8 @@ public abstract class Simulation<
     private static final Logger LOG = LoggerFactory.getLogger(Simulation.class);
     private static final String AGENT_PACKAGE = Agent.class.getPackageName();
 
-    private final CLIENT client;
-    private final Context context;
+    protected final CLIENT client;
+    protected final Context context;
     private final RandomSource randomSource;
     private final List<Agent<?, TX>> agents;
     private final Map<Class<? extends Agent>, Map<String, List<Agent.Report>>> agentReports;
