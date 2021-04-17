@@ -107,7 +107,7 @@ public class Neo4JSimulation extends Simulation<Neo4jClient, Neo4jSession, Neo4j
             try (Session session = nativeDriver.session()) {
                 Transaction tx = session.beginTransaction();
                 Query interpolatedQuery = new Query(String.format(
-                        "CREATE (x:Continent:Region {code: '%s', name: '%s'})", continent.code(), continent.name()
+                        "CREATE (x:Continent:Region {code: '%s', name: '%s'})", continent.code(), escapeQuotes(continent.name())
                 ));
                 tx.run(interpolatedQuery);
                 tx.commit();
@@ -131,7 +131,7 @@ public class Neo4JSimulation extends Simulation<Neo4jClient, Neo4jSession, Neo4j
             }
             Query query = new Query(String.format(
                     "MATCH (c:Continent {code: '%s'}) CREATE (x:Country:Region {code: '%s', name: '%s'%s})-[:LOCATED_IN]->(c)",
-                    continent.code(), country.code(), country.name(), currencyProps
+                    continent.code(), country.code(), escapeQuotes(country.name()), currencyProps
             ));
             tx.run(query);
             tx.commit();
@@ -145,7 +145,7 @@ public class Neo4JSimulation extends Simulation<Neo4jClient, Neo4jSession, Neo4j
         country.cities().forEach(city -> {
             Query query = new Query(String.format(
                     "MATCH (c:Country {code: '%s'}) CREATE (x:City:Region {code: '%s', name: '%s'})-[:LOCATED_IN]->(c)",
-                    country.code(), city.code(), city.name()
+                    country.code(), city.code(), escapeQuotes(city.name())
             ));
             tx.run(query);
         });
@@ -157,11 +157,15 @@ public class Neo4JSimulation extends Simulation<Neo4jClient, Neo4jSession, Neo4j
         country.universities().forEach(university -> {
             Query query = new Query(String.format(
                     "MATCH (c:Country {code: '%s'}) CREATE (x:University {name: '%s'})-[:LOCATED_IN]->(c)",
-                    country.code(), university.name()
+                    country.code(), escapeQuotes(university.name())
             ));
             tx.run(query);
         });
         tx.commit();
+    }
+
+    private String escapeQuotes(String string) {
+        return string.replace("'", "\\'");
     }
 
     @Override

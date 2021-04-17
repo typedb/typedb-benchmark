@@ -27,21 +27,21 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public abstract class PersonAgent<TX extends Transaction> extends Agent<SeedData.City, TX>{
+public abstract class PersonAgent<TX extends Transaction> extends Agent<SeedData.Country, TX>{
 
     protected PersonAgent(Client<?, TX> client, Context context) {
         super(client, context);
     }
 
     @Override
-    protected List<SeedData.City> regions() {
-        return context.seedData().cities();
+    protected List<SeedData.Country> regions() {
+        return context.seedData().countries();
     }
 
     @Override
-    protected List<Report> run(Session<TX> session, SeedData.City city, Random random) {
+    protected List<Report> run(Session<TX> session, SeedData.Country country, Random random) {
         List<Report> reports = new ArrayList<>();
-        try (TX tx = session.transaction(city.tracker(), context.iterationNumber())) {
+        try (TX tx = session.transaction(country.tracker(), context.iterationNumber())) {
             insertPerson(tx);
             tx.commit();
         }
