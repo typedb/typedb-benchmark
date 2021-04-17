@@ -146,7 +146,7 @@ build:
 
         sudo systemctl daemon-reload
         sudo systemctl start grakn-cluster
-        export GRABL_EXPORT_PERFORMANCE_GRAKN_CLUSTER_1_HOSTNAME="${HOSTNAME}"
+        export GRABL_EXPORT_PERFORMANCE_GRAKN_CLUSTER_1_HOSTNAME="${HOSTNAME}:1729"
       monitor: |
         sleep 20s
         tail -f -n +1 ./dist/grakn-cluster-all-linux/server/logs/grakn.log
@@ -226,7 +226,7 @@ build:
 
         bazel run //:benchmark -- \
           --database grakn-cluster \
-          --address $GRABL_EXPORT_PERFORMANCE_GRAKN_CLUSTER_1_HOSTNAME:1729 \
+          --address $GRABL_EXPORT_PERFORMANCE_GRAKN_CLUSTER_1_HOSTNAME \
           --config /home/grabl/$GRABL_REPO/config/simulation.yml \
           --grabl $GRABL_TRACING_URI \
           --org $GRABL_OWNER \
@@ -276,7 +276,7 @@ build:
       command: |
         bazel run //:benchmark -- \
           --database grakn-core \
-          --address $GRABL_EXPORT_PERFORMANCE_GRAKN_CORE_URI:1729 \
+          --address $GRABL_EXPORT_PERFORMANCE_GRAKN_CORE_URI \
           --config /home/grabl/$GRABL_REPO/config/simulation.yml \
           --grabl $GRABL_TRACING_URI \
           --org $GRABL_OWNER \
