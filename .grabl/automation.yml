@@ -61,7 +61,7 @@ build:
         wget -O - https://debian.neo4j.com/neotechnology.gpg.key | sudo apt-key add -
         echo 'deb https://debian.neo4j.com stable 4.2' | sudo tee -a /etc/apt/sources.list.d/neo4j.list
         sudo apt-get update
-        sudo apt-get install -y neo4j=1:4.2.0
+        sudo apt-get install -y neo4j=1:4.2.5
         sudo update-java-alternatives --jre --set java-1.11.0-openjdk-amd64
         echo 'dbms.connector.bolt.listen_address=0.0.0.0:7687' | sudo tee -a /etc/neo4j/neo4j.conf
         echo 'dbms.security.auth_enabled=false' | sudo tee -a /etc/neo4j/neo4j.conf
@@ -305,7 +305,7 @@ build:
         wget -O - https://debian.neo4j.com/neotechnology.gpg.key | sudo apt-key add -
         echo 'deb https://debian.neo4j.com stable 4.2' | sudo tee -a /etc/apt/sources.list.d/neo4j.list
         sudo apt-get update
-        sudo apt-get install -y neo4j=1:4.2.0
+        sudo apt-get install -y neo4j=1:4.2.5
         sudo update-java-alternatives --jre --set java-1.11.0-openjdk-amd64
         echo 'dbms.connector.bolt.listen_address=0.0.0.0:7687' | sudo tee -a /etc/neo4j/neo4j.conf
         echo 'dbms.security.auth_enabled=false' | sudo tee -a /etc/neo4j/neo4j.conf
