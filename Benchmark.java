@@ -44,7 +44,7 @@ public class Benchmark {
         if (optionsOpt.isEmpty()) System.exit(0);
         Options options = optionsOpt.get();
 
-        try (GrablTracing ignore = initTracing(null, options.database().fullname())) {
+        try (GrablTracing ignore = initTracing(options.tracing().orElse(null), options.database().fullname())) {
             Config config = Config.loadYML(options.config());
             try (Simulation<?, ?, ?> simulation = initSimulation(options, config)) {
                 simulation.run();

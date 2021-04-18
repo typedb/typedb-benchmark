@@ -24,14 +24,15 @@ import grakn.benchmark.common.seed.RandomSource;
 import grakn.benchmark.simulation.driver.Client;
 import grakn.benchmark.simulation.driver.Session;
 import grakn.benchmark.simulation.driver.Transaction;
-import grakn.common.collection.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.Supplier;
@@ -40,7 +41,7 @@ import static grabl.tracing.client.GrablTracingThreadStatic.contextOnThread;
 import static grabl.tracing.client.GrablTracingThreadStatic.traceOnThread;
 import static grakn.common.collection.Collections.pair;
 import static grakn.common.util.Objects.className;
-import static java.util.stream.Collectors.toList;
+import static java.util.concurrent.CompletableFuture.runAsync;
 
 /**
  * Agent constructs regional agents of a given class and runs them in parallel, providing them with the appropriate
@@ -82,14 +83,16 @@ public abstract class Agent<REGION extends Region, TX extends Transaction> {
 
     public Map<String, List<Report>> iterate(RandomSource randomSrc) {
         ConcurrentMap<String, List<Report>> reports = new ConcurrentHashMap<>();
+        List<CompletableFuture<Void>> asyncRuns = new ArrayList<>(regions().size());
         // We need to generate pairs of Region and Random deterministically before passing them to a parallel stream
-        regions().stream().map(r -> pair(r, randomSrc.nextSource())).collect(toList()).parallelStream().forEach(rr -> {
+        regions().stream().map(r -> pair(r, randomSrc.nextSource())).forEach(rr -> asyncRuns.add(runAsync(() -> {
             List<Report> report = runAndMayTrace(rr.first(), rr.second());
             if (context.isReporting()) {
                 assert !report.isEmpty();
                 reports.put(rr.first().tracker(), report);
             } else assert report.isEmpty();
-        });
+        }, context.executor())));
+        CompletableFuture.allOf(asyncRuns.toArray(new CompletableFuture[0])).join();
         return reports;
     }
 
