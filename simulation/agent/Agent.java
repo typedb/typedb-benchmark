@@ -87,10 +87,8 @@ public abstract class Agent<REGION extends Region, TX extends Transaction> {
         // We need to generate pairs of Region and Random deterministically before passing them to a parallel stream
         regions().stream().map(r -> pair(r, randomSrc.nextSource())).forEach(rr -> asyncRuns.add(runAsync(() -> {
             List<Report> report = runAndMayTrace(rr.first(), rr.second());
-            if (context.isReporting()) {
-                assert !report.isEmpty();
-                reports.put(rr.first().tracker(), report);
-            } else assert report.isEmpty();
+            if (context.isReporting()) reports.put(rr.first().tracker(), report);
+            else assert report.isEmpty();
         }, context.executor())));
         CompletableFuture.allOf(asyncRuns.toArray(new CompletableFuture[0])).join();
         return reports;
