@@ -44,7 +44,7 @@ public class Context {
         this.config = config;
         this.isTracing = isTracing;
         this.isReporting = isReporting;
-        this.iteration = new AtomicInteger(0);
+        this.iteration = new AtomicInteger(1);
     }
 
     public static Context create(Config config, boolean isTracing, boolean isTest) throws IOException {
