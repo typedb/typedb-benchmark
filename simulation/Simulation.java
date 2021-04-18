@@ -19,8 +19,8 @@ package grakn.benchmark.simulation;
 
 import grakn.benchmark.common.params.Config;
 import grakn.benchmark.common.params.Context;
-import grakn.benchmark.common.seed.SeedData;
 import grakn.benchmark.common.seed.RandomSource;
+import grakn.benchmark.common.seed.SeedData;
 import grakn.benchmark.simulation.agent.Agent;
 import grakn.benchmark.simulation.agent.PersonAgent;
 import grakn.benchmark.simulation.driver.Client;
@@ -100,8 +100,7 @@ public abstract class Simulation<
             int iter = context.iterationNumber();
             Instant iterStart = Instant.now();
             iterate();
-            Instant iterEnd = Instant.now();
-            LOG.info("Iteration {}: {}", iter, printDuration(iterStart, iterEnd));
+            LOG.info("Iteration {}: {}", iter, printDuration(iterStart, Instant.now()));
             LOG.info("-------------------------");
         }
         LOG.info("Simulation run duration: " + printDuration(start, Instant.now()));
@@ -110,11 +109,7 @@ public abstract class Simulation<
 
     public void iterate() {
         agentReports.clear();
-        for (Agent<?, ?> agent : agents) {
-            agentReports.put(agent.getClass(), agent.iterate(randomSource.nextSource()));
-        }
-        // We want to test opening new sessions each iteration.
-        client.closeSessions();
+        agents.forEach(agent -> agentReports.put(agent.getClass(), agent.iterate(randomSource.nextSource())));
         context.incrementIteration();
     }
 
