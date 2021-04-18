@@ -18,9 +18,9 @@
 package grakn.benchmark.simulation.agent;
 
 import grabl.tracing.client.GrablTracingThreadStatic;
+import grakn.benchmark.common.concept.Region;
 import grakn.benchmark.common.params.Context;
 import grakn.benchmark.common.seed.RandomSource;
-import grakn.benchmark.common.concept.Region;
 import grakn.benchmark.simulation.driver.Client;
 import grakn.benchmark.simulation.driver.Session;
 import grakn.benchmark.simulation.driver.Transaction;
@@ -32,7 +32,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.Supplier;
@@ -64,6 +63,8 @@ public abstract class Agent<REGION extends Region, TX extends Transaction> {
         this.client = client;
         this.context = context;
     }
+
+    protected abstract Class<? extends Agent> agentClass();
 
     protected abstract List<REGION> regions();
 
@@ -98,18 +99,10 @@ public abstract class Agent<REGION extends Region, TX extends Transaction> {
         try {
             if (isTracing()) tracingCtx = contextOnThread(region.tracker(), context.iterationNumber());
             Session<TX> session = client.session(region);
-            return mayTrace(() -> run(session, region, random), className(getClass()));
+            return mayTrace(() -> run(session, region, random), className(agentClass()));
         } finally {
             if (tracingCtx != null) tracingCtx.close();
         }
-    }
-
-    public <U> U pickOne(List<U> list, Random random) {
-        return list.get(random.nextInt(list.size()));
-    }
-
-    public String uniqueId(Context benchmarkContext, String tracker, int iterationScopeId) {
-        return benchmarkContext.iterationNumber() + "/" + tracker + "/" + iterationScopeId;
     }
 
     public <T> T mayTrace(Supplier<T> methodToTrace, String trace) {
