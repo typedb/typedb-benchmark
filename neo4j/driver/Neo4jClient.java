@@ -17,7 +17,6 @@
 
 package grakn.benchmark.neo4j.driver;
 
-import grabl.tracing.client.GrablTracingThreadStatic;
 import grakn.benchmark.common.concept.Region;
 import grakn.benchmark.simulation.driver.Client;
 import org.neo4j.driver.AuthTokens;
@@ -30,9 +29,6 @@ import org.neo4j.driver.Result;
 import java.text.DecimalFormat;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
-
-import static grabl.tracing.client.GrablTracingThreadStatic.traceOnThread;
-import static grakn.benchmark.simulation.driver.Client.TracingLabel.OPEN_SESSION;
 
 public class Neo4jClient implements Client<Neo4jSession, Neo4jTransaction> {
 
@@ -49,11 +45,7 @@ public class Neo4jClient implements Client<Neo4jSession, Neo4jTransaction> {
 
     @Override
     public Neo4jSession session(Region region) {
-        return sessionMap.computeIfAbsent(region.name(), k -> {
-            try (GrablTracingThreadStatic.ThreadTrace ignored = traceOnThread(OPEN_SESSION.getName())) {
-                return new Neo4jSession(nativeDriver.session());
-            }
-        });
+        return sessionMap.computeIfAbsent(region.name(), k -> new Neo4jSession(nativeDriver.session()));
     }
 
     @Override
@@ -76,11 +68,11 @@ public class Neo4jClient implements Client<Neo4jSession, Neo4jTransaction> {
             });
             long numberOfRelationships = (long) numberOfRelationshipsList.get(0).asMap().get("count(*)");
 
-            str.append("Benchmark statistic:");
+            str.append("Benchmark statistic:").append("\n");
             str.append("\n");
 
-            str.append("Count 'node': {}").append(formatter.format(numberOfNodes));
-            str.append("Count 'relationship': {}").append(formatter.format(numberOfRelationships));
+            str.append("Count 'node': {}").append(formatter.format(numberOfNodes)).append("\n");
+            str.append("Count 'relationship': {}").append(formatter.format(numberOfRelationships)).append("\n");
             str.append("\n");
         }
         return str.toString();

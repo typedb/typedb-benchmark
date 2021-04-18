@@ -74,7 +74,7 @@ public class Neo4jPersonAgent extends PersonAgent<Neo4jTransaction> {
             put(BIRTH_DATE, birthDate);
         }};
         tx.execute(new Query(query, parameters));
-        if (context.isTest()) return report(tx, email);
+        if (context.isReporting()) return report(tx, email);
         else return Optional.empty();
     }
 

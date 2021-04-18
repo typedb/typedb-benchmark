@@ -120,25 +120,9 @@ public class Options {
         @Option(names = {"--commit"}, required = true, description = "Git commit SHA")
         private String commit;
 
+        @Nullable
         @ArgGroup(exclusive = false, multiplicity = "0..1", heading = "Authentication credentials for Grabl tracing server")
         private Credentials credentials;
-
-        public static class Credentials {
-
-            @Option(names = {"--username"}, required = true, description = "Grabl tracing username")
-            private String username;
-
-            @Option(names = {"--token"}, required = true, description = "Grabl tracing API token")
-            private String token;
-
-            public String username() {
-                return username;
-            }
-
-            public String token() {
-                return token;
-            }
-        }
 
         public String grabl() {
             return grabl;
@@ -158,6 +142,23 @@ public class Options {
 
         public Optional<Credentials> credentials() {
             return Optional.ofNullable(credentials);
+        }
+
+        public static class Credentials {
+
+            @Option(names = {"--username"}, required = true, description = "Grabl tracing username")
+            private String username;
+
+            @Option(names = {"--token"}, required = true, description = "Grabl tracing API token")
+            private String token;
+
+            public String username() {
+                return username;
+            }
+
+            public String token() {
+                return token;
+            }
         }
     }
 }

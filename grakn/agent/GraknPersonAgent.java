@@ -69,7 +69,7 @@ public class GraknPersonAgent extends PersonAgent<GraknTransaction> {
                 var().rel(PLACE, var(CITY)).rel(CHILD, var("p")).isa(BIRTH_PLACE),
                 var().rel(RESIDENCE, var(CITY)).rel(RESIDENT, var("p")).isa(RESIDENTSHIP)
         ));
-        if (context.isTest()) return report(tx, email);
+        if (context.isReporting()) return report(tx, email);
         else return Optional.empty();
     }
 

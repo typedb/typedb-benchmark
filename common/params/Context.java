@@ -36,14 +36,14 @@ public class Context {
     private final SeedData seedData;
     private final Config config;
     private final boolean isTracing;
-    private final boolean isTest;
+    private final boolean isReporting;
     private final AtomicInteger iteration;
 
-    private Context(SeedData seedData, Config config, boolean isTracing, boolean isTest) {
+    private Context(SeedData seedData, Config config, boolean isTracing, boolean isReporting) {
         this.seedData = seedData;
         this.config = config;
         this.isTracing = isTracing;
-        this.isTest = isTest;
+        this.isReporting = isReporting;
         this.iteration = new AtomicInteger(0);
     }
 
@@ -97,7 +97,7 @@ public class Context {
         return isTracing && config.traceSampling().samplingFunction().apply(iterationNumber());
     }
 
-    public boolean isTest() {
-        return isTest;
+    public boolean isReporting() {
+        return isReporting;
     }
 }

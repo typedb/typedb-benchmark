@@ -60,7 +60,7 @@ public abstract class PersonAgent<TX extends Transaction> extends Agent<Country,
                 String email = String.format("%s.%s.%s.%s@email.com", firstName, lastName, city.code(), random.nextInt());
                 String address = random.address(city);
                 Optional<Pair<Person, City>> inserted = insertPerson(tx, email, firstName, lastName, address, gender, context.today(), city);
-                if (context.isTest()) {
+                if (context.isReporting()) {
                     assert inserted.isPresent();
                     reports.add(new Report(list(email, firstName, lastName, address, gender, context.today(), city),
                                            list(inserted.get().first(), inserted.get().second())));

@@ -17,7 +17,6 @@
 
 package grakn.benchmark.grakn.driver;
 
-import grabl.tracing.client.GrablTracingThreadStatic;
 import grakn.benchmark.common.concept.Region;
 import grakn.benchmark.simulation.driver.Client;
 import grakn.client.Grakn;
@@ -25,8 +24,6 @@ import grakn.client.Grakn;
 import java.text.DecimalFormat;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static grabl.tracing.client.GrablTracingThreadStatic.traceOnThread;
-import static grakn.benchmark.simulation.driver.Client.TracingLabel.OPEN_SESSION;
 import static grakn.client.api.GraknSession.Type.DATA;
 import static grakn.client.api.GraknTransaction.Type.READ;
 import static graql.lang.Graql.match;
@@ -58,11 +55,7 @@ public class GraknClient implements Client<GraknSession, GraknTransaction> {
 
     @Override
     public GraknSession session(Region region) {
-        return sessionMap.computeIfAbsent(region.group(), k -> {
-            try (GrablTracingThreadStatic.ThreadTrace ignored = traceOnThread(OPEN_SESSION.getName())) {
-                return new GraknSession(nativeClient.session(database, DATA));
-            }
-        });
+        return sessionMap.computeIfAbsent(region.group(), k -> new GraknSession(nativeClient.session(database, DATA)));
     }
 
     @Override
@@ -76,15 +69,16 @@ public class GraknClient implements Client<GraknSession, GraknTransaction> {
                 long numberOfRelations = tx.query().match(match(var("x").isa("relation")).count()).get().asLong();
                 long numberOfThings = tx.query().match(match(var("x").isa("thing")).count()).get().asLong();
 
-                str.append("Benchmark statistic:");
+                str.append("Benchmark statistic:").append("\n");
                 str.append("\n");
-                str.append("Count 'entity': {}").append(formatter.format(numberOfEntities));
-                str.append("Count 'relation': {}").append(formatter.format(numberOfRelations));
-                str.append("Count 'attribute': {}").append(formatter.format(numberOfAttributes));
+                str.append("Count 'entity': ").append(formatter.format(numberOfEntities)).append("\n");
+                str.append("Count 'relation': ").append(formatter.format(numberOfRelations)).append("\n");
+                str.append("Count 'attribute': ").append(formatter.format(numberOfAttributes)).append("\n");
                 if (numberOfThings != numberOfEntities + numberOfAttributes + numberOfRelations) {
-                    str.append("The sum of 'entity', 'relation', and 'attribute' counts do not match the total 'thing' count: {}").append(formatter.format(numberOfThings));
+                    str.append("The sum of 'entity', 'relation', and 'attribute' counts do not match the total 'thing' count: ")
+                            .append(formatter.format(numberOfThings)).append("\n");
                 } else {
-                    str.append("Count 'thing' (total): {}").append(formatter.format(numberOfThings));
+                    str.append("Count 'thing' (total): ").append(formatter.format(numberOfThings)).append("\n");
                 }
                 str.append("\n");
             }

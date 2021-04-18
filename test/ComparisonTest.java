@@ -34,6 +34,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Stream;
 
 import static grakn.benchmark.common.params.Options.parseCLIOptions;
 import static grakn.benchmark.test.ComparisonTest.Suite.GRAKN_CORE;
@@ -81,8 +82,7 @@ public class ComparisonTest {
         @Override
         protected void runChild(org.junit.runner.Runner runner, final RunNotifier notifier) {
             iteration++;
-            NEO4J.iterate();
-            GRAKN_CORE.iterate();
+            Stream.of(NEO4J, GRAKN_CORE).parallel().forEach(Simulation::iterate);
             super.runChild(runner, notifier);
             if (iteration == CONFIG.iterations() + 1) {
                 GRAKN_CORE.close();

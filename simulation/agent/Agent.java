@@ -85,7 +85,7 @@ public abstract class Agent<REGION extends Region, TX extends Transaction> {
                 .map(region -> new Pair<>(region, randomSrc.nextSource())).collect(toList());
         regionRandomPairs.parallelStream().forEach(pair -> {
             List<Report> report = runWithMayTrace(pair.first(), pair.second());
-            if (context.isTest()) {
+            if (context.isReporting()) {
                 assert !report.isEmpty();
                 reports.put(pair.first().tracker(), report);
             } else assert report.isEmpty();
