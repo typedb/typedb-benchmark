@@ -26,6 +26,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class Context {
@@ -33,11 +35,12 @@ public class Context {
     public static final int AGE_OF_ADULTHOOD = 21;
     private static final Logger LOG = LoggerFactory.getLogger(Context.class);
 
-    private final SeedData seedData;
-    private final Config config;
     private final boolean isTracing;
     private final boolean isReporting;
+    private final Config config;
+    private final SeedData seedData;
     private final AtomicInteger iteration;
+    private final ExecutorService executor;
 
     private Context(SeedData seedData, Config config, boolean isTracing, boolean isReporting) {
         this.seedData = seedData;
@@ -45,6 +48,7 @@ public class Context {
         this.isTracing = isTracing;
         this.isReporting = isReporting;
         this.iteration = new AtomicInteger(1);
+        this.executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
     }
 
     public static Context create(Config config, boolean isTracing, boolean isTest) throws IOException {
@@ -55,6 +59,10 @@ public class Context {
         LOG.info("Total number of universities in seed: {}", seedData.universities().size());
 
         return new Context(seedData, config, isTracing, isTest);
+    }
+
+    public ExecutorService executor() {
+        return executor;
     }
 
     public List<Config.Agent> agentConfigs() {
