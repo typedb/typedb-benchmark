@@ -54,7 +54,7 @@ public abstract class PersonAgent<TX extends Transaction> extends Agent<Country,
 
     @Override
     protected List<Country> regions() {
-        return context.seedData().countries();
+        return context.seedData().countries().subList(0, 16);
     }
 
     @Override
