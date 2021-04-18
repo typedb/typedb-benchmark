@@ -23,21 +23,30 @@ import grakn.benchmark.common.concept.Gender;
 import grakn.benchmark.common.concept.Person;
 import grakn.benchmark.common.params.Context;
 import grakn.benchmark.common.seed.RandomSource;
+import grakn.benchmark.grakn.agent.GraknPersonAgent;
 import grakn.benchmark.simulation.driver.Client;
 import grakn.benchmark.simulation.driver.Session;
 import grakn.benchmark.simulation.driver.Transaction;
 import grakn.common.collection.Pair;
+import grakn.common.util.Objects;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static grakn.benchmark.common.Util.printDuration;
 import static grakn.benchmark.common.concept.Gender.FEMALE;
 import static grakn.benchmark.common.concept.Gender.MALE;
 import static grakn.common.collection.Collections.list;
+import static grakn.common.util.Objects.className;
 
 public abstract class PersonAgent<TX extends Transaction> extends Agent<Country, TX> {
+
+    private static final Logger LOG = LoggerFactory.getLogger(PersonAgent.class);
 
     protected PersonAgent(Client<?, TX> client, Context context) {
         super(client, context);
@@ -55,6 +64,7 @@ public abstract class PersonAgent<TX extends Transaction> extends Agent<Country,
 
     @Override
     protected List<Report> run(Session<TX> session, Country country, RandomSource random) {
+        Instant start = Instant.now();
         List<Report> reports = new ArrayList<>();
         try (TX tx = session.transaction(country.tracker(), context.iterationNumber())) {
             Gender gender = random.nextBoolean() ? MALE : FEMALE;
@@ -71,6 +81,7 @@ public abstract class PersonAgent<TX extends Transaction> extends Agent<Country,
             }
             tx.commit();
         }
+        LOG.info("{} for {} completed in: {}", className(agentClass()), country.name(), printDuration(start, Instant.now()));
         return reports;
     }
 
