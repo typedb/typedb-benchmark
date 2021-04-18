@@ -52,14 +52,14 @@ public class Context implements AutoCloseable {
         this.executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
     }
 
-    public static Context create(Config config, boolean isTracing, boolean isTest) throws IOException {
+    public static Context create(Config config, boolean isTracing, boolean isReporting) throws IOException {
         SeedData seedData = SeedData.initialise();
         LOG.info("Total number of continents in seed: {}", seedData.continents().size());
         LOG.info("Total number of countries in seed: {}", seedData.countries().size());
         LOG.info("Total number of cities in seed: {}", seedData.cities().size());
         LOG.info("Total number of universities in seed: {}", seedData.universities().size());
 
-        return new Context(seedData, config, isTracing, isTest);
+        return new Context(seedData, config, isTracing, isReporting);
     }
 
     public ExecutorService executor() {

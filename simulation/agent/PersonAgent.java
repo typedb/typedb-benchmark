@@ -73,7 +73,7 @@ public abstract class PersonAgent<TX extends Transaction> extends Agent<Country,
                     assert inserted.isPresent();
                     reports.add(new Report(list(email, firstName, lastName, address, gender, context.today(), city),
                                            list(inserted.get().first(), inserted.get().second())));
-                } assert inserted.isEmpty();
+                } else assert inserted.isEmpty();
             }
             tx.commit();
         }
