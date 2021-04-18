@@ -23,12 +23,10 @@ import grakn.benchmark.common.concept.Gender;
 import grakn.benchmark.common.concept.Person;
 import grakn.benchmark.common.params.Context;
 import grakn.benchmark.common.seed.RandomSource;
-import grakn.benchmark.grakn.agent.GraknPersonAgent;
 import grakn.benchmark.simulation.driver.Client;
 import grakn.benchmark.simulation.driver.Session;
 import grakn.benchmark.simulation.driver.Transaction;
 import grakn.common.collection.Pair;
-import grakn.common.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
