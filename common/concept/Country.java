@@ -21,6 +21,7 @@ import grakn.benchmark.common.seed.SeedData;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class Country implements Region {
 
@@ -43,7 +44,7 @@ public class Country implements Region {
         this.currencies = new ArrayList<>();
         this.cities = new ArrayList<>();
         this.universities = new ArrayList<>();
-        this.hash = this.code.hashCode();
+        this.hash = Objects.hash(this.code, this.name, this.continent);
     }
 
     public void addCurrency(Currency currency) {
@@ -105,7 +106,9 @@ public class Country implements Region {
         if (o == null || getClass() != o.getClass()) return false;
 
         Country that = (Country) o;
-        return this.code.equals(that.code) && this.name.equals(that.name);
+        return (this.code.equals(that.code) &&
+                Objects.equals(this.name, that.name) &&
+                Objects.equals(this.continent, that.continent));
     }
 
     @Override

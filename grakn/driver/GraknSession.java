@@ -30,8 +30,8 @@ public class GraknSession implements Session<GraknTransaction> {
     }
 
     @Override
-    public GraknTransaction transaction(String tracker, long iteration) {
-        return new GraknTransaction(nativeSession.transaction(WRITE), tracker, iteration);
+    public GraknTransaction transaction() {
+        return new GraknTransaction(nativeSession.transaction(WRITE));
     }
 
     @Override

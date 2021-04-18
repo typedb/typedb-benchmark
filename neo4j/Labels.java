@@ -55,12 +55,11 @@ public class Labels {
     public static final String SELLER = "seller";
 
     public static final String BORN_IN = "BORN_IN";
+    public static final String CONTAINED_IN = "CONTAINED_IN";
     public static final String LOCATED_IN = "LOCATED_IN";
     public static final String RESIDES_IN = "RESIDES_IN";
     public static final String PARENTS = "parents";
     public static final String FRIENDS_WITH = "FRIENDS_WITH";
     public static final String EMPLOYED_BY = "EMPLOYED_BY";
     public static final String STUDIES_AT = "STUDIES_AT";
-    public static final String CONTAINED_IN = "CONTAINED_IN";
-
 }

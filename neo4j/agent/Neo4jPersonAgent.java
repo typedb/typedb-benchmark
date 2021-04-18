@@ -79,14 +79,14 @@ public class Neo4jPersonAgent extends PersonAgent<Neo4jTransaction> {
     }
 
     private Optional<Pair<Person, City>> report(Neo4jTransaction tx, String email) {
-        List<Record> answer = tx.execute(new Query(
+        List<Record> answers = tx.execute(new Query(
                 "MATCH (person:Person {email: '" + email + "'})-[:BORN_IN]->(city:City), " +
                         "(person)-[:RESIDES_IN]->(city) " +
                         "RETURN person.email, person.firstName, person.lastName, person.address, " +
                         "person.gender, person.birthDate, city.code"
         ));
-        assert answer.size() == 1;
-        Map<String, Object> inserted = answer.get(0).asMap();
+        assert answers.size() == 1;
+        Map<String, Object> inserted = answers.get(0).asMap();
         Person person = new Person((String) inserted.get(PERSON + "." + EMAIL),
                                    (String) inserted.get(PERSON + "." + FIRST_NAME),
                                    (String) inserted.get(PERSON + "." + LAST_NAME),

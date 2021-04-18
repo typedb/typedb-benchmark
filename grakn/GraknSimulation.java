@@ -22,11 +22,13 @@ import grakn.benchmark.common.concept.Country;
 import grakn.benchmark.common.concept.Global;
 import grakn.benchmark.common.params.Context;
 import grakn.benchmark.common.seed.SeedData;
+import grakn.benchmark.grakn.agent.GraknFriendshipAgent;
 import grakn.benchmark.grakn.agent.GraknPersonAgent;
 import grakn.benchmark.grakn.driver.GraknClient;
 import grakn.benchmark.grakn.driver.GraknSession;
 import grakn.benchmark.grakn.driver.GraknTransaction;
 import grakn.benchmark.simulation.Simulation;
+import grakn.benchmark.simulation.agent.FriendshipAgent;
 import grakn.benchmark.simulation.agent.PersonAgent;
 import graql.lang.Graql;
 import graql.lang.pattern.variable.ThingVariable;
@@ -171,5 +173,10 @@ public class GraknSimulation extends Simulation<GraknClient, GraknSession, Grakn
     @Override
     protected PersonAgent<GraknTransaction> createPersonAgent(GraknClient client, Context context) {
         return new GraknPersonAgent(client, context);
+    }
+
+    @Override
+    protected FriendshipAgent<GraknTransaction> createFriendshipAgent(GraknClient client, Context context) {
+        return new GraknFriendshipAgent(client, context);
     }
 }

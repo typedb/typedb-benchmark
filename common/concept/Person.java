@@ -17,6 +17,7 @@
 
 package grakn.benchmark.common.concept;
 
+import javax.annotation.Nullable;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
@@ -30,8 +31,12 @@ public class Person {
     private final LocalDateTime birthDate;
     private final int hash;
 
-    public Person(String email, String firstName, String lastName, String address,
-                  Gender gender, LocalDateTime birthDate) {
+    public Person(String email) {
+        this(email, null, null, null, null, null);
+    }
+
+    public Person(String email, @Nullable String firstName, @Nullable String lastName, @Nullable String address,
+                  @Nullable Gender gender, @Nullable LocalDateTime birthDate) {
         this.email = email;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -41,17 +46,21 @@ public class Person {
         hash = Objects.hash(email, firstName, lastName, address, gender, birthDate);
     }
 
+    public String email() {
+        return email;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Person that = (Person) o;
         return (email.equals(that.email) &&
-                firstName.equals(that.firstName) &&
-                lastName.equals(that.lastName) &&
-                address.equals(that.address) &&
-                gender.equals(that.gender) &&
-                birthDate.equals(that.birthDate));
+                Objects.equals(firstName, that.firstName) &&
+                Objects.equals(lastName, that.lastName) &&
+                Objects.equals(address, that.address) &&
+                Objects.equals(gender, that.gender) &&
+                Objects.equals(birthDate, that.birthDate));
     }
 
     @Override

@@ -19,9 +19,12 @@ package grakn.benchmark.common.seed;
 
 import grakn.benchmark.common.concept.City;
 import grakn.benchmark.common.concept.Gender;
+import grakn.common.collection.Pair;
 
 import java.util.ArrayList;
 import java.util.Random;
+
+import static grakn.common.collection.Collections.pair;
 
 public class RandomSource {
 
@@ -51,5 +54,17 @@ public class RandomSource {
         return String.format("%s %s Street, %s, %s %s", random.nextInt(1000),
                              choose(city.country().continent().commonFirstNames(Gender.of(nextBoolean()))),
                              city.name(), random.nextInt(10_000), city.country().name());
+    }
+
+    public <T> ArrayList<Pair<T, T>> randomPairs(ArrayList<T> list, int pairsPerElement) {
+        ArrayList<Pair<T, T>> pairs = new ArrayList<>(list.size() * pairsPerElement);
+        for (int i = 0; i < list.size(); i++) {
+            for (int j = 0; j < pairsPerElement; j++) {
+                int other = random.nextInt(list.size() - 1);
+                if (other >= i) other++;
+                pairs.add(pair(list.get(i), list.get(other)));
+            }
+        }
+        return pairs;
     }
 }

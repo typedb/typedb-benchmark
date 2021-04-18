@@ -19,12 +19,8 @@ package grakn.benchmark.grakn.driver;
 
 import grakn.benchmark.simulation.driver.Transaction;
 import grakn.client.api.answer.ConceptMap;
-import grakn.client.api.answer.Numeric;
 import grakn.client.api.query.QueryManager;
-import graql.lang.query.GraqlDelete;
-import graql.lang.query.GraqlInsert;
 import graql.lang.query.GraqlMatch;
-import graql.lang.query.GraqlUpdate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,14 +34,9 @@ public class GraknTransaction implements Transaction {
     private static final Logger LOG = LoggerFactory.getLogger(GraknTransaction.class);
 
     private final grakn.client.api.GraknTransaction tx;
-    private final String tracker;
-    private final long iteration;
-    private boolean closed = false;
 
-    public GraknTransaction(grakn.client.api.GraknTransaction tx, String tracker, long iteration) {
+    public GraknTransaction(grakn.client.api.GraknTransaction tx) {
         this.tx = tx;
-        this.tracker = tracker;
-        this.iteration = iteration;
     }
 
     public QueryManager query() {
@@ -55,25 +46,14 @@ public class GraknTransaction implements Transaction {
     @Override
     public void close() {
         tx.close();
-        closed = true;
     }
 
     @Override
     public void commit() {
-        throwIfClosed();
         tx.commit();
-        closed = true;
-    }
-
-    private void throwIfClosed() {
-        if (closed) {
-            throw new RuntimeException("Transaction is closed, please open a new one.");
-        }
     }
 
     public <T> List<T> sortedExecute(GraqlMatch query, String attributeName, Integer limit) {
-        throwIfClosed();
-        LOG.debug("{}/{}:\n{}", iteration, tracker, query);
         Stream<T> answerStream = tx.query().match(query)
                 .map(conceptMap -> (T) conceptMap.get(attributeName).asThing().asAttribute().getValue())
                 .sorted();
@@ -81,46 +61,6 @@ public class GraknTransaction implements Transaction {
             answerStream = answerStream.limit(limit);
         }
         return answerStream.collect(toList());
-    }
-
-    public void execute(GraqlDelete query) {
-        LOG.debug("{}/{}:\n{}", iteration, tracker, query);
-        tx.query().delete(query).get();
-    }
-
-    public void executeAsync(GraqlDelete query) {
-        LOG.debug("{}/{}:\n{}", iteration, tracker, query);
-        tx.query().delete(query);
-    }
-
-    public List<ConceptMap> execute(GraqlInsert query) {
-        LOG.debug("{}/{}:\n{}", iteration, tracker, query);
-        return tx.query().insert(query).collect(toList());
-    }
-
-    public Stream<ConceptMap> executeAsync(GraqlInsert query) {
-        LOG.debug("{}/{}:\n{}", iteration, tracker, query);
-        return tx.query().insert(query);
-    }
-
-    public Stream<ConceptMap> executeAsync(GraqlUpdate query) {
-        LOG.debug("{}/{}:\n{}", iteration, tracker, query);
-        return tx.query().update(query);
-    }
-
-    public List<ConceptMap> execute(GraqlMatch query) {
-        LOG.debug("{}/{}:\n{}", iteration, tracker, query);
-        return tx.query().match(query).collect(toList());
-    }
-
-    public Stream<ConceptMap> executeAsync(GraqlMatch query) {
-        LOG.debug("{}/{}:\n{}", iteration, tracker, query);
-        return tx.query().match(query);
-    }
-
-    public Numeric execute(GraqlMatch.Aggregate query) {
-        LOG.debug("{}/{}:\n{}", iteration, tracker, query);
-        return tx.query().match(query).get();
     }
 
     public Object getOnlyAttributeOfThing(ConceptMap answer, String var, String attributeType) {

@@ -26,39 +26,23 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class Neo4jTransaction implements Transaction {
 
     private static final Logger LOG = LoggerFactory.getLogger(Neo4jTransaction.class);
-    private final Session session;
-    private final String tracker;
-    private final long iteration;
 
-    public Neo4jTransaction(Session session, String tracker, long iteration) {
+    private final Session session;
+
+    public Neo4jTransaction(Session session) {
+        // TODO: why are we not passing a Transaction in here?
         this.session = session;
-        this.tracker = tracker;
-        this.iteration = iteration;
     }
 
     public List<Record> execute(Query query) {
-        LOG.debug("{}/{}:\n{}", iteration, tracker, query);
         return session.writeTransaction(tx -> {
             Result result = tx.run(query);
             return result.list();
         });
-    }
-
-    public <T> List<T> sortedExecute(Query query, String attributeName, Integer limit) {
-        LOG.debug("{}/{}:\n{}", iteration, tracker, query);
-        Stream<T> answerStream = execute(query).stream()
-                .map(record -> (T) record.asMap().get(attributeName))
-                .sorted();
-        if (limit != null) {
-            answerStream = answerStream.limit(limit);
-        }
-        return answerStream.collect(Collectors.toList());
     }
 
     /**

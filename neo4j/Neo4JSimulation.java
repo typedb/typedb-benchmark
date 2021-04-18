@@ -23,11 +23,13 @@ import grakn.benchmark.common.concept.Currency;
 import grakn.benchmark.common.concept.Global;
 import grakn.benchmark.common.params.Context;
 import grakn.benchmark.common.seed.SeedData;
+import grakn.benchmark.neo4j.agent.Neo4jFriendshipAgent;
 import grakn.benchmark.neo4j.agent.Neo4jPersonAgent;
 import grakn.benchmark.neo4j.driver.Neo4jClient;
 import grakn.benchmark.neo4j.driver.Neo4jSession;
 import grakn.benchmark.neo4j.driver.Neo4jTransaction;
 import grakn.benchmark.simulation.Simulation;
+import grakn.benchmark.simulation.agent.FriendshipAgent;
 import grakn.benchmark.simulation.agent.PersonAgent;
 import org.neo4j.driver.Driver;
 import org.neo4j.driver.Query;
@@ -135,7 +137,7 @@ public class Neo4JSimulation extends Simulation<Neo4jClient, Neo4jSession, Neo4j
 
                 }
                 Query query = new Query(String.format(
-                        "MATCH (c:Continent {code: '%s'}) CREATE (x:Country:Region {code: '%s', name: '%s'%s})-[:LOCATED_IN]->(c)",
+                        "MATCH (c:Continent {code: '%s'}) CREATE (x:Country:Region {code: '%s', name: '%s'%s})-[:CONTAINED_IN]->(c)",
                         continent.code(), country.code(), escapeQuotes(country.name()), currencyProps
                 ));
                 tx.run(query);
@@ -150,7 +152,7 @@ public class Neo4JSimulation extends Simulation<Neo4jClient, Neo4jSession, Neo4j
         Transaction tx = session.beginTransaction();
         country.cities().forEach(city -> {
             Query query = new Query(String.format(
-                    "MATCH (c:Country {code: '%s'}) CREATE (x:City:Region {code: '%s', name: '%s'})-[:LOCATED_IN]->(c)",
+                    "MATCH (c:Country {code: '%s'}) CREATE (x:City:Region {code: '%s', name: '%s'})-[:CONTAINED_IN]->(c)",
                     country.code(), city.code(), escapeQuotes(city.name())
             ));
             tx.run(query);
@@ -177,5 +179,10 @@ public class Neo4JSimulation extends Simulation<Neo4jClient, Neo4jSession, Neo4j
     @Override
     protected PersonAgent<Neo4jTransaction> createPersonAgent(Neo4jClient client, Context context) {
         return new Neo4jPersonAgent(client, context);
+    }
+
+    @Override
+    protected FriendshipAgent<Neo4jTransaction> createFriendshipAgent(Neo4jClient client, Context context) {
+        return new Neo4jFriendshipAgent(client, context);
     }
 }

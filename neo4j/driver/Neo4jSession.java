@@ -29,8 +29,8 @@ public class Neo4jSession implements Session<Neo4jTransaction> {
     }
 
     @Override
-    public Neo4jTransaction transaction(String tracker, long iteration) {
-        return new Neo4jTransaction(nativeSession, tracker, iteration);
+    public Neo4jTransaction transaction() {
+        return new Neo4jTransaction(nativeSession);
     }
 
     @Override

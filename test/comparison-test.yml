@@ -16,8 +16,9 @@
 #
 
 agents:
-  # For each agent select a `mode`, `RUN` to run without tracing, `TRACE` to run with tracing, and `OFF` to not run at all
   - name: "PersonAgent"
+    mode: RUN
+  - name: "FriendshipAgent"
     mode: RUN
 
 randomSeed: 1

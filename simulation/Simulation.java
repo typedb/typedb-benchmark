@@ -22,6 +22,7 @@ import grakn.benchmark.common.params.Context;
 import grakn.benchmark.common.seed.RandomSource;
 import grakn.benchmark.common.seed.SeedData;
 import grakn.benchmark.simulation.agent.Agent;
+import grakn.benchmark.simulation.agent.FriendshipAgent;
 import grakn.benchmark.simulation.agent.PersonAgent;
 import grakn.benchmark.simulation.driver.Client;
 import grakn.benchmark.simulation.driver.Session;
@@ -87,6 +88,7 @@ public abstract class Simulation<
     private Map<Class<? extends Agent>, Supplier<Agent<?, TX>>> initAgentBuilders() {
         return new HashMap<>() {{
             put(PersonAgent.class, () -> createPersonAgent(client, context));
+            put(FriendshipAgent.class, () -> createFriendshipAgent(client, context));
         }};
     }
 
@@ -120,4 +122,6 @@ public abstract class Simulation<
     }
 
     protected abstract PersonAgent<TX> createPersonAgent(CLIENT client, Context context);
+
+    protected abstract FriendshipAgent<TX> createFriendshipAgent(CLIENT client, Context context);
 }

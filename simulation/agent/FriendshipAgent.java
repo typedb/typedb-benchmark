@@ -17,9 +17,7 @@
 
 package grakn.benchmark.simulation.agent;
 
-import grakn.benchmark.common.concept.City;
 import grakn.benchmark.common.concept.Country;
-import grakn.benchmark.common.concept.Gender;
 import grakn.benchmark.common.concept.Person;
 import grakn.benchmark.common.params.Context;
 import grakn.benchmark.common.seed.RandomSource;
@@ -27,29 +25,30 @@ import grakn.benchmark.simulation.driver.Client;
 import grakn.benchmark.simulation.driver.Session;
 import grakn.benchmark.simulation.driver.Transaction;
 import grakn.common.collection.Pair;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-import static grakn.benchmark.common.concept.Gender.FEMALE;
-import static grakn.benchmark.common.concept.Gender.MALE;
+import static grakn.benchmark.common.params.Context.AGE_OF_FRIENDSHIP;
 import static grakn.common.collection.Collections.list;
+import static java.lang.Math.log;
+import static java.lang.Math.min;
+import static java.util.Comparator.comparing;
+import static java.util.stream.Collectors.toCollection;
 
-public abstract class PersonAgent<TX extends Transaction> extends Agent<Country, TX> {
+public abstract class FriendshipAgent<TX extends Transaction> extends Agent<Country, TX> {
 
-    private static final Logger LOG = LoggerFactory.getLogger(PersonAgent.class);
-
-    protected PersonAgent(Client<?, TX> client, Context context) {
+    protected FriendshipAgent(Client<?, TX> client, Context context) {
         super(client, context);
     }
 
     @Override
     protected Class<? extends Agent> agentClass() {
-        return PersonAgent.class;
+        return FriendshipAgent.class;
     }
 
     @Override
@@ -61,25 +60,28 @@ public abstract class PersonAgent<TX extends Transaction> extends Agent<Country,
     protected List<Report> run(Session<TX> session, Country country, RandomSource random) {
         List<Report> reports = new ArrayList<>();
         try (TX tx = session.transaction()) {
-            for (int i = 0; i < context.scaleFactor(); i++) {
-                Gender gender = random.nextBoolean() ? MALE : FEMALE;
-                String firstName = random.choose(country.continent().commonFirstNames(gender));
-                String lastName = random.choose(country.continent().commonLastNames());
-                City city = random.choose(country.cities());
-                String email = String.format("%s.%s.%s.%s@email.com", firstName, lastName, city.code(), random.nextInt());
-                String address = random.address(city);
-                Optional<Pair<Person, City>> inserted = insertPerson(tx, email, firstName, lastName, address, gender, context.today(), city);
+            LocalDateTime youngestDate = context.today().minusYears(AGE_OF_FRIENDSHIP);
+            LocalDateTime oldestDate = youngestDate.minusYears(1);
+            ArrayList<Person> teenagers = matchTeenagers(tx, country, oldestDate, youngestDate)
+                    .sorted(comparing(Person::email)).collect(toCollection(ArrayList::new));
+            random.randomPairs(teenagers, min(log2(context.scaleFactor()), 1)).forEach(friends -> {
+                Optional<Pair<Person, Person>> inserted = insertFriends(tx, friends.first().email(), friends.second().email());
                 if (context.isReporting()) {
                     assert inserted.isPresent();
-                    reports.add(new Report(list(email, firstName, lastName, address, gender, context.today(), city),
+                    reports.add(new Report(list(friends.first().email(), friends.second().email()),
                                            list(inserted.get().first(), inserted.get().second())));
-                } assert inserted.isEmpty();
-            }
+                } else assert inserted.isEmpty();
+            });
             tx.commit();
         }
         return reports;
     }
 
-    protected abstract Optional<Pair<Person, City>> insertPerson(TX tx, String email, String firstName, String lastName, String address,
-                                                                 Gender gender, LocalDateTime birthDate, City city);
+    public static int log2(int x) {
+        return (int) (log(x) / log(2));
+    }
+
+    protected abstract Stream<Person> matchTeenagers(TX tx, Country country, LocalDateTime oldestDate, LocalDateTime youngestDate);
+
+    protected abstract Optional<Pair<Person, Person>> insertFriends(TX tx, String email1, String email2);
 }
