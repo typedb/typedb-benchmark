@@ -24,6 +24,7 @@ import grakn.benchmark.common.seed.RandomSource;
 import grakn.benchmark.simulation.driver.Client;
 import grakn.benchmark.simulation.driver.Session;
 import grakn.benchmark.simulation.driver.Transaction;
+import grakn.common.collection.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,6 +40,7 @@ import static grabl.tracing.client.GrablTracingThreadStatic.contextOnThread;
 import static grabl.tracing.client.GrablTracingThreadStatic.traceOnThread;
 import static grakn.common.collection.Collections.pair;
 import static grakn.common.util.Objects.className;
+import static java.util.stream.Collectors.toList;
 
 /**
  * Agent constructs regional agents of a given class and runs them in parallel, providing them with the appropriate
@@ -78,17 +80,15 @@ public abstract class Agent<REGION extends Region, TX extends Transaction> {
         return context.isTracing() && isTracing;
     }
 
-    public Map<String, List<Report>> iterate(RandomSource random) {
+    public Map<String, List<Report>> iterate(RandomSource randomSrc) {
         ConcurrentMap<String, List<Report>> reports = new ConcurrentHashMap<>();
         // We need to generate pairs of Region and Random deterministically before passing them to a parallel stream
-        regions().stream().map(r -> pair(r, random.nextSource())).forEach(rr -> {
-            context.executor().submit(() -> {
-                List<Report> report = runAndMayTrace(rr.first(), rr.second());
-                if (context.isReporting()) {
-                    assert !report.isEmpty();
-                    reports.put(rr.first().tracker(), report);
-                } else assert report.isEmpty();
-            });
+        regions().stream().map(r -> pair(r, randomSrc.nextSource())).collect(toList()).parallelStream().forEach(rr -> {
+            List<Report> report = runAndMayTrace(rr.first(), rr.second());
+            if (context.isReporting()) {
+                assert !report.isEmpty();
+                reports.put(rr.first().tracker(), report);
+            } else assert report.isEmpty();
         });
         return reports;
     }

@@ -71,8 +71,8 @@ public class Neo4jClient implements Client<Neo4jSession, Neo4jTransaction> {
             str.append("Benchmark statistic:").append("\n");
             str.append("\n");
 
-            str.append("Count 'node': {}").append(formatter.format(numberOfNodes)).append("\n");
-            str.append("Count 'relationship': {}").append(formatter.format(numberOfRelationships)).append("\n");
+            str.append("Count 'node': ").append(formatter.format(numberOfNodes)).append("\n");
+            str.append("Count 'relationship': ").append(formatter.format(numberOfRelationships)).append("\n");
             str.append("\n");
         }
         return str.toString();
