@@ -30,7 +30,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class Context {
+public class Context implements AutoCloseable {
 
     public static final int AGE_OF_ADULTHOOD = 21;
     private static final Logger LOG = LoggerFactory.getLogger(Context.class);
@@ -107,5 +107,10 @@ public class Context {
 
     public boolean isReporting() {
         return isReporting;
+    }
+
+    @Override
+    public void close() {
+        executor.shutdown();
     }
 }

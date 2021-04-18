@@ -116,6 +116,7 @@ public abstract class Simulation<
     @Override
     public void close() {
         client.close();
+        context.close();
     }
 
     protected abstract PersonAgent<TX> createPersonAgent(CLIENT client, Context context);
