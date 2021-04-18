@@ -30,7 +30,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static grakn.benchmark.common.params.Context.AGE_OF_FRIENDSHIP;
@@ -60,9 +59,8 @@ public abstract class FriendshipAgent<TX extends Transaction> extends Agent<Coun
     protected List<Report> run(Session<TX> session, Country country, RandomSource random) {
         List<Report> reports = new ArrayList<>();
         try (TX tx = session.transaction()) {
-            LocalDateTime youngestDate = context.today().minusYears(AGE_OF_FRIENDSHIP);
-            LocalDateTime oldestDate = youngestDate.minusYears(1);
-            ArrayList<Person> teenagers = matchTeenagers(tx, country, oldestDate, youngestDate)
+            LocalDateTime birthDate = context.today().minusYears(AGE_OF_FRIENDSHIP);
+            ArrayList<Person> teenagers = matchTeenagers(tx, country, birthDate)
                     .sorted(comparing(Person::email)).collect(toCollection(ArrayList::new));
             random.randomPairs(teenagers, min(log2(context.scaleFactor()), 1)).forEach(friends -> {
                 Optional<Pair<Person, Person>> inserted = insertFriends(tx, friends.first().email(), friends.second().email());
@@ -81,7 +79,7 @@ public abstract class FriendshipAgent<TX extends Transaction> extends Agent<Coun
         return (int) (log(x) / log(2));
     }
 
-    protected abstract Stream<Person> matchTeenagers(TX tx, Country country, LocalDateTime oldestDate, LocalDateTime youngestDate);
+    protected abstract Stream<Person> matchTeenagers(TX tx, Country country, LocalDateTime birthDate);
 
     protected abstract Optional<Pair<Person, Person>> insertFriends(TX tx, String email1, String email2);
 }

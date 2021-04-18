@@ -47,6 +47,7 @@ import static grakn.benchmark.grakn.Labels.RESIDENCE;
 import static grakn.benchmark.grakn.Labels.RESIDENT;
 import static grakn.benchmark.grakn.Labels.RESIDENTSHIP;
 import static grakn.common.collection.Collections.pair;
+import static graql.lang.Graql.eq;
 import static graql.lang.Graql.rel;
 import static graql.lang.Graql.var;
 import static java.util.stream.Collectors.toList;
@@ -61,11 +62,9 @@ public class GraknFriendshipAgent extends FriendshipAgent<GraknTransaction> {
     }
 
     @Override
-    protected Stream<Person> matchTeenagers(GraknTransaction tx, Country country,
-                                            LocalDateTime oldestDate, LocalDateTime youngestDate) {
+    protected Stream<Person> matchTeenagers(GraknTransaction tx, Country country, LocalDateTime birthDate) {
         return tx.query().match(Graql.match(
-                var(PERSON).isa(PERSON).has(BIRTH_DATE, var(BIRTH_DATE)).has(EMAIL, var(EMAIL)),
-                var(BIRTH_DATE).gt(oldestDate), var(BIRTH_DATE).lte(youngestDate),
+                var(PERSON).isa(PERSON).has(BIRTH_DATE, eq(birthDate)).has(EMAIL, var(EMAIL)),
                 var(COUNTRY).isa(COUNTRY).has(CODE, country.code()),
                 rel(RESIDENT, var(PERSON)).rel(RESIDENCE, var(CITY)).isa(RESIDENTSHIP),
                 rel(CONTAINED, var(CITY)).rel(CONTAINER, var(COUNTRY)).isa(CONTAINS)

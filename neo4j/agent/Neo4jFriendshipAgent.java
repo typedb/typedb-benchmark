@@ -34,6 +34,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import static grakn.benchmark.neo4j.Labels.BIRTH_DATE;
 import static grakn.benchmark.neo4j.Labels.CODE;
 import static grakn.benchmark.neo4j.Labels.EMAIL;
 import static grakn.common.collection.Collections.pair;
@@ -47,16 +48,13 @@ public class Neo4jFriendshipAgent extends FriendshipAgent<Neo4jTransaction> {
     }
 
     @Override
-    protected Stream<Person> matchTeenagers(Neo4jTransaction tx, Country country,
-                                            LocalDateTime oldestDate, LocalDateTime youngestDate) {
-        String query = "MATCH (person:Person)-[:RESIDES_IN]->(city:City)-[:CONTAINED_IN]->(country:Country {code: $code}) \n" +
-                "WHERE datetime(person.birthDate) > datetime($oldestDate) \n" +
-                "AND datetime(person.birthDate) <= datetime($youngestDate) " +
+    protected Stream<Person> matchTeenagers(Neo4jTransaction tx, Country country, LocalDateTime birthDate) {
+        String query = "MATCH (person:Person {birthDate: $birthDate})" +
+                "-[:RESIDES_IN]->(city:City)-[:CONTAINED_IN]->(country:Country {code: $code}) \n" +
                 "RETURN person.email";
         HashMap<String, Object> parameters = new HashMap<>() {{
             put(CODE, country.code());
-            put("oldestDate", oldestDate);
-            put("youngestDate", youngestDate);
+            put(BIRTH_DATE, birthDate);
         }};
         return tx.execute(new Query(query, parameters)).stream().map(
                 record -> new Person((String) record.asMap().get("person.email"))
