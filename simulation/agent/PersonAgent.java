@@ -57,19 +57,17 @@ public abstract class PersonAgent<TX extends Transaction> extends Agent<Country,
     protected List<Report> run(Session<TX> session, Country country, RandomSource random) {
         List<Report> reports = new ArrayList<>();
         try (TX tx = session.transaction(country.tracker(), context.iterationNumber())) {
-            for (int i = 0; i < context.scaleFactor(); i++) {
-                Gender gender = random.nextBoolean() ? MALE : FEMALE;
-                String firstName = random.choose(country.continent().commonFirstNames(gender));
-                String lastName = random.choose(country.continent().commonLastNames());
-                City city = random.choose(country.cities());
-                String email = String.format("%s.%s.%s.%s@email.com", firstName, lastName, city.code(), random.nextInt());
-                String address = random.address(city);
-                Optional<Pair<Person, City>> inserted = insertPerson(tx, email, firstName, lastName, address, gender, context.today(), city);
-                if (context.isReporting()) {
-                    assert inserted.isPresent();
-                    reports.add(new Report(list(email, firstName, lastName, address, gender, context.today(), city),
-                                           list(inserted.get().first(), inserted.get().second())));
-                }
+            Gender gender = random.nextBoolean() ? MALE : FEMALE;
+            String firstName = random.choose(country.continent().commonFirstNames(gender));
+            String lastName = random.choose(country.continent().commonLastNames());
+            City city = random.choose(country.cities());
+            String email = String.format("%s.%s.%s.%s@email.com", firstName, lastName, city.code(), random.nextInt());
+            String address = random.address(city);
+            Optional<Pair<Person, City>> inserted = insertPerson(tx, email, firstName, lastName, address, gender, context.today(), city);
+            if (context.isReporting()) {
+                assert inserted.isPresent();
+                reports.add(new Report(list(email, firstName, lastName, address, gender, context.today(), city),
+                                       list(inserted.get().first(), inserted.get().second())));
             }
             tx.commit();
         }
