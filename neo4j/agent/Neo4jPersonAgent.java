@@ -27,13 +27,17 @@ import grakn.benchmark.simulation.agent.PersonAgent;
 import grakn.common.collection.Pair;
 import org.neo4j.driver.Query;
 import org.neo4j.driver.Record;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import static grakn.benchmark.common.Util.printDuration;
 import static grakn.benchmark.neo4j.Labels.ADDRESS;
 import static grakn.benchmark.neo4j.Labels.BIRTH_DATE;
 import static grakn.benchmark.neo4j.Labels.CITY;
@@ -47,6 +51,8 @@ import static grakn.common.collection.Collections.pair;
 
 public class Neo4jPersonAgent extends PersonAgent<Neo4jTransaction> {
 
+    private static final Logger LOG = LoggerFactory.getLogger(Neo4jPersonAgent.class);
+
     public Neo4jPersonAgent(Neo4jClient client, Context context) {
         super(client, context);
     }
@@ -54,6 +60,7 @@ public class Neo4jPersonAgent extends PersonAgent<Neo4jTransaction> {
     @Override
     protected Optional<Pair<Person, City>> insertPerson(Neo4jTransaction tx, String email, String firstName, String lastName,
                                                         String address, Gender gender, LocalDateTime birthDate, City city) {
+        Instant start = Instant.now();
         String query = "MATCH (c:City {code: $code}) " +
                 "CREATE (person:Person {" +
                 "email: $email, " +
@@ -74,6 +81,7 @@ public class Neo4jPersonAgent extends PersonAgent<Neo4jTransaction> {
             put(BIRTH_DATE, birthDate);
         }};
         tx.execute(new Query(query, parameters));
+        LOG.info("{} completed in: {}", Neo4jPersonAgent.class.getSimpleName(), printDuration(start, Instant.now()));
         if (context.isReporting()) return report(tx, email);
         else return Optional.empty();
     }

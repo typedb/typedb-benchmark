@@ -38,6 +38,7 @@ import java.util.function.Supplier;
 
 import static grabl.tracing.client.GrablTracingThreadStatic.contextOnThread;
 import static grabl.tracing.client.GrablTracingThreadStatic.traceOnThread;
+import static grakn.common.collection.Collections.pair;
 import static grakn.common.util.Objects.className;
 import static java.util.stream.Collectors.toList;
 
@@ -82,19 +83,17 @@ public abstract class Agent<REGION extends Region, TX extends Transaction> {
     public Map<String, List<Report>> iterate(RandomSource randomSrc) {
         ConcurrentMap<String, List<Report>> reports = new ConcurrentHashMap<>();
         // We need to generate pairs of Region and Random deterministically before passing them to a parallel stream
-        List<Pair<REGION, RandomSource>> regionRandomPairs = regions().stream()
-                .map(region -> new Pair<>(region, randomSrc.nextSource())).collect(toList());
-        regionRandomPairs.parallelStream().forEach(pair -> {
-            List<Report> report = runWithMayTrace(pair.first(), pair.second());
+        regions().stream().map(r -> pair(r, randomSrc.nextSource())).collect(toList()).parallelStream().forEach(rr -> {
+            List<Report> report = runAndMayTrace(rr.first(), rr.second());
             if (context.isReporting()) {
                 assert !report.isEmpty();
-                reports.put(pair.first().tracker(), report);
+                reports.put(rr.first().tracker(), report);
             } else assert report.isEmpty();
         });
         return reports;
     }
 
-    private List<Report> runWithMayTrace(REGION region, RandomSource random) {
+    private List<Report> runAndMayTrace(REGION region, RandomSource random) {
         GrablTracingThreadStatic.ThreadContext tracingCtx = null;
         try {
             if (isTracing()) tracingCtx = contextOnThread(region.tracker(), context.iterationNumber());

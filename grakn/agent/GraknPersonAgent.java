@@ -27,11 +27,15 @@ import grakn.benchmark.simulation.agent.PersonAgent;
 import grakn.client.api.answer.ConceptMap;
 import grakn.common.collection.Pair;
 import graql.lang.Graql;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+import static grakn.benchmark.common.Util.printDuration;
 import static grakn.benchmark.grakn.Labels.ADDRESS;
 import static grakn.benchmark.grakn.Labels.BIRTH_DATE;
 import static grakn.benchmark.grakn.Labels.BIRTH_PLACE;
@@ -54,6 +58,8 @@ import static java.util.stream.Collectors.toList;
 
 public class GraknPersonAgent extends PersonAgent<GraknTransaction> {
 
+    private static final Logger LOG = LoggerFactory.getLogger(GraknPersonAgent.class);
+
     public GraknPersonAgent(GraknClient client, Context context) {
         super(client, context);
     }
@@ -61,6 +67,7 @@ public class GraknPersonAgent extends PersonAgent<GraknTransaction> {
     @Override
     protected Optional<Pair<Person, City>> insertPerson(GraknTransaction tx, String email, String firstName, String lastName,
                                                         String address, Gender gender, LocalDateTime birthDate, City city) {
+        Instant start = Instant.now();
         tx.query().insert(Graql.match(
                 var(CITY).isa(CITY).has(CODE, city.code())
         ).insert(
@@ -69,6 +76,7 @@ public class GraknPersonAgent extends PersonAgent<GraknTransaction> {
                 var().rel(PLACE, var(CITY)).rel(CHILD, var("p")).isa(BIRTH_PLACE),
                 var().rel(RESIDENCE, var(CITY)).rel(RESIDENT, var("p")).isa(RESIDENTSHIP)
         ));
+        LOG.info("{} completed in: {}", GraknPersonAgent.class.getSimpleName(), printDuration(start, Instant.now()));
         if (context.isReporting()) return report(tx, email);
         else return Optional.empty();
     }

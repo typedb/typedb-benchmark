@@ -97,10 +97,12 @@ public abstract class Simulation<
     public void run() {
         Instant start = Instant.now();
         while (context.iterationNumber() <= context.iterationMax()) {
+            int iter = context.iterationNumber();
             Instant iterStart = Instant.now();
             iterate();
             Instant iterEnd = Instant.now();
-            LOG.info("Iteration {}: {}", context.iterationNumber(), printDuration(iterStart, iterEnd));
+            LOG.info("Iteration {}: {}", iter, printDuration(iterStart, iterEnd));
+            LOG.info("-------------------------");
         }
         LOG.info("Simulation run duration: " + printDuration(start, Instant.now()));
         LOG.info(client.printStatistics());
