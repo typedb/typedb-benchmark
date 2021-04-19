@@ -1,0 +1,13 @@
+digraph mygraph {
+  node [shape=box];
+  "//:benchmark-lib"
+  "//:benchmark-lib" -> "//common:common"
+  "//:benchmark-lib" -> "//grakn:grakn\n//neo4j:neo4j"
+  "//:benchmark-lib" -> "//simulation:simulation"
+  "//grakn:grakn\n//neo4j:neo4j"
+  "//grakn:grakn\n//neo4j:neo4j" -> "//common:common"
+  "//grakn:grakn\n//neo4j:neo4j" -> "//simulation:simulation"
+  "//simulation:simulation"
+  "//simulation:simulation" -> "//common:common"
+  "//common:common"
+}

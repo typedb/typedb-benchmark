@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Grakn Labs
+ * Copyright (C) 2021 Grakn Labs
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -17,133 +17,111 @@
 
 package grakn.benchmark.simulation;
 
-import grakn.benchmark.simulation.action.ActionFactory;
-import grakn.benchmark.simulation.agent.AgentFactory;
-import grakn.benchmark.simulation.agent.base.Agent;
-import grakn.benchmark.simulation.driver.DbDriver;
-import grakn.benchmark.simulation.driver.DbOperation;
-import grakn.benchmark.simulation.utils.RandomSource;
-import grakn.benchmark.simulation.world.World;
-import grakn.benchmark.config.Config;
+import grakn.benchmark.common.params.Config;
+import grakn.benchmark.common.params.Context;
+import grakn.benchmark.common.seed.RandomSource;
+import grakn.benchmark.common.seed.SeedData;
+import grakn.benchmark.simulation.agent.Agent;
+import grakn.benchmark.simulation.agent.FriendshipAgent;
+import grakn.benchmark.simulation.agent.PersonAgent;
+import grakn.benchmark.simulation.driver.Client;
+import grakn.benchmark.simulation.driver.Session;
+import grakn.benchmark.simulation.driver.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.nio.file.Path;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
+import java.io.IOException;
+import java.time.Instant;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Function;
+import java.util.function.Supplier;
 
-public abstract class Simulation<DB_DRIVER extends DbDriver<DB_OPERATION>, DB_OPERATION extends DbOperation> implements grakn.benchmark.simulation.agent.base.BenchmarkContext {
+import static grakn.benchmark.common.Util.printDuration;
 
-    final static Logger LOG = LoggerFactory.getLogger(Simulation.class);
-    private final List<Agent<?, DB_OPERATION>> agentList;
-    protected final DB_DRIVER driver;
-    private final Random random;
-    private final List<Config.Agent> agentConfigs;
-    private final Function<Integer, Boolean> iterationSamplingFunction;
-    private final Report report;
-    private final World world;
-    private final boolean test;
-    private int iteration = 1;
+public abstract class Simulation<
+        CLIENT extends Client<SESSION, TX>,
+        SESSION extends Session<TX>,
+        TX extends Transaction> implements AutoCloseable {
 
-    public Simulation(DB_DRIVER driver, Map<String, Path> initialisationDataPaths, int randomSeed, World world, List<Config.Agent> agentConfigs, Function<Integer, Boolean> iterationSamplingFunction, boolean test) {
-        this.driver = driver;
-        this.random = new Random(randomSeed);
-        this.agentConfigs = agentConfigs;
-        this.iterationSamplingFunction = iterationSamplingFunction;
-        this.world = world;
-        this.test = test;
-        initialise(initialisationDataPaths);
-        this.agentList = agentListFromConfigs();
-        this.report = new Report();
+    public static final Set<Class<? extends Agent>> REGISTERED_AGENTS = new HashSet<>();
+    private static final Logger LOG = LoggerFactory.getLogger(Simulation.class);
+    private static final String AGENT_PACKAGE = Agent.class.getPackageName();
+
+    protected final CLIENT client;
+    protected final Context context;
+    private final RandomSource randomSource;
+    private final List<Agent<?, TX>> agents;
+    private final Map<Class<? extends Agent>, Map<String, List<Agent.Report>>> agentReports;
+
+    public Simulation(CLIENT client, Context context) throws Exception {
+        this.client = client;
+        this.context = context;
+        this.agents = initAgents();
+        this.agentReports = new ConcurrentHashMap<>();
+        this.randomSource = new RandomSource(context.seed());
+        initialise(context.seedData());
     }
 
-    protected List<Agent<?, DB_OPERATION>> agentListFromConfigs() {
-        List<Agent<?, DB_OPERATION>> agents = new ArrayList<>();
-        ActionFactory<DB_OPERATION, ?> actionFactory = actionFactory();
-        AgentFactory<DB_OPERATION, ?> agentFactory = new AgentFactory<>(driver, actionFactory, this);
+    protected abstract void initialise(SeedData geoData) throws IOException;
 
-        for (Config.Agent agentConfig : agentConfigs) {
-            if (agentConfig.getAgentMode().getRun()) {
-                Agent<?, DB_OPERATION> agent = agentFactory.get(agentConfig.getName());
-                agent.setTracing(agentConfig.getAgentMode().getTrace());
-                agents.add(agent);
+    @SuppressWarnings("unchecked")
+    protected List<Agent<?, TX>> initAgents() throws ClassNotFoundException {
+        Map<Class<? extends Agent>, Supplier<Agent<?, TX>>> agentBuilders = initAgentBuilders();
+        List<Agent<?, TX>> agents = new ArrayList<>();
+        for (Config.Agent agentConfig : context.agentConfigs()) {
+            if (agentConfig.isRun()) {
+                String className = AGENT_PACKAGE + "." + agentConfig.getName();
+                Class<? extends Agent> agentClass = (Class<? extends Agent>) Class.forName(className);
+                assert agentBuilders.containsKey(agentClass);
+                agents.add(agentBuilders.get(agentClass).get().setTracing(agentConfig.isTracing()));
+                REGISTERED_AGENTS.add(agentClass);
             }
         }
         return agents;
     }
 
-    protected abstract ActionFactory<DB_OPERATION, ?> actionFactory();
+    private Map<Class<? extends Agent>, Supplier<Agent<?, TX>>> initAgentBuilders() {
+        return new HashMap<>() {{
+            put(PersonAgent.class, () -> createPersonAgent(client, context));
+            put(FriendshipAgent.class, () -> createFriendshipAgent(client, context));
+        }};
+    }
 
-    protected abstract void initialise(Map<String, Path> initialisationDataPaths);
+    public Map<String, List<Agent.Report>> getReport(Class<? extends Agent> agentName) {
+        return agentReports.get(agentName);
+    }
+
+    public void run() {
+        Instant start = Instant.now();
+        while (context.iterationNumber() <= context.iterationMax()) {
+            int iter = context.iterationNumber();
+            Instant iterStart = Instant.now();
+            iterate();
+            LOG.info("Iteration {}: {}", iter, printDuration(iterStart, Instant.now()));
+            LOG.info("-------------------------");
+        }
+        LOG.info("Simulation run duration: " + printDuration(start, Instant.now()));
+        LOG.info(client.printStatistics());
+    }
 
     public void iterate() {
-        report.clean();
-        for (Agent<?, ?> agent : agentList) {
-            this.report.addAgentResult(agent.name(), agent.iterate(RandomSource.nextSource(random)));
-        }
-        closeIteration();  // We want to test opening new sessions each iteration.
-        iteration++;
-    }
-
-    protected abstract void closeIteration();
-
-    @Override
-    public int iteration() {
-        return iteration;
+        agentReports.clear();
+        agents.forEach(agent -> agentReports.put(agent.getClass(), agent.iterate(randomSource.nextSource())));
+        context.incrementIteration();
     }
 
     @Override
-    public LocalDateTime today() {
-        return LocalDateTime.of(LocalDate.ofYearDay(iteration, 1), LocalTime.of(0, 0, 0));
+    public void close() {
+        client.close();
+        context.close();
     }
 
-    @Override
-    public World world() {
-        return world;
-    }
+    protected abstract PersonAgent<TX> createPersonAgent(CLIENT client, Context context);
 
-    @Override
-    public boolean trace() {
-        return iterationSamplingFunction.apply(iteration());
-    }
-
-    @Override
-    public boolean test() {
-        return test;
-    }
-
-    public Report getReport() {
-        return report;
-    }
-
-    public abstract void close();
-
-    public abstract void printStatistics(Logger LOG);
-
-    public class Report {
-
-        private ConcurrentHashMap<String, Agent<?, ?>.Report> agentReports = new ConcurrentHashMap<>();
-
-        public void addAgentResult(String agentName, Agent<?, ?>.Report agentReport) {
-            if (agentReport == null) {
-                throw new NullPointerException(String.format("The result returned from a %s agent was null", agentName));
-            }
-            agentReports.put(agentName, agentReport);
-        }
-
-        public Agent<?, ?>.Report getAgentReport(String agentName) {
-            return agentReports.get(agentName);
-        }
-
-        public void clean() {
-            agentReports = new ConcurrentHashMap<>();
-        }
-    }
+    protected abstract FriendshipAgent<TX> createFriendshipAgent(CLIENT client, Context context);
 }

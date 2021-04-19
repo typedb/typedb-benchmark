@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Grakn Labs
+ * Copyright (C) 2021 Grakn Labs
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -17,90 +17,114 @@
 
 package grakn.benchmark.test;
 
-import grakn.benchmark.simulation.action.Action;
-import grakn.benchmark.simulation.agent.base.Agent;
+import grakn.benchmark.common.params.Config;
+import grakn.benchmark.common.params.Context;
+import grakn.benchmark.grakn.GraknSimulation;
+import grakn.benchmark.neo4j.Neo4JSimulation;
+import grakn.benchmark.simulation.Simulation;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.junit.runner.notification.RunNotifier;
+import org.junit.runners.BlockJUnit4ClassRunner;
+import org.junit.runners.model.FrameworkMethod;
+import org.junit.runners.model.InitializationError;
+import picocli.CommandLine;
 
-import java.util.Iterator;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Stream;
 
-import static grakn.benchmark.test.BenchmarksForComparison.graknCore;
-import static grakn.benchmark.test.BenchmarksForComparison.neo4j;
+import static grakn.benchmark.common.params.Options.parseCLIOptions;
+import static grakn.benchmark.test.ComparisonTest.Suite.GRAKN_CORE;
+import static grakn.benchmark.test.ComparisonTest.Suite.NEO4J;
 import static org.junit.Assert.assertEquals;
 
-@RunWith(ComparisonTestSuite.class)
+@RunWith(ComparisonTest.Suite.class)
 public class ComparisonTest {
 
-    private void compareReports(String agentName) {
-        Agent<?, ?>.Report graknAgentReport = graknCore.getReport().getAgentReport(agentName);
-        Agent<?, ?>.Report neo4jAgentReport = neo4j.getReport().getAgentReport(agentName);
+    @Test
+    public void test_agents_have_equal_reports() {
+        Simulation.REGISTERED_AGENTS.forEach(agent -> assertEquals(GRAKN_CORE.getReport(agent), NEO4J.getReport(agent)));
+    }
 
-        if (!graknAgentReport.equals(neo4jAgentReport)) {
-            graknAgentReport.trackers().forEach(tracker -> {
-                Agent.Regional.Report graknRegionReport = graknAgentReport.getRegionalAgentReport(tracker);
-                Agent.Regional.Report neo4jRegionReport = neo4jAgentReport.getRegionalAgentReport(tracker);
+    public static class Suite extends org.junit.runners.Suite {
 
-                if (!graknRegionReport.equals(neo4jRegionReport)) {
-                    Iterator<Action<?, ?>.Report> graknIter = graknRegionReport.getActionReportIterator();
-                    Iterator<Action<?, ?>.Report> neo4jIter = neo4jRegionReport.getActionReportIterator();
-                    while (graknIter.hasNext() && neo4jIter.hasNext()) {
-                        Action<?, ?>.Report graknActionReport = graknIter.next();
-                        Action<?, ?>.Report neo4jActionReport = neo4jIter.next();
-                        assertEquals(neo4jActionReport, graknActionReport);
-                    }
-                }
-            });
+        private static final Config CONFIG = Config.loadYML(Paths.get("test/comparison-test.yml").toFile());
+        private static final Options OPTIONS = parseCLIOptions(args(), new Options()).get();
+
+        public static GraknSimulation GRAKN_CORE;
+
+        public static Neo4JSimulation NEO4J;
+        private int iteration = 1;
+
+        public Suite(Class<?> testClass) throws Throwable {
+            super(testClass, createRunners(testClass));
+            GRAKN_CORE = GraknSimulation.core(OPTIONS.graknAddress(), Context.create(CONFIG, false, true));
+            NEO4J = Neo4JSimulation.create(OPTIONS.neo4jAddress(), Context.create(CONFIG, false, true));
+        }
+
+        private static String[] args() {
+            String[] input = System.getProperty("sun.java.command").split(" ");
+            return Arrays.copyOfRange(input, 1, input.length);
+        }
+
+        private static List<org.junit.runner.Runner> createRunners(Class<?> testClass) throws InitializationError {
+            List<org.junit.runner.Runner> runners = new ArrayList<>();
+            for (int i = 1; i <= CONFIG.iterations(); i++) {
+                BlockJUnit4ClassRunner runner = new Runner(testClass, i);
+                runners.add(runner);
+            }
+            return runners;
+        }
+
+        @Override
+        protected void runChild(org.junit.runner.Runner runner, final RunNotifier notifier) {
+            iteration++;
+            Stream.of(NEO4J, GRAKN_CORE).parallel().forEach(Simulation::iterate);
+            super.runChild(runner, notifier);
+            if (iteration == CONFIG.iterations() + 1) {
+                GRAKN_CORE.close();
+                NEO4J.close();
+            }
+        }
+
+        private static class Runner extends BlockJUnit4ClassRunner {
+            private final int iteration;
+
+            public Runner(Class<?> aClass, int iteration) throws InitializationError {
+                super(aClass);
+                this.iteration = iteration;
+            }
+
+            @Override
+            protected String testName(FrameworkMethod method) {
+                return method.getName() + "-iter-" + iteration;
+            }
+
+            @Override
+            protected String getName() {
+                return super.getName() + "-iter-" + iteration;
+            }
+        }
+
+        @CommandLine.Command(name = "benchmark-test", mixinStandardHelpOptions = true)
+        private static class Options {
+
+            @CommandLine.Option(names = {"--grakn"}, required = true, description = "Database address URI")
+            private String graknAddress;
+
+            @CommandLine.Option(names = {"--neo4j"}, required = true, description = "Database address URI")
+            private String neo4jAddress;
+
+            public String graknAddress() {
+                return graknAddress;
+            }
+
+            public String neo4jAddress() {
+                return neo4jAddress;
+            }
         }
     }
-
-//    @Test
-//    public void testMarriageAgent() {
-//        compareReports("MarriageAgent");
-//    }
-
-    @Test
-    public void testPersonBirthAgent() {
-        compareReports("PersonBirthAgent");
-    }
-
-//    @Test
-//    public void testAgeUpdateAgent() {
-//    Comparing results of this agent will require sending a set equal to the size of the number of people in each city,
-//    which doesn't scale well. So this is skipped in favour of spot-testing
-//    }
-
-//    @Test
-//    public void testParentshipAgent() {
-//        compareReports("ParentshipAgent");
-//    }
-
-//    @Test
-//    public void testRelocationAgent() {
-//        compareFields("RelocationAgent");
-//    }
-
-    @Test
-    public void testCompanyAgent() {
-        compareReports("CompanyAgent");
-    }
-
-//    @Test
-//    public void testEmploymentAgent() {
-//        compareReports("EmploymentAgent");
-//    }
-
-    @Test
-    public void testProductAgent() {
-        compareReports("ProductAgent");
-    }
-
-    @Test
-    public void testPurchaseAgent() {
-        compareReports("PurchaseAgent");
-    }
-
-//    @Test
-//    public void testFriendshipAgent() {
-//        compareFields("FriendshipAgent");
-//    }
 }

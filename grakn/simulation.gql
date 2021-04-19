@@ -1,0 +1,141 @@
+#
+# Copyright (C) 2021 Grakn Labs
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+#
+
+define
+
+email sub attribute, value string;
+person-name sub attribute, abstract, value string;
+first-name sub person-name;
+last-name sub person-name;
+birth-date sub attribute, value datetime;
+gender sub attribute, value string;
+address sub attribute, value string;
+code sub attribute, value string;
+name sub attribute, value string;
+company-number sub attribute, value string;
+incorporation-date sub attribute, value datetime;
+currency sub attribute, value string;
+marriage-license sub attribute, value string;
+start-date sub attribute, value datetime;
+end-date sub attribute, value datetime;
+id sub attribute, value long;
+price sub attribute, value double;
+
+person sub entity,
+    owns email @key,
+    owns first-name,
+    owns last-name,
+    owns birth-date,
+    owns gender,
+    owns address,
+    plays birth-place:child,
+    plays residentship:resident,
+    plays marriage:husband,
+    plays marriage:wife,
+    plays parentship:parent,
+    plays parentship:child,
+    plays friendship:friend,
+    plays employment:employee,
+    plays studentship:student,
+    plays purchase:buyer,
+    plays purchase:seller;
+
+organisation sub entity,
+    owns name,
+    owns address,
+    plays locates:located;
+
+company sub organisation,
+    owns company-number @key,
+    owns incorporation-date,
+    plays employment:employer,
+    plays purchase:buyer,
+    plays purchase:seller;
+
+school sub organisation,
+    plays studentship:school;
+
+primary-school sub school;
+secondary-school sub school;
+university sub school;
+
+region sub entity, abstract,
+    owns code @key,
+    owns name,
+    plays birth-place:place,
+    plays locates:location,
+    plays residentship:residence,
+    plays contains:container,
+    plays contains:contained;
+
+continent sub region;
+country sub region,
+    owns currency;
+city sub region;
+
+product sub entity,
+    owns id @key,
+    owns name,
+    plays purchase:product;
+
+birth-place sub relation,
+    relates place,
+    relates child;
+
+locates sub relation,
+    relates location,
+    relates located;
+
+residentship sub locates,
+    relates residence as location,
+    relates resident as located;
+
+marriage sub relation,
+    owns marriage-license @key,
+    plays locates:located,
+    relates husband,
+    relates wife;
+
+parentship sub relation,
+    relates parent,
+    relates child;
+
+friendship sub relation,
+    relates friend;
+
+employment sub relation,
+    plays locates:located,
+    relates employer,
+    relates employee;
+
+studentship sub relation,
+    owns start-date,
+    owns end-date,
+    relates school,
+    relates student;
+
+purchase sub relation,
+    owns id @key,
+    owns price,
+    owns currency,
+    relates buyer,
+    relates seller,
+    relates product;
+
+contains sub relation,
+    relates container,
+    relates contained;

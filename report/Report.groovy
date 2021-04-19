@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Grakn Labs
+ * Copyright (C) 2021 Grakn Labs
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -17,15 +17,7 @@
 
 package grakn.benchmark.report
 
-import grakn.benchmark.simulation.agent.insight.*
-import grakn.benchmark.simulation.agent.write.AgeUpdateAgent
-import grakn.benchmark.simulation.agent.write.PersonBirthAgent
-import grakn.benchmark.grakn.action.insight.*
-import grakn.benchmark.grakn.action.read.GraknBirthsInCityAction
-import grakn.benchmark.grakn.action.write.GraknUpdateAgesOfPeopleInCityAction
-import grakn.benchmark.neo4j.action.insight.*
-import grakn.benchmark.neo4j.action.read.Neo4jBirthsInCityAction
-import grakn.benchmark.neo4j.action.write.Neo4jUpdateAgesOfPeopleInCityAction
+
 import groovy.text.GStringTemplateEngine
 
 import java.time.LocalDateTime
@@ -162,28 +154,28 @@ Finds existing people and makes them employees of companies.
         List<AgentSection> agentSections = Arrays.asList(
                 new AgentSection(
                         ArbitraryOneHopAgent.class,
-                        GraknArbitraryOneHopAction.query().toString(),
-                        Neo4jArbitraryOneHopAction.query()
+                        GraknArbitraryOneHopAgent.query().toString(),
+                        Neo4jArbitraryOneHopAgent.query()
                 ),
                 new AgentSection(
                         FindCurrentResidentsAgent.class,
-                        GraknFindCurrentResidentsAction.query().toString(),
-                        Neo4jFindCurrentResidentsAction.query()
+                        GraknFindCurrentResidentsAgent.query().toString(),
+                        Neo4jFindCurrentResidentsAgent.query()
                 ),
                 new AgentSection(
                         FindLivedInAgent.class,
-                        GraknFindLivedInAction.query().toString(),
-                        Neo4jFindLivedInAction.query()
+                        GraknFindLivedInAgent.query().toString(),
+                        Neo4jFindLivedInAgent.query()
                 ),
                 new AgentSection(
                         FindSpecificMarriageAgent.class,
-                        GraknFindSpecificMarriageAction.query().toString(),
-                        Neo4jFindSpecificMarriageAction.query()
+                        GraknFindSpecificMarriageAgent.query().toString(),
+                        Neo4jFindSpecificMarriageAgent.query()
                 ),
                 new AgentSection(
                         FindSpecificPersonAgent.class,
-                        GraknFindSpecificPersonAction.query().toString(),
-                        Neo4jFindSpecificPersonAction.query()
+                        GraknFindSpecificPersonAgent.query().toString(),
+                        Neo4jFindSpecificPersonAgent.query()
                 ),
 //                Disabled due to long runtimes
 //                new AgentSection(
@@ -193,38 +185,38 @@ Finds existing people and makes them employees of companies.
 //                ),
                 new AgentSection(
                         FourHopAgent.class,
-                        GraknFourHopAction.query().toString(),
-                        Neo4jFourHopAction.query()
+                        GraknFourHopAgent.query().toString(),
+                        Neo4jFourHopAgent.query()
                 ),
                 new AgentSection(
                         MeanWageAgent.class,
-                        GraknMeanWageOfPeopleInWorldAction.query().toString(),
-                        Neo4jMeanWageOfPeopleInWorldAction.query()
+                        GraknMeanWageAgent.query().toString(),
+                        Neo4jMeanWageAgent.query()
                 ),
                 new AgentSection(
                         ThreeHopAgent.class,
-                        GraknThreeHopAction.query().toString(),
-                        Neo4jThreeHopAction.query()
+                        GraknThreeHopAgent.query().toString(),
+                        Neo4jThreeHopAgent.query()
                 ),
                 new AgentSection(
                         TwoHopAgent.class,
-                        GraknTwoHopAction.query().toString(),
-                        Neo4jTwoHopAction.query()
+                        GraknTwoHopAgent.query().toString(),
+                        Neo4jTwoHopAgent.query()
                 ),
                 new AgentSection(
                         PersonBirthAgent.class,
-                        GraknBirthsInCityAction.query(cityName, dummyDate).toString(),
-                        Neo4jBirthsInCityAction.query()
+                        GraknPersonBirthAgent.query(cityName, dummyDate).toString(),
+                        Neo4jPersonBirthAgent.query()
                 ),
                 new AgentSection(
                         AgeUpdateAgent.class,
                         Arrays.asList(
-                                GraknUpdateAgesOfPeopleInCityAction.getPeopleBornInCityQuery(cityName).toString(),
-                                GraknUpdateAgesOfPeopleInCityAction.deleteHasQuery(email).toString(),
-                                GraknUpdateAgesOfPeopleInCityAction.insertNewAgeQuery(email, age).toString()
+                                GraknAgeUpdateAgent.getPeopleBornInCityQuery(cityName).toString(),
+                                GraknAgeUpdateAgent.deleteHasQuery(email).toString(),
+                                GraknAgeUpdateAgent.insertNewAgeQuery(email, age).toString()
                         ),
                         Arrays.asList(
-                                Neo4jUpdateAgesOfPeopleInCityAction.query()
+                                Neo4jAgeUpdateAgent.query()
                         )
                 ),
         )

@@ -1,42 +1,42 @@
+#
+# Copyright (C) 2021 Grakn Labs
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+#
+
 load("@graknlabs_dependencies//tool/checkstyle:rules.bzl", "checkstyle_test")
 
 java_library(
     name = "grakn",
-    srcs = glob([
-        "*.java",
-        "action/*.java",
-        "action/read/*.java",
-        "action/write/*.java",
-        "action/insight/*.java",
-        "driver/*.java",
-        "yaml_tool/*.java",
-    ]),
+    srcs = glob(["*.java", "*/*.java", "*/*/*.java"]),
     visibility = ["//visibility:public"],
     deps = [
+        "//common:common",
         "//simulation:simulation",
-        "//simulation/action",
-        "//simulation/driver",
-        "//simulation/utils",
-        "//simulation/world",
-        "//simulation/yaml_tool",
-        "//config",
-        "@graknlabs_common//:common",
         "@graknlabs_client_java//api:api",
         "@graknlabs_client_java//:client-java",
-        "@graknlabs_grabl_tracing//client",
+        "@graknlabs_common//:common",
         "@graknlabs_graql//java:graql",
-        "@graknlabs_graql//java/pattern",
-        "@graknlabs_graql//java/query",
-        "@maven//:com_google_guava_guava",
-        "@maven//:org_apache_commons_commons_csv",
+        "@graknlabs_graql//java/pattern:pattern",
+        "@graknlabs_graql//java/query:query",
         "@maven//:org_slf4j_slf4j_api",
     ],
+    data = ["simulation.gql"],
 )
 
 checkstyle_test(
     name = "checkstyle",
-    include = [":grakn"],
+    include = glob(["*", "*/*", "*/*/*"]),
     license_type = "agpl",
-    size = "small",
 )
-
