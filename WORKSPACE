@@ -110,8 +110,7 @@ http_archive(
 http_archive(
     name = "groovy_sdk_artifact",
     urls = [
-        "https://mirror.bazel.build/dl.bintray.com/groovy/maven/apache-groovy-binary-3.0.6.zip",
-        "https://dl.bintray.com/groovy/maven/apache-groovy-binary-3.0.6.zip",
+        "https://groovy.jfrog.io/artifactory/dist-release-local/groovy-zips/apache-groovy-binary-3.0.6.zip"
     ],
     build_file_content = """
 filegroup(
