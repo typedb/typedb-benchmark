@@ -278,7 +278,7 @@ build:
           --database typedb \
           --address $GRABL_EXPORT_PERFORMANCE_TYPEDB_CORE_URI \
           --config /home/grabl/$GRABL_REPO/config/simulation.yml \
-          --grabl $GRABL_TRACING_URI \
+          --factory $GRABL_TRACING_URI \
           --org $GRABL_OWNER \
           --repo $GRABL_REPO \
           --commit $GRABL_COMMIT \
@@ -330,7 +330,7 @@ build:
           --database neo4j \
           --address bolt://$GRABL_EXPORT_PERFORMANCE_NEO4J_URI \
           --config /home/grabl/$GRABL_REPO/config/simulation.yml \
-          --grabl $GRABL_TRACING_URI \
+          --factory $GRABL_TRACING_URI \
           --org $GRABL_OWNER \
           --repo $GRABL_REPO \
           --commit $GRABL_COMMIT \
