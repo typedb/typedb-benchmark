@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Grakn Labs
+ * Copyright (C) 2021 Vaticle
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package grakn.benchmark.common.params;
+package com.vaticle.typedb.benchmark.common.params;
 
 import picocli.CommandLine;
 import picocli.CommandLine.ArgGroup;
@@ -46,8 +46,8 @@ public class Options {
 
     @Nullable
     @ArgGroup(exclusive = false, multiplicity = "0..1",
-            heading = "Grabl tracing options to run this benchmark with")
-    private GrablTracing tracing;
+            heading = "Vaticle Factory tracing options to run this benchmark with")
+    private FactoryTracing tracing;
 
     public static Optional<Options> parseCLIOptions(String[] args) {
         return parseCLIOptions(args, new Options());
@@ -88,7 +88,7 @@ public class Options {
         return config;
     }
 
-    public Optional<GrablTracing> tracing() {
+    public Optional<FactoryTracing> tracing() {
         return Optional.ofNullable(tracing);
     }
 
@@ -106,10 +106,10 @@ public class Options {
         }
     }
 
-    public static class GrablTracing {
+    public static class FactoryTracing {
 
-        @Option(names = {"--grabl"}, required = true, description = "Grabl tracing server address")
-        private String grabl;
+        @Option(names = {"--factory"}, required = true, description = "Vaticle Factory tracing server address")
+        private String factory;
 
         @Option(names = {"--org"}, required = true, description = "GitHub organisation name")
         private String org;
@@ -121,11 +121,11 @@ public class Options {
         private String commit;
 
         @Nullable
-        @ArgGroup(exclusive = false, multiplicity = "0..1", heading = "Authentication credentials for Grabl tracing server")
+        @ArgGroup(exclusive = false, multiplicity = "0..1", heading = "Authentication credentials for Vaticle Factory tracing server")
         private Credentials credentials;
 
-        public String grabl() {
-            return grabl;
+        public String factory() {
+            return factory;
         }
 
         public String org() {
@@ -146,10 +146,10 @@ public class Options {
 
         public static class Credentials {
 
-            @Option(names = {"--username"}, required = true, description = "Grabl tracing username")
+            @Option(names = {"--username"}, required = true, description = "Vaticle Factory tracing username")
             private String username;
 
-            @Option(names = {"--token"}, required = true, description = "Grabl tracing API token")
+            @Option(names = {"--token"}, required = true, description = "Vaticle Factory tracing API token")
             private String token;
 
             public String username() {

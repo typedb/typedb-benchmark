@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Grakn Labs
+ * Copyright (C) 2021 Vaticle
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -15,13 +15,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package grakn.benchmark.common.params;
+package com.vaticle.typedb.benchmark.common.params;
 
 import javax.annotation.Nullable;
 
 public enum DatabaseType {
-    GRAKN_CORE("grakn-core", "Grakn Core", "localhost:1729"),
-    GRAKN_CLUSTER("grakn-cluster", "Grakn Cluster", "localhost:1729"),
+    TYPEDB("typedb", "TypeDB", "localhost:1729"),
+    TYPEDB_CLUSTER("typedb-cluster", "TypeDB Cluster", "localhost:1729"),
     NEO4J("neo4j", "Neo4j", "bolt://localhost:7687");
 
     private final String key;
@@ -54,12 +54,12 @@ public enum DatabaseType {
         return defaultAddress;
     }
 
-    public boolean isGraknCore() {
-        return key.equals("grakn-core");
+    public boolean isTypeDB() {
+        return key.equals("typedb");
     }
 
-    public boolean isGraknCluster() {
-        return key.equals("grakn-cluster");
+    public boolean isTypeDBCluster() {
+        return key.equals("typedb-cluster");
     }
 
     public boolean isNeo4j() {

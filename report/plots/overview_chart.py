@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2021 Grakn Labs
+# Copyright (C) 2021 Vaticle
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -21,7 +21,7 @@ from matplotlib import pyplot as plt
 from matplotlib.pyplot import tight_layout
 
 
-def overview_chart(iterations, agents, capsize, bar_edgecolor, grakn_overviews, neo4j_overviews, grakn_color,
+def overview_chart(iterations, agents, capsize, bar_edgecolor, typedboverviews, neo4j_overviews, typedbcolor,
                    neo4j_color, image_extension):
 
     fig, axs = plt.subplots(len(iterations), 1, sharex=True, figsize=(20, 20))
@@ -34,13 +34,13 @@ def overview_chart(iterations, agents, capsize, bar_edgecolor, grakn_overviews, 
     bar_width = 0.3  # the width of the bars
 
     neo4j_overviews = sort_overviews(neo4j_overviews)
-    grakn_overviews = sort_overviews(grakn_overviews)
+    typedboverviews = sort_overviews(typedboverviews)
 
     for iteration, ax in zip(iterations, axs):
         neo4j_average = unwrap_overviews(neo4j_overviews, "average", agents, iteration)
         neo4j_error = unwrap_overviews(neo4j_overviews, "standard-deviation", agents, iteration)
-        grakn_average = unwrap_overviews(grakn_overviews, "average", agents, iteration)
-        grakn_error = unwrap_overviews(grakn_overviews, "standard-deviation", agents, iteration)
+        typedbaverage = unwrap_overviews(typedboverviews, "average", agents, iteration)
+        typedberror = unwrap_overviews(typedboverviews, "standard-deviation", agents, iteration)
 
         bars1 = ax.bar(label_locations - bar_width / 2,
                        neo4j_average,
@@ -52,12 +52,12 @@ def overview_chart(iterations, agents, capsize, bar_edgecolor, grakn_overviews, 
                        edgecolor=bar_edgecolor)
 
         bars2 = ax.bar(label_locations + bar_width / 2,
-                       grakn_average,
+                       typedbaverage,
                        bar_width,
-                       yerr=grakn_error,
+                       yerr=typedberror,
                        capsize=capsize,
-                       label='Grakn',
-                       color=grakn_color,
+                       label='TypeDB',
+                       color=typedbcolor,
                        edgecolor=bar_edgecolor)
 
         # Add some text for labels, title and custom x-axis tick labels, etc.

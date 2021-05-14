@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Grakn Labs
+ * Copyright (C) 2021 Vaticle
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -15,12 +15,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package grakn.benchmark.grakn.driver;
+package com.vaticle.typedb.benchmark.typedb.driver;
 
-import grakn.benchmark.simulation.driver.Transaction;
-import grakn.client.api.answer.ConceptMap;
-import grakn.client.api.query.QueryManager;
-import graql.lang.query.GraqlMatch;
+import com.vaticle.typedb.benchmark.simulation.driver.Transaction;
+import com.vaticle.typedb.client.api.answer.ConceptMap;
+import com.vaticle.typedb.client.api.query.QueryManager;
+import com.vaticle.typeql.lang.query.TypeQLMatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,13 +29,13 @@ import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
 
-public class GraknTransaction implements Transaction {
+public class TypeDBTransaction implements Transaction {
 
-    private static final Logger LOG = LoggerFactory.getLogger(GraknTransaction.class);
+    private static final Logger LOG = LoggerFactory.getLogger(TypeDBTransaction.class);
 
-    private final grakn.client.api.GraknTransaction tx;
+    private final com.vaticle.typedb.client.api.TypeDBTransaction tx;
 
-    public GraknTransaction(grakn.client.api.GraknTransaction tx) {
+    public TypeDBTransaction(com.vaticle.typedb.client.api.TypeDBTransaction tx) {
         this.tx = tx;
     }
 
@@ -53,7 +53,7 @@ public class GraknTransaction implements Transaction {
         tx.commit();
     }
 
-    public <T> List<T> sortedExecute(GraqlMatch query, String attributeName, Integer limit) {
+    public <T> List<T> sortedExecute(TypeQLMatch query, String attributeName, Integer limit) {
         Stream<T> answerStream = tx.query().match(query)
                 .map(conceptMap -> (T) conceptMap.get(attributeName).asThing().asAttribute().getValue())
                 .sorted();

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Grakn Labs
+ * Copyright (C) 2021 Vaticle
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -15,16 +15,16 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package grakn.benchmark.simulation.agent;
+package com.vaticle.typedb.benchmark.simulation.agent;
 
-import grakn.benchmark.common.concept.Country;
-import grakn.benchmark.common.concept.Person;
-import grakn.benchmark.common.params.Context;
-import grakn.benchmark.common.seed.RandomSource;
-import grakn.benchmark.simulation.driver.Client;
-import grakn.benchmark.simulation.driver.Session;
-import grakn.benchmark.simulation.driver.Transaction;
-import grakn.common.collection.Pair;
+import com.vaticle.typedb.benchmark.common.concept.Country;
+import com.vaticle.typedb.benchmark.common.concept.Person;
+import com.vaticle.typedb.benchmark.common.params.Context;
+import com.vaticle.typedb.benchmark.common.seed.RandomSource;
+import com.vaticle.typedb.benchmark.simulation.driver.Client;
+import com.vaticle.typedb.benchmark.simulation.driver.Session;
+import com.vaticle.typedb.benchmark.simulation.driver.Transaction;
+import com.vaticle.typedb.common.collection.Pair;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -32,8 +32,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import static grakn.benchmark.common.params.Context.AGE_OF_FRIENDSHIP;
-import static grakn.common.collection.Collections.list;
+import static com.vaticle.typedb.benchmark.common.params.Context.AGE_OF_FRIENDSHIP;
+import static com.vaticle.typedb.common.collection.Collections.list;
 import static java.lang.Math.log;
 import static java.lang.Math.min;
 import static java.util.Comparator.comparing;

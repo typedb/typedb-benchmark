@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Grakn Labs
+ * Copyright (C) 2021 Vaticle
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -15,22 +15,22 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package grakn.benchmark.neo4j;
+package com.vaticle.typedb.benchmark.neo4j;
 
-import grakn.benchmark.common.concept.Continent;
-import grakn.benchmark.common.concept.Country;
-import grakn.benchmark.common.concept.Currency;
-import grakn.benchmark.common.concept.Global;
-import grakn.benchmark.common.params.Context;
-import grakn.benchmark.common.seed.SeedData;
-import grakn.benchmark.neo4j.agent.Neo4jFriendshipAgent;
-import grakn.benchmark.neo4j.agent.Neo4jPersonAgent;
-import grakn.benchmark.neo4j.driver.Neo4jClient;
-import grakn.benchmark.neo4j.driver.Neo4jSession;
-import grakn.benchmark.neo4j.driver.Neo4jTransaction;
-import grakn.benchmark.simulation.Simulation;
-import grakn.benchmark.simulation.agent.FriendshipAgent;
-import grakn.benchmark.simulation.agent.PersonAgent;
+import com.vaticle.typedb.benchmark.common.concept.Continent;
+import com.vaticle.typedb.benchmark.common.concept.Country;
+import com.vaticle.typedb.benchmark.common.concept.Currency;
+import com.vaticle.typedb.benchmark.common.concept.Global;
+import com.vaticle.typedb.benchmark.common.params.Context;
+import com.vaticle.typedb.benchmark.common.seed.SeedData;
+import com.vaticle.typedb.benchmark.neo4j.agent.Neo4jFriendshipAgent;
+import com.vaticle.typedb.benchmark.neo4j.agent.Neo4jPersonAgent;
+import com.vaticle.typedb.benchmark.neo4j.driver.Neo4jClient;
+import com.vaticle.typedb.benchmark.neo4j.driver.Neo4jSession;
+import com.vaticle.typedb.benchmark.neo4j.driver.Neo4jTransaction;
+import com.vaticle.typedb.benchmark.simulation.Simulation;
+import com.vaticle.typedb.benchmark.simulation.agent.FriendshipAgent;
+import com.vaticle.typedb.benchmark.simulation.agent.PersonAgent;
 import org.neo4j.driver.Driver;
 import org.neo4j.driver.Query;
 import org.neo4j.driver.Session;
@@ -42,7 +42,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
-import static grakn.benchmark.common.Util.printDuration;
+import static com.vaticle.typedb.benchmark.common.Util.printDuration;
 
 public class Neo4JSimulation extends Simulation<Neo4jClient, Neo4jSession, Neo4jTransaction> {
 

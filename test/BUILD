@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2021 Grakn Labs
+# Copyright (C) 2021 Vaticle
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -15,27 +15,27 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 
-load("@graknlabs_dependencies//tool/checkstyle:rules.bzl", "checkstyle_test")
-load("@graknlabs_bazel_distribution//artifact:rules.bzl", "artifact_extractor")
+load("@vaticle_dependencies//tool/checkstyle:rules.bzl", "checkstyle_test")
+load("@vaticle_bazel_distribution//artifact:rules.bzl", "artifact_extractor")
 
 artifact_extractor(
-    name = "grakn-core-extractor-linux",
-    artifact = "@graknlabs_grakn_core_artifact_linux//file",
+    name = "typedb-extractor-linux",
+    artifact = "@vaticle_typedb_artifact_linux//file",
 )
 
 artifact_extractor(
-    name = "grakn-cluster-extractor-linux",
+    name = "typedb-cluster-extractor-linux",
     artifact = "@graknlabs_grakn_cluster_artifact_linux//file",
 )
 
 java_test(
     name = "comparison-test",
     srcs = ["ComparisonTest.java"],
-    test_class = "grakn.benchmark.test.ComparisonTest",
+    test_class = "com.vaticle.typedb.benchmark.test.ComparisonTest",
     deps = [
         "//common:common",
         "//simulation:simulation",
-        "//grakn:grakn",
+        "//typedb:typedb",
         "//neo4j:neo4j",
         "@maven//:info_picocli_picocli",
     ],

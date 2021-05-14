@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2021 Grakn Labs
+# Copyright (C) 2021 Vaticle
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -15,7 +15,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 
-load("@graknlabs_dependencies//tool/checkstyle:rules.bzl", "checkstyle_test")
+load("@vaticle_dependencies//tool/checkstyle:rules.bzl", "checkstyle_test")
 
 java_library(
     name = "benchmark-lib",
@@ -25,9 +25,9 @@ java_library(
     deps = [
         "//common:common",
         "//simulation:simulation",
-        "//grakn:grakn",
+        "//typedb:typedb",
         "//neo4j:neo4j",
-        "@graknlabs_grabl_tracing//client",
+        "@vaticle_factory_tracing//client",
         "@maven//:com_google_code_findbugs_jsr305",
         "@maven//:org_slf4j_slf4j_api",
     ],
@@ -36,7 +36,7 @@ java_library(
 java_binary(
     name = "benchmark",
     runtime_deps = [":benchmark-lib"],
-    main_class = "grakn.benchmark.Benchmark",
+    main_class = "com.vaticle.typedb.benchmark.Benchmark",
     classpath_resources = ["//config:logback.xml"],
 )
 

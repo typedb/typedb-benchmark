@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Grakn Labs
+ * Copyright (C) 2021 Vaticle
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -15,16 +15,16 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package grakn.benchmark.common.seed;
+package com.vaticle.typedb.benchmark.common.seed;
 
-import grakn.benchmark.common.concept.City;
-import grakn.benchmark.common.concept.Gender;
-import grakn.common.collection.Pair;
+import com.vaticle.typedb.benchmark.common.concept.City;
+import com.vaticle.typedb.benchmark.common.concept.Gender;
+import com.vaticle.typedb.common.collection.Pair;
 
 import java.util.ArrayList;
 import java.util.Random;
 
-import static grakn.common.collection.Collections.pair;
+import static com.vaticle.typedb.common.collection.Collections.pair;
 
 public class RandomSource {
 

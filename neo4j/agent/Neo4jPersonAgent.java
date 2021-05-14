@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Grakn Labs
+ * Copyright (C) 2021 Vaticle
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -15,16 +15,16 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package grakn.benchmark.neo4j.agent;
+package com.vaticle.typedb.benchmark.neo4j.agent;
 
-import grakn.benchmark.common.concept.City;
-import grakn.benchmark.common.concept.Gender;
-import grakn.benchmark.common.concept.Person;
-import grakn.benchmark.common.params.Context;
-import grakn.benchmark.neo4j.driver.Neo4jClient;
-import grakn.benchmark.neo4j.driver.Neo4jTransaction;
-import grakn.benchmark.simulation.agent.PersonAgent;
-import grakn.common.collection.Pair;
+import com.vaticle.typedb.benchmark.common.concept.City;
+import com.vaticle.typedb.benchmark.common.concept.Gender;
+import com.vaticle.typedb.benchmark.common.concept.Person;
+import com.vaticle.typedb.benchmark.common.params.Context;
+import com.vaticle.typedb.benchmark.neo4j.driver.Neo4jClient;
+import com.vaticle.typedb.benchmark.neo4j.driver.Neo4jTransaction;
+import com.vaticle.typedb.benchmark.simulation.agent.PersonAgent;
+import com.vaticle.typedb.common.collection.Pair;
 import org.neo4j.driver.Query;
 import org.neo4j.driver.Record;
 
@@ -34,16 +34,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import static grakn.benchmark.neo4j.Labels.ADDRESS;
-import static grakn.benchmark.neo4j.Labels.BIRTH_DATE;
-import static grakn.benchmark.neo4j.Labels.CITY;
-import static grakn.benchmark.neo4j.Labels.CODE;
-import static grakn.benchmark.neo4j.Labels.EMAIL;
-import static grakn.benchmark.neo4j.Labels.FIRST_NAME;
-import static grakn.benchmark.neo4j.Labels.GENDER;
-import static grakn.benchmark.neo4j.Labels.LAST_NAME;
-import static grakn.benchmark.neo4j.Labels.PERSON;
-import static grakn.common.collection.Collections.pair;
+import static com.vaticle.typedb.benchmark.neo4j.Labels.ADDRESS;
+import static com.vaticle.typedb.benchmark.neo4j.Labels.BIRTH_DATE;
+import static com.vaticle.typedb.benchmark.neo4j.Labels.CITY;
+import static com.vaticle.typedb.benchmark.neo4j.Labels.CODE;
+import static com.vaticle.typedb.benchmark.neo4j.Labels.EMAIL;
+import static com.vaticle.typedb.benchmark.neo4j.Labels.FIRST_NAME;
+import static com.vaticle.typedb.benchmark.neo4j.Labels.GENDER;
+import static com.vaticle.typedb.benchmark.neo4j.Labels.LAST_NAME;
+import static com.vaticle.typedb.benchmark.neo4j.Labels.PERSON;
+import static com.vaticle.typedb.common.collection.Collections.pair;
 
 public class Neo4jPersonAgent extends PersonAgent<Neo4jTransaction> {
 

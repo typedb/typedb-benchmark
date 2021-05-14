@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Grakn Labs
+ * Copyright (C) 2021 Vaticle
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package grakn.benchmark.report
+package com.vaticle.typedb.benchmark.report
 
 
 import groovy.text.GStringTemplateEngine
@@ -85,7 +85,7 @@ Finds existing people and makes them employees of companies.
         private String title
         private String agentName
 
-        AgentSection(Class<?> agentClass, List<String> graknQueries, List<String> neo4jQueries) {
+        AgentSection(Class<?> agentClass, List<String> typeDBQueries, List<String> neo4jQueries) {
             this.agentClass = agentClass
             this.agentName = agentClass.getSimpleName()
             this.title = this.agentName
@@ -94,12 +94,12 @@ Finds existing people and makes them employees of companies.
             if (this.title.endsWith(suffix)) {
                 this.title = this.title.substring(0, this.title.length() - suffix.length())
             }
-            dbAgents.add(new DbAgentSection("Grakn", graknQueries))
+            dbAgents.add(new DbAgentSection("TypeDB", typeDBQueries))
             dbAgents.add(new DbAgentSection("Neo4j", neo4jQueries))
         }
 
-        AgentSection(Class<?> agentClass, String graknQueries, String neo4jQueries) {
-            this(agentClass, Arrays.asList(graknQueries), Arrays.asList(neo4jQueries))
+        AgentSection(Class<?> agentClass, String typeDBQueries, String neo4jQueries) {
+            this(agentClass, Arrays.asList(typeDBQueries), Arrays.asList(neo4jQueries))
         }
 
         @Override
@@ -154,66 +154,66 @@ Finds existing people and makes them employees of companies.
         List<AgentSection> agentSections = Arrays.asList(
                 new AgentSection(
                         ArbitraryOneHopAgent.class,
-                        GraknArbitraryOneHopAgent.query().toString(),
+                        TypeDBArbitraryOneHopAgent.query().toString(),
                         Neo4jArbitraryOneHopAgent.query()
                 ),
                 new AgentSection(
                         FindCurrentResidentsAgent.class,
-                        GraknFindCurrentResidentsAgent.query().toString(),
+                        TypeDBFindCurrentResidentsAgent.query().toString(),
                         Neo4jFindCurrentResidentsAgent.query()
                 ),
                 new AgentSection(
                         FindLivedInAgent.class,
-                        GraknFindLivedInAgent.query().toString(),
+                        TypeDBFindLivedInAgent.query().toString(),
                         Neo4jFindLivedInAgent.query()
                 ),
                 new AgentSection(
                         FindSpecificMarriageAgent.class,
-                        GraknFindSpecificMarriageAgent.query().toString(),
+                        TypeDBFindSpecificMarriageAgent.query().toString(),
                         Neo4jFindSpecificMarriageAgent.query()
                 ),
                 new AgentSection(
                         FindSpecificPersonAgent.class,
-                        GraknFindSpecificPersonAgent.query().toString(),
+                        TypeDBFindSpecificPersonAgent.query().toString(),
                         Neo4jFindSpecificPersonAgent.query()
                 ),
 //                Disabled due to long runtimes
 //                new AgentSection(
 //                        FindTransactionCurrencyAgent.class,
-//                        GraknFindTransactionCurrencyAction.query().toString(),
+//                        TypeDBFindTransactionCurrencyAction.query().toString(),
 //                        Neo4jFindTransactionCurrencyAction.query()
 //                ),
                 new AgentSection(
                         FourHopAgent.class,
-                        GraknFourHopAgent.query().toString(),
+                        TypeDBFourHopAgent.query().toString(),
                         Neo4jFourHopAgent.query()
                 ),
                 new AgentSection(
                         MeanWageAgent.class,
-                        GraknMeanWageAgent.query().toString(),
+                        TypeDBMeanWageAgent.query().toString(),
                         Neo4jMeanWageAgent.query()
                 ),
                 new AgentSection(
                         ThreeHopAgent.class,
-                        GraknThreeHopAgent.query().toString(),
+                        TypeDBThreeHopAgent.query().toString(),
                         Neo4jThreeHopAgent.query()
                 ),
                 new AgentSection(
                         TwoHopAgent.class,
-                        GraknTwoHopAgent.query().toString(),
+                        TypeDBTwoHopAgent.query().toString(),
                         Neo4jTwoHopAgent.query()
                 ),
                 new AgentSection(
                         PersonBirthAgent.class,
-                        GraknPersonBirthAgent.query(cityName, dummyDate).toString(),
+                        TypeDBPersonBirthAgent.query(cityName, dummyDate).toString(),
                         Neo4jPersonBirthAgent.query()
                 ),
                 new AgentSection(
                         AgeUpdateAgent.class,
                         Arrays.asList(
-                                GraknAgeUpdateAgent.getPeopleBornInCityQuery(cityName).toString(),
-                                GraknAgeUpdateAgent.deleteHasQuery(email).toString(),
-                                GraknAgeUpdateAgent.insertNewAgeQuery(email, age).toString()
+                                TypeDBAgeUpdateAgent.getPeopleBornInCityQuery(cityName).toString(),
+                                TypeDBAgeUpdateAgent.deleteHasQuery(email).toString(),
+                                TypeDBAgeUpdateAgent.insertNewAgeQuery(email, age).toString()
                         ),
                         Arrays.asList(
                                 Neo4jAgeUpdateAgent.query()

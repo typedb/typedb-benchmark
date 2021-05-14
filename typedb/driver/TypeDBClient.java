@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Grakn Labs
+ * Copyright (C) 2021 Vaticle
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -15,54 +15,54 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package grakn.benchmark.grakn.driver;
+package com.vaticle.typedb.benchmark.typedb.driver;
 
-import grakn.benchmark.common.concept.Region;
-import grakn.benchmark.simulation.driver.Client;
-import grakn.client.Grakn;
+import com.vaticle.typedb.benchmark.common.concept.Region;
+import com.vaticle.typedb.benchmark.simulation.driver.Client;
+import com.vaticle.typedb.client.TypeDB;
 
 import java.text.DecimalFormat;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static grakn.client.api.GraknSession.Type.DATA;
-import static grakn.client.api.GraknTransaction.Type.READ;
-import static graql.lang.Graql.match;
-import static graql.lang.Graql.var;
+import static com.vaticle.typedb.client.api.TypeDBSession.Type.DATA;
+import static com.vaticle.typedb.client.api.TypeDBTransaction.Type.READ;
+import static com.vaticle.typeql.lang.TypeQL.match;
+import static com.vaticle.typeql.lang.TypeQL.var;
 
-public class GraknClient implements Client<GraknSession, GraknTransaction> {
+public class TypeDBClient implements Client<TypeDBSession, TypeDBTransaction> {
 
-    private final grakn.client.api.GraknClient nativeClient;
-    private final ConcurrentHashMap<String, GraknSession> sessionMap;
+    private final com.vaticle.typedb.client.api.TypeDBClient nativeClient;
+    private final ConcurrentHashMap<String, TypeDBSession> sessionMap;
     private final String database;
 
-    private GraknClient(grakn.client.api.GraknClient nativeClient, String database) {
+    private TypeDBClient(com.vaticle.typedb.client.api.TypeDBClient nativeClient, String database) {
         this.nativeClient = nativeClient;
         this.database = database;
         this.sessionMap = new ConcurrentHashMap<>();
     }
 
-    public static GraknClient core(String hostUri, String database) {
-        return new GraknClient(Grakn.coreClient(hostUri), database);
+    public static TypeDBClient core(String hostUri, String database) {
+        return new TypeDBClient(TypeDB.coreClient(hostUri), database);
     }
 
-    public static GraknClient cluster(String hostUri, String database) {
-        return new GraknClient(Grakn.clusterClient(hostUri), database);
+    public static TypeDBClient cluster(String hostUri, String database) {
+        return new TypeDBClient(TypeDB.clusterClient(hostUri), database);
     }
 
-    public grakn.client.api.GraknClient unpack() {
+    public com.vaticle.typedb.client.api.TypeDBClient unpack() {
         return nativeClient;
     }
 
     @Override
-    public GraknSession session(Region region) {
-        return sessionMap.computeIfAbsent(region.group(), k -> new GraknSession(nativeClient.session(database, DATA)));
+    public TypeDBSession session(Region region) {
+        return sessionMap.computeIfAbsent(region.group(), k -> new TypeDBSession(nativeClient.session(database, DATA)));
     }
 
     @Override
     public String printStatistics() {
         StringBuilder str = new StringBuilder();
-        try (grakn.client.api.GraknSession session = nativeClient.session(database, DATA)) {
-            try (grakn.client.api.GraknTransaction tx = session.transaction(READ)) {
+        try (com.vaticle.typedb.client.api.TypeDBSession session = nativeClient.session(database, DATA)) {
+            try (com.vaticle.typedb.client.api.TypeDBTransaction tx = session.transaction(READ)) {
                 DecimalFormat formatter = new DecimalFormat("#,###");
                 long numberOfEntities = tx.query().match(match(var("x").isa("entity")).count()).get().asLong();
                 long numberOfAttributes = tx.query().match(match(var("x").isa("attribute")).count()).get().asLong();
@@ -88,7 +88,7 @@ public class GraknClient implements Client<GraknSession, GraknTransaction> {
 
     @Override
     public void closeSessions() {
-        sessionMap.values().forEach(GraknSession::close);
+        sessionMap.values().forEach(TypeDBSession::close);
         sessionMap.clear();
     }
 

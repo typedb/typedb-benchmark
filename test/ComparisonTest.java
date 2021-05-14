@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Grakn Labs
+ * Copyright (C) 2021 Vaticle
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -15,13 +15,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package grakn.benchmark.test;
+package com.vaticle.typedb.benchmark.test;
 
-import grakn.benchmark.common.params.Config;
-import grakn.benchmark.common.params.Context;
-import grakn.benchmark.grakn.GraknSimulation;
-import grakn.benchmark.neo4j.Neo4JSimulation;
-import grakn.benchmark.simulation.Simulation;
+import com.vaticle.typedb.benchmark.common.params.Config;
+import com.vaticle.typedb.benchmark.common.params.Context;
+import com.vaticle.typedb.benchmark.typedb.TypeDBSimulation;
+import com.vaticle.typedb.benchmark.neo4j.Neo4JSimulation;
+import com.vaticle.typedb.benchmark.simulation.Simulation;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runner.notification.RunNotifier;
@@ -36,9 +36,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
 
-import static grakn.benchmark.common.params.Options.parseCLIOptions;
-import static grakn.benchmark.test.ComparisonTest.Suite.GRAKN_CORE;
-import static grakn.benchmark.test.ComparisonTest.Suite.NEO4J;
+import static com.vaticle.typedb.benchmark.common.params.Options.parseCLIOptions;
+import static com.vaticle.typedb.benchmark.test.ComparisonTest.Suite.TYPEDB;
+import static com.vaticle.typedb.benchmark.test.ComparisonTest.Suite.NEO4J;
 import static org.junit.Assert.assertEquals;
 
 @RunWith(ComparisonTest.Suite.class)
@@ -46,7 +46,7 @@ public class ComparisonTest {
 
     @Test
     public void test_agents_have_equal_reports() {
-        Simulation.REGISTERED_AGENTS.forEach(agent -> assertEquals(GRAKN_CORE.getReport(agent), NEO4J.getReport(agent)));
+        Simulation.REGISTERED_AGENTS.forEach(agent -> assertEquals(TYPEDB.getReport(agent), NEO4J.getReport(agent)));
     }
 
     public static class Suite extends org.junit.runners.Suite {
@@ -54,14 +54,14 @@ public class ComparisonTest {
         private static final Config CONFIG = Config.loadYML(Paths.get("test/comparison-test.yml").toFile());
         private static final Options OPTIONS = parseCLIOptions(args(), new Options()).get();
 
-        public static GraknSimulation GRAKN_CORE;
+        public static TypeDBSimulation TYPEDB;
 
         public static Neo4JSimulation NEO4J;
         private int iteration = 1;
 
         public Suite(Class<?> testClass) throws Throwable {
             super(testClass, createRunners(testClass));
-            GRAKN_CORE = GraknSimulation.core(OPTIONS.graknAddress(), Context.create(CONFIG, false, true));
+            TYPEDB = TypeDBSimulation.core(OPTIONS.typeDBAddress(), Context.create(CONFIG, false, true));
             NEO4J = Neo4JSimulation.create(OPTIONS.neo4jAddress(), Context.create(CONFIG, false, true));
         }
 
@@ -82,10 +82,10 @@ public class ComparisonTest {
         @Override
         protected void runChild(org.junit.runner.Runner runner, final RunNotifier notifier) {
             iteration++;
-            Stream.of(NEO4J, GRAKN_CORE).parallel().forEach(Simulation::iterate);
+            Stream.of(NEO4J, TYPEDB).parallel().forEach(Simulation::iterate);
             super.runChild(runner, notifier);
             if (iteration == CONFIG.iterations() + 1) {
-                GRAKN_CORE.close();
+                TYPEDB.close();
                 NEO4J.close();
             }
         }
@@ -112,14 +112,14 @@ public class ComparisonTest {
         @CommandLine.Command(name = "benchmark-test", mixinStandardHelpOptions = true)
         private static class Options {
 
-            @CommandLine.Option(names = {"--grakn"}, required = true, description = "Database address URI")
-            private String graknAddress;
+            @CommandLine.Option(names = {"--typedb"}, required = true, description = "Database address URI")
+            private String typeDBAddress;
 
             @CommandLine.Option(names = {"--neo4j"}, required = true, description = "Database address URI")
             private String neo4jAddress;
 
-            public String graknAddress() {
-                return graknAddress;
+            public String typeDBAddress() {
+                return typeDBAddress;
             }
 
             public String neo4jAddress() {

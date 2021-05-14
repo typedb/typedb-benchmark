@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2021 Grakn Labs
+# Copyright (C) 2021 Vaticle
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -15,28 +15,10 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 
-load("@graknlabs_dependencies//tool/checkstyle:rules.bzl", "checkstyle_test")
-
-java_library(
-    name = "grakn",
-    srcs = glob(["*.java", "*/*.java", "*/*/*.java"]),
-    visibility = ["//visibility:public"],
-    deps = [
-        "//common:common",
-        "//simulation:simulation",
-        "@graknlabs_client_java//api:api",
-        "@graknlabs_client_java//:client-java",
-        "@graknlabs_common//:common",
-        "@graknlabs_graql//java:graql",
-        "@graknlabs_graql//java/pattern:pattern",
-        "@graknlabs_graql//java/query:query",
-        "@maven//:org_slf4j_slf4j_api",
-    ],
-    data = ["simulation.gql"],
-)
+load("@vaticle_dependencies//tool/checkstyle:rules.bzl", "checkstyle_test")
 
 checkstyle_test(
     name = "checkstyle",
-    include = glob(["*", "*/*", "*/*/*"]),
+    include = glob(["*"]),
     license_type = "agpl",
 )

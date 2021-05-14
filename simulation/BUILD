@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2021 Grakn Labs
+# Copyright (C) 2021 Vaticle
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -15,15 +15,15 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 
-load("@graknlabs_dependencies//tool/checkstyle:rules.bzl", "checkstyle_test")
+load("@vaticle_dependencies//tool/checkstyle:rules.bzl", "checkstyle_test")
 
 java_library(
     name = "simulation",
     srcs = glob(["*.java", "*/*.java"]),
     deps = [
         "//common:common",
-        "@graknlabs_common//:common",
-        "@graknlabs_grabl_tracing//client",
+        "@vaticle_typedb_common//:common",
+        "@vaticle_factory_tracing//client",
         "@maven//:org_slf4j_slf4j_api",
     ],
     visibility = ["//visibility:public"],

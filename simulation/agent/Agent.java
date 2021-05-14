@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Grakn Labs
+ * Copyright (C) 2021 Vaticle
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -15,15 +15,15 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package grakn.benchmark.simulation.agent;
+package com.vaticle.typedb.benchmark.simulation.agent;
 
-import grabl.tracing.client.GrablTracingThreadStatic;
-import grakn.benchmark.common.concept.Region;
-import grakn.benchmark.common.params.Context;
-import grakn.benchmark.common.seed.RandomSource;
-import grakn.benchmark.simulation.driver.Client;
-import grakn.benchmark.simulation.driver.Session;
-import grakn.benchmark.simulation.driver.Transaction;
+import com.vaticle.factory.tracing.client.FactoryTracingThreadStatic;
+import com.vaticle.typedb.benchmark.common.concept.Region;
+import com.vaticle.typedb.benchmark.common.params.Context;
+import com.vaticle.typedb.benchmark.common.seed.RandomSource;
+import com.vaticle.typedb.benchmark.simulation.driver.Client;
+import com.vaticle.typedb.benchmark.simulation.driver.Session;
+import com.vaticle.typedb.benchmark.simulation.driver.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,15 +37,15 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.Supplier;
 
-import static grabl.tracing.client.GrablTracingThreadStatic.contextOnThread;
-import static grabl.tracing.client.GrablTracingThreadStatic.traceOnThread;
-import static grakn.common.collection.Collections.pair;
-import static grakn.common.util.Objects.className;
+import static com.vaticle.factory.tracing.client.FactoryTracingThreadStatic.contextOnThread;
+import static com.vaticle.factory.tracing.client.FactoryTracingThreadStatic.traceOnThread;
+import static com.vaticle.typedb.common.collection.Collections.pair;
+import static com.vaticle.typedb.common.util.Objects.className;
 import static java.util.concurrent.CompletableFuture.runAsync;
 
 /**
  * Agent constructs regional agents of a given class and runs them in parallel, providing them with the appropriate
- * region, a deterministic random and the tracker and session key for tracing and grakn transactions.
+ * region, a deterministic random and the tracker and session key for tracing and TypeDB transactions.
  *
  * This class must be extended to provide the source of the random items and the methods to obtain the session key and
  * tracker from them.
@@ -95,7 +95,7 @@ public abstract class Agent<REGION extends Region, TX extends Transaction> {
     }
 
     private List<Report> runAndMayTrace(REGION region, RandomSource random) {
-        GrablTracingThreadStatic.ThreadContext tracingCtx = null;
+        FactoryTracingThreadStatic.ThreadContext tracingCtx = null;
         try {
             if (isTracing()) tracingCtx = contextOnThread(region.tracker(), context.iterationNumber());
             Session<TX> session = client.session(region);
@@ -107,7 +107,7 @@ public abstract class Agent<REGION extends Region, TX extends Transaction> {
 
     public <T> T mayTrace(Supplier<T> methodToTrace, String trace) {
         if (isTracing()) {
-            try (GrablTracingThreadStatic.ThreadTrace ignored = traceOnThread(trace)) {
+            try (FactoryTracingThreadStatic.ThreadTrace ignored = traceOnThread(trace)) {
                 return methodToTrace.get();
             }
         } else {

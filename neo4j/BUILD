@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2021 Grakn Labs
+# Copyright (C) 2021 Vaticle
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -15,7 +15,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 
-load("@graknlabs_dependencies//tool/checkstyle:rules.bzl", "checkstyle_test")
+load("@vaticle_dependencies//tool/checkstyle:rules.bzl", "checkstyle_test")
 
 java_library(
     name = "neo4j",
@@ -24,7 +24,7 @@ java_library(
     deps = [
         "//common:common",
         "//simulation:simulation",
-        "@graknlabs_common//:common",
+        "@vaticle_typedb_common//:common",
         "@neo4j//:org_neo4j_driver_neo4j_java_driver",
         "@maven//:org_slf4j_slf4j_api",
     ],

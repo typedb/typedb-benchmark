@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Grakn Labs
+ * Copyright (C) 2021 Vaticle
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -15,53 +15,53 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package grakn.benchmark.grakn.agent;
+package com.vaticle.typedb.benchmark.typedb.agent;
 
-import grakn.benchmark.common.concept.City;
-import grakn.benchmark.common.concept.Gender;
-import grakn.benchmark.common.concept.Person;
-import grakn.benchmark.common.params.Context;
-import grakn.benchmark.grakn.driver.GraknClient;
-import grakn.benchmark.grakn.driver.GraknTransaction;
-import grakn.benchmark.simulation.agent.PersonAgent;
-import grakn.client.api.answer.ConceptMap;
-import grakn.common.collection.Pair;
-import graql.lang.Graql;
+import com.vaticle.typedb.benchmark.common.concept.City;
+import com.vaticle.typedb.benchmark.common.concept.Gender;
+import com.vaticle.typedb.benchmark.common.concept.Person;
+import com.vaticle.typedb.benchmark.common.params.Context;
+import com.vaticle.typedb.benchmark.typedb.driver.TypeDBClient;
+import com.vaticle.typedb.benchmark.typedb.driver.TypeDBTransaction;
+import com.vaticle.typedb.benchmark.simulation.agent.PersonAgent;
+import com.vaticle.typedb.client.api.answer.ConceptMap;
+import com.vaticle.typedb.common.collection.Pair;
+import com.vaticle.typeql.lang.TypeQL;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-import static grakn.benchmark.grakn.Labels.ADDRESS;
-import static grakn.benchmark.grakn.Labels.BIRTH_DATE;
-import static grakn.benchmark.grakn.Labels.BIRTH_PLACE;
-import static grakn.benchmark.grakn.Labels.CHILD;
-import static grakn.benchmark.grakn.Labels.CITY;
-import static grakn.benchmark.grakn.Labels.CODE;
-import static grakn.benchmark.grakn.Labels.EMAIL;
-import static grakn.benchmark.grakn.Labels.FIRST_NAME;
-import static grakn.benchmark.grakn.Labels.GENDER;
-import static grakn.benchmark.grakn.Labels.LAST_NAME;
-import static grakn.benchmark.grakn.Labels.PERSON;
-import static grakn.benchmark.grakn.Labels.PLACE;
-import static grakn.benchmark.grakn.Labels.RESIDENCE;
-import static grakn.benchmark.grakn.Labels.RESIDENT;
-import static grakn.benchmark.grakn.Labels.RESIDENTSHIP;
-import static grakn.common.collection.Collections.pair;
-import static graql.lang.Graql.rel;
-import static graql.lang.Graql.var;
+import static com.vaticle.typedb.benchmark.typedb.Labels.ADDRESS;
+import static com.vaticle.typedb.benchmark.typedb.Labels.BIRTH_DATE;
+import static com.vaticle.typedb.benchmark.typedb.Labels.BIRTH_PLACE;
+import static com.vaticle.typedb.benchmark.typedb.Labels.CHILD;
+import static com.vaticle.typedb.benchmark.typedb.Labels.CITY;
+import static com.vaticle.typedb.benchmark.typedb.Labels.CODE;
+import static com.vaticle.typedb.benchmark.typedb.Labels.EMAIL;
+import static com.vaticle.typedb.benchmark.typedb.Labels.FIRST_NAME;
+import static com.vaticle.typedb.benchmark.typedb.Labels.GENDER;
+import static com.vaticle.typedb.benchmark.typedb.Labels.LAST_NAME;
+import static com.vaticle.typedb.benchmark.typedb.Labels.PERSON;
+import static com.vaticle.typedb.benchmark.typedb.Labels.PLACE;
+import static com.vaticle.typedb.benchmark.typedb.Labels.RESIDENCE;
+import static com.vaticle.typedb.benchmark.typedb.Labels.RESIDENT;
+import static com.vaticle.typedb.benchmark.typedb.Labels.RESIDENTSHIP;
+import static com.vaticle.typedb.common.collection.Collections.pair;
+import static com.vaticle.typeql.lang.TypeQL.rel;
+import static com.vaticle.typeql.lang.TypeQL.var;
 import static java.util.stream.Collectors.toList;
 
-public class GraknPersonAgent extends PersonAgent<GraknTransaction> {
+public class TypeDBPersonAgent extends PersonAgent<TypeDBTransaction> {
 
-    public GraknPersonAgent(GraknClient client, Context context) {
+    public TypeDBPersonAgent(TypeDBClient client, Context context) {
         super(client, context);
     }
 
     @Override
-    protected Optional<Pair<Person, City>> insertPerson(GraknTransaction tx, String email, String firstName, String lastName,
+    protected Optional<Pair<Person, City>> insertPerson(TypeDBTransaction tx, String email, String firstName, String lastName,
                                                         String address, Gender gender, LocalDateTime birthDate, City city) {
-        tx.query().insert(Graql.match(
+        tx.query().insert(TypeQL.match(
                 var(CITY).isa(CITY).has(CODE, city.code())
         ).insert(
                 var("p").isa(PERSON).has(EMAIL, email).has(FIRST_NAME, firstName).has(LAST_NAME, lastName)
@@ -73,8 +73,8 @@ public class GraknPersonAgent extends PersonAgent<GraknTransaction> {
         else return Optional.empty();
     }
 
-    private Optional<Pair<Person, City>> report(GraknTransaction tx, String email) {
-        List<ConceptMap> answers = tx.query().match(Graql.match(
+    private Optional<Pair<Person, City>> report(TypeDBTransaction tx, String email) {
+        List<ConceptMap> answers = tx.query().match(TypeQL.match(
                 var(PERSON).isa(PERSON).has(EMAIL, email).has(FIRST_NAME, var(FIRST_NAME)).has(LAST_NAME, var(LAST_NAME))
                         .has(ADDRESS, var(ADDRESS)).has(GENDER, var(GENDER)).has(BIRTH_DATE, var(BIRTH_DATE)),
                 var(CITY).has(CODE, var(CODE)),

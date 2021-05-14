@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Grakn Labs
+ * Copyright (C) 2021 Vaticle
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -15,14 +15,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package grakn.benchmark.common.seed;
+package com.vaticle.typedb.benchmark.common.seed;
 
-import grakn.benchmark.common.concept.City;
-import grakn.benchmark.common.concept.Continent;
-import grakn.benchmark.common.concept.Country;
-import grakn.benchmark.common.concept.Currency;
-import grakn.benchmark.common.concept.Global;
-import grakn.benchmark.common.concept.University;
+import com.vaticle.typedb.benchmark.common.concept.City;
+import com.vaticle.typedb.benchmark.common.concept.Continent;
+import com.vaticle.typedb.benchmark.common.concept.Country;
+import com.vaticle.typedb.benchmark.common.concept.Currency;
+import com.vaticle.typedb.benchmark.common.concept.Global;
+import com.vaticle.typedb.benchmark.common.concept.University;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.slf4j.Logger;

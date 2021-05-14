@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Grakn Labs
+ * Copyright (C) 2021 Vaticle
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -15,23 +15,23 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package grakn.benchmark.grakn.driver;
+package com.vaticle.typedb.benchmark.typedb.driver;
 
-import grakn.benchmark.simulation.driver.Session;
+import com.vaticle.typedb.benchmark.simulation.driver.Session;
 
-import static grakn.client.api.GraknTransaction.Type.WRITE;
+import static com.vaticle.typedb.client.api.TypeDBTransaction.Type.WRITE;
 
-public class GraknSession implements Session<GraknTransaction> {
+public class TypeDBSession implements Session<TypeDBTransaction> {
 
-    private final grakn.client.api.GraknSession nativeSession;
+    private final com.vaticle.typedb.client.api.TypeDBSession nativeSession;
 
-    public GraknSession(grakn.client.api.GraknSession nativeSession) {
+    public TypeDBSession(com.vaticle.typedb.client.api.TypeDBSession nativeSession) {
         this.nativeSession = nativeSession;
     }
 
     @Override
-    public GraknTransaction transaction() {
-        return new GraknTransaction(nativeSession.transaction(WRITE));
+    public TypeDBTransaction transaction() {
+        return new TypeDBTransaction(nativeSession.transaction(WRITE));
     }
 
     @Override

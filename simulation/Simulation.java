@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Grakn Labs
+ * Copyright (C) 2021 Vaticle
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -15,18 +15,18 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package grakn.benchmark.simulation;
+package com.vaticle.typedb.benchmark.simulation;
 
-import grakn.benchmark.common.params.Config;
-import grakn.benchmark.common.params.Context;
-import grakn.benchmark.common.seed.RandomSource;
-import grakn.benchmark.common.seed.SeedData;
-import grakn.benchmark.simulation.agent.Agent;
-import grakn.benchmark.simulation.agent.FriendshipAgent;
-import grakn.benchmark.simulation.agent.PersonAgent;
-import grakn.benchmark.simulation.driver.Client;
-import grakn.benchmark.simulation.driver.Session;
-import grakn.benchmark.simulation.driver.Transaction;
+import com.vaticle.typedb.benchmark.common.params.Config;
+import com.vaticle.typedb.benchmark.common.params.Context;
+import com.vaticle.typedb.benchmark.common.seed.RandomSource;
+import com.vaticle.typedb.benchmark.common.seed.SeedData;
+import com.vaticle.typedb.benchmark.simulation.agent.Agent;
+import com.vaticle.typedb.benchmark.simulation.agent.FriendshipAgent;
+import com.vaticle.typedb.benchmark.simulation.agent.PersonAgent;
+import com.vaticle.typedb.benchmark.simulation.driver.Client;
+import com.vaticle.typedb.benchmark.simulation.driver.Session;
+import com.vaticle.typedb.benchmark.simulation.driver.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,7 +41,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 
-import static grakn.benchmark.common.Util.printDuration;
+import static com.vaticle.typedb.benchmark.common.Util.printDuration;
 
 public abstract class Simulation<
         CLIENT extends Client<SESSION, TX>,

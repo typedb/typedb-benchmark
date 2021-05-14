@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Grakn Labs
+ * Copyright (C) 2021 Vaticle
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -15,23 +15,23 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package grakn.benchmark;
+package com.vaticle.typedb.benchmark;
 
-import grabl.tracing.client.GrablTracing;
-import grabl.tracing.client.GrablTracingThreadStatic;
-import grakn.benchmark.common.params.Config;
-import grakn.benchmark.common.params.Options;
-import grakn.benchmark.grakn.GraknSimulation;
-import grakn.benchmark.neo4j.Neo4JSimulation;
-import grakn.benchmark.simulation.Simulation;
-import grakn.benchmark.common.params.Context;
+import com.vaticle.factory.tracing.client.FactoryTracing;
+import com.vaticle.factory.tracing.client.FactoryTracingThreadStatic;
+import com.vaticle.typedb.benchmark.common.params.Config;
+import com.vaticle.typedb.benchmark.common.params.Options;
+import com.vaticle.typedb.benchmark.typedb.TypeDBSimulation;
+import com.vaticle.typedb.benchmark.neo4j.Neo4JSimulation;
+import com.vaticle.typedb.benchmark.simulation.Simulation;
+import com.vaticle.typedb.benchmark.common.params.Context;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import java.util.Optional;
 
-import static grakn.benchmark.common.params.Options.parseCLIOptions;
+import static com.vaticle.typedb.benchmark.common.params.Options.parseCLIOptions;
 
 public class Benchmark {
 
@@ -44,7 +44,7 @@ public class Benchmark {
         if (optionsOpt.isEmpty()) System.exit(0);
         Options options = optionsOpt.get();
 
-        try (GrablTracing ignore = initTracing(options.tracing().orElse(null), options.database().fullname())) {
+        try (FactoryTracing ignore = initTracing(options.tracing().orElse(null), options.database().fullname())) {
             Config config = Config.loadYML(options.config());
             try (Simulation<?, ?, ?> simulation = initSimulation(options, config)) {
                 simulation.run();
@@ -58,23 +58,23 @@ public class Benchmark {
     private static Simulation<?, ?, ?> initSimulation(Options options, Config config) throws Exception {
         Context context = Context.create(config, options.tracing().isPresent(), false);
         Simulation<?, ?, ?> simulation;
-        if (options.database().isGraknCore()) simulation = GraknSimulation.core(options.address(), context);
-        else if (options.database().isGraknCluster()) simulation = GraknSimulation.cluster(options.address(), context);
+        if (options.database().isTypeDB()) simulation = TypeDBSimulation.core(options.address(), context);
+        else if (options.database().isTypeDBCluster()) simulation = TypeDBSimulation.cluster(options.address(), context);
         else if (options.database().isNeo4j()) simulation = Neo4JSimulation.create(options.address(), context);
         else throw new IllegalStateException();
         return simulation;
     }
 
-    private static GrablTracing initTracing(@Nullable Options.GrablTracing options, String analysisName) {
-        GrablTracing tracing;
-        if (options == null) return GrablTracing.createNoOp().withLogging();
-        else if (options.credentials().isEmpty()) tracing = GrablTracing.create(options.grabl()).withLogging();
+    private static FactoryTracing initTracing(@Nullable Options.FactoryTracing options, String analysisName) {
+        FactoryTracing tracing;
+        if (options == null) return FactoryTracing.createNoOp().withLogging();
+        else if (options.credentials().isEmpty()) tracing = FactoryTracing.create(options.factory()).withLogging();
         else {
-            Options.GrablTracing.Credentials cred = options.credentials().get();
-            tracing = GrablTracing.create(options.grabl(), cred.username(), cred.token()).withLogging();
+            Options.FactoryTracing.Credentials cred = options.credentials().get();
+            tracing = FactoryTracing.create(options.factory(), cred.username(), cred.token()).withLogging();
         }
-        GrablTracingThreadStatic.setGlobalTracingClient(tracing);
-        GrablTracingThreadStatic.openGlobalAnalysis(options.org(), options.repo(), options.commit(), analysisName);
+        FactoryTracingThreadStatic.setGlobalTracingClient(tracing);
+        FactoryTracingThreadStatic.openGlobalAnalysis(options.org(), options.repo(), options.commit(), analysisName);
         return tracing;
     }
 }

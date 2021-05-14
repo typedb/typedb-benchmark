@@ -18,24 +18,25 @@
 load("@vaticle_dependencies//tool/checkstyle:rules.bzl", "checkstyle_test")
 
 java_library(
-    name = "common",
-    srcs = glob(["*.java", "*/*.java"]),
+    name = "typedb",
+    srcs = glob(["*.java", "*/*.java", "*/*/*.java"]),
     visibility = ["//visibility:public"],
     deps = [
+        "//common:common",
+        "//simulation:simulation",
+        "@vaticle_typedb_client_java//api:api",
+        "@vaticle_typedb_client_java//:client-java",
         "@vaticle_typedb_common//:common",
-        "@maven//:com_google_code_findbugs_jsr305",
-        "@maven//:info_picocli_picocli",
-        "@maven//:org_apache_commons_commons_csv",
+        "@vaticle_typeql_lang_java//:typeql-lang",
+        "@vaticle_typeql_lang_java//pattern:pattern",
+        "@vaticle_typeql_lang_java//query:query",
         "@maven//:org_slf4j_slf4j_api",
-        "@maven//:org_yaml_snakeyaml",
     ],
-    data = [
-        "//data:data",
-    ],
+    data = ["simulation.gql"],
 )
 
 checkstyle_test(
     name = "checkstyle",
-    include = glob(["*", "*/*"]),
-    license_type = "agpl"
+    include = glob(["*", "*/*", "*/*/*"]),
+    license_type = "agpl",
 )
