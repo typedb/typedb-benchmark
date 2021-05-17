@@ -26,7 +26,7 @@ from overview_chart import overview_chart
 
 def get_json(json_url):
     user_agent = 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.9.0.7) Gecko/2009021910 Firefox/3.0.7'
-    request = urllib.request.Request(json_url, headers={"Authorization": f"Token {os.environ.get('GRABL_USER_TOKEN')}",
+    request = urllib.request.Request(json_url, headers={"Authorization": f"Token {os.environ.get('FACTORY_USER_TOKEN')}",
                                                         "User-Agent": user_agent})
     with urllib.request.urlopen(request) as response:
         return json.loads(response.read())

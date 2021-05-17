@@ -44,10 +44,12 @@ load("@vaticle_dependencies//builder/python:deps.bzl", python_deps = "deps")
 python_deps()
 
 # Load //builder/antlr
-load("@vaticle_dependencies//builder/antlr:deps.bzl", antlr_deps = "deps")
+load("@vaticle_dependencies//builder/antlr:deps.bzl", antlr_deps = "deps", "antlr_version")
 antlr_deps()
-load("@rules_antlr//antlr:deps.bzl", "antlr_dependencies")
-antlr_dependencies()
+
+load("@rules_antlr//antlr:lang.bzl", "JAVA")
+load("@rules_antlr//antlr:repositories.bzl", "rules_antlr_dependencies")
+rules_antlr_dependencies(antlr_version, JAVA)
 
 # Load //builder/grpc
 load("@vaticle_dependencies//builder/grpc:deps.bzl", grpc_deps = "deps")
@@ -153,9 +155,9 @@ load("@vaticle_typeql_lang_java//dependencies/vaticle:repositories.bzl", "vaticl
 vaticle_typeql()
 
 # Load artifact
-load("//dependencies/vaticle:artifacts.bzl", "vaticle_typedb_artifacts", "graknlabs_grakn_cluster_artifacts")
+load("//dependencies/vaticle:artifacts.bzl", "vaticle_typedb_artifacts", "vaticle_typedb_cluster_artifacts")
 vaticle_typedb_artifacts()
-graknlabs_grakn_cluster_artifacts()
+vaticle_typedb_cluster_artifacts()
 
 # Load maven
 load("//dependencies/maven:artifacts.bzl", vaticle_typedb_benchmark_artifacts = "artifacts")

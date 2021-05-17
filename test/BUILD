@@ -25,7 +25,7 @@ artifact_extractor(
 
 artifact_extractor(
     name = "typedb-cluster-extractor-linux",
-    artifact = "@graknlabs_grakn_cluster_artifact_linux//file",
+    artifact = "@vaticle_typedb_cluster_artifact_linux//file",
 )
 
 java_test(

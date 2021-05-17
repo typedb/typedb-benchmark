@@ -27,7 +27,7 @@ Here we'll talk about how we went about benchmarking TypeDB, and how we drew com
 Our objectives:
 1. Profile TypeDB query latency and throughput as scale increases, with parallelism
     - This is for internal use at Vaticle, to ensure that TypeDB and TypeDB Cluster only improve in performance across all queries without any regression
-    - Therefore this is integrated into our CI system, Grabl
+    - Therefore this is integrated into our CI system, Vaticle Factory
 2. Use the same infrastructure to profile other databases against the same synthetically generated data
     - This creates like-for-like data models stored in different database softwares.
     - Emulate units of work that resemble a real application

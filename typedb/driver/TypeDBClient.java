@@ -20,6 +20,7 @@ package com.vaticle.typedb.benchmark.typedb.driver;
 import com.vaticle.typedb.benchmark.common.concept.Region;
 import com.vaticle.typedb.benchmark.simulation.driver.Client;
 import com.vaticle.typedb.client.TypeDB;
+import com.vaticle.typedb.client.api.TypeDBCredential;
 
 import java.text.DecimalFormat;
 import java.util.concurrent.ConcurrentHashMap;
@@ -46,7 +47,7 @@ public class TypeDBClient implements Client<TypeDBSession, TypeDBTransaction> {
     }
 
     public static TypeDBClient cluster(String hostUri, String database) {
-        return new TypeDBClient(TypeDB.clusterClient(hostUri), database);
+        return new TypeDBClient(TypeDB.clusterClient(hostUri, TypeDBCredential.plainText()), database);
     }
 
     public com.vaticle.typedb.client.api.TypeDBClient unpack() {

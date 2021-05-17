@@ -140,16 +140,16 @@ build:
 
         bazel run //ci:wait-for-file -- /tmp/typedb-cluster-peers.txt
 
-        bazel run //test:typedb-cluster-extractor-linux -- dist/grakn-cluster-all-linux
-        cd ./dist/grakn-cluster-all-linux/
-        bazel run @vaticle_dependencies//tool/util:create-systemd-service -- typedb-cluster "\/home\/grabl\/$GRABL_REPO\/dist\/grakn-cluster-all-linux\/typedb server --address=$(cat /tmp/hostname.txt):1729:1730 --peers=$(cat /tmp/typedb-cluster-peers.txt)"
+        bazel run //test:typedb-cluster-extractor-linux -- dist/typedb-cluster-all-linux
+        cd ./dist/typedb-cluster-all-linux/
+        bazel run @vaticle_dependencies//tool/util:create-systemd-service -- typedb-cluster "\/home\/grabl\/$GRABL_REPO\/dist\/typedb-cluster-all-linux\/typedb server --address=$(cat /tmp/hostname.txt):1729:1730 --peers=$(cat /tmp/typedb-cluster-peers.txt)"
 
         sudo systemctl daemon-reload
         sudo systemctl start typedb-cluster
         export GRABL_EXPORT_PERFORMANCE_TYPEDB_CLUSTER_1_HOSTNAME="${HOSTNAME}:1729"
       monitor: |
         sleep 20s
-        tail -f -n +1 ./dist/grakn-cluster-all-linux/server/logs/typedb.log
+        tail -f -n +1 ./dist/typedb-cluster-all-linux/server/logs/typedb.log
     test-performance-typedb-cluster-2-server:
       machine: 16-core-32-gb
       image: vaticle-ubuntu-20.04
@@ -172,15 +172,15 @@ build:
 
         bazel run //ci:wait-for-file -- /tmp/typedb-cluster-peers.txt
 
-        bazel run //test:typedb-cluster-extractor-linux -- dist/grakn-cluster-all-linux
-        cd ./dist/grakn-cluster-all-linux/
-        bazel run @vaticle_dependencies//tool/util:create-systemd-service -- typedb-cluster "\/home\/grabl\/$GRABL_REPO\/dist\/grakn-cluster-all-linux\/typedb server --address=$(cat /tmp/hostname.txt):1729:1730 --peers=$(cat /tmp/typedb-cluster-peers.txt)"
+        bazel run //test:typedb-cluster-extractor-linux -- dist/typedb-cluster-all-linux
+        cd ./dist/typedb-cluster-all-linux/
+        bazel run @vaticle_dependencies//tool/util:create-systemd-service -- typedb-cluster "\/home\/grabl\/$GRABL_REPO\/dist\/typedb-cluster-all-linux\/typedb server --address=$(cat /tmp/hostname.txt):1729:1730 --peers=$(cat /tmp/typedb-cluster-peers.txt)"
 
         sudo systemctl daemon-reload
         sudo systemctl start typedb-cluster
       monitor: |
         sleep 20s
-        tail -f -n +1 ./dist/grakn-cluster-all-linux/server/logs/typedb.log
+        tail -f -n +1 ./dist/typedb-cluster-all-linux/server/logs/typedb.log
     test-performance-typedb-cluster-3-server:
       machine: 16-core-32-gb
       image: vaticle-ubuntu-20.04
@@ -203,15 +203,15 @@ build:
 
         bazel run //ci:wait-for-file -- /tmp/typedb-cluster-peers.txt
 
-        bazel run //test:typedb-cluster-extractor-linux -- dist/grakn-cluster-all-linux
-        cd ./dist/grakn-cluster-all-linux/
-        bazel run @vaticle_dependencies//tool/util:create-systemd-service -- typedb-cluster "\/home\/grabl\/$GRABL_REPO\/dist\/grakn-cluster-all-linux\/typedb server --address=$(cat /tmp/hostname.txt):1729:1730 --peers=$(cat /tmp/typedb-cluster-peers.txt)"
+        bazel run //test:typedb-cluster-extractor-linux -- dist/typedb-cluster-all-linux
+        cd ./dist/typedb-cluster-all-linux/
+        bazel run @vaticle_dependencies//tool/util:create-systemd-service -- typedb-cluster "\/home\/grabl\/$GRABL_REPO\/dist\/typedb-cluster-all-linux\/typedb server --address=$(cat /tmp/hostname.txt):1729:1730 --peers=$(cat /tmp/typedb-cluster-peers.txt)"
 
         sudo systemctl daemon-reload
         sudo systemctl start typedb-cluster
       monitor: |
         sleep 20s
-        tail -f -n +1 ./dist/grakn-cluster-all-linux/server/logs/typedb.log
+        tail -f -n +1 ./dist/typedb-cluster-all-linux/server/logs/typedb.log
     test-performance-typedb-cluster-benchmark:
       image: vaticle-ubuntu-20.04
       filter:

@@ -25,15 +25,15 @@ def vaticle_typedb_artifacts():
         artifact_name = "typedb-server-{platform}-{version}.{ext}",
         tag_source = deployment["artifact.release"],
         commit_source = deployment["artifact.snapshot"],
-        commit = "77a4d559de9886c8919d12d946e14ef335fc7413",
+        commit = "d08dd7339d134018644736cd625ecc04f7b87e5b",
     )
 
-def graknlabs_grakn_cluster_artifacts():
+def vaticle_typedb_cluster_artifacts():
     native_artifact_files(
-        name = "graknlabs_grakn_cluster_artifact",
-        group_name = "graknlabs_grakn_cluster",
-        artifact_name = "grakn-cluster-all-{platform}-{version}.{ext}",
+        name = "vaticle_typedb_cluster_artifact",
+        group_name = "vaticle_typedb_cluster",
+        artifact_name = "typedb-cluster-all-{platform}-{version}.{ext}",
         tag_source = deployment_private["artifact.release"],
         commit_source = deployment_private["artifact.snapshot"],
-        commit = "3a94c636a49b302433e0c1f20c437550c85523a8",
+        commit = "7a058fa9a77d22448f07dda5f6caf88374158c6b",
     )
