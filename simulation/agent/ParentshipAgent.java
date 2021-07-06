@@ -62,7 +62,7 @@ public abstract class ParentshipAgent<TX extends Transaction> extends Agent<Coun
         try (TX tx = session.transaction()) {
             LocalDateTime marriageDate = context.today().minusYears(LENGTH_OF_MARRIAGE_BEFORE_PARENTSHIP);
              List<Marriage> marriages = matchMarriages(tx, country, marriageDate)
-                    .sorted(comparing(Marriage::hashCode)).collect(toCollection(ArrayList::new));
+                    .sorted(comparing(Marriage::licence)).collect(toCollection(ArrayList::new));
              List<Person> newBorns = matchNewborns(tx, country, context.today())
                      .sorted(comparing(Person::email)).collect(toCollection(ArrayList::new));
             List<Pair<Marriage, Person>> parentships = random.randomAllocation(marriages, newBorns);

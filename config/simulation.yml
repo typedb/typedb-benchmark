@@ -21,6 +21,8 @@ agents:
     mode: TRACE
   - name: "FriendshipAgent"
     mode: TRACE
+  - name: "MarriageAgent"
+    mode: TRACE
 
 traceSampling:
   # Options: `"every"` for every K traces; `"log"` for logarithm with base N

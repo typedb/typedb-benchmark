@@ -18,6 +18,7 @@
 package com.vaticle.typedb.benchmark.simulation.agent;
 
 import com.vaticle.typedb.benchmark.common.concept.Country;
+import com.vaticle.typedb.benchmark.common.concept.Gender;
 import com.vaticle.typedb.benchmark.common.concept.Marriage;
 import com.vaticle.typedb.benchmark.common.concept.Person;
 import com.vaticle.typedb.benchmark.common.params.Context;
@@ -29,6 +30,7 @@ import com.vaticle.typedb.benchmark.simulation.driver.Transaction;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -57,20 +59,21 @@ public abstract class MarriageAgent<TX extends Transaction> extends Agent<Countr
     protected List<Report> run(Session<TX> session, Country country, RandomSource random) {
         List<Report> reports = new ArrayList<>();
         try (TX tx = session.transaction()) {
-            LocalDateTime parentBirthDate = context.today().minusYears(AGE_OF_ADULTHOOD);
-             List<Person> women = matchWomen(tx, country, parentBirthDate)
+            LocalDateTime partnerBirthDate = context.today().minusYears(AGE_OF_ADULTHOOD);
+             List<Person> women = matchPartner(tx, country, partnerBirthDate, Gender.FEMALE)
                     .sorted(comparing(Person::email)).collect(toCollection(ArrayList::new));
-            List<Person> men = matchMen(tx, country, parentBirthDate)
+            List<Person> men = matchPartner(tx, country, partnerBirthDate, Gender.MALE)
                     .sorted(comparing(Person::email)).collect(toCollection(ArrayList::new));
             random.randomPairs(women, men).forEach(partners -> {
+                String licence = String.valueOf(Objects.hash(partners.first().email(), partners.second().email()));
                 Optional<Marriage> inserted = insertMarriage(tx, partners.first().email(),
                                                              partners.second().email(),
-                                                             context.today());
+                                                             licence);
                 if (context.isReporting()) {
                     assert inserted.isPresent();
-                    reports.add(new Report(list(partners.first().email(), partners.second().email(), context.today()),
+                    reports.add(new Report(list(partners.first().email(), partners.second().email(), licence),
                                            list(inserted.get().wife().email(), inserted.get().husband().email(),
-                                                inserted.get().date())));
+                                                inserted.get().licence())));
                 } else assert inserted.isEmpty();
             });
             tx.commit();
@@ -78,9 +81,8 @@ public abstract class MarriageAgent<TX extends Transaction> extends Agent<Countr
         return reports;
     }
 
-    protected abstract Stream<Person> matchWomen(TX tx, Country country, LocalDateTime birthDate);
+    protected abstract Stream<Person> matchPartner(TX tx, Country country, LocalDateTime birthDate, Gender gender);
 
-    protected abstract Stream<Person> matchMen(TX tx, Country country, LocalDateTime birthDate);
-
-    protected abstract Optional<Marriage> insertMarriage(TX tx, String wifeEmail, String husbandEmail, LocalDateTime date);
+    protected abstract Optional<Marriage> insertMarriage(TX tx, String wifeEmail, String husbandEmail,
+                                                         String marriageLicence);
 }
