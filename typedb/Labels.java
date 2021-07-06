@@ -62,6 +62,9 @@ public class Labels {
     public static final String WIFE = "wife";
     public static final String PARENTSHIP = "parentship";
     public static final String PARENT = "parent";
+    public static final String ANCESTOR = "ancestor";
+    public static final String DESCENDENT = "descendent";
+    public static final String LINEAGE = "lineage";
     public static final String FRIENDSHIP = "friendship";
     public static final String FRIEND = "friend";
     public static final String EMPLOYMENT = "employment";

@@ -57,5 +57,5 @@ public abstract class LineageAgent<TX extends Transaction> extends Agent<Country
         return reports;
     }
 
-    abstract void matchLineages(TX tx, Country country, LocalDateTime startDay, LocalDateTime today);
+    protected abstract void matchLineages(TX tx, Country country, LocalDateTime startDay, LocalDateTime today);
 }

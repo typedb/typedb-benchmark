@@ -48,6 +48,8 @@ person sub entity,
     plays marriage:wife,
     plays parentship:parent,
     plays parentship:child,
+    plays lineage:ancestor,
+    plays lineage:descendent,
     plays friendship:friend,
     plays employment:employee,
     plays studentship:student,
@@ -114,6 +116,10 @@ parentship sub relation,
     relates parent,
     relates child;
 
+lineage sub relation,
+    relates ancestor,
+    relates descendent;
+
 friendship sub relation,
     relates friend;
 
@@ -139,3 +145,18 @@ purchase sub relation,
 contains sub relation,
     relates container,
     relates contained;
+
+rule parentship-is-lineage:
+when {
+  (parent:$p, child:$c) isa parentship;
+} then {
+  (ancestor:$p, descendent:$c) isa lineage;
+};
+
+rule lineage-is-transitive:
+when {
+  (ancestor:$a, descendent:$b) isa lineage;
+  (ancestor:$b, descendent:$c) isa lineage;
+} then {
+  (ancestor:$a, descendent:$c) isa lineage;
+};
