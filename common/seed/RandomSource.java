@@ -22,6 +22,8 @@ import com.vaticle.typedb.benchmark.common.concept.Gender;
 import com.vaticle.typedb.common.collection.Pair;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Random;
 
 import static com.vaticle.typedb.common.collection.Collections.pair;
@@ -42,7 +44,7 @@ public class RandomSource {
         return random.nextBoolean();
     }
 
-    public <T> T choose(ArrayList<T> list) {
+    public <T> T choose(List<T> list) {
         return list.get(random.nextInt(list.size()));
     }
 
@@ -56,8 +58,8 @@ public class RandomSource {
                              city.name(), random.nextInt(10_000), city.country().name());
     }
 
-    public <T> ArrayList<Pair<T, T>> randomPairs(ArrayList<T> list, int pairsPerElement) {
-        ArrayList<Pair<T, T>> pairs = new ArrayList<>(list.size() * pairsPerElement);
+    public <T> List<Pair<T, T>> randomPairs(List<T> list, int pairsPerElement) {
+        List<Pair<T, T>> pairs = new ArrayList<>(list.size() * pairsPerElement);
         for (int i = 0; i < list.size(); i++) {
             for (int j = 0; j < pairsPerElement; j++) {
                 int other = random.nextInt(list.size() - 1);
@@ -66,5 +68,25 @@ public class RandomSource {
             }
         }
         return pairs;
+    }
+
+    public <T> List<Pair<T, T>> randomPairs(List<T> list1, List<T> list2) {
+        int numPairs = Math.min(list1.size(), list2.size());
+        List<Pair<T, T>> pairs = new ArrayList<>(numPairs);
+        Collections.shuffle(list2, random);
+        for (int i = 0; i < numPairs; i++) {
+            pairs.add(new Pair<>(list1.get(i), list2.get(i)));
+        }
+        return pairs;
+    }
+
+    public <RECIPIENT, RESOURCE> List<Pair<RECIPIENT, RESOURCE>> randomAllocation(List<RECIPIENT> recipients,
+                                                                                  List<RESOURCE> resources) {
+        List<Pair<RECIPIENT, RESOURCE>> allocations = new ArrayList<>(resources.size());
+        for (RESOURCE assignee : resources) {
+            int other = random.nextInt(recipients.size() - 1);
+            allocations.add(new Pair<>(recipients.get(other), assignee));
+        }
+        return allocations;
     }
 }

@@ -32,6 +32,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class Context implements AutoCloseable {
 
+    public static final int LENGTH_OF_MARRIAGE_BEFORE_PARENTSHIP = 3;
     public static final int AGE_OF_ADULTHOOD = 21;
     public static final int AGE_OF_FRIENDSHIP = 14;
     private static final Logger LOG = LoggerFactory.getLogger(Context.class);
