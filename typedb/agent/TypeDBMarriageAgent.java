@@ -58,7 +58,7 @@ import static java.util.stream.Collectors.toList;
 public class TypeDBMarriageAgent extends MarriageAgent<TypeDBTransaction> {
 
     private static final String W = "w", H = "h";
-    private static final String EW = "ew", EH = "eh", L = "l";
+    private static final String EW = "ew", EH = "eh", L = "l", D = "d";
 
     public TypeDBMarriageAgent(Client<?, TypeDBTransaction> client, Context context) {
         super(client, context);
@@ -86,22 +86,26 @@ public class TypeDBMarriageAgent extends MarriageAgent<TypeDBTransaction> {
                         .has(MARRIAGE_LICENSE, marriageLicence).has(MARRIAGE_DATE, marriageDate)
         ));
 
-        if (context.isReporting()) return report(tx, wifeEmail, husbandEmail, marriageLicence);
+        if (context.isReporting()) return report(tx, wifeEmail, husbandEmail, marriageLicence, marriageDate);
         else return Optional.empty();
     }
 
-    private Optional<Marriage> report(TypeDBTransaction tx, String wifeEmail, String husbandEmail, String marriageLicence) {
+    private Optional<Marriage> report(TypeDBTransaction tx, String wifeEmail, String husbandEmail,
+                                      String marriageLicence, LocalDateTime marriageDate) {
         List<ConceptMap> answers = tx.query().match(TypeQL.match(
                 var(W).isa(PERSON).has(EMAIL, var(EW)), var(EW).eq(wifeEmail),
                 var(H).isa(PERSON).has(EMAIL, var(EH)), var(EH).eq(husbandEmail),
-                rel(WIFE, W).rel(HUSBAND, H).isa(MARRIAGE).has(MARRIAGE_LICENSE, var(L)), var(L).eq(marriageLicence)
-        ).get(var(W), var(H), var(L)))
+                rel(WIFE, W).rel(HUSBAND, H).isa(MARRIAGE)
+                        .has(MARRIAGE_LICENSE, var(L)), var(L).eq(marriageLicence)
+                        .has(MARRIAGE_DATE, var(D)), var(D).eq(marriageDate)
+        ).get(var(W), var(H), var(L), var(D)))
                 .collect(toList());
         assert answers.size() == 1;
         ConceptMap inserted = answers.get(0);
         Person wife = new Person(inserted.get(EW).asAttribute().asString().getValue());
         Person husband = new Person(inserted.get(EH).asAttribute().asString().getValue());
         String licence = inserted.get(L).asAttribute().asString().getValue();
-        return Optional.of(new Marriage(wife, husband, licence));
+        LocalDateTime date = inserted.get(D).asAttribute().asDateTime().getValue();
+        return Optional.of(new Marriage(wife, husband, licence, date));
     }
 }

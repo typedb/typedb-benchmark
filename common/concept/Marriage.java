@@ -17,16 +17,20 @@
 
 package com.vaticle.typedb.benchmark.common.concept;
 
+import java.time.LocalDateTime;
+
 public class Marriage {
 
     private final Person wife;
     private final Person husband;
-    private String licence;
+    private final String licence;
+    private final LocalDateTime date;
 
-    public Marriage(Person wife, Person husband, String licence) {
+    public Marriage(Person wife, Person husband, String licence, LocalDateTime date) {
         this.wife = wife;
         this.husband = husband;
         this.licence = licence;
+        this.date = date;
     }
 
     public String licence() {
@@ -41,4 +45,7 @@ public class Marriage {
         return husband;
     }
 
+    public LocalDateTime date() {
+        return date;
+    }
 }
