@@ -34,6 +34,6 @@ traceSampling:
   arg: 10
 
 randomSeed: 1
-iterations: 100
-scaleFactor: 10
+iterations: 5
+scaleFactor: 2
 databaseName: "simulation"

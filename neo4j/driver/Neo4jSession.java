@@ -34,6 +34,11 @@ public class Neo4jSession implements Session<Neo4jTransaction> {
     }
 
     @Override
+    public Neo4jTransaction reasoningTransaction() {
+        throw new UnsupportedOperationException("Neo4j does not support reasoning transactions");
+    }
+
+    @Override
     public void close() {
         nativeSession.close();
     }

@@ -21,6 +21,8 @@ public interface Session<TX extends Transaction> extends AutoCloseable {
 
     TX transaction();
 
+    TX reasoningTransaction();
+
     @Override
     void close();
 }

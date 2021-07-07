@@ -47,12 +47,11 @@ public abstract class LineageAgent<TX extends Transaction> extends Agent<Country
     @Override
     protected List<Report> run(Session<TX> session, Country country, RandomSource random) {
         List<Report> reports = new ArrayList<>();
-        try (TX tx = session.transaction()) {
+        try (TX tx = session.reasoningTransaction()) {
             matchLineages(tx, country, context.startDay(), context.today());
             if (context.isReporting()) {
                 throw new RuntimeException("Reports are not comparable for reasoning agents.");
             }
-            tx.commit();
         }
         return reports;
     }

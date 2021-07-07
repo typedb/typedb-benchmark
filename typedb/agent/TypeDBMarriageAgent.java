@@ -69,7 +69,7 @@ public class TypeDBMarriageAgent extends MarriageAgent<TypeDBTransaction> {
                 rel(CONTAINER, COUNTRY).rel(CONTAINED, CITY).isa(CONTAINS),
                 var(COUNTRY).isa(COUNTRY).has(CODE, country.code()),
                 var(CITY).isa(CITY),
-                var(PERSON).isa(PERSON).has(EMAIL, EMAIL).has(GENDER, gender.value()).has(BIRTH_DATE, birthDate),
+                var(PERSON).isa(PERSON).has(EMAIL, var(EMAIL)).has(GENDER, gender.value()).has(BIRTH_DATE, birthDate),
                 var().rel(RESIDENCE, var(CITY)).rel(RESIDENT, var(PERSON)).isa(RESIDENTSHIP)))
                 .map(conceptMap -> new Person(conceptMap.get(EMAIL).asAttribute().asString().getValue()));
     }
@@ -90,9 +90,9 @@ public class TypeDBMarriageAgent extends MarriageAgent<TypeDBTransaction> {
 
     private Optional<Marriage> report(TypeDBTransaction tx, String wifeEmail, String husbandEmail, String marriageLicence) {
         List<ConceptMap> answers = tx.query().match(TypeQL.match(
-                var(W).isa(PERSON).has(EMAIL, EW), var(EW).eq(wifeEmail),
-                var(H).isa(PERSON).has(EMAIL, EH), var(EH).eq(husbandEmail),
-                rel(WIFE, W).rel(HUSBAND, H).isa(MARRIAGE).has(MARRIAGE_LICENSE, L), var(L).eq(marriageLicence)
+                var(W).isa(PERSON).has(EMAIL, var(EW)), var(EW).eq(wifeEmail),
+                var(H).isa(PERSON).has(EMAIL, var(EH)), var(EH).eq(husbandEmail),
+                rel(WIFE, W).rel(HUSBAND, H).isa(MARRIAGE).has(MARRIAGE_LICENSE, var(L)), var(L).eq(marriageLicence)
         ).get(var(W), var(H), var(L)))
                 .collect(toList());
         assert answers.size() == 1;

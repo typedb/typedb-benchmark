@@ -148,15 +148,15 @@ contains sub relation,
 
 rule parentship-is-lineage:
 when {
-  (parent:$p, child:$c) isa parentship;
+    (parent:$p, child:$c) isa parentship;
 } then {
-  (ancestor:$p, descendent:$c) isa lineage;
+    (ancestor:$p, descendent:$c) isa lineage;
 };
 
 rule lineage-is-transitive:
 when {
-  (ancestor:$a, descendent:$b) isa lineage;
-  (ancestor:$b, descendent:$c) isa lineage;
+    (ancestor:$a, descendent:$b) isa lineage;
+    (ancestor:$b, descendent:$c) isa lineage;
 } then {
-  (ancestor:$a, descendent:$c) isa lineage;
+    (ancestor:$a, descendent:$c) isa lineage;
 };

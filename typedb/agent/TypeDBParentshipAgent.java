@@ -73,21 +73,21 @@ public class TypeDBParentshipAgent extends ParentshipAgent<TypeDBTransaction> {
     protected Stream<Person> matchNewborns(TypeDBTransaction tx, City city, LocalDateTime today) {
         return tx.query().match(TypeQL.match(
                 var(CITY).isa(CITY).has(CODE, city.code()),
-                var(PERSON).isa(PERSON).has(EMAIL, EMAIL).has(BIRTH_DATE, today),
+                var(PERSON).isa(PERSON).has(EMAIL, var(EMAIL)).has(BIRTH_DATE, today),
                 rel(PLACE, var(CITY)).rel(CHILD, PERSON).isa(BIRTH_PLACE),
                 rel(RESIDENCE, var(CITY)).rel(RESIDENT, PERSON).isa(RESIDENTSHIP)
         )).map(conceptMap -> new Person(conceptMap.get(EMAIL).asAttribute().asString().getValue()));
     }
 
     @Override
-    protected Stream<Marriage> matchMarriages(TypeDBTransaction tx, City city, LocalDateTime marriageDate) {
+    protected Stream<Marriage> matchMarriages(TypeDBTransaction tx, City city) {
         return tx.query().match(TypeQL.match(
                 rel(CONTAINER, COUNTRY).rel(CONTAINED, CITY).isa(CONTAINS),
                 var(COUNTRY).isa(COUNTRY),
                 var(CITY).isa(CITY).has(CODE, city.code()),
-                var(W).isa(PERSON).has(EMAIL, EW),
-                var(H).isa(PERSON).has(EMAIL, EH),
-                rel(WIFE, W).rel(HUSBAND, H).isa(MARRIAGE).has(MARRIAGE_LICENSE, MARRIAGE_LICENSE),
+                var(W).isa(PERSON).has(EMAIL, var(EW)),
+                var(H).isa(PERSON).has(EMAIL, var(EH)),
+                rel(WIFE, W).rel(HUSBAND, H).isa(MARRIAGE).has(MARRIAGE_LICENSE, var(MARRIAGE_LICENSE)),
                 rel(RESIDENCE, var(CITY)).rel(RESIDENT, W).isa(RESIDENTSHIP)
         )).map(conceptMap -> new Marriage(
                 new Person(conceptMap.get(EW).asAttribute().asString().getValue()),
@@ -111,9 +111,9 @@ public class TypeDBParentshipAgent extends ParentshipAgent<TypeDBTransaction> {
 
     private Optional<Parentship> report(TypeDBTransaction tx, String motherEmail, String fatherEmail, String childEmail) {
         List<ConceptMap> answers = tx.query().match(TypeQL.match(
-                var(M).isa(PERSON).has(EMAIL, EM), var(EM).eq(motherEmail),
-                var(F).isa(PERSON).has(EMAIL, EF), var(EF).eq(fatherEmail),
-                var(C).isa(PERSON).has(EMAIL, EC), var(EC).eq(childEmail),
+                var(M).isa(PERSON).has(EMAIL, var(EM)), var(EM).eq(motherEmail),
+                var(F).isa(PERSON).has(EMAIL, var(EF)), var(EF).eq(fatherEmail),
+                var(C).isa(PERSON).has(EMAIL, var(EC)), var(EC).eq(childEmail),
                 rel(PARENT, M).rel(PARENT, F).rel(CHILD, C).isa(PARENTSHIP)
         ).get(var(EM), var(EF), var(EC))).collect(toList());
         assert answers.size() == 1;

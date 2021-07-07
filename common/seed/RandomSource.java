@@ -83,9 +83,13 @@ public class RandomSource {
     public <RECIPIENT, RESOURCE> List<Pair<RECIPIENT, RESOURCE>> randomAllocation(List<RECIPIENT> recipients,
                                                                                   List<RESOURCE> resources) {
         List<Pair<RECIPIENT, RESOURCE>> allocations = new ArrayList<>(resources.size());
-        for (RESOURCE assignee : resources) {
-            int other = random.nextInt(recipients.size() - 1);
-            allocations.add(new Pair<>(recipients.get(other), assignee));
+        if (recipients.size() == 0) {
+            return allocations;
+        } else if (recipients.size() == 1) {
+            resources.forEach(resource -> allocations.add(new Pair<>(recipients.get(0), resource)));
+        } else {
+            resources.forEach(resource -> allocations.add(
+                    new Pair<>(recipients.get(random.nextInt(recipients.size() - 1)), resource)));
         }
         return allocations;
     }

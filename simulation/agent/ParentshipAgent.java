@@ -34,7 +34,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import static com.vaticle.typedb.benchmark.common.params.Context.AGE_OF_ADULTHOOD;
 import static com.vaticle.typedb.benchmark.common.params.Context.LENGTH_OF_MARRIAGE_BEFORE_PARENTSHIP;
 import static com.vaticle.typedb.common.collection.Collections.list;
 import static java.util.Comparator.comparing;
@@ -61,7 +60,7 @@ public abstract class ParentshipAgent<TX extends Transaction> extends Agent<City
         List<Report> reports = new ArrayList<>();
         try (TX tx = session.transaction()) {
             LocalDateTime marriageDate = context.today().minusYears(LENGTH_OF_MARRIAGE_BEFORE_PARENTSHIP);
-             List<Marriage> marriages = matchMarriages(tx, city, marriageDate)
+             List<Marriage> marriages = matchMarriages(tx, city)
                     .sorted(comparing(Marriage::licence)).collect(toCollection(ArrayList::new));
              List<Person> newBorns = matchNewborns(tx, city, context.today())
                      .sorted(comparing(Person::email)).collect(toCollection(ArrayList::new));
@@ -86,7 +85,7 @@ public abstract class ParentshipAgent<TX extends Transaction> extends Agent<City
 
     protected abstract Stream<Person> matchNewborns(TX tx, City city, LocalDateTime today);
 
-    protected abstract Stream<Marriage> matchMarriages(TX tx, City city, LocalDateTime marriageDate);
+    protected abstract Stream<Marriage> matchMarriages(TX tx, City city);
 
     protected abstract Optional<Parentship> insertParentShip(TX tx, String motherEmail, String fatherEmail, String childEmail);
 }
