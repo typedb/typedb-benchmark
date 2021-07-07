@@ -25,13 +25,15 @@ agents:
     mode: TRACE
   - name: "ParentshipAgent"
     mode: TRACE
+  - name: "LineageAgent"
+    mode: TRACE
 
 traceSampling:
   # Options: `"every"` for every K traces; `"log"` for logarithm with base N
   function: "every"
-  arg: 10
+  arg: 1
 
 randomSeed: 1
-iterations: 100
-scaleFactor: 10
-databaseName: "simulation"
+iterations: 5
+scaleFactor: 2
+databaseName: "simulation-reasoning"
