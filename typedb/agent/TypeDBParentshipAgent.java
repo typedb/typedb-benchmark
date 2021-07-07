@@ -17,7 +17,7 @@
 
 package com.vaticle.typedb.benchmark.typedb.agent;
 
-import com.vaticle.typedb.benchmark.common.concept.City;
+import com.vaticle.typedb.benchmark.common.concept.Country;
 import com.vaticle.typedb.benchmark.common.concept.Marriage;
 import com.vaticle.typedb.benchmark.common.concept.Parentship;
 import com.vaticle.typedb.benchmark.common.concept.Person;
@@ -45,6 +45,7 @@ import static com.vaticle.typedb.benchmark.typedb.Labels.COUNTRY;
 import static com.vaticle.typedb.benchmark.typedb.Labels.EMAIL;
 import static com.vaticle.typedb.benchmark.typedb.Labels.HUSBAND;
 import static com.vaticle.typedb.benchmark.typedb.Labels.MARRIAGE;
+import static com.vaticle.typedb.benchmark.typedb.Labels.MARRIAGE_DATE;
 import static com.vaticle.typedb.benchmark.typedb.Labels.MARRIAGE_LICENSE;
 import static com.vaticle.typedb.benchmark.typedb.Labels.PARENT;
 import static com.vaticle.typedb.benchmark.typedb.Labels.PARENTSHIP;
@@ -70,9 +71,11 @@ public class TypeDBParentshipAgent extends ParentshipAgent<TypeDBTransaction> {
     }
 
     @Override
-    protected Stream<Person> matchNewborns(TypeDBTransaction tx, City city, LocalDateTime today) {
+    protected Stream<Person> matchNewborns(TypeDBTransaction tx, Country country, LocalDateTime today) {
         return tx.query().match(TypeQL.match(
-                var(CITY).isa(CITY).has(CODE, city.code()),
+                var(COUNTRY).isa(COUNTRY).has(CODE, country.code()),
+                rel(CONTAINER, COUNTRY).rel(CONTAINED, CITY).isa(CONTAINS),
+                var(CITY).isa(CITY),
                 var(PERSON).isa(PERSON).has(EMAIL, var(EMAIL)).has(BIRTH_DATE, today),
                 rel(PLACE, var(CITY)).rel(CHILD, PERSON).isa(BIRTH_PLACE),
                 rel(RESIDENCE, var(CITY)).rel(RESIDENT, PERSON).isa(RESIDENTSHIP)
@@ -80,14 +83,15 @@ public class TypeDBParentshipAgent extends ParentshipAgent<TypeDBTransaction> {
     }
 
     @Override
-    protected Stream<Marriage> matchMarriages(TypeDBTransaction tx, City city) {
+    protected Stream<Marriage> matchMarriages(TypeDBTransaction tx, Country country, LocalDateTime marriageDate) {
         return tx.query().match(TypeQL.match(
+                var(COUNTRY).isa(COUNTRY).has(CODE, country.code()),
                 rel(CONTAINER, COUNTRY).rel(CONTAINED, CITY).isa(CONTAINS),
-                var(COUNTRY).isa(COUNTRY),
-                var(CITY).isa(CITY).has(CODE, city.code()),
+                var(CITY).isa(CITY),
                 var(W).isa(PERSON).has(EMAIL, var(EW)),
                 var(H).isa(PERSON).has(EMAIL, var(EH)),
-                rel(WIFE, W).rel(HUSBAND, H).isa(MARRIAGE).has(MARRIAGE_LICENSE, var(MARRIAGE_LICENSE)),
+                rel(WIFE, W).rel(HUSBAND, H).isa(MARRIAGE)
+                        .has(MARRIAGE_DATE, marriageDate).has(MARRIAGE_LICENSE, var(MARRIAGE_LICENSE)),
                 rel(RESIDENCE, var(CITY)).rel(RESIDENT, W).isa(RESIDENTSHIP)
         )).map(conceptMap -> new Marriage(
                 new Person(conceptMap.get(EW).asAttribute().asString().getValue()),

@@ -44,6 +44,7 @@ import static com.vaticle.typedb.benchmark.typedb.Labels.EMAIL;
 import static com.vaticle.typedb.benchmark.typedb.Labels.GENDER;
 import static com.vaticle.typedb.benchmark.typedb.Labels.HUSBAND;
 import static com.vaticle.typedb.benchmark.typedb.Labels.MARRIAGE;
+import static com.vaticle.typedb.benchmark.typedb.Labels.MARRIAGE_DATE;
 import static com.vaticle.typedb.benchmark.typedb.Labels.MARRIAGE_LICENSE;
 import static com.vaticle.typedb.benchmark.typedb.Labels.PERSON;
 import static com.vaticle.typedb.benchmark.typedb.Labels.RESIDENCE;
@@ -76,12 +77,13 @@ public class TypeDBMarriageAgent extends MarriageAgent<TypeDBTransaction> {
 
     @Override
     protected Optional<Marriage> insertMarriage(TypeDBTransaction tx, String wifeEmail,
-                                                String husbandEmail, String marriageLicence) {
+                                                String husbandEmail, String marriageLicence, LocalDateTime marriageDate) {
         tx.query().insert(TypeQL.match(
                 var(W).isa(PERSON).has(EMAIL, wifeEmail),
                 var(H).isa(PERSON).has(EMAIL, husbandEmail)
         ).insert(
-                rel(WIFE, W).rel(HUSBAND, H).isa(MARRIAGE).has(MARRIAGE_LICENSE, marriageLicence)
+                rel(WIFE, W).rel(HUSBAND, H).isa(MARRIAGE)
+                        .has(MARRIAGE_LICENSE, marriageLicence).has(MARRIAGE_DATE, marriageDate)
         ));
 
         if (context.isReporting()) return report(tx, wifeEmail, husbandEmail, marriageLicence);

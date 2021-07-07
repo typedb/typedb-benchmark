@@ -17,7 +17,7 @@
 
 package com.vaticle.typedb.benchmark.simulation.agent;
 
-import com.vaticle.typedb.benchmark.common.concept.City;
+import com.vaticle.typedb.benchmark.common.concept.Country;
 import com.vaticle.typedb.benchmark.common.concept.Marriage;
 import com.vaticle.typedb.benchmark.common.concept.Parentship;
 import com.vaticle.typedb.benchmark.common.concept.Person;
@@ -39,7 +39,7 @@ import static com.vaticle.typedb.common.collection.Collections.list;
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.toCollection;
 
-public abstract class ParentshipAgent<TX extends Transaction> extends Agent<City, TX> {
+public abstract class ParentshipAgent<TX extends Transaction> extends Agent<Country, TX> {
 
     protected ParentshipAgent(Client<?, TX> client, Context context) {
         super(client, context);
@@ -51,19 +51,19 @@ public abstract class ParentshipAgent<TX extends Transaction> extends Agent<City
     }
 
     @Override
-    protected List<City> regions() {
-        return context.seedData().cities();
+    protected List<Country> regions() {
+        return context.seedData().countries();
     }
 
     @Override
-    protected List<Report> run(Session<TX> session, City city, RandomSource random) {
+    protected List<Report> run(Session<TX> session, Country country, RandomSource random) {
         List<Report> reports = new ArrayList<>();
         try (TX tx = session.transaction()) {
             LocalDateTime marriageDate = context.today().minusYears(LENGTH_OF_MARRIAGE_BEFORE_PARENTSHIP);
-             List<Marriage> marriages = matchMarriages(tx, city)
+            List<Marriage> marriages = matchMarriages(tx, country, marriageDate)
                     .sorted(comparing(Marriage::licence)).collect(toCollection(ArrayList::new));
-             List<Person> newBorns = matchNewborns(tx, city, context.today())
-                     .sorted(comparing(Person::email)).collect(toCollection(ArrayList::new));
+            List<Person> newBorns = matchNewborns(tx, country, context.today())
+                    .sorted(comparing(Person::email)).collect(toCollection(ArrayList::new));
             List<Pair<Marriage, Person>> parentships = random.randomAllocation(marriages, newBorns);
 
             parentships.forEach(parentship -> {
@@ -83,9 +83,9 @@ public abstract class ParentshipAgent<TX extends Transaction> extends Agent<City
         return reports;
     }
 
-    protected abstract Stream<Person> matchNewborns(TX tx, City city, LocalDateTime today);
+    protected abstract Stream<Person> matchNewborns(TX tx, Country country, LocalDateTime today);
 
-    protected abstract Stream<Marriage> matchMarriages(TX tx, City city);
+    protected abstract Stream<Marriage> matchMarriages(TX tx, Country country, LocalDateTime marriageDate);
 
     protected abstract Optional<Parentship> insertParentShip(TX tx, String motherEmail, String fatherEmail, String childEmail);
 }

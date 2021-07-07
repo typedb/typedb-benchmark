@@ -30,6 +30,7 @@ company-number sub attribute, value string;
 incorporation-date sub attribute, value datetime;
 currency sub attribute, value string;
 marriage-license sub attribute, value string;
+marriage-date sub attribute, value datetime;
 start-date sub attribute, value datetime;
 end-date sub attribute, value datetime;
 id sub attribute, value long;
@@ -108,6 +109,7 @@ residentship sub locates,
 
 marriage sub relation,
     owns marriage-license @key,
+    owns marriage-date,
     plays locates:located,
     relates husband,
     relates wife;

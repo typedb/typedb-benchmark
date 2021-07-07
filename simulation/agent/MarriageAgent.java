@@ -68,7 +68,7 @@ public abstract class MarriageAgent<TX extends Transaction> extends Agent<Countr
                 String licence = String.valueOf(Objects.hash(partners.first().email(), partners.second().email()));
                 Optional<Marriage> inserted = insertMarriage(tx, partners.first().email(),
                                                              partners.second().email(),
-                                                             licence);
+                                                             licence, context.today());
                 if (context.isReporting()) {
                     assert inserted.isPresent();
                     reports.add(new Report(list(partners.first().email(), partners.second().email(), licence),
@@ -84,5 +84,5 @@ public abstract class MarriageAgent<TX extends Transaction> extends Agent<Countr
     protected abstract Stream<Person> matchPartner(TX tx, Country country, LocalDateTime birthDate, Gender gender);
 
     protected abstract Optional<Marriage> insertMarriage(TX tx, String wifeEmail, String husbandEmail,
-                                                         String marriageLicence);
+                                                         String marriageLicence, LocalDateTime marriageDate);
 }
