@@ -22,9 +22,13 @@ import com.vaticle.typedb.benchmark.common.concept.Country;
 import com.vaticle.typedb.benchmark.common.concept.Global;
 import com.vaticle.typedb.benchmark.common.params.Context;
 import com.vaticle.typedb.benchmark.common.seed.SeedData;
+import com.vaticle.typedb.benchmark.simulation.agent.LineageAgent;
 import com.vaticle.typedb.benchmark.simulation.agent.MarriageAgent;
+import com.vaticle.typedb.benchmark.simulation.agent.ParentshipAgent;
 import com.vaticle.typedb.benchmark.typedb.agent.TypeDBFriendshipAgent;
+import com.vaticle.typedb.benchmark.typedb.agent.TypeDBLineageAgent;
 import com.vaticle.typedb.benchmark.typedb.agent.TypeDBMarriageAgent;
+import com.vaticle.typedb.benchmark.typedb.agent.TypeDBParentshipAgent;
 import com.vaticle.typedb.benchmark.typedb.agent.TypeDBPersonAgent;
 import com.vaticle.typedb.benchmark.typedb.driver.TypeDBClient;
 import com.vaticle.typedb.benchmark.typedb.driver.TypeDBSession;
@@ -185,5 +189,15 @@ public class TypeDBSimulation extends Simulation<TypeDBClient, TypeDBSession, Ty
     @Override
     protected MarriageAgent<TypeDBTransaction> createMarriageAgent(TypeDBClient client, Context context) {
         return new TypeDBMarriageAgent(client, context);
+    }
+
+    @Override
+    protected ParentshipAgent<TypeDBTransaction> createParentshipAgent(TypeDBClient client, Context context) {
+        return new TypeDBParentshipAgent(client, context);
+    }
+
+    @Override
+    protected LineageAgent<TypeDBTransaction> createLineageReasoningAgent(TypeDBClient client, Context context) {
+        return new TypeDBLineageAgent(client, context);
     }
 }

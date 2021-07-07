@@ -65,7 +65,7 @@ public class TypeDBParentshipAgent extends ParentshipAgent<TypeDBTransaction> {
     private static final String M = "m", F = "f", C = "c";
     private static final String EM = "em", EF = "ef", EC = "ec";
 
-    protected TypeDBParentshipAgent(Client<?, TypeDBTransaction> client, Context context) {
+    public TypeDBParentshipAgent(Client<?, TypeDBTransaction> client, Context context) {
         super(client, context);
     }
 

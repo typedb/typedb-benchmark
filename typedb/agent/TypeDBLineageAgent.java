@@ -22,9 +22,11 @@ import com.vaticle.typedb.benchmark.common.params.Context;
 import com.vaticle.typedb.benchmark.simulation.agent.LineageAgent;
 import com.vaticle.typedb.benchmark.simulation.driver.Client;
 import com.vaticle.typedb.benchmark.typedb.driver.TypeDBTransaction;
+import com.vaticle.typedb.client.api.answer.ConceptMap;
 import com.vaticle.typeql.lang.TypeQL;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import static com.vaticle.typedb.benchmark.typedb.Labels.ANCESTOR;
@@ -47,13 +49,13 @@ import static com.vaticle.typeql.lang.TypeQL.var;
 public class TypeDBLineageAgent extends LineageAgent<TypeDBTransaction> {
 
 
-    protected TypeDBLineageAgent(Client<?, TypeDBTransaction> client, Context context) {
+    public TypeDBLineageAgent(Client<?, TypeDBTransaction> client, Context context) {
         super(client, context);
     }
 
     @Override
     protected void matchLineages(TypeDBTransaction tx, Country country, LocalDateTime startDay, LocalDateTime today) {
-        tx.query().match(TypeQL.match(
+        List<ConceptMap> answers = tx.query().match(TypeQL.match(
                 rel(CONTAINER, COUNTRY).rel(CONTAINED, CITY).isa(CONTAINS),
                 var(COUNTRY).isa(COUNTRY).has(CODE, country.code()),
                 var(CITY).isa(CITY),
