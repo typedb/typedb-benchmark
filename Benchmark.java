@@ -75,7 +75,7 @@ public class Benchmark {
         }
         FactoryTracingThreadStatic.setGlobalTracingClient(tracing);
         String analysisName = databaseFullname;
-        if (options.scope() != null) analysisName = analysisName + "-" + options.scope();
+        if (options.tags() != null) analysisName = analysisName + " [ " + String.join(", ", options.tags()) + " ]";
         FactoryTracingThreadStatic.openGlobalAnalysis(options.org(), options.repo(), options.commit(), analysisName);
         return tracing;
     }

@@ -385,4 +385,4 @@ build:
           --commit $GRABL_COMMIT \
           --username $GRABL_OWNER \
           --token $GRABL_TOKEN \
-          --scope reasoning
+          --tag reasoning
