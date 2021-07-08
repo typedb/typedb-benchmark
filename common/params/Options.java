@@ -120,6 +120,9 @@ public class Options {
         @Option(names = {"--commit"}, required = true, description = "Git commit SHA")
         private String commit;
 
+        @Option(names = {"--scope"}, description = "Name for the scope of the analysis")
+        private String scope;
+
         @Nullable
         @ArgGroup(exclusive = false, multiplicity = "0..1", heading = "Authentication credentials for Vaticle Factory tracing server")
         private Credentials credentials;
@@ -138,6 +141,10 @@ public class Options {
 
         public String commit() {
             return commit;
+        }
+
+        public String scope() {
+            return scope;
         }
 
         public Optional<Credentials> credentials() {

@@ -65,7 +65,7 @@ public class Benchmark {
         return simulation;
     }
 
-    private static FactoryTracing initTracing(@Nullable Options.FactoryTracing options, String analysisName) {
+    private static FactoryTracing initTracing(@Nullable Options.FactoryTracing options, String databaseFullname) {
         FactoryTracing tracing;
         if (options == null) return FactoryTracing.createNoOp().withLogging();
         else if (options.credentials().isEmpty()) tracing = FactoryTracing.create(options.factory()).withLogging();
@@ -74,6 +74,8 @@ public class Benchmark {
             tracing = FactoryTracing.create(options.factory(), cred.username(), cred.token()).withLogging();
         }
         FactoryTracingThreadStatic.setGlobalTracingClient(tracing);
+        String analysisName = databaseFullname;
+        if (options.scope() != null) analysisName = analysisName + "-" + options.scope();
         FactoryTracingThreadStatic.openGlobalAnalysis(options.org(), options.repo(), options.commit(), analysisName);
         return tracing;
     }
