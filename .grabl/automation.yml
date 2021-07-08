@@ -369,20 +369,20 @@ build:
       monitor: |
         sleep 10s
         tail -f -n +1 /home/grabl/$GRABL_REPO/dist/typedb-all-linux/server/logs/typedb.log
-      test-performance-typedb-core-reasoning-benchmark:
-        machine: 16-core-32-gb
-        image: vaticle-ubuntu-20.04
-        dependencies: [test-performance-typedb-core-reasoning-server]
-        timeout: "30m"
-        command: |
-          bazel run //:benchmark -- \
-            --database typedb \
-            --address $GRABL_EXPORT_PERFORMANCE_TYPEDB_CORE_REASONING_URI \
-            --config /home/grabl/$GRABL_REPO/config/simulation_reasoning.yml \
-            --factory $GRABL_TRACING_URI \
-            --org $GRABL_OWNER \
-            --repo $GRABL_REPO \
-            --commit $GRABL_COMMIT \
-            --username $GRABL_OWNER \
-            --token $GRABL_TOKEN
-            --scope reasoning \
+    test-performance-typedb-core-reasoning-benchmark:
+      machine: 16-core-32-gb
+      image: vaticle-ubuntu-20.04
+      dependencies: [test-performance-typedb-core-reasoning-server]
+      timeout: "30m"
+      command: |
+        bazel run //:benchmark -- \
+          --database typedb \
+          --address $GRABL_EXPORT_PERFORMANCE_TYPEDB_CORE_REASONING_URI \
+          --config /home/grabl/$GRABL_REPO/config/simulation_reasoning.yml \
+          --factory $GRABL_TRACING_URI \
+          --org $GRABL_OWNER \
+          --repo $GRABL_REPO \
+          --commit $GRABL_COMMIT \
+          --username $GRABL_OWNER \
+          --token $GRABL_TOKEN
+          --scope reasoning \
