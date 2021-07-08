@@ -18,14 +18,18 @@
 agents:
   # For each agent select a `mode`, `RUN` to run without tracing, `TRACE` to run with tracing, and `OFF` to not run at all
   - name: "PersonAgent"
-    mode: TRACE
+    mode: RUN
   - name: "FriendshipAgent"
-    mode: TRACE
+    mode: RUN
   - name: "MarriageAgent"
-    mode: TRACE
+    mode: RUN
   - name: "ParentshipAgent"
-    mode: TRACE
+    mode: RUN
   - name: "LineageAgent"
+    mode: TRACE
+  - name: "NationalityAgent"
+    mode: TRACE
+  - name: "CitizenshipAgent"
     mode: TRACE
 
 traceSampling:

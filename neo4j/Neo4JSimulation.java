@@ -29,9 +29,11 @@ import com.vaticle.typedb.benchmark.neo4j.driver.Neo4jClient;
 import com.vaticle.typedb.benchmark.neo4j.driver.Neo4jSession;
 import com.vaticle.typedb.benchmark.neo4j.driver.Neo4jTransaction;
 import com.vaticle.typedb.benchmark.simulation.Simulation;
+import com.vaticle.typedb.benchmark.simulation.agent.CitizenshipAgent;
 import com.vaticle.typedb.benchmark.simulation.agent.FriendshipAgent;
 import com.vaticle.typedb.benchmark.simulation.agent.LineageAgent;
 import com.vaticle.typedb.benchmark.simulation.agent.MarriageAgent;
+import com.vaticle.typedb.benchmark.simulation.agent.NationalityAgent;
 import com.vaticle.typedb.benchmark.simulation.agent.ParentshipAgent;
 import com.vaticle.typedb.benchmark.simulation.agent.PersonAgent;
 import org.neo4j.driver.Driver;
@@ -200,7 +202,17 @@ public class Neo4JSimulation extends Simulation<Neo4jClient, Neo4jSession, Neo4j
     }
 
     @Override
-    protected LineageAgent<Neo4jTransaction> createLineageReasoningAgent(Neo4jClient client, Context context) {
+    protected LineageAgent<Neo4jTransaction> createLineageAgent(Neo4jClient client, Context context) {
         throw new UnsupportedOperationException("LineageAgent requires reasoning, which is not supported by Neo4j");
+    }
+
+    @Override
+    protected NationalityAgent<Neo4jTransaction> createNationalityAgent(Neo4jClient client, Context context) {
+        throw new UnsupportedOperationException("NationalityAgent requires reasoning, which is not supported by Neo4j");
+    }
+
+    @Override
+    protected CitizenshipAgent<Neo4jTransaction> createCitizenshipAgent(Neo4jClient client, Context context) {
+        throw new UnsupportedOperationException("CitizenshipAgent requires reasoning, which is not supported by Neo4j");
     }
 }

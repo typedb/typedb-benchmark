@@ -22,9 +22,11 @@ import com.vaticle.typedb.benchmark.common.params.Context;
 import com.vaticle.typedb.benchmark.common.seed.RandomSource;
 import com.vaticle.typedb.benchmark.common.seed.SeedData;
 import com.vaticle.typedb.benchmark.simulation.agent.Agent;
+import com.vaticle.typedb.benchmark.simulation.agent.CitizenshipAgent;
 import com.vaticle.typedb.benchmark.simulation.agent.FriendshipAgent;
 import com.vaticle.typedb.benchmark.simulation.agent.LineageAgent;
 import com.vaticle.typedb.benchmark.simulation.agent.MarriageAgent;
+import com.vaticle.typedb.benchmark.simulation.agent.NationalityAgent;
 import com.vaticle.typedb.benchmark.simulation.agent.ParentshipAgent;
 import com.vaticle.typedb.benchmark.simulation.agent.PersonAgent;
 import com.vaticle.typedb.benchmark.simulation.driver.Client;
@@ -94,7 +96,9 @@ public abstract class Simulation<
             put(FriendshipAgent.class, () -> createFriendshipAgent(client, context));
             put(MarriageAgent.class, () -> createMarriageAgent(client, context));
             put(ParentshipAgent.class, () -> createParentshipAgent(client, context));
-            put(LineageAgent.class, () -> createLineageReasoningAgent(client, context));
+            put(LineageAgent.class, () -> createLineageAgent(client, context));
+            put(NationalityAgent.class, () -> createNationalityAgent(client, context));
+            put(CitizenshipAgent.class, () -> createCitizenshipAgent(client, context));
         }};
     }
 
@@ -137,5 +141,9 @@ public abstract class Simulation<
 
     protected abstract ParentshipAgent<TX> createParentshipAgent(CLIENT client, Context context);
 
-    protected abstract LineageAgent<TX> createLineageReasoningAgent(CLIENT client, Context context);
+    protected abstract LineageAgent<TX> createLineageAgent(CLIENT client, Context context);
+
+    protected abstract NationalityAgent<TX> createNationalityAgent(CLIENT client, Context context);
+
+    protected abstract CitizenshipAgent<TX> createCitizenshipAgent(CLIENT client, Context context);
 }
