@@ -45,6 +45,8 @@ person sub entity,
     owns address,
     plays birth-place:child,
     plays residentship:resident,
+    plays nationality:national,
+    plays citizenship:citizen,
     plays marriage:husband,
     plays marriage:wife,
     plays parentship:parent,
@@ -87,7 +89,9 @@ region sub entity, abstract,
 
 continent sub region;
 country sub region,
-    owns currency;
+    owns currency,
+    plays nationality:state,
+    plays citizenship:state;
 city sub region;
 
 product sub entity,
@@ -113,6 +117,14 @@ marriage sub relation,
     plays locates:located,
     relates husband,
     relates wife;
+
+nationality sub relation,
+    relates state,
+    relates national;
+
+citizenship sub relation,
+    relates state,
+    relates citizen;
 
 parentship sub relation,
     relates parent,
@@ -161,4 +173,38 @@ when {
     (ancestor:$b, descendent:$c) isa lineage;
 } then {
     (ancestor:$a, descendent:$c) isa lineage;
+};
+
+rule birthplace-determines-nationality:
+when {
+    $city isa city;
+    $country isa country;
+    (container:$country, contained:$city) isa contains;
+    $person isa person;
+    (place:$city, child:$person) isa birth-place;
+} then {
+    (national:$person, state:$country) isa nationality;
+};
+
+rule children-of-nationals-are-nationals:
+when {
+    (parent:$p, child:$c) isa parentship;
+    (national:$p, state:$country) isa nationality;
+} then {
+    (national:$p, state:$country) isa nationality;
+};
+
+rule nationals-are-citizens:
+when {
+    (national:$person, state:$country) isa nationality;
+} then {
+    (citizen:$person, state:$country) isa citizenship;
+};
+
+rule married-partners-of-nationals-are-citizens:
+when {
+    ($p1, $p2) isa marriage;
+    (national:$p1, state:$country) isa nationality;
+} then {
+    (citizen:$p2, state:$country) isa citizenship;
 };
