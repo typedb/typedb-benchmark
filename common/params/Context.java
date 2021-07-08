@@ -69,31 +69,31 @@ public class Context implements AutoCloseable {
     }
 
     public long seed() {
-        return config.randomSeed();
+        return config.runParams().randomSeed();
     }
 
     public int scaleFactor() {
-        return config.scaleFactor();
+        return config.runParams().scaleFactor();
     }
 
     public String databaseName() {
-        return config.databaseName();
+        return config.runParams().databaseName();
     }
 
     public int iterationMax() {
-        return config.iterations();
+        return config.runParams().iterations();
     }
 
     public int ageOfFriendship() {
-        return config.ageOfFriendship();
+        return config.modelParams().ageOfFriendship();
     }
 
     public int ageOfAdulthood() {
-        return config.ageOfAdulthood();
+        return config.modelParams().ageOfAdulthood();
     }
 
     public int yearsBeforeParentship() {
-        return config.yearsBeforeParentship();
+        return config.modelParams().yearsBeforeParentship();
     }
 
     public int iterationNumber() {
