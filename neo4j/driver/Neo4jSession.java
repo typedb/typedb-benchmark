@@ -29,8 +29,13 @@ public class Neo4jSession implements Session<Neo4jTransaction> {
     }
 
     @Override
-    public Neo4jTransaction transaction() {
-        return new Neo4jTransaction(nativeSession);
+    public Neo4jTransaction writeTransaction() {
+        return new Neo4jTransaction.Write(nativeSession);
+    }
+
+    @Override
+    public Neo4jTransaction readTransaction() {
+        return new Neo4jTransaction.Read(nativeSession);
     }
 
     @Override

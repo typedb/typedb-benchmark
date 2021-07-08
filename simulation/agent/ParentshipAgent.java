@@ -57,7 +57,7 @@ public abstract class ParentshipAgent<TX extends Transaction> extends Agent<Coun
     @Override
     protected List<Report> run(Session<TX> session, Country country, RandomSource random) {
         List<Report> reports = new ArrayList<>();
-        try (TX tx = session.transaction()) {
+        try (TX tx = session.writeTransaction()) {
             LocalDateTime marriageDate = context.today().minusYears(context.yearsBeforeParentship());
             List<Marriage> marriages = matchMarriages(tx, country, marriageDate)
                     .sorted(comparing(Marriage::licence)).collect(toCollection(ArrayList::new));

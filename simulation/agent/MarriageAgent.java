@@ -57,7 +57,7 @@ public abstract class MarriageAgent<TX extends Transaction> extends Agent<Countr
     @Override
     protected List<Report> run(Session<TX> session, Country country, RandomSource random) {
         List<Report> reports = new ArrayList<>();
-        try (TX tx = session.transaction()) {
+        try (TX tx = session.writeTransaction()) {
             LocalDateTime partnerBirthDate = context.today().minusYears(context.ageOfAdulthood());
              List<Person> women = matchPartner(tx, country, partnerBirthDate, Gender.FEMALE)
                     .sorted(comparing(Person::email)).collect(toCollection(ArrayList::new));

@@ -32,8 +32,13 @@ public class TypeDBSession implements Session<TypeDBTransaction> {
     }
 
     @Override
-    public TypeDBTransaction transaction() {
+    public TypeDBTransaction writeTransaction() {
         return new TypeDBTransaction(nativeSession.transaction(WRITE));
+    }
+
+    @Override
+    public TypeDBTransaction readTransaction() {
+        return new TypeDBTransaction(nativeSession.transaction(READ, TypeDBOptions.core()));
     }
 
     @Override
