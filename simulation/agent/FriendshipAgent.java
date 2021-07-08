@@ -32,7 +32,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import static com.vaticle.typedb.benchmark.common.params.Context.AGE_OF_FRIENDSHIP;
 import static com.vaticle.typedb.common.collection.Collections.list;
 import static java.lang.Math.log;
 import static java.lang.Math.min;
@@ -59,7 +58,7 @@ public abstract class FriendshipAgent<TX extends Transaction> extends Agent<Coun
     protected List<Report> run(Session<TX> session, Country country, RandomSource random) {
         List<Report> reports = new ArrayList<>();
         try (TX tx = session.transaction()) {
-            LocalDateTime birthDate = context.today().minusYears(AGE_OF_FRIENDSHIP);
+            LocalDateTime birthDate = context.today().minusYears(context.ageOfFriendship());
             ArrayList<Person> teenagers = matchTeenagers(tx, country, birthDate)
                     .sorted(comparing(Person::email)).collect(toCollection(ArrayList::new));
             random.randomPairs(teenagers, min(log2(context.scaleFactor()), 1)).forEach(friends -> {

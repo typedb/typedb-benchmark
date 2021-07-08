@@ -34,7 +34,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import static com.vaticle.typedb.benchmark.common.params.Context.LENGTH_OF_MARRIAGE_BEFORE_PARENTSHIP;
 import static com.vaticle.typedb.common.collection.Collections.list;
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.toCollection;
@@ -59,7 +58,7 @@ public abstract class ParentshipAgent<TX extends Transaction> extends Agent<Coun
     protected List<Report> run(Session<TX> session, Country country, RandomSource random) {
         List<Report> reports = new ArrayList<>();
         try (TX tx = session.transaction()) {
-            LocalDateTime marriageDate = context.today().minusYears(LENGTH_OF_MARRIAGE_BEFORE_PARENTSHIP);
+            LocalDateTime marriageDate = context.today().minusYears(context.yearsBeforeParentship());
             List<Marriage> marriages = matchMarriages(tx, country, marriageDate)
                     .sorted(comparing(Marriage::licence)).collect(toCollection(ArrayList::new));
             List<Person> newBorns = matchNewborns(tx, country, context.today())

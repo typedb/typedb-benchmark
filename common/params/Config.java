@@ -33,6 +33,9 @@ public class Config {
     private final static int DEFAULT_NUM_ITERATIONS = 10;
     private final static int DEFAULT_SCALE_FACTOR = 5;
     private final static String DEFAULT_DATABASE_NAME = "world";
+    private final static int DEFAULT_AGE_OF_FRIENDSHIP = 14;
+    private final static int DEFAULT_AGE_OF_ADULTHOOD = 21;
+    private final static int DEFAULT_YEARS_BEFORE_PARENTSHIP = 3;
 
     private List<Agent> agents;
     private TraceSampling traceSampling;
@@ -40,6 +43,9 @@ public class Config {
     private int iterations = DEFAULT_NUM_ITERATIONS;
     private int scaleFactor = DEFAULT_SCALE_FACTOR;
     private String databaseName = DEFAULT_DATABASE_NAME;
+    private int ageOfFriendship = DEFAULT_AGE_OF_FRIENDSHIP;
+    private int ageOfAdulthood = DEFAULT_AGE_OF_ADULTHOOD;
+    private int yearsBeforeParentship = DEFAULT_YEARS_BEFORE_PARENTSHIP;
 
     public static Config loadYML(File file) throws YAMLException {
         Yaml yaml = new Yaml(new Constructor(Config.class));
@@ -98,6 +104,31 @@ public class Config {
     public void setDatabaseName(String databaseName) {
         this.databaseName = databaseName;
     }
+
+    public void setAgeOfFriendship(int ageOfFriendship) {
+        this.ageOfFriendship = ageOfFriendship;
+    }
+
+    public void setAgeOfAdulthood(int ageOfAdulthood) {
+        this.ageOfAdulthood = ageOfAdulthood;
+    }
+
+    public void setYearsBeforeParentship(int yearsBeforeParentship) {
+        this.yearsBeforeParentship = yearsBeforeParentship;
+    }
+
+    public int ageOfFriendship() {
+        return ageOfFriendship;
+    }
+
+    public int ageOfAdulthood() {
+        return ageOfAdulthood;
+    }
+
+    public int yearsBeforeParentship() {
+        return yearsBeforeParentship;
+    }
+
 
     public static class TraceSampling {
         private SamplingFunction function;

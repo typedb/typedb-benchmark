@@ -32,9 +32,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class Context implements AutoCloseable {
 
-    public static final int LENGTH_OF_MARRIAGE_BEFORE_PARENTSHIP = 1;
-    public static final int AGE_OF_ADULTHOOD = 1;
-    public static final int AGE_OF_FRIENDSHIP = 2;
     private static final Logger LOG = LoggerFactory.getLogger(Context.class);
 
     private final boolean isTracing;
@@ -75,10 +72,6 @@ public class Context implements AutoCloseable {
         return config.randomSeed();
     }
 
-    public void incrementIteration() {
-        iteration.incrementAndGet();
-    }
-
     public int scaleFactor() {
         return config.scaleFactor();
     }
@@ -87,12 +80,28 @@ public class Context implements AutoCloseable {
         return config.databaseName();
     }
 
+    public int iterationMax() {
+        return config.iterations();
+    }
+
+    public int ageOfFriendship() {
+        return config.ageOfFriendship();
+    }
+
+    public int ageOfAdulthood() {
+        return config.ageOfAdulthood();
+    }
+
+    public int yearsBeforeParentship() {
+        return config.yearsBeforeParentship();
+    }
+
     public int iterationNumber() {
         return iteration.get();
     }
 
-    public int iterationMax() {
-        return config.iterations();
+    public void incrementIteration() {
+        iteration.incrementAndGet();
     }
 
     public LocalDateTime today() {

@@ -96,7 +96,8 @@ public class TypeDBParentshipAgent extends ParentshipAgent<TypeDBTransaction> {
         )).map(conceptMap -> new Marriage(
                 new Person(conceptMap.get(EW).asAttribute().asString().getValue()),
                 new Person(conceptMap.get(EH).asAttribute().asString().getValue()),
-                conceptMap.get(MARRIAGE_LICENSE).asAttribute().asString().getValue()));
+                conceptMap.get(MARRIAGE_LICENSE).asAttribute().asString().getValue(),
+                marriageDate));
     }
 
     @Override

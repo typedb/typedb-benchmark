@@ -37,3 +37,6 @@ randomSeed: 1
 iterations: 5
 scaleFactor: 2
 databaseName: "simulation-reasoning"
+ageOfFriendship: 1
+ageOfAdulthood: 2
+yearsBeforeParentship: 1

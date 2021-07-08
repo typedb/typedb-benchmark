@@ -34,7 +34,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import static com.vaticle.typedb.benchmark.common.params.Context.AGE_OF_ADULTHOOD;
 import static com.vaticle.typedb.common.collection.Collections.list;
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.toCollection;
@@ -59,7 +58,7 @@ public abstract class MarriageAgent<TX extends Transaction> extends Agent<Countr
     protected List<Report> run(Session<TX> session, Country country, RandomSource random) {
         List<Report> reports = new ArrayList<>();
         try (TX tx = session.transaction()) {
-            LocalDateTime partnerBirthDate = context.today().minusYears(AGE_OF_ADULTHOOD);
+            LocalDateTime partnerBirthDate = context.today().minusYears(context.ageOfAdulthood());
              List<Person> women = matchPartner(tx, country, partnerBirthDate, Gender.FEMALE)
                     .sorted(comparing(Person::email)).collect(toCollection(ArrayList::new));
             List<Person> men = matchPartner(tx, country, partnerBirthDate, Gender.MALE)
