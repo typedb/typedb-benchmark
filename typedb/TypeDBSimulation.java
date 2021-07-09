@@ -24,12 +24,14 @@ import com.vaticle.typedb.benchmark.common.params.Context;
 import com.vaticle.typedb.benchmark.common.seed.SeedData;
 import com.vaticle.typedb.benchmark.simulation.agent.CitizenshipAgent;
 import com.vaticle.typedb.benchmark.simulation.agent.LineageAgent;
+import com.vaticle.typedb.benchmark.simulation.agent.MaritalStatusAgent;
 import com.vaticle.typedb.benchmark.simulation.agent.MarriageAgent;
 import com.vaticle.typedb.benchmark.simulation.agent.NationalityAgent;
 import com.vaticle.typedb.benchmark.simulation.agent.ParentshipAgent;
 import com.vaticle.typedb.benchmark.typedb.agent.TypeDBCitizenshipAgent;
 import com.vaticle.typedb.benchmark.typedb.agent.TypeDBFriendshipAgent;
 import com.vaticle.typedb.benchmark.typedb.agent.TypeDBLineageAgent;
+import com.vaticle.typedb.benchmark.typedb.agent.TypeDBMaritalStatusAgent;
 import com.vaticle.typedb.benchmark.typedb.agent.TypeDBMarriageAgent;
 import com.vaticle.typedb.benchmark.typedb.agent.TypeDBNationalityAgent;
 import com.vaticle.typedb.benchmark.typedb.agent.TypeDBParentshipAgent;
@@ -213,5 +215,10 @@ public class TypeDBSimulation extends Simulation<TypeDBClient, TypeDBSession, Ty
     @Override
     protected CitizenshipAgent<TypeDBTransaction> createCitizenshipAgent(TypeDBClient client, Context context) {
         return new TypeDBCitizenshipAgent(client, context);
+    }
+
+    @Override
+    protected MaritalStatusAgent<TypeDBTransaction> createMaritalStatusAgent(TypeDBClient client, Context context) {
+        return new TypeDBMaritalStatusAgent(client, context);
     }
 }

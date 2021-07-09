@@ -25,6 +25,7 @@ import com.vaticle.typedb.benchmark.simulation.agent.Agent;
 import com.vaticle.typedb.benchmark.simulation.agent.CitizenshipAgent;
 import com.vaticle.typedb.benchmark.simulation.agent.FriendshipAgent;
 import com.vaticle.typedb.benchmark.simulation.agent.LineageAgent;
+import com.vaticle.typedb.benchmark.simulation.agent.MaritalStatusAgent;
 import com.vaticle.typedb.benchmark.simulation.agent.MarriageAgent;
 import com.vaticle.typedb.benchmark.simulation.agent.NationalityAgent;
 import com.vaticle.typedb.benchmark.simulation.agent.ParentshipAgent;
@@ -82,7 +83,10 @@ public abstract class Simulation<
             if (agentConfig.isRun()) {
                 String className = AGENT_PACKAGE + "." + agentConfig.getName();
                 Class<? extends Agent> agentClass = (Class<? extends Agent>) Class.forName(className);
-                assert agentBuilders.containsKey(agentClass);
+                if (!agentBuilders.containsKey(agentClass)) {
+                    throw new RuntimeException(String.format("%s is not registered as an agent",
+                                                             agentConfig.getName()));
+                }
                 agents.add(agentBuilders.get(agentClass).get().setTracing(agentConfig.isTracing()));
                 REGISTERED_AGENTS.add(agentClass);
             }
@@ -96,6 +100,7 @@ public abstract class Simulation<
             put(FriendshipAgent.class, () -> createFriendshipAgent(client, context));
             put(MarriageAgent.class, () -> createMarriageAgent(client, context));
             put(ParentshipAgent.class, () -> createParentshipAgent(client, context));
+            put(MaritalStatusAgent.class, () -> createMaritalStatusAgent(client, context));
             put(LineageAgent.class, () -> createLineageAgent(client, context));
             put(NationalityAgent.class, () -> createNationalityAgent(client, context));
             put(CitizenshipAgent.class, () -> createCitizenshipAgent(client, context));
@@ -146,4 +151,6 @@ public abstract class Simulation<
     protected abstract NationalityAgent<TX> createNationalityAgent(CLIENT client, Context context);
 
     protected abstract CitizenshipAgent<TX> createCitizenshipAgent(CLIENT client, Context context);
+
+    protected abstract MaritalStatusAgent<TX> createMaritalStatusAgent(CLIENT client, Context context);
 }

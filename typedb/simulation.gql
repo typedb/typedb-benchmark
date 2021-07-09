@@ -24,6 +24,7 @@ last-name sub person-name;
 birth-date sub attribute, value datetime;
 gender sub attribute, value string;
 address sub attribute, value string;
+marital-status sub attribute, value string;
 code sub attribute, value string;
 name sub attribute, value string;
 company-number sub attribute, value string;
@@ -43,6 +44,7 @@ person sub entity,
     owns birth-date,
     owns gender,
     owns address,
+    owns marital-status,
     plays birth-place:child,
     plays residentship:resident,
     plays nationality:national,
@@ -207,4 +209,20 @@ when {
     (national:$p1, state:$country) isa nationality;
 } then {
     (citizen:$p2, state:$country) isa citizenship;
+};
+
+rule marital-status-single:
+when {
+    $p isa person;
+    not { ($p) isa marriage; };
+} then {
+    $p has marital-status "single";
+};
+
+rule marital-status-married:
+when {
+    $p isa person;
+    ($p) isa marriage;
+} then {
+    $p has marital-status "married";
 };
