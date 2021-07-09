@@ -20,8 +20,11 @@ agents:
     mode: RUN
   - name: "FriendshipAgent"
     mode: RUN
+  - name: "MarriageAgent"
+    mode: RUN
 
-randomSeed: 1
-iterations: 5
-scaleFactor: 5
-databaseName: "simulation"
+runParams:
+  randomSeed: 1
+  iterations: 5
+  scaleFactor: 5
+  databaseName: "simulation"
