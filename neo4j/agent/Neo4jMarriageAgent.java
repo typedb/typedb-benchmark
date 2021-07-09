@@ -62,7 +62,7 @@ public class Neo4jMarriageAgent extends MarriageAgent<Neo4jTransaction> {
         HashMap<String, Object> parameters = new HashMap<>() {{
             put(CODE, country.code());
             put(BIRTH_DATE, birthDate);
-            put(GENDER, gender);
+            put(GENDER, gender.value());
         }};
         return tx.execute(new Query(query, parameters)).stream().map(
                 record -> new Person((String) record.asMap().get("person.email"))
