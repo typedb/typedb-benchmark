@@ -23,6 +23,7 @@ import com.vaticle.typedb.benchmark.common.seed.RandomSource;
 import com.vaticle.typedb.benchmark.common.seed.SeedData;
 import com.vaticle.typedb.benchmark.simulation.agent.Agent;
 import com.vaticle.typedb.benchmark.simulation.agent.CitizenshipAgent;
+import com.vaticle.typedb.benchmark.simulation.agent.CoupleFriendshipAgent;
 import com.vaticle.typedb.benchmark.simulation.agent.FriendshipAgent;
 import com.vaticle.typedb.benchmark.simulation.agent.LineageAgent;
 import com.vaticle.typedb.benchmark.simulation.agent.MaritalStatusAgent;
@@ -104,6 +105,7 @@ public abstract class Simulation<
             put(LineageAgent.class, () -> createLineageAgent(client, context));
             put(NationalityAgent.class, () -> createNationalityAgent(client, context));
             put(CitizenshipAgent.class, () -> createCitizenshipAgent(client, context));
+            put(CoupleFriendshipAgent.class, () -> createCoupleFriendshipAgent(client, context));
         }};
     }
 
@@ -128,7 +130,12 @@ public abstract class Simulation<
 
     public void iterate() {
         agentReports.clear();
-        agents.forEach(agent -> agentReports.put(agent.getClass().getSuperclass().getSimpleName(), agent.iterate(randomSource.nextSource())));
+        agents.forEach(agent -> {
+            Instant start = Instant.now();;
+            Map<String, List<Agent.Report>> reports = agent.iterate(randomSource.nextSource());
+            LOG.info("{} took: {}", agent.getClass().getSimpleName(), printDuration(start, Instant.now()));
+            agentReports.put(agent.getClass().getSuperclass().getSimpleName(), reports);
+        });
         context.incrementIteration();
     }
 
@@ -153,4 +160,6 @@ public abstract class Simulation<
     protected abstract CitizenshipAgent<TX> createCitizenshipAgent(CLIENT client, Context context);
 
     protected abstract MaritalStatusAgent<TX> createMaritalStatusAgent(CLIENT client, Context context);
+
+    protected abstract CoupleFriendshipAgent<TX> createCoupleFriendshipAgent(CLIENT client, Context context);
 }

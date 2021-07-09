@@ -19,7 +19,7 @@ package com.vaticle.typedb.benchmark.typedb.agent;
 
 import com.vaticle.typedb.benchmark.common.concept.Country;
 import com.vaticle.typedb.benchmark.common.params.Context;
-import com.vaticle.typedb.benchmark.simulation.agent.MaritalStatusAgent;
+import com.vaticle.typedb.benchmark.simulation.agent.CoupleFriendshipAgent;
 import com.vaticle.typedb.benchmark.simulation.driver.Client;
 import com.vaticle.typedb.benchmark.typedb.driver.TypeDBTransaction;
 import com.vaticle.typedb.client.api.answer.ConceptMap;
@@ -36,6 +36,8 @@ import static com.vaticle.typedb.benchmark.typedb.Labels.CONTAINED;
 import static com.vaticle.typedb.benchmark.typedb.Labels.CONTAINER;
 import static com.vaticle.typedb.benchmark.typedb.Labels.CONTAINS;
 import static com.vaticle.typedb.benchmark.typedb.Labels.COUNTRY;
+import static com.vaticle.typedb.benchmark.typedb.Labels.FRIENDSHIP;
+import static com.vaticle.typedb.benchmark.typedb.Labels.MARRIAGE;
 import static com.vaticle.typedb.benchmark.typedb.Labels.PERSON;
 import static com.vaticle.typedb.benchmark.typedb.Labels.RESIDENCE;
 import static com.vaticle.typedb.benchmark.typedb.Labels.RESIDENT;
@@ -43,20 +45,27 @@ import static com.vaticle.typedb.benchmark.typedb.Labels.RESIDENTSHIP;
 import static com.vaticle.typeql.lang.TypeQL.rel;
 import static com.vaticle.typeql.lang.TypeQL.var;
 
-public class TypeDBMaritalStatusAgent extends MaritalStatusAgent<TypeDBTransaction> {
+public class TypeDBCoupleFriendshipAgent extends CoupleFriendshipAgent<TypeDBTransaction> {
 
-    public TypeDBMaritalStatusAgent(Client<?, TypeDBTransaction> client, Context context) {
+    private static final String X = "x";
+    private static final String Y = "y";
+
+    public TypeDBCoupleFriendshipAgent(Client<?, TypeDBTransaction> client, Context context) {
         super(client, context);
     }
 
     @Override
-    protected void matchMaritalStatus(TypeDBTransaction tx, Country country, LocalDateTime marriageBirthDate) {
-        List<ConceptMap> answers = tx.query().match(TypeQL.match(
-                var(PERSON).isa(PERSON).has(BIRTH_DATE, marriageBirthDate),
-                var(COUNTRY).isa(COUNTRY).has(CODE, country.code()),
-                rel(RESIDENT, var(PERSON)).rel(RESIDENCE, var(CITY)).isa(RESIDENTSHIP),
-                rel(CONTAINED, var(CITY)).rel(CONTAINER, var(COUNTRY)).isa(CONTAINS)
-        )).collect(Collectors.toList());
+    protected void matchFriendships(TypeDBTransaction tx, Country country, LocalDateTime marriageBirthDate) {
+        List<ConceptMap> answers = tx.query().match(
+                TypeQL.match(
+                        var(COUNTRY).isa(COUNTRY).has(CODE, country.code()),
+                        var(X).isa(PERSON).has(BIRTH_DATE, marriageBirthDate),
+                        rel(RESIDENT, var(X)).rel(RESIDENCE, var(CITY)).isa(RESIDENTSHIP),
+                        rel(CONTAINED, var(CITY)).rel(CONTAINER, var(COUNTRY)).isa(CONTAINS),
+                        var(Y).isa(PERSON),
+                        rel(X).rel(Y).isa(FRIENDSHIP),
+                        rel(X).rel(Y).isa(MARRIAGE)
+                )
+        ).collect(Collectors.toList());
     }
-
 }

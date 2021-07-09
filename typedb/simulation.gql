@@ -226,3 +226,10 @@ when {
 } then {
     $p has marital-status "married";
 };
+
+rule married-couples-are-friends:
+when {
+    ($p1, $p2) isa marriage;
+} then {
+    (friend:$p1, friend:$p2) isa friendship;
+};
