@@ -32,10 +32,10 @@ import java.util.stream.Collectors;
 import static com.vaticle.typedb.benchmark.typedb.Labels.BIRTH_DATE;
 import static com.vaticle.typedb.benchmark.typedb.Labels.CODE;
 import static com.vaticle.typedb.benchmark.typedb.Labels.COUNTRY;
+import static com.vaticle.typedb.benchmark.typedb.Labels.NATION;
 import static com.vaticle.typedb.benchmark.typedb.Labels.NATIONAL;
 import static com.vaticle.typedb.benchmark.typedb.Labels.NATIONALITY;
 import static com.vaticle.typedb.benchmark.typedb.Labels.PERSON;
-import static com.vaticle.typedb.benchmark.typedb.Labels.STATE;
 import static com.vaticle.typeql.lang.TypeQL.rel;
 import static com.vaticle.typeql.lang.TypeQL.var;
 
@@ -51,7 +51,7 @@ public class TypeDBNationalityAgent extends NationalityAgent<TypeDBTransaction> 
         List<ConceptMap> answers = tx.query().match(TypeQL.match(
                 var(COUNTRY).isa(COUNTRY).has(CODE, country.code()),
                 var(NATIONAL).isa(PERSON).has(BIRTH_DATE, today),
-                rel(NATIONAL, NATIONAL).rel(STATE, COUNTRY).isa(NATIONALITY)
+                rel(NATIONAL, NATIONAL).rel(NATION, COUNTRY).isa(NATIONALITY)
         )).collect(Collectors.toList());
     }
 }

@@ -35,7 +35,6 @@ import static com.vaticle.typedb.benchmark.typedb.Labels.CITIZENSHIP;
 import static com.vaticle.typedb.benchmark.typedb.Labels.CODE;
 import static com.vaticle.typedb.benchmark.typedb.Labels.COUNTRY;
 import static com.vaticle.typedb.benchmark.typedb.Labels.PERSON;
-import static com.vaticle.typedb.benchmark.typedb.Labels.STATE;
 import static com.vaticle.typeql.lang.TypeQL.rel;
 import static com.vaticle.typeql.lang.TypeQL.var;
 
@@ -51,7 +50,7 @@ public class TypeDBCitizenshipAgent extends CitizenshipAgent<TypeDBTransaction> 
         List<ConceptMap> answers = tx.query().match(TypeQL.match(
                 var(COUNTRY).isa(COUNTRY).has(CODE, country.code()),
                 var(CITIZEN).isa(PERSON).has(BIRTH_DATE, today),
-                rel(CITIZEN, CITIZEN).rel(STATE, COUNTRY).isa(CITIZENSHIP)
+                rel(CITIZEN, CITIZEN).rel(COUNTRY, COUNTRY).isa(CITIZENSHIP)
         )).collect(Collectors.toList());
     }
 

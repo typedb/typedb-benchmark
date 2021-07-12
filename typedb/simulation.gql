@@ -92,8 +92,8 @@ region sub entity, abstract,
 continent sub region;
 country sub region,
     owns currency,
-    plays nationality:state,
-    plays citizenship:state;
+    plays nationality:nation,
+    plays citizenship:country;
 city sub region;
 
 product sub entity,
@@ -121,11 +121,11 @@ marriage sub relation,
     relates wife;
 
 nationality sub relation,
-    relates state,
+    relates nation,
     relates national;
 
 citizenship sub relation,
-    relates state,
+    relates country,
     relates citizen;
 
 parentship sub relation,
@@ -185,30 +185,30 @@ when {
     $person isa person;
     (place:$city, child:$person) isa birth-place;
 } then {
-    (national:$person, state:$country) isa nationality;
+    (national:$person, nation:$country) isa nationality;
 };
 
 rule children-of-nationals-are-nationals:
 when {
     (parent:$p, child:$c) isa parentship;
-    (national:$p, state:$country) isa nationality;
+    (national:$p, nation:$country) isa nationality;
 } then {
-    (national:$p, state:$country) isa nationality;
+    (national:$p, nation:$country) isa nationality;
 };
 
 rule nationals-are-citizens:
 when {
-    (national:$person, state:$country) isa nationality;
+    (national:$person, nation:$country) isa nationality;
 } then {
-    (citizen:$person, state:$country) isa citizenship;
+    (citizen:$person, country:$country) isa citizenship;
 };
 
 rule married-partners-of-nationals-are-citizens:
 when {
     ($p1, $p2) isa marriage;
-    (national:$p1, state:$country) isa nationality;
+    (national:$p1, nation:$country) isa nationality;
 } then {
-    (citizen:$p2, state:$country) isa citizenship;
+    (citizen:$p2, country:$country) isa citizenship;
 };
 
 rule marital-status-single:

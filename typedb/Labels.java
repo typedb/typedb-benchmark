@@ -61,7 +61,7 @@ public class Labels {
     public static final String RESIDENT = "resident";
     public static final String NATIONALITY = "nationality";
     public static final String NATIONAL = "national";
-    public static final String STATE = "state";
+    public static final String NATION = "nation";
     public static final String CITIZENSHIP = "citizenship";
     public static final String CITIZEN = "citizen";
     public static final String MARRIAGE = "marriage";
