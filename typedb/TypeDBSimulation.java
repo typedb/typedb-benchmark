@@ -80,7 +80,7 @@ import static com.vaticle.typeql.lang.TypeQL.var;
 public class TypeDBSimulation extends Simulation<TypeDBClient, TypeDBSession, TypeDBTransaction> {
 
     private static final Logger LOG = LoggerFactory.getLogger(TypeDBSimulation.class);
-    private static final File SCHEMA_FILE = Paths.get("typedb/simulation.gql").toFile();
+    private static final File SCHEMA_FILE = Paths.get("typedb/simulation.tql").toFile();
     private static final String X = "x", Y = "y";
 
     private TypeDBSimulation(TypeDBClient client, Context context) throws Exception {
