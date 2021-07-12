@@ -77,7 +77,7 @@ public class Labels {
     public static final String EMPLOYMENT = "employment";
     public static final String EMPLOYER = "employer";
     public static final String EMPLOYEE = "employee";
-    public static final String STUDENTSHIP = "studentship";
+    public static final String STUDY = "study";
     public static final String STUDENT = "student";
     public static final String PURCHASE = "purchase";
     public static final String BUYER = "buyer";

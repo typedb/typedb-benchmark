@@ -57,7 +57,7 @@ person sub entity,
     plays lineage:descendent,
     plays friendship:friend,
     plays employment:employee,
-    plays studentship:student,
+    plays study:student,
     plays purchase:buyer,
     plays purchase:seller;
 
@@ -74,7 +74,7 @@ company sub organisation,
     plays purchase:seller;
 
 school sub organisation,
-    plays studentship:school;
+    plays study:school;
 
 primary-school sub school;
 secondary-school sub school;
@@ -144,7 +144,7 @@ employment sub relation,
     relates employer,
     relates employee;
 
-studentship sub relation,
+study sub relation,
     owns start-date,
     owns end-date,
     relates school,
