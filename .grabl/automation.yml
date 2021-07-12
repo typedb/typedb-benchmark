@@ -95,247 +95,247 @@ build:
           --test_arg=--typedb=$GRABL_EXPORT_TEST_COMPARISON_TYPEDB_URI \
           --test_arg=--neo4j=bolt://$GRABL_EXPORT_TEST_COMPARISON_NEO4J_URI
   performance:
-#    test-performance-typedb-cluster-bootstrapper:
-#      image: vaticle-ubuntu-20.04
-#      filter:
-#        owner: vaticle
-#        branch: typedb-cluster
-#      type: background
-#      command: |
-#        bazel run //ci:install-ssh-credential
-#        export GRABL_EXPORT_PERFORMANCE_TYPEDB_CLUSTER_BOOTSTRAPPER_URI="${HOSTNAME}"
-#
-#      monitor: |
-#        bazel run //ci:wait-for-file -- /tmp/typedb-cluster-1.txt
-#        bazel run //ci:wait-for-file -- /tmp/typedb-cluster-2.txt
-#        bazel run //ci:wait-for-file -- /tmp/typedb-cluster-3.txt
-#
-#        echo "$(cat /tmp/typedb-cluster-1.txt):1729:1730,$(cat /tmp/typedb-cluster-2.txt):1729:1730,$(cat /tmp/typedb-cluster-3.txt):1729:1730" > /tmp/typedb-cluster-peers.txt
-#
-#        bazel run //ci:transfer-file -- /tmp/typedb-cluster-peers.txt grabl@$(cat /tmp/typedb-cluster-1.txt):/tmp/typedb-cluster-peers.txt
-#        bazel run //ci:transfer-file -- /tmp/typedb-cluster-peers.txt grabl@$(cat /tmp/typedb-cluster-2.txt):/tmp/typedb-cluster-peers.txt
-#        bazel run //ci:transfer-file -- /tmp/typedb-cluster-peers.txt grabl@$(cat /tmp/typedb-cluster-3.txt):/tmp/typedb-cluster-peers.txt
-#
-#        sleep 1800
-#
-#    test-performance-typedb-cluster-1-server:
-#      machine: 16-core-32-gb
-#      image: vaticle-ubuntu-20.04
-#      filter:
-#        owner: vaticle
-#        branch: typedb-cluster
-#      type: background
-#      timeout: "30m"
-#      dependencies: [test-performance-typedb-cluster-bootstrapper]
-#      command: |
-#        export ARTIFACT_USERNAME=$REPO_VATICLE_USERNAME
-#        export ARTIFACT_PASSWORD=$REPO_VATICLE_PASSWORD
-#        bazel run @vaticle_dependencies//distribution/artifact:create-netrc
-#
-#        bazel run //ci:install-ssh-credential
-#
-#        echo -n "${HOSTNAME}" > /tmp/hostname.txt
-#        bazel run //ci:transfer-file -- /tmp/hostname.txt \
-#          grabl@$GRABL_EXPORT_PERFORMANCE_TYPEDB_CLUSTER_BOOTSTRAPPER_URI:/tmp/typedb-cluster-1.txt
-#
-#        bazel run //ci:wait-for-file -- /tmp/typedb-cluster-peers.txt
-#
-#        bazel run //test:typedb-cluster-extractor-linux -- dist/typedb-cluster-all-linux
-#        cd ./dist/typedb-cluster-all-linux/
-#        bazel run @vaticle_dependencies//tool/util:create-systemd-service -- typedb-cluster "\/home\/grabl\/$GRABL_REPO\/dist\/typedb-cluster-all-linux\/typedb server --address=$(cat /tmp/hostname.txt):1729:1730 --peers=$(cat /tmp/typedb-cluster-peers.txt)"
-#
-#        sudo systemctl daemon-reload
-#        sudo systemctl start typedb-cluster
-#        export GRABL_EXPORT_PERFORMANCE_TYPEDB_CLUSTER_1_HOSTNAME="${HOSTNAME}:1729"
-#      monitor: |
-#        sleep 20s
-#        tail -f -n +1 ./dist/typedb-cluster-all-linux/server/logs/typedb.log
-#    test-performance-typedb-cluster-2-server:
-#      machine: 16-core-32-gb
-#      image: vaticle-ubuntu-20.04
-#      filter:
-#        owner: vaticle
-#        branch: typedb-cluster
-#      type: background
-#      timeout: "30m"
-#      dependencies: [test-performance-typedb-cluster-bootstrapper]
-#      command: |
-#        export ARTIFACT_USERNAME=$REPO_VATICLE_USERNAME
-#        export ARTIFACT_PASSWORD=$REPO_VATICLE_PASSWORD
-#        bazel run @vaticle_dependencies//distribution/artifact:create-netrc
-#
-#        bazel run //ci:install-ssh-credential
-#
-#        echo -n "${HOSTNAME}" > /tmp/hostname.txt
-#        bazel run //ci:transfer-file -- /tmp/hostname.txt \
-#          grabl@$GRABL_EXPORT_PERFORMANCE_TYPEDB_CLUSTER_BOOTSTRAPPER_URI:/tmp/typedb-cluster-2.txt
-#
-#        bazel run //ci:wait-for-file -- /tmp/typedb-cluster-peers.txt
-#
-#        bazel run //test:typedb-cluster-extractor-linux -- dist/typedb-cluster-all-linux
-#        cd ./dist/typedb-cluster-all-linux/
-#        bazel run @vaticle_dependencies//tool/util:create-systemd-service -- typedb-cluster "\/home\/grabl\/$GRABL_REPO\/dist\/typedb-cluster-all-linux\/typedb server --address=$(cat /tmp/hostname.txt):1729:1730 --peers=$(cat /tmp/typedb-cluster-peers.txt)"
-#
-#        sudo systemctl daemon-reload
-#        sudo systemctl start typedb-cluster
-#      monitor: |
-#        sleep 20s
-#        tail -f -n +1 ./dist/typedb-cluster-all-linux/server/logs/typedb.log
-#    test-performance-typedb-cluster-3-server:
-#      machine: 16-core-32-gb
-#      image: vaticle-ubuntu-20.04
-#      filter:
-#        owner: vaticle
-#        branch: typedb-cluster
-#      type: background
-#      timeout: "30m"
-#      dependencies: [test-performance-typedb-cluster-bootstrapper]
-#      command: |
-#        export ARTIFACT_USERNAME=$REPO_VATICLE_USERNAME
-#        export ARTIFACT_PASSWORD=$REPO_VATICLE_PASSWORD
-#        bazel run @vaticle_dependencies//distribution/artifact:create-netrc
-#
-#        bazel run //ci:install-ssh-credential
-#
-#        echo -n "${HOSTNAME}" > /tmp/hostname.txt
-#        bazel run //ci:transfer-file -- /tmp/hostname.txt \
-#          grabl@$GRABL_EXPORT_PERFORMANCE_TYPEDB_CLUSTER_BOOTSTRAPPER_URI:/tmp/typedb-cluster-3.txt
-#
-#        bazel run //ci:wait-for-file -- /tmp/typedb-cluster-peers.txt
-#
-#        bazel run //test:typedb-cluster-extractor-linux -- dist/typedb-cluster-all-linux
-#        cd ./dist/typedb-cluster-all-linux/
-#        bazel run @vaticle_dependencies//tool/util:create-systemd-service -- typedb-cluster "\/home\/grabl\/$GRABL_REPO\/dist\/typedb-cluster-all-linux\/typedb server --address=$(cat /tmp/hostname.txt):1729:1730 --peers=$(cat /tmp/typedb-cluster-peers.txt)"
-#
-#        sudo systemctl daemon-reload
-#        sudo systemctl start typedb-cluster
-#      monitor: |
-#        sleep 20s
-#        tail -f -n +1 ./dist/typedb-cluster-all-linux/server/logs/typedb.log
-#    test-performance-typedb-cluster-benchmark:
-#      image: vaticle-ubuntu-20.04
-#      filter:
-#        owner: vaticle
-#        branch: typedb-cluster
-#      timeout: "30m"
-#      dependencies: [test-performance-typedb-cluster-1-server, test-performance-typedb-cluster-2-server, test-performance-typedb-cluster-3-server]
-#      command: |
-#        export ARTIFACT_USERNAME=$REPO_VATICLE_USERNAME
-#        export ARTIFACT_PASSWORD=$REPO_VATICLE_PASSWORD
-#        bazel run @vaticle_dependencies//distribution/artifact:create-netrc
-#
-#        bazel run //:benchmark -- \
-#          --database typedb-cluster \
-#          --address $GRABL_EXPORT_PERFORMANCE_TYPEDB_CLUSTER_1_HOSTNAME \
-#          --config /home/grabl/$GRABL_REPO/config/simulation.yml \
-#          --factory $GRABL_TRACING_URI \
-#          --org $GRABL_OWNER \
-#          --repo $GRABL_REPO \
-#          --commit $GRABL_COMMIT \
-#          --username $GRABL_OWNER \
-#          --token $GRABL_TOKEN
-#
-#    test-performance-typedb-core-server:
-#      machine: 16-core-32-gb
-#      image: vaticle-ubuntu-20.04
-#      type: background
-#      timeout: "30m"
-#      command: |
-#        cat > typedb.service <<- EOM
-#        [Unit]
-#        Description=TypeDB
-#
-#        [Service]
-#        Type=simple
-#        Environment=SERVER_JAVAOPTS=-Xmx16G
-#        ExecStart=/home/grabl/$GRABL_REPO/dist/typedb-all-linux/typedb server
-#        Restart=on-failure
-#        RestartSec=10
-#        KillMode=process
-#
-#        [Install]
-#        WantedBy=multi-user.target
-#        EOM
-#
-#        sudo mv typedb.service /etc/systemd/system/
-#
-#        bazel run //test:typedb-extractor-linux -- dist/typedb-all-linux
-#        cd ./dist/typedb-all-linux/
-#
-#        sudo systemctl daemon-reload
-#        sudo systemctl start typedb
-#        export GRABL_EXPORT_PERFORMANCE_TYPEDB_CORE_URI="${HOSTNAME}:1729"
-#      monitor: |
-#        sleep 10s
-#        tail -f -n +1 /home/grabl/$GRABL_REPO/dist/typedb-all-linux/server/logs/typedb.log
-#    test-performance-typedb-core-benchmark:
-#      machine: 16-core-32-gb
-#      image: vaticle-ubuntu-20.04
-#      dependencies: [test-performance-typedb-core-server]
-#      timeout: "30m"
-#      command: |
-#        bazel run //:benchmark -- \
-#          --database typedb \
-#          --address $GRABL_EXPORT_PERFORMANCE_TYPEDB_CORE_URI \
-#          --config /home/grabl/$GRABL_REPO/config/simulation.yml \
-#          --factory $GRABL_TRACING_URI \
-#          --org $GRABL_OWNER \
-#          --repo $GRABL_REPO \
-#          --commit $GRABL_COMMIT \
-#          --username $GRABL_OWNER \
-#          --token $GRABL_TOKEN
-#    test-performance-neo4j-server:
-#      machine: 16-core-32-gb
-#      image: vaticle-ubuntu-20.04
-#      type: background
-#      timeout: "30m"
-#      monitor: |
-#        journalctl -fu neo4j
-#      command: |
-#        sudo add-apt-repository -y ppa:openjdk-r/ppa
-#        curl https://cli-assets.heroku.com/apt/release.key | sudo apt-key add -
-#        curl https://dl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
-#        sudo apt-get update
-#        wget -O - https://debian.neo4j.com/neotechnology.gpg.key | sudo apt-key add -
-#        echo 'deb https://debian.neo4j.com stable 4.2' | sudo tee -a /etc/apt/sources.list.d/neo4j.list
-#        sudo apt-get update
-#        sudo apt-get install -y neo4j=1:4.2.5
-#        sudo update-java-alternatives --jre --set java-1.11.0-openjdk-amd64
-#        echo 'dbms.connector.bolt.listen_address=0.0.0.0:7687' | sudo tee -a /etc/neo4j/neo4j.conf
-#        echo 'dbms.security.auth_enabled=false' | sudo tee -a /etc/neo4j/neo4j.conf
-#        echo 'dbms.memory.heap.max_size=24G' | sudo tee -a /etc/neo4j/neo4j.conf
-#        sudo systemctl restart neo4j
-#        export GRABL_EXPORT_PERFORMANCE_NEO4J_URI="${HOSTNAME}:7687"
-#    test-performance-neo4j-benchmark:
-#      machine: 16-core-32-gb
-#      image: vaticle-ubuntu-20.04
-#      dependencies: [test-performance-neo4j-server]
-#      timeout: "30m"
-#      command: |
-#        echo 'Trying to connect to Neo4j'
-#        attempt_counter=0
-#        max_attempts=50
-#        expected_exit_code=52
-#        until curl --output /dev/null --silent --head --fail $GRABL_EXPORT_PERFORMANCE_NEO4J_URI || [[ $? == $expected_exit_code ]]; do
-#            if [ ${attempt_counter} -eq ${max_attempts} ];then
-#              echo "Max attempts reached"
-#              exit 1
-#            fi
-#
-#            echo '...'
-#            attempt_counter=$(($attempt_counter+1))
-#            sleep 3
-#        done
-#        bazel run //:benchmark -- \
-#          --database neo4j \
-#          --address bolt://$GRABL_EXPORT_PERFORMANCE_NEO4J_URI \
-#          --config /home/grabl/$GRABL_REPO/config/simulation.yml \
-#          --factory $GRABL_TRACING_URI \
-#          --org $GRABL_OWNER \
-#          --repo $GRABL_REPO \
-#          --commit $GRABL_COMMIT \
-#          --username $GRABL_OWNER \
-#          --token $GRABL_TOKEN
+    test-performance-typedb-cluster-bootstrapper:
+      image: vaticle-ubuntu-20.04
+      filter:
+        owner: vaticle
+        branch: typedb-cluster
+      type: background
+      command: |
+        bazel run //ci:install-ssh-credential
+        export GRABL_EXPORT_PERFORMANCE_TYPEDB_CLUSTER_BOOTSTRAPPER_URI="${HOSTNAME}"
+
+      monitor: |
+        bazel run //ci:wait-for-file -- /tmp/typedb-cluster-1.txt
+        bazel run //ci:wait-for-file -- /tmp/typedb-cluster-2.txt
+        bazel run //ci:wait-for-file -- /tmp/typedb-cluster-3.txt
+
+        echo "$(cat /tmp/typedb-cluster-1.txt):1729:1730,$(cat /tmp/typedb-cluster-2.txt):1729:1730,$(cat /tmp/typedb-cluster-3.txt):1729:1730" > /tmp/typedb-cluster-peers.txt
+
+        bazel run //ci:transfer-file -- /tmp/typedb-cluster-peers.txt grabl@$(cat /tmp/typedb-cluster-1.txt):/tmp/typedb-cluster-peers.txt
+        bazel run //ci:transfer-file -- /tmp/typedb-cluster-peers.txt grabl@$(cat /tmp/typedb-cluster-2.txt):/tmp/typedb-cluster-peers.txt
+        bazel run //ci:transfer-file -- /tmp/typedb-cluster-peers.txt grabl@$(cat /tmp/typedb-cluster-3.txt):/tmp/typedb-cluster-peers.txt
+
+        sleep 1800
+
+    test-performance-typedb-cluster-1-server:
+      machine: 16-core-32-gb
+      image: vaticle-ubuntu-20.04
+      filter:
+        owner: vaticle
+        branch: typedb-cluster
+      type: background
+      timeout: "30m"
+      dependencies: [test-performance-typedb-cluster-bootstrapper]
+      command: |
+        export ARTIFACT_USERNAME=$REPO_VATICLE_USERNAME
+        export ARTIFACT_PASSWORD=$REPO_VATICLE_PASSWORD
+        bazel run @vaticle_dependencies//distribution/artifact:create-netrc
+
+        bazel run //ci:install-ssh-credential
+
+        echo -n "${HOSTNAME}" > /tmp/hostname.txt
+        bazel run //ci:transfer-file -- /tmp/hostname.txt \
+          grabl@$GRABL_EXPORT_PERFORMANCE_TYPEDB_CLUSTER_BOOTSTRAPPER_URI:/tmp/typedb-cluster-1.txt
+
+        bazel run //ci:wait-for-file -- /tmp/typedb-cluster-peers.txt
+
+        bazel run //test:typedb-cluster-extractor-linux -- dist/typedb-cluster-all-linux
+        cd ./dist/typedb-cluster-all-linux/
+        bazel run @vaticle_dependencies//tool/util:create-systemd-service -- typedb-cluster "\/home\/grabl\/$GRABL_REPO\/dist\/typedb-cluster-all-linux\/typedb server --address=$(cat /tmp/hostname.txt):1729:1730 --peers=$(cat /tmp/typedb-cluster-peers.txt)"
+
+        sudo systemctl daemon-reload
+        sudo systemctl start typedb-cluster
+        export GRABL_EXPORT_PERFORMANCE_TYPEDB_CLUSTER_1_HOSTNAME="${HOSTNAME}:1729"
+      monitor: |
+        sleep 20s
+        tail -f -n +1 ./dist/typedb-cluster-all-linux/server/logs/typedb.log
+    test-performance-typedb-cluster-2-server:
+      machine: 16-core-32-gb
+      image: vaticle-ubuntu-20.04
+      filter:
+        owner: vaticle
+        branch: typedb-cluster
+      type: background
+      timeout: "30m"
+      dependencies: [test-performance-typedb-cluster-bootstrapper]
+      command: |
+        export ARTIFACT_USERNAME=$REPO_VATICLE_USERNAME
+        export ARTIFACT_PASSWORD=$REPO_VATICLE_PASSWORD
+        bazel run @vaticle_dependencies//distribution/artifact:create-netrc
+
+        bazel run //ci:install-ssh-credential
+
+        echo -n "${HOSTNAME}" > /tmp/hostname.txt
+        bazel run //ci:transfer-file -- /tmp/hostname.txt \
+          grabl@$GRABL_EXPORT_PERFORMANCE_TYPEDB_CLUSTER_BOOTSTRAPPER_URI:/tmp/typedb-cluster-2.txt
+
+        bazel run //ci:wait-for-file -- /tmp/typedb-cluster-peers.txt
+
+        bazel run //test:typedb-cluster-extractor-linux -- dist/typedb-cluster-all-linux
+        cd ./dist/typedb-cluster-all-linux/
+        bazel run @vaticle_dependencies//tool/util:create-systemd-service -- typedb-cluster "\/home\/grabl\/$GRABL_REPO\/dist\/typedb-cluster-all-linux\/typedb server --address=$(cat /tmp/hostname.txt):1729:1730 --peers=$(cat /tmp/typedb-cluster-peers.txt)"
+
+        sudo systemctl daemon-reload
+        sudo systemctl start typedb-cluster
+      monitor: |
+        sleep 20s
+        tail -f -n +1 ./dist/typedb-cluster-all-linux/server/logs/typedb.log
+    test-performance-typedb-cluster-3-server:
+      machine: 16-core-32-gb
+      image: vaticle-ubuntu-20.04
+      filter:
+        owner: vaticle
+        branch: typedb-cluster
+      type: background
+      timeout: "30m"
+      dependencies: [test-performance-typedb-cluster-bootstrapper]
+      command: |
+        export ARTIFACT_USERNAME=$REPO_VATICLE_USERNAME
+        export ARTIFACT_PASSWORD=$REPO_VATICLE_PASSWORD
+        bazel run @vaticle_dependencies//distribution/artifact:create-netrc
+
+        bazel run //ci:install-ssh-credential
+
+        echo -n "${HOSTNAME}" > /tmp/hostname.txt
+        bazel run //ci:transfer-file -- /tmp/hostname.txt \
+          grabl@$GRABL_EXPORT_PERFORMANCE_TYPEDB_CLUSTER_BOOTSTRAPPER_URI:/tmp/typedb-cluster-3.txt
+
+        bazel run //ci:wait-for-file -- /tmp/typedb-cluster-peers.txt
+
+        bazel run //test:typedb-cluster-extractor-linux -- dist/typedb-cluster-all-linux
+        cd ./dist/typedb-cluster-all-linux/
+        bazel run @vaticle_dependencies//tool/util:create-systemd-service -- typedb-cluster "\/home\/grabl\/$GRABL_REPO\/dist\/typedb-cluster-all-linux\/typedb server --address=$(cat /tmp/hostname.txt):1729:1730 --peers=$(cat /tmp/typedb-cluster-peers.txt)"
+
+        sudo systemctl daemon-reload
+        sudo systemctl start typedb-cluster
+      monitor: |
+        sleep 20s
+        tail -f -n +1 ./dist/typedb-cluster-all-linux/server/logs/typedb.log
+    test-performance-typedb-cluster-benchmark:
+      image: vaticle-ubuntu-20.04
+      filter:
+        owner: vaticle
+        branch: typedb-cluster
+      timeout: "30m"
+      dependencies: [test-performance-typedb-cluster-1-server, test-performance-typedb-cluster-2-server, test-performance-typedb-cluster-3-server]
+      command: |
+        export ARTIFACT_USERNAME=$REPO_VATICLE_USERNAME
+        export ARTIFACT_PASSWORD=$REPO_VATICLE_PASSWORD
+        bazel run @vaticle_dependencies//distribution/artifact:create-netrc
+
+        bazel run //:benchmark -- \
+          --database typedb-cluster \
+          --address $GRABL_EXPORT_PERFORMANCE_TYPEDB_CLUSTER_1_HOSTNAME \
+          --config /home/grabl/$GRABL_REPO/config/simulation.yml \
+          --factory $GRABL_TRACING_URI \
+          --org $GRABL_OWNER \
+          --repo $GRABL_REPO \
+          --commit $GRABL_COMMIT \
+          --username $GRABL_OWNER \
+          --token $GRABL_TOKEN
+
+    test-performance-typedb-core-server:
+      machine: 16-core-32-gb
+      image: vaticle-ubuntu-20.04
+      type: background
+      timeout: "30m"
+      command: |
+        cat > typedb.service <<- EOM
+        [Unit]
+        Description=TypeDB
+
+        [Service]
+        Type=simple
+        Environment=SERVER_JAVAOPTS=-Xmx16G
+        ExecStart=/home/grabl/$GRABL_REPO/dist/typedb-all-linux/typedb server
+        Restart=on-failure
+        RestartSec=10
+        KillMode=process
+
+        [Install]
+        WantedBy=multi-user.target
+        EOM
+
+        sudo mv typedb.service /etc/systemd/system/
+
+        bazel run //test:typedb-extractor-linux -- dist/typedb-all-linux
+        cd ./dist/typedb-all-linux/
+
+        sudo systemctl daemon-reload
+        sudo systemctl start typedb
+        export GRABL_EXPORT_PERFORMANCE_TYPEDB_CORE_URI="${HOSTNAME}:1729"
+      monitor: |
+        sleep 10s
+        tail -f -n +1 /home/grabl/$GRABL_REPO/dist/typedb-all-linux/server/logs/typedb.log
+    test-performance-typedb-core-benchmark:
+      machine: 16-core-32-gb
+      image: vaticle-ubuntu-20.04
+      dependencies: [test-performance-typedb-core-server]
+      timeout: "30m"
+      command: |
+        bazel run //:benchmark -- \
+          --database typedb \
+          --address $GRABL_EXPORT_PERFORMANCE_TYPEDB_CORE_URI \
+          --config /home/grabl/$GRABL_REPO/config/simulation.yml \
+          --factory $GRABL_TRACING_URI \
+          --org $GRABL_OWNER \
+          --repo $GRABL_REPO \
+          --commit $GRABL_COMMIT \
+          --username $GRABL_OWNER \
+          --token $GRABL_TOKEN
+    test-performance-neo4j-server:
+      machine: 16-core-32-gb
+      image: vaticle-ubuntu-20.04
+      type: background
+      timeout: "30m"
+      monitor: |
+        journalctl -fu neo4j
+      command: |
+        sudo add-apt-repository -y ppa:openjdk-r/ppa
+        curl https://cli-assets.heroku.com/apt/release.key | sudo apt-key add -
+        curl https://dl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
+        sudo apt-get update
+        wget -O - https://debian.neo4j.com/neotechnology.gpg.key | sudo apt-key add -
+        echo 'deb https://debian.neo4j.com stable 4.2' | sudo tee -a /etc/apt/sources.list.d/neo4j.list
+        sudo apt-get update
+        sudo apt-get install -y neo4j=1:4.2.5
+        sudo update-java-alternatives --jre --set java-1.11.0-openjdk-amd64
+        echo 'dbms.connector.bolt.listen_address=0.0.0.0:7687' | sudo tee -a /etc/neo4j/neo4j.conf
+        echo 'dbms.security.auth_enabled=false' | sudo tee -a /etc/neo4j/neo4j.conf
+        echo 'dbms.memory.heap.max_size=24G' | sudo tee -a /etc/neo4j/neo4j.conf
+        sudo systemctl restart neo4j
+        export GRABL_EXPORT_PERFORMANCE_NEO4J_URI="${HOSTNAME}:7687"
+    test-performance-neo4j-benchmark:
+      machine: 16-core-32-gb
+      image: vaticle-ubuntu-20.04
+      dependencies: [test-performance-neo4j-server]
+      timeout: "30m"
+      command: |
+        echo 'Trying to connect to Neo4j'
+        attempt_counter=0
+        max_attempts=50
+        expected_exit_code=52
+        until curl --output /dev/null --silent --head --fail $GRABL_EXPORT_PERFORMANCE_NEO4J_URI || [[ $? == $expected_exit_code ]]; do
+            if [ ${attempt_counter} -eq ${max_attempts} ];then
+              echo "Max attempts reached"
+              exit 1
+            fi
+
+            echo '...'
+            attempt_counter=$(($attempt_counter+1))
+            sleep 3
+        done
+        bazel run //:benchmark -- \
+          --database neo4j \
+          --address bolt://$GRABL_EXPORT_PERFORMANCE_NEO4J_URI \
+          --config /home/grabl/$GRABL_REPO/config/simulation.yml \
+          --factory $GRABL_TRACING_URI \
+          --org $GRABL_OWNER \
+          --repo $GRABL_REPO \
+          --commit $GRABL_COMMIT \
+          --username $GRABL_OWNER \
+          --token $GRABL_TOKEN
     test-performance-typedb-core-reasoning-server:
       machine: 16-core-32-gb
       image: vaticle-ubuntu-20.04
