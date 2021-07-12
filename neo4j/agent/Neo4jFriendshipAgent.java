@@ -79,7 +79,7 @@ public class Neo4jFriendshipAgent extends FriendshipAgent<Neo4jTransaction> {
     private Optional<Pair<Person, Person>> report(Neo4jTransaction tx, String email1, String email2) {
         String query = "MATCH " +
                 "(x:Person {email: $email1}), \n" +
-                "(y:Person {email: $email2}) \n" +
+                "(y:Person {email: $email2}), \n" +
                 "(x)-[:FRIENDS_WITH]->(y) \n" +
                 "RETURN x.email, y.email";
         HashMap<String, Object> parameters = new HashMap<>() {{

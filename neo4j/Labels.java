@@ -30,7 +30,7 @@ public class Labels {
     public static final String NUMBER = "number";
     public static final String INCORPORATION_DATE = "incorporationDate";
     public static final String CURRENCY = "currency";
-    public static final String MARRIAGE_LICENSE = "marriageLicense";
+    public static final String MARRIAGE_LICENCE = "marriageLicence";
     public static final String MARRIAGE_DATE = "marriageDate";
     public static final String START_DATE = "startDate";
     public static final String END_DATE = "endDate";

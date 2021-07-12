@@ -25,6 +25,7 @@ import com.vaticle.typedb.benchmark.common.params.Context;
 import com.vaticle.typedb.benchmark.common.seed.SeedData;
 import com.vaticle.typedb.benchmark.neo4j.agent.Neo4jFriendshipAgent;
 import com.vaticle.typedb.benchmark.neo4j.agent.Neo4jMarriageAgent;
+import com.vaticle.typedb.benchmark.neo4j.agent.Neo4jParentshipAgent;
 import com.vaticle.typedb.benchmark.neo4j.agent.Neo4jPersonAgent;
 import com.vaticle.typedb.benchmark.neo4j.driver.Neo4jClient;
 import com.vaticle.typedb.benchmark.neo4j.driver.Neo4jSession;
@@ -94,7 +95,7 @@ public class Neo4JSimulation extends Simulation<Neo4jClient, Neo4jSession, Neo4j
             add("CREATE CONSTRAINT unique_company_number ON (company:Company) ASSERT company.number IS UNIQUE");
             add("CREATE CONSTRAINT unique_product_id ON (product:Product) ASSERT product.id IS UNIQUE");
             add("CREATE CONSTRAINT unique_purchase_id ON (purchase:Purchase) ASSERT purchase.id IS UNIQUE");
-            add("CREATE CONSTRAINT unique_marriage_license ON (marriage:Marriage) ASSERT marriage.license IS UNIQUE");
+            add("CREATE CONSTRAINT unique_marriage_licence ON (marriage:Marriage) ASSERT marriage.licence IS UNIQUE");
         }};
         Transaction tx = session.beginTransaction();
         for (String query : queries) {
@@ -201,7 +202,7 @@ public class Neo4JSimulation extends Simulation<Neo4jClient, Neo4jSession, Neo4j
 
     @Override
     protected ParentshipAgent<Neo4jTransaction> createParentshipAgent(Neo4jClient client, Context context) {
-        throw new UnsupportedOperationException("ParentshipAgent is not yet implemented for Neo4j");
+        return new Neo4jParentshipAgent(client, context);
     }
 
     @Override

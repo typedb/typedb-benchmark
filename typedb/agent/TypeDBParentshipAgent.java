@@ -46,7 +46,7 @@ import static com.vaticle.typedb.benchmark.typedb.Labels.EMAIL;
 import static com.vaticle.typedb.benchmark.typedb.Labels.HUSBAND;
 import static com.vaticle.typedb.benchmark.typedb.Labels.MARRIAGE;
 import static com.vaticle.typedb.benchmark.typedb.Labels.MARRIAGE_DATE;
-import static com.vaticle.typedb.benchmark.typedb.Labels.MARRIAGE_LICENSE;
+import static com.vaticle.typedb.benchmark.typedb.Labels.MARRIAGE_LICENCE;
 import static com.vaticle.typedb.benchmark.typedb.Labels.PARENT;
 import static com.vaticle.typedb.benchmark.typedb.Labels.PARENTSHIP;
 import static com.vaticle.typedb.benchmark.typedb.Labels.PERSON;
@@ -91,12 +91,12 @@ public class TypeDBParentshipAgent extends ParentshipAgent<TypeDBTransaction> {
                 var(W).isa(PERSON).has(EMAIL, var(EW)),
                 var(H).isa(PERSON).has(EMAIL, var(EH)),
                 rel(WIFE, W).rel(HUSBAND, H).isa(MARRIAGE)
-                        .has(MARRIAGE_DATE, marriageDate).has(MARRIAGE_LICENSE, var(MARRIAGE_LICENSE)),
+                        .has(MARRIAGE_DATE, marriageDate).has(MARRIAGE_LICENCE, var(MARRIAGE_LICENCE)),
                 rel(RESIDENCE, var(CITY)).rel(RESIDENT, W).isa(RESIDENTSHIP)
         )).map(conceptMap -> new Marriage(
                 new Person(conceptMap.get(EW).asAttribute().asString().getValue()),
                 new Person(conceptMap.get(EH).asAttribute().asString().getValue()),
-                conceptMap.get(MARRIAGE_LICENSE).asAttribute().asString().getValue(),
+                conceptMap.get(MARRIAGE_LICENCE).asAttribute().asString().getValue(),
                 marriageDate));
     }
 

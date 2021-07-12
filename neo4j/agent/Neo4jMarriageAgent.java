@@ -40,7 +40,7 @@ import static com.vaticle.typedb.benchmark.neo4j.Labels.CODE;
 import static com.vaticle.typedb.benchmark.neo4j.Labels.EMAIL;
 import static com.vaticle.typedb.benchmark.neo4j.Labels.GENDER;
 import static com.vaticle.typedb.benchmark.neo4j.Labels.MARRIAGE_DATE;
-import static com.vaticle.typedb.benchmark.neo4j.Labels.MARRIAGE_LICENSE;
+import static com.vaticle.typedb.benchmark.neo4j.Labels.MARRIAGE_LICENCE;
 
 
 public class Neo4jMarriageAgent extends MarriageAgent<Neo4jTransaction> {
@@ -91,13 +91,13 @@ public class Neo4jMarriageAgent extends MarriageAgent<Neo4jTransaction> {
                                       String marriageLicence, LocalDateTime marriageDate) {
         String query = "MATCH " +
                 "(x:Person {email: $wifeEmail}), \n" +
-                "(y:Person {email: $husbandEmail}) \n" +
+                "(y:Person {email: $husbandEmail}), \n" +
                 "(x)-[m:MARRIED_TO {marriageLicence: $marriageLicence, marriageDate: $marriageDate}]->(y) \n" +
                 "RETURN x.email, y.email, m.marriageLicence, m.marriageDate";
         HashMap<String, Object> parameters = new HashMap<>() {{
             put("wifeEmail", wifeEmail);
             put("husbandEmail", husbandEmail);
-            put(MARRIAGE_LICENSE, marriageLicence);
+            put(MARRIAGE_LICENCE, marriageLicence);
             put(MARRIAGE_DATE, marriageDate);
         }};
         List<Record> answers = tx.execute(new Query(query, parameters));
@@ -105,7 +105,7 @@ public class Neo4jMarriageAgent extends MarriageAgent<Neo4jTransaction> {
         Map<String, Object> inserted = answers.get(0).asMap();
         Person person1 = new Person((String) inserted.get(X + "." + EMAIL));
         Person person2 = new Person((String) inserted.get(Y + "." + EMAIL));
-        return Optional.of(new Marriage(person1, person2, (String) inserted.get(M + "." + MARRIAGE_LICENSE),
+        return Optional.of(new Marriage(person1, person2, (String) inserted.get(M + "." + MARRIAGE_LICENCE),
                                         (LocalDateTime) inserted.get(M + "." + MARRIAGE_DATE)));
     }
 }

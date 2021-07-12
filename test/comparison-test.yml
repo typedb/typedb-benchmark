@@ -22,9 +22,16 @@ agents:
     mode: RUN
   - name: "MarriageAgent"
     mode: RUN
+  - name: "ParentshipAgent"
+    mode: RUN
 
 runParams:
   randomSeed: 1
   iterations: 5
   scaleFactor: 5
   databaseName: "simulation"
+
+modelParams:
+  ageOfFriendship: 1
+  ageOfAdulthood: 2
+  yearsBeforeParentship: 1

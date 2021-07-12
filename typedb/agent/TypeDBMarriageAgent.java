@@ -45,7 +45,7 @@ import static com.vaticle.typedb.benchmark.typedb.Labels.GENDER;
 import static com.vaticle.typedb.benchmark.typedb.Labels.HUSBAND;
 import static com.vaticle.typedb.benchmark.typedb.Labels.MARRIAGE;
 import static com.vaticle.typedb.benchmark.typedb.Labels.MARRIAGE_DATE;
-import static com.vaticle.typedb.benchmark.typedb.Labels.MARRIAGE_LICENSE;
+import static com.vaticle.typedb.benchmark.typedb.Labels.MARRIAGE_LICENCE;
 import static com.vaticle.typedb.benchmark.typedb.Labels.PERSON;
 import static com.vaticle.typedb.benchmark.typedb.Labels.RESIDENCE;
 import static com.vaticle.typedb.benchmark.typedb.Labels.RESIDENT;
@@ -83,7 +83,7 @@ public class TypeDBMarriageAgent extends MarriageAgent<TypeDBTransaction> {
                 var(H).isa(PERSON).has(EMAIL, husbandEmail)
         ).insert(
                 rel(WIFE, W).rel(HUSBAND, H).isa(MARRIAGE)
-                        .has(MARRIAGE_LICENSE, marriageLicence).has(MARRIAGE_DATE, marriageDate)
+                        .has(MARRIAGE_LICENCE, marriageLicence).has(MARRIAGE_DATE, marriageDate)
         ));
 
         if (context.isReporting()) return report(tx, wifeEmail, husbandEmail, marriageLicence, marriageDate);
@@ -96,9 +96,11 @@ public class TypeDBMarriageAgent extends MarriageAgent<TypeDBTransaction> {
                 var(W).isa(PERSON).has(EMAIL, var(EW)), var(EW).eq(wifeEmail),
                 var(H).isa(PERSON).has(EMAIL, var(EH)), var(EH).eq(husbandEmail),
                 rel(WIFE, W).rel(HUSBAND, H).isa(MARRIAGE)
-                        .has(MARRIAGE_LICENSE, var(L)), var(L).eq(marriageLicence)
-                        .has(MARRIAGE_DATE, var(D)), var(D).eq(marriageDate)
-        ).get(var(W), var(H), var(L), var(D)))
+                        .has(MARRIAGE_LICENCE, var(L))
+                        .has(MARRIAGE_DATE, var(D)),
+                        var(D).eq(marriageDate),
+                        var(L).eq(marriageLicence)
+        ).get(var(EW), var(EH), var(L), var(D)))
                 .collect(toList());
         assert answers.size() == 1;
         ConceptMap inserted = answers.get(0);
