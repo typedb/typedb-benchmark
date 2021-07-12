@@ -53,6 +53,8 @@ person sub entity,
     plays marriage:wife,
     plays parenthood:parent,
     plays parenthood:child,
+    plays grandparenthood:grandparent,
+    plays grandparenthood:grandchild,
     plays lineage:ancestor,
     plays lineage:descendent,
     plays friendship:friend,
@@ -131,6 +133,10 @@ citizenship sub relation,
 parenthood sub relation,
     relates parent,
     relates child;
+
+grandparenthood sub relation,
+    relates grandparent,
+    relates grandchild;
 
 lineage sub relation,
     relates ancestor,

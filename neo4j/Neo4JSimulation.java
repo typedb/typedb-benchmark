@@ -34,6 +34,7 @@ import com.vaticle.typedb.benchmark.simulation.Simulation;
 import com.vaticle.typedb.benchmark.simulation.agent.CitizenshipAgent;
 import com.vaticle.typedb.benchmark.simulation.agent.CoupleFriendshipAgent;
 import com.vaticle.typedb.benchmark.simulation.agent.FriendshipAgent;
+import com.vaticle.typedb.benchmark.simulation.agent.GrandparenthoodAgent;
 import com.vaticle.typedb.benchmark.simulation.agent.LineageAgent;
 import com.vaticle.typedb.benchmark.simulation.agent.MaritalStatusAgent;
 import com.vaticle.typedb.benchmark.simulation.agent.MarriageAgent;
@@ -231,6 +232,12 @@ public class Neo4JSimulation extends Simulation<Neo4jClient, Neo4jSession, Neo4j
     protected CoupleFriendshipAgent<Neo4jTransaction> createCoupleFriendshipAgent(Neo4jClient client,
                                                                                   Context context) {
         throw new UnsupportedOperationException("CoupleFriendshipAgent requires reasoning. Reasoning is not supported" +
+                                                        " by Neo4j");
+    }
+
+    @Override
+    protected GrandparenthoodAgent<Neo4jTransaction> createGrandparenthoodAgent(Neo4jClient client, Context context) {
+        throw new UnsupportedOperationException("GrandparenthoodAgent requires reasoning. Reasoning is not supported" +
                                                         " by Neo4j");
     }
 }

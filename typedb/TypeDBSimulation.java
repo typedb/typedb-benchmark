@@ -24,6 +24,7 @@ import com.vaticle.typedb.benchmark.common.params.Context;
 import com.vaticle.typedb.benchmark.common.seed.SeedData;
 import com.vaticle.typedb.benchmark.simulation.agent.CitizenshipAgent;
 import com.vaticle.typedb.benchmark.simulation.agent.CoupleFriendshipAgent;
+import com.vaticle.typedb.benchmark.simulation.agent.GrandparenthoodAgent;
 import com.vaticle.typedb.benchmark.simulation.agent.LineageAgent;
 import com.vaticle.typedb.benchmark.simulation.agent.MaritalStatusAgent;
 import com.vaticle.typedb.benchmark.simulation.agent.MarriageAgent;
@@ -32,6 +33,7 @@ import com.vaticle.typedb.benchmark.simulation.agent.ParenthoodAgent;
 import com.vaticle.typedb.benchmark.typedb.agent.TypeDBCitizenshipAgent;
 import com.vaticle.typedb.benchmark.typedb.agent.TypeDBCoupleFriendshipAgent;
 import com.vaticle.typedb.benchmark.typedb.agent.TypeDBFriendshipAgent;
+import com.vaticle.typedb.benchmark.typedb.agent.TypeDBGrandParenthoodAgent;
 import com.vaticle.typedb.benchmark.typedb.agent.TypeDBLineageAgent;
 import com.vaticle.typedb.benchmark.typedb.agent.TypeDBMaritalStatusAgent;
 import com.vaticle.typedb.benchmark.typedb.agent.TypeDBMarriageAgent;
@@ -228,5 +230,10 @@ public class TypeDBSimulation extends Simulation<TypeDBClient, TypeDBSession, Ty
     protected CoupleFriendshipAgent<TypeDBTransaction> createCoupleFriendshipAgent(TypeDBClient client,
                                                                                      Context context) {
         return new TypeDBCoupleFriendshipAgent(client, context);
+    }
+
+    @Override
+    protected GrandparenthoodAgent<TypeDBTransaction> createGrandparenthoodAgent(TypeDBClient client, Context context) {
+        return new TypeDBGrandParenthoodAgent(client, context);
     }
 }

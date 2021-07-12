@@ -27,6 +27,8 @@ agents:
     mode: RUN
   - name: "MaritalStatusAgent"
     mode: TRACE
+  - name: "GrandparenthoodAgent"
+    mode: TRACE
   - name: "LineageAgent"
     mode: TRACE
   - name: "NationalityAgent"
