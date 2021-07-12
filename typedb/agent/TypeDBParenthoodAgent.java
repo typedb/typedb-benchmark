@@ -19,10 +19,10 @@ package com.vaticle.typedb.benchmark.typedb.agent;
 
 import com.vaticle.typedb.benchmark.common.concept.Country;
 import com.vaticle.typedb.benchmark.common.concept.Marriage;
-import com.vaticle.typedb.benchmark.common.concept.Parentship;
+import com.vaticle.typedb.benchmark.common.concept.Parenthood;
 import com.vaticle.typedb.benchmark.common.concept.Person;
 import com.vaticle.typedb.benchmark.common.params.Context;
-import com.vaticle.typedb.benchmark.simulation.agent.ParentshipAgent;
+import com.vaticle.typedb.benchmark.simulation.agent.ParenthoodAgent;
 import com.vaticle.typedb.benchmark.simulation.driver.Client;
 import com.vaticle.typedb.benchmark.typedb.driver.TypeDBTransaction;
 import com.vaticle.typedb.client.api.answer.ConceptMap;
@@ -48,7 +48,7 @@ import static com.vaticle.typedb.benchmark.typedb.Labels.MARRIAGE;
 import static com.vaticle.typedb.benchmark.typedb.Labels.MARRIAGE_DATE;
 import static com.vaticle.typedb.benchmark.typedb.Labels.MARRIAGE_LICENCE;
 import static com.vaticle.typedb.benchmark.typedb.Labels.PARENT;
-import static com.vaticle.typedb.benchmark.typedb.Labels.PARENTSHIP;
+import static com.vaticle.typedb.benchmark.typedb.Labels.PARENTHOOD;
 import static com.vaticle.typedb.benchmark.typedb.Labels.PERSON;
 import static com.vaticle.typedb.benchmark.typedb.Labels.PLACE;
 import static com.vaticle.typedb.benchmark.typedb.Labels.RESIDENCE;
@@ -59,14 +59,14 @@ import static com.vaticle.typeql.lang.TypeQL.rel;
 import static com.vaticle.typeql.lang.TypeQL.var;
 import static java.util.stream.Collectors.toList;
 
-public class TypeDBParentshipAgent extends ParentshipAgent<TypeDBTransaction> {
+public class TypeDBParenthoodAgent extends ParenthoodAgent<TypeDBTransaction> {
 
     private static final String W = "w", H = "h";
     private static final String EW = "ew", EH = "eh";
     private static final String M = "m", F = "f", C = "c";
     private static final String EM = "em", EF = "ef", EC = "ec";
 
-    public TypeDBParentshipAgent(Client<?, TypeDBTransaction> client, Context context) {
+    public TypeDBParenthoodAgent(Client<?, TypeDBTransaction> client, Context context) {
         super(client, context);
     }
 
@@ -101,32 +101,32 @@ public class TypeDBParentshipAgent extends ParentshipAgent<TypeDBTransaction> {
     }
 
     @Override
-    protected Optional<Parentship> insertParentShip(TypeDBTransaction tx, String motherEmail, String fatherEmail,
+    protected Optional<Parenthood> insertParenthood(TypeDBTransaction tx, String motherEmail, String fatherEmail,
                                                     String childEmail) {
         tx.query().insert(TypeQL.match(
                 var(M).isa(PERSON).has(EMAIL, motherEmail),
                 var(F).isa(PERSON).has(EMAIL, fatherEmail),
                 var(C).isa(PERSON).has(EMAIL, childEmail)
         ).insert(
-                rel(PARENT, M).rel(PARENT, F).rel(CHILD, C).isa(PARENTSHIP)
+                rel(PARENT, M).rel(PARENT, F).rel(CHILD, C).isa(PARENTHOOD)
         ));
         if (context.isReporting()) return report(tx, motherEmail, fatherEmail, childEmail);
         else return Optional.empty();
     }
 
-    private Optional<Parentship> report(TypeDBTransaction tx, String motherEmail, String fatherEmail, String childEmail) {
+    private Optional<Parenthood> report(TypeDBTransaction tx, String motherEmail, String fatherEmail, String childEmail) {
         List<ConceptMap> answers = tx.query().match(TypeQL.match(
                 var(M).isa(PERSON).has(EMAIL, var(EM)), var(EM).eq(motherEmail),
                 var(F).isa(PERSON).has(EMAIL, var(EF)), var(EF).eq(fatherEmail),
                 var(C).isa(PERSON).has(EMAIL, var(EC)), var(EC).eq(childEmail),
-                rel(PARENT, M).rel(PARENT, F).rel(CHILD, C).isa(PARENTSHIP)
+                rel(PARENT, M).rel(PARENT, F).rel(CHILD, C).isa(PARENTHOOD)
         ).get(var(EM), var(EF), var(EC))).collect(toList());
         assert answers.size() == 1;
         ConceptMap inserted = answers.get(0);
         Person mother = new Person(inserted.get(EM).asAttribute().asString().getValue());
         Person father = new Person(inserted.get(EF).asAttribute().asString().getValue());
         Person child = new Person(inserted.get(EC).asAttribute().asString().getValue());
-        return Optional.of(new Parentship(mother, father, child));
+        return Optional.of(new Parenthood(mother, father, child));
     }
 
 }

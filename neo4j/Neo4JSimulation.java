@@ -25,7 +25,7 @@ import com.vaticle.typedb.benchmark.common.params.Context;
 import com.vaticle.typedb.benchmark.common.seed.SeedData;
 import com.vaticle.typedb.benchmark.neo4j.agent.Neo4jFriendshipAgent;
 import com.vaticle.typedb.benchmark.neo4j.agent.Neo4jMarriageAgent;
-import com.vaticle.typedb.benchmark.neo4j.agent.Neo4jParentshipAgent;
+import com.vaticle.typedb.benchmark.neo4j.agent.Neo4jParenthoodAgent;
 import com.vaticle.typedb.benchmark.neo4j.agent.Neo4jPersonAgent;
 import com.vaticle.typedb.benchmark.neo4j.driver.Neo4jClient;
 import com.vaticle.typedb.benchmark.neo4j.driver.Neo4jSession;
@@ -38,7 +38,7 @@ import com.vaticle.typedb.benchmark.simulation.agent.LineageAgent;
 import com.vaticle.typedb.benchmark.simulation.agent.MaritalStatusAgent;
 import com.vaticle.typedb.benchmark.simulation.agent.MarriageAgent;
 import com.vaticle.typedb.benchmark.simulation.agent.NationalityAgent;
-import com.vaticle.typedb.benchmark.simulation.agent.ParentshipAgent;
+import com.vaticle.typedb.benchmark.simulation.agent.ParenthoodAgent;
 import com.vaticle.typedb.benchmark.simulation.agent.PersonAgent;
 import org.neo4j.driver.Driver;
 import org.neo4j.driver.Query;
@@ -201,8 +201,8 @@ public class Neo4JSimulation extends Simulation<Neo4jClient, Neo4jSession, Neo4j
     }
 
     @Override
-    protected ParentshipAgent<Neo4jTransaction> createParentshipAgent(Neo4jClient client, Context context) {
-        return new Neo4jParentshipAgent(client, context);
+    protected ParenthoodAgent<Neo4jTransaction> createParenthoodAgent(Neo4jClient client, Context context) {
+        return new Neo4jParenthoodAgent(client, context);
     }
 
     @Override

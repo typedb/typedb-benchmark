@@ -19,7 +19,7 @@ package com.vaticle.typedb.benchmark.simulation.agent;
 
 import com.vaticle.typedb.benchmark.common.concept.Country;
 import com.vaticle.typedb.benchmark.common.concept.Marriage;
-import com.vaticle.typedb.benchmark.common.concept.Parentship;
+import com.vaticle.typedb.benchmark.common.concept.Parenthood;
 import com.vaticle.typedb.benchmark.common.concept.Person;
 import com.vaticle.typedb.benchmark.common.params.Context;
 import com.vaticle.typedb.benchmark.common.seed.RandomSource;
@@ -38,15 +38,15 @@ import static com.vaticle.typedb.common.collection.Collections.list;
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.toCollection;
 
-public abstract class ParentshipAgent<TX extends Transaction> extends Agent<Country, TX> {
+public abstract class ParenthoodAgent<TX extends Transaction> extends Agent<Country, TX> {
 
-    protected ParentshipAgent(Client<?, TX> client, Context context) {
+    protected ParenthoodAgent(Client<?, TX> client, Context context) {
         super(client, context);
     }
 
     @Override
     protected Class<? extends Agent> agentClass() {
-        return ParentshipAgent.class;
+        return ParenthoodAgent.class;
     }
 
     @Override
@@ -58,21 +58,21 @@ public abstract class ParentshipAgent<TX extends Transaction> extends Agent<Coun
     protected List<Report> run(Session<TX> session, Country country, RandomSource random) {
         List<Report> reports = new ArrayList<>();
         try (TX tx = session.writeTransaction()) {
-            LocalDateTime marriageDate = context.today().minusYears(context.yearsBeforeParentship());
+            LocalDateTime marriageDate = context.today().minusYears(context.yearsBeforeParenthood());
             List<Marriage> marriages = matchMarriages(tx, country, marriageDate)
                     .sorted(comparing(Marriage::licence)).collect(toCollection(ArrayList::new));
             List<Person> newBorns = matchNewborns(tx, country, context.today())
                     .sorted(comparing(Person::email)).collect(toCollection(ArrayList::new));
-            List<Pair<Marriage, Person>> parentships = random.randomAllocation(marriages, newBorns);
+            List<Pair<Marriage, Person>> parenthoods = random.randomAllocation(marriages, newBorns);
 
-            parentships.forEach(parentship -> {
-                Optional<Parentship> inserted = insertParentShip(tx, parentship.first().wife().email(),
-                                                                 parentship.first().husband().email(),
-                                                                 parentship.second().email());
+            parenthoods.forEach(parenthood -> {
+                Optional<Parenthood> inserted = insertParenthood(tx, parenthood.first().wife().email(),
+                                                                 parenthood.first().husband().email(),
+                                                                 parenthood.second().email());
                 if (context.isReporting()) {
                     assert inserted.isPresent();
-                    reports.add(new Report(list(parentship.first().wife().email(), parentship.first().husband().email(),
-                                                parentship.second().email()),
+                    reports.add(new Report(list(parenthood.first().wife().email(), parenthood.first().husband().email(),
+                                                parenthood.second().email()),
                                            list(inserted.get().mother().email(), inserted.get().father().email(),
                                                 inserted.get().child().email())));
                 } else assert inserted.isEmpty();
@@ -86,5 +86,5 @@ public abstract class ParentshipAgent<TX extends Transaction> extends Agent<Coun
 
     protected abstract Stream<Marriage> matchMarriages(TX tx, Country country, LocalDateTime marriageDate);
 
-    protected abstract Optional<Parentship> insertParentShip(TX tx, String motherEmail, String fatherEmail, String childEmail);
+    protected abstract Optional<Parenthood> insertParenthood(TX tx, String motherEmail, String fatherEmail, String childEmail);
 }

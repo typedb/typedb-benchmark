@@ -23,7 +23,7 @@ agents:
     mode: RUN
   - name: "MarriageAgent"
     mode: RUN
-  - name: "ParentshipAgent"
+  - name: "ParenthoodAgent"
     mode: RUN
   - name: "MaritalStatusAgent"
     mode: TRACE
@@ -50,4 +50,4 @@ runParams:
 modelParams:
   ageOfFriendship: 1
   ageOfAdulthood: 2
-  yearsBeforeParentship: 1
+  yearsBeforeParenthood: 1

@@ -128,11 +128,11 @@ public class Config {
 
         private final static int DEFAULT_AGE_OF_FRIENDSHIP = 14;
         private final static int DEFAULT_AGE_OF_ADULTHOOD = 21;
-        private final static int DEFAULT_YEARS_BEFORE_PARENTSHIP = 3;
+        private final static int DEFAULT_YEARS_BEFORE_PARENTHOOD = 3;
 
         private int ageOfFriendship = DEFAULT_AGE_OF_FRIENDSHIP;
         private int ageOfAdulthood = DEFAULT_AGE_OF_ADULTHOOD;
-        private int yearsBeforeParentship = DEFAULT_YEARS_BEFORE_PARENTSHIP;
+        private int yearsBeforeParenthood = DEFAULT_YEARS_BEFORE_PARENTHOOD;
 
         public int ageOfFriendship() {
             return ageOfFriendship;
@@ -150,12 +150,12 @@ public class Config {
             this.ageOfAdulthood = ageOfAdulthood;
         }
 
-        public int yearsBeforeParentship() {
-            return yearsBeforeParentship;
+        public int yearsBeforeParenthood() {
+            return yearsBeforeParenthood;
         }
 
-        public void setYearsBeforeParentship(int yearsBeforeParentship) {
-            this.yearsBeforeParentship = yearsBeforeParentship;
+        public void setYearsBeforeParenthood(int yearsBeforeParenthood) {
+            this.yearsBeforeParenthood = yearsBeforeParenthood;
         }
     }
 

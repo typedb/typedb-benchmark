@@ -17,13 +17,13 @@
 
 package com.vaticle.typedb.benchmark.common.concept;
 
-public class Parentship {
+public class Parenthood {
 
     private final Person mother;
     private final Person father;
     private final Person child;
 
-    public Parentship(Person mother, Person father, Person child) {
+    public Parenthood(Person mother, Person father, Person child) {
         this.mother = mother;
         this.father = father;
         this.child = child;

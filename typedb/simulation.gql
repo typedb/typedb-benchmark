@@ -51,8 +51,8 @@ person sub entity,
     plays citizenship:citizen,
     plays marriage:husband,
     plays marriage:wife,
-    plays parentship:parent,
-    plays parentship:child,
+    plays parenthood:parent,
+    plays parenthood:child,
     plays lineage:ancestor,
     plays lineage:descendent,
     plays friendship:friend,
@@ -128,7 +128,7 @@ citizenship sub relation,
     relates country,
     relates citizen;
 
-parentship sub relation,
+parenthood sub relation,
     relates parent,
     relates child;
 
@@ -162,9 +162,9 @@ contains sub relation,
     relates container,
     relates contained;
 
-rule parentship-is-lineage:
+rule parenthood-is-lineage:
 when {
-    (parent:$p, child:$c) isa parentship;
+    (parent:$p, child:$c) isa parenthood;
 } then {
     (ancestor:$p, descendent:$c) isa lineage;
 };
@@ -190,7 +190,7 @@ when {
 
 rule children-of-nationals-are-nationals:
 when {
-    (parent:$p, child:$c) isa parentship;
+    (parent:$p, child:$c) isa parenthood;
     (national:$p, nation:$country) isa nationality;
 } then {
     (national:$p, nation:$country) isa nationality;

@@ -92,8 +92,8 @@ public class Context implements AutoCloseable {
         return config.modelParams().ageOfAdulthood();
     }
 
-    public int yearsBeforeParentship() {
-        return config.modelParams().yearsBeforeParentship();
+    public int yearsBeforeParenthood() {
+        return config.modelParams().yearsBeforeParenthood();
     }
 
     public int iterationNumber() {

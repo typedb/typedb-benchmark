@@ -19,11 +19,11 @@ package com.vaticle.typedb.benchmark.neo4j.agent;
 
 import com.vaticle.typedb.benchmark.common.concept.Country;
 import com.vaticle.typedb.benchmark.common.concept.Marriage;
-import com.vaticle.typedb.benchmark.common.concept.Parentship;
+import com.vaticle.typedb.benchmark.common.concept.Parenthood;
 import com.vaticle.typedb.benchmark.common.concept.Person;
 import com.vaticle.typedb.benchmark.common.params.Context;
 import com.vaticle.typedb.benchmark.neo4j.driver.Neo4jTransaction;
-import com.vaticle.typedb.benchmark.simulation.agent.ParentshipAgent;
+import com.vaticle.typedb.benchmark.simulation.agent.ParenthoodAgent;
 import com.vaticle.typedb.benchmark.simulation.driver.Client;
 import org.neo4j.driver.Query;
 import org.neo4j.driver.Record;
@@ -40,11 +40,11 @@ import static com.vaticle.typedb.benchmark.neo4j.Labels.CODE;
 import static com.vaticle.typedb.benchmark.neo4j.Labels.EMAIL;
 import static com.vaticle.typedb.benchmark.neo4j.Labels.MARRIAGE_DATE;
 
-public class Neo4jParentshipAgent extends ParentshipAgent<Neo4jTransaction> {
+public class Neo4jParenthoodAgent extends ParenthoodAgent<Neo4jTransaction> {
 
     private static final String M = "m", F = "f", C = "c";
 
-    public Neo4jParentshipAgent(Client<?, Neo4jTransaction> client, Context context) {
+    public Neo4jParenthoodAgent(Client<?, Neo4jTransaction> client, Context context) {
         super(client, context);
     }
 
@@ -81,7 +81,7 @@ public class Neo4jParentshipAgent extends ParentshipAgent<Neo4jTransaction> {
     }
 
     @Override
-    protected Optional<Parentship> insertParentShip(Neo4jTransaction tx, String motherEmail, String fatherEmail,
+    protected Optional<Parenthood> insertParenthood(Neo4jTransaction tx, String motherEmail, String fatherEmail,
                                                     String childEmail) {
         String query = "MATCH " +
                 "(m:Person {email: $motherEmail}),\n" +
@@ -99,7 +99,7 @@ public class Neo4jParentshipAgent extends ParentshipAgent<Neo4jTransaction> {
         else return Optional.empty();
     }
 
-    private Optional<Parentship> report(Neo4jTransaction tx, String motherEmail, String fatherEmail, String childEmail) {
+    private Optional<Parenthood> report(Neo4jTransaction tx, String motherEmail, String fatherEmail, String childEmail) {
         String query = "MATCH " +
                 "(m:Person {email: $motherEmail}),\n" +
                 "(f:Person {email: $fatherEmail}),\n" +
@@ -118,6 +118,6 @@ public class Neo4jParentshipAgent extends ParentshipAgent<Neo4jTransaction> {
         Person mother = new Person((String) inserted.get(M + "." + EMAIL));
         Person father = new Person((String) inserted.get(F + "." + EMAIL));
         Person child = new Person((String) inserted.get(C + "." + EMAIL));
-        return Optional.of(new Parentship(mother, father, child));
+        return Optional.of(new Parenthood(mother, father, child));
     }
 }

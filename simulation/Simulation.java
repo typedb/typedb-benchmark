@@ -29,7 +29,7 @@ import com.vaticle.typedb.benchmark.simulation.agent.LineageAgent;
 import com.vaticle.typedb.benchmark.simulation.agent.MaritalStatusAgent;
 import com.vaticle.typedb.benchmark.simulation.agent.MarriageAgent;
 import com.vaticle.typedb.benchmark.simulation.agent.NationalityAgent;
-import com.vaticle.typedb.benchmark.simulation.agent.ParentshipAgent;
+import com.vaticle.typedb.benchmark.simulation.agent.ParenthoodAgent;
 import com.vaticle.typedb.benchmark.simulation.agent.PersonAgent;
 import com.vaticle.typedb.benchmark.simulation.driver.Client;
 import com.vaticle.typedb.benchmark.simulation.driver.Session;
@@ -100,7 +100,7 @@ public abstract class Simulation<
             put(PersonAgent.class, () -> createPersonAgent(client, context));
             put(FriendshipAgent.class, () -> createFriendshipAgent(client, context));
             put(MarriageAgent.class, () -> createMarriageAgent(client, context));
-            put(ParentshipAgent.class, () -> createParentshipAgent(client, context));
+            put(ParenthoodAgent.class, () -> createParenthoodAgent(client, context));
             put(MaritalStatusAgent.class, () -> createMaritalStatusAgent(client, context));
             put(LineageAgent.class, () -> createLineageAgent(client, context));
             put(NationalityAgent.class, () -> createNationalityAgent(client, context));
@@ -151,7 +151,7 @@ public abstract class Simulation<
 
     protected abstract MarriageAgent<TX> createMarriageAgent(CLIENT client, Context context);
 
-    protected abstract ParentshipAgent<TX> createParentshipAgent(CLIENT client, Context context);
+    protected abstract ParenthoodAgent<TX> createParenthoodAgent(CLIENT client, Context context);
 
     protected abstract LineageAgent<TX> createLineageAgent(CLIENT client, Context context);
 

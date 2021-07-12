@@ -23,7 +23,7 @@ agents:
     mode: TRACE
   - name: "MarriageAgent"
     mode: TRACE
-  - name: "ParentshipAgent"
+  - name: "ParenthoodAgent"
     mode: TRACE
 
 traceSampling:

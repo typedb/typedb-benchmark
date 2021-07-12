@@ -28,7 +28,7 @@ import com.vaticle.typedb.benchmark.simulation.agent.LineageAgent;
 import com.vaticle.typedb.benchmark.simulation.agent.MaritalStatusAgent;
 import com.vaticle.typedb.benchmark.simulation.agent.MarriageAgent;
 import com.vaticle.typedb.benchmark.simulation.agent.NationalityAgent;
-import com.vaticle.typedb.benchmark.simulation.agent.ParentshipAgent;
+import com.vaticle.typedb.benchmark.simulation.agent.ParenthoodAgent;
 import com.vaticle.typedb.benchmark.typedb.agent.TypeDBCitizenshipAgent;
 import com.vaticle.typedb.benchmark.typedb.agent.TypeDBCoupleFriendshipAgent;
 import com.vaticle.typedb.benchmark.typedb.agent.TypeDBFriendshipAgent;
@@ -36,7 +36,7 @@ import com.vaticle.typedb.benchmark.typedb.agent.TypeDBLineageAgent;
 import com.vaticle.typedb.benchmark.typedb.agent.TypeDBMaritalStatusAgent;
 import com.vaticle.typedb.benchmark.typedb.agent.TypeDBMarriageAgent;
 import com.vaticle.typedb.benchmark.typedb.agent.TypeDBNationalityAgent;
-import com.vaticle.typedb.benchmark.typedb.agent.TypeDBParentshipAgent;
+import com.vaticle.typedb.benchmark.typedb.agent.TypeDBParenthoodAgent;
 import com.vaticle.typedb.benchmark.typedb.agent.TypeDBPersonAgent;
 import com.vaticle.typedb.benchmark.typedb.driver.TypeDBClient;
 import com.vaticle.typedb.benchmark.typedb.driver.TypeDBSession;
@@ -200,8 +200,8 @@ public class TypeDBSimulation extends Simulation<TypeDBClient, TypeDBSession, Ty
     }
 
     @Override
-    protected ParentshipAgent<TypeDBTransaction> createParentshipAgent(TypeDBClient client, Context context) {
-        return new TypeDBParentshipAgent(client, context);
+    protected ParenthoodAgent<TypeDBTransaction> createParenthoodAgent(TypeDBClient client, Context context) {
+        return new TypeDBParenthoodAgent(client, context);
     }
 
     @Override
