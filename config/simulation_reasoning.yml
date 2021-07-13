@@ -30,7 +30,7 @@ agents:
   - name: "GrandparenthoodAgent"
     mode: TRACE
   - name: "LineageAgent"
-    mode: TRACE
+    mode: OFF
   - name: "NationalityAgent"
     mode: OFF
   - name: "CitizenshipAgent"
