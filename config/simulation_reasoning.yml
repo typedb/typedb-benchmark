@@ -32,9 +32,9 @@ agents:
   - name: "LineageAgent"
     mode: TRACE
   - name: "NationalityAgent"
-    mode: TRACE
+    mode: OFF
   - name: "CitizenshipAgent"
-    mode: TRACE
+    mode: OFF
   - name: "CoupleFriendshipAgent"
     mode: TRACE
 
@@ -45,7 +45,7 @@ traceSampling:
 
 runParams:
   randomSeed: 1
-  iterations: 5
+  iterations: 4
   scaleFactor: 2
   databaseName: "simulation-reasoning"
 
