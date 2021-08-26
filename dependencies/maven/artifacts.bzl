@@ -18,7 +18,6 @@
 artifacts = [
   "com.google.code.findbugs:jsr305",
   "info.picocli:picocli",
-  "io.netty:netty-tcnative-boringssl-static",
   "junit:junit",
   "org.apache.commons:commons-csv",
   "org.slf4j:slf4j-api",
