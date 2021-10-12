@@ -20,23 +20,23 @@ package com.vaticle.typedb.benchmark.typedb.driver;
 import com.vaticle.typedb.benchmark.common.concept.Region;
 import com.vaticle.typedb.benchmark.simulation.driver.Client;
 import com.vaticle.typedb.client.TypeDB;
-import com.vaticle.typedb.client.api.TypeDBCredential;
+import com.vaticle.typedb.client.api.connection.TypeDBCredential;
 
 import java.text.DecimalFormat;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static com.vaticle.typedb.client.api.TypeDBSession.Type.DATA;
-import static com.vaticle.typedb.client.api.TypeDBTransaction.Type.READ;
+import static com.vaticle.typedb.client.api.connection.TypeDBSession.Type.DATA;
+import static com.vaticle.typedb.client.api.connection.TypeDBTransaction.Type.READ;
 import static com.vaticle.typeql.lang.TypeQL.match;
 import static com.vaticle.typeql.lang.TypeQL.var;
 
 public class TypeDBClient implements Client<TypeDBSession, TypeDBTransaction> {
 
-    private final com.vaticle.typedb.client.api.TypeDBClient nativeClient;
+    private final com.vaticle.typedb.client.api.connection.TypeDBClient nativeClient;
     private final ConcurrentHashMap<String, TypeDBSession> sessionMap;
     private final String database;
 
-    private TypeDBClient(com.vaticle.typedb.client.api.TypeDBClient nativeClient, String database) {
+    private TypeDBClient(com.vaticle.typedb.client.api.connection.TypeDBClient nativeClient, String database) {
         this.nativeClient = nativeClient;
         this.database = database;
         this.sessionMap = new ConcurrentHashMap<>();
@@ -47,10 +47,10 @@ public class TypeDBClient implements Client<TypeDBSession, TypeDBTransaction> {
     }
 
     public static TypeDBClient cluster(String hostUri, String database) {
-        return new TypeDBClient(TypeDB.clusterClient(hostUri, TypeDBCredential.plainText()), database);
+        return new TypeDBClient(TypeDB.clusterClient(hostUri, new TypeDBCredential("admin", "password", false)), database);
     }
 
-    public com.vaticle.typedb.client.api.TypeDBClient unpack() {
+    public com.vaticle.typedb.client.api.connection.TypeDBClient unpack() {
         return nativeClient;
     }
 
@@ -62,8 +62,8 @@ public class TypeDBClient implements Client<TypeDBSession, TypeDBTransaction> {
     @Override
     public String printStatistics() {
         StringBuilder str = new StringBuilder();
-        try (com.vaticle.typedb.client.api.TypeDBSession session = nativeClient.session(database, DATA)) {
-            try (com.vaticle.typedb.client.api.TypeDBTransaction tx = session.transaction(READ)) {
+        try (com.vaticle.typedb.client.api.connection.TypeDBSession session = nativeClient.session(database, DATA)) {
+            try (com.vaticle.typedb.client.api.connection.TypeDBTransaction tx = session.transaction(READ)) {
                 DecimalFormat formatter = new DecimalFormat("#,###");
                 long numberOfEntities = tx.query().match(match(var("x").isa("entity")).count()).get().asLong();
                 long numberOfAttributes = tx.query().match(match(var("x").isa("attribute")).count()).get().asLong();
