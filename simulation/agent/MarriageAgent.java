@@ -30,7 +30,6 @@ import com.vaticle.typedb.benchmark.simulation.driver.Transaction;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -59,12 +58,12 @@ public abstract class MarriageAgent<TX extends Transaction> extends Agent<Countr
         List<Report> reports = new ArrayList<>();
         try (TX tx = session.writeTransaction()) {
             LocalDateTime partnerBirthDate = context.today().minusYears(context.ageOfAdulthood());
-             List<Person> women = matchPartner(tx, country, partnerBirthDate, Gender.FEMALE)
+            List<Person> women = matchPartner(tx, country, partnerBirthDate, Gender.FEMALE)
                     .sorted(comparing(Person::email)).collect(toCollection(ArrayList::new));
             List<Person> men = matchPartner(tx, country, partnerBirthDate, Gender.MALE)
                     .sorted(comparing(Person::email)).collect(toCollection(ArrayList::new));
             random.randomPairs(women, men).forEach(partners -> {
-                String licence = String.valueOf(Objects.hash(partners.first().email(), partners.second().email()));
+                String licence = partners.first().email() + partners.second().email();
                 Optional<Marriage> inserted = insertMarriage(tx, partners.first().email(),
                                                              partners.second().email(),
                                                              licence, context.today());
