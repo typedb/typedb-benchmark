@@ -30,11 +30,11 @@ agents:
   - name: "GrandparenthoodAgent"
     mode: TRACE
   - name: "LineageAgent"
-    mode: OFF
+    mode: TRACE
   - name: "NationalityAgent"
-    mode: OFF
+    mode: TRACE
   - name: "CitizenshipAgent"
-    mode: OFF
+    mode: TRACE
   - name: "CoupleFriendshipAgent"
     mode: TRACE
 
