@@ -183,6 +183,14 @@ when {
     (ancestor:$a, descendent:$c) isa lineage;
 };
 
+rule parent-of-parent-is-grandparent:
+when {
+  (parent:$p, child:$gc) isa parenthood;
+  (parent:$gp, child:$p) isa parenthood;
+} then {
+  (grandchild: $gc, grandparent: $gp) isa grandparenthood;
+};
+
 rule birthplace-determines-nationality:
 when {
     $city isa city;
