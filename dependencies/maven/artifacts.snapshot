@@ -106,6 +106,8 @@
 @maven//:org_apiguardian_apiguardian_api_1_1_0
 @maven//:org_codehaus_mojo_animal_sniffer_annotations
 @maven//:org_codehaus_mojo_animal_sniffer_annotations_1_18
+@maven//:org_hamcrest_hamcrest
+@maven//:org_hamcrest_hamcrest_2_2
 @maven//:org_hamcrest_hamcrest_all
 @maven//:org_hamcrest_hamcrest_all_1_3
 @maven//:org_hamcrest_hamcrest_core
