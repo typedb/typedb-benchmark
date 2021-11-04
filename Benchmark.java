@@ -65,7 +65,7 @@ public class Benchmark {
         return simulation;
     }
 
-    private static FactoryTracing initTracing(@Nullable Options.FactoryTracing options, String databaseFullname) {
+    private static FactoryTracing initTracing(@Nullable Options.FactoryTracing options, String analysisName) {
         FactoryTracing tracing;
         if (options == null) return FactoryTracing.createNoOp().withLogging();
         else if (options.credentials().isEmpty()) tracing = FactoryTracing.create(options.factory()).withLogging();
@@ -74,9 +74,9 @@ public class Benchmark {
             tracing = FactoryTracing.create(options.factory(), cred.username(), cred.token()).withLogging();
         }
         FactoryTracingThreadStatic.setGlobalTracingClient(tracing);
-        String analysisName = databaseFullname;
-        if (options.tags() != null) analysisName = analysisName + " [ " + String.join(", ", options.tags()) + " ]";
-        FactoryTracingThreadStatic.openGlobalAnalysis(options.org(), options.repo(), options.commit(), analysisName);
+        String taggedAnalysisName = analysisName;
+        if (options.tags() != null) taggedAnalysisName = taggedAnalysisName + " [ " + String.join(", ", options.tags()) + " ]";
+        FactoryTracingThreadStatic.openGlobalAnalysis(options.org(), options.repo(), options.commit(), taggedAnalysisName);
         return tracing;
     }
 }
