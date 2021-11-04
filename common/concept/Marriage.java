@@ -18,6 +18,7 @@
 package com.vaticle.typedb.benchmark.common.concept;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 public class Marriage {
 
@@ -47,5 +48,21 @@ public class Marriage {
 
     public LocalDateTime date() {
         return date;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Marriage marriage = (Marriage) o;
+        return wife.equals(marriage.wife) &&
+                husband.equals(marriage.husband) &&
+                licence.equals(marriage.licence) &&
+                date.equals(marriage.date);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(wife, husband, licence, date);
     }
 }

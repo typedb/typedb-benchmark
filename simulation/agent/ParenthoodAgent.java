@@ -72,9 +72,7 @@ public abstract class ParenthoodAgent<TX extends Transaction> extends Agent<Coun
                 if (context.isReporting()) {
                     assert inserted.isPresent();
                     reports.add(new Report(list(parenthood.first().wife().email(), parenthood.first().husband().email(),
-                                                parenthood.second().email()),
-                                           list(inserted.get().mother().email(), inserted.get().father().email(),
-                                                inserted.get().child().email())));
+                                                parenthood.second().email()), list(inserted.get())));
                 } else assert inserted.isEmpty();
             });
             tx.commit();

@@ -69,10 +69,8 @@ public abstract class MarriageAgent<TX extends Transaction> extends Agent<Countr
                                                              licence, context.today());
                 if (context.isReporting()) {
                     assert inserted.isPresent();
-                    reports.add(new Report(list(partners.first().email(), partners.second().email(),
-                                                licence, context.today()),
-                                           list(inserted.get().wife().email(), inserted.get().husband().email(),
-                                                inserted.get().licence(), inserted.get().date())));
+                    reports.add(new Report(list(partners.first().email(), partners.second().email(), licence,
+                                                context.today()), list(inserted.get())));
                 } else assert inserted.isEmpty();
             });
             tx.commit();

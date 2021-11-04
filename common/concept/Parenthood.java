@@ -17,6 +17,8 @@
 
 package com.vaticle.typedb.benchmark.common.concept;
 
+import java.util.Objects;
+
 public class Parenthood {
 
     private final Person mother;
@@ -39,5 +41,20 @@ public class Parenthood {
 
     public Person child() {
         return child;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Parenthood that = (Parenthood) o;
+        return mother.equals(that.mother) &&
+                father.equals(that.father) &&
+                child.equals(that.child);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(mother, father, child);
     }
 }
