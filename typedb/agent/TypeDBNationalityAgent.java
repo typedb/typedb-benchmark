@@ -41,7 +41,6 @@ import static com.vaticle.typeql.lang.TypeQL.var;
 
 public class TypeDBNationalityAgent extends NationalityAgent<TypeDBTransaction> {
 
-
     public TypeDBNationalityAgent(Client<?, TypeDBTransaction> client, Context context) {
         super(client, context);
     }

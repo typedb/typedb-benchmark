@@ -35,7 +35,7 @@ import java.util.stream.Stream;
 
 import static com.vaticle.typedb.common.collection.Collections.list;
 import static java.util.Comparator.comparing;
-import static java.util.stream.Collectors.toCollection;
+import static java.util.stream.Collectors.toList;
 
 public abstract class MarriageAgent<TX extends Transaction> extends Agent<Country, TX> {
 
@@ -59,18 +59,20 @@ public abstract class MarriageAgent<TX extends Transaction> extends Agent<Countr
         try (TX tx = session.writeTransaction()) {
             LocalDateTime partnerBirthDate = context.today().minusYears(context.ageOfAdulthood());
             List<Person> women = matchPartner(tx, country, partnerBirthDate, Gender.FEMALE)
-                    .sorted(comparing(Person::email)).collect(toCollection(ArrayList::new));
+                    .sorted(comparing(Person::email)).collect(toList());
             List<Person> men = matchPartner(tx, country, partnerBirthDate, Gender.MALE)
-                    .sorted(comparing(Person::email)).collect(toCollection(ArrayList::new));
-            random.randomPairs(women, men).forEach(partners -> {
-                String licence = partners.first().email() + partners.second().email();
-                Optional<Marriage> inserted = insertMarriage(tx, partners.first().email(),
-                                                             partners.second().email(),
-                                                             licence, context.today());
+                    .sorted(comparing(Person::email)).collect(toList());
+            random.randomPairs(women, men).forEach(pair -> {
+                String licence = pair.first().email() + pair.second().email();
+                Optional<Marriage> inserted = insertMarriage(
+                        tx, pair.first().email(), pair.second().email(), licence, context.today()
+                );
                 if (context.isReporting()) {
                     assert inserted.isPresent();
-                    reports.add(new Report(list(partners.first().email(), partners.second().email(), licence,
-                                                context.today()), list(inserted.get())));
+                    reports.add(new Report(
+                            list(pair.first().email(), pair.second().email(), licence, context.today()),
+                            list(inserted.get())
+                    ));
                 } else assert inserted.isEmpty();
             });
             tx.commit();

@@ -48,20 +48,20 @@ import static com.vaticle.typeql.lang.TypeQL.var;
 
 public class TypeDBLineageAgent extends LineageAgent<TypeDBTransaction> {
 
-
     public TypeDBLineageAgent(Client<?, TypeDBTransaction> client, Context context) {
         super(client, context);
     }
 
     @Override
-    protected void matchLineages(TypeDBTransaction tx, Country country, LocalDateTime startDay, LocalDateTime today) {
+    protected void matchLineages(TypeDBTransaction tx, Country country, LocalDateTime ancestorBirthDate,
+                                 LocalDateTime birthDate) {
         List<ConceptMap> answers = tx.query().match(TypeQL.match(
                 rel(CONTAINER, COUNTRY).rel(CONTAINED, CITY).isa(CONTAINS),
                 var(COUNTRY).isa(COUNTRY).has(CODE, country.code()),
                 var(CITY).isa(CITY),
-                var(ANCESTOR).isa(PERSON).has(BIRTH_DATE, startDay),
+                var(ANCESTOR).isa(PERSON).has(BIRTH_DATE, ancestorBirthDate),
                 var().rel(PLACE, var(CITY)).rel(CHILD, var(ANCESTOR)).isa(BIRTH_PLACE),
-                var(DESCENDENT).isa(PERSON).has(BIRTH_DATE, today),
+                var(DESCENDENT).isa(PERSON).has(BIRTH_DATE, birthDate),
                 rel(ANCESTOR, ANCESTOR).rel(DESCENDENT, DESCENDENT).isa(LINEAGE)
         )).collect(Collectors.toList());
     }

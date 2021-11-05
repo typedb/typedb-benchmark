@@ -38,6 +38,19 @@ public abstract class Neo4jTransaction implements Transaction {
         this.session = session;
     }
 
+    public List<Record> execute(Query query) {
+        return session.writeTransaction(tx -> {
+            Result result = tx.run(query);
+            return result.list();
+        });
+    }
+
+    /**
+     * Not necessary when using Neo4j's Transaction Functions
+     */
+    @Override
+    public void close() {}
+
     static class Read extends Neo4jTransaction {
 
         public Read(Session session) {
@@ -47,7 +60,6 @@ public abstract class Neo4jTransaction implements Transaction {
         public List<Record> execute(Query query) {
             return session.readTransaction(tx -> tx.run(query).list());
         }
-
         @Override
         public void commit() {
             throw new UnsupportedOperationException("There should not be a call to .commit() for read transactions.");
@@ -63,25 +75,10 @@ public abstract class Neo4jTransaction implements Transaction {
         public List<Record> execute(Query query) {
             return session.writeTransaction(tx -> tx.run(query).list());
         }
-
         /**
          * Not necessary when using Neo4j's Transaction Functions
          */
         @Override
         public void commit() {}
     }
-
-    public List<Record> execute(Query query) {
-        return session.writeTransaction(tx -> {
-            Result result = tx.run(query);
-            return result.list();
-        });
-    }
-
-
-    /**
-     * Not necessary when using Neo4j's Transaction Functions
-     */
-    @Override
-    public void close() {}
 }

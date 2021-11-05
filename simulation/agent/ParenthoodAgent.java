@@ -36,7 +36,7 @@ import java.util.stream.Stream;
 
 import static com.vaticle.typedb.common.collection.Collections.list;
 import static java.util.Comparator.comparing;
-import static java.util.stream.Collectors.toCollection;
+import static java.util.stream.Collectors.toList;
 
 public abstract class ParenthoodAgent<TX extends Transaction> extends Agent<Country, TX> {
 
@@ -60,19 +60,19 @@ public abstract class ParenthoodAgent<TX extends Transaction> extends Agent<Coun
         try (TX tx = session.writeTransaction()) {
             LocalDateTime marriageDate = context.today().minusYears(context.yearsBeforeParenthood());
             List<Marriage> marriages = matchMarriages(tx, country, marriageDate)
-                    .sorted(comparing(Marriage::licence)).collect(toCollection(ArrayList::new));
+                    .sorted(comparing(Marriage::licence)).collect(toList());
             List<Person> newBorns = matchNewborns(tx, country, context.today())
-                    .sorted(comparing(Person::email)).collect(toCollection(ArrayList::new));
-            List<Pair<Marriage, Person>> parenthoods = random.randomAllocation(marriages, newBorns);
+                    .sorted(comparing(Person::email)).collect(toList());
 
+            List<Pair<Marriage, Person>> parenthoods = random.randomAllocation(marriages, newBorns);
             parenthoods.forEach(parenthood -> {
-                Optional<Parenthood> inserted = insertParenthood(tx, parenthood.first().wife().email(),
-                                                                 parenthood.first().husband().email(),
-                                                                 parenthood.second().email());
+                String wife = parenthood.first().wife().email();
+                String husband = parenthood.first().husband().email();
+                String child = parenthood.second().email();
+                Optional<Parenthood> inserted = insertParenthood(tx, wife, husband, child);
                 if (context.isReporting()) {
                     assert inserted.isPresent();
-                    reports.add(new Report(list(parenthood.first().wife().email(), parenthood.first().husband().email(),
-                                                parenthood.second().email()), list(inserted.get())));
+                    reports.add(new Report(list(wife, husband, child), list(inserted.get())));
                 } else assert inserted.isEmpty();
             });
             tx.commit();
