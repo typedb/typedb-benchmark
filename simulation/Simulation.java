@@ -56,7 +56,7 @@ public abstract class Simulation<
     protected final Context context;
     private final RandomSource randomSource;
     private final List<Agent<?, TX>> agents;
-    private final Map<Class<? extends Agent>, Map<String, List<Agent.Report>>> agentReports;
+    private final Map<String, Map<String, List<Agent.Report>>> agentReports;
 
     public Simulation(CLIENT client, Context context) throws Exception {
         this.client = client;
@@ -93,7 +93,9 @@ public abstract class Simulation<
     }
 
     public Map<String, List<Agent.Report>> getReport(Class<? extends Agent> agentName) {
-        return agentReports.get(agentName);
+        Map<String, List<Agent.Report>> report = agentReports.get(agentName.getSimpleName());
+        assert report != null;
+        return report;
     }
 
     public void run() {
@@ -111,7 +113,7 @@ public abstract class Simulation<
 
     public void iterate() {
         agentReports.clear();
-        agents.forEach(agent -> agentReports.put(agent.getClass(), agent.iterate(randomSource.nextSource())));
+        agents.forEach(agent -> agentReports.put(agent.getClass().getSuperclass().getSimpleName(), agent.iterate(randomSource.nextSource())));
         context.incrementIteration();
     }
 
