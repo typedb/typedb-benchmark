@@ -29,17 +29,14 @@ import java.util.List;
 import java.util.function.Function;
 
 public class Config {
-    private final static int DEFAULT_RANDOM_SEED = 1;
-    private final static int DEFAULT_NUM_ITERATIONS = 10;
-    private final static int DEFAULT_SCALE_FACTOR = 5;
-    private final static String DEFAULT_DATABASE_NAME = "world";
-
     private List<Agent> agents;
     private TraceSampling traceSampling;
-    private int randomSeed = DEFAULT_RANDOM_SEED;
-    private int iterations = DEFAULT_NUM_ITERATIONS;
-    private int scaleFactor = DEFAULT_SCALE_FACTOR;
-    private String databaseName = DEFAULT_DATABASE_NAME;
+
+    private static final RunParams DEFAULT_RUN_PARAMS = new RunParams();
+    private static final ModelParams DEFAULT_MODEL_PARAMS = new ModelParams();
+
+    private RunParams runParams = DEFAULT_RUN_PARAMS;
+    private ModelParams modelParams = DEFAULT_MODEL_PARAMS;
 
     public static Config loadYML(File file) throws YAMLException {
         Yaml yaml = new Yaml(new Constructor(Config.class));
@@ -59,6 +56,22 @@ public class Config {
         this.agents = agents;
     }
 
+    public void setRunParams(RunParams runParams) {
+        this.runParams = runParams;
+    }
+
+    public RunParams runParams() {
+        return runParams;
+    }
+
+    public void setModelParams(ModelParams modelParams) {
+        this.modelParams = modelParams;
+    }
+
+    public ModelParams modelParams() {
+        return modelParams;
+    }
+
     public TraceSampling traceSampling() {
         return traceSampling;
     }
@@ -67,36 +80,83 @@ public class Config {
         this.traceSampling = traceSampling;
     }
 
-    public int randomSeed() {
-        return randomSeed;
+    public static class RunParams {
+        private final static int DEFAULT_RANDOM_SEED = 1;
+        private final static int DEFAULT_NUM_ITERATIONS = 10;
+        private final static int DEFAULT_SCALE_FACTOR = 5;
+        private final static String DEFAULT_DATABASE_NAME = "world";
+
+        private int randomSeed = DEFAULT_RANDOM_SEED;
+        private int iterations = DEFAULT_NUM_ITERATIONS;
+        private int scaleFactor = DEFAULT_SCALE_FACTOR;
+        private String databaseName = DEFAULT_DATABASE_NAME;
+
+        public int randomSeed() {
+            return randomSeed;
+        }
+
+        public void setRandomSeed(int randomSeed) {
+            this.randomSeed = randomSeed;
+        }
+
+        public int iterations() {
+            return iterations;
+        }
+
+        public void setIterations(int iterations) {
+            this.iterations = iterations;
+        }
+
+        public int scaleFactor() {
+            return scaleFactor;
+        }
+
+        public void setScaleFactor(int scaleFactor) {
+            this.scaleFactor = scaleFactor;
+        }
+
+        public String databaseName() {
+            return databaseName;
+        }
+
+        public void setDatabaseName(String databaseName) {
+            this.databaseName = databaseName;
+        }
     }
 
-    public void setRandomSeed(int randomSeed) {
-        this.randomSeed = randomSeed;
-    }
+    public static class ModelParams {
 
-    public int iterations() {
-        return iterations;
-    }
+        private final static int DEFAULT_AGE_OF_FRIENDSHIP = 14;
+        private final static int DEFAULT_AGE_OF_ADULTHOOD = 21;
+        private final static int DEFAULT_YEARS_BEFORE_PARENTHOOD = 3;
 
-    public void setIterations(int iterations) {
-        this.iterations = iterations;
-    }
+        private int ageOfFriendship = DEFAULT_AGE_OF_FRIENDSHIP;
+        private int ageOfAdulthood = DEFAULT_AGE_OF_ADULTHOOD;
+        private int yearsBeforeParenthood = DEFAULT_YEARS_BEFORE_PARENTHOOD;
 
-    public int scaleFactor() {
-        return scaleFactor;
-    }
+        public int ageOfFriendship() {
+            return ageOfFriendship;
+        }
 
-    public void setScaleFactor(int scaleFactor) {
-        this.scaleFactor = scaleFactor;
-    }
+        public void setAgeOfFriendship(int ageOfFriendship) {
+            this.ageOfFriendship = ageOfFriendship;
+        }
 
-    public String databaseName() {
-        return databaseName;
-    }
+        public int ageOfAdulthood() {
+            return ageOfAdulthood;
+        }
 
-    public void setDatabaseName(String databaseName) {
-        this.databaseName = databaseName;
+        public void setAgeOfAdulthood(int ageOfAdulthood) {
+            this.ageOfAdulthood = ageOfAdulthood;
+        }
+
+        public int yearsBeforeParenthood() {
+            return yearsBeforeParenthood;
+        }
+
+        public void setYearsBeforeParenthood(int yearsBeforeParenthood) {
+            this.yearsBeforeParenthood = yearsBeforeParenthood;
+        }
     }
 
     public static class TraceSampling {

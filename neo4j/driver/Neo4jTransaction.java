@@ -27,11 +27,11 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
-public class Neo4jTransaction implements Transaction {
+public abstract class Neo4jTransaction implements Transaction {
 
     private static final Logger LOG = LoggerFactory.getLogger(Neo4jTransaction.class);
 
-    private final Session session;
+    protected final Session session;
 
     public Neo4jTransaction(Session session) {
         // TODO: why are we not passing a Transaction in here?
@@ -49,11 +49,36 @@ public class Neo4jTransaction implements Transaction {
      * Not necessary when using Neo4j's Transaction Functions
      */
     @Override
-    public void commit() {}
-
-    /**
-     * Not necessary when using Neo4j's Transaction Functions
-     */
-    @Override
     public void close() {}
+
+    static class Read extends Neo4jTransaction {
+
+        public Read(Session session) {
+            super(session);
+        }
+
+        public List<Record> execute(Query query) {
+            return session.readTransaction(tx -> tx.run(query).list());
+        }
+        @Override
+        public void commit() {
+            throw new UnsupportedOperationException("There should not be a call to .commit() for read transactions.");
+        }
+    }
+
+    static class Write extends Neo4jTransaction {
+
+        public Write(Session session) {
+            super(session);
+        }
+
+        public List<Record> execute(Query query) {
+            return session.writeTransaction(tx -> tx.run(query).list());
+        }
+        /**
+         * Not necessary when using Neo4j's Transaction Functions
+         */
+        @Override
+        public void commit() {}
+    }
 }

@@ -72,7 +72,7 @@ public class ComparisonTest {
 
         private static List<org.junit.runner.Runner> createRunners(Class<?> testClass) throws InitializationError {
             List<org.junit.runner.Runner> runners = new ArrayList<>();
-            for (int i = 1; i <= CONFIG.iterations(); i++) {
+            for (int i = 1; i <= CONFIG.runParams().iterations(); i++) {
                 BlockJUnit4ClassRunner runner = new Runner(testClass, i);
                 runners.add(runner);
             }
@@ -84,7 +84,7 @@ public class ComparisonTest {
             iteration++;
             Stream.of(NEO4J, TYPEDB).parallel().forEach(Simulation::iterate);
             super.runChild(runner, notifier);
-            if (iteration == CONFIG.iterations() + 1) {
+            if (iteration == CONFIG.runParams().iterations() + 1) {
                 TYPEDB.close();
                 NEO4J.close();
             }

@@ -21,13 +21,18 @@ agents:
     mode: TRACE
   - name: "FriendshipAgent"
     mode: TRACE
+  - name: "MarriageAgent"
+    mode: TRACE
+  - name: "ParenthoodAgent"
+    mode: TRACE
 
 traceSampling:
   # Options: `"every"` for every K traces; `"log"` for logarithm with base N
   function: "every"
   arg: 10
 
-randomSeed: 1
-iterations: 100
-scaleFactor: 10
-databaseName: "simulation"
+runParams:
+  randomSeed: 1
+  iterations: 100
+  scaleFactor: 10
+  databaseName: "simulation"

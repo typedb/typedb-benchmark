@@ -60,7 +60,7 @@ public abstract class PersonAgent<TX extends Transaction> extends Agent<Country,
     @Override
     protected List<Report> run(Session<TX> session, Country country, RandomSource random) {
         List<Report> reports = new ArrayList<>();
-        try (TX tx = session.transaction()) {
+        try (TX tx = session.writeTransaction()) {
             for (int i = 0; i < context.scaleFactor(); i++) {
                 Gender gender = random.nextBoolean() ? MALE : FEMALE;
                 String firstName = random.choose(country.continent().commonFirstNames(gender));

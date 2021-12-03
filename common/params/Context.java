@@ -32,8 +32,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class Context implements AutoCloseable {
 
-    public static final int AGE_OF_ADULTHOOD = 21;
-    public static final int AGE_OF_FRIENDSHIP = 14;
     private static final Logger LOG = LoggerFactory.getLogger(Context.class);
 
     private final boolean isTracing;
@@ -71,31 +69,47 @@ public class Context implements AutoCloseable {
     }
 
     public long seed() {
-        return config.randomSeed();
-    }
-
-    public void incrementIteration() {
-        iteration.incrementAndGet();
+        return config.runParams().randomSeed();
     }
 
     public int scaleFactor() {
-        return config.scaleFactor();
+        return config.runParams().scaleFactor();
     }
 
     public String databaseName() {
-        return config.databaseName();
+        return config.runParams().databaseName();
+    }
+
+    public int iterationMax() {
+        return config.runParams().iterations();
+    }
+
+    public int ageOfFriendship() {
+        return config.modelParams().ageOfFriendship();
+    }
+
+    public int ageOfAdulthood() {
+        return config.modelParams().ageOfAdulthood();
+    }
+
+    public int yearsBeforeParenthood() {
+        return config.modelParams().yearsBeforeParenthood();
     }
 
     public int iterationNumber() {
         return iteration.get();
     }
 
-    public int iterationMax() {
-        return config.iterations();
+    public void incrementIteration() {
+        iteration.incrementAndGet();
     }
 
     public LocalDateTime today() {
-        return LocalDateTime.of(LocalDate.ofYearDay(2000 + iteration.get(), 1), LocalTime.of(0, 0, 0));
+        return startDay().plusYears(iteration.get() - 1);
+    }
+
+    public LocalDateTime startDay() {
+        return LocalDateTime.of(LocalDate.ofYearDay(2000, 1), LocalTime.of(0, 0, 0));
     }
 
     public SeedData seedData() {

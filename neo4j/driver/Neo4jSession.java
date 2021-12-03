@@ -29,8 +29,18 @@ public class Neo4jSession implements Session<Neo4jTransaction> {
     }
 
     @Override
-    public Neo4jTransaction transaction() {
-        return new Neo4jTransaction(nativeSession);
+    public Neo4jTransaction writeTransaction() {
+        return new Neo4jTransaction.Write(nativeSession);
+    }
+
+    @Override
+    public Neo4jTransaction readTransaction() {
+        return new Neo4jTransaction.Read(nativeSession);
+    }
+
+    @Override
+    public Neo4jTransaction reasoningTransaction() {
+        throw new UnsupportedOperationException("Neo4j does not support reasoning transactions");
     }
 
     @Override

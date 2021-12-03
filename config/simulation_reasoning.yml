@@ -17,53 +17,39 @@
 
 agents:
   # For each agent select a `mode`, `RUN` to run without tracing, `TRACE` to run with tracing, and `OFF` to not run at all
-  - name: "marriage"
-    mode: TRACE
-  - name: "personBirth"
-    mode: TRACE
-  - name: "ageUpdate"
-    mode: OFF # until we have macro functions
-  - name: "parentship"
+  - name: "PersonAgent"
     mode: RUN
-  - name: "relocation"
+  - name: "FriendshipAgent"
     mode: RUN
-  - name: "company"
+  - name: "MarriageAgent"
     mode: RUN
-  - name: "employment"
+  - name: "ParenthoodAgent"
     mode: RUN
-  - name: "product"
-    mode: RUN
-  - name: "purchase"
-    mode: RUN
-  - name: "friendship"
-    mode: RUN
-  - name: "meanWage"
+  - name: "MaritalStatusAgent"
     mode: TRACE
-  - name: "findLivedIn"
+  - name: "GrandparenthoodAgent"
     mode: TRACE
-  - name: "findCurrentResidents"
+  - name: "LineageAgent"
     mode: TRACE
-  #  - name: "findTransactionCurrency"
-  #    mode: TRACE
-  - name: "arbitraryOneHop"
+  - name: "NationalityAgent"
     mode: TRACE
-  - name: "twoHop"
+  - name: "CitizenshipAgent"
     mode: TRACE
-  - name: "threeHop"
-    mode: TRACE
-  - name: "fourHop"
-    mode: TRACE
-  - name: "findSpecificMarriage"
-    mode: TRACE
-  - name: "findSpecificPerson"
+  - name: "CoupleFriendshipAgent"
     mode: TRACE
 
 traceSampling:
   # Options: `"every"` for every K traces; `"log"` for logarithm with base N
   function: "every"
-  arg: 3
+  arg: 1
 
-randomSeed: 1
-iterations: 12
-scaleFactor: 3
-databaseName: "world"
+runParams:
+  randomSeed: 1
+  iterations: 6
+  scaleFactor: 2
+  databaseName: "simulation-reasoning"
+
+modelParams:
+  ageOfFriendship: 1
+  ageOfAdulthood: 2
+  yearsBeforeParenthood: 1

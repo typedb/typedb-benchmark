@@ -25,6 +25,7 @@ import picocli.CommandLine.Option;
 import javax.annotation.Nullable;
 import java.io.File;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -120,6 +121,9 @@ public class Options {
         @Option(names = {"--commit"}, required = true, description = "Git commit SHA")
         private String commit;
 
+        @Option(names = {"--tags"}, description = "Tags for the analysis", converter = TagConverter.class)
+        private List<String> tags;
+
         @Nullable
         @ArgGroup(exclusive = false, multiplicity = "0..1", heading = "Authentication credentials for Vaticle Factory tracing server")
         private Credentials credentials;
@@ -140,8 +144,21 @@ public class Options {
             return commit;
         }
 
+        public List<String> tags() {
+            return tags;
+        }
+
         public Optional<Credentials> credentials() {
             return Optional.ofNullable(credentials);
+        }
+
+        public static class TagConverter implements CommandLine.ITypeConverter<List<String>> {
+
+            @Override
+            public List<String> convert(String value) throws IllegalArgumentException {
+                if (value.equals("")) throw new IllegalArgumentException("Tags cannot be an empty string");
+                return Arrays.asList(value.split("\\s*,\\s*"));
+            }
         }
 
         public static class Credentials {

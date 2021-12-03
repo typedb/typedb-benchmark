@@ -24,12 +24,22 @@ import com.vaticle.typedb.benchmark.common.concept.Global;
 import com.vaticle.typedb.benchmark.common.params.Context;
 import com.vaticle.typedb.benchmark.common.seed.SeedData;
 import com.vaticle.typedb.benchmark.neo4j.agent.Neo4jFriendshipAgent;
+import com.vaticle.typedb.benchmark.neo4j.agent.Neo4jMarriageAgent;
+import com.vaticle.typedb.benchmark.neo4j.agent.Neo4jParenthoodAgent;
 import com.vaticle.typedb.benchmark.neo4j.agent.Neo4jPersonAgent;
 import com.vaticle.typedb.benchmark.neo4j.driver.Neo4jClient;
 import com.vaticle.typedb.benchmark.neo4j.driver.Neo4jSession;
 import com.vaticle.typedb.benchmark.neo4j.driver.Neo4jTransaction;
 import com.vaticle.typedb.benchmark.simulation.Simulation;
+import com.vaticle.typedb.benchmark.simulation.agent.CitizenshipAgent;
+import com.vaticle.typedb.benchmark.simulation.agent.CoupleFriendshipAgent;
 import com.vaticle.typedb.benchmark.simulation.agent.FriendshipAgent;
+import com.vaticle.typedb.benchmark.simulation.agent.GrandparenthoodAgent;
+import com.vaticle.typedb.benchmark.simulation.agent.LineageAgent;
+import com.vaticle.typedb.benchmark.simulation.agent.MaritalStatusAgent;
+import com.vaticle.typedb.benchmark.simulation.agent.MarriageAgent;
+import com.vaticle.typedb.benchmark.simulation.agent.NationalityAgent;
+import com.vaticle.typedb.benchmark.simulation.agent.ParenthoodAgent;
 import com.vaticle.typedb.benchmark.simulation.agent.PersonAgent;
 import org.neo4j.driver.Driver;
 import org.neo4j.driver.Query;
@@ -86,7 +96,7 @@ public class Neo4JSimulation extends Simulation<Neo4jClient, Neo4jSession, Neo4j
             add("CREATE CONSTRAINT unique_company_number ON (company:Company) ASSERT company.number IS UNIQUE");
             add("CREATE CONSTRAINT unique_product_id ON (product:Product) ASSERT product.id IS UNIQUE");
             add("CREATE CONSTRAINT unique_purchase_id ON (purchase:Purchase) ASSERT purchase.id IS UNIQUE");
-            add("CREATE CONSTRAINT unique_marriage_license ON (marriage:Marriage) ASSERT marriage.license IS UNIQUE");
+            add("CREATE CONSTRAINT unique_marriage_licence ON (marriage:Marriage) ASSERT marriage.licence IS UNIQUE");
         }};
         Transaction tx = session.beginTransaction();
         for (String query : queries) {
@@ -184,5 +194,50 @@ public class Neo4JSimulation extends Simulation<Neo4jClient, Neo4jSession, Neo4j
     @Override
     protected FriendshipAgent<Neo4jTransaction> createFriendshipAgent(Neo4jClient client, Context context) {
         return new Neo4jFriendshipAgent(client, context);
+    }
+
+    @Override
+    protected MarriageAgent<Neo4jTransaction> createMarriageAgent(Neo4jClient client, Context context) {
+        return new Neo4jMarriageAgent(client, context);
+    }
+
+    @Override
+    protected ParenthoodAgent<Neo4jTransaction> createParenthoodAgent(Neo4jClient client, Context context) {
+        return new Neo4jParenthoodAgent(client, context);
+    }
+
+    @Override
+    protected LineageAgent<Neo4jTransaction> createLineageAgent(Neo4jClient client, Context context) {
+        throw new UnsupportedOperationException("LineageAgent requires reasoning, which is not supported by Neo4j");
+    }
+
+    @Override
+    protected NationalityAgent<Neo4jTransaction> createNationalityAgent(Neo4jClient client, Context context) {
+        throw new UnsupportedOperationException("NationalityAgent requires reasoning, which is not supported by Neo4j");
+    }
+
+    @Override
+    protected CitizenshipAgent<Neo4jTransaction> createCitizenshipAgent(Neo4jClient client, Context context) {
+        throw new UnsupportedOperationException("CitizenshipAgent requires reasoning. Reasoning is not supported by " +
+                                                        "Neo4j");
+    }
+
+    @Override
+    protected MaritalStatusAgent<Neo4jTransaction> createMaritalStatusAgent(Neo4jClient client, Context context) {
+        throw new UnsupportedOperationException("MaritalStatusAgent requires reasoning. Reasoning is not supported by" +
+                                                        " Neo4j.");
+    }
+
+    @Override
+    protected CoupleFriendshipAgent<Neo4jTransaction> createCoupleFriendshipAgent(Neo4jClient client,
+                                                                                  Context context) {
+        throw new UnsupportedOperationException("CoupleFriendshipAgent requires reasoning. Reasoning is not supported" +
+                                                        " by Neo4j");
+    }
+
+    @Override
+    protected GrandparenthoodAgent<Neo4jTransaction> createGrandparenthoodAgent(Neo4jClient client, Context context) {
+        throw new UnsupportedOperationException("GrandparenthoodAgent requires reasoning. Reasoning is not supported" +
+                                                        " by Neo4j");
     }
 }

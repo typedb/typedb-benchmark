@@ -18,20 +18,32 @@
 package com.vaticle.typedb.benchmark.typedb.driver;
 
 import com.vaticle.typedb.benchmark.simulation.driver.Session;
+import com.vaticle.typedb.client.api.connection.TypeDBOptions;
 
-import static com.vaticle.typedb.client.api.TypeDBTransaction.Type.WRITE;
+import static com.vaticle.typedb.client.api.connection.TypeDBTransaction.Type.READ;
+import static com.vaticle.typedb.client.api.connection.TypeDBTransaction.Type.WRITE;
 
 public class TypeDBSession implements Session<TypeDBTransaction> {
 
-    private final com.vaticle.typedb.client.api.TypeDBSession nativeSession;
+    private final com.vaticle.typedb.client.api.connection.TypeDBSession nativeSession;
 
-    public TypeDBSession(com.vaticle.typedb.client.api.TypeDBSession nativeSession) {
+    public TypeDBSession(com.vaticle.typedb.client.api.connection.TypeDBSession nativeSession) {
         this.nativeSession = nativeSession;
     }
 
     @Override
-    public TypeDBTransaction transaction() {
+    public TypeDBTransaction writeTransaction() {
         return new TypeDBTransaction(nativeSession.transaction(WRITE));
+    }
+
+    @Override
+    public TypeDBTransaction readTransaction() {
+        return new TypeDBTransaction(nativeSession.transaction(READ, TypeDBOptions.core()));
+    }
+
+    @Override
+    public TypeDBTransaction reasoningTransaction() {
+        return new TypeDBTransaction(nativeSession.transaction(READ, TypeDBOptions.core().infer(true)));
     }
 
     @Override

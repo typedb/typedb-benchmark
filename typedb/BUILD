@@ -32,7 +32,7 @@ java_library(
         "@vaticle_typeql_lang_java//query:query",
         "@maven//:org_slf4j_slf4j_api",
     ],
-    data = ["simulation.gql"],
+    data = ["simulation.tql"],
 )
 
 checkstyle_test(

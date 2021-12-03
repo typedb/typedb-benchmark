@@ -18,6 +18,8 @@
 package com.vaticle.typedb.benchmark.simulation.agent;
 
 import com.vaticle.typedb.benchmark.common.concept.Country;
+import com.vaticle.typedb.benchmark.common.concept.Marriage;
+import com.vaticle.typedb.benchmark.common.concept.Parenthood;
 import com.vaticle.typedb.benchmark.common.concept.Person;
 import com.vaticle.typedb.benchmark.common.params.Context;
 import com.vaticle.typedb.benchmark.common.seed.RandomSource;
@@ -33,20 +35,18 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 import static com.vaticle.typedb.common.collection.Collections.list;
-import static java.lang.Math.log;
-import static java.lang.Math.min;
 import static java.util.Comparator.comparing;
-import static java.util.stream.Collectors.toCollection;
+import static java.util.stream.Collectors.toList;
 
-public abstract class FriendshipAgent<TX extends Transaction> extends Agent<Country, TX> {
+public abstract class ParenthoodAgent<TX extends Transaction> extends Agent<Country, TX> {
 
-    protected FriendshipAgent(Client<?, TX> client, Context context) {
+    protected ParenthoodAgent(Client<?, TX> client, Context context) {
         super(client, context);
     }
 
     @Override
     protected Class<? extends Agent> agentClass() {
-        return FriendshipAgent.class;
+        return ParenthoodAgent.class;
     }
 
     @Override
@@ -58,15 +58,21 @@ public abstract class FriendshipAgent<TX extends Transaction> extends Agent<Coun
     protected List<Report> run(Session<TX> session, Country country, RandomSource random) {
         List<Report> reports = new ArrayList<>();
         try (TX tx = session.writeTransaction()) {
-            LocalDateTime birthDate = context.today().minusYears(context.ageOfFriendship());
-            ArrayList<Person> teenagers = matchTeenagers(tx, country, birthDate)
-                    .sorted(comparing(Person::email)).collect(toCollection(ArrayList::new));
-            random.randomPairs(teenagers, min(log2(context.scaleFactor()), 1)).forEach(friends -> {
-                Optional<Pair<Person, Person>> inserted = insertFriends(tx, friends.first().email(), friends.second().email());
+            LocalDateTime marriageDate = context.today().minusYears(context.yearsBeforeParenthood());
+            List<Marriage> marriages = matchMarriages(tx, country, marriageDate)
+                    .sorted(comparing(Marriage::licence)).collect(toList());
+            List<Person> newBorns = matchNewborns(tx, country, context.today())
+                    .sorted(comparing(Person::email)).collect(toList());
+
+            List<Pair<Marriage, Person>> parenthoods = random.randomAllocation(marriages, newBorns);
+            parenthoods.forEach(parenthood -> {
+                String wife = parenthood.first().wife().email();
+                String husband = parenthood.first().husband().email();
+                String child = parenthood.second().email();
+                Optional<Parenthood> inserted = insertParenthood(tx, wife, husband, child);
                 if (context.isReporting()) {
                     assert inserted.isPresent();
-                    reports.add(new Report(list(friends.first().email(), friends.second().email()),
-                                           list(inserted.get().first(), inserted.get().second())));
+                    reports.add(new Report(list(wife, husband, child), list(inserted.get())));
                 } else assert inserted.isEmpty();
             });
             tx.commit();
@@ -74,11 +80,9 @@ public abstract class FriendshipAgent<TX extends Transaction> extends Agent<Coun
         return reports;
     }
 
-    public static int log2(int x) {
-        return (int) (log(x) / log(2));
-    }
+    protected abstract Stream<Person> matchNewborns(TX tx, Country country, LocalDateTime today);
 
-    protected abstract Stream<Person> matchTeenagers(TX tx, Country country, LocalDateTime birthDate);
+    protected abstract Stream<Marriage> matchMarriages(TX tx, Country country, LocalDateTime marriageDate);
 
-    protected abstract Optional<Pair<Person, Person>> insertFriends(TX tx, String email1, String email2);
+    protected abstract Optional<Parenthood> insertParenthood(TX tx, String motherEmail, String fatherEmail, String childEmail);
 }

@@ -19,7 +19,11 @@ package com.vaticle.typedb.benchmark.simulation.driver;
 
 public interface Session<TX extends Transaction> extends AutoCloseable {
 
-    TX transaction();
+    TX writeTransaction();
+
+    TX readTransaction();
+
+    TX reasoningTransaction();
 
     @Override
     void close();

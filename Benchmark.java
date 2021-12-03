@@ -74,7 +74,9 @@ public class Benchmark {
             tracing = FactoryTracing.create(options.factory(), cred.username(), cred.token()).withLogging();
         }
         FactoryTracingThreadStatic.setGlobalTracingClient(tracing);
-        FactoryTracingThreadStatic.openGlobalAnalysis(options.org(), options.repo(), options.commit(), analysisName);
+        String taggedAnalysisName = analysisName;
+        if (options.tags() != null) taggedAnalysisName = taggedAnalysisName + " [ " + String.join(", ", options.tags()) + " ]";
+        FactoryTracingThreadStatic.openGlobalAnalysis(options.org(), options.repo(), options.commit(), taggedAnalysisName);
         return tracing;
     }
 }
