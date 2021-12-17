@@ -1,7 +1,7 @@
 @maven//:ch_qos_logback_logback_classic
-@maven//:ch_qos_logback_logback_classic_1_2_3
+@maven//:ch_qos_logback_logback_classic_1_2_7
 @maven//:ch_qos_logback_logback_core
-@maven//:ch_qos_logback_logback_core_1_2_3
+@maven//:ch_qos_logback_logback_core_1_2_7
 @maven//:com_google_android_annotations
 @maven//:com_google_android_annotations_4_1_1_4
 @maven//:com_google_api_grpc_proto_google_common_protos
@@ -103,7 +103,7 @@
 @maven//:net_jcip_jcip_annotations
 @maven//:net_jcip_jcip_annotations_1_0
 @maven//:org_antlr_antlr4_runtime
-@maven//:org_antlr_antlr4_runtime_4_7_1
+@maven//:org_antlr_antlr4_runtime_4_8
 @maven//:org_apache_commons_commons_csv
 @maven//:org_apache_commons_commons_csv_1_8
 @maven//:org_apiguardian_apiguardian_api
@@ -125,13 +125,13 @@
 @maven//:org_objenesis_objenesis
 @maven//:org_objenesis_objenesis_2_5
 @maven//:org_slf4j_jcl_over_slf4j
-@maven//:org_slf4j_jcl_over_slf4j_1_7_20
+@maven//:org_slf4j_jcl_over_slf4j_1_7_32
 @maven//:org_slf4j_log4j_over_slf4j
-@maven//:org_slf4j_log4j_over_slf4j_1_7_20
+@maven//:org_slf4j_log4j_over_slf4j_1_7_32
 @maven//:org_slf4j_slf4j_api
-@maven//:org_slf4j_slf4j_api_1_7_28
+@maven//:org_slf4j_slf4j_api_1_7_32
 @maven//:org_slf4j_slf4j_simple
-@maven//:org_slf4j_slf4j_simple_1_7_20
+@maven//:org_slf4j_slf4j_simple_1_7_32
 @maven//:org_yaml_snakeyaml
 @maven//:org_yaml_snakeyaml_1_25
 @maven//:org_zeroturnaround_zt_exec

@@ -18,7 +18,7 @@
 build:
   correctness:
     build:
-      image: vaticle-ubuntu-20.04
+      image: vaticle-ubuntu-21.04
       command: |
         export ARTIFACT_USERNAME=$REPO_VATICLE_USERNAME
         export ARTIFACT_PASSWORD=$REPO_VATICLE_PASSWORD
@@ -27,14 +27,14 @@ build:
         bazel run @vaticle_dependencies//tool/checkstyle:test-coverage
         bazel test $(bazel query 'kind(checkstyle_test, //...)') --test_output=streamed
     build-dependency:
-      image: vaticle-ubuntu-20.04
+      image: vaticle-ubuntu-21.04
       command: |
         dependencies/maven/update.sh
         git diff --exit-code dependencies/maven/artifacts.snapshot
         bazel run @vaticle_dependencies//tool/unuseddeps:unused-deps -- list
     test-comparison-typedb-core-server:
       machine: 16-core-32-gb
-      image: vaticle-ubuntu-20.04
+      image: vaticle-ubuntu-21.04
       type: background
       timeout: "30m"
       command: |
@@ -50,7 +50,7 @@ build:
         tail -f -n +1 /home/grabl/$GRABL_REPO/dist/typedb-all-linux/server/logs/typedb.log
     test-comparison-neo4j-server:
       machine: 16-core-32-gb
-      image: vaticle-ubuntu-20.04
+      image: vaticle-ubuntu-21.04
       type: background
       timeout: "30m"
       command: |
@@ -72,7 +72,7 @@ build:
         journalctl -fu neo4j
     test-comparison:
       machine: 16-core-32-gb
-      image: vaticle-ubuntu-20.04
+      image: vaticle-ubuntu-21.04
       timeout: "30m"
       dependencies: [test-comparison-typedb-core-server, test-comparison-neo4j-server]
       command: |
@@ -96,7 +96,7 @@ build:
           --test_arg=--neo4j=bolt://$GRABL_EXPORT_TEST_COMPARISON_NEO4J_URI
   performance:
     test-performance-typedb-cluster-bootstrapper:
-      image: vaticle-ubuntu-20.04
+      image: vaticle-ubuntu-21.04
       filter:
         owner: vaticle
         branch: typedb-cluster
@@ -120,7 +120,7 @@ build:
 
     test-performance-typedb-cluster-1-server:
       machine: 16-core-32-gb
-      image: vaticle-ubuntu-20.04
+      image: vaticle-ubuntu-21.04
       filter:
         owner: vaticle
         branch: typedb-cluster
@@ -152,7 +152,7 @@ build:
         tail -f -n +1 ./dist/typedb-cluster-all-linux/server/logs/typedb.log
     test-performance-typedb-cluster-2-server:
       machine: 16-core-32-gb
-      image: vaticle-ubuntu-20.04
+      image: vaticle-ubuntu-21.04
       filter:
         owner: vaticle
         branch: typedb-cluster
@@ -183,7 +183,7 @@ build:
         tail -f -n +1 ./dist/typedb-cluster-all-linux/server/logs/typedb.log
     test-performance-typedb-cluster-3-server:
       machine: 16-core-32-gb
-      image: vaticle-ubuntu-20.04
+      image: vaticle-ubuntu-21.04
       filter:
         owner: vaticle
         branch: typedb-cluster
@@ -213,7 +213,7 @@ build:
         sleep 20s
         tail -f -n +1 ./dist/typedb-cluster-all-linux/server/logs/typedb.log
     test-performance-typedb-cluster-benchmark:
-      image: vaticle-ubuntu-20.04
+      image: vaticle-ubuntu-21.04
       filter:
         owner: vaticle
         branch: typedb-cluster
@@ -237,7 +237,7 @@ build:
 
     test-performance-typedb-core-server:
       machine: 16-core-32-gb
-      image: vaticle-ubuntu-20.04
+      image: vaticle-ubuntu-21.04
       type: background
       timeout: "30m"
       command: |
@@ -270,7 +270,7 @@ build:
         tail -f -n +1 /home/grabl/$GRABL_REPO/dist/typedb-all-linux/server/logs/typedb.log
     test-performance-typedb-core-benchmark:
       machine: 16-core-32-gb
-      image: vaticle-ubuntu-20.04
+      image: vaticle-ubuntu-21.04
       dependencies: [test-performance-typedb-core-server]
       timeout: "30m"
       command: |
@@ -286,7 +286,7 @@ build:
           --token $GRABL_TOKEN
     test-performance-neo4j-server:
       machine: 16-core-32-gb
-      image: vaticle-ubuntu-20.04
+      image: vaticle-ubuntu-21.04
       type: background
       timeout: "30m"
       monitor: |
@@ -308,7 +308,7 @@ build:
         export GRABL_EXPORT_PERFORMANCE_NEO4J_URI="${HOSTNAME}:7687"
     test-performance-neo4j-benchmark:
       machine: 16-core-32-gb
-      image: vaticle-ubuntu-20.04
+      image: vaticle-ubuntu-21.04
       dependencies: [test-performance-neo4j-server]
       timeout: "30m"
       command: |
@@ -338,7 +338,7 @@ build:
           --token $GRABL_TOKEN
     test-performance-typedb-core-reasoning-server:
       machine: 16-core-32-gb
-      image: vaticle-ubuntu-20.04
+      image: vaticle-ubuntu-21.04
       type: background
       timeout: "30m"
       command: |
@@ -371,7 +371,7 @@ build:
         tail -f -n +1 /home/grabl/$GRABL_REPO/dist/typedb-all-linux/server/logs/typedb.log
     test-performance-typedb-core-reasoning-benchmark:
       machine: 16-core-32-gb
-      image: vaticle-ubuntu-20.04
+      image: vaticle-ubuntu-21.04
       dependencies: [test-performance-typedb-core-reasoning-server]
       timeout: "30m"
       command: |
