@@ -33,9 +33,9 @@ public class TypeDBTransaction implements Transaction {
 
     private static final Logger LOG = LoggerFactory.getLogger(TypeDBTransaction.class);
 
-    private final com.vaticle.typedb.client.api.connection.TypeDBTransaction tx;
+    private final com.vaticle.typedb.client.api.TypeDBTransaction tx;
 
-    public TypeDBTransaction(com.vaticle.typedb.client.api.connection.TypeDBTransaction tx) {
+    public TypeDBTransaction(com.vaticle.typedb.client.api.TypeDBTransaction tx) {
         this.tx = tx;
     }
 
