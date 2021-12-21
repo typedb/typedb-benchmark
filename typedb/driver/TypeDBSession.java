@@ -18,16 +18,16 @@
 package com.vaticle.typedb.benchmark.typedb.driver;
 
 import com.vaticle.typedb.benchmark.simulation.driver.Session;
-import com.vaticle.typedb.client.api.connection.TypeDBOptions;
+import com.vaticle.typedb.client.api.TypeDBOptions;
 
-import static com.vaticle.typedb.client.api.connection.TypeDBTransaction.Type.READ;
-import static com.vaticle.typedb.client.api.connection.TypeDBTransaction.Type.WRITE;
+import static com.vaticle.typedb.client.api.TypeDBTransaction.Type.READ;
+import static com.vaticle.typedb.client.api.TypeDBTransaction.Type.WRITE;
 
 public class TypeDBSession implements Session<TypeDBTransaction> {
 
-    private final com.vaticle.typedb.client.api.connection.TypeDBSession nativeSession;
+    private final com.vaticle.typedb.client.api.TypeDBSession nativeSession;
 
-    public TypeDBSession(com.vaticle.typedb.client.api.connection.TypeDBSession nativeSession) {
+    public TypeDBSession(com.vaticle.typedb.client.api.TypeDBSession nativeSession) {
         this.nativeSession = nativeSession;
     }
 

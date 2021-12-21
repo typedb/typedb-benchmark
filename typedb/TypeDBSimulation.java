@@ -22,14 +22,17 @@ import com.vaticle.typedb.benchmark.common.concept.Country;
 import com.vaticle.typedb.benchmark.common.concept.Global;
 import com.vaticle.typedb.benchmark.common.params.Context;
 import com.vaticle.typedb.benchmark.common.seed.SeedData;
+import com.vaticle.typedb.benchmark.simulation.Simulation;
 import com.vaticle.typedb.benchmark.simulation.agent.CitizenshipAgent;
 import com.vaticle.typedb.benchmark.simulation.agent.CoupleFriendshipAgent;
+import com.vaticle.typedb.benchmark.simulation.agent.FriendshipAgent;
 import com.vaticle.typedb.benchmark.simulation.agent.GrandparenthoodAgent;
 import com.vaticle.typedb.benchmark.simulation.agent.LineageAgent;
 import com.vaticle.typedb.benchmark.simulation.agent.MaritalStatusAgent;
 import com.vaticle.typedb.benchmark.simulation.agent.MarriageAgent;
 import com.vaticle.typedb.benchmark.simulation.agent.NationalityAgent;
 import com.vaticle.typedb.benchmark.simulation.agent.ParenthoodAgent;
+import com.vaticle.typedb.benchmark.simulation.agent.PersonAgent;
 import com.vaticle.typedb.benchmark.typedb.agent.TypeDBCitizenshipAgent;
 import com.vaticle.typedb.benchmark.typedb.agent.TypeDBCoupleFriendshipAgent;
 import com.vaticle.typedb.benchmark.typedb.agent.TypeDBFriendshipAgent;
@@ -43,9 +46,6 @@ import com.vaticle.typedb.benchmark.typedb.agent.TypeDBPersonAgent;
 import com.vaticle.typedb.benchmark.typedb.driver.TypeDBClient;
 import com.vaticle.typedb.benchmark.typedb.driver.TypeDBSession;
 import com.vaticle.typedb.benchmark.typedb.driver.TypeDBTransaction;
-import com.vaticle.typedb.benchmark.simulation.Simulation;
-import com.vaticle.typedb.benchmark.simulation.agent.FriendshipAgent;
-import com.vaticle.typedb.benchmark.simulation.agent.PersonAgent;
 import com.vaticle.typeql.lang.TypeQL;
 import com.vaticle.typeql.lang.pattern.variable.ThingVariable;
 import org.slf4j.Logger;
@@ -71,9 +71,9 @@ import static com.vaticle.typedb.benchmark.typedb.Labels.LOCATES;
 import static com.vaticle.typedb.benchmark.typedb.Labels.LOCATION;
 import static com.vaticle.typedb.benchmark.typedb.Labels.NAME;
 import static com.vaticle.typedb.benchmark.typedb.Labels.UNIVERSITY;
-import static com.vaticle.typedb.client.api.connection.TypeDBSession.Type.DATA;
-import static com.vaticle.typedb.client.api.connection.TypeDBSession.Type.SCHEMA;
-import static com.vaticle.typedb.client.api.connection.TypeDBTransaction.Type.WRITE;
+import static com.vaticle.typedb.client.api.TypeDBSession.Type.DATA;
+import static com.vaticle.typedb.client.api.TypeDBSession.Type.SCHEMA;
+import static com.vaticle.typedb.client.api.TypeDBTransaction.Type.WRITE;
 import static com.vaticle.typeql.lang.TypeQL.insert;
 import static com.vaticle.typeql.lang.TypeQL.match;
 import static com.vaticle.typeql.lang.TypeQL.rel;
@@ -99,25 +99,25 @@ public class TypeDBSimulation extends Simulation<TypeDBClient, TypeDBSession, Ty
 
     @Override
     protected void initialise(SeedData geoData) throws IOException {
-        com.vaticle.typedb.client.api.connection.TypeDBClient nativeClient = client.unpack();
+        com.vaticle.typedb.client.api.TypeDBClient nativeClient = client.unpack();
         initDatabase(nativeClient);
         initSchema(nativeClient);
         initData(nativeClient, geoData);
     }
 
-    private void initDatabase(com.vaticle.typedb.client.api.connection.TypeDBClient nativeClient) {
+    private void initDatabase(com.vaticle.typedb.client.api.TypeDBClient nativeClient) {
         if (nativeClient.databases().contains(context.databaseName())) {
             nativeClient.databases().get(context.databaseName()).delete();
         }
         nativeClient.databases().create(context.databaseName());
     }
 
-    private void initSchema(com.vaticle.typedb.client.api.connection.TypeDBClient nativeClient) throws IOException {
-        try (com.vaticle.typedb.client.api.connection.TypeDBSession session = nativeClient.session(context.databaseName(), SCHEMA)) {
+    private void initSchema(com.vaticle.typedb.client.api.TypeDBClient nativeClient) throws IOException {
+        try (com.vaticle.typedb.client.api.TypeDBSession session = nativeClient.session(context.databaseName(), SCHEMA)) {
             LOG.info("TypeDB initialisation of world simulation schema started ...");
             Instant start = Instant.now();
             String schemaQuery = Files.readString(SCHEMA_FILE.toPath());
-            try (com.vaticle.typedb.client.api.connection.TypeDBTransaction tx = session.transaction(WRITE)) {
+            try (com.vaticle.typedb.client.api.TypeDBTransaction tx = session.transaction(WRITE)) {
                 tx.query().define(TypeQL.parseQuery(schemaQuery));
                 tx.commit();
             }
@@ -125,8 +125,8 @@ public class TypeDBSimulation extends Simulation<TypeDBClient, TypeDBSession, Ty
         }
     }
 
-    private void initData(com.vaticle.typedb.client.api.connection.TypeDBClient nativeClient, SeedData geoData) {
-        try (com.vaticle.typedb.client.api.connection.TypeDBSession session = nativeClient.session(context.databaseName(), DATA)) {
+    private void initData(com.vaticle.typedb.client.api.TypeDBClient nativeClient, SeedData geoData) {
+        try (com.vaticle.typedb.client.api.TypeDBSession session = nativeClient.session(context.databaseName(), DATA)) {
             LOG.info("TypeDB initialisation of world simulation data started ...");
             Instant start = Instant.now();
             initContinents(session, geoData.global());
@@ -134,9 +134,9 @@ public class TypeDBSimulation extends Simulation<TypeDBClient, TypeDBSession, Ty
         }
     }
 
-    private void initContinents(com.vaticle.typedb.client.api.connection.TypeDBSession session, Global global) {
+    private void initContinents(com.vaticle.typedb.client.api.TypeDBSession session, Global global) {
         global.continents().parallelStream().forEach(continent -> {
-            try (com.vaticle.typedb.client.api.connection.TypeDBTransaction tx = session.transaction(WRITE)) {
+            try (com.vaticle.typedb.client.api.TypeDBTransaction tx = session.transaction(WRITE)) {
                 tx.query().insert(insert(var().isa(CONTINENT).has(CODE, continent.code()).has(NAME, continent.name())));
                 tx.commit();
             }
@@ -144,9 +144,9 @@ public class TypeDBSimulation extends Simulation<TypeDBClient, TypeDBSession, Ty
         });
     }
 
-    private void initCountries(com.vaticle.typedb.client.api.connection.TypeDBSession session, Continent continent) {
+    private void initCountries(com.vaticle.typedb.client.api.TypeDBSession session, Continent continent) {
         continent.countries().parallelStream().forEach(country -> {
-            try (com.vaticle.typedb.client.api.connection.TypeDBTransaction tx = session.transaction(WRITE)) {
+            try (com.vaticle.typedb.client.api.TypeDBTransaction tx = session.transaction(WRITE)) {
                 ThingVariable.Thing countryVar = var(Y).isa(COUNTRY).has(CODE, country.code()).has(NAME, country.name());
                 country.currencies().forEach(currency -> countryVar.has(CURRENCY, currency.code()));
                 tx.query().insert(match(
@@ -162,8 +162,8 @@ public class TypeDBSimulation extends Simulation<TypeDBClient, TypeDBSession, Ty
         });
     }
 
-    private void initCities(com.vaticle.typedb.client.api.connection.TypeDBSession session, Country country) {
-        try (com.vaticle.typedb.client.api.connection.TypeDBTransaction tx = session.transaction(WRITE)) {
+    private void initCities(com.vaticle.typedb.client.api.TypeDBSession session, Country country) {
+        try (com.vaticle.typedb.client.api.TypeDBTransaction tx = session.transaction(WRITE)) {
             country.cities().forEach(city -> tx.query().insert(match(
                     var(X).isa(COUNTRY).has(CODE, country.code())
             ).insert(
@@ -174,8 +174,8 @@ public class TypeDBSimulation extends Simulation<TypeDBClient, TypeDBSession, Ty
         }
     }
 
-    private void initUniversities(com.vaticle.typedb.client.api.connection.TypeDBSession session, Country country) {
-        try (com.vaticle.typedb.client.api.connection.TypeDBTransaction tx = session.transaction(WRITE)) {
+    private void initUniversities(com.vaticle.typedb.client.api.TypeDBSession session, Country country) {
+        try (com.vaticle.typedb.client.api.TypeDBTransaction tx = session.transaction(WRITE)) {
             country.universities().forEach(university -> tx.query().insert(match(
                     var(X).isa(COUNTRY).has(CODE, country.code())
             ).insert(
