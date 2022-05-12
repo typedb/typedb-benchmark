@@ -171,10 +171,10 @@ load("@vaticle_typedb_protocol//dependencies/maven:artifacts.bzl", vaticle_typed
 load("@vaticle_typeql_lang_java//dependencies/maven:artifacts.bzl", vaticle_typeql_lang_java_artifacts = "artifacts")
 
 # Load neo4j
-load("@rules_jvm_external//:defs.bzl", rje_maven_install = "maven_install")
-rje_maven_install(
+load("@rules_jvm_external//:defs.bzl", "maven_install")
+maven_install(
     name = "neo4j",
-    artifacts = ["org.neo4j.driver:neo4j-java-driver:4.1.0"],
+    artifacts = ["org.neo4j.driver:neo4j-java-driver:4.4.5"],
     repositories = [
         "https://repo1.maven.org/maven2",
     ],
