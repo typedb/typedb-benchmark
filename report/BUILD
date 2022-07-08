@@ -57,5 +57,5 @@ checkstyle_test(
     name = "checkstyle",
     include = glob(["*", "plots/*.py"]),
     exclude = glob(["templates/*", "plots/requirements.txt"]),
-    license_type = "agpl"
+    license_type = "agpl-header",
 )

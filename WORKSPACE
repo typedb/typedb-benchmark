@@ -150,13 +150,10 @@ bind(
 load("//dependencies/vaticle:repositories.bzl", "vaticle_factory_tracing", "vaticle_typedb_client_java")
 vaticle_factory_tracing()
 vaticle_typedb_client_java()
-load("@vaticle_typedb_client_java//dependencies/vaticle:repositories.bzl", "vaticle_typedb_common", "vaticle_typeql_lang_java", "vaticle_typedb_protocol")
+load("@vaticle_typedb_client_java//dependencies/vaticle:repositories.bzl", "vaticle_typedb_common", "vaticle_typeql", "vaticle_typedb_protocol")
 vaticle_typedb_common()
-vaticle_typeql_lang_java()
-vaticle_typedb_protocol()
-
-load("@vaticle_typeql_lang_java//dependencies/vaticle:repositories.bzl", "vaticle_typeql")
 vaticle_typeql()
+vaticle_typedb_protocol()
 
 # Load artifact
 load("//dependencies/vaticle:artifacts.bzl", "vaticle_typedb_artifacts", "vaticle_typedb_cluster_artifacts")
@@ -168,7 +165,7 @@ load("//dependencies/maven:artifacts.bzl", vaticle_typedb_benchmark_artifacts = 
 load("@vaticle_typedb_client_java//dependencies/maven:artifacts.bzl", vaticle_typedb_client_java_artifacts = "artifacts")
 load("@vaticle_factory_tracing//dependencies/maven:artifacts.bzl", vaticle_factory_tracing_artifacts = "artifacts")
 load("@vaticle_typedb_protocol//dependencies/maven:artifacts.bzl", vaticle_typedb_protocol_artifacts = "artifacts")
-load("@vaticle_typeql_lang_java//dependencies/maven:artifacts.bzl", vaticle_typeql_lang_java_artifacts = "artifacts")
+load("@vaticle_typeql//dependencies/maven:artifacts.bzl", vaticle_typeql_artifacts = "artifacts")
 
 # Load neo4j
 load("@rules_jvm_external//:defs.bzl", "maven_install")
@@ -189,7 +186,7 @@ maven_install(
 load("@vaticle_dependencies//library/maven:rules.bzl", "maven")
 maven(
     vaticle_typedb_benchmark_artifacts +
-    vaticle_typeql_lang_java_artifacts +
+    vaticle_typeql_artifacts +
     vaticle_typedb_protocol_artifacts +
     vaticle_typedb_client_java_artifacts +
     vaticle_factory_tracing_artifacts

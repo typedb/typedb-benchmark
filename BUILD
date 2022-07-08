@@ -43,6 +43,17 @@ java_binary(
 checkstyle_test(
     name = "checkstyle",
     include = glob(["*", ".grabl/*"]),
-    exclude = glob(["docs/*"]),
-    license_type = "agpl",
+    exclude = glob([
+        ".bazelversion",
+        "LICENSE",
+        "README.md",
+        "docs/*",
+    ]),
+    license_type = "agpl-header",
+)
+
+checkstyle_test(
+    name = "checkstyle-license",
+    include = ["LICENSE"],
+    license_type = "agpl-fulltext",
 )
