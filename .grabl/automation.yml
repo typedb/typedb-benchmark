@@ -117,10 +117,67 @@ build:
       dependencies: [test-performance-typedb-core-server]
       timeout: "30m"
       command: |
-       bazel run //:benchmark -- \
-         --database typedb \
-         --address $GRABL_EXPORT_PERFORMANCE_TYPEDB_CORE_URI \
-         --config /home/grabl/$GRABL_REPO/config/simulation.yml
+        bazel run //:benchmark -- \
+          --database typedb \
+          --address $GRABL_EXPORT_PERFORMANCE_TYPEDB_CORE_URI \
+          --config /home/grabl/$GRABL_REPO/config/simulation.yml \
+          --factory $GRABL_TRACING_URI \
+          --org $GRABL_OWNER \
+          --repo $GRABL_REPO \
+          --commit $GRABL_COMMIT \
+          --username $GRABL_OWNER \
+          --token $GRABL_TOKEN
+    test-performance-neo4j-server:
+      machine: 16-core-32-gb
+      image: vaticle-ubuntu-21.04
+      type: background
+      timeout: "30m"
+      monitor: |
+        journalctl -fu neo4j
+      command: |
+        sudo add-apt-repository -y ppa:openjdk-r/ppa
+        curl https://cli-assets.heroku.com/apt/release.key | sudo apt-key add -
+        curl https://dl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
+        sudo apt-get update
+        wget -O - https://debian.neo4j.com/neotechnology.gpg.key | sudo apt-key add -
+        echo 'deb https://debian.neo4j.com stable 4.2' | sudo tee -a /etc/apt/sources.list.d/neo4j.list
+        sudo apt-get update
+        sudo apt-get install -y neo4j=1:4.2.5
+        sudo update-java-alternatives --jre --set java-1.11.0-openjdk-amd64
+        echo 'dbms.connector.bolt.listen_address=0.0.0.0:7687' | sudo tee -a /etc/neo4j/neo4j.conf
+        echo 'dbms.security.auth_enabled=false' | sudo tee -a /etc/neo4j/neo4j.conf
+        echo 'dbms.memory.heap.max_size=24G' | sudo tee -a /etc/neo4j/neo4j.conf
+        sudo systemctl restart neo4j
+        export GRABL_EXPORT_PERFORMANCE_NEO4J_URI="${HOSTNAME}:7687"
+    test-performance-neo4j-benchmark:
+      machine: 16-core-32-gb
+      image: vaticle-ubuntu-21.04
+      dependencies: [ test-performance-neo4j-server ]
+      timeout: "30m"
+      command: |
+        echo 'Trying to connect to Neo4j'
+        attempt_counter=0
+        max_attempts=50
+        expected_exit_code=52
+        until curl --output /dev/null --silent --head --fail $GRABL_EXPORT_PERFORMANCE_NEO4J_URI || [[ $? == $expected_exit_code ]]; do
+            if [ ${attempt_counter} -eq ${max_attempts} ];then
+              echo "Max attempts reached"
+              exit 1
+            fi
+            echo '...'
+            attempt_counter=$(($attempt_counter+1))
+            sleep 3
+        done
+        bazel run //:benchmark -- \
+          --database neo4j \
+          --address bolt://$GRABL_EXPORT_PERFORMANCE_NEO4J_URI \
+          --config /home/grabl/$GRABL_REPO/config/simulation.yml \
+          --factory $GRABL_TRACING_URI \
+          --org $GRABL_OWNER \
+          --repo $GRABL_REPO \
+          --commit $GRABL_COMMIT \
+          --username $GRABL_OWNER \
+          --token $GRABL_TOKEN
     test-performance-typedb-cluster-one-server:
       machine: 16-core-32-gb
       image: vaticle-ubuntu-21.04
