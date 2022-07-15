@@ -120,13 +120,7 @@ build:
         bazel run //:benchmark -- \
           --database typedb \
           --address $GRABL_EXPORT_PERFORMANCE_TYPEDB_CORE_URI \
-          --config /home/grabl/$GRABL_REPO/config/simulation.yml \
-          --factory $GRABL_TRACING_URI \
-          --org $GRABL_OWNER \
-          --repo $GRABL_REPO \
-          --commit $GRABL_COMMIT \
-          --username $GRABL_OWNER \
-          --token $GRABL_TOKEN
+          --config /home/grabl/$GRABL_REPO/config/simulation.yml
     test-performance-neo4j-server:
       machine: 16-core-32-gb
       image: vaticle-ubuntu-21.04
@@ -171,189 +165,183 @@ build:
         bazel run //:benchmark -- \
           --database neo4j \
           --address bolt://$GRABL_EXPORT_PERFORMANCE_NEO4J_URI \
-          --config /home/grabl/$GRABL_REPO/config/simulation.yml \
-          --factory $GRABL_TRACING_URI \
-          --org $GRABL_OWNER \
-          --repo $GRABL_REPO \
-          --commit $GRABL_COMMIT \
-          --username $GRABL_OWNER \
-          --token $GRABL_TOKEN
-    test-performance-typedb-cluster-one-server:
-      machine: 16-core-32-gb
-      image: vaticle-ubuntu-21.04
-      type: background
-      timeout: "30m"
-      command: |
-        export ARTIFACT_USERNAME=$REPO_VATICLE_USERNAME
-        export ARTIFACT_PASSWORD=$REPO_VATICLE_PASSWORD
-        bazel run @vaticle_dependencies//distribution/artifact:create-netrc
-
-        bazel run //test:typedb-cluster-extractor-linux -- dist/typedb-cluster-all-linux
-        bazel run @vaticle_dependencies//tool/util:create-systemd-service -- typedb-cluster "\/home\/grabl\/$GRABL_REPO\/dist\/typedb-cluster-all-linux\/typedb cluster --server.address=${HOSTNAME}:1729"
-
-        sudo systemctl daemon-reload
-        sudo systemctl start typedb-cluster
-
-        export GRABL_EXPORT_PERFORMANCE_TYPEDB_CLUSTER_SERVER_URI="${HOSTNAME}:1729"
-      monitor: |
-        sleep 20s
-        tail -f -n +1 ./dist/typedb-cluster-all-linux/server/logs/typedb.log
-    test-performance-typedb-cluster-one-benchmark:
-      machine: 16-core-32-gb
-      image: vaticle-ubuntu-21.04
-      dependencies: [test-performance-typedb-cluster-one-server]
-      timeout: "30m"
-      command: |
-       bazel run //:benchmark -- \
-         --database typedb-cluster \
-         --address $GRABL_EXPORT_PERFORMANCE_TYPEDB_CLUSTER_SERVER_URI \
-         --config /home/grabl/$GRABL_REPO/config/simulation.yml
-    test-performance-typedb-cluster-three-bootstrapper:
-      image: vaticle-ubuntu-21.04
-      type: background
-      command: |
-        bazel run @vaticle_dependencies//tool/util:install-ssh-credential
-        export GRABL_EXPORT_PERFORMANCE_TYPEDB_CLUSTER_BOOTSTRAPPER_URI="${HOSTNAME}"
-
-      monitor: |
-        bazel run @vaticle_dependencies//tool/util:wait-for-file -- /tmp/typedb-cluster-server-1.txt
-        bazel run @vaticle_dependencies//tool/util:wait-for-file -- /tmp/typedb-cluster-server-2.txt
-        bazel run @vaticle_dependencies//tool/util:wait-for-file -- /tmp/typedb-cluster-server-3.txt
-
-        # to server 1
-        bazel run @vaticle_dependencies//tool/util:transfer-file -- /tmp/typedb-cluster-server-2.txt grabl@$(cat /tmp/typedb-cluster-server-1.txt):/tmp/typedb-cluster-server-2.txt
-        bazel run @vaticle_dependencies//tool/util:transfer-file -- /tmp/typedb-cluster-server-3.txt grabl@$(cat /tmp/typedb-cluster-server-1.txt):/tmp/typedb-cluster-server-3.txt
-        
-        # to server 2
-        bazel run @vaticle_dependencies//tool/util:transfer-file -- /tmp/typedb-cluster-server-1.txt grabl@$(cat /tmp/typedb-cluster-server-2.txt):/tmp/typedb-cluster-server-1.txt
-        bazel run @vaticle_dependencies//tool/util:transfer-file -- /tmp/typedb-cluster-server-3.txt grabl@$(cat /tmp/typedb-cluster-server-2.txt):/tmp/typedb-cluster-server-3.txt
-
-        # to server 3
-        bazel run @vaticle_dependencies//tool/util:transfer-file -- /tmp/typedb-cluster-server-1.txt grabl@$(cat /tmp/typedb-cluster-server-3.txt):/tmp/typedb-cluster-server-1.txt
-        bazel run @vaticle_dependencies//tool/util:transfer-file -- /tmp/typedb-cluster-server-2.txt grabl@$(cat /tmp/typedb-cluster-server-3.txt):/tmp/typedb-cluster-server-2.txt
-
-        sleep 1800
-    test-performance-typedb-cluster-three-server-1:
-      machine: 16-core-32-gb
-      image: vaticle-ubuntu-21.04
-      type: background
-      dependencies: [test-performance-typedb-cluster-three-bootstrapper]
-      timeout: "30m"
-      command: |
-        export ARTIFACT_USERNAME=$REPO_VATICLE_USERNAME
-        export ARTIFACT_PASSWORD=$REPO_VATICLE_PASSWORD
-        bazel run @vaticle_dependencies//distribution/artifact:create-netrc
-
-        bazel run @vaticle_dependencies//tool/util:install-ssh-credential
-
-        echo -n "${HOSTNAME}" > /tmp/typedb-cluster-server-1.txt
-        bazel run @vaticle_dependencies//tool/util:transfer-file -- /tmp/typedb-cluster-server-1.txt \
-          grabl@$GRABL_EXPORT_PERFORMANCE_TYPEDB_CLUSTER_BOOTSTRAPPER_URI:/tmp/typedb-cluster-server-1.txt
-
-        bazel run @vaticle_dependencies//tool/util:wait-for-file -- /tmp/typedb-cluster-server-2.txt
-        bazel run @vaticle_dependencies//tool/util:wait-for-file -- /tmp/typedb-cluster-server-3.txt
-
-        bazel run //test:typedb-cluster-extractor-linux -- dist/typedb-cluster-all-linux
-        PEER_1=$(cat /tmp/typedb-cluster-server-1.txt)
-        PEER_2=$(cat /tmp/typedb-cluster-server-2.txt)
-        PEER_3=$(cat /tmp/typedb-cluster-server-3.txt)
-        export BIN="\/home\/grabl\/$GRABL_REPO\/dist\/typedb-cluster-all-linux\/typedb cluster"
-        export OPTS_ADDR="--server.address=$PEER_1:1729 --server.internal-address.zeromq=$PEER_1:1730 --server.internal-address.grpc=$PEER_1:1731"
-        export OPTS_PEER_1="--server.peers.peer-1.address=$PEER_1:1729 --server.peers.peer-1.internal-address.zeromq=$PEER_1:1730 --server.peers.peer-1.internal-address.grpc=$PEER_1:1731"
-        export OPTS_PEER_2="--server.peers.peer-2.address=$PEER_2:1729 --server.peers.peer-2.internal-address.zeromq=$PEER_2:1730 --server.peers.peer-2.internal-address.grpc=$PEER_2:1731"
-        export OPTS_PEER_3="--server.peers.peer-3.address=$PEER_3:1729 --server.peers.peer-3.internal-address.zeromq=$PEER_3:1730 --server.peers.peer-3.internal-address.grpc=$PEER_3:1731"
-        bazel run @vaticle_dependencies//tool/util:create-systemd-service -- typedb-cluster "$BIN $OPTS_ADDR $OPTS_PEER_1 $OPTS_PEER_2 $OPTS_PEER_3"
-
-        sudo systemctl daemon-reload
-        sudo systemctl start typedb-cluster
-
-        export GRABL_EXPORT_PERFORMANCE_TYPEDB_CLUSTER_SERVER_URI="${HOSTNAME}:1729"
-      monitor: |
-        sleep 20s
-        tail -f -n +1 ./dist/typedb-cluster-all-linux/server/logs/typedb.log
-    test-performance-typedb-cluster-three-server-2:
-      machine: 16-core-32-gb
-      image: vaticle-ubuntu-21.04
-      type: background
-      dependencies: [test-performance-typedb-cluster-three-bootstrapper]
-      timeout: "30m"
-      command: |
-        export ARTIFACT_USERNAME=$REPO_VATICLE_USERNAME
-        export ARTIFACT_PASSWORD=$REPO_VATICLE_PASSWORD
-        bazel run @vaticle_dependencies//distribution/artifact:create-netrc
-
-        bazel run @vaticle_dependencies//tool/util:install-ssh-credential
-
-        echo -n "${HOSTNAME}" > /tmp/typedb-cluster-server-2.txt
-        bazel run @vaticle_dependencies//tool/util:transfer-file -- /tmp/typedb-cluster-server-2.txt \
-          grabl@$GRABL_EXPORT_PERFORMANCE_TYPEDB_CLUSTER_BOOTSTRAPPER_URI:/tmp/typedb-cluster-server-2.txt
-
-        bazel run @vaticle_dependencies//tool/util:wait-for-file -- /tmp/typedb-cluster-server-1.txt
-        bazel run @vaticle_dependencies//tool/util:wait-for-file -- /tmp/typedb-cluster-server-3.txt
-
-        bazel run //test:typedb-cluster-extractor-linux -- dist/typedb-cluster-all-linux
-        PEER_1=$(cat /tmp/typedb-cluster-server-1.txt)
-        PEER_2=$(cat /tmp/typedb-cluster-server-2.txt)
-        PEER_3=$(cat /tmp/typedb-cluster-server-3.txt)
-        export BIN="\/home\/grabl\/$GRABL_REPO\/dist\/typedb-cluster-all-linux\/typedb cluster"
-        export OPTS_ADDR="--server.address=$PEER_2:1729 --server.internal-address.zeromq=$PEER_2:1730 --server.internal-address.grpc=$PEER_2:1731"
-        export OPTS_PEER_1="--server.peers.peer-1.address=$PEER_1:1729 --server.peers.peer-1.internal-address.zeromq=$PEER_1:1730 --server.peers.peer-1.internal-address.grpc=$PEER_1:1731"
-        export OPTS_PEER_2="--server.peers.peer-2.address=$PEER_2:1729 --server.peers.peer-2.internal-address.zeromq=$PEER_2:1730 --server.peers.peer-2.internal-address.grpc=$PEER_2:1731"
-        export OPTS_PEER_3="--server.peers.peer-3.address=$PEER_3:1729 --server.peers.peer-3.internal-address.zeromq=$PEER_3:1730 --server.peers.peer-3.internal-address.grpc=$PEER_3:1731"
-        bazel run @vaticle_dependencies//tool/util:create-systemd-service -- typedb-cluster "$BIN $OPTS_ADDR $OPTS_PEER_1 $OPTS_PEER_2 $OPTS_PEER_3"
-
-        sudo systemctl daemon-reload
-        sudo systemctl start typedb-cluster
-
-        export GRABL_EXPORT_PERFORMANCE_TYPEDB_CLUSTER_SERVER_URI="${HOSTNAME}:1729"
-      monitor: |
-        sleep 20s
-        tail -f -n +1 ./dist/typedb-cluster-all-linux/server/logs/typedb.log
-    test-performance-typedb-cluster-three-server-3:
-      machine: 16-core-32-gb
-      image: vaticle-ubuntu-21.04
-      type: background
-      dependencies: [test-performance-typedb-cluster-three-bootstrapper]
-      timeout: "30m"
-      command: |
-        export ARTIFACT_USERNAME=$REPO_VATICLE_USERNAME
-        export ARTIFACT_PASSWORD=$REPO_VATICLE_PASSWORD
-        bazel run @vaticle_dependencies//distribution/artifact:create-netrc
-
-        bazel run @vaticle_dependencies//tool/util:install-ssh-credential
-
-        echo -n "${HOSTNAME}" > /tmp/typedb-cluster-server-3.txt
-        bazel run @vaticle_dependencies//tool/util:transfer-file -- /tmp/typedb-cluster-server-3.txt \
-          grabl@$GRABL_EXPORT_PERFORMANCE_TYPEDB_CLUSTER_BOOTSTRAPPER_URI:/tmp/typedb-cluster-server-3.txt
-
-        bazel run @vaticle_dependencies//tool/util:wait-for-file -- /tmp/typedb-cluster-server-1.txt
-        bazel run @vaticle_dependencies//tool/util:wait-for-file -- /tmp/typedb-cluster-server-2.txt
-
-        bazel run //test:typedb-cluster-extractor-linux -- dist/typedb-cluster-all-linux
-        PEER_1=$(cat /tmp/typedb-cluster-server-1.txt)
-        PEER_2=$(cat /tmp/typedb-cluster-server-2.txt)
-        PEER_3=$(cat /tmp/typedb-cluster-server-3.txt)
-        export BIN="\/home\/grabl\/$GRABL_REPO\/dist\/typedb-cluster-all-linux\/typedb cluster"
-        export OPTS_ADDR="--server.address=$PEER_3:1729 --server.internal-address.zeromq=$PEER_3:1730 --server.internal-address.grpc=$PEER_3:1731"
-        export OPTS_PEER_1="--server.peers.peer-1.address=$PEER_1:1729 --server.peers.peer-1.internal-address.zeromq=$PEER_1:1730 --server.peers.peer-1.internal-address.grpc=$PEER_1:1731"
-        export OPTS_PEER_2="--server.peers.peer-2.address=$PEER_2:1729 --server.peers.peer-2.internal-address.zeromq=$PEER_2:1730 --server.peers.peer-2.internal-address.grpc=$PEER_2:1731"
-        export OPTS_PEER_3="--server.peers.peer-3.address=$PEER_3:1729 --server.peers.peer-3.internal-address.zeromq=$PEER_3:1730 --server.peers.peer-3.internal-address.grpc=$PEER_3:1731"
-        bazel run @vaticle_dependencies//tool/util:create-systemd-service -- typedb-cluster "$BIN $OPTS_ADDR $OPTS_PEER_1 $OPTS_PEER_2 $OPTS_PEER_3"
-
-        sudo systemctl daemon-reload
-        sudo systemctl start typedb-cluster
-
-        export GRABL_EXPORT_PERFORMANCE_TYPEDB_CLUSTER_SERVER_URI="${HOSTNAME}:1729"
-      monitor: |
-        sleep 20s
-        tail -f -n +1 ./dist/typedb-cluster-all-linux/server/logs/typedb.log
-    test-performance-typedb-cluster-three-benchmark:
-      machine: 16-core-32-gb
-      image: vaticle-ubuntu-21.04
-      dependencies: [test-performance-typedb-cluster-three-server-1, test-performance-typedb-cluster-three-server-2, test-performance-typedb-cluster-three-server-3]
-      timeout: "30m"
-      command: |
-       bazel run //:benchmark -- \
-         --database typedb-cluster \
-         --address $GRABL_EXPORT_PERFORMANCE_TYPEDB_CLUSTER_SERVER_URI \
-         --config /home/grabl/$GRABL_REPO/config/simulation.yml
+          --config /home/grabl/$GRABL_REPO/config/simulation.yml
+#    test-performance-typedb-cluster-one-server:
+#      machine: 16-core-32-gb
+#      image: vaticle-ubuntu-21.04
+#      type: background
+#      timeout: "30m"
+#      command: |
+#        export ARTIFACT_USERNAME=$REPO_VATICLE_USERNAME
+#        export ARTIFACT_PASSWORD=$REPO_VATICLE_PASSWORD
+#        bazel run @vaticle_dependencies//distribution/artifact:create-netrc
+#
+#        bazel run //test:typedb-cluster-extractor-linux -- dist/typedb-cluster-all-linux
+#        bazel run @vaticle_dependencies//tool/util:create-systemd-service -- typedb-cluster "\/home\/grabl\/$GRABL_REPO\/dist\/typedb-cluster-all-linux\/typedb cluster --server.address=${HOSTNAME}:1729"
+#
+#        sudo systemctl daemon-reload
+#        sudo systemctl start typedb-cluster
+#
+#        export GRABL_EXPORT_PERFORMANCE_TYPEDB_CLUSTER_SERVER_URI="${HOSTNAME}:1729"
+#      monitor: |
+#        sleep 20s
+#        tail -f -n +1 ./dist/typedb-cluster-all-linux/server/logs/typedb.log
+#    test-performance-typedb-cluster-one-benchmark:
+#      machine: 16-core-32-gb
+#      image: vaticle-ubuntu-21.04
+#      dependencies: [test-performance-typedb-cluster-one-server]
+#      timeout: "30m"
+#      command: |
+#       bazel run //:benchmark -- \
+#         --database typedb-cluster \
+#         --address $GRABL_EXPORT_PERFORMANCE_TYPEDB_CLUSTER_SERVER_URI \
+#         --config /home/grabl/$GRABL_REPO/config/simulation.yml
+#    test-performance-typedb-cluster-three-bootstrapper:
+#      image: vaticle-ubuntu-21.04
+#      type: background
+#      command: |
+#        bazel run @vaticle_dependencies//tool/util:install-ssh-credential
+#        export GRABL_EXPORT_PERFORMANCE_TYPEDB_CLUSTER_BOOTSTRAPPER_URI="${HOSTNAME}"
+#
+#      monitor: |
+#        bazel run @vaticle_dependencies//tool/util:wait-for-file -- /tmp/typedb-cluster-server-1.txt
+#        bazel run @vaticle_dependencies//tool/util:wait-for-file -- /tmp/typedb-cluster-server-2.txt
+#        bazel run @vaticle_dependencies//tool/util:wait-for-file -- /tmp/typedb-cluster-server-3.txt
+#
+#        # to server 1
+#        bazel run @vaticle_dependencies//tool/util:transfer-file -- /tmp/typedb-cluster-server-2.txt grabl@$(cat /tmp/typedb-cluster-server-1.txt):/tmp/typedb-cluster-server-2.txt
+#        bazel run @vaticle_dependencies//tool/util:transfer-file -- /tmp/typedb-cluster-server-3.txt grabl@$(cat /tmp/typedb-cluster-server-1.txt):/tmp/typedb-cluster-server-3.txt
+#
+#        # to server 2
+#        bazel run @vaticle_dependencies//tool/util:transfer-file -- /tmp/typedb-cluster-server-1.txt grabl@$(cat /tmp/typedb-cluster-server-2.txt):/tmp/typedb-cluster-server-1.txt
+#        bazel run @vaticle_dependencies//tool/util:transfer-file -- /tmp/typedb-cluster-server-3.txt grabl@$(cat /tmp/typedb-cluster-server-2.txt):/tmp/typedb-cluster-server-3.txt
+#
+#        # to server 3
+#        bazel run @vaticle_dependencies//tool/util:transfer-file -- /tmp/typedb-cluster-server-1.txt grabl@$(cat /tmp/typedb-cluster-server-3.txt):/tmp/typedb-cluster-server-1.txt
+#        bazel run @vaticle_dependencies//tool/util:transfer-file -- /tmp/typedb-cluster-server-2.txt grabl@$(cat /tmp/typedb-cluster-server-3.txt):/tmp/typedb-cluster-server-2.txt
+#
+#        sleep 1800
+#    test-performance-typedb-cluster-three-server-1:
+#      machine: 16-core-32-gb
+#      image: vaticle-ubuntu-21.04
+#      type: background
+#      dependencies: [test-performance-typedb-cluster-three-bootstrapper]
+#      timeout: "30m"
+#      command: |
+#        export ARTIFACT_USERNAME=$REPO_VATICLE_USERNAME
+#        export ARTIFACT_PASSWORD=$REPO_VATICLE_PASSWORD
+#        bazel run @vaticle_dependencies//distribution/artifact:create-netrc
+#
+#        bazel run @vaticle_dependencies//tool/util:install-ssh-credential
+#
+#        echo -n "${HOSTNAME}" > /tmp/typedb-cluster-server-1.txt
+#        bazel run @vaticle_dependencies//tool/util:transfer-file -- /tmp/typedb-cluster-server-1.txt \
+#          grabl@$GRABL_EXPORT_PERFORMANCE_TYPEDB_CLUSTER_BOOTSTRAPPER_URI:/tmp/typedb-cluster-server-1.txt
+#
+#        bazel run @vaticle_dependencies//tool/util:wait-for-file -- /tmp/typedb-cluster-server-2.txt
+#        bazel run @vaticle_dependencies//tool/util:wait-for-file -- /tmp/typedb-cluster-server-3.txt
+#
+#        bazel run //test:typedb-cluster-extractor-linux -- dist/typedb-cluster-all-linux
+#        PEER_1=$(cat /tmp/typedb-cluster-server-1.txt)
+#        PEER_2=$(cat /tmp/typedb-cluster-server-2.txt)
+#        PEER_3=$(cat /tmp/typedb-cluster-server-3.txt)
+#        export BIN="\/home\/grabl\/$GRABL_REPO\/dist\/typedb-cluster-all-linux\/typedb cluster"
+#        export OPTS_ADDR="--server.address=$PEER_1:1729 --server.internal-address.zeromq=$PEER_1:1730 --server.internal-address.grpc=$PEER_1:1731"
+#        export OPTS_PEER_1="--server.peers.peer-1.address=$PEER_1:1729 --server.peers.peer-1.internal-address.zeromq=$PEER_1:1730 --server.peers.peer-1.internal-address.grpc=$PEER_1:1731"
+#        export OPTS_PEER_2="--server.peers.peer-2.address=$PEER_2:1729 --server.peers.peer-2.internal-address.zeromq=$PEER_2:1730 --server.peers.peer-2.internal-address.grpc=$PEER_2:1731"
+#        export OPTS_PEER_3="--server.peers.peer-3.address=$PEER_3:1729 --server.peers.peer-3.internal-address.zeromq=$PEER_3:1730 --server.peers.peer-3.internal-address.grpc=$PEER_3:1731"
+#        bazel run @vaticle_dependencies//tool/util:create-systemd-service -- typedb-cluster "$BIN $OPTS_ADDR $OPTS_PEER_1 $OPTS_PEER_2 $OPTS_PEER_3"
+#
+#        sudo systemctl daemon-reload
+#        sudo systemctl start typedb-cluster
+#
+#        export GRABL_EXPORT_PERFORMANCE_TYPEDB_CLUSTER_SERVER_URI="${HOSTNAME}:1729"
+#      monitor: |
+#        sleep 20s
+#        tail -f -n +1 ./dist/typedb-cluster-all-linux/server/logs/typedb.log
+#    test-performance-typedb-cluster-three-server-2:
+#      machine: 16-core-32-gb
+#      image: vaticle-ubuntu-21.04
+#      type: background
+#      dependencies: [test-performance-typedb-cluster-three-bootstrapper]
+#      timeout: "30m"
+#      command: |
+#        export ARTIFACT_USERNAME=$REPO_VATICLE_USERNAME
+#        export ARTIFACT_PASSWORD=$REPO_VATICLE_PASSWORD
+#        bazel run @vaticle_dependencies//distribution/artifact:create-netrc
+#
+#        bazel run @vaticle_dependencies//tool/util:install-ssh-credential
+#
+#        echo -n "${HOSTNAME}" > /tmp/typedb-cluster-server-2.txt
+#        bazel run @vaticle_dependencies//tool/util:transfer-file -- /tmp/typedb-cluster-server-2.txt \
+#          grabl@$GRABL_EXPORT_PERFORMANCE_TYPEDB_CLUSTER_BOOTSTRAPPER_URI:/tmp/typedb-cluster-server-2.txt
+#
+#        bazel run @vaticle_dependencies//tool/util:wait-for-file -- /tmp/typedb-cluster-server-1.txt
+#        bazel run @vaticle_dependencies//tool/util:wait-for-file -- /tmp/typedb-cluster-server-3.txt
+#
+#        bazel run //test:typedb-cluster-extractor-linux -- dist/typedb-cluster-all-linux
+#        PEER_1=$(cat /tmp/typedb-cluster-server-1.txt)
+#        PEER_2=$(cat /tmp/typedb-cluster-server-2.txt)
+#        PEER_3=$(cat /tmp/typedb-cluster-server-3.txt)
+#        export BIN="\/home\/grabl\/$GRABL_REPO\/dist\/typedb-cluster-all-linux\/typedb cluster"
+#        export OPTS_ADDR="--server.address=$PEER_2:1729 --server.internal-address.zeromq=$PEER_2:1730 --server.internal-address.grpc=$PEER_2:1731"
+#        export OPTS_PEER_1="--server.peers.peer-1.address=$PEER_1:1729 --server.peers.peer-1.internal-address.zeromq=$PEER_1:1730 --server.peers.peer-1.internal-address.grpc=$PEER_1:1731"
+#        export OPTS_PEER_2="--server.peers.peer-2.address=$PEER_2:1729 --server.peers.peer-2.internal-address.zeromq=$PEER_2:1730 --server.peers.peer-2.internal-address.grpc=$PEER_2:1731"
+#        export OPTS_PEER_3="--server.peers.peer-3.address=$PEER_3:1729 --server.peers.peer-3.internal-address.zeromq=$PEER_3:1730 --server.peers.peer-3.internal-address.grpc=$PEER_3:1731"
+#        bazel run @vaticle_dependencies//tool/util:create-systemd-service -- typedb-cluster "$BIN $OPTS_ADDR $OPTS_PEER_1 $OPTS_PEER_2 $OPTS_PEER_3"
+#
+#        sudo systemctl daemon-reload
+#        sudo systemctl start typedb-cluster
+#
+#        export GRABL_EXPORT_PERFORMANCE_TYPEDB_CLUSTER_SERVER_URI="${HOSTNAME}:1729"
+#      monitor: |
+#        sleep 20s
+#        tail -f -n +1 ./dist/typedb-cluster-all-linux/server/logs/typedb.log
+#    test-performance-typedb-cluster-three-server-3:
+#      machine: 16-core-32-gb
+#      image: vaticle-ubuntu-21.04
+#      type: background
+#      dependencies: [test-performance-typedb-cluster-three-bootstrapper]
+#      timeout: "30m"
+#      command: |
+#        export ARTIFACT_USERNAME=$REPO_VATICLE_USERNAME
+#        export ARTIFACT_PASSWORD=$REPO_VATICLE_PASSWORD
+#        bazel run @vaticle_dependencies//distribution/artifact:create-netrc
+#
+#        bazel run @vaticle_dependencies//tool/util:install-ssh-credential
+#
+#        echo -n "${HOSTNAME}" > /tmp/typedb-cluster-server-3.txt
+#        bazel run @vaticle_dependencies//tool/util:transfer-file -- /tmp/typedb-cluster-server-3.txt \
+#          grabl@$GRABL_EXPORT_PERFORMANCE_TYPEDB_CLUSTER_BOOTSTRAPPER_URI:/tmp/typedb-cluster-server-3.txt
+#
+#        bazel run @vaticle_dependencies//tool/util:wait-for-file -- /tmp/typedb-cluster-server-1.txt
+#        bazel run @vaticle_dependencies//tool/util:wait-for-file -- /tmp/typedb-cluster-server-2.txt
+#
+#        bazel run //test:typedb-cluster-extractor-linux -- dist/typedb-cluster-all-linux
+#        PEER_1=$(cat /tmp/typedb-cluster-server-1.txt)
+#        PEER_2=$(cat /tmp/typedb-cluster-server-2.txt)
+#        PEER_3=$(cat /tmp/typedb-cluster-server-3.txt)
+#        export BIN="\/home\/grabl\/$GRABL_REPO\/dist\/typedb-cluster-all-linux\/typedb cluster"
+#        export OPTS_ADDR="--server.address=$PEER_3:1729 --server.internal-address.zeromq=$PEER_3:1730 --server.internal-address.grpc=$PEER_3:1731"
+#        export OPTS_PEER_1="--server.peers.peer-1.address=$PEER_1:1729 --server.peers.peer-1.internal-address.zeromq=$PEER_1:1730 --server.peers.peer-1.internal-address.grpc=$PEER_1:1731"
+#        export OPTS_PEER_2="--server.peers.peer-2.address=$PEER_2:1729 --server.peers.peer-2.internal-address.zeromq=$PEER_2:1730 --server.peers.peer-2.internal-address.grpc=$PEER_2:1731"
+#        export OPTS_PEER_3="--server.peers.peer-3.address=$PEER_3:1729 --server.peers.peer-3.internal-address.zeromq=$PEER_3:1730 --server.peers.peer-3.internal-address.grpc=$PEER_3:1731"
+#        bazel run @vaticle_dependencies//tool/util:create-systemd-service -- typedb-cluster "$BIN $OPTS_ADDR $OPTS_PEER_1 $OPTS_PEER_2 $OPTS_PEER_3"
+#
+#        sudo systemctl daemon-reload
+#        sudo systemctl start typedb-cluster
+#
+#        export GRABL_EXPORT_PERFORMANCE_TYPEDB_CLUSTER_SERVER_URI="${HOSTNAME}:1729"
+#      monitor: |
+#        sleep 20s
+#        tail -f -n +1 ./dist/typedb-cluster-all-linux/server/logs/typedb.log
+#    test-performance-typedb-cluster-three-benchmark:
+#      machine: 16-core-32-gb
+#      image: vaticle-ubuntu-21.04
+#      dependencies: [test-performance-typedb-cluster-three-server-1, test-performance-typedb-cluster-three-server-2, test-performance-typedb-cluster-three-server-3]
+#      timeout: "30m"
+#      command: |
+#       bazel run //:benchmark -- \
+#         --database typedb-cluster \
+#         --address $GRABL_EXPORT_PERFORMANCE_TYPEDB_CLUSTER_SERVER_URI \
+#         --config /home/grabl/$GRABL_REPO/config/simulation.yml
