@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2021 Vaticle
+# Copyright (C) 2022 Vaticle
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -43,6 +43,17 @@ java_binary(
 checkstyle_test(
     name = "checkstyle",
     include = glob(["*", ".grabl/*"]),
-    exclude = glob(["docs/*"]),
-    license_type = "agpl",
+    exclude = glob([
+        ".bazelversion",
+        "LICENSE",
+        "README.md",
+        "docs/*",
+    ]),
+    license_type = "agpl-header",
+)
+
+checkstyle_test(
+    name = "checkstyle-license",
+    include = ["LICENSE"],
+    license_type = "agpl-fulltext",
 )
