@@ -51,7 +51,7 @@ public class Neo4jParenthoodAgent extends ParenthoodAgent<Neo4jTransaction> {
     @Override
     protected Stream<Person> matchNewborns(Neo4jTransaction tx, Country country, LocalDateTime today) {
         String query = "MATCH (person:Person {birthDate: $birthDate})" +
-                "-[:RESIDES_IN]->(:City)-[:CONTAINED_IN]->(country:Country {code: $code}) \n" +
+                "-[:BORN_IN]->(:City)-[:CONTAINED_IN]->(country:Country {code: $code}) \n" +
                 "RETURN person.email";
         HashMap<String, Object> parameters = new HashMap<>() {{
             put(CODE, country.code());

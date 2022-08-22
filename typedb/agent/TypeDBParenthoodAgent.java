@@ -77,8 +77,7 @@ public class TypeDBParenthoodAgent extends ParenthoodAgent<TypeDBTransaction> {
                 rel(CONTAINER, COUNTRY).rel(CONTAINED, CITY).isa(CONTAINS),
                 var(CITY).isa(CITY),
                 var(PERSON).isa(PERSON).has(EMAIL, var(EMAIL)).has(BIRTH_DATE, today),
-                rel(PLACE, var(CITY)).rel(CHILD, PERSON).isa(BIRTH_PLACE),
-                rel(RESIDENCE, var(CITY)).rel(RESIDENT, PERSON).isa(RESIDENTSHIP)
+                rel(PLACE, var(CITY)).rel(CHILD, PERSON).isa(BIRTH_PLACE)
         )).map(conceptMap -> new Person(conceptMap.get(EMAIL).asAttribute().asString().getValue()));
     }
 
