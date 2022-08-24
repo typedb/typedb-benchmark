@@ -121,12 +121,12 @@ build:
           --database typedb \
           --address $GRABL_EXPORT_PERFORMANCE_TYPEDB_CORE_URI \
           --config /home/grabl/$GRABL_REPO/config/simulation.yml \
-          --factory $GRABL_TRACING_URI \
-          --org $GRABL_OWNER \
-          --repo $GRABL_REPO \
-          --commit $GRABL_COMMIT \
-          --username $GRABL_OWNER \
-          --token $GRABL_TOKEN
+#          --factory $GRABL_TRACING_URI \
+#          --org $GRABL_OWNER \
+#          --repo $GRABL_REPO \
+#          --commit $GRABL_COMMIT \
+#          --username $GRABL_OWNER \
+#          --token $GRABL_TOKEN
     test-performance-neo4j-server:
       machine: 16-core-32-gb
       image: vaticle-ubuntu-20.04
@@ -172,12 +172,12 @@ build:
           --database neo4j \
           --address bolt://$GRABL_EXPORT_PERFORMANCE_NEO4J_URI \
           --config /home/grabl/$GRABL_REPO/config/simulation.yml \
-          --factory $GRABL_TRACING_URI \
-          --org $GRABL_OWNER \
-          --repo $GRABL_REPO \
-          --commit $GRABL_COMMIT \
-          --username $GRABL_OWNER \
-          --token $GRABL_TOKEN
+#          --factory $GRABL_TRACING_URI \
+#          --org $GRABL_OWNER \
+#          --repo $GRABL_REPO \
+#          --commit $GRABL_COMMIT \
+#          --username $GRABL_OWNER \
+#          --token $GRABL_TOKEN
     test-performance-typedb-cluster-one-server:
       machine: 16-core-32-gb
       image: vaticle-ubuntu-20.04
@@ -208,12 +208,12 @@ build:
          --database typedb-cluster \
          --address $GRABL_EXPORT_PERFORMANCE_TYPEDB_CLUSTER_SERVER_URI \
          --config /home/grabl/$GRABL_REPO/config/simulation.yml \
-         --factory $GRABL_TRACING_URI \
-         --org $GRABL_OWNER \
-         --repo $GRABL_REPO \
-         --commit $GRABL_COMMIT \
-         --username $GRABL_OWNER \
-         --token $GRABL_TOKEN
+#         --factory $GRABL_TRACING_URI \
+#         --org $GRABL_OWNER \
+#         --repo $GRABL_REPO \
+#         --commit $GRABL_COMMIT \
+#         --username $GRABL_OWNER \
+#         --token $GRABL_TOKEN
 #    test-performance-typedb-cluster-three-bootstrapper:
 #      image: vaticle-ubuntu-20.04
 #      type: background
