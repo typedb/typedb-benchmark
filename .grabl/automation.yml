@@ -120,7 +120,13 @@ build:
         bazel run //:benchmark -- \
           --database typedb \
           --address $GRABL_EXPORT_PERFORMANCE_TYPEDB_CORE_URI \
-          --config /home/grabl/$GRABL_REPO/config/simulation.yml
+          --config /home/grabl/$GRABL_REPO/config/simulation.yml \
+          --factory $GRABL_TRACING_URI \
+          --org $GRABL_OWNER \
+          --repo $GRABL_REPO \
+          --commit $GRABL_COMMIT \
+          --username $GRABL_OWNER \
+          --token $GRABL_TOKEN
     test-performance-neo4j-server:
       machine: 16-core-32-gb
       image: vaticle-ubuntu-21.04
@@ -165,37 +171,49 @@ build:
         bazel run //:benchmark -- \
           --database neo4j \
           --address bolt://$GRABL_EXPORT_PERFORMANCE_NEO4J_URI \
-          --config /home/grabl/$GRABL_REPO/config/simulation.yml
-#    test-performance-typedb-cluster-one-server:
-#      machine: 16-core-32-gb
-#      image: vaticle-ubuntu-21.04
-#      type: background
-#      timeout: "30m"
-#      command: |
-#        export ARTIFACT_USERNAME=$REPO_VATICLE_USERNAME
-#        export ARTIFACT_PASSWORD=$REPO_VATICLE_PASSWORD
-#        bazel run @vaticle_dependencies//distribution/artifact:create-netrc
-#
-#        bazel run //test:typedb-cluster-extractor-linux -- dist/typedb-cluster-all-linux
-#        bazel run @vaticle_dependencies//tool/util:create-systemd-service -- typedb-cluster "\/home\/grabl\/$GRABL_REPO\/dist\/typedb-cluster-all-linux\/typedb cluster --server.address=${HOSTNAME}:1729"
-#
-#        sudo systemctl daemon-reload
-#        sudo systemctl start typedb-cluster
-#
-#        export GRABL_EXPORT_PERFORMANCE_TYPEDB_CLUSTER_SERVER_URI="${HOSTNAME}:1729"
-#      monitor: |
-#        sleep 20s
-#        tail -f -n +1 ./dist/typedb-cluster-all-linux/server/logs/typedb.log
-#    test-performance-typedb-cluster-one-benchmark:
-#      machine: 16-core-32-gb
-#      image: vaticle-ubuntu-21.04
-#      dependencies: [test-performance-typedb-cluster-one-server]
-#      timeout: "30m"
-#      command: |
-#       bazel run //:benchmark -- \
-#         --database typedb-cluster \
-#         --address $GRABL_EXPORT_PERFORMANCE_TYPEDB_CLUSTER_SERVER_URI \
-#         --config /home/grabl/$GRABL_REPO/config/simulation.yml
+          --config /home/grabl/$GRABL_REPO/config/simulation.yml \
+          --factory $GRABL_TRACING_URI \
+          --org $GRABL_OWNER \
+          --repo $GRABL_REPO \
+          --commit $GRABL_COMMIT \
+          --username $GRABL_OWNER \
+          --token $GRABL_TOKEN
+    test-performance-typedb-cluster-one-server:
+      machine: 16-core-32-gb
+      image: vaticle-ubuntu-21.04
+      type: background
+      timeout: "30m"
+      command: |
+        export ARTIFACT_USERNAME=$REPO_VATICLE_USERNAME
+        export ARTIFACT_PASSWORD=$REPO_VATICLE_PASSWORD
+        bazel run @vaticle_dependencies//distribution/artifact:create-netrc
+
+        bazel run //test:typedb-cluster-extractor-linux -- dist/typedb-cluster-all-linux
+        bazel run @vaticle_dependencies//tool/util:create-systemd-service -- typedb-cluster "\/home\/grabl\/$GRABL_REPO\/dist\/typedb-cluster-all-linux\/typedb cluster --server.address=${HOSTNAME}:1729"
+
+        sudo systemctl daemon-reload
+        sudo systemctl start typedb-cluster
+
+        export GRABL_EXPORT_PERFORMANCE_TYPEDB_CLUSTER_SERVER_URI="${HOSTNAME}:1729"
+      monitor: |
+        sleep 20s
+        tail -f -n +1 ./dist/typedb-cluster-all-linux/server/logs/typedb.log
+    test-performance-typedb-cluster-one-benchmark:
+      machine: 16-core-32-gb
+      image: vaticle-ubuntu-21.04
+      dependencies: [test-performance-typedb-cluster-one-server]
+      timeout: "30m"
+      command: |
+       bazel run //:benchmark -- \
+         --database typedb-cluster \
+         --address $GRABL_EXPORT_PERFORMANCE_TYPEDB_CLUSTER_SERVER_URI \
+         --config /home/grabl/$GRABL_REPO/config/simulation.yml \
+         --factory $GRABL_TRACING_URI \
+         --org $GRABL_OWNER \
+         --repo $GRABL_REPO \
+         --commit $GRABL_COMMIT \
+         --username $GRABL_OWNER \
+         --token $GRABL_TOKEN
 #    test-performance-typedb-cluster-three-bootstrapper:
 #      image: vaticle-ubuntu-21.04
 #      type: background
@@ -344,4 +362,10 @@ build:
 #       bazel run //:benchmark -- \
 #         --database typedb-cluster \
 #         --address $GRABL_EXPORT_PERFORMANCE_TYPEDB_CLUSTER_SERVER_URI \
-#         --config /home/grabl/$GRABL_REPO/config/simulation.yml
+#         --config /home/grabl/$GRABL_REPO/config/simulation.yml \
+#         --factory $GRABL_TRACING_URI \
+#         --org $GRABL_OWNER \
+#         --repo $GRABL_REPO \
+#         --commit $GRABL_COMMIT \
+#         --username $GRABL_OWNER \
+#         --token $GRABL_TOKEN
