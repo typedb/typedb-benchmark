@@ -55,7 +55,7 @@ def reformat_iterations_in_overviews(overviews):
 
 
 def get_json_url(commit_sha, analysis_id):
-    return f"https://grabl.io/api/data/jmsfltchr/simulation/{commit_sha}/analysis/performance-analysis?q={{" \
+    return f"https://factory.vaticle.com/api/data/jmsfltchr/simulation/{commit_sha}/analysis/performance-analysis?q={{" \
            f"%22analysis%22:{{%22id%22:{{%22selected%22:%22{analysis_id}%22}},%22trace%22:{{%22path%22:[{{" \
            f"%22optional%22:true}}],%22tracker%22:{{%22optional%22:true}},%22labels%22:{{%22names%22:[]}}," \
            f"%22iteration%22:{{}}}}}}}}"
