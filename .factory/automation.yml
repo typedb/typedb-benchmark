@@ -199,7 +199,7 @@ build:
         sleep 20s
         tail -f -n +1 ./dist/typedb-cluster-all-linux/server/logs/typedb.log
     test-performance-typedb-cluster-one-benchmark:
-      machine: 8-core-32-gb
+      machine: 16-core-64-gb
       image: vaticle-ubuntu-20.04
       dependencies: [test-performance-typedb-cluster-one-server]
       timeout: "30m"
