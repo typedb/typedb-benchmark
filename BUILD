@@ -42,7 +42,7 @@ java_binary(
 
 checkstyle_test(
     name = "checkstyle",
-    include = glob(["*", ".grabl/*"]),
+    include = glob(["*", ".factory/*"]),
     exclude = glob([
         ".bazelversion",
         "LICENSE",
