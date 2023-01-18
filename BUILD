@@ -43,7 +43,7 @@ kt_jvm_library(
 java_binary(
     name = "benchmark",
     runtime_deps = [":benchmark-lib"],
-    main_class = "com.vaticle.typedb.benchmark.BenchmarkKt",
+    main_class = "com.vaticle.typedb.benchmark.Benchmark",
     classpath_resources = ["//config:logback.xml"],
 )
 

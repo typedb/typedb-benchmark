@@ -33,7 +33,7 @@ class Options {
     lateinit var database: DatabaseType; private set
 
     @CommandLine.Option(names = ["--address"], description = ["Database address URI"])
-    private val _address: String? = null
+    private var _address: String? = null
 
     @CommandLine.Option(names = ["--config"], required = true, description = ["Simulation configuration file"])
     lateinit var configFile: File; private set
