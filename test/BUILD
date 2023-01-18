@@ -15,6 +15,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 
+load("@io_bazel_rules_kotlin//kotlin:jvm.bzl", "kt_jvm_test")
 load("@vaticle_dependencies//tool/checkstyle:rules.bzl", "checkstyle_test")
 load("@vaticle_bazel_distribution//artifact:rules.bzl", "artifact_extractor")
 
@@ -28,16 +29,19 @@ artifact_extractor(
     artifact = "@vaticle_typedb_cluster_artifact_linux//file",
 )
 
-java_test(
+kt_jvm_test(
     name = "comparison-test",
-    srcs = ["ComparisonTest.java"],
+    srcs = ["ComparisonTest.kt"],
     test_class = "com.vaticle.typedb.benchmark.test.ComparisonTest",
     deps = [
-        "//common:common",
-        "//simulation:simulation",
-        "//typedb:typedb",
-        "//neo4j:neo4j",
+        "//common",
+        "//simulation",
+        "//typedb",
+        "//neo4j",
+
+        # External Maven Dependencies
         "@maven//:info_picocli_picocli",
+        "@maven//:junit_junit",
     ],
     size = "enormous",
     resource_strip_prefix = "config/",

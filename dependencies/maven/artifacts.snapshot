@@ -48,6 +48,8 @@
 @maven//:io_cucumber_docstring_5_1_3
 @maven//:io_cucumber_tag_expressions
 @maven//:io_cucumber_tag_expressions_2_0_4
+@maven//:io_github_microutils_kotlin_logging_jvm
+@maven//:io_github_microutils_kotlin_logging_jvm_2_0_10
 @maven//:io_grpc_grpc_api
 @maven//:io_grpc_grpc_api_1_43_0
 @maven//:io_grpc_grpc_context
@@ -122,6 +124,16 @@
 @maven//:org_hamcrest_hamcrest_core_1_3
 @maven//:org_hamcrest_hamcrest_library
 @maven//:org_hamcrest_hamcrest_library_1_3
+@maven//:org_jetbrains_annotations
+@maven//:org_jetbrains_annotations_13_0
+@maven//:org_jetbrains_kotlin_kotlin_stdlib
+@maven//:org_jetbrains_kotlin_kotlin_stdlib_1_5_21
+@maven//:org_jetbrains_kotlin_kotlin_stdlib_common
+@maven//:org_jetbrains_kotlin_kotlin_stdlib_common_1_5_21
+@maven//:org_jetbrains_kotlin_kotlin_stdlib_jdk7
+@maven//:org_jetbrains_kotlin_kotlin_stdlib_jdk7_1_5_21
+@maven//:org_jetbrains_kotlin_kotlin_stdlib_jdk8
+@maven//:org_jetbrains_kotlin_kotlin_stdlib_jdk8_1_5_21
 @maven//:org_mockito_mockito_core
 @maven//:org_mockito_mockito_core_2_6_4
 @maven//:org_objenesis_objenesis

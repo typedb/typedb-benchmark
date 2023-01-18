@@ -16,10 +16,11 @@
 #
 
 artifacts = [
-  "com.google.code.findbugs:jsr305",
-  "info.picocli:picocli",
-  "junit:junit",
-  "org.apache.commons:commons-csv",
-  "org.slf4j:slf4j-api",
-  "org.yaml:snakeyaml",
+    "com.google.code.findbugs:jsr305",
+    "info.picocli:picocli",
+    "io.github.microutils:kotlin-logging-jvm",
+    "junit:junit",
+    "org.apache.commons:commons-csv",
+    "org.slf4j:slf4j-api",
+    "org.yaml:snakeyaml",
 ]

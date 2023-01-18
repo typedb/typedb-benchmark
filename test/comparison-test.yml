@@ -15,15 +15,15 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 
-agents:
-  - name: "PersonAgent"
-    mode: RUN
-  - name: "FriendshipAgent"
-    mode: RUN
-  - name: "MarriageAgent"
-    mode: RUN
-  - name: "ParenthoodAgent"
-    mode: RUN
+#agents:
+#  - name: "PersonAgent"
+#    mode: RUN
+#  - name: "FriendshipAgent"
+#    mode: RUN
+#  - name: "MarriageAgent"
+#    mode: RUN
+#  - name: "ParenthoodAgent"
+#    mode: RUN
 
 runParams:
   randomSeed: 1

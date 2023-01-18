@@ -15,15 +15,21 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 
+load("@io_bazel_rules_kotlin//kotlin:jvm.bzl", "kt_jvm_library")
 load("@vaticle_dependencies//tool/checkstyle:rules.bzl", "checkstyle_test")
 
-java_library(
+kt_jvm_library(
     name = "simulation",
-    srcs = glob(["*.java", "*/*.java"]),
+    srcs = glob(["*.kt", "*/*.kt"]),
     deps = [
-        "//common:common",
+        "//common",
+
+        # External Vaticle Dependencies
         "@vaticle_typedb_common//:common",
         "@vaticle_factory_tracing//client",
+
+        # External Maven Dependencies
+        "@maven//:io_github_microutils_kotlin_logging_jvm",
         "@maven//:org_slf4j_slf4j_api",
     ],
     visibility = ["//visibility:public"],
