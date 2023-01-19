@@ -48,7 +48,7 @@ class Neo4jParenthoodAgent(client: Neo4jClient, context: Context) : ParenthoodAg
     override fun matchMarriages(tx: Neo4jTransaction, country: Country, marriageDate: LocalDateTime): Stream<Marriage> {
         val query = "MATCH (w:Person)-[:RESIDES_IN]->(:City)-[:CONTAINED_IN]->(country:Country {code: \$code}),\n" +
                 "(w)-[m:MARRIED_TO {marriageDate: \$marriageDate}]->(h:Person)" +
-                "RETURN w.email, h.email, m.marriageLicence";
+                "RETURN w.email, h.email, m.marriageLicence, m.marriageDate"
         val parameters = mapOf(MARRIAGE_DATE to marriageDate, CODE to country.code)
         tx.execute(Query(query, parameters))
         return tx.execute(Query(query, parameters)).stream().map { record: Record ->
