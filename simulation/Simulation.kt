@@ -44,7 +44,7 @@ abstract class Simulation<CLIENT: Client<SESSION>, SESSION: Session<TX>, TX: Tra
 ) : AutoCloseable {
     private val randomSource = RandomSource(context.seed)
     private val agents: List<Agent<*, TX>> = initAgents()
-    private val agentReports: MutableMap<String, Map<String, List<Agent.Report>>> = ConcurrentHashMap()
+    private val agentReports = ConcurrentHashMap<String, Map<String, List<Agent.Report>>>()
 
     init {
         initialise(context.seedData)

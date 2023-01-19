@@ -67,7 +67,7 @@ class Neo4jPersonAgent(client: Neo4jClient, context: Context) : PersonAgent<Neo4
     private fun report(tx: Neo4jTransaction, email: String): Pair<Person, City> {
         val answers = tx.execute(
             Query(
-                "MATCH (person:Person {email: '" + email + "'})-[:BORN_IN]->(city:City), " +
+                "MATCH (person:Person {email: '$email'})-[:BORN_IN]->(city:City), " +
                         "(person)-[:RESIDES_IN]->(city) " +
                         "RETURN person.email, person.firstName, person.lastName, person.address, " +
                         "person.gender, person.birthDate, city.code"

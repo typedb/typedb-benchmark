@@ -46,9 +46,7 @@ import mu.KotlinLogging
 import org.neo4j.driver.Driver
 import org.neo4j.driver.Query
 import org.neo4j.driver.Session
-import org.slf4j.LoggerFactory
 import java.time.Instant
-import java.util.function.Consumer
 
 class Neo4jSimulation private constructor(client: Neo4jClient, context: Context) :
     Simulation<Neo4jClient, Neo4jSession, Neo4jTransaction>(client, context) {
@@ -58,8 +56,8 @@ class Neo4jSimulation private constructor(client: Neo4jClient, context: Context)
         initData(nativeDriver, geoData)
     }
 
-    private fun initDatabase(nativeDriver: Driver?) {
-        nativeDriver!!.session().use { session ->
+    private fun initDatabase(nativeDriver: Driver) {
+        nativeDriver.session().use { session ->
             addKeyConstraints(session)
             cleanDatabase(session)
         }
@@ -181,27 +179,27 @@ class Neo4jSimulation private constructor(client: Neo4jClient, context: Context)
     }
 
     override fun createLineageAgent(client: Neo4jClient, context: Context): LineageAgent<Neo4jTransaction> {
-        throw UnsupportedOperationException("LineageAgent requires reasoning, which is not supported by Neo4j")
+        throw unsupportedReasoningAgentException("LineageAgent")
     }
 
     override fun createNationalityAgent(client: Neo4jClient, context: Context): NationalityAgent<Neo4jTransaction> {
-        throw UnsupportedOperationException("NationalityAgent requires reasoning, which is not supported by Neo4j")
+        throw unsupportedReasoningAgentException("NationalityAgent")
     }
 
     override fun createCitizenshipAgent(client: Neo4jClient, context: Context): CitizenshipAgent<Neo4jTransaction> {
-        throw UnsupportedOperationException("CitizenshipAgent requires reasoning, which is not supported by Neo4j")
+        throw unsupportedReasoningAgentException("CitizenshipAgent")
     }
 
     override fun createMaritalStatusAgent(client: Neo4jClient, context: Context): MaritalStatusAgent<Neo4jTransaction> {
-        throw UnsupportedOperationException("MaritalStatusAgent requires reasoning, which is not supported by Neo4j")
+        throw unsupportedReasoningAgentException("MaritalStatusAgent")
     }
 
     override fun createCoupleFriendshipAgent(client: Neo4jClient, context: Context): CoupleFriendshipAgent<Neo4jTransaction> {
-        throw UnsupportedOperationException("CoupleFriendshipAgent requires reasoning, which is not supported by Neo4j")
+        throw unsupportedReasoningAgentException("CoupleFriendshipAgent")
     }
 
     override fun createGrandparenthoodAgent(client: Neo4jClient, context: Context): GrandparenthoodAgent<Neo4jTransaction> {
-        throw UnsupportedOperationException("GrandparenthoodAgent requires reasoning, which is not supported by Neo4j")
+        throw unsupportedReasoningAgentException("GrandparenthoodAgent")
     }
 
     companion object {
@@ -209,6 +207,10 @@ class Neo4jSimulation private constructor(client: Neo4jClient, context: Context)
 
         fun create(hostUri: String, context: Context): Neo4jSimulation {
             return Neo4jSimulation(Neo4jClient(hostUri), context)
+        }
+
+        fun unsupportedReasoningAgentException(agentName: String): UnsupportedOperationException {
+            return UnsupportedOperationException("$agentName requires reasoning, which is not supported by Neo4j")
         }
     }
 }

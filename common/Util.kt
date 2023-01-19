@@ -18,14 +18,12 @@ package com.vaticle.typedb.benchmark.common
 
 import java.time.Duration
 import java.time.Instant
-import java.util.Locale
 
 object Util {
-    @JvmStatic
     fun printDuration(start: Instant?, end: Instant?): String {
         return Duration.between(start, end).toString()
             .substring(2)
             .replace("(\\d[HMS])(?!$)".toRegex(), "$1 ")
-            .lowercase(Locale.getDefault())
+            .lowercase()
     }
 }
