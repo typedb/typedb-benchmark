@@ -18,10 +18,8 @@ package com.vaticle.typedb.benchmark.neo4j.agent
 
 import com.vaticle.typedb.benchmark.common.concept.City
 import com.vaticle.typedb.benchmark.common.concept.Gender
-import com.vaticle.typedb.benchmark.common.concept.Gender.Companion.of
 import com.vaticle.typedb.benchmark.common.concept.Person
 import com.vaticle.typedb.benchmark.common.params.Context
-import com.vaticle.typedb.benchmark.neo4j.Labels
 import com.vaticle.typedb.benchmark.neo4j.Labels.ADDRESS
 import com.vaticle.typedb.benchmark.neo4j.Labels.BIRTH_DATE
 import com.vaticle.typedb.benchmark.neo4j.Labels.CITY
@@ -34,11 +32,9 @@ import com.vaticle.typedb.benchmark.neo4j.Labels.PERSON
 import com.vaticle.typedb.benchmark.neo4j.driver.Neo4jClient
 import com.vaticle.typedb.benchmark.neo4j.driver.Neo4jTransaction
 import com.vaticle.typedb.benchmark.simulation.agent.PersonAgent
-import com.vaticle.typedb.common.collection.Collections
 import com.vaticle.typedb.common.collection.Pair
 import org.neo4j.driver.Query
 import java.time.LocalDateTime
-import java.util.Optional
 
 class Neo4jPersonAgent(client: Neo4jClient, context: Context) : PersonAgent<Neo4jTransaction>(client, context) {
     override fun insertPerson(
@@ -80,14 +76,14 @@ class Neo4jPersonAgent(client: Neo4jClient, context: Context) : PersonAgent<Neo4
         assert(answers.size == 1)
         val inserted = answers[0].asMap()
         val person = Person(
-            (inserted["$PERSON.$EMAIL"] as String?)!!,
-            inserted["$PERSON.$FIRST_NAME"] as String?,
-            inserted["$PERSON.$LAST_NAME"] as String?,
-            inserted["$PERSON.$ADDRESS"] as String?,
-            of((inserted["$PERSON.$GENDER"] as String?)!!),
-            inserted["$PERSON.$BIRTH_DATE"] as LocalDateTime?
+            email = inserted["$PERSON.$EMAIL"] as String,
+            firstName = inserted["$PERSON.$FIRST_NAME"] as String,
+            lastName = inserted["$PERSON.$LAST_NAME"] as String,
+            address = inserted["$PERSON.$ADDRESS"] as String,
+            gender = Gender.of(inserted["$PERSON.$GENDER"] as String),
+            birthDate = inserted["$PERSON.$BIRTH_DATE"] as LocalDateTime
         )
-        val city = City((inserted["$CITY.$CODE"] as String?)!!)
+        val city = City(inserted["$CITY.$CODE"] as String)
         return Pair(person, city)
     }
 }

@@ -42,7 +42,7 @@ class Neo4jParenthoodAgent(client: Neo4jClient, context: Context) : ParenthoodAg
                 "RETURN person.email"
         val parameters = mapOf(CODE to country.code, BIRTH_DATE to today)
         return tx.execute(Query(query, parameters)).stream()
-            .map { record: Record -> Person((record.asMap()["person.email"] as String?)!!) }
+            .map { record: Record -> Person(email = record.asMap()["person.email"] as String) }
     }
 
     override fun matchMarriages(tx: Neo4jTransaction, country: Country, marriageDate: LocalDateTime): Stream<Marriage> {
@@ -53,10 +53,10 @@ class Neo4jParenthoodAgent(client: Neo4jClient, context: Context) : ParenthoodAg
         tx.execute(Query(query, parameters))
         return tx.execute(Query(query, parameters)).stream().map { record: Record ->
             Marriage(
-                Person((record.asMap()["w.email"] as String?)!!),
-                Person((record.asMap()["h.email"] as String?)!!),
-                (record.asMap()["m.marriageLicence"] as String?)!!,
-                (record.asMap()["m.marriageDate"] as LocalDateTime?)!!
+                wife = Person(email = record.asMap()["w.email"] as String),
+                husband = Person(email = record.asMap()["h.email"] as String),
+                licence = record.asMap()["m.marriageLicence"] as String,
+                date = record.asMap()["m.marriageDate"] as LocalDateTime
             )
         }
     }
@@ -88,9 +88,9 @@ class Neo4jParenthoodAgent(client: Neo4jClient, context: Context) : ParenthoodAg
         val answers = tx.execute(Query(query, parameters))
         assert(answers.size == 1)
         val inserted = answers[0].asMap()
-        val mother = Person((inserted[M + "." + Labels.EMAIL] as String?)!!)
-        val father = Person((inserted[F + "." + Labels.EMAIL] as String?)!!)
-        val child = Person((inserted[C + "." + Labels.EMAIL] as String?)!!)
+        val mother = Person(email = inserted["$M.${Labels.EMAIL}"] as String)
+        val father = Person(email = inserted["$F.${Labels.EMAIL}"] as String)
+        val child = Person(email = inserted["$C.${Labels.EMAIL}"] as String)
         return Parenthood(mother, father, child)
     }
 

@@ -38,7 +38,7 @@ class Neo4jFriendshipAgent(client: Neo4jClient, context: Context) : FriendshipAg
                 "RETURN person.email"
         val parameters = mapOf(Labels.CODE to country.code, Labels.BIRTH_DATE to birthDate)
         return tx.execute(Query(query, parameters)).stream()
-            .map { record: Record -> Person((record.asMap()["person.email"] as String?)!!) }
+            .map { record: Record -> Person(email = record.asMap()["person.email"] as String) }
     }
 
     override fun insertFriends(tx: Neo4jTransaction, email1: String, email2: String): Pair<Person, Person>? {
@@ -61,8 +61,8 @@ class Neo4jFriendshipAgent(client: Neo4jClient, context: Context) : FriendshipAg
         val answers = tx.execute(Query(query, parameters))
         assert(answers.size == 1)
         val inserted = answers[0].asMap()
-        val person1 = Person((inserted[X + "." + Labels.EMAIL] as String?)!!)
-        val person2 = Person((inserted[Y + "." + Labels.EMAIL] as String?)!!)
+        val person1 = Person(email = inserted[X + "." + Labels.EMAIL] as String)
+        val person2 = Person(email = inserted[Y + "." + Labels.EMAIL] as String)
         return Pair(person1, person2)
     }
 

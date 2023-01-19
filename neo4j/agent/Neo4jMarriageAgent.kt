@@ -46,7 +46,7 @@ class Neo4jMarriageAgent(client: Neo4jClient, context: Context) : MarriageAgent<
                 "RETURN person.email"
         val parameters = mapOf(CODE to country.code, BIRTH_DATE to birthDate, GENDER to gender.value)
         return tx.execute(Query(query, parameters)).stream()
-            .map { record: Record -> Person((record.asMap()["person.email"] as String?)!!) }
+            .map { record: Record -> Person(email = record.asMap()["person.email"] as String) }
     }
 
     override fun insertMarriage(
@@ -85,11 +85,11 @@ class Neo4jMarriageAgent(client: Neo4jClient, context: Context) : MarriageAgent<
         val answers = tx.execute(Query(query, parameters))
         assert(answers.size == 1)
         val inserted = answers[0].asMap()
-        val person1 = Person((inserted[X + "." + Labels.EMAIL] as String?)!!)
-        val person2 = Person((inserted[Y + "." + Labels.EMAIL] as String?)!!)
+        val person1 = Person(email = inserted["$X.${Labels.EMAIL}"] as String)
+        val person2 = Person(email = inserted["$Y.${Labels.EMAIL}"] as String)
         return Marriage(
-            person1, person2, (inserted["$M.$MARRIAGE_LICENCE"] as String?)!!,
-            (inserted["$M.$MARRIAGE_DATE"] as LocalDateTime?)!!
+            wife = person1, husband = person2, licence = inserted["$M.$MARRIAGE_LICENCE"] as String,
+            date = inserted["$M.$MARRIAGE_DATE"] as LocalDateTime
         )
     }
 
