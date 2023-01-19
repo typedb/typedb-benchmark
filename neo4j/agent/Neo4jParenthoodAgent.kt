@@ -46,10 +46,9 @@ class Neo4jParenthoodAgent(client: Neo4jClient, context: Context) : ParenthoodAg
     }
 
     override fun matchMarriages(tx: Neo4jTransaction, country: Country, marriageDate: LocalDateTime): Stream<Marriage> {
-        val query = """
-            MATCH (w:Person)-[:RESIDES_IN]->(:City)-[:CONTAINED_IN]->(country:Country {code: ${"$"}code}),
-            (w)-[m:MARRIED_TO {marriageDate: ${"$"}marriageDate}]->(h:Person)RETURN w.email, h.email, m.marriageLicence
-            """.trimIndent()
+        val query = "MATCH (w:Person)-[:RESIDES_IN]->(:City)-[:CONTAINED_IN]->(country:Country {code: \$code}),\n" +
+                "(w)-[m:MARRIED_TO {marriageDate: \$marriageDate}]->(h:Person)" +
+                "RETURN w.email, h.email, m.marriageLicence";
         val parameters = mapOf(MARRIAGE_DATE to marriageDate, CODE to country.code)
         tx.execute(Query(query, parameters))
         return tx.execute(Query(query, parameters)).stream().map { record: Record ->
@@ -66,27 +65,25 @@ class Neo4jParenthoodAgent(client: Neo4jClient, context: Context) : ParenthoodAg
         tx: Neo4jTransaction, motherEmail: String, fatherEmail: String,
         childEmail: String
     ): Parenthood? {
-        val query = """
-            MATCH (m:Person {email: ${"$"}motherEmail}),
-            (f:Person {email: ${"$"}fatherEmail}),
-            (c:Person {email: ${"$"}childEmail})
-            CREATE (m)-[:PARENT_OF]->(c),
-            (f)-[:PARENT_OF]->(c)
-            """.trimIndent()
+        val query = "MATCH " +
+                "(m:Person {email: \$motherEmail}),\n" +
+                "(f:Person {email: \$fatherEmail}),\n" +
+                "(c:Person {email: \$childEmail})\n" +
+                "CREATE (m)-[:PARENT_OF]->(c),\n" +
+                "(f)-[:PARENT_OF]->(c)"
         val parameters = mapOf("motherEmail" to motherEmail, "fatherEmail" to fatherEmail, "childEmail" to childEmail)
         tx.execute(Query(query, parameters))
         return if (context.isReporting) report(tx, motherEmail, fatherEmail, childEmail) else null
     }
 
     private fun report(tx: Neo4jTransaction, motherEmail: String, fatherEmail: String, childEmail: String): Parenthood {
-        val query = """
-            MATCH (m:Person {email: ${"$"}motherEmail}),
-            (f:Person {email: ${"$"}fatherEmail}),
-            (c:Person {email: ${"$"}childEmail}),
-            (m)-[:PARENT_OF]->(c),
-            (f)-[:PARENT_OF]->(c)
-            RETURN m.email, f.email, c.email
-            """.trimIndent()
+        val query = "MATCH " +
+                "(m:Person {email: \$motherEmail}),\n" +
+                "(f:Person {email: \$fatherEmail}),\n" +
+                "(c:Person {email: \$childEmail}),\n" +
+                "(m)-[:PARENT_OF]->(c),\n" +
+                "(f)-[:PARENT_OF]->(c)\n" +
+                "RETURN m.email, f.email, c.email"
         val parameters = mapOf("motherEmail" to motherEmail, "fatherEmail" to fatherEmail, "childEmail" to childEmail)
         val answers = tx.execute(Query(query, parameters))
         assert(answers.size == 1)
