@@ -19,27 +19,33 @@ package com.vaticle.typedb.benchmark.typedb.agent
 import com.vaticle.typedb.benchmark.common.concept.Country
 import com.vaticle.typedb.benchmark.common.params.Context
 import com.vaticle.typedb.benchmark.simulation.agent.MaritalStatusAgent
-import com.vaticle.typedb.benchmark.typedb.Labels
+import com.vaticle.typedb.benchmark.typedb.Labels.BIRTH_DATE
+import com.vaticle.typedb.benchmark.typedb.Labels.CITY
+import com.vaticle.typedb.benchmark.typedb.Labels.CODE
+import com.vaticle.typedb.benchmark.typedb.Labels.CONTAINED
+import com.vaticle.typedb.benchmark.typedb.Labels.CONTAINER
+import com.vaticle.typedb.benchmark.typedb.Labels.CONTAINS
+import com.vaticle.typedb.benchmark.typedb.Labels.COUNTRY
+import com.vaticle.typedb.benchmark.typedb.Labels.PERSON
+import com.vaticle.typedb.benchmark.typedb.Labels.RESIDENCE
+import com.vaticle.typedb.benchmark.typedb.Labels.RESIDENT
+import com.vaticle.typedb.benchmark.typedb.Labels.RESIDENTSHIP
 import com.vaticle.typedb.benchmark.typedb.driver.TypeDBClient
 import com.vaticle.typedb.benchmark.typedb.driver.TypeDBTransaction
-import com.vaticle.typeql.lang.TypeQL
+import com.vaticle.typeql.lang.TypeQL.match
+import com.vaticle.typeql.lang.TypeQL.rel
+import com.vaticle.typeql.lang.TypeQL.`var`
 import java.time.LocalDateTime
 import java.util.stream.Collectors.toList
 
 class TypeDBMaritalStatusAgent(client: TypeDBClient, context: Context) :
     MaritalStatusAgent<TypeDBTransaction>(client, context) {
     override fun matchMaritalStatus(tx: TypeDBTransaction, country: Country, marriageBirthDate: LocalDateTime) {
-        tx.query().match(
-            TypeQL.match(
-                TypeQL.`var`(Labels.PERSON).isa(Labels.PERSON).has(Labels.BIRTH_DATE, marriageBirthDate),
-                TypeQL.`var`(Labels.COUNTRY).isa(Labels.COUNTRY).has(Labels.CODE, country.code),
-                TypeQL.rel(Labels.RESIDENT, TypeQL.`var`(Labels.PERSON))
-                    .rel(Labels.RESIDENCE, TypeQL.`var`(Labels.CITY))
-                    .isa(Labels.RESIDENTSHIP),
-                TypeQL.rel(Labels.CONTAINED, TypeQL.`var`(Labels.CITY))
-                    .rel(Labels.CONTAINER, TypeQL.`var`(Labels.COUNTRY))
-                    .isa(Labels.CONTAINS)
-            )
-        ).collect(toList())
+        tx.query().match(match(
+            `var`(PERSON).isa(PERSON).has(BIRTH_DATE, marriageBirthDate),
+            `var`(COUNTRY).isa(COUNTRY).has(CODE, country.code),
+            rel(RESIDENT, `var`(PERSON)).rel(RESIDENCE, `var`(CITY)).isa(RESIDENTSHIP),
+            rel(CONTAINED, `var`(CITY)).rel(CONTAINER, `var`(COUNTRY)).isa(CONTAINS)
+        )).collect(toList())
     }
 }

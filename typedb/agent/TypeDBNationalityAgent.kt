@@ -19,24 +19,28 @@ package com.vaticle.typedb.benchmark.typedb.agent
 import com.vaticle.typedb.benchmark.common.concept.Country
 import com.vaticle.typedb.benchmark.common.params.Context
 import com.vaticle.typedb.benchmark.simulation.agent.NationalityAgent
-import com.vaticle.typedb.benchmark.simulation.driver.Client
 import com.vaticle.typedb.benchmark.typedb.Labels
+import com.vaticle.typedb.benchmark.typedb.Labels.BIRTH_DATE
+import com.vaticle.typedb.benchmark.typedb.Labels.CODE
+import com.vaticle.typedb.benchmark.typedb.Labels.COUNTRY
+import com.vaticle.typedb.benchmark.typedb.Labels.NATIONAL
+import com.vaticle.typedb.benchmark.typedb.Labels.NATIONALITY
+import com.vaticle.typedb.benchmark.typedb.Labels.PERSON
 import com.vaticle.typedb.benchmark.typedb.driver.TypeDBClient
 import com.vaticle.typedb.benchmark.typedb.driver.TypeDBTransaction
-import com.vaticle.typeql.lang.TypeQL
+import com.vaticle.typeql.lang.TypeQL.match
+import com.vaticle.typeql.lang.TypeQL.rel
+import com.vaticle.typeql.lang.TypeQL.`var`
 import java.time.LocalDateTime
-import java.util.stream.Collectors
 import java.util.stream.Collectors.toList
 
 class TypeDBNationalityAgent(client: TypeDBClient, context: Context) :
     NationalityAgent<TypeDBTransaction>(client, context) {
     override fun matchNationalities(tx: TypeDBTransaction, country: Country, today: LocalDateTime) {
-        tx.query().match(
-            TypeQL.match(
-                TypeQL.`var`(Labels.COUNTRY).isa(Labels.COUNTRY).has(Labels.CODE, country.code),
-                TypeQL.`var`(Labels.NATIONAL).isa(Labels.PERSON).has(Labels.BIRTH_DATE, today),
-                TypeQL.rel(Labels.NATIONAL, Labels.NATIONAL).rel(Labels.NATION, Labels.COUNTRY).isa(Labels.NATIONALITY)
-            )
-        ).collect(toList())
+        tx.query().match(match(
+            `var`(COUNTRY).isa(COUNTRY).has(CODE, country.code),
+            `var`(NATIONAL).isa(PERSON).has(BIRTH_DATE, today),
+            rel(NATIONAL, NATIONAL).rel(Labels.NATION, COUNTRY).isa(NATIONALITY)
+        )).collect(toList())
     }
 }

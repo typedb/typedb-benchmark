@@ -21,15 +21,28 @@ import com.vaticle.typedb.benchmark.common.concept.Gender
 import com.vaticle.typedb.benchmark.common.concept.Person
 import com.vaticle.typedb.benchmark.common.params.Context
 import com.vaticle.typedb.benchmark.simulation.agent.PersonAgent
-import com.vaticle.typedb.benchmark.typedb.Labels
+import com.vaticle.typedb.benchmark.typedb.Labels.ADDRESS
+import com.vaticle.typedb.benchmark.typedb.Labels.BIRTH_DATE
+import com.vaticle.typedb.benchmark.typedb.Labels.BIRTH_PLACE
+import com.vaticle.typedb.benchmark.typedb.Labels.CHILD
+import com.vaticle.typedb.benchmark.typedb.Labels.CITY
+import com.vaticle.typedb.benchmark.typedb.Labels.CODE
+import com.vaticle.typedb.benchmark.typedb.Labels.EMAIL
+import com.vaticle.typedb.benchmark.typedb.Labels.FIRST_NAME
+import com.vaticle.typedb.benchmark.typedb.Labels.GENDER
+import com.vaticle.typedb.benchmark.typedb.Labels.LAST_NAME
+import com.vaticle.typedb.benchmark.typedb.Labels.PERSON
+import com.vaticle.typedb.benchmark.typedb.Labels.PLACE
+import com.vaticle.typedb.benchmark.typedb.Labels.RESIDENCE
+import com.vaticle.typedb.benchmark.typedb.Labels.RESIDENT
+import com.vaticle.typedb.benchmark.typedb.Labels.RESIDENTSHIP
 import com.vaticle.typedb.benchmark.typedb.driver.TypeDBClient
 import com.vaticle.typedb.benchmark.typedb.driver.TypeDBTransaction
-import com.vaticle.typedb.common.collection.Collections
 import com.vaticle.typedb.common.collection.Pair
 import com.vaticle.typeql.lang.TypeQL
+import com.vaticle.typeql.lang.TypeQL.match
+import com.vaticle.typeql.lang.TypeQL.`var`
 import java.time.LocalDateTime
-import java.util.Optional
-import java.util.stream.Collectors
 import java.util.stream.Collectors.toList
 
 class TypeDBPersonAgent(client: TypeDBClient, context: Context) : PersonAgent<TypeDBTransaction>(client, context) {
@@ -38,50 +51,45 @@ class TypeDBPersonAgent(client: TypeDBClient, context: Context) : PersonAgent<Ty
         address: String, gender: Gender, birthDate: LocalDateTime, city: City
     ): Pair<Person, City.Report>? {
         tx.query().insert(
-            TypeQL.match(
-                TypeQL.`var`(Labels.CITY).isa(Labels.CITY).has(Labels.CODE, city.code)
+            match(
+                `var`(CITY).isa(CITY).has(CODE, city.code)
             ).insert(
-                TypeQL.`var`("p").isa(Labels.PERSON).has(Labels.EMAIL, email).has(Labels.FIRST_NAME, firstName)
-                    .has(Labels.LAST_NAME, lastName)
-                    .has(Labels.ADDRESS, address).has(Labels.GENDER, gender.value)
-                    .has(Labels.BIRTH_DATE, birthDate),
-                TypeQL.`var`().rel(Labels.PLACE, TypeQL.`var`(Labels.CITY)).rel(Labels.CHILD, TypeQL.`var`("p"))
-                    .isa(Labels.BIRTH_PLACE),
-                TypeQL.`var`().rel(Labels.RESIDENCE, TypeQL.`var`(Labels.CITY)).rel(Labels.RESIDENT, TypeQL.`var`("p"))
-                    .isa(Labels.RESIDENTSHIP)
+                `var`("p").isa(PERSON).has(EMAIL, email).has(FIRST_NAME, firstName)
+                    .has(LAST_NAME, lastName).has(ADDRESS, address)
+                    .has(GENDER, gender.value).has(BIRTH_DATE, birthDate),
+                `var`().rel(PLACE, `var`(CITY)).rel(CHILD, `var`("p")).isa(BIRTH_PLACE),
+                `var`().rel(RESIDENCE, `var`(CITY)).rel(RESIDENT, `var`("p")).isa(RESIDENTSHIP)
             )
         )
         return if (context.isReporting) report(tx, email) else null
     }
 
     private fun report(tx: TypeDBTransaction, email: String): Pair<Person, City.Report> {
-        val answers = tx.query().match(
-            TypeQL.match(
-                TypeQL.`var`(Labels.PERSON).isa(Labels.PERSON).has(Labels.EMAIL, email)
-                    .has(Labels.FIRST_NAME, TypeQL.`var`(Labels.FIRST_NAME))
-                    .has(Labels.LAST_NAME, TypeQL.`var`(Labels.LAST_NAME))
-                    .has(Labels.ADDRESS, TypeQL.`var`(Labels.ADDRESS))
-                    .has(Labels.GENDER, TypeQL.`var`(Labels.GENDER))
-                    .has(Labels.BIRTH_DATE, TypeQL.`var`(Labels.BIRTH_DATE)),
-                TypeQL.`var`(Labels.CITY).has(Labels.CODE, TypeQL.`var`(Labels.CODE)),
-                TypeQL.rel(Labels.CHILD, TypeQL.`var`(Labels.PERSON)).rel(Labels.PLACE, TypeQL.`var`(Labels.CITY))
-                    .isa(Labels.BIRTH_PLACE),
-                TypeQL.rel(Labels.RESIDENT, TypeQL.`var`(Labels.PERSON))
-                    .rel(Labels.RESIDENCE, TypeQL.`var`(Labels.CITY))
-                    .isa(Labels.RESIDENTSHIP)
-            )
-        ).collect(toList())
+        val answers = tx.query().match(match(
+            `var`(PERSON).isa(PERSON).has(EMAIL, email)
+                .has(FIRST_NAME, `var`(FIRST_NAME))
+                .has(LAST_NAME, `var`(LAST_NAME))
+                .has(ADDRESS, `var`(ADDRESS))
+                .has(GENDER, `var`(GENDER))
+                .has(BIRTH_DATE, `var`(BIRTH_DATE)),
+            `var`(CITY).has(CODE, `var`(CODE)),
+            TypeQL.rel(CHILD, `var`(PERSON)).rel(PLACE, `var`(CITY))
+                .isa(BIRTH_PLACE),
+            TypeQL.rel(RESIDENT, `var`(PERSON))
+                .rel(RESIDENCE, `var`(CITY))
+                .isa(RESIDENTSHIP)
+        )).collect(toList())
         assert(answers.size == 1)
         val inserted = answers[0]
         val person = Person(
             email,
-            inserted[Labels.FIRST_NAME].asAttribute().asString().value,
-            inserted[Labels.LAST_NAME].asAttribute().asString().value,
-            inserted[Labels.ADDRESS].asAttribute().asString().value,
-            Gender.of(inserted[Labels.GENDER].asAttribute().asString().value),
-            inserted[Labels.BIRTH_DATE].asAttribute().asDateTime().value
+            inserted[FIRST_NAME].asAttribute().asString().value,
+            inserted[LAST_NAME].asAttribute().asString().value,
+            inserted[ADDRESS].asAttribute().asString().value,
+            Gender.of(inserted[GENDER].asAttribute().asString().value),
+            inserted[BIRTH_DATE].asAttribute().asDateTime().value
         )
-        val city = City.Report(code = inserted[Labels.CODE].asAttribute().asString().value)
+        val city = City.Report(code = inserted[CODE].asAttribute().asString().value)
         return Pair(person, city)
     }
 }

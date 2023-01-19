@@ -20,7 +20,6 @@ import com.vaticle.typedb.benchmark.simulation.driver.Transaction
 import org.neo4j.driver.Query
 import org.neo4j.driver.Record
 import org.neo4j.driver.Session
-import org.slf4j.LoggerFactory
 
 // TODO: why are we not passing a Transaction in here?
 abstract class Neo4jTransaction(protected val session: Session) : Transaction {

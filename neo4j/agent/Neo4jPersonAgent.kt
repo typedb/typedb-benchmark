@@ -20,15 +20,22 @@ import com.vaticle.typedb.benchmark.common.concept.City
 import com.vaticle.typedb.benchmark.common.concept.Gender
 import com.vaticle.typedb.benchmark.common.concept.Person
 import com.vaticle.typedb.benchmark.common.params.Context
-import com.vaticle.typedb.benchmark.neo4j.Labels.ADDRESS
-import com.vaticle.typedb.benchmark.neo4j.Labels.BIRTH_DATE
-import com.vaticle.typedb.benchmark.neo4j.Labels.CITY
-import com.vaticle.typedb.benchmark.neo4j.Labels.CODE
-import com.vaticle.typedb.benchmark.neo4j.Labels.EMAIL
-import com.vaticle.typedb.benchmark.neo4j.Labels.FIRST_NAME
-import com.vaticle.typedb.benchmark.neo4j.Labels.GENDER
-import com.vaticle.typedb.benchmark.neo4j.Labels.LAST_NAME
-import com.vaticle.typedb.benchmark.neo4j.Labels.PERSON
+import com.vaticle.typedb.benchmark.neo4j.Keywords.CREATE
+import com.vaticle.typedb.benchmark.neo4j.Keywords.MATCH
+import com.vaticle.typedb.benchmark.neo4j.Keywords.RETURN
+import com.vaticle.typedb.benchmark.neo4j.Literals.ADDRESS
+import com.vaticle.typedb.benchmark.neo4j.Literals.BIRTH_DATE
+import com.vaticle.typedb.benchmark.neo4j.Literals.BORN_IN
+import com.vaticle.typedb.benchmark.neo4j.Literals.CITY
+import com.vaticle.typedb.benchmark.neo4j.Literals.CITY_LABEL
+import com.vaticle.typedb.benchmark.neo4j.Literals.CODE
+import com.vaticle.typedb.benchmark.neo4j.Literals.EMAIL
+import com.vaticle.typedb.benchmark.neo4j.Literals.FIRST_NAME
+import com.vaticle.typedb.benchmark.neo4j.Literals.GENDER
+import com.vaticle.typedb.benchmark.neo4j.Literals.LAST_NAME
+import com.vaticle.typedb.benchmark.neo4j.Literals.PERSON
+import com.vaticle.typedb.benchmark.neo4j.Literals.PERSON_LABEL
+import com.vaticle.typedb.benchmark.neo4j.Literals.RESIDES_IN
 import com.vaticle.typedb.benchmark.neo4j.driver.Neo4jClient
 import com.vaticle.typedb.benchmark.neo4j.driver.Neo4jTransaction
 import com.vaticle.typedb.benchmark.simulation.agent.PersonAgent
@@ -41,16 +48,16 @@ class Neo4jPersonAgent(client: Neo4jClient, context: Context) : PersonAgent<Neo4
         tx: Neo4jTransaction, email: String, firstName: String, lastName: String,
         address: String, gender: Gender, birthDate: LocalDateTime, city: City
     ): Pair<Person, City.Report>? {
-        val query = "MATCH (c:City {code: \$code}) " +
-                "CREATE (person:Person {" +
-                "email: \$email, " +
-                "firstName: \$firstName, " +
-                "lastName: \$lastName, " +
-                "address: \$address, " +
-                "gender: \$gender, " +
-                "birthDate: \$birthDate" +
-                "})-[:BORN_IN]->(c), " +
-                "(person)-[:RESIDES_IN]->(c)"
+        val query = "$MATCH ($C:$CITY_LABEL {$CODE: \$$CODE}) " +
+                "$CREATE ($PERSON:$PERSON_LABEL {" +
+                "$EMAIL: \$$EMAIL, " +
+                "$FIRST_NAME: \$$FIRST_NAME, " +
+                "$LAST_NAME: \$$LAST_NAME, " +
+                "$ADDRESS: \$$ADDRESS, " +
+                "$GENDER: \$$GENDER, " +
+                "$BIRTH_DATE: \$$BIRTH_DATE" +
+                "})-[:$BORN_IN]->($C), " +
+                "($PERSON)-[:$RESIDES_IN]->($C)"
         val parameters = mapOf(
             CODE to city.code,
             EMAIL to email,
@@ -67,10 +74,10 @@ class Neo4jPersonAgent(client: Neo4jClient, context: Context) : PersonAgent<Neo4
     private fun report(tx: Neo4jTransaction, email: String): Pair<Person, City.Report> {
         val answers = tx.execute(
             Query(
-                "MATCH (person:Person {email: '$email'})-[:BORN_IN]->(city:City), " +
-                        "(person)-[:RESIDES_IN]->(city) " +
-                        "RETURN person.email, person.firstName, person.lastName, person.address, " +
-                        "person.gender, person.birthDate, city.code"
+                "$MATCH ($PERSON:$PERSON_LABEL {$EMAIL: '$email'})-[:$BORN_IN]->($CITY:$CITY_LABEL), " +
+                        "($PERSON)-[:$RESIDES_IN]->($CITY) " +
+                        "$RETURN $PERSON.$EMAIL, $PERSON.$FIRST_NAME, $PERSON.$LAST_NAME, $PERSON.$ADDRESS, " +
+                        "$PERSON.$GENDER, $PERSON.$BIRTH_DATE, $CITY.$CODE"
             )
         )
         assert(answers.size == 1)
@@ -85,5 +92,9 @@ class Neo4jPersonAgent(client: Neo4jClient, context: Context) : PersonAgent<Neo4
         )
         val city = City.Report(code = inserted["$CITY.$CODE"] as String)
         return Pair(person, city)
+    }
+
+    companion object {
+        private const val C = "c"
     }
 }

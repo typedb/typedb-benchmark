@@ -19,30 +19,38 @@ package com.vaticle.typedb.benchmark.typedb.agent
 import com.vaticle.typedb.benchmark.common.concept.Country
 import com.vaticle.typedb.benchmark.common.params.Context
 import com.vaticle.typedb.benchmark.simulation.agent.GrandparenthoodAgent
-import com.vaticle.typedb.benchmark.simulation.driver.Client
-import com.vaticle.typedb.benchmark.typedb.Labels
+import com.vaticle.typedb.benchmark.typedb.Labels.BIRTH_DATE
+import com.vaticle.typedb.benchmark.typedb.Labels.CITY
+import com.vaticle.typedb.benchmark.typedb.Labels.CODE
+import com.vaticle.typedb.benchmark.typedb.Labels.CONTAINED
+import com.vaticle.typedb.benchmark.typedb.Labels.CONTAINER
+import com.vaticle.typedb.benchmark.typedb.Labels.CONTAINS
+import com.vaticle.typedb.benchmark.typedb.Labels.COUNTRY
+import com.vaticle.typedb.benchmark.typedb.Labels.GRANDCHILD
+import com.vaticle.typedb.benchmark.typedb.Labels.GRANDPARENT
+import com.vaticle.typedb.benchmark.typedb.Labels.GRANDPARENTHOOD
+import com.vaticle.typedb.benchmark.typedb.Labels.PERSON
+import com.vaticle.typedb.benchmark.typedb.Labels.RESIDENCE
+import com.vaticle.typedb.benchmark.typedb.Labels.RESIDENT
+import com.vaticle.typedb.benchmark.typedb.Labels.RESIDENTSHIP
 import com.vaticle.typedb.benchmark.typedb.driver.TypeDBClient
 import com.vaticle.typedb.benchmark.typedb.driver.TypeDBTransaction
-import com.vaticle.typeql.lang.TypeQL
+import com.vaticle.typeql.lang.TypeQL.match
+import com.vaticle.typeql.lang.TypeQL.rel
+import com.vaticle.typeql.lang.TypeQL.`var`
 import java.time.LocalDateTime
-import java.util.stream.Collectors
 import java.util.stream.Collectors.toList
 
 class TypeDBGrandparenthoodAgent(client: TypeDBClient, context: Context) :
     GrandparenthoodAgent<TypeDBTransaction>(client, context) {
     override fun matchGrandparents(tx: TypeDBTransaction, country: Country, birthDate: LocalDateTime) {
         tx.query().match(
-            TypeQL.match(
-                TypeQL.`var`(Labels.PERSON).isa(Labels.PERSON).has(Labels.BIRTH_DATE, birthDate),
-                TypeQL.`var`(Labels.COUNTRY).isa(Labels.COUNTRY).has(Labels.CODE, country.code),
-                TypeQL.rel(Labels.RESIDENT, TypeQL.`var`(Labels.PERSON))
-                    .rel(Labels.RESIDENCE, TypeQL.`var`(Labels.CITY))
-                    .isa(Labels.RESIDENTSHIP),
-                TypeQL.rel(Labels.CONTAINED, TypeQL.`var`(Labels.CITY))
-                    .rel(Labels.CONTAINER, TypeQL.`var`(Labels.COUNTRY))
-                    .isa(Labels.CONTAINS),
-                TypeQL.rel(Labels.GRANDPARENT, TypeQL.`var`(GP)).rel(Labels.GRANDCHILD, TypeQL.`var`(Labels.PERSON))
-                    .isa(Labels.GRANDPARENTHOOD)
+            match(
+                `var`(PERSON).isa(PERSON).has(BIRTH_DATE, birthDate),
+                `var`(COUNTRY).isa(COUNTRY).has(CODE, country.code),
+                rel(RESIDENT, `var`(PERSON)).rel(RESIDENCE, `var`(CITY)).isa(RESIDENTSHIP),
+                rel(CONTAINED, `var`(CITY)).rel(CONTAINER, `var`(COUNTRY)).isa(CONTAINS),
+                rel(GRANDPARENT, `var`(GP)).rel(GRANDCHILD, `var`(PERSON)).isa(GRANDPARENTHOOD)
             )
         ).collect(toList())
     }

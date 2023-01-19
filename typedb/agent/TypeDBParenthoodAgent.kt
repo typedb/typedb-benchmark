@@ -22,52 +22,66 @@ import com.vaticle.typedb.benchmark.common.concept.Parenthood
 import com.vaticle.typedb.benchmark.common.concept.Person
 import com.vaticle.typedb.benchmark.common.params.Context
 import com.vaticle.typedb.benchmark.simulation.agent.ParenthoodAgent
-import com.vaticle.typedb.benchmark.simulation.driver.Client
-import com.vaticle.typedb.benchmark.typedb.Labels
+import com.vaticle.typedb.benchmark.typedb.Labels.BIRTH_DATE
+import com.vaticle.typedb.benchmark.typedb.Labels.BIRTH_PLACE
+import com.vaticle.typedb.benchmark.typedb.Labels.CHILD
+import com.vaticle.typedb.benchmark.typedb.Labels.CITY
+import com.vaticle.typedb.benchmark.typedb.Labels.CODE
+import com.vaticle.typedb.benchmark.typedb.Labels.CONTAINED
+import com.vaticle.typedb.benchmark.typedb.Labels.CONTAINER
+import com.vaticle.typedb.benchmark.typedb.Labels.CONTAINS
+import com.vaticle.typedb.benchmark.typedb.Labels.COUNTRY
+import com.vaticle.typedb.benchmark.typedb.Labels.EMAIL
+import com.vaticle.typedb.benchmark.typedb.Labels.HUSBAND
+import com.vaticle.typedb.benchmark.typedb.Labels.MARRIAGE
+import com.vaticle.typedb.benchmark.typedb.Labels.MARRIAGE_DATE
+import com.vaticle.typedb.benchmark.typedb.Labels.MARRIAGE_LICENCE
+import com.vaticle.typedb.benchmark.typedb.Labels.PARENT
+import com.vaticle.typedb.benchmark.typedb.Labels.PARENTHOOD
+import com.vaticle.typedb.benchmark.typedb.Labels.PERSON
+import com.vaticle.typedb.benchmark.typedb.Labels.PLACE
+import com.vaticle.typedb.benchmark.typedb.Labels.RESIDENCE
+import com.vaticle.typedb.benchmark.typedb.Labels.RESIDENT
+import com.vaticle.typedb.benchmark.typedb.Labels.RESIDENTSHIP
+import com.vaticle.typedb.benchmark.typedb.Labels.WIFE
 import com.vaticle.typedb.benchmark.typedb.driver.TypeDBClient
 import com.vaticle.typedb.benchmark.typedb.driver.TypeDBTransaction
 import com.vaticle.typedb.client.api.answer.ConceptMap
-import com.vaticle.typeql.lang.TypeQL
+import com.vaticle.typeql.lang.TypeQL.match
+import com.vaticle.typeql.lang.TypeQL.rel
+import com.vaticle.typeql.lang.TypeQL.`var`
 import java.time.LocalDateTime
-import java.util.Optional
-import java.util.stream.Collectors
 import java.util.stream.Collectors.toList
 import java.util.stream.Stream
 
 class TypeDBParenthoodAgent(client: TypeDBClient, context: Context) : ParenthoodAgent<TypeDBTransaction>(client, context) {
     override fun matchNewborns(tx: TypeDBTransaction, country: Country, today: LocalDateTime): Stream<Person> {
-        return tx.query().match(
-            TypeQL.match(
-                TypeQL.`var`(Labels.COUNTRY).isa(Labels.COUNTRY).has(Labels.CODE, country.code),
-                TypeQL.rel(Labels.CONTAINER, Labels.COUNTRY).rel(Labels.CONTAINED, Labels.CITY).isa(Labels.CONTAINS),
-                TypeQL.`var`(Labels.CITY).isa(Labels.CITY),
-                TypeQL.`var`(Labels.PERSON).isa(Labels.PERSON).has(Labels.EMAIL, TypeQL.`var`(Labels.EMAIL))
-                    .has(Labels.BIRTH_DATE, today),
-                TypeQL.rel(Labels.PLACE, TypeQL.`var`(Labels.CITY)).rel(Labels.CHILD, Labels.PERSON)
-                    .isa(Labels.BIRTH_PLACE)
-            )
-        ).map { conceptMap: ConceptMap -> Person(conceptMap[Labels.EMAIL].asAttribute().asString().value) }
+        return tx.query().match(match(
+            `var`(COUNTRY).isa(COUNTRY).has(CODE, country.code),
+            rel(CONTAINER, COUNTRY).rel(CONTAINED, CITY).isa(CONTAINS),
+            `var`(CITY).isa(CITY),
+            `var`(PERSON).isa(PERSON).has(EMAIL, `var`(EMAIL)).has(BIRTH_DATE, today),
+            rel(PLACE, `var`(CITY)).rel(CHILD, PERSON).isa(BIRTH_PLACE)
+        )).map { conceptMap: ConceptMap -> Person(email = conceptMap[EMAIL].asAttribute().asString().value) }
     }
 
     override fun matchMarriages(tx: TypeDBTransaction, country: Country, marriageDate: LocalDateTime): Stream<Marriage> {
-        return tx.query().match(
-            TypeQL.match(
-                TypeQL.`var`(Labels.COUNTRY).isa(Labels.COUNTRY).has(Labels.CODE, country.code),
-                TypeQL.rel(Labels.CONTAINER, Labels.COUNTRY).rel(Labels.CONTAINED, Labels.CITY).isa(Labels.CONTAINS),
-                TypeQL.`var`(Labels.CITY).isa(Labels.CITY),
-                TypeQL.`var`(W).isa(Labels.PERSON).has(Labels.EMAIL, TypeQL.`var`(EW)),
-                TypeQL.`var`(H).isa(Labels.PERSON).has(Labels.EMAIL, TypeQL.`var`(EH)),
-                TypeQL.rel(Labels.WIFE, W).rel(Labels.HUSBAND, H).isa(Labels.MARRIAGE)
-                    .has(Labels.MARRIAGE_DATE, marriageDate)
-                    .has(Labels.MARRIAGE_LICENCE, TypeQL.`var`(Labels.MARRIAGE_LICENCE)),
-                TypeQL.rel(Labels.RESIDENCE, TypeQL.`var`(Labels.CITY)).rel(Labels.RESIDENT, W).isa(Labels.RESIDENTSHIP)
-            )
-        ).map { conceptMap: ConceptMap ->
+        return tx.query().match(match(
+            `var`(COUNTRY).isa(COUNTRY).has(CODE, country.code),
+            rel(CONTAINER, COUNTRY).rel(CONTAINED, CITY).isa(CONTAINS),
+            `var`(CITY).isa(CITY),
+            `var`(W).isa(PERSON).has(EMAIL, `var`(EW)),
+            `var`(H).isa(PERSON).has(EMAIL, `var`(EH)),
+            rel(WIFE, W).rel(HUSBAND, H).isa(MARRIAGE)
+                .has(MARRIAGE_DATE, marriageDate)
+                .has(MARRIAGE_LICENCE, `var`(MARRIAGE_LICENCE)),
+            rel(RESIDENCE, `var`(CITY)).rel(RESIDENT, W).isa(RESIDENTSHIP)
+        )).map { conceptMap: ConceptMap ->
             Marriage(
-                Person(conceptMap[EW].asAttribute().asString().value),
-                Person(conceptMap[EH].asAttribute().asString().value),
-                conceptMap[Labels.MARRIAGE_LICENCE].asAttribute().asString().value,
-                marriageDate
+                wife = Person(conceptMap[EW].asAttribute().asString().value),
+                husband = Person(conceptMap[EH].asAttribute().asString().value),
+                licence = conceptMap[MARRIAGE_LICENCE].asAttribute().asString().value,
+                date = marriageDate
             )
         }
     }
@@ -76,12 +90,12 @@ class TypeDBParenthoodAgent(client: TypeDBClient, context: Context) : Parenthood
         tx: TypeDBTransaction, motherEmail: String, fatherEmail: String, childEmail: String
     ): Parenthood? {
         tx.query().insert(
-            TypeQL.match(
-                TypeQL.`var`(M).isa(Labels.PERSON).has(Labels.EMAIL, motherEmail),
-                TypeQL.`var`(F).isa(Labels.PERSON).has(Labels.EMAIL, fatherEmail),
-                TypeQL.`var`(C).isa(Labels.PERSON).has(Labels.EMAIL, childEmail)
+            match(
+                `var`(M).isa(PERSON).has(EMAIL, motherEmail),
+                `var`(F).isa(PERSON).has(EMAIL, fatherEmail),
+                `var`(C).isa(PERSON).has(EMAIL, childEmail)
             ).insert(
-                TypeQL.rel(Labels.PARENT, M).rel(Labels.PARENT, F).rel(Labels.CHILD, C).isa(Labels.PARENTHOOD)
+                rel(PARENT, M).rel(PARENT, F).rel(CHILD, C).isa(PARENTHOOD)
             )
         )
         return if (context.isReporting) report(tx, motherEmail, fatherEmail, childEmail) else null
@@ -89,21 +103,21 @@ class TypeDBParenthoodAgent(client: TypeDBClient, context: Context) : Parenthood
 
     private fun report(tx: TypeDBTransaction, motherEmail: String, fatherEmail: String, childEmail: String): Parenthood {
         val answers = tx.query().match(
-            TypeQL.match(
-                TypeQL.`var`(M).isa(Labels.PERSON).has(Labels.EMAIL, TypeQL.`var`(EM)),
-                TypeQL.`var`(EM).eq(motherEmail),
-                TypeQL.`var`(F).isa(Labels.PERSON).has(Labels.EMAIL, TypeQL.`var`(EF)),
-                TypeQL.`var`(EF).eq(fatherEmail),
-                TypeQL.`var`(C).isa(Labels.PERSON).has(Labels.EMAIL, TypeQL.`var`(EC)),
-                TypeQL.`var`(EC).eq(childEmail),
-                TypeQL.rel(Labels.PARENT, M).rel(Labels.PARENT, F).rel(Labels.CHILD, C).isa(Labels.PARENTHOOD)
-            )[TypeQL.`var`(EM), TypeQL.`var`(EF), TypeQL.`var`(EC)]
+            match(
+                `var`(M).isa(PERSON).has(EMAIL, `var`(EM)),
+                `var`(EM).eq(motherEmail),
+                `var`(F).isa(PERSON).has(EMAIL, `var`(EF)),
+                `var`(EF).eq(fatherEmail),
+                `var`(C).isa(PERSON).has(EMAIL, `var`(EC)),
+                `var`(EC).eq(childEmail),
+                rel(PARENT, M).rel(PARENT, F).rel(CHILD, C).isa(PARENTHOOD)
+            )[`var`(EM), `var`(EF), `var`(EC)]
         ).collect(toList())
         assert(answers.size == 1)
         val inserted = answers[0]
-        val mother = Person(inserted[EM].asAttribute().asString().value)
-        val father = Person(inserted[EF].asAttribute().asString().value)
-        val child = Person(inserted[EC].asAttribute().asString().value)
+        val mother = Person(email = inserted[EM].asAttribute().asString().value)
+        val father = Person(email = inserted[EF].asAttribute().asString().value)
+        val child = Person(email = inserted[EC].asAttribute().asString().value)
         return Parenthood(mother, father, child)
     }
 

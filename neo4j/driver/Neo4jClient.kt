@@ -17,6 +17,8 @@
 package com.vaticle.typedb.benchmark.neo4j.driver
 
 import com.vaticle.typedb.benchmark.common.concept.Region
+import com.vaticle.typedb.benchmark.neo4j.Keywords.MATCH
+import com.vaticle.typedb.benchmark.neo4j.Keywords.RETURN
 import com.vaticle.typedb.benchmark.simulation.driver.Client
 import org.neo4j.driver.AuthTokens
 import org.neo4j.driver.Driver
@@ -25,7 +27,6 @@ import org.neo4j.driver.Query
 import org.neo4j.driver.Transaction
 import java.text.DecimalFormat
 import java.util.concurrent.ConcurrentHashMap
-import java.util.function.Consumer
 
 class Neo4jClient(hostUri: String) : Client<Neo4jSession> {
     private val nativeDriver = GraphDatabase.driver(hostUri, AuthTokens.basic("neo4j", "admin"))
@@ -43,13 +44,13 @@ class Neo4jClient(hostUri: String) : Client<Neo4jSession> {
         val str = StringBuilder()
         nativeDriver.session().use { nativeSession ->
             val formatter = DecimalFormat("#,###")
-            val numberOfNodesQ = "MATCH (n)\n RETURN count(n)"
+            val numberOfNodesQ = "$MATCH (n)\n $RETURN count(n)"
             val numberOfNodesList = nativeSession.writeTransaction { tx: Transaction ->
                 val result = tx.run(Query(numberOfNodesQ))
                 result.list()
             }
             val numberOfNodes = numberOfNodesList[0].asMap()["count(n)"] as Long
-            val numberOfRelationshipsQ = "MATCH ()-->()\n RETURN count(*)"
+            val numberOfRelationshipsQ = "$MATCH ()-->()\n $RETURN count(*)"
             val numberOfRelationshipsList = nativeSession.writeTransaction { tx: Transaction ->
                 val result = tx.run(Query(numberOfRelationshipsQ))
                 result.list()

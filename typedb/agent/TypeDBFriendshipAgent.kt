@@ -20,44 +20,51 @@ import com.vaticle.typedb.benchmark.common.concept.Country
 import com.vaticle.typedb.benchmark.common.concept.Person
 import com.vaticle.typedb.benchmark.common.params.Context
 import com.vaticle.typedb.benchmark.simulation.agent.FriendshipAgent
-import com.vaticle.typedb.benchmark.typedb.Labels
+import com.vaticle.typedb.benchmark.typedb.Labels.BIRTH_DATE
+import com.vaticle.typedb.benchmark.typedb.Labels.CITY
+import com.vaticle.typedb.benchmark.typedb.Labels.CODE
+import com.vaticle.typedb.benchmark.typedb.Labels.CONTAINED
+import com.vaticle.typedb.benchmark.typedb.Labels.CONTAINER
+import com.vaticle.typedb.benchmark.typedb.Labels.CONTAINS
+import com.vaticle.typedb.benchmark.typedb.Labels.COUNTRY
+import com.vaticle.typedb.benchmark.typedb.Labels.EMAIL
+import com.vaticle.typedb.benchmark.typedb.Labels.FRIEND
+import com.vaticle.typedb.benchmark.typedb.Labels.FRIENDSHIP
+import com.vaticle.typedb.benchmark.typedb.Labels.PERSON
+import com.vaticle.typedb.benchmark.typedb.Labels.RESIDENCE
+import com.vaticle.typedb.benchmark.typedb.Labels.RESIDENT
+import com.vaticle.typedb.benchmark.typedb.Labels.RESIDENTSHIP
 import com.vaticle.typedb.benchmark.typedb.driver.TypeDBClient
 import com.vaticle.typedb.benchmark.typedb.driver.TypeDBTransaction
 import com.vaticle.typedb.client.api.answer.ConceptMap
-import com.vaticle.typedb.common.collection.Collections
 import com.vaticle.typedb.common.collection.Pair
-import com.vaticle.typeql.lang.TypeQL
+import com.vaticle.typeql.lang.TypeQL.eq
+import com.vaticle.typeql.lang.TypeQL.match
+import com.vaticle.typeql.lang.TypeQL.rel
+import com.vaticle.typeql.lang.TypeQL.`var`
 import java.time.LocalDateTime
-import java.util.Optional
-import java.util.stream.Collectors
 import java.util.stream.Collectors.toList
 import java.util.stream.Stream
 
 class TypeDBFriendshipAgent(client: TypeDBClient, context: Context) : FriendshipAgent<TypeDBTransaction>(client, context) {
     override fun matchTeenagers(tx: TypeDBTransaction, country: Country, birthDate: LocalDateTime): Stream<Person> {
         return tx.query().match(
-            TypeQL.match(
-                TypeQL.`var`(Labels.PERSON).isa(Labels.PERSON).has(Labels.BIRTH_DATE, TypeQL.eq(birthDate)).has(
-                    Labels.EMAIL, TypeQL.`var`(Labels.EMAIL)
-                ),
-                TypeQL.`var`(Labels.COUNTRY).isa(Labels.COUNTRY).has(Labels.CODE, country.code),
-                TypeQL.rel(Labels.RESIDENT, TypeQL.`var`(Labels.PERSON))
-                    .rel(Labels.RESIDENCE, TypeQL.`var`(Labels.CITY))
-                    .isa(Labels.RESIDENTSHIP),
-                TypeQL.rel(Labels.CONTAINED, TypeQL.`var`(Labels.CITY))
-                    .rel(Labels.CONTAINER, TypeQL.`var`(Labels.COUNTRY))
-                    .isa(Labels.CONTAINS)
-            )[TypeQL.`var`(Labels.EMAIL)]
-        ).map { conceptMap: ConceptMap -> Person(conceptMap[Labels.EMAIL].asAttribute().asString().value) }
+            match(
+                `var`(PERSON).isa(PERSON).has(BIRTH_DATE, eq(birthDate)).has(EMAIL, `var`(EMAIL)),
+                `var`(COUNTRY).isa(COUNTRY).has(CODE, country.code),
+                rel(RESIDENT, `var`(PERSON)).rel(RESIDENCE, `var`(CITY)).isa(RESIDENTSHIP),
+                rel(CONTAINED, `var`(CITY)).rel(CONTAINER, `var`(COUNTRY)).isa(CONTAINS)
+            )[`var`(EMAIL)]
+        ).map { conceptMap: ConceptMap -> Person(conceptMap[EMAIL].asAttribute().asString().value) }
     }
 
     override fun insertFriends(tx: TypeDBTransaction, email1: String, email2: String): Pair<Person, Person>? {
         tx.query().insert(
-            TypeQL.match(
-                TypeQL.`var`(X).isa(Labels.PERSON).has(Labels.EMAIL, email1),
-                TypeQL.`var`(Y).isa(Labels.PERSON).has(Labels.EMAIL, email2)
+            match(
+                `var`(X).isa(PERSON).has(EMAIL, email1),
+                `var`(Y).isa(PERSON).has(EMAIL, email2)
             ).insert(
-                TypeQL.rel(Labels.FRIEND, TypeQL.`var`(X)).rel(Labels.FRIEND, TypeQL.`var`(Y)).isa(Labels.FRIENDSHIP)
+                rel(FRIEND, `var`(X)).rel(FRIEND, `var`(Y)).isa(FRIENDSHIP)
             )
         )
         return if (context.isReporting) report(tx, email1, email2) else null
@@ -65,13 +72,13 @@ class TypeDBFriendshipAgent(client: TypeDBClient, context: Context) : Friendship
 
     private fun report(tx: TypeDBTransaction, email1: String, email2: String): Pair<Person, Person> {
         val answers = tx.query().match(
-            TypeQL.match(
-                TypeQL.`var`(X).isa(Labels.PERSON).has(Labels.EMAIL, TypeQL.`var`(E1)),
-                TypeQL.`var`(E1).eq(email1),
-                TypeQL.`var`(Y).isa(Labels.PERSON).has(Labels.EMAIL, TypeQL.`var`(E2)),
-                TypeQL.`var`(E2).eq(email2),
-                TypeQL.rel(Labels.FRIEND, TypeQL.`var`(X)).rel(Labels.FRIEND, TypeQL.`var`(Y)).isa(Labels.FRIENDSHIP)
-            )[TypeQL.`var`(E1), TypeQL.`var`(E2)]
+            match(
+                `var`(X).isa(PERSON).has(EMAIL, `var`(E1)),
+                `var`(E1).eq(email1),
+                `var`(Y).isa(PERSON).has(EMAIL, `var`(E2)),
+                `var`(E2).eq(email2),
+                rel(FRIEND, `var`(X)).rel(FRIEND, `var`(Y)).isa(FRIENDSHIP)
+            )[`var`(E1), `var`(E2)]
         ).collect(toList())
         assert(answers.size == 1)
         val inserted = answers[0]

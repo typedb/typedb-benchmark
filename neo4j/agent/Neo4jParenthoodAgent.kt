@@ -21,82 +21,98 @@ import com.vaticle.typedb.benchmark.common.concept.Marriage
 import com.vaticle.typedb.benchmark.common.concept.Parenthood
 import com.vaticle.typedb.benchmark.common.concept.Person
 import com.vaticle.typedb.benchmark.common.params.Context
-import com.vaticle.typedb.benchmark.neo4j.Labels
-import com.vaticle.typedb.benchmark.neo4j.Labels.BIRTH_DATE
-import com.vaticle.typedb.benchmark.neo4j.Labels.CODE
-import com.vaticle.typedb.benchmark.neo4j.Labels.MARRIAGE_DATE
+import com.vaticle.typedb.benchmark.neo4j.Keywords.CREATE
+import com.vaticle.typedb.benchmark.neo4j.Keywords.MATCH
+import com.vaticle.typedb.benchmark.neo4j.Keywords.RETURN
+import com.vaticle.typedb.benchmark.neo4j.Literals.BIRTH_DATE
+import com.vaticle.typedb.benchmark.neo4j.Literals.BORN_IN
+import com.vaticle.typedb.benchmark.neo4j.Literals.CHILD_EMAIL
+import com.vaticle.typedb.benchmark.neo4j.Literals.CITY_LABEL
+import com.vaticle.typedb.benchmark.neo4j.Literals.CODE
+import com.vaticle.typedb.benchmark.neo4j.Literals.CONTAINED_IN
+import com.vaticle.typedb.benchmark.neo4j.Literals.COUNTRY
+import com.vaticle.typedb.benchmark.neo4j.Literals.COUNTRY_LABEL
+import com.vaticle.typedb.benchmark.neo4j.Literals.EMAIL
+import com.vaticle.typedb.benchmark.neo4j.Literals.FATHER_EMAIL
+import com.vaticle.typedb.benchmark.neo4j.Literals.MARRIAGE_DATE
+import com.vaticle.typedb.benchmark.neo4j.Literals.MARRIAGE_LICENCE
+import com.vaticle.typedb.benchmark.neo4j.Literals.MARRIED_TO
+import com.vaticle.typedb.benchmark.neo4j.Literals.MOTHER_EMAIL
+import com.vaticle.typedb.benchmark.neo4j.Literals.PARENT_OF
+import com.vaticle.typedb.benchmark.neo4j.Literals.PERSON
+import com.vaticle.typedb.benchmark.neo4j.Literals.PERSON_LABEL
+import com.vaticle.typedb.benchmark.neo4j.Literals.RESIDES_IN
 import com.vaticle.typedb.benchmark.neo4j.driver.Neo4jClient
 import com.vaticle.typedb.benchmark.neo4j.driver.Neo4jTransaction
 import com.vaticle.typedb.benchmark.simulation.agent.ParenthoodAgent
-import com.vaticle.typedb.benchmark.simulation.driver.Client
 import org.neo4j.driver.Query
 import org.neo4j.driver.Record
 import java.time.LocalDateTime
-import java.util.Optional
 import java.util.stream.Stream
 
 class Neo4jParenthoodAgent(client: Neo4jClient, context: Context) : ParenthoodAgent<Neo4jTransaction>(client, context) {
     override fun matchNewborns(tx: Neo4jTransaction, country: Country, today: LocalDateTime): Stream<Person> {
-        val query = "MATCH (person:Person {birthDate: \$birthDate})" +
-                "-[:BORN_IN]->(:City)-[:CONTAINED_IN]->(country:Country {code: \$code}) \n" +
-                "RETURN person.email"
+        val query = "$MATCH ($PERSON:$PERSON_LABEL {$BIRTH_DATE: \$$BIRTH_DATE})" +
+                "-[:$BORN_IN]->(:$CITY_LABEL)-[:$CONTAINED_IN]->($COUNTRY:$COUNTRY_LABEL {$CODE: \$$CODE}) \n" +
+                "$RETURN $PERSON.$EMAIL"
         val parameters = mapOf(CODE to country.code, BIRTH_DATE to today)
         return tx.execute(Query(query, parameters)).stream()
-            .map { record: Record -> Person(email = record.asMap()["person.email"] as String) }
+            .map { record: Record -> Person(email = record.asMap()["$PERSON.$EMAIL"] as String) }
     }
 
     override fun matchMarriages(tx: Neo4jTransaction, country: Country, marriageDate: LocalDateTime): Stream<Marriage> {
-        val query = "MATCH (w:Person)-[:RESIDES_IN]->(:City)-[:CONTAINED_IN]->(country:Country {code: \$code}),\n" +
-                "(w)-[m:MARRIED_TO {marriageDate: \$marriageDate}]->(h:Person)" +
-                "RETURN w.email, h.email, m.marriageLicence, m.marriageDate"
+        val query = "$MATCH (w:$PERSON_LABEL)-[:$RESIDES_IN]->(:$CITY_LABEL)-[:$CONTAINED_IN]->($COUNTRY:$COUNTRY_LABEL {$CODE: \$$CODE}),\n" +
+                "(w)-[m:$MARRIED_TO {$MARRIAGE_DATE: \$$MARRIAGE_DATE}]->($H:$PERSON_LABEL)" +
+                "$RETURN $W.$EMAIL, $H.$EMAIL, $M.$MARRIAGE_LICENCE, $M.$MARRIAGE_DATE"
         val parameters = mapOf(MARRIAGE_DATE to marriageDate, CODE to country.code)
         tx.execute(Query(query, parameters))
         return tx.execute(Query(query, parameters)).stream().map { record: Record ->
             Marriage(
-                wife = Person(email = record.asMap()["w.email"] as String),
-                husband = Person(email = record.asMap()["h.email"] as String),
-                licence = record.asMap()["m.marriageLicence"] as String,
-                date = record.asMap()["m.marriageDate"] as LocalDateTime
+                wife = Person(email = record.asMap()["$W.$EMAIL"] as String),
+                husband = Person(email = record.asMap()["$H.$EMAIL"] as String),
+                licence = record.asMap()["$M.$MARRIAGE_LICENCE"] as String,
+                date = record.asMap()["$M.$MARRIAGE_DATE"] as LocalDateTime
             )
         }
     }
 
     override fun insertParenthood(
-        tx: Neo4jTransaction, motherEmail: String, fatherEmail: String,
-        childEmail: String
+        tx: Neo4jTransaction, motherEmail: String, fatherEmail: String, childEmail: String
     ): Parenthood? {
-        val query = "MATCH " +
-                "(m:Person {email: \$motherEmail}),\n" +
-                "(f:Person {email: \$fatherEmail}),\n" +
-                "(c:Person {email: \$childEmail})\n" +
-                "CREATE (m)-[:PARENT_OF]->(c),\n" +
-                "(f)-[:PARENT_OF]->(c)"
-        val parameters = mapOf("motherEmail" to motherEmail, "fatherEmail" to fatherEmail, "childEmail" to childEmail)
+        val query = "$MATCH " +
+                "($M:$PERSON_LABEL {$EMAIL: \$$MOTHER_EMAIL}),\n" +
+                "($F:$PERSON_LABEL {$EMAIL: \$$FATHER_EMAIL}),\n" +
+                "($C:$PERSON_LABEL {$EMAIL: \$$CHILD_EMAIL})\n" +
+                "$CREATE ($M)-[:$PARENT_OF]->($C),\n" +
+                "($F)-[:$PARENT_OF]->($C)"
+        val parameters = mapOf(MOTHER_EMAIL to motherEmail, FATHER_EMAIL to fatherEmail, CHILD_EMAIL to childEmail)
         tx.execute(Query(query, parameters))
         return if (context.isReporting) report(tx, motherEmail, fatherEmail, childEmail) else null
     }
 
     private fun report(tx: Neo4jTransaction, motherEmail: String, fatherEmail: String, childEmail: String): Parenthood {
-        val query = "MATCH " +
-                "(m:Person {email: \$motherEmail}),\n" +
-                "(f:Person {email: \$fatherEmail}),\n" +
-                "(c:Person {email: \$childEmail}),\n" +
-                "(m)-[:PARENT_OF]->(c),\n" +
-                "(f)-[:PARENT_OF]->(c)\n" +
-                "RETURN m.email, f.email, c.email"
-        val parameters = mapOf("motherEmail" to motherEmail, "fatherEmail" to fatherEmail, "childEmail" to childEmail)
+        val query = "$MATCH " +
+                "($M:$PERSON_LABEL {$EMAIL: \$$MOTHER_EMAIL}),\n" +
+                "($F:$PERSON_LABEL {$EMAIL: \$$FATHER_EMAIL}),\n" +
+                "($C:$PERSON_LABEL {$EMAIL: \$$CHILD_EMAIL}),\n" +
+                "$M)-[:$PARENT_OF]->($C),\n" +
+                "($F)-[:$PARENT_OF]->($C)\n" +
+                "$RETURN $M.$EMAIL, $F.$EMAIL, $C.$EMAIL"
+        val parameters = mapOf(MOTHER_EMAIL to motherEmail, FATHER_EMAIL to fatherEmail, CHILD_EMAIL to childEmail)
         val answers = tx.execute(Query(query, parameters))
         assert(answers.size == 1)
         val inserted = answers[0].asMap()
-        val mother = Person(email = inserted["$M.${Labels.EMAIL}"] as String)
-        val father = Person(email = inserted["$F.${Labels.EMAIL}"] as String)
-        val child = Person(email = inserted["$C.${Labels.EMAIL}"] as String)
+        val mother = Person(email = inserted["$M.$EMAIL"] as String)
+        val father = Person(email = inserted["$F.$EMAIL"] as String)
+        val child = Person(email = inserted["$C.$EMAIL"] as String)
         return Parenthood(mother, father, child)
     }
 
     companion object {
-        private const val M = "m"
-        private const val F = "f"
         private const val C = "c"
+        private const val F = "f"
+        private const val H = "h"
+        private const val M = "m"
+        private const val W = "w"
     }
 }

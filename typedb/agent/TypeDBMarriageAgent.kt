@@ -22,15 +22,31 @@ import com.vaticle.typedb.benchmark.common.concept.Marriage
 import com.vaticle.typedb.benchmark.common.concept.Person
 import com.vaticle.typedb.benchmark.common.params.Context
 import com.vaticle.typedb.benchmark.simulation.agent.MarriageAgent
-import com.vaticle.typedb.benchmark.simulation.driver.Client
-import com.vaticle.typedb.benchmark.typedb.Labels
+import com.vaticle.typedb.benchmark.typedb.Labels.BIRTH_DATE
+import com.vaticle.typedb.benchmark.typedb.Labels.CITY
+import com.vaticle.typedb.benchmark.typedb.Labels.CODE
+import com.vaticle.typedb.benchmark.typedb.Labels.CONTAINED
+import com.vaticle.typedb.benchmark.typedb.Labels.CONTAINER
+import com.vaticle.typedb.benchmark.typedb.Labels.CONTAINS
+import com.vaticle.typedb.benchmark.typedb.Labels.COUNTRY
+import com.vaticle.typedb.benchmark.typedb.Labels.EMAIL
+import com.vaticle.typedb.benchmark.typedb.Labels.GENDER
+import com.vaticle.typedb.benchmark.typedb.Labels.HUSBAND
+import com.vaticle.typedb.benchmark.typedb.Labels.MARRIAGE
+import com.vaticle.typedb.benchmark.typedb.Labels.MARRIAGE_DATE
+import com.vaticle.typedb.benchmark.typedb.Labels.MARRIAGE_LICENCE
+import com.vaticle.typedb.benchmark.typedb.Labels.PERSON
+import com.vaticle.typedb.benchmark.typedb.Labels.RESIDENCE
+import com.vaticle.typedb.benchmark.typedb.Labels.RESIDENT
+import com.vaticle.typedb.benchmark.typedb.Labels.RESIDENTSHIP
+import com.vaticle.typedb.benchmark.typedb.Labels.WIFE
 import com.vaticle.typedb.benchmark.typedb.driver.TypeDBClient
 import com.vaticle.typedb.benchmark.typedb.driver.TypeDBTransaction
 import com.vaticle.typedb.client.api.answer.ConceptMap
-import com.vaticle.typeql.lang.TypeQL
+import com.vaticle.typeql.lang.TypeQL.match
+import com.vaticle.typeql.lang.TypeQL.rel
+import com.vaticle.typeql.lang.TypeQL.`var`
 import java.time.LocalDateTime
-import java.util.Optional
-import java.util.stream.Collectors
 import java.util.stream.Collectors.toList
 import java.util.stream.Stream
 
@@ -38,19 +54,13 @@ class TypeDBMarriageAgent(client: TypeDBClient, context: Context) : MarriageAgen
     override fun matchPartner(
         tx: TypeDBTransaction, country: Country, birthDate: LocalDateTime, gender: Gender
     ): Stream<Person> {
-        return tx.query().match(
-            TypeQL.match(
-                TypeQL.rel(Labels.CONTAINER, Labels.COUNTRY).rel(Labels.CONTAINED, Labels.CITY).isa(Labels.CONTAINS),
-                TypeQL.`var`(Labels.COUNTRY).isa(Labels.COUNTRY).has(Labels.CODE, country.code),
-                TypeQL.`var`(Labels.CITY).isa(Labels.CITY),
-                TypeQL.`var`(Labels.PERSON).isa(Labels.PERSON).has(Labels.EMAIL, TypeQL.`var`(Labels.EMAIL))
-                    .has(Labels.GENDER, gender.value)
-                    .has(Labels.BIRTH_DATE, birthDate),
-                TypeQL.`var`().rel(Labels.RESIDENCE, TypeQL.`var`(Labels.CITY))
-                    .rel(Labels.RESIDENT, TypeQL.`var`(Labels.PERSON))
-                    .isa(Labels.RESIDENTSHIP)
-            )
-        ).map { conceptMap: ConceptMap -> Person(conceptMap[Labels.EMAIL].asAttribute().asString().value) }
+        return tx.query().match(match(
+            rel(CONTAINER, COUNTRY).rel(CONTAINED, CITY).isa(CONTAINS),
+            `var`(COUNTRY).isa(COUNTRY).has(CODE, country.code),
+            `var`(CITY).isa(CITY),
+            `var`(PERSON).isa(PERSON).has(EMAIL, `var`(EMAIL)).has(GENDER, gender.value).has(BIRTH_DATE, birthDate),
+            `var`().rel(RESIDENCE, `var`(CITY)).rel(RESIDENT, `var`(PERSON)).isa(RESIDENTSHIP)
+        )).map { conceptMap: ConceptMap -> Person(conceptMap[EMAIL].asAttribute().asString().value) }
     }
 
     override fun insertMarriage(
@@ -58,12 +68,12 @@ class TypeDBMarriageAgent(client: TypeDBClient, context: Context) : MarriageAgen
         husbandEmail: String, marriageLicence: String, marriageDate: LocalDateTime
     ): Marriage? {
         tx.query().insert(
-            TypeQL.match(
-                TypeQL.`var`(W).isa(Labels.PERSON).has(Labels.EMAIL, wifeEmail),
-                TypeQL.`var`(H).isa(Labels.PERSON).has(Labels.EMAIL, husbandEmail)
+            match(
+                `var`(W).isa(PERSON).has(EMAIL, wifeEmail),
+                `var`(H).isa(PERSON).has(EMAIL, husbandEmail)
             ).insert(
-                TypeQL.rel(Labels.WIFE, W).rel(Labels.HUSBAND, H).isa(Labels.MARRIAGE)
-                    .has(Labels.MARRIAGE_LICENCE, marriageLicence).has(Labels.MARRIAGE_DATE, marriageDate)
+                rel(WIFE, W).rel(HUSBAND, H).isa(MARRIAGE)
+                    .has(MARRIAGE_LICENCE, marriageLicence).has(MARRIAGE_DATE, marriageDate)
             )
         )
         return if (context.isReporting) report(tx, wifeEmail, husbandEmail, marriageLicence, marriageDate) else null
@@ -74,17 +84,17 @@ class TypeDBMarriageAgent(client: TypeDBClient, context: Context) : MarriageAgen
         marriageLicence: String, marriageDate: LocalDateTime
     ): Marriage {
         val answers = tx.query().match(
-            TypeQL.match(
-                TypeQL.`var`(W).isa(Labels.PERSON).has(Labels.EMAIL, TypeQL.`var`(EW)),
-                TypeQL.`var`(EW).eq(wifeEmail),
-                TypeQL.`var`(H).isa(Labels.PERSON).has(Labels.EMAIL, TypeQL.`var`(EH)),
-                TypeQL.`var`(EH).eq(husbandEmail),
-                TypeQL.rel(Labels.WIFE, W).rel(Labels.HUSBAND, H).isa(Labels.MARRIAGE)
-                    .has(Labels.MARRIAGE_LICENCE, TypeQL.`var`(L))
-                    .has(Labels.MARRIAGE_DATE, TypeQL.`var`(D)),
-                TypeQL.`var`(D).eq(marriageDate),
-                TypeQL.`var`(L).eq(marriageLicence)
-            )[TypeQL.`var`(EW), TypeQL.`var`(EH), TypeQL.`var`(L), TypeQL.`var`(D)]
+            match(
+                `var`(W).isa(PERSON).has(EMAIL, `var`(EW)),
+                `var`(EW).eq(wifeEmail),
+                `var`(H).isa(PERSON).has(EMAIL, `var`(EH)),
+                `var`(EH).eq(husbandEmail),
+                rel(WIFE, W).rel(HUSBAND, H).isa(MARRIAGE)
+                    .has(MARRIAGE_LICENCE, `var`(L))
+                    .has(MARRIAGE_DATE, `var`(D)),
+                `var`(D).eq(marriageDate),
+                `var`(L).eq(marriageLicence)
+            )[`var`(EW), `var`(EH), `var`(L), `var`(D)]
         ).collect(toList())
         assert(answers.size == 1)
         val inserted = answers[0]

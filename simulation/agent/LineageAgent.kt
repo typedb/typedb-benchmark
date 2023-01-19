@@ -35,5 +35,5 @@ abstract class LineageAgent<TX: Transaction> protected constructor(client: Clien
         return emptyList()
     }
 
-    protected abstract fun matchLineages(tx: TX, country: Country, startDay: LocalDateTime, today: LocalDateTime?)
+    protected abstract fun matchLineages(tx: TX, country: Country, startDay: LocalDateTime, today: LocalDateTime)
 }

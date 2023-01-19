@@ -19,28 +19,38 @@ package com.vaticle.typedb.benchmark.typedb.agent
 import com.vaticle.typedb.benchmark.common.concept.Country
 import com.vaticle.typedb.benchmark.common.params.Context
 import com.vaticle.typedb.benchmark.simulation.agent.LineageAgent
-import com.vaticle.typedb.benchmark.typedb.Labels
+import com.vaticle.typedb.benchmark.typedb.Labels.ANCESTOR
+import com.vaticle.typedb.benchmark.typedb.Labels.BIRTH_DATE
+import com.vaticle.typedb.benchmark.typedb.Labels.BIRTH_PLACE
+import com.vaticle.typedb.benchmark.typedb.Labels.CHILD
+import com.vaticle.typedb.benchmark.typedb.Labels.CITY
+import com.vaticle.typedb.benchmark.typedb.Labels.CODE
+import com.vaticle.typedb.benchmark.typedb.Labels.CONTAINED
+import com.vaticle.typedb.benchmark.typedb.Labels.CONTAINER
+import com.vaticle.typedb.benchmark.typedb.Labels.CONTAINS
+import com.vaticle.typedb.benchmark.typedb.Labels.COUNTRY
+import com.vaticle.typedb.benchmark.typedb.Labels.DESCENDENT
+import com.vaticle.typedb.benchmark.typedb.Labels.LINEAGE
+import com.vaticle.typedb.benchmark.typedb.Labels.PERSON
+import com.vaticle.typedb.benchmark.typedb.Labels.PLACE
 import com.vaticle.typedb.benchmark.typedb.driver.TypeDBClient
 import com.vaticle.typedb.benchmark.typedb.driver.TypeDBTransaction
-import com.vaticle.typeql.lang.TypeQL
+import com.vaticle.typeql.lang.TypeQL.match
+import com.vaticle.typeql.lang.TypeQL.rel
+import com.vaticle.typeql.lang.TypeQL.`var`
 import java.time.LocalDateTime
 import java.util.stream.Collectors.toList
 
 class TypeDBLineageAgent(client: TypeDBClient, context: Context) : LineageAgent<TypeDBTransaction>(client, context) {
-    override fun matchLineages(tx: TypeDBTransaction, country: Country, startDay: LocalDateTime, today: LocalDateTime?) {
-        tx.query().match(
-            TypeQL.match(
-                TypeQL.rel(Labels.CONTAINER, Labels.COUNTRY).rel(Labels.CONTAINED, Labels.CITY).isa(Labels.CONTAINS),
-                TypeQL.`var`(Labels.COUNTRY).isa(Labels.COUNTRY).has(Labels.CODE, country.code),
-                TypeQL.`var`(Labels.CITY).isa(Labels.CITY),
-                TypeQL.`var`(Labels.ANCESTOR).isa(Labels.PERSON).has(Labels.BIRTH_DATE, startDay),
-                TypeQL.`var`().rel(Labels.PLACE, TypeQL.`var`(Labels.CITY))
-                    .rel(Labels.CHILD, TypeQL.`var`(Labels.ANCESTOR))
-                    .isa(Labels.BIRTH_PLACE),
-                TypeQL.`var`(Labels.DESCENDENT).isa(Labels.PERSON).has(Labels.BIRTH_DATE, today),
-                TypeQL.rel(Labels.ANCESTOR, Labels.ANCESTOR).rel(Labels.DESCENDENT, Labels.DESCENDENT)
-                    .isa(Labels.LINEAGE)
-            )
-        ).collect(toList())
+    override fun matchLineages(tx: TypeDBTransaction, country: Country, startDay: LocalDateTime, today: LocalDateTime) {
+        tx.query().match(match(
+            rel(CONTAINER, COUNTRY).rel(CONTAINED, CITY).isa(CONTAINS),
+            `var`(COUNTRY).isa(COUNTRY).has(CODE, country.code),
+            `var`(CITY).isa(CITY),
+            `var`(ANCESTOR).isa(PERSON).has(BIRTH_DATE, startDay),
+            `var`().rel(PLACE, `var`(CITY)).rel(CHILD, `var`(ANCESTOR)).isa(BIRTH_PLACE),
+            `var`(DESCENDENT).isa(PERSON).has(BIRTH_DATE, today),
+            rel(ANCESTOR, ANCESTOR).rel(DESCENDENT, DESCENDENT).isa(LINEAGE)
+        )).collect(toList())
     }
 }

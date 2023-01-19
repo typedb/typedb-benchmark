@@ -19,21 +19,26 @@ package com.vaticle.typedb.benchmark.typedb.agent
 import com.vaticle.typedb.benchmark.common.concept.Country
 import com.vaticle.typedb.benchmark.common.params.Context
 import com.vaticle.typedb.benchmark.simulation.agent.CitizenshipAgent
-import com.vaticle.typedb.benchmark.typedb.Labels
+import com.vaticle.typedb.benchmark.typedb.Labels.BIRTH_DATE
+import com.vaticle.typedb.benchmark.typedb.Labels.CITIZEN
+import com.vaticle.typedb.benchmark.typedb.Labels.CITIZENSHIP
+import com.vaticle.typedb.benchmark.typedb.Labels.CODE
+import com.vaticle.typedb.benchmark.typedb.Labels.COUNTRY
+import com.vaticle.typedb.benchmark.typedb.Labels.PERSON
 import com.vaticle.typedb.benchmark.typedb.driver.TypeDBClient
 import com.vaticle.typedb.benchmark.typedb.driver.TypeDBTransaction
-import com.vaticle.typeql.lang.TypeQL
+import com.vaticle.typeql.lang.TypeQL.match
+import com.vaticle.typeql.lang.TypeQL.rel
+import com.vaticle.typeql.lang.TypeQL.`var`
 import java.time.LocalDateTime
 import java.util.stream.Collectors.toList
 
 class TypeDBCitizenshipAgent(client: TypeDBClient, context: Context) : CitizenshipAgent<TypeDBTransaction>(client, context) {
     override fun matchCitizenship(tx: TypeDBTransaction, country: Country, today: LocalDateTime) {
-        tx.query().match(
-            TypeQL.match(
-                TypeQL.`var`(Labels.COUNTRY).isa(Labels.COUNTRY).has(Labels.CODE, country.code),
-                TypeQL.`var`(Labels.CITIZEN).isa(Labels.PERSON).has(Labels.BIRTH_DATE, today),
-                TypeQL.rel(Labels.CITIZEN, Labels.CITIZEN).rel(Labels.COUNTRY, Labels.COUNTRY).isa(Labels.CITIZENSHIP)
-            )
-        ).collect(toList())
+        tx.query().match(match(
+            `var`(COUNTRY).isa(COUNTRY).has(CODE, country.code),
+            `var`(CITIZEN).isa(PERSON).has(BIRTH_DATE, today),
+            rel(CITIZEN, CITIZEN).rel(COUNTRY, COUNTRY).isa(CITIZENSHIP)
+        )).collect(toList())
     }
 }

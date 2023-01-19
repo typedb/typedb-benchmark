@@ -36,6 +36,19 @@ import com.vaticle.typedb.benchmark.simulation.agent.MarriageAgent
 import com.vaticle.typedb.benchmark.simulation.agent.NationalityAgent
 import com.vaticle.typedb.benchmark.simulation.agent.ParenthoodAgent
 import com.vaticle.typedb.benchmark.simulation.agent.PersonAgent
+import com.vaticle.typedb.benchmark.typedb.Labels.CITY
+import com.vaticle.typedb.benchmark.typedb.Labels.CODE
+import com.vaticle.typedb.benchmark.typedb.Labels.CONTAINED
+import com.vaticle.typedb.benchmark.typedb.Labels.CONTAINER
+import com.vaticle.typedb.benchmark.typedb.Labels.CONTAINS
+import com.vaticle.typedb.benchmark.typedb.Labels.CONTINENT
+import com.vaticle.typedb.benchmark.typedb.Labels.COUNTRY
+import com.vaticle.typedb.benchmark.typedb.Labels.CURRENCY
+import com.vaticle.typedb.benchmark.typedb.Labels.LOCATED
+import com.vaticle.typedb.benchmark.typedb.Labels.LOCATES
+import com.vaticle.typedb.benchmark.typedb.Labels.LOCATION
+import com.vaticle.typedb.benchmark.typedb.Labels.NAME
+import com.vaticle.typedb.benchmark.typedb.Labels.UNIVERSITY
 import com.vaticle.typedb.benchmark.typedb.agent.TypeDBCitizenshipAgent
 import com.vaticle.typedb.benchmark.typedb.agent.TypeDBCoupleFriendshipAgent
 import com.vaticle.typedb.benchmark.typedb.agent.TypeDBFriendshipAgent
@@ -53,6 +66,10 @@ import com.vaticle.typedb.client.api.TypeDBSession.Type.DATA
 import com.vaticle.typedb.client.api.TypeDBSession.Type.SCHEMA
 import com.vaticle.typedb.client.api.TypeDBTransaction.Type.WRITE
 import com.vaticle.typeql.lang.TypeQL
+import com.vaticle.typeql.lang.TypeQL.insert
+import com.vaticle.typeql.lang.TypeQL.match
+import com.vaticle.typeql.lang.TypeQL.rel
+import com.vaticle.typeql.lang.TypeQL.`var`
 import mu.KotlinLogging
 import java.nio.file.Files
 import java.nio.file.Paths
@@ -102,13 +119,7 @@ class TypeDBSimulation private constructor(client: TypeDBClient, context: Contex
     private fun initContinents(session: com.vaticle.typedb.client.api.TypeDBSession, global: Global) {
         global.continents.parallelStream().forEach { continent: Continent ->
             session.transaction(WRITE).use { tx ->
-                tx.query().insert(
-                    TypeQL.insert(
-                        TypeQL.`var`().isa(Labels.CONTINENT).has(Labels.CODE, continent.code).has(
-                            Labels.NAME, continent.name
-                        )
-                    )
-                )
+                tx.query().insert(insert(`var`().isa(CONTINENT).has(CODE, continent.code).has(NAME, continent.name)))
                 tx.commit()
             }
             initCountries(session, continent)
@@ -118,13 +129,14 @@ class TypeDBSimulation private constructor(client: TypeDBClient, context: Contex
     private fun initCountries(session: com.vaticle.typedb.client.api.TypeDBSession, continent: Continent) {
         continent.countries.parallelStream().forEach { country: Country ->
             session.transaction(WRITE).use { tx ->
-                val countryVar = TypeQL.`var`(Y).isa(Labels.COUNTRY).has(Labels.CODE, country.code)
-                    .has(Labels.NAME, country.name)
-                country.currencies.forEach { currency: Currency -> countryVar.has(Labels.CURRENCY, currency.code) }
+                val countryVar = `var`(Y).isa(COUNTRY).has(CODE, country.code).has(NAME, country.name)
+                country.currencies.forEach { currency: Currency -> countryVar.has(CURRENCY, currency.code) }
                 tx.query().insert(
-                    TypeQL.match(
-                        TypeQL.`var`(X).isa(Labels.CONTINENT).has(Labels.CODE, continent.code)
-                    ).insert(countryVar, TypeQL.rel(Labels.CONTAINER, X).rel(Labels.CONTAINED, Y).isa(Labels.CONTAINS))
+                    match(
+                        `var`(X).isa(CONTINENT).has(CODE, continent.code)
+                    ).insert(
+                        countryVar, rel(CONTAINER, X).rel(CONTAINED, Y).isa(CONTAINS)
+                    )
                 )
                 // TODO: Currency should be an entity we relate to by relation
                 tx.commit()
@@ -138,11 +150,11 @@ class TypeDBSimulation private constructor(client: TypeDBClient, context: Contex
         session.transaction(WRITE).use { tx ->
             country.cities.forEach { city: City ->
                 tx.query().insert(
-                    TypeQL.match(
-                        TypeQL.`var`(X).isa(Labels.COUNTRY).has(Labels.CODE, country.code)
+                    match(
+                        `var`(X).isa(COUNTRY).has(CODE, country.code)
                     ).insert(
-                        TypeQL.`var`(Y).isa(Labels.CITY).has(Labels.CODE, city.code).has(Labels.NAME, city.name),
-                        TypeQL.rel(Labels.CONTAINER, X).rel(Labels.CONTAINED, Y).isa(Labels.CONTAINS)
+                        `var`(Y).isa(CITY).has(CODE, city.code).has(NAME, city.name),
+                        rel(CONTAINER, X).rel(CONTAINED, Y).isa(CONTAINS)
                     )
                 )
             }
@@ -154,11 +166,11 @@ class TypeDBSimulation private constructor(client: TypeDBClient, context: Contex
         session.transaction(WRITE).use { tx ->
             country.universities.forEach { university: University ->
                 tx.query().insert(
-                    TypeQL.match(
-                        TypeQL.`var`(X).isa(Labels.COUNTRY).has(Labels.CODE, country.code)
+                    match(
+                        `var`(X).isa(COUNTRY).has(CODE, country.code)
                     ).insert(
-                        TypeQL.`var`(Y).isa(Labels.UNIVERSITY).has(Labels.NAME, university.name),
-                        TypeQL.rel(Labels.LOCATION, X).rel(Labels.LOCATED, Y).isa(Labels.LOCATES)
+                        `var`(Y).isa(UNIVERSITY).has(NAME, university.name),
+                        rel(LOCATION, X).rel(LOCATED, Y).isa(LOCATES)
                     )
                 )
             }
@@ -199,15 +211,13 @@ class TypeDBSimulation private constructor(client: TypeDBClient, context: Contex
     }
 
     override fun createCoupleFriendshipAgent(
-        client: TypeDBClient,
-        context: Context
+        client: TypeDBClient, context: Context
     ): CoupleFriendshipAgent<TypeDBTransaction> {
         return TypeDBCoupleFriendshipAgent(client, context)
     }
 
     override fun createGrandparenthoodAgent(
-        client: TypeDBClient,
-        context: Context
+        client: TypeDBClient, context: Context
     ): GrandparenthoodAgent<TypeDBTransaction> {
         return TypeDBGrandparenthoodAgent(client, context)
     }

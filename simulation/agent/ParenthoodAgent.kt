@@ -25,7 +25,6 @@ import com.vaticle.typedb.benchmark.common.seed.RandomSource
 import com.vaticle.typedb.benchmark.simulation.driver.Client
 import com.vaticle.typedb.benchmark.simulation.driver.Session
 import com.vaticle.typedb.benchmark.simulation.driver.Transaction
-import com.vaticle.typedb.common.collection.Collections
 import com.vaticle.typedb.common.collection.Pair
 import java.time.LocalDateTime
 import java.util.Comparator.comparing
