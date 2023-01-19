@@ -30,7 +30,7 @@ artifact_extractor(
 )
 
 kt_jvm_test(
-    name = "comparison-test",
+    name = "comparison",
     srcs = ["ComparisonTest.kt"],
     test_class = "com.vaticle.typedb.benchmark.test.ComparisonTest",
     deps = [

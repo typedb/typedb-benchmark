@@ -20,7 +20,7 @@ import com.vaticle.typedb.common.yaml.YAML
 import java.io.File
 import kotlin.math.ln
 
-class Config(val agents: List<Agent>, val traceSampling: TraceSampling, val run: Run, val model: Model) {
+class Config(val agents: List<Agent>, val traceSampling: TraceSampling?, val run: Run, val model: Model) {
 
     class Agent(val name: String, val isEnabled: Boolean, val trace: Boolean) {
 
@@ -92,7 +92,7 @@ class Config(val agents: List<Agent>, val traceSampling: TraceSampling, val run:
         fun of(yaml: YAML.Map): Config {
             return Config(
                 agents = yaml["agents"].asList().content().map { Agent.of(it.asMap()) },
-                traceSampling = TraceSampling.of(yaml["traceSampling"].asMap()),
+                traceSampling = yaml["traceSampling"]?.let { TraceSampling.of(it.asMap()) },
                 run = Run.of(yaml["run"].asMap()),
                 model = Model.of(yaml["model"].asMap())
             )

@@ -57,7 +57,9 @@ class Context private constructor(
     }
 
     val isTracing get(): Boolean {
-        return _isTracing && config.traceSampling.function(iterationNumber)
+        if (!_isTracing) return false
+        val traceSampling = requireNotNull(config.traceSampling) { "Tracing was requested, but 'traceSampling' is not configured" }
+        return traceSampling.function(iterationNumber)
     }
 
     override fun close() {
