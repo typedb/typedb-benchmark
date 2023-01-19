@@ -17,11 +17,10 @@
 package com.vaticle.typedb.benchmark.common.seed
 
 import com.vaticle.typedb.benchmark.common.concept.City
-import com.vaticle.typedb.benchmark.common.concept.Gender.Companion.of
+import com.vaticle.typedb.benchmark.common.concept.Gender
 import com.vaticle.typedb.common.collection.Collections
 import com.vaticle.typedb.common.collection.Pair
 import java.util.Random
-import java.util.function.Consumer
 
 class RandomSource(seed: Long) {
     private val random = Random(seed)
@@ -34,18 +33,18 @@ class RandomSource(seed: Long) {
         return random.nextBoolean()
     }
 
+    fun nextInt(bound: Int = Int.MAX_VALUE): Int {
+        return random.nextInt(bound)
+    }
+
     fun <T> choose(list: List<T>): T {
         return list[random.nextInt(list.size)]
     }
 
-    fun nextInt(): Int {
-        return random.nextInt(Int.MAX_VALUE)
-    }
-
     fun address(city: City): String {
-        val houseNumber = random.nextInt(1000)
-        val streetName = choose(city.country!!.continent!!.commonFirstNames(of(nextBoolean())))
-        val zipCode = random.nextInt(10000)
+        val houseNumber = nextInt(1000)
+        val streetName = choose(city.country.continent.commonFirstNames(Gender.of(nextBoolean())))
+        val zipCode = nextInt(10000)
         return "$houseNumber $streetName Street, ${city.name}, $zipCode ${city.country.name}"
     }
 
@@ -74,7 +73,7 @@ class RandomSource(seed: Long) {
         return when (recipients.size) {
             0 -> emptyList()
             1 -> resources.map { Pair(recipients[0], it) }
-            else -> resources.map { Pair(recipients[random.nextInt(recipients.size - 1)], it) }
+            else -> resources.map { Pair(recipients[nextInt(recipients.size - 1)], it) }
         }
     }
 }

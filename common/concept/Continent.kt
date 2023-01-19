@@ -16,50 +16,20 @@
  */
 package com.vaticle.typedb.benchmark.common.concept
 
+import com.vaticle.typedb.benchmark.common.concept.Gender.FEMALE
 import com.vaticle.typedb.benchmark.common.concept.Gender.MALE
 import com.vaticle.typedb.benchmark.common.seed.SeedData
 
 class Continent(override val code: String, override val name: String) : Region {
-    private val countries = mutableListOf<Country>()
-    private val commonLastNames = mutableListOf<String>()
-    private val commonFemaleFirstNames = mutableListOf<String>()
-    private val commonMaleFirstNames = mutableListOf<String>()
+    val countries = mutableListOf<Country>()
+    val commonLastNames = mutableListOf<String>()
+    val commonFemaleFirstNames = mutableListOf<String>()
+    val commonMaleFirstNames = mutableListOf<String>()
     private val hash: Int = this.code.hashCode()
 
-    fun addCountry(country: Country) {
-        countries.add(country)
-    }
-
-    fun addCommonLastName(name: String) {
-        commonLastNames.add(name)
-    }
-
-    fun addCommonFemaleFirstName(name: String) {
-        commonFemaleFirstNames.add(name)
-    }
-
-    fun addCommonMaleFirstName(name: String) {
-        commonMaleFirstNames.add(name)
-    }
-
-    fun countries(): MutableList<Country> {
-        return countries
-    }
-
-    fun commonLastNames(): MutableList<String> {
-        return commonLastNames
-    }
-
-    fun commonFirstNames(gender: Gender): MutableList<String> {
-        return if (gender == MALE) commonMaleFirstNames else commonFemaleFirstNames
-    }
-
-    fun commonFemaleFirstNames(): MutableList<String> {
-        return commonFemaleFirstNames
-    }
-
-    fun commonMaleFirstNames(): MutableList<String> {
-        return commonMaleFirstNames
+    fun commonFirstNames(gender: Gender) = when (gender) {
+        MALE -> commonMaleFirstNames
+        FEMALE -> commonFemaleFirstNames
     }
 
     override val tracker get(): String {

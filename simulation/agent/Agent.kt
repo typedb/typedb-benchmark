@@ -61,7 +61,7 @@ abstract class Agent<REGION: Region, TX: Transaction> protected constructor(
                 asyncRuns.add(CompletableFuture.runAsync(
                     {
                         val report = runAndMayTrace(rr.first(), rr.second())
-                        if (context.isReporting) reports[rr.first()!!.tracker!!] = report else assert(report.isEmpty())
+                        if (context.isReporting) reports[rr.first()!!.tracker] = report else assert(report.isEmpty())
                     }, context.executor
                 ))
             }
@@ -101,12 +101,6 @@ abstract class Agent<REGION: Region, TX: Transaction> protected constructor(
 
         override fun hashCode(): Int {
             return hash
-        }
-
-        companion object {
-            fun create(input: Collection<Any>, output: Collection<Any>): Report {
-                return Report(input, output)
-            }
         }
     }
 }

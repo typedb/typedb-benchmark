@@ -38,7 +38,7 @@ class TypeDBClient private constructor(
     }
 
     override fun session(region: Region): TypeDBSession {
-        return sessionMap.computeIfAbsent(region.group!!) { TypeDBSession(nativeClient.session(database, DATA)) }
+        return sessionMap.computeIfAbsent(region.group) { TypeDBSession(nativeClient.session(database, DATA)) }
     }
 
     override fun printStatistics(): String {

@@ -116,7 +116,7 @@ class TypeDBSimulation private constructor(client: TypeDBClient, context: Contex
     }
 
     private fun initCountries(session: com.vaticle.typedb.client.api.TypeDBSession, continent: Continent) {
-        continent.countries().parallelStream().forEach { country: Country ->
+        continent.countries.parallelStream().forEach { country: Country ->
             session.transaction(WRITE).use { tx ->
                 val countryVar = TypeQL.`var`(Y).isa(Labels.COUNTRY).has(Labels.CODE, country.code)
                     .has(Labels.NAME, country.name)

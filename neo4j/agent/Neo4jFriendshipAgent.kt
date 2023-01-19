@@ -61,8 +61,8 @@ class Neo4jFriendshipAgent(client: Neo4jClient, context: Context) : FriendshipAg
         val answers = tx.execute(Query(query, parameters))
         assert(answers.size == 1)
         val inserted = answers[0].asMap()
-        val person1 = Person(email = inserted[X + "." + Labels.EMAIL] as String)
-        val person2 = Person(email = inserted[Y + "." + Labels.EMAIL] as String)
+        val person1 = Person(email = inserted["$X.${Labels.EMAIL}"] as String)
+        val person2 = Person(email = inserted["$Y.${Labels.EMAIL}"] as String)
         return Pair(person1, person2)
     }
 

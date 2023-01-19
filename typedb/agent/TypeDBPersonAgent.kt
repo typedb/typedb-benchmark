@@ -36,7 +36,7 @@ class TypeDBPersonAgent(client: TypeDBClient, context: Context) : PersonAgent<Ty
     override fun insertPerson(
         tx: TypeDBTransaction, email: String, firstName: String, lastName: String,
         address: String, gender: Gender, birthDate: LocalDateTime, city: City
-    ): Pair<Person, City>? {
+    ): Pair<Person, City.Report>? {
         tx.query().insert(
             TypeQL.match(
                 TypeQL.`var`(Labels.CITY).isa(Labels.CITY).has(Labels.CODE, city.code)
@@ -54,7 +54,7 @@ class TypeDBPersonAgent(client: TypeDBClient, context: Context) : PersonAgent<Ty
         return if (context.isReporting) report(tx, email) else null
     }
 
-    private fun report(tx: TypeDBTransaction, email: String): Pair<Person, City> {
+    private fun report(tx: TypeDBTransaction, email: String): Pair<Person, City.Report> {
         val answers = tx.query().match(
             TypeQL.match(
                 TypeQL.`var`(Labels.PERSON).isa(Labels.PERSON).has(Labels.EMAIL, email)
@@ -81,7 +81,7 @@ class TypeDBPersonAgent(client: TypeDBClient, context: Context) : PersonAgent<Ty
             Gender.of(inserted[Labels.GENDER].asAttribute().asString().value),
             inserted[Labels.BIRTH_DATE].asAttribute().asDateTime().value
         )
-        val city = City(inserted[Labels.CODE].asAttribute().asString().value)
+        val city = City.Report(code = inserted[Labels.CODE].asAttribute().asString().value)
         return Pair(person, city)
     }
 }

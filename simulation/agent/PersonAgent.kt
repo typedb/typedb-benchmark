@@ -40,8 +40,8 @@ abstract class PersonAgent<TX: Transaction> protected constructor(client: Client
         session.writeTransaction().use { tx ->
             for (i in 0 until context.scaleFactor) {
                 val gender = if (random.nextBoolean()) Gender.MALE else Gender.FEMALE
-                val firstName = random.choose(region.continent!!.commonFirstNames(gender))
-                val lastName = random.choose(region.continent!!.commonLastNames())
+                val firstName = random.choose(region.continent.commonFirstNames(gender))
+                val lastName = random.choose(region.continent.commonLastNames)
                 val city = random.choose(region.cities)
                 val email = "$firstName.$lastName.${city.code}.${random.nextInt()}@email.com"
                 val address = random.address(city)
@@ -62,5 +62,5 @@ abstract class PersonAgent<TX: Transaction> protected constructor(client: Client
     protected abstract fun insertPerson(
         tx: TX, email: String, firstName: String, lastName: String, address: String,
         gender: Gender, birthDate: LocalDateTime, city: City
-    ): Pair<Person, City>?
+    ): Pair<Person, City.Report>?
 }

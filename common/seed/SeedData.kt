@@ -34,7 +34,7 @@ class SeedData(val global: Global) {
     val continents get() = global.continents
 
     val countries get(): List<Country> {
-        return continents.flatMap { it.countries() }
+        return continents.flatMap { it.countries }
     }
 
     val cities get(): List<City> {
@@ -66,8 +66,8 @@ class SeedData(val global: Global) {
 
         fun initialise(): SeedData {
             val global = Global()
-            val continents: MutableMap<String, Continent> = HashMap()
-            val countries: MutableMap<String, Country> = HashMap()
+            val continents = mutableMapOf<String, Continent>()
+            val countries = mutableMapOf<String, Country>()
             initialiseContinents(global, continents)
             initialiseCountries(continents, countries)
             initialiseCurrencies(countries)
@@ -88,7 +88,7 @@ class SeedData(val global: Global) {
                 val code = record[0]
                 val name = record[1]
                 val continent = Continent(code, name)
-                global.continents.add(continent)
+                global.continents += continent
                 continents[code] = continent
             }
         }
@@ -97,9 +97,9 @@ class SeedData(val global: Global) {
             parse(COUNTRIES_FILE).forEach { record: CSVRecord ->
                 val code = record[0]
                 val name = record[1]
-                val continent = continents[record[2]]
+                val continent = requireNotNull(continents[record[2]])
                 val country = Country(code, name, continent)
-                continent!!.addCountry(country)
+                continent.countries += country
                 countries[code] = country
             }
         }
@@ -109,9 +109,9 @@ class SeedData(val global: Global) {
             parse(CURRENCIES_FILE).forEach { record: CSVRecord ->
                 val code = record[0]
                 val name = record[1]
-                val country = countries[record[2]]
+                val country = requireNotNull(countries[record[2]])
                 val currency = currencies.computeIfAbsent(code) { Currency(it, name) }
-                country!!.currencies += currency
+                country.currencies += currency
             }
         }
 
@@ -119,17 +119,17 @@ class SeedData(val global: Global) {
             parse(CITIES_FILE).forEach { record: CSVRecord ->
                 val code = record[0]
                 val name = record[1]
-                val country = countries[record[2]]
+                val country = requireNotNull(countries[record[2]])
                 val city = City(code, name, country)
-                country!!.cities += city
+                country.cities += city
             }
         }
 
         private fun initialiseUniversities(countries: Map<String, Country>) {
             parse(UNIVERSITIES_FILE).forEach { record: CSVRecord ->
                 val name = record[0]
-                val country = countries[record[1]]
-                val university = University(name, country!!)
+                val country = requireNotNull(countries[record[1]])
+                val university = University(name, country)
                 country.universities += university
             }
         }
@@ -137,49 +137,45 @@ class SeedData(val global: Global) {
         private fun initialiseLastNames(continents: Map<String, Continent>) {
             parse(LAST_NAMES_FILE).forEach { record: CSVRecord ->
                 val name = record[0]
-                val continent = continents[record[1]]
-                continent!!.addCommonLastName(name)
+                val continent = requireNotNull(continents[record[1]])
+                continent.commonLastNames += name
             }
         }
 
         private fun initialiseFemaleFirstNames(continents: Map<String, Continent>) {
             parse(FIRST_NAMES_FEMALE_FILE).forEach { record: CSVRecord ->
                 val name = record[0]
-                val continent = continents[record[1]]
-                continent!!.addCommonFemaleFirstName(name)
+                val continent = requireNotNull(continents[record[1]])
+                continent.commonFemaleFirstNames += name
             }
         }
 
         private fun initialiseMaleFirstNames(continents: Map<String, Continent>) {
             parse(FIRST_NAMES_MALE_FILE).forEach { record: CSVRecord ->
                 val name = record[0]
-                val continent = continents[record[1]]
-                continent!!.addCommonMaleFirstName(name)
+                val continent = requireNotNull(continents[record[1]])
+                continent.commonMaleFirstNames += name
             }
         }
 
         private fun initialiseAdjectives(words: Words) {
-            parse(ADJECTIVES_FILE).forEach { record: CSVRecord ->
-                words.adjectives.add(record[0])
-            }
+            words.adjectives += parse(ADJECTIVES_FILE).map { record: CSVRecord -> record[0] }
         }
 
         private fun initialiseNouns(words: Words) {
-            parse(NOUNS_FILE).forEach { record: CSVRecord ->
-                words.nouns.add(record[0])
-            }
+            words.nouns += parse(NOUNS_FILE).map { record: CSVRecord -> record[0] }
         }
 
         private fun prune(global: Global) {
             val continents = global.continents.listIterator()
             while (continents.hasNext()) {
                 val continent = continents.next()
-                if (continent.countries().isEmpty()) {
+                if (continent.countries.isEmpty()) {
                     continents.remove()
                     LOG.warn("The continent '{}' is excluded as it has no countries in the seed dataset", continent)
-                } else if (continent.commonLastNames().isEmpty() ||
-                    continent.commonFemaleFirstNames().isEmpty() ||
-                    continent.commonMaleFirstNames().isEmpty()
+                } else if (continent.commonLastNames.isEmpty() ||
+                    continent.commonFemaleFirstNames.isEmpty() ||
+                    continent.commonMaleFirstNames.isEmpty()
                 ) {
                     continents.remove()
                     LOG.warn(
@@ -191,7 +187,7 @@ class SeedData(val global: Global) {
         }
 
         private fun prune(continent: Continent) {
-            val countries = continent.countries().listIterator()
+            val countries = continent.countries.listIterator()
             while (countries.hasNext()) {
                 val country = countries.next()
                 if (country.cities.isEmpty()) {

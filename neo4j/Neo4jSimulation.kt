@@ -111,7 +111,7 @@ class Neo4jSimulation private constructor(client: Neo4jClient, context: Context)
     }
 
     private fun initCountries(nativeDriver: Driver, continent: Continent) {
-        continent.countries().parallelStream().forEach { country: Country ->
+        continent.countries.parallelStream().forEach { country: Country ->
             nativeDriver.session().use { session ->
                 val tx = session.beginTransaction()
                 val currencyProps = StringBuilder()
@@ -125,7 +125,7 @@ class Neo4jSimulation private constructor(client: Neo4jClient, context: Context)
                 }
                 val query = Query(
                     "MATCH (c:Continent {code: '${continent.code}'}) " +
-                            "CREATE (x:Country:Region {code: '${country.code}', name: '${escapeQuotes(country.name!!)}'$currencyProps})-[:CONTAINED_IN]->(c)"
+                            "CREATE (x:Country:Region {code: '${country.code}', name: '${escapeQuotes(country.name)}'$currencyProps})-[:CONTAINED_IN]->(c)"
                 )
                 tx.run(query)
                 tx.commit()
@@ -140,7 +140,7 @@ class Neo4jSimulation private constructor(client: Neo4jClient, context: Context)
         country.cities.forEach { city: City ->
             val query = Query(
                 "MATCH (c:Country {code: '${country.code}'}) " +
-                        "CREATE (x:City:Region {code: '${city.code}', name: '${escapeQuotes(city.name!!)}'})-[:CONTAINED_IN]->(c)",
+                        "CREATE (x:City:Region {code: '${city.code}', name: '${escapeQuotes(city.name)}'})-[:CONTAINED_IN]->(c)",
             )
             tx.run(query)
         }

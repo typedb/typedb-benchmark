@@ -18,15 +18,15 @@ package com.vaticle.typedb.benchmark.common.concept
 
 import com.vaticle.typedb.benchmark.common.seed.SeedData
 
-class City(override val code: String, override val name: String? = null, val country: Country? = null) : Region {
+class City(override val code: String, override val name: String, val country: Country) : Region {
     private val hash: Int = code.hashCode()
 
     override val tracker get(): String {
-        return SeedData.buildTracker(country!!.tracker, name)
+        return SeedData.buildTracker(country.tracker, name)
     }
 
     override val group get(): String {
-        return country!!.continent!!.name
+        return country.continent.name
     }
 
     override fun toString(): String {
@@ -43,4 +43,6 @@ class City(override val code: String, override val name: String? = null, val cou
     override fun hashCode(): Int {
         return hash
     }
+
+    data class Report(val code: String)
 }

@@ -20,7 +20,7 @@ import java.time.Duration
 import java.time.Instant
 
 object Util {
-    fun printDuration(start: Instant?, end: Instant?): String {
+    fun printDuration(start: Instant, end: Instant): String {
         return Duration.between(start, end).toString()
             .substring(2)
             .replace("(\\d[HMS])(?!$)".toRegex(), "$1 ")

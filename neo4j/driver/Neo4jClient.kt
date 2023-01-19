@@ -36,7 +36,7 @@ class Neo4jClient(hostUri: String) : Client<Neo4jSession> {
     }
 
     override fun session(region: Region): Neo4jSession {
-        return sessionMap.computeIfAbsent(region.name!!) { Neo4jSession(nativeDriver.session()) }
+        return sessionMap.computeIfAbsent(region.name) { Neo4jSession(nativeDriver.session()) }
     }
 
     override fun printStatistics(): String {

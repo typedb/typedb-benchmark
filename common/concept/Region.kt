@@ -18,7 +18,7 @@ package com.vaticle.typedb.benchmark.common.concept
 
 interface Region {
     val code: String
-    val name: String?
-    val tracker: String?
-    val group: String? // Used to assign session keys for TypeDB model
+    val name: String
+    val tracker: String
+    val group: String // Used to assign session keys for TypeDB model
 }

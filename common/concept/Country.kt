@@ -19,18 +19,18 @@ package com.vaticle.typedb.benchmark.common.concept
 import com.vaticle.typedb.benchmark.common.seed.SeedData
 import java.util.Objects
 
-class Country(override val code: String, override val name: String? = null, val continent: Continent? = null) : Region {
+class Country(override val code: String, override val name: String, val continent: Continent) : Region {
     val currencies = mutableListOf<Currency>()
     val cities = mutableListOf<City>()
     val universities = mutableListOf<University>()
     private val hash: Int = Objects.hash(this.code, this.name, this.continent)
 
-    override val tracker get(): String? {
-        return SeedData.buildTracker(continent!!.tracker, name)
+    override val tracker get(): String {
+        return SeedData.buildTracker(continent.tracker, name)
     }
 
-    override val group get(): String? {
-        return continent!!.name
+    override val group get(): String {
+        return continent.name
     }
 
     override fun toString(): String {

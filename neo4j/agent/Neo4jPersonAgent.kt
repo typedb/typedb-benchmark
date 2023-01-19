@@ -40,7 +40,7 @@ class Neo4jPersonAgent(client: Neo4jClient, context: Context) : PersonAgent<Neo4
     override fun insertPerson(
         tx: Neo4jTransaction, email: String, firstName: String, lastName: String,
         address: String, gender: Gender, birthDate: LocalDateTime, city: City
-    ): Pair<Person, City>? {
+    ): Pair<Person, City.Report>? {
         val query = "MATCH (c:City {code: \$code}) " +
                 "CREATE (person:Person {" +
                 "email: \$email, " +
@@ -64,7 +64,7 @@ class Neo4jPersonAgent(client: Neo4jClient, context: Context) : PersonAgent<Neo4
         return if (context.isReporting) report(tx, email) else null
     }
 
-    private fun report(tx: Neo4jTransaction, email: String): Pair<Person, City> {
+    private fun report(tx: Neo4jTransaction, email: String): Pair<Person, City.Report> {
         val answers = tx.execute(
             Query(
                 "MATCH (person:Person {email: '$email'})-[:BORN_IN]->(city:City), " +
@@ -83,7 +83,7 @@ class Neo4jPersonAgent(client: Neo4jClient, context: Context) : PersonAgent<Neo4
             gender = Gender.of(inserted["$PERSON.$GENDER"] as String),
             birthDate = inserted["$PERSON.$BIRTH_DATE"] as LocalDateTime
         )
-        val city = City(inserted["$CITY.$CODE"] as String)
+        val city = City.Report(code = inserted["$CITY.$CODE"] as String)
         return Pair(person, city)
     }
 }
