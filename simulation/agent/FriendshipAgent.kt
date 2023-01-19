@@ -38,7 +38,7 @@ abstract class FriendshipAgent<TX: Transaction> protected constructor(client: Cl
     override fun run(session: Session<TX>, region: Country, random: RandomSource): List<Report> {
         val reports = mutableListOf<Report>()
         session.writeTransaction().use { tx ->
-            val birthDate = context.today().minusYears(context.ageOfFriendship.toLong())
+            val birthDate = context.today().minusYears(context.model.ageOfFriendship.toLong())
             val teenagers = matchTeenagers(tx, region, birthDate).sorted(comparing { it.email }).collect(toList())
             random.randomPairs(teenagers, log2(context.scaleFactor).coerceAtMost(1)).forEach { friends ->
                 val inserted = insertFriends(tx, friends.first().email, friends.second().email)

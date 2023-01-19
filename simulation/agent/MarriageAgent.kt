@@ -41,7 +41,7 @@ abstract class MarriageAgent<TX: Transaction> protected constructor(client: Clie
     override fun run(session: Session<TX>, region: Country, random: RandomSource): List<Report> {
         val reports = mutableListOf<Report>()
         session.writeTransaction().use { tx ->
-            val partnerBirthDate = context.today().minusYears(context.ageOfAdulthood.toLong())
+            val partnerBirthDate = context.today().minusYears(context.model.ageOfAdulthood.toLong())
             val women = matchPartner(tx, region, partnerBirthDate, FEMALE).sorted(comparing { it.email }).collect(toList())
             val men = matchPartner(tx, region, partnerBirthDate, MALE).sorted(comparing { it.email }).collect(toList())
             random.randomPairs(women, men).forEach { pair: Pair<Person, Person?> ->

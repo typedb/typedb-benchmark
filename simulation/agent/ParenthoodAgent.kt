@@ -40,7 +40,7 @@ abstract class ParenthoodAgent<TX: Transaction> protected constructor(client: Cl
     override fun run(session: Session<TX>, region: Country, random: RandomSource): List<Report> {
         val reports: MutableList<Report> = ArrayList()
         session.writeTransaction().use { tx ->
-            val marriageDate = context.today().minusYears(context.yearsBeforeParenthood.toLong())
+            val marriageDate = context.today().minusYears(context.model.yearsBeforeParenthood.toLong())
             val marriages = matchMarriages(tx, region, marriageDate).sorted(comparing { it.licence }).collect(toList())
             val newBorns = matchNewborns(tx, region, context.today()).sorted(comparing { it.email }).collect(toList())
             val parenthoods = random.randomAllocation(marriages, newBorns)

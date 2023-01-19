@@ -55,13 +55,13 @@ abstract class Simulation<CLIENT: Client<SESSION>, SESSION: Session<TX>, TX: Tra
     private fun initAgents(): List<Agent<*, TX>> {
         val agentBuilders = initAgentBuilders()
         val agents = mutableListOf<Agent<*, TX>>()
-        for (agentConfig in context.agentConfigs!!) {
-            if (agentConfig!!.isEnabled) {
+        for (agentConfig in context.agentConfigs) {
+            if (agentConfig.isEnabled) {
                 val className = "$AGENT_PACKAGE.${agentConfig.name}"
                 val agentClass = Class.forName(className) as Class<out Agent<*, *>>
                 val agentBuilder = agentBuilders[agentClass]
                     ?: throw RuntimeException("${agentConfig.name} is not registered as an agent")
-                agents.add(agentBuilder.get().apply { tracingEnabled = agentConfig.isTracing })
+                agents.add(agentBuilder.get().apply { tracingEnabled = agentConfig.trace })
                 REGISTERED_AGENTS.add(agentClass)
             }
         }

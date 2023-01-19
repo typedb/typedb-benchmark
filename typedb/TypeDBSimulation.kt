@@ -69,14 +69,14 @@ class TypeDBSimulation private constructor(client: TypeDBClient, context: Contex
     }
 
     private fun initDatabase(nativeClient: com.vaticle.typedb.client.api.TypeDBClient) {
-        if (nativeClient.databases().contains(context.databaseName)) {
-            nativeClient.databases()[context.databaseName].delete()
+        if (nativeClient.databases().contains(context.dbName)) {
+            nativeClient.databases()[context.dbName].delete()
         }
-        nativeClient.databases().create(context.databaseName)
+        nativeClient.databases().create(context.dbName)
     }
 
     private fun initSchema(nativeClient: com.vaticle.typedb.client.api.TypeDBClient) {
-        nativeClient.session(context.databaseName, SCHEMA).use { session ->
+        nativeClient.session(context.dbName, SCHEMA).use { session ->
             LOGGER.info("TypeDB initialisation of world simulation schema started ...")
             val start = Instant.now()
             val schemaQuery = Files.readString(SCHEMA_FILE.toPath())
@@ -91,7 +91,7 @@ class TypeDBSimulation private constructor(client: TypeDBClient, context: Contex
     }
 
     private fun initData(nativeClient: com.vaticle.typedb.client.api.TypeDBClient, geoData: SeedData) {
-        nativeClient.session(context.databaseName, DATA).use { session ->
+        nativeClient.session(context.dbName, DATA).use { session ->
             LOGGER.info("TypeDB initialisation of world simulation data started ...")
             val start = Instant.now()
             initContinents(session, geoData.global)
@@ -219,11 +219,11 @@ class TypeDBSimulation private constructor(client: TypeDBClient, context: Contex
         private const val Y = "y"
 
         fun core(address: String, context: Context): TypeDBSimulation {
-            return TypeDBSimulation(TypeDBClient.core(address, context.databaseName), context)
+            return TypeDBSimulation(TypeDBClient.core(address, context.dbName), context)
         }
 
         fun cluster(address: String, context: Context): TypeDBSimulation {
-            return TypeDBSimulation(TypeDBClient.cluster(address, context.databaseName), context)
+            return TypeDBSimulation(TypeDBClient.cluster(address, context.dbName), context)
         }
     }
 }

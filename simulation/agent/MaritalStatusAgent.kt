@@ -33,7 +33,7 @@ abstract class MaritalStatusAgent<TX: Transaction> protected constructor(client:
         if (context.isReporting) throw RuntimeException("Reports are not comparable for reasoning agents.")
         session.reasoningTransaction().use { tx ->
             // Pick people who are exactly old enough to be married since this determines their status
-            matchMaritalStatus(tx, region, context.today().minusYears(context.ageOfAdulthood.toLong()))
+            matchMaritalStatus(tx, region, context.today().minusYears(context.model.ageOfAdulthood.toLong()))
         }
         return emptyList()
     }

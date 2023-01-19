@@ -18,7 +18,6 @@ package com.vaticle.typedb.benchmark.common.params
 
 import com.vaticle.typedb.benchmark.common.seed.SeedData
 import org.slf4j.LoggerFactory
-import java.io.IOException
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
@@ -34,38 +33,12 @@ class Context private constructor(
 ) : AutoCloseable {
     private val iteration = AtomicInteger(1)
     val executor: ExecutorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors())
-
-    val agentConfigs get(): List<Config.Agent> {
-        return requireNotNull(config.agents)
-    }
-
-    val seed get(): Long {
-        return config.runParams.randomSeed.toLong()
-    }
-
-    val scaleFactor get(): Int {
-        return config.runParams.scaleFactor
-    }
-
-    val databaseName get(): String {
-        return config.runParams.databaseName
-    }
-
-    val iterationMax get(): Int {
-        return config.runParams.iterations
-    }
-
-    val ageOfFriendship get(): Int {
-        return config.modelParams.ageOfFriendship
-    }
-
-    val ageOfAdulthood get(): Int {
-        return config.modelParams.ageOfAdulthood
-    }
-
-    val yearsBeforeParenthood get(): Int {
-        return config.modelParams.yearsBeforeParenthood
-    }
+    val agentConfigs = config.agents
+    val seed = config.run.randomSeed
+    val scaleFactor = config.run.scaleFactor
+    val dbName = config.run.databaseName
+    val iterationMax = config.run.iterations
+    val model = config.model
 
     val iterationNumber get(): Int {
         return iteration.get()
@@ -84,7 +57,7 @@ class Context private constructor(
     }
 
     val isTracing get(): Boolean {
-        return _isTracing && config.traceSampling!!.samplingFunction().apply(iterationNumber)!!
+        return _isTracing && config.traceSampling.function(iterationNumber)
     }
 
     override fun close() {

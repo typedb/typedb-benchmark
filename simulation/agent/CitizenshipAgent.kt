@@ -33,7 +33,7 @@ abstract class CitizenshipAgent<TX: Transaction> protected constructor(client: C
         if (context.isReporting) throw RuntimeException("Reports are not comparable for reasoning agents.")
         session.reasoningTransaction().use { tx ->
             // Pick people who can be married since this is one interesting way they can become citizens
-            matchCitizenship(tx, region, context.today().minusYears(context.ageOfAdulthood.toLong()))
+            matchCitizenship(tx, region, context.today().minusYears(context.model.ageOfAdulthood.toLong()))
         }
         return emptyList()
     }

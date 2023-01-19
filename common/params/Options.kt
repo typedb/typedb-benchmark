@@ -134,7 +134,7 @@ class Options {
                     commandLine.printVersionHelp(commandLine.out)
                     null
                 } else {
-                    parseResult.asCommandLineList()[0].getCommand()
+                    parseResult.asCommandLineList()[0].getCommand<T>()
                 }
             } catch (ex: ParameterException) {
                 commandLine.err.println(ex.message)

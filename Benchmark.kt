@@ -19,7 +19,6 @@ package com.vaticle.typedb.benchmark
 import com.vaticle.factory.tracing.client.FactoryTracing
 import com.vaticle.factory.tracing.client.FactoryTracingThreadStatic
 import com.vaticle.typedb.benchmark.common.params.Config
-import com.vaticle.typedb.benchmark.common.params.Config.Companion.loadYML
 import com.vaticle.typedb.benchmark.common.params.Context.Companion.create
 import com.vaticle.typedb.benchmark.common.params.DatabaseType.NEO4J
 import com.vaticle.typedb.benchmark.common.params.DatabaseType.TYPEDB
@@ -41,7 +40,7 @@ object Benchmark {
         try {
             val options = parseCLIOptions(args) ?: exitProcess(0)
             initTracing(options = options.tracing, analysisName = options.database.fullname).use {
-                val config = loadYML(options.configFile)
+                val config = Config.of(options.configFile)
                 initSimulation(options, config).use { simulation -> simulation.run() }
             }
         } catch (e: Exception) {

@@ -16,23 +16,31 @@
 #
 
 agents:
-  # For each agent select a `mode`, `RUN` to run without tracing, `TRACE` to run with tracing, and `OFF` to not run at all
   - name: "PersonAgent"
-    mode: TRACE
+    isEnabled: true
+    trace: true
   - name: "FriendshipAgent"
-    mode: TRACE
+    isEnabled: true
+    trace: true
   - name: "MarriageAgent"
-    mode: TRACE
+    isEnabled: true
+    trace: true
   - name: "ParenthoodAgent"
-    mode: TRACE
+    isEnabled: true
+    trace: true
 
 traceSampling:
   # Options: `"every"` for every K traces; `"log"` for logarithm with base N
   function: "every"
   arg: 10
 
-runParams:
+run:
   randomSeed: 1
   iterations: 100
   scaleFactor: 10
   databaseName: "simulation"
+
+model:
+  ageOfFriendship: 14
+  ageOfAdulthood: 21
+  yearsBeforeParenthood: 3

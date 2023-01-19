@@ -16,7 +16,7 @@
  */
 package com.vaticle.typedb.benchmark.test
 
-import com.vaticle.typedb.benchmark.common.params.Config.Companion.loadYML
+import com.vaticle.typedb.benchmark.common.params.Config
 import com.vaticle.typedb.benchmark.common.params.Context.Companion.create
 import com.vaticle.typedb.benchmark.common.params.Options.Companion.parseCLIOptions
 import com.vaticle.typedb.benchmark.neo4j.Neo4jSimulation
@@ -30,23 +30,17 @@ import org.junit.runner.RunWith
 import org.junit.runner.notification.RunNotifier
 import org.junit.runners.BlockJUnit4ClassRunner
 import org.junit.runners.model.FrameworkMethod
-import org.junit.runners.model.InitializationError
 import picocli.CommandLine
 import java.nio.file.Paths
-import java.util.function.Consumer
 import java.util.stream.Stream
 
 @RunWith(ComparisonTest.Suite::class)
 class ComparisonTest {
     @Test
     fun test_agents_have_equal_reports() {
-        Simulation.REGISTERED_AGENTS.forEach(Consumer { agent: Class<out Agent<*, *>?>? ->
-            Assert.assertEquals(
-                Suite.TYPEDB.getReport(
-                    agent!!
-                ), Suite.NEO4J.getReport(agent)
-            )
-        })
+        Simulation.REGISTERED_AGENTS.forEach { agent: Class<out Agent<*, *>> ->
+            Assert.assertEquals(Suite.TYPEDB.getReport(agent), Suite.NEO4J.getReport(agent))
+        }
     }
 
     class Suite(testClass: Class<*>) : org.junit.runners.Suite(testClass, createRunners(testClass)) {
@@ -61,7 +55,7 @@ class ComparisonTest {
             iteration++
             Stream.of(NEO4J, TYPEDB).parallel().forEach { it.iterate() }
             super.runChild(runner, notifier)
-            if (iteration == CONFIG.runParams.iterations + 1) {
+            if (iteration == CONFIG.run.iterations + 1) {
                 TYPEDB.close()
                 NEO4J.close()
             }
@@ -87,7 +81,7 @@ class ComparisonTest {
         }
 
         companion object {
-            private val CONFIG = loadYML(Paths.get("test/comparison-test.yml").toFile())
+            private val CONFIG = Config.of(Paths.get("test/comparison-test.yml").toFile())
             private val OPTIONS = requireNotNull(parseCLIOptions(args(), Options()))
             lateinit var TYPEDB: TypeDBSimulation
             lateinit var NEO4J: Neo4jSimulation
@@ -96,10 +90,9 @@ class ComparisonTest {
                 return input.copyOfRange(1, input.size)
             }
 
-            @Throws(InitializationError::class)
             private fun createRunners(testClass: Class<*>): List<org.junit.runner.Runner> {
                 val runners: MutableList<org.junit.runner.Runner> = ArrayList()
-                for (i in 1..CONFIG.runParams.iterations) {
+                for (i in 1..CONFIG.run.iterations) {
                     val runner: BlockJUnit4ClassRunner = Runner(testClass, i)
                     runners.add(runner)
                 }
