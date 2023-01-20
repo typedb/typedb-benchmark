@@ -16,6 +16,22 @@
  */
 package com.vaticle.typedb.benchmark.common.params
 
+import com.vaticle.typedb.benchmark.common.params.Config.Keys.AGENTS
+import com.vaticle.typedb.benchmark.common.params.Config.Keys.AGE_OF_ADULTHOOD
+import com.vaticle.typedb.benchmark.common.params.Config.Keys.AGE_OF_FRIENDSHIP
+import com.vaticle.typedb.benchmark.common.params.Config.Keys.ARG
+import com.vaticle.typedb.benchmark.common.params.Config.Keys.DATABASE_NAME
+import com.vaticle.typedb.benchmark.common.params.Config.Keys.FUNCTION
+import com.vaticle.typedb.benchmark.common.params.Config.Keys.IS_ENABLED
+import com.vaticle.typedb.benchmark.common.params.Config.Keys.ITERATIONS
+import com.vaticle.typedb.benchmark.common.params.Config.Keys.MODEL
+import com.vaticle.typedb.benchmark.common.params.Config.Keys.NAME
+import com.vaticle.typedb.benchmark.common.params.Config.Keys.RANDOM_SEED
+import com.vaticle.typedb.benchmark.common.params.Config.Keys.RUN
+import com.vaticle.typedb.benchmark.common.params.Config.Keys.SCALE_FACTOR
+import com.vaticle.typedb.benchmark.common.params.Config.Keys.TRACE
+import com.vaticle.typedb.benchmark.common.params.Config.Keys.TRACE_SAMPLING
+import com.vaticle.typedb.benchmark.common.params.Config.Keys.YEARS_BEFORE_PARENTHOOD
 import com.vaticle.typedb.common.yaml.YAML
 import java.io.File
 import kotlin.math.ln
@@ -26,9 +42,9 @@ class Config(val agents: List<Agent>, val traceSampling: TraceSampling?, val run
 
         companion object {
             internal fun of(yaml: YAML.Map) = Agent(
-                name = yaml["name"].asString().value(),
-                isEnabled = yaml["isEnabled"].asBoolean().value(),
-                trace = yaml["trace"].asBoolean().value()
+                name = yaml[NAME].asString().value(),
+                isEnabled = yaml[IS_ENABLED].asBoolean().value(),
+                trace = yaml[TRACE].asBoolean().value()
             )
         }
     }
@@ -59,8 +75,8 @@ class Config(val agents: List<Agent>, val traceSampling: TraceSampling?, val run
 
         companion object {
             internal fun of(yaml: YAML.Map) = TraceSampling(
-                _function = SamplingFunction.valueOf(yaml["function"].asString().value().uppercase()),
-                arg = yaml["arg"].asInt().value()
+                _function = SamplingFunction.valueOf(yaml[FUNCTION].asString().value().uppercase()),
+                arg = yaml[ARG].asInt().value()
             )
         }
     }
@@ -68,10 +84,10 @@ class Config(val agents: List<Agent>, val traceSampling: TraceSampling?, val run
     class Run(val randomSeed: Long, val iterations: Int, val scaleFactor: Int, val databaseName: String) {
         companion object {
             internal fun of(yaml: YAML.Map) = Run(
-                databaseName = yaml["databaseName"].asString().value(),
-                iterations = yaml["iterations"].asInt().value(),
-                scaleFactor = yaml["scaleFactor"].asInt().value(),
-                randomSeed = yaml["randomSeed"].asInt().value().toLong(),
+                databaseName = yaml[DATABASE_NAME].asString().value(),
+                iterations = yaml[ITERATIONS].asInt().value(),
+                scaleFactor = yaml[SCALE_FACTOR].asInt().value(),
+                randomSeed = yaml[RANDOM_SEED].asInt().value().toLong(),
             )
         }
     }
@@ -79,9 +95,9 @@ class Config(val agents: List<Agent>, val traceSampling: TraceSampling?, val run
     class Model(val ageOfFriendship: Int, val ageOfAdulthood: Int, val yearsBeforeParenthood: Int) {
         companion object {
             internal fun of(yaml: YAML.Map) = Model(
-                ageOfAdulthood = yaml["ageOfAdulthood"].asInt().value(),
-                ageOfFriendship = yaml["ageOfFriendship"].asInt().value(),
-                yearsBeforeParenthood = yaml["yearsBeforeParenthood"].asInt().value(),
+                ageOfAdulthood = yaml[AGE_OF_ADULTHOOD].asInt().value(),
+                ageOfFriendship = yaml[AGE_OF_FRIENDSHIP].asInt().value(),
+                yearsBeforeParenthood = yaml[YEARS_BEFORE_PARENTHOOD].asInt().value(),
             )
         }
     }
@@ -91,11 +107,30 @@ class Config(val agents: List<Agent>, val traceSampling: TraceSampling?, val run
 
         fun of(yaml: YAML.Map): Config {
             return Config(
-                agents = yaml["agents"].asList().content().map { Agent.of(it.asMap()) },
-                traceSampling = yaml["traceSampling"]?.let { TraceSampling.of(it.asMap()) },
-                run = Run.of(yaml["run"].asMap()),
-                model = Model.of(yaml["model"].asMap())
+                agents = yaml[AGENTS].asList().content().map { Agent.of(it.asMap()) },
+                traceSampling = yaml[TRACE_SAMPLING]?.let { TraceSampling.of(it.asMap()) },
+                run = Run.of(yaml[RUN].asMap()),
+                model = Model.of(yaml[MODEL].asMap())
             )
         }
+    }
+
+    internal object Keys {
+        const val AGE_OF_ADULTHOOD = "ageOfAdulthood"
+        const val AGE_OF_FRIENDSHIP = "ageOfFriendship"
+        const val AGENTS = "agents"
+        const val ARG = "arg"
+        const val DATABASE_NAME = "databaseName"
+        const val FUNCTION = "function"
+        const val IS_ENABLED = "isEnabled"
+        const val ITERATIONS = "iterations"
+        const val MODEL = "model"
+        const val NAME = "name"
+        const val RANDOM_SEED = "randomSeed"
+        const val RUN = "run"
+        const val SCALE_FACTOR = "scaleFactor"
+        const val TRACE = "trace"
+        const val TRACE_SAMPLING = "traceSampling"
+        const val YEARS_BEFORE_PARENTHOOD = "yearsBeforeParenthood"
     }
 }
