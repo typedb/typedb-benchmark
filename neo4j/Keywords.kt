@@ -24,5 +24,6 @@ object Keywords {
     const val DETACH = "DETACH"
     const val IS_UNIQUE = "IS UNIQUE"
     const val MATCH = "MATCH"
+    const val ON = "ON"
     const val RETURN = "RETURN"
 }

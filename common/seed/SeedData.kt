@@ -22,10 +22,10 @@ import com.vaticle.typedb.benchmark.common.concept.Country
 import com.vaticle.typedb.benchmark.common.concept.Currency
 import com.vaticle.typedb.benchmark.common.concept.Global
 import com.vaticle.typedb.benchmark.common.concept.University
+import mu.KotlinLogging
 import org.apache.commons.csv.CSVFormat
 import org.apache.commons.csv.CSVParser
 import org.apache.commons.csv.CSVRecord
-import org.slf4j.LoggerFactory
 import java.io.File
 import java.nio.charset.StandardCharsets
 import java.nio.file.Paths
@@ -51,7 +51,7 @@ class SeedData(val global: Global) {
     }
 
     companion object {
-        private val LOG = LoggerFactory.getLogger(SeedData::class.java)
+        private val LOGGER = KotlinLogging.logger {}
         private val ADJECTIVES_FILE = Paths.get("data/adjectives.csv").toFile()
         private val CITIES_FILE = Paths.get("data/cities.csv").toFile()
         private val CONTINENTS_FILE = Paths.get("data/continents.csv").toFile()
@@ -160,13 +160,13 @@ class SeedData(val global: Global) {
                 val continent = continents.next()
                 if (continent.countries.isEmpty()) {
                     continents.remove()
-                    LOG.warn("The continent '{}' is excluded as it has no countries in the seed dataset", continent)
+                    LOGGER.warn("The continent '{}' is excluded as it has no countries in the seed dataset", continent)
                 } else if (continent.commonLastNames.isEmpty() ||
                     continent.commonFemaleFirstNames.isEmpty() ||
                     continent.commonMaleFirstNames.isEmpty()
                 ) {
                     continents.remove()
-                    LOG.warn(
+                    LOGGER.warn(
                         "The continent '{}' is excluded as it has no first/last names in the seed dataset",
                         continent
                     )
@@ -180,7 +180,7 @@ class SeedData(val global: Global) {
                 val country = countries.next()
                 if (country.cities.isEmpty()) {
                     countries.remove()
-                    LOG.warn("The country {} is excluded as has no cities in the seed dataset", country)
+                    LOGGER.warn("The country {} is excluded as has no cities in the seed dataset", country)
                 }
             }
         }

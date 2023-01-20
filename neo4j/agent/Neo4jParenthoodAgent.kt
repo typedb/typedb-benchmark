@@ -61,8 +61,8 @@ class Neo4jParenthoodAgent(client: Neo4jClient, context: Context) : ParenthoodAg
     }
 
     override fun matchMarriages(tx: Neo4jTransaction, country: Country, marriageDate: LocalDateTime): Stream<Marriage> {
-        val query = "$MATCH (w:$PERSON_LABEL)-[:$RESIDES_IN]->(:$CITY_LABEL)-[:$CONTAINED_IN]->($COUNTRY:$COUNTRY_LABEL {$CODE: \$$CODE}),\n" +
-                "(w)-[m:$MARRIED_TO {$MARRIAGE_DATE: \$$MARRIAGE_DATE}]->($H:$PERSON_LABEL)" +
+        val query = "$MATCH ($W:$PERSON_LABEL)-[:$RESIDES_IN]->(:$CITY_LABEL)-[:$CONTAINED_IN]->($COUNTRY:$COUNTRY_LABEL {$CODE: \$$CODE}),\n" +
+                "($W)-[$M:$MARRIED_TO {$MARRIAGE_DATE: \$$MARRIAGE_DATE}]->($H:$PERSON_LABEL)" +
                 "$RETURN $W.$EMAIL, $H.$EMAIL, $M.$MARRIAGE_LICENCE, $M.$MARRIAGE_DATE"
         val parameters = mapOf(MARRIAGE_DATE to marriageDate, CODE to country.code)
         tx.execute(Query(query, parameters))
@@ -95,7 +95,7 @@ class Neo4jParenthoodAgent(client: Neo4jClient, context: Context) : ParenthoodAg
                 "($M:$PERSON_LABEL {$EMAIL: \$$MOTHER_EMAIL}),\n" +
                 "($F:$PERSON_LABEL {$EMAIL: \$$FATHER_EMAIL}),\n" +
                 "($C:$PERSON_LABEL {$EMAIL: \$$CHILD_EMAIL}),\n" +
-                "$M)-[:$PARENT_OF]->($C),\n" +
+                "($M)-[:$PARENT_OF]->($C),\n" +
                 "($F)-[:$PARENT_OF]->($C)\n" +
                 "$RETURN $M.$EMAIL, $F.$EMAIL, $C.$EMAIL"
         val parameters = mapOf(MOTHER_EMAIL to motherEmail, FATHER_EMAIL to fatherEmail, CHILD_EMAIL to childEmail)

@@ -60,7 +60,7 @@ class TypeDBMarriageAgent(client: TypeDBClient, context: Context) : MarriageAgen
             `var`(CITY).isa(CITY),
             `var`(PERSON).isa(PERSON).has(EMAIL, `var`(EMAIL)).has(GENDER, gender.value).has(BIRTH_DATE, birthDate),
             `var`().rel(RESIDENCE, `var`(CITY)).rel(RESIDENT, `var`(PERSON)).isa(RESIDENTSHIP)
-        )).map { conceptMap: ConceptMap -> Person(conceptMap[EMAIL].asAttribute().asString().value) }
+        )).map { conceptMap: ConceptMap -> Person(email = conceptMap[EMAIL].asAttribute().asString().value) }
     }
 
     override fun insertMarriage(
@@ -98,8 +98,8 @@ class TypeDBMarriageAgent(client: TypeDBClient, context: Context) : MarriageAgen
         ).collect(toList())
         assert(answers.size == 1)
         val inserted = answers[0]
-        val wife = Person(inserted[EW].asAttribute().asString().value)
-        val husband = Person(inserted[EH].asAttribute().asString().value)
+        val wife = Person(email = inserted[EW].asAttribute().asString().value)
+        val husband = Person(email = inserted[EH].asAttribute().asString().value)
         val licence = inserted[L].asAttribute().asString().value
         val date = inserted[D].asAttribute().asDateTime().value
         return Marriage(wife, husband, licence, date)

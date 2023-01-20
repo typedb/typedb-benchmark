@@ -17,7 +17,7 @@
 package com.vaticle.typedb.benchmark.common.params
 
 import com.vaticle.typedb.benchmark.common.seed.SeedData
-import org.slf4j.LoggerFactory
+import mu.KotlinLogging
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
@@ -67,14 +67,14 @@ class Context private constructor(
     }
 
     companion object {
-        private val LOG = LoggerFactory.getLogger(Context::class.java)
+        private val LOGGER = KotlinLogging.logger {}
 
         fun create(config: Config, isTracing: Boolean, isReporting: Boolean): Context {
             val seedData = SeedData.initialise()
-            LOG.info("Total number of continents in seed: {}", seedData.continents.size)
-            LOG.info("Total number of countries in seed: {}", seedData.countries.size)
-            LOG.info("Total number of cities in seed: {}", seedData.cities.size)
-            LOG.info("Total number of universities in seed: {}", seedData.universities.size)
+            LOGGER.info("Total number of continents in seed: {}", seedData.continents.size)
+            LOGGER.info("Total number of countries in seed: {}", seedData.countries.size)
+            LOGGER.info("Total number of cities in seed: {}", seedData.cities.size)
+            LOGGER.info("Total number of universities in seed: {}", seedData.universities.size)
             return Context(seedData, config, isTracing, isReporting)
         }
     }

@@ -78,8 +78,8 @@ class TypeDBParenthoodAgent(client: TypeDBClient, context: Context) : Parenthood
             rel(RESIDENCE, `var`(CITY)).rel(RESIDENT, W).isa(RESIDENTSHIP)
         )).map { conceptMap: ConceptMap ->
             Marriage(
-                wife = Person(conceptMap[EW].asAttribute().asString().value),
-                husband = Person(conceptMap[EH].asAttribute().asString().value),
+                wife = Person(email = conceptMap[EW].asAttribute().asString().value),
+                husband = Person(email = conceptMap[EH].asAttribute().asString().value),
                 licence = conceptMap[MARRIAGE_LICENCE].asAttribute().asString().value,
                 date = marriageDate
             )

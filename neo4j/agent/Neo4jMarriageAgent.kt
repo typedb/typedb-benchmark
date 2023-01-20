@@ -68,7 +68,7 @@ class Neo4jMarriageAgent(client: Neo4jClient, context: Context) : MarriageAgent<
         val query = "$MATCH " +
                 "($X:$PERSON_LABEL {$EMAIL: \$$WIFE_EMAIL}), \n" +
                 "($Y:$PERSON_LABEL {$EMAIL: \$$HUSBAND_EMAIL}) \n" +
-                "$CREATE (x)-[:$MARRIED_TO {$MARRIAGE_LICENCE: \$$MARRIAGE_LICENCE, $MARRIAGE_DATE: \$$MARRIAGE_DATE}]->($Y)"
+                "$CREATE ($X)-[:$MARRIED_TO {$MARRIAGE_LICENCE: \$$MARRIAGE_LICENCE, $MARRIAGE_DATE: \$$MARRIAGE_DATE}]->($Y)"
         val parameters = mapOf(
             WIFE_EMAIL to wifeEmail, HUSBAND_EMAIL to husbandEmail,
             MARRIAGE_LICENCE to marriageLicence, MARRIAGE_DATE to marriageDate

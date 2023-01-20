@@ -55,7 +55,7 @@ class TypeDBFriendshipAgent(client: TypeDBClient, context: Context) : Friendship
                 rel(RESIDENT, `var`(PERSON)).rel(RESIDENCE, `var`(CITY)).isa(RESIDENTSHIP),
                 rel(CONTAINED, `var`(CITY)).rel(CONTAINER, `var`(COUNTRY)).isa(CONTAINS)
             )[`var`(EMAIL)]
-        ).map { conceptMap: ConceptMap -> Person(conceptMap[EMAIL].asAttribute().asString().value) }
+        ).map { conceptMap: ConceptMap -> Person(email = conceptMap[EMAIL].asAttribute().asString().value) }
     }
 
     override fun insertFriends(tx: TypeDBTransaction, email1: String, email2: String): Pair<Person, Person>? {
@@ -82,8 +82,8 @@ class TypeDBFriendshipAgent(client: TypeDBClient, context: Context) : Friendship
         ).collect(toList())
         assert(answers.size == 1)
         val inserted = answers[0]
-        val person1 = Person(inserted[E1].asAttribute().asString().value)
-        val person2 = Person(inserted[E2].asAttribute().asString().value)
+        val person1 = Person(email = inserted[E1].asAttribute().asString().value)
+        val person2 = Person(email = inserted[E2].asAttribute().asString().value)
         return Pair(person1, person2)
     }
 

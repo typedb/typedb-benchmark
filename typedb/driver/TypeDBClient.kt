@@ -22,14 +22,14 @@ import com.vaticle.typedb.client.TypeDB
 import com.vaticle.typedb.client.api.TypeDBCredential
 import com.vaticle.typedb.client.api.TypeDBSession.Type.DATA
 import com.vaticle.typedb.client.api.TypeDBTransaction.Type.READ
-import com.vaticle.typeql.lang.TypeQL
+import com.vaticle.typeql.lang.TypeQL.match
 import com.vaticle.typeql.lang.TypeQL.`var`
 import java.text.DecimalFormat
 import java.util.concurrent.ConcurrentHashMap
 
 class TypeDBClient private constructor(
     private val nativeClient: com.vaticle.typedb.client.api.TypeDBClient,
-    private val database: String?
+    private val database: String
 ) : Client<TypeDBSession> {
     private val sessionMap = ConcurrentHashMap<String, TypeDBSession>()
 
@@ -46,14 +46,10 @@ class TypeDBClient private constructor(
         nativeClient.session(database, DATA).use { session ->
             session.transaction(READ).use { tx ->
                 val formatter = DecimalFormat("#,###")
-                val numberOfEntities =
-                    tx.query().match(TypeQL.match(`var`("x").isa("entity")).count()).get().asLong()
-                val numberOfAttributes =
-                    tx.query().match(TypeQL.match(`var`("x").isa("attribute")).count()).get().asLong()
-                val numberOfRelations =
-                    tx.query().match(TypeQL.match(`var`("x").isa("relation")).count()).get().asLong()
-                val numberOfThings =
-                    tx.query().match(TypeQL.match(`var`("x").isa("thing")).count()).get().asLong()
+                val numberOfEntities = tx.query().match(match(`var`("x").isa("entity")).count()).get().asLong()
+                val numberOfAttributes = tx.query().match(match(`var`("x").isa("attribute")).count()).get().asLong()
+                val numberOfRelations = tx.query().match(match(`var`("x").isa("relation")).count()).get().asLong()
+                val numberOfThings = tx.query().match(match(`var`("x").isa("thing")).count()).get().asLong()
                 str.append("Benchmark statistic:").append("\n")
                 str.append("\n")
                 str.append("Count 'entity': ").append(formatter.format(numberOfEntities)).append("\n")
@@ -82,11 +78,11 @@ class TypeDBClient private constructor(
     }
 
     companion object {
-        fun core(hostUri: String?, database: String?): TypeDBClient {
+        fun core(hostUri: String, database: String): TypeDBClient {
             return TypeDBClient(TypeDB.coreClient(hostUri), database)
         }
 
-        fun cluster(hostUri: String?, database: String?): TypeDBClient {
+        fun cluster(hostUri: String, database: String): TypeDBClient {
             return TypeDBClient(TypeDB.clusterClient(hostUri, TypeDBCredential("admin", "password", false)), database)
         }
     }

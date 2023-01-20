@@ -23,13 +23,4 @@ interface Client<out SESSION: Session<*>> : AutoCloseable {
     fun closeSessions()
     fun printStatistics(): String?
     override fun close()
-    // TODO: looks like something we'd use to identify actions in factory-tracing
-    enum class TracingLabel(val displayName: String) {
-        OPEN_CLIENT("open_client"), CLOSE_CLIENT("close_client"), OPEN_SESSION("open_session"), CLOSE_SESSION("close_session"), OPEN_TRANSACTION(
-            "open_tx"
-        ),
-        CLOSE_TRANSACTION("close_tx"), COMMIT_TRANSACTION("commit_tx"), EXECUTE("execute"), SORTED_EXECUTE("sorted_execute"), EXECUTE_ASYNC(
-            "execute_async"
-        )
-    }
 }

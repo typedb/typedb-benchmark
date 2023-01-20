@@ -31,6 +31,7 @@ import com.vaticle.typedb.benchmark.neo4j.Keywords.DELETE
 import com.vaticle.typedb.benchmark.neo4j.Keywords.DETACH
 import com.vaticle.typedb.benchmark.neo4j.Keywords.IS_UNIQUE
 import com.vaticle.typedb.benchmark.neo4j.Keywords.MATCH
+import com.vaticle.typedb.benchmark.neo4j.Keywords.ON
 import com.vaticle.typedb.benchmark.neo4j.Literals.CITY
 import com.vaticle.typedb.benchmark.neo4j.Literals.CITY_LABEL
 import com.vaticle.typedb.benchmark.neo4j.Literals.CODE
@@ -106,14 +107,14 @@ class Neo4jSimulation private constructor(client: Neo4jClient, context: Context)
      */
     private fun addKeyConstraints(session: Session) {
         val queries: List<String> = listOf(
-            "$CREATE $CONSTRAINT unique_person_email ON ($PERSON:$PERSON_LABEL) $ASSERT $PERSON.$EMAIL $IS_UNIQUE",
-            "$CREATE $CONSTRAINT unique_continent_code ON ($CONTINENT:$CONTINENT_LABEL) $ASSERT $CONTINENT.$CODE $IS_UNIQUE",
-            "$CREATE $CONSTRAINT unique_country_code ON ($COUNTRY:$COUNTRY_LABEL) $ASSERT $COUNTRY.$CODE $IS_UNIQUE",
-            "$CREATE $CONSTRAINT unique_city_code ON ($CITY:$CITY_LABEL) $ASSERT $CITY.$CODE $IS_UNIQUE",
-            "$CREATE $CONSTRAINT unique_company_number ON ($COMPANY:$COMPANY_LABEL) $ASSERT $COMPANY.$NUMBER $IS_UNIQUE",
-            "$CREATE $CONSTRAINT unique_product_id ON ($PRODUCT:$PRODUCT_LABEL) $ASSERT $PRODUCT.$ID $IS_UNIQUE",
-            "$CREATE $CONSTRAINT unique_purchase_id ON ($PURCHASE:$PURCHASE_LABEL) $ASSERT $PURCHASE.$ID $IS_UNIQUE",
-            "$CREATE $CONSTRAINT unique_marriage_licence ON ($MARRIAGE:$MARRIAGE_LABEL) $ASSERT $MARRIAGE.$LICENCE $IS_UNIQUE",
+            "$CREATE $CONSTRAINT unique_person_email $ON ($PERSON:$PERSON_LABEL) $ASSERT $PERSON.$EMAIL $IS_UNIQUE",
+            "$CREATE $CONSTRAINT unique_continent_code $ON ($CONTINENT:$CONTINENT_LABEL) $ASSERT $CONTINENT.$CODE $IS_UNIQUE",
+            "$CREATE $CONSTRAINT unique_country_code $ON ($COUNTRY:$COUNTRY_LABEL) $ASSERT $COUNTRY.$CODE $IS_UNIQUE",
+            "$CREATE $CONSTRAINT unique_city_code $ON ($CITY:$CITY_LABEL) $ASSERT $CITY.$CODE $IS_UNIQUE",
+            "$CREATE $CONSTRAINT unique_company_number $ON ($COMPANY:$COMPANY_LABEL) $ASSERT $COMPANY.$NUMBER $IS_UNIQUE",
+            "$CREATE $CONSTRAINT unique_product_id $ON ($PRODUCT:$PRODUCT_LABEL) $ASSERT $PRODUCT.$ID $IS_UNIQUE",
+            "$CREATE $CONSTRAINT unique_purchase_id $ON ($PURCHASE:$PURCHASE_LABEL) $ASSERT $PURCHASE.$ID $IS_UNIQUE",
+            "$CREATE $CONSTRAINT unique_marriage_licence $ON ($MARRIAGE:$MARRIAGE_LABEL) $ASSERT $MARRIAGE.$LICENCE $IS_UNIQUE",
         )
         val tx = session.beginTransaction()
         queries.forEach { tx.run(Query(it)) }
