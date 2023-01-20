@@ -24,10 +24,6 @@ workspace(name = "vaticle_typedb_benchmark")
 load("//dependencies/vaticle:repositories.bzl", "vaticle_dependencies")
 vaticle_dependencies()
 
-# Load //builder/bazel for RBE
-load("@vaticle_dependencies//builder/bazel:deps.bzl", "bazel_toolchain")
-bazel_toolchain()
-
 # Load //builder/java
 load("@vaticle_dependencies//builder/java:deps.bzl", java_deps = "deps")
 java_deps()
@@ -91,14 +87,6 @@ load("@vaticle_bazel_distribution//common:deps.bzl", "rules_pkg")
 rules_pkg()
 load("@rules_pkg//:deps.bzl", "rules_pkg_dependencies")
 rules_pkg_dependencies()
-
-# Load //github
-load("@vaticle_bazel_distribution//github:deps.bzl", github_deps = "deps")
-github_deps()
-
-# Load //pip
-load("@vaticle_bazel_distribution//pip:deps.bzl", pip_deps = "deps")
-pip_deps()
 
 ################################
 # Load @vaticle dependencies #
