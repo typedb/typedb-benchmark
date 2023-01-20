@@ -22,11 +22,11 @@ enum class DatabaseType(val key: String, val fullname: String, val defaultAddres
     NEO4J("neo4j", "Neo4j", "bolt://localhost:7687");
 
     companion object {
-        fun of(key: String): DatabaseType? {
-            for (value in values()) {
-                if (value.key == key) return value
-            }
-            return null
+        private val validValues = values().joinToString(", ") { it.key }
+
+        fun of(key: String): DatabaseType {
+            return values().find { it.key == key }
+                ?: throw IllegalArgumentException("Unexpected database type: '$key'. Allowed database types are: $validValues")
         }
     }
 }

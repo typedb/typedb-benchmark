@@ -50,17 +50,7 @@ class Options {
     }
 
     class DatabaseConverter : ITypeConverter<DatabaseType> {
-        override fun convert(value: String): DatabaseType {
-            return when (val databaseType = DatabaseType.of(value)) {
-                null -> {
-                    val expected = DatabaseType.values().joinToString(", ") { it.key }
-                    throw IllegalArgumentException(
-                        "Unexpected database type: '$value'. Expected database types are: $expected"
-                    )
-                }
-                else -> databaseType
-            }
-        }
+        override fun convert(value: String) = DatabaseType.of(value)
     }
 
     class FactoryTracing {
