@@ -60,7 +60,7 @@ class RandomSource(seed: Long) {
         return pairs
     }
 
-    fun <T> randomPairs(list1: List<T>, list2: MutableList<T?>): List<Pair<T, T?>> {
+    fun <T> randomPairs(list1: List<T>, list2: MutableList<T>): List<Pair<T, T>> {
         val numPairs = list1.size.coerceAtMost(list2.size)
         list2.shuffle(random)
         return (0 until numPairs).map { i -> Pair(list1[i], list2[i]) }

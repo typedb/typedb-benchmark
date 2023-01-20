@@ -44,13 +44,13 @@ abstract class MarriageAgent<TX: Transaction> protected constructor(client: Clie
             val partnerBirthDate = context.today().minusYears(context.model.ageOfAdulthood.toLong())
             val women = matchPartner(tx, region, partnerBirthDate, FEMALE).sorted(comparing { it.email }).collect(toList())
             val men = matchPartner(tx, region, partnerBirthDate, MALE).sorted(comparing { it.email }).collect(toList())
-            random.randomPairs(women, men).forEach { pair: Pair<Person, Person?> ->
-                val licence = pair.first().email + pair.second()!!.email
-                val inserted = insertMarriage(tx, pair.first().email, pair.second()!!.email, licence, context.today())
+            random.randomPairs(women, men).forEach { pair: Pair<Person, Person> ->
+                val licence = pair.first().email + pair.second().email
+                val inserted = insertMarriage(tx, pair.first().email, pair.second().email, licence, context.today())
                 if (context.isReporting) {
                     requireNotNull(inserted)
                     reports.add(Report(
-                        input = listOf(pair.first().email, pair.second()!!.email, licence, context.today()),
+                        input = listOf(pair.first().email, pair.second().email, licence, context.today()),
                         output = listOf(inserted)
                     ))
                 } else assert(inserted == null)

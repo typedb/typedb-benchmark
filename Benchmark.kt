@@ -59,16 +59,15 @@ object Benchmark {
     }
 
     private fun initTracing(options: Options.FactoryTracing?, analysisName: String): FactoryTracing {
-        val tracing: FactoryTracing = when {
-            options == null -> return FactoryTracing.createNoOp()
-            options.credentials == null -> FactoryTracing.create(options.factoryURI).withLogging()
-            else -> FactoryTracing.create(options.factoryURI, options.credentials!!.username, options.credentials!!.token)
-                .withLogging()
+        if (options == null) return FactoryTracing.createNoOp()
+        val tracing: FactoryTracing = when (val credentials = options.credentials) {
+            null -> FactoryTracing.create(options.factoryURI).withLogging()
+            else -> FactoryTracing.create(options.factoryURI, credentials.username, credentials.token).withLogging()
         }
         FactoryTracingThreadStatic.setGlobalTracingClient(tracing)
-        val taggedAnalysisName = when (options.tags) {
+        val taggedAnalysisName = when (val tags = options.tags) {
             null -> analysisName
-            else -> "$analysisName [ ${options.tags!!.joinToString(", ")} ]"
+            else -> "$analysisName [ ${tags.joinToString(", ")} ]"
         }
         FactoryTracingThreadStatic.openGlobalAnalysis(options.org, options.repo, options.commit, taggedAnalysisName)
         return tracing
