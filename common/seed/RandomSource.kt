@@ -18,7 +18,6 @@ package com.vaticle.typedb.benchmark.common.seed
 
 import com.vaticle.typedb.benchmark.common.concept.City
 import com.vaticle.typedb.benchmark.common.concept.Gender
-import com.vaticle.typedb.common.collection.Collections
 import com.vaticle.typedb.common.collection.Pair
 import java.util.Random
 
@@ -54,7 +53,7 @@ class RandomSource(seed: Long) {
             for (j in 0 until pairsPerElement) {
                 var other = random.nextInt(list.size - 1)
                 if (other >= i) other++
-                pairs.add(Collections.pair(list[i], list[other]))
+                pairs.add(Pair(list[i], list[other]))
             }
         }
         return pairs

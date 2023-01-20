@@ -84,9 +84,7 @@ class SeedData(val global: Global) {
         }
 
         private fun initialiseContinents(global: Global, continents: MutableMap<String, Continent>) {
-            parse(CONTINENTS_FILE).forEach { record: CSVRecord ->
-                val code = record[0]
-                val name = record[1]
+            parse(CONTINENTS_FILE).map { it.readPair() }.forEach { (code, name) ->
                 val continent = Continent(code, name)
                 global.continents += continent
                 continents[code] = continent
@@ -94,10 +92,8 @@ class SeedData(val global: Global) {
         }
 
         private fun initialiseCountries(continents: Map<String, Continent>, countries: MutableMap<String, Country>) {
-            parse(COUNTRIES_FILE).forEach { record: CSVRecord ->
-                val code = record[0]
-                val name = record[1]
-                val continent = requireNotNull(continents[record[2]])
+            parse(COUNTRIES_FILE).map { it.readTriple() }.forEach { (code, name, continentCode) ->
+                val continent = requireNotNull(continents[continentCode])
                 val country = Country(code, name, continent)
                 continent.countries += country
                 countries[code] = country
@@ -105,65 +101,57 @@ class SeedData(val global: Global) {
         }
 
         private fun initialiseCurrencies(countries: Map<String, Country>) {
-            val currencies: MutableMap<String, Currency> = HashMap()
-            parse(CURRENCIES_FILE).forEach { record: CSVRecord ->
-                val code = record[0]
-                val name = record[1]
-                val country = requireNotNull(countries[record[2]])
+            val currencies = mutableMapOf<String, Currency>()
+            parse(CURRENCIES_FILE).map { it.readTriple() }.forEach { (code, name, countryCode) ->
+                val country = requireNotNull(countries[countryCode])
                 val currency = currencies.computeIfAbsent(code) { Currency(it, name) }
                 country.currencies += currency
             }
         }
 
         private fun initialiseCities(countries: Map<String, Country>) {
-            parse(CITIES_FILE).forEach { record: CSVRecord ->
-                val code = record[0]
-                val name = record[1]
-                val country = requireNotNull(countries[record[2]])
+            parse(CITIES_FILE).map { it.readTriple() }.forEach { (code, name, countryCode) ->
+                val country = requireNotNull(countries[countryCode])
                 val city = City(code, name, country)
                 country.cities += city
             }
         }
 
         private fun initialiseUniversities(countries: Map<String, Country>) {
-            parse(UNIVERSITIES_FILE).forEach { record: CSVRecord ->
-                val name = record[0]
-                val country = requireNotNull(countries[record[1]])
+            parse(UNIVERSITIES_FILE).map { it.readPair() }.forEach { (name, countryCode) ->
+                val country = requireNotNull(countries[countryCode])
                 val university = University(name, country)
                 country.universities += university
             }
         }
 
         private fun initialiseLastNames(continents: Map<String, Continent>) {
-            parse(LAST_NAMES_FILE).forEach { record: CSVRecord ->
-                val name = record[0]
-                val continent = requireNotNull(continents[record[1]])
+            parse(LAST_NAMES_FILE).map { it.readPair() }.forEach { (name, continentCode) ->
+                val continent = requireNotNull(continents[continentCode])
                 continent.commonLastNames += name
             }
         }
 
         private fun initialiseFemaleFirstNames(continents: Map<String, Continent>) {
-            parse(FIRST_NAMES_FEMALE_FILE).forEach { record: CSVRecord ->
-                val name = record[0]
-                val continent = requireNotNull(continents[record[1]])
+            parse(FIRST_NAMES_FEMALE_FILE).map { it.readPair() }.forEach { (name, continentCode) ->
+                val continent = requireNotNull(continents[continentCode])
                 continent.commonFemaleFirstNames += name
             }
         }
 
         private fun initialiseMaleFirstNames(continents: Map<String, Continent>) {
-            parse(FIRST_NAMES_MALE_FILE).forEach { record: CSVRecord ->
-                val name = record[0]
-                val continent = requireNotNull(continents[record[1]])
+            parse(FIRST_NAMES_MALE_FILE).map { it.readPair() }.forEach { (name, continentCode) ->
+                val continent = requireNotNull(continents[continentCode])
                 continent.commonMaleFirstNames += name
             }
         }
 
         private fun initialiseAdjectives(words: Words) {
-            words.adjectives += parse(ADJECTIVES_FILE).map { record: CSVRecord -> record[0] }
+            words.adjectives += parse(ADJECTIVES_FILE).map { it.readSingle() }
         }
 
         private fun initialiseNouns(words: Words) {
-            words.nouns += parse(NOUNS_FILE).map { record: CSVRecord -> record[0] }
+            words.nouns += parse(NOUNS_FILE).map { it.readSingle() }
         }
 
         private fun prune(global: Global) {
@@ -203,6 +191,22 @@ class SeedData(val global: Global) {
 
         fun buildTracker(vararg items: Any?): String {
             return items.joinToString(":")
+        }
+
+        private fun CSVRecord.readSingle(): String {
+            return requireNotNull(this[0]) { "Expected CSV record '$this' to have at least 1 element, but found ${count()}" }
+        }
+
+        private fun CSVRecord.readPair(): Pair<String, String> {
+            return listOf(this[0], this[1]).map {
+                requireNotNull(it) { "Expected CSV record '$this' to have at least 2 elements, but found ${count()}" }
+            }.let { Pair(it[0], it[1]) }
+        }
+
+        private fun CSVRecord.readTriple(): Triple<String, String, String> {
+            return listOf(this[0], this[1], this[2]).map {
+                requireNotNull(it) { "Expected CSV record '$this' to have at least 3 elements, but found ${count()}" }
+            }.let { Triple(it[0], it[1], it[2]) }
         }
     }
 }
