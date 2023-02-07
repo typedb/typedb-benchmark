@@ -16,40 +16,49 @@
 #
 
 agents:
-  # For each agent select a `mode`, `RUN` to run without tracing, `TRACE` to run with tracing, and `OFF` to not run at all
   - name: "PersonAgent"
-    mode: RUN
+    isEnabled: true
+    trace: false
   - name: "FriendshipAgent"
-    mode: RUN
+    isEnabled: true
+    trace: false
   - name: "MarriageAgent"
-    mode: RUN
+    isEnabled: true
+    trace: false
   - name: "ParenthoodAgent"
-    mode: RUN
+    isEnabled: true
+    trace: false
   - name: "MaritalStatusAgent"
-    mode: TRACE
+    isEnabled: true
+    trace: true
   - name: "GrandparenthoodAgent"
-    mode: TRACE
+    isEnabled: true
+    trace: true
   - name: "LineageAgent"
-    mode: TRACE
+    isEnabled: true
+    trace: true
   - name: "NationalityAgent"
-    mode: TRACE
+    isEnabled: true
+    trace: true
   - name: "CitizenshipAgent"
-    mode: TRACE
+    isEnabled: true
+    trace: true
   - name: "CoupleFriendshipAgent"
-    mode: TRACE
+    isEnabled: true
+    trace: true
 
 traceSampling:
   # Options: `"every"` for every K traces; `"log"` for logarithm with base N
   function: "every"
   arg: 1
 
-runParams:
+run:
   randomSeed: 1
   iterations: 6
   scaleFactor: 2
   databaseName: "simulation-reasoning"
 
-modelParams:
+model:
   ageOfFriendship: 1
   ageOfAdulthood: 2
   yearsBeforeParenthood: 1

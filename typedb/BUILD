@@ -15,21 +15,27 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 
+load("@io_bazel_rules_kotlin//kotlin:jvm.bzl", "kt_jvm_library")
 load("@vaticle_dependencies//tool/checkstyle:rules.bzl", "checkstyle_test")
 
-java_library(
+kt_jvm_library(
     name = "typedb",
-    srcs = glob(["*.java", "*/*.java", "*/*/*.java"]),
+    srcs = glob(["*.kt", "*/*.kt", "*/*/*.kt"]),
     visibility = ["//visibility:public"],
     deps = [
-        "//common:common",
-        "//simulation:simulation",
-        "@vaticle_typedb_client_java//api:api",
+        "//common",
+        "//simulation",
+
+        # External Vaticle Dependencies
+        "@vaticle_typedb_client_java//api",
         "@vaticle_typedb_client_java//:client-java",
         "@vaticle_typedb_common//:common",
         "@vaticle_typeql//java:typeql-lang",
-        "@vaticle_typeql//java/pattern:pattern",
-        "@vaticle_typeql//java/query:query",
+        "@vaticle_typeql//java/pattern",
+        "@vaticle_typeql//java/query",
+
+        # External Maven Dependencies
+        "@maven//:io_github_microutils_kotlin_logging_jvm",
         "@maven//:org_slf4j_slf4j_api",
     ],
     data = ["simulation.tql"],

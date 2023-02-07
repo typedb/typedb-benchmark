@@ -90,7 +90,7 @@ build:
             attempt_counter=$(($attempt_counter+1))
             sleep 3
         done
-        bazel test //test:comparison-test \
+        bazel test //test:comparison \
           --test_output=streamed \
           --test_arg=--typedb=$FACTORY_EXPORT_TEST_COMPARISON_TYPEDB_URI \
           --test_arg=--neo4j=bolt://$FACTORY_EXPORT_TEST_COMPARISON_NEO4J_URI

@@ -24,10 +24,6 @@ workspace(name = "vaticle_typedb_benchmark")
 load("//dependencies/vaticle:repositories.bzl", "vaticle_dependencies")
 vaticle_dependencies()
 
-# Load //builder/bazel for RBE
-load("@vaticle_dependencies//builder/bazel:deps.bzl", "bazel_toolchain")
-bazel_toolchain()
-
 # Load //builder/java
 load("@vaticle_dependencies//builder/java:deps.bzl", java_deps = "deps")
 java_deps()
@@ -35,9 +31,11 @@ java_deps()
 # Load //builder/kotlin
 load("@vaticle_dependencies//builder/kotlin:deps.bzl", kotlin_deps = "deps")
 kotlin_deps()
-load("@io_bazel_rules_kotlin//kotlin:kotlin.bzl", "kotlin_repositories", "kt_register_toolchains")
+load("@io_bazel_rules_kotlin//kotlin:repositories.bzl", "kotlin_repositories", "kotlinc_version")
 kotlin_repositories()
+load("@io_bazel_rules_kotlin//kotlin:core.bzl", "kt_register_toolchains")
 kt_register_toolchains()
+register_toolchains("//:kotlin_toolchain_strict_deps")
 
 # Load //builder/python
 load("@vaticle_dependencies//builder/python:deps.bzl", python_deps = "deps")
@@ -89,58 +87,6 @@ load("@vaticle_bazel_distribution//common:deps.bzl", "rules_pkg")
 rules_pkg()
 load("@rules_pkg//:deps.bzl", "rules_pkg_dependencies")
 rules_pkg_dependencies()
-
-# Load //github
-load("@vaticle_bazel_distribution//github:deps.bzl", github_deps = "deps")
-github_deps()
-
-# Load //pip
-load("@vaticle_bazel_distribution//pip:deps.bzl", pip_deps = "deps")
-pip_deps()
-
-######################################
-# Load groovy dependencies #
-######################################
-
-load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
-http_archive(
-    name = "io_bazel_rules_groovy",
-    url = "https://github.com/bazelbuild/rules_groovy/archive/0.0.6.tar.gz",
-    sha256 = "21c7172786623f280402d3b3a2fc92f36568afad5a4f6f5ea38fd1c6897aecf8",
-    strip_prefix = "rules_groovy-0.0.6",
-)
-#Rather than use these recommended lines, we use the below such that we have access to the groovy library in our groovy scripts
-#load("@io_bazel_rules_groovy//groovy:repositories.bzl", "rules_groovy_dependencies")
-#rules_groovy_dependencies()
-
-http_archive(
-    name = "groovy_sdk_artifact",
-    urls = [
-        "https://groovy.jfrog.io/artifactory/dist-release-local/groovy-zips/apache-groovy-binary-3.0.6.zip"
-    ],
-    build_file_content = """
-filegroup(
-    name = "sdk",
-    srcs = glob(["groovy-3.0.6/**"]),
-    visibility = ["//visibility:public"],
-)
-java_import(
-    name = "groovy",
-    jars = ["groovy-3.0.6/lib/groovy-3.0.6.jar", "groovy-3.0.6/lib/groovy-templates-3.0.6.jar"],
-    visibility = ["//visibility:public"],
-)
-java_import
-"""
-)
-
-bind(
-    name = "groovy-sdk",
-    actual = "@groovy_sdk_artifact//:sdk",
-)
-bind(
-    name = "groovy",
-    actual = "@groovy_sdk_artifact//:groovy",
-)
 
 ################################
 # Load @vaticle dependencies #

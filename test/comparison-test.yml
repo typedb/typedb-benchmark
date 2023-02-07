@@ -17,21 +17,25 @@
 
 agents:
   - name: "PersonAgent"
-    mode: RUN
+    isEnabled: true
+    trace: true
   - name: "FriendshipAgent"
-    mode: RUN
+    isEnabled: true
+    trace: true
   - name: "MarriageAgent"
-    mode: RUN
+    isEnabled: true
+    trace: true
   - name: "ParenthoodAgent"
-    mode: RUN
+    isEnabled: true
+    trace: true
 
-runParams:
+run:
   randomSeed: 1
   iterations: 5
   scaleFactor: 5
   databaseName: "simulation"
 
-modelParams:
+model:
   ageOfFriendship: 1
   ageOfAdulthood: 2
   yearsBeforeParenthood: 1
