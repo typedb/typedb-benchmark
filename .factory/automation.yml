@@ -28,4 +28,3 @@ build:
       command: |
         dependencies/maven/update.sh
         git diff --exit-code dependencies/maven/artifacts.snapshot
-        bazel run @vaticle_dependencies//tool/unuseddeps:unused-deps -- list
