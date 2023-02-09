@@ -20,25 +20,22 @@ load("@vaticle_dependencies//tool/checkstyle:rules.bzl", "checkstyle_test")
 
 kt_jvm_library(
     name = "typedb",
-    srcs = glob(["*.kt", "*/*.kt", "*/*/*.kt"]),
+    srcs = glob(["*.kt", "*/*.kt"]),
     visibility = ["//visibility:public"],
     deps = [
         "//common",
-        "//simulation",
+        "//:typedb_simulation",
 
         # External Vaticle Dependencies
         "@vaticle_typedb_client_java//api",
         "@vaticle_typedb_client_java//:client-java",
         "@vaticle_typedb_common//:common",
         "@vaticle_typeql//java:typeql-lang",
-        "@vaticle_typeql//java/pattern",
-        "@vaticle_typeql//java/query",
 
         # External Maven Dependencies
         "@maven//:io_github_microutils_kotlin_logging_jvm",
         "@maven//:org_slf4j_slf4j_api",
     ],
-    data = ["simulation.tql"],
 )
 
 checkstyle_test(

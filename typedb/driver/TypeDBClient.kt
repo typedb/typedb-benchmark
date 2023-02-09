@@ -14,10 +14,10 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.vaticle.typedb.benchmark.typedb.driver
+package com.vaticle.typedb.simulation.typedb.driver
 
-import com.vaticle.typedb.benchmark.common.concept.Region
-import com.vaticle.typedb.benchmark.simulation.driver.Client
+import com.vaticle.typedb.simulation.common.Partition
+import com.vaticle.typedb.simulation.common.driver.Client
 import com.vaticle.typedb.client.TypeDB
 import com.vaticle.typedb.client.api.TypeDBCredential
 import com.vaticle.typedb.client.api.TypeDBSession.Type.DATA
@@ -37,8 +37,8 @@ class TypeDBClient private constructor(
         return nativeClient
     }
 
-    override fun session(region: Region): TypeDBSession {
-        return sessionMap.computeIfAbsent(region.group) { TypeDBSession(nativeClient.session(database, DATA)) }
+    override fun session(partition: Partition): TypeDBSession {
+        return sessionMap.computeIfAbsent(partition.group) { TypeDBSession(nativeClient.session(database, DATA)) }
     }
 
     override fun printStatistics(): String {
@@ -50,7 +50,7 @@ class TypeDBClient private constructor(
                 val numberOfAttributes = tx.query().match(match(`var`("x").isa("attribute")).count()).get().asLong()
                 val numberOfRelations = tx.query().match(match(`var`("x").isa("relation")).count()).get().asLong()
                 val numberOfThings = tx.query().match(match(`var`("x").isa("thing")).count()).get().asLong()
-                str.append("Benchmark statistic:").append("\n")
+                str.append("Simulation statistic:").append("\n")
                 str.append("\n")
                 str.append("Count 'entity': ").append(formatter.format(numberOfEntities)).append("\n")
                 str.append("Count 'relation': ").append(formatter.format(numberOfRelations)).append("\n")

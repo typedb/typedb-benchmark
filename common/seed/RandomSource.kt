@@ -14,11 +14,8 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.vaticle.typedb.benchmark.common.seed
+package com.vaticle.typedb.simulation.common.seed
 
-import com.vaticle.typedb.benchmark.common.concept.City
-import com.vaticle.typedb.benchmark.common.concept.Gender
-import com.vaticle.typedb.common.collection.Pair
 import java.util.Random
 
 class RandomSource(seed: Long) {
@@ -38,13 +35,6 @@ class RandomSource(seed: Long) {
 
     fun <T> choose(list: List<T>): T {
         return list[random.nextInt(list.size)]
-    }
-
-    fun address(city: City): String {
-        val houseNumber = nextInt(1000)
-        val streetName = choose(city.country.continent.commonFirstNames(Gender.of(nextBoolean())))
-        val zipCode = nextInt(10000)
-        return "$houseNumber $streetName Street, ${city.name}, $zipCode ${city.country.name}"
     }
 
     fun <T> randomPairs(list: List<T>, pairsPerElement: Int): List<Pair<T, T>> {

@@ -14,12 +14,12 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.vaticle.typedb.benchmark.neo4j.driver
+package com.vaticle.typedb.simulation.neo4j.driver
 
-import com.vaticle.typedb.benchmark.common.concept.Region
-import com.vaticle.typedb.benchmark.neo4j.Keywords.MATCH
-import com.vaticle.typedb.benchmark.neo4j.Keywords.RETURN
-import com.vaticle.typedb.benchmark.simulation.driver.Client
+import com.vaticle.typedb.simulation.common.Partition
+import com.vaticle.typedb.simulation.neo4j.Keywords.MATCH
+import com.vaticle.typedb.simulation.neo4j.Keywords.RETURN
+import com.vaticle.typedb.simulation.common.driver.Client
 import org.neo4j.driver.AuthTokens
 import org.neo4j.driver.Driver
 import org.neo4j.driver.GraphDatabase
@@ -36,8 +36,8 @@ class Neo4jClient(hostUri: String) : Client<Neo4jSession> {
         return nativeDriver
     }
 
-    override fun session(region: Region): Neo4jSession {
-        return sessionMap.computeIfAbsent(region.name) { Neo4jSession(nativeDriver.session()) }
+    override fun session(partition: Partition): Neo4jSession {
+        return sessionMap.computeIfAbsent(partition.name) { Neo4jSession(nativeDriver.session()) }
     }
 
     override fun printStatistics(): String {
@@ -56,7 +56,7 @@ class Neo4jClient(hostUri: String) : Client<Neo4jSession> {
                 result.list()
             }
             val numberOfRelationships = numberOfRelationshipsList[0].asMap()["count(*)"] as Long
-            str.append("Benchmark statistic:").append("\n")
+            str.append("Simulation statistic:").append("\n")
             str.append("\n")
             str.append("Count 'node': ").append(formatter.format(numberOfNodes)).append("\n")
             str.append("Count 'relationship': ").append(formatter.format(numberOfRelationships)).append("\n")

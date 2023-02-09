@@ -20,31 +20,22 @@ load("@io_bazel_rules_kotlin//kotlin:jvm.bzl", "kt_jvm_library")
 load("@vaticle_dependencies//tool/checkstyle:rules.bzl", "checkstyle_test")
 
 kt_jvm_library(
-    name = "benchmark-lib",
+    name = "typedb_simulation",
     srcs = glob(["*.kt"]),
     resource_strip_prefix = "config/",
     visibility = ["//visibility:public"],
     deps = [
         "//common",
-        "//simulation",
-        "//typedb",
-        "//neo4j",
 
         # External Vaticle Dependencies
         "@vaticle_factory_tracing//client",
+        "@vaticle_typedb_common//:common",
 
         # External Maven Dependencies
         "@maven//:com_google_code_findbugs_jsr305",
         "@maven//:io_github_microutils_kotlin_logging_jvm",
         "@maven//:org_slf4j_slf4j_api",
     ],
-)
-
-java_binary(
-    name = "benchmark",
-    runtime_deps = [":benchmark-lib"],
-    main_class = "com.vaticle.typedb.benchmark.Benchmark",
-    classpath_resources = ["//config:logback.xml"],
 )
 
 define_kt_toolchain(

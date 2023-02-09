@@ -14,28 +14,23 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.vaticle.typedb.benchmark.neo4j.driver
+package com.vaticle.typedb.simulation.neo4j.driver
 
-import com.vaticle.typedb.benchmark.simulation.driver.Transaction
+import com.vaticle.typedb.simulation.common.driver.Transaction
 import org.neo4j.driver.Query
 import org.neo4j.driver.Record
 import org.neo4j.driver.Session
 
 // TODO: why are we not passing a Transaction in here?
 abstract class Neo4jTransaction(protected val session: Session) : Transaction {
-    open fun execute(query: Query?): List<Record> {
-        return session.writeTransaction { tx: org.neo4j.driver.Transaction ->
-            val result = tx.run(query)
-            result.list()
-        }
-    }
+    abstract fun execute(query: Query): List<Record>
 
     /**
      * Not necessary when using Neo4j's Transaction Functions
      */
     override fun close() {}
     internal class Read(session: Session) : Neo4jTransaction(session) {
-        override fun execute(query: Query?): List<Record> {
+        override fun execute(query: Query): List<Record> {
             return session.readTransaction { tx -> tx.run(query).list() }
         }
 
@@ -45,7 +40,7 @@ abstract class Neo4jTransaction(protected val session: Session) : Transaction {
     }
 
     internal class Write(session: Session) : Neo4jTransaction(session) {
-        override fun execute(query: Query?): List<Record> {
+        override fun execute(query: Query): List<Record> {
             return session.writeTransaction { tx -> tx.run(query).list() }
         }
 

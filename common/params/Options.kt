@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.vaticle.typedb.benchmark.common.params
+package com.vaticle.typedb.simulation.common.params
 
 import picocli.CommandLine
 import picocli.CommandLine.ArgGroup
@@ -22,15 +22,15 @@ import picocli.CommandLine.ITypeConverter
 import picocli.CommandLine.ParameterException
 import java.io.File
 
-@CommandLine.Command(name = "benchmark", mixinStandardHelpOptions = true)
+@CommandLine.Command(name = "simulation", mixinStandardHelpOptions = true)
 class Options {
     @CommandLine.Option(
         names = ["--database"],
         required = true,
         converter = [DatabaseConverter::class],
-        description = ["The database to run this benchmark against"]
+        description = ["The database to run this simulation against"]
     )
-    lateinit var database: DatabaseType; private set
+    lateinit var database: Database; private set
 
     @CommandLine.Option(names = ["--address"], description = ["Database address URI"])
     private var _address: String? = null
@@ -41,7 +41,7 @@ class Options {
     @ArgGroup(
         exclusive = false,
         multiplicity = "0..1",
-        heading = "Vaticle Factory tracing options to run this benchmark with"
+        heading = "Vaticle Factory tracing options to run this simulation with"
     )
     val tracing: FactoryTracing? = null
 
@@ -49,8 +49,8 @@ class Options {
         return _address ?: database.defaultAddress
     }
 
-    class DatabaseConverter : ITypeConverter<DatabaseType> {
-        override fun convert(value: String) = DatabaseType.of(value)
+    class DatabaseConverter : ITypeConverter<Database> {
+        override fun convert(value: String) = Database.of(value)
     }
 
     class FactoryTracing {

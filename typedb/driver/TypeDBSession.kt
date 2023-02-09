@@ -14,9 +14,9 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.vaticle.typedb.benchmark.typedb.driver
+package com.vaticle.typedb.simulation.typedb.driver
 
-import com.vaticle.typedb.benchmark.simulation.driver.Session
+import com.vaticle.typedb.simulation.common.driver.Session
 import com.vaticle.typedb.client.api.TypeDBOptions
 import com.vaticle.typedb.client.api.TypeDBSession
 import com.vaticle.typedb.client.api.TypeDBTransaction.Type.READ

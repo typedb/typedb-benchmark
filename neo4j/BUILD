@@ -24,7 +24,7 @@ kt_jvm_library(
     visibility = ["//visibility:public"],
     deps = [
         "//common",
-        "//simulation",
+        "//:typedb_simulation",
 
         # External Vaticle Dependencies
         "@vaticle_typedb_common//:common",

@@ -14,14 +14,14 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.vaticle.typedb.benchmark.neo4j.driver
+package com.vaticle.typedb.simulation.neo4j.driver
 
-import com.vaticle.typedb.benchmark.neo4j.driver.Neo4jTransaction.Read
-import com.vaticle.typedb.benchmark.neo4j.driver.Neo4jTransaction.Write
+import com.vaticle.typedb.simulation.neo4j.driver.Neo4jTransaction.Read
+import com.vaticle.typedb.simulation.neo4j.driver.Neo4jTransaction.Write
 import org.neo4j.driver.Session
 
 class Neo4jSession(private val nativeSession: Session) :
-    com.vaticle.typedb.benchmark.simulation.driver.Session<Neo4jTransaction> {
+    com.vaticle.typedb.simulation.common.driver.Session<Neo4jTransaction> {
     override fun writeTransaction(): Neo4jTransaction {
         return Write(nativeSession)
     }
