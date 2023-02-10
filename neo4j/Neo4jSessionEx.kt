@@ -14,13 +14,13 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.vaticle.typedb.simulation.common.driver
+package com.vaticle.typedb.simulation.neo4j
 
-import com.vaticle.typedb.simulation.common.Partition
+import org.neo4j.driver.Session
 
-interface Client<out SESSION: Session<*>> : AutoCloseable {
-    fun session(partition: Partition): SESSION
-    fun closeSessions()
-    fun printStatistics(): String
-    override fun close()
+object Neo4jSessionEx {
+
+//    fun Session.readTransaction() {
+//
+//    }
 }

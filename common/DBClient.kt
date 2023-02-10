@@ -14,21 +14,11 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.vaticle.typedb.simulation.typedb.driver
+package com.vaticle.typedb.simulation.common
 
-import com.vaticle.typedb.simulation.common.driver.Transaction
-import com.vaticle.typedb.client.api.query.QueryManager
-
-class TypeDBTransaction(private val tx: com.vaticle.typedb.client.api.TypeDBTransaction) : Transaction {
-    fun query(): QueryManager {
-        return tx.query()
-    }
-
-    override fun close() {
-        tx.close()
-    }
-
-    override fun commit() {
-        tx.commit()
-    }
+interface DBClient<out SESSION> : AutoCloseable {
+    fun session(partition: Partition): SESSION
+    fun closeSessions()
+    fun printStatistics(): String
+    override fun close()
 }

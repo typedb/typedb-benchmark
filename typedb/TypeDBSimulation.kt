@@ -19,7 +19,6 @@ package com.vaticle.typedb.simulation.typedb
 import com.vaticle.typedb.simulation.common.Util.printDuration
 import com.vaticle.typedb.simulation.Context
 import com.vaticle.typedb.simulation.Simulation
-import com.vaticle.typedb.simulation.typedb.driver.TypeDBClient
 import com.vaticle.typedb.client.api.TypeDBSession.Type.DATA
 import com.vaticle.typedb.client.api.TypeDBSession.Type.SCHEMA
 import com.vaticle.typedb.client.api.TypeDBTransaction.Type.WRITE
@@ -28,7 +27,6 @@ import com.vaticle.typeql.lang.TypeQL
 import mu.KotlinLogging
 import java.io.File
 import java.nio.file.Files
-import java.nio.file.Paths
 import java.time.Instant
 
 abstract class TypeDBSimulation<out CONTEXT: Context<*, *>> protected constructor(

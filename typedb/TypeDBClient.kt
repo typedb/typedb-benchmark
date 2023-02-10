@@ -14,12 +14,13 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.vaticle.typedb.simulation.typedb.driver
+package com.vaticle.typedb.simulation.typedb
 
 import com.vaticle.typedb.simulation.common.Partition
-import com.vaticle.typedb.simulation.common.driver.Client
+import com.vaticle.typedb.simulation.common.DBClient
 import com.vaticle.typedb.client.TypeDB
 import com.vaticle.typedb.client.api.TypeDBCredential
+import com.vaticle.typedb.client.api.TypeDBSession
 import com.vaticle.typedb.client.api.TypeDBSession.Type.DATA
 import com.vaticle.typedb.client.api.TypeDBTransaction.Type.READ
 import com.vaticle.typeql.lang.TypeQL.match
@@ -30,7 +31,7 @@ import java.util.concurrent.ConcurrentHashMap
 class TypeDBClient private constructor(
     private val nativeClient: com.vaticle.typedb.client.api.TypeDBClient,
     private val database: String
-) : Client<TypeDBSession> {
+) : DBClient<TypeDBSession> {
     private val sessionMap = ConcurrentHashMap<String, TypeDBSession>()
 
     fun unpack(): com.vaticle.typedb.client.api.TypeDBClient {
@@ -38,7 +39,7 @@ class TypeDBClient private constructor(
     }
 
     override fun session(partition: Partition): TypeDBSession {
-        return sessionMap.computeIfAbsent(partition.group) { TypeDBSession(nativeClient.session(database, DATA)) }
+        return sessionMap.computeIfAbsent(partition.group) { nativeClient.session(database, DATA) }
     }
 
     override fun printStatistics(): String {

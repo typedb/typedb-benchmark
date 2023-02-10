@@ -21,7 +21,6 @@ import com.vaticle.typedb.simulation.common.Util.printDuration
 import com.vaticle.typedb.simulation.neo4j.Keywords.DELETE
 import com.vaticle.typedb.simulation.neo4j.Keywords.DETACH
 import com.vaticle.typedb.simulation.neo4j.Keywords.MATCH
-import com.vaticle.typedb.simulation.neo4j.driver.Neo4jClient
 import com.vaticle.typedb.simulation.Context
 import com.vaticle.typedb.simulation.Simulation
 import mu.KotlinLogging

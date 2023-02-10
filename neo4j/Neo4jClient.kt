@@ -14,30 +14,31 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.vaticle.typedb.simulation.neo4j.driver
+package com.vaticle.typedb.simulation.neo4j
 
 import com.vaticle.typedb.simulation.common.Partition
 import com.vaticle.typedb.simulation.neo4j.Keywords.MATCH
 import com.vaticle.typedb.simulation.neo4j.Keywords.RETURN
-import com.vaticle.typedb.simulation.common.driver.Client
+import com.vaticle.typedb.simulation.common.DBClient
 import org.neo4j.driver.AuthTokens
 import org.neo4j.driver.Driver
 import org.neo4j.driver.GraphDatabase
 import org.neo4j.driver.Query
+import org.neo4j.driver.Session
 import org.neo4j.driver.Transaction
 import java.text.DecimalFormat
 import java.util.concurrent.ConcurrentHashMap
 
-class Neo4jClient(hostUri: String) : Client<Neo4jSession> {
+class Neo4jClient(hostUri: String) : DBClient<Session> {
     private val nativeDriver = GraphDatabase.driver(hostUri, AuthTokens.basic("neo4j", "admin"))
-    private val sessionMap = ConcurrentHashMap<String, Neo4jSession>()
+    private val sessionMap = ConcurrentHashMap<String, Session>()
 
     fun unpack(): Driver {
         return nativeDriver
     }
 
-    override fun session(partition: Partition): Neo4jSession {
-        return sessionMap.computeIfAbsent(partition.name) { Neo4jSession(nativeDriver.session()) }
+    override fun session(partition: Partition): Session {
+        return sessionMap.computeIfAbsent(partition.name) { nativeDriver.session() }
     }
 
     override fun printStatistics(): String {

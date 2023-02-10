@@ -19,9 +19,7 @@ package com.vaticle.typedb.simulation
 import com.vaticle.factory.tracing.client.FactoryTracingThreadStatic
 import com.vaticle.typedb.simulation.common.Partition
 import com.vaticle.typedb.simulation.common.seed.RandomSource
-import com.vaticle.typedb.simulation.common.driver.Client
-import com.vaticle.typedb.simulation.common.driver.Session
-import com.vaticle.typedb.simulation.common.driver.Transaction
+import com.vaticle.typedb.simulation.common.DBClient
 import com.vaticle.typedb.common.util.Objects.className
 import java.util.Objects.hash
 import java.util.concurrent.CompletableFuture
@@ -38,13 +36,13 @@ import java.util.function.Supplier
  * @param <PARTITION> The type of region used by the agent.
  * @param <TX>     The abstraction of database operations used by the agent.
 </TX></REGION> */
-abstract class Agent<PARTITION: Partition, TX: Transaction, MODEL_PARAMS> protected constructor(
-    private val client: Client<Session<TX>>, protected val context: Context<*, MODEL_PARAMS>
+abstract class Agent<PARTITION: Partition, SESSION, MODEL_PARAMS> protected constructor(
+    private val client: DBClient<SESSION>, protected val context: Context<*, MODEL_PARAMS>
 ) {
     var tracingEnabled = true
     protected abstract val agentClass: Class<out Agent<*, *, *>>
     protected abstract val partitions: List<PARTITION>
-    protected abstract fun run(session: Session<TX>, partition: PARTITION, random: RandomSource): List<Report>
+    protected abstract fun run(session: SESSION, partition: PARTITION, random: RandomSource): List<Report>
 
     private fun shouldTrace(): Boolean {
         return context.isTracing && this.tracingEnabled

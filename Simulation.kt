@@ -17,13 +17,13 @@
 package com.vaticle.typedb.simulation
 
 import com.vaticle.typedb.simulation.common.Util.printDuration
-import com.vaticle.typedb.simulation.common.driver.Client
+import com.vaticle.typedb.simulation.common.DBClient
 import com.vaticle.typedb.simulation.common.seed.RandomSource
 import mu.KotlinLogging
 import java.time.Instant
 import java.util.concurrent.ConcurrentHashMap
 
-abstract class Simulation<CLIENT: Client<*>, out CONTEXT: Context<*, *>>(
+abstract class Simulation<CLIENT: DBClient<*>, out CONTEXT: Context<*, *>>(
     protected val client: CLIENT, protected val context: CONTEXT, protected val agentFactory: Agent.Factory
 ) : AutoCloseable {
     private val randomSource = RandomSource(context.seed)
