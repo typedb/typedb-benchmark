@@ -35,10 +35,6 @@ abstract class Simulation<CLIENT: DBClient<*>, out CONTEXT: Context<*, *>>(
 
     protected abstract val name: String
 
-    init {
-        initialise()
-    }
-
     protected abstract fun initialise()
 
     private fun initAgents(): List<Agent<*, *, *>> {
@@ -55,6 +51,7 @@ abstract class Simulation<CLIENT: DBClient<*>, out CONTEXT: Context<*, *>>(
     }
 
     fun run() {
+        initialise()
         val start = Instant.now()
         while (context.iterationNumber <= context.iterationMax) {
             val iter = context.iterationNumber
