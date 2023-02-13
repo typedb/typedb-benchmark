@@ -33,7 +33,7 @@ abstract class Neo4jSimulation<out CONTEXT: Context<*, *>> protected constructor
     client: Neo4jClient, context: CONTEXT, agentFactory: Agent.Factory
 ) : Simulation<Neo4jClient, CONTEXT>(client, context, agentFactory) {
 
-    override fun initialise() {
+    override fun init() {
         val nativeDriver = client.unpack()
         initDatabase(nativeDriver)
 

@@ -35,7 +35,7 @@ abstract class Simulation<CLIENT: DBClient<*>, out CONTEXT: Context<*, *>>(
 
     protected abstract val name: String
 
-    protected abstract fun initialise()
+    abstract fun init()
 
     private fun initAgents(): List<Agent<*, *, *>> {
         return context.agentConfigs.filter { it.isEnabled }.map { agentConfig ->
@@ -51,7 +51,6 @@ abstract class Simulation<CLIENT: DBClient<*>, out CONTEXT: Context<*, *>>(
     }
 
     fun run() {
-        initialise()
         val start = Instant.now()
         while (context.iterationNumber <= context.iterationMax) {
             val iter = context.iterationNumber

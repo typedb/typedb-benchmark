@@ -35,7 +35,7 @@ abstract class TypeDBSimulation<out CONTEXT: Context<*, *>> protected constructo
 
     abstract val schemaFile: File
 
-    override fun initialise() {
+    override fun init() {
         val nativeClient = client.unpack()
         initDatabase(nativeClient)
         initSchema(nativeClient)
