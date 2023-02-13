@@ -27,7 +27,6 @@ abstract class Simulation<CLIENT: DBClient<*>, out CONTEXT: Context<*, *>>(
     protected val client: CLIENT, protected val context: CONTEXT, protected val agentFactory: Agent.Factory
 ) : AutoCloseable {
     private val randomSource = RandomSource(context.seed)
-    private val agents: List<Agent<*, *, *>> = initAgents()
     private val agentReports = ConcurrentHashMap<String, Map<String, List<Agent.Report>>>()
     private val _registeredAgents = mutableListOf<Class<out Agent<*, *, *>>>()
     val registeredAgents: List<Class<out Agent<*, *, *>>> get() = _registeredAgents
@@ -70,6 +69,7 @@ abstract class Simulation<CLIENT: DBClient<*>, out CONTEXT: Context<*, *>>(
 
     fun iterate() {
         agentReports.clear()
+        val agents = initAgents()
         agents.forEach { agent ->
             val start = Instant.now()
             val reports = agent.iterate(randomSource.nextSource())
