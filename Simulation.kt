@@ -32,6 +32,8 @@ abstract class Simulation<CLIENT: DBClient<*>, out CONTEXT: Context<*, *>>(
     private val _registeredAgents = mutableListOf<Class<out Agent<*, *, *>>>()
     val registeredAgents: List<Class<out Agent<*, *, *>>> get() = _registeredAgents
 
+    protected abstract val agentPackage: String
+
     protected abstract val name: String
 
     init {
@@ -42,7 +44,7 @@ abstract class Simulation<CLIENT: DBClient<*>, out CONTEXT: Context<*, *>>(
 
     private fun initAgents(): List<Agent<*, *, *>> {
         return context.agentConfigs.filter { it.isEnabled }.map { agentConfig ->
-            val className = "${Agent::class.java.packageName}.${agentConfig.name}"
+            val className = "$agentPackage.${agentConfig.name}"
             val agentClass = Class.forName(className) as Class<out Agent<*, *, *>>
             val agent = agentFactory[agentClass]?.let { it() } ?: throw RuntimeException("${agentConfig.name} is not registered as an agent")
             agent.apply { tracingEnabled = agentConfig.trace }.also { _registeredAgents += agentClass }
