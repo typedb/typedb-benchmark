@@ -21,6 +21,7 @@ import com.vaticle.typedb.simulation.common.Partition
 import com.vaticle.typedb.simulation.common.seed.RandomSource
 import com.vaticle.typedb.simulation.common.DBClient
 import com.vaticle.typedb.common.util.Objects.className
+import com.vaticle.typedb.simulation.common.params.Config.Agent.Companion.DEFAULT_ACTION
 import java.util.Objects.hash
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ConcurrentHashMap
@@ -39,10 +40,18 @@ import java.util.function.Supplier
 abstract class Agent<PARTITION: Partition, SESSION, MODEL_PARAMS> protected constructor(
     private val client: DBClient<SESSION>, protected val context: Context<*, MODEL_PARAMS>
 ) {
+    var action = DEFAULT_ACTION
     var tracingEnabled = true
     protected abstract val agentClass: Class<out Agent<*, *, *>>
     protected abstract val partitions: List<PARTITION>
-    protected abstract fun run(session: SESSION, partition: PARTITION, random: RandomSource): List<Report>
+
+    protected abstract val actionHandlers: Map<String, (SESSION, PARTITION, RandomSource) -> List<Report>>
+
+    fun run(session: SESSION, partition: PARTITION, random: RandomSource): List<Report> {
+        return actionHandlers[action]?.let { it(session, partition, random) }
+            ?: throw IllegalArgumentException("The action '$action' has no registered handler in '${javaClass.simpleName}'"
+                    + if (action == DEFAULT_ACTION) " (help: '$action' is the default action)" else "")
+    }
 
     private fun shouldTrace(): Boolean {
         return context.isTracing && this.tracingEnabled

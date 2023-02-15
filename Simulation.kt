@@ -42,7 +42,10 @@ abstract class Simulation<CLIENT: DBClient<*>, out CONTEXT: Context<*, *>>(
             val className = "$agentPackage.${agentConfig.name}"
             val agentClass = Class.forName(className) as Class<out Agent<*, *, *>>
             val agent = agentFactory[agentClass]?.let { it() } ?: throw RuntimeException("${agentConfig.name} is not registered as an agent")
-            agent.apply { tracingEnabled = agentConfig.trace }.also { _registeredAgents += agentClass }
+            agent.apply {
+                action = agentConfig.action
+                tracingEnabled = agentConfig.trace
+            }.also { _registeredAgents += agentClass }
         }
     }
 

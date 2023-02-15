@@ -28,16 +28,20 @@ import com.vaticle.typedb.simulation.common.params.Config.Keys.RUN
 import com.vaticle.typedb.simulation.common.params.Config.Keys.TRACE
 import com.vaticle.typedb.simulation.common.params.Config.Keys.TRACE_SAMPLING
 import com.vaticle.typedb.common.yaml.YAML
+import com.vaticle.typedb.simulation.common.params.Config.Keys.ACTION
 import java.io.File
 import kotlin.math.ln
 
 class Config<out MODEL>(val agents: List<Agent>, val traceSampling: TraceSampling?, val run: Run, val model: MODEL) {
 
-    class Agent(val name: String, val isEnabled: Boolean, val trace: Boolean) {
+    class Agent(val name: String, val action: String, val isEnabled: Boolean, val trace: Boolean) {
 
         companion object {
+            const val DEFAULT_ACTION = "run"
+
             internal fun of(yaml: YAML.Map) = Agent(
                 name = yaml[NAME].asString().value(),
+                action = yaml[ACTION]?.asString()?.value() ?: DEFAULT_ACTION,
                 isEnabled = yaml[IS_ENABLED].asBoolean().value(),
                 trace = yaml[TRACE].asBoolean().value()
             )
@@ -102,6 +106,7 @@ class Config<out MODEL>(val agents: List<Agent>, val traceSampling: TraceSamplin
     }
 
     internal object Keys {
+        const val ACTION = "action"
         const val AGENTS = "agents"
         const val ARG = "arg"
         const val DATABASE_NAME = "databaseName"
