@@ -23,6 +23,7 @@ import com.vaticle.typedb.simulation.neo4j.Keywords.DETACH
 import com.vaticle.typedb.simulation.neo4j.Keywords.MATCH
 import com.vaticle.typedb.simulation.Context
 import com.vaticle.typedb.simulation.Simulation
+import com.vaticle.typedb.simulation.common.seed.RandomSource
 import mu.KotlinLogging
 import org.neo4j.driver.Driver
 import org.neo4j.driver.Query
@@ -33,13 +34,13 @@ abstract class Neo4jSimulation<out CONTEXT: Context<*, *>> protected constructor
     client: Neo4jClient, context: CONTEXT, agentFactory: Agent.Factory
 ) : Simulation<Neo4jClient, CONTEXT>(client, context, agentFactory) {
 
-    override fun init() {
+    override fun init(randomSource: RandomSource) {
         val nativeDriver = client.unpack()
         initDatabase(nativeDriver)
 
         LOGGER.info("Neo4j initialisation of $name simulation data started ...")
         val start = Instant.now()
-        initData(nativeDriver)
+        initData(nativeDriver, randomSource)
         LOGGER.info("Neo4j initialisation of $name simulation data ended in: {}", printDuration(start, Instant.now()))
     }
 
@@ -65,7 +66,7 @@ abstract class Neo4jSimulation<out CONTEXT: Context<*, *>> protected constructor
         tx.commit()
     }
 
-    protected abstract fun initData(nativeDriver: Driver)
+    protected abstract fun initData(nativeDriver: Driver, randomSource: RandomSource)
 
     protected fun escapeQuotes(string: String): String {
         return string.replace("'", "\\'")

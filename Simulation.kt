@@ -35,7 +35,11 @@ abstract class Simulation<CLIENT: DBClient<*>, out CONTEXT: Context<*, *>>(
 
     protected abstract val name: String
 
-    abstract fun init()
+    fun init() {
+        init(randomSource.nextSource())
+    }
+
+    abstract fun init(randomSource: RandomSource)
 
     private fun initAgents(): List<Agent<*, *, *>> {
         return context.agentConfigs.filter { it.isEnabled }.map { agentConfig ->

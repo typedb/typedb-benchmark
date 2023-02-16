@@ -23,6 +23,7 @@ import com.vaticle.typedb.client.api.TypeDBSession.Type.DATA
 import com.vaticle.typedb.client.api.TypeDBSession.Type.SCHEMA
 import com.vaticle.typedb.client.api.TypeDBTransaction.Type.WRITE
 import com.vaticle.typedb.simulation.Agent
+import com.vaticle.typedb.simulation.common.seed.RandomSource
 import com.vaticle.typeql.lang.TypeQL
 import mu.KotlinLogging
 import java.io.File
@@ -35,14 +36,14 @@ abstract class TypeDBSimulation<out CONTEXT: Context<*, *>> protected constructo
 
     abstract val schemaFile: File
 
-    override fun init() {
+    override fun init(randomSource: RandomSource) {
         val nativeClient = client.unpack()
         initDatabase(nativeClient)
         initSchema(nativeClient)
         nativeClient.session(context.dbName, DATA).use { nativeSession ->
             LOGGER.info("TypeDB initialisation of $name simulation data started ...")
             val start = Instant.now()
-            initData(nativeSession)
+            initData(nativeSession, randomSource)
             LOGGER.info("TypeDB initialisation of $name simulation data ended in: {}", printDuration(start, Instant.now()))
         }
     }
@@ -69,7 +70,7 @@ abstract class TypeDBSimulation<out CONTEXT: Context<*, *>> protected constructo
         }
     }
 
-    protected abstract fun initData(nativeSession: com.vaticle.typedb.client.api.TypeDBSession)
+    protected abstract fun initData(nativeSession: com.vaticle.typedb.client.api.TypeDBSession, randomSource: RandomSource)
 
     companion object {
         private val LOGGER = KotlinLogging.logger {}
