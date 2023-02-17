@@ -37,8 +37,8 @@ import java.util.function.Supplier
  * @param <PARTITION> The type of region used by the agent.
  * @param <TX>     The abstraction of database operations used by the agent.
 </TX></REGION> */
-abstract class Agent<PARTITION: Partition, SESSION, MODEL_PARAMS> protected constructor(
-    private val client: DBClient<SESSION>, protected val context: Context<*, MODEL_PARAMS>
+abstract class Agent<PARTITION: Partition, SESSION, CONTEXT: Context<*, *>> protected constructor(
+    private val client: DBClient<SESSION>, protected val context: CONTEXT
 ) {
     var action = DEFAULT_ACTION
     var tracingEnabled = true
