@@ -20,7 +20,6 @@ import com.vaticle.typedb.simulation.common.params.Config.Keys.AGENTS
 import com.vaticle.typedb.simulation.common.params.Config.Keys.ARG
 import com.vaticle.typedb.simulation.common.params.Config.Keys.DATABASE_NAME
 import com.vaticle.typedb.simulation.common.params.Config.Keys.FUNCTION
-import com.vaticle.typedb.simulation.common.params.Config.Keys.IS_ENABLED
 import com.vaticle.typedb.simulation.common.params.Config.Keys.ITERATIONS
 import com.vaticle.typedb.simulation.common.params.Config.Keys.NAME
 import com.vaticle.typedb.simulation.common.params.Config.Keys.RANDOM_SEED
@@ -29,20 +28,22 @@ import com.vaticle.typedb.simulation.common.params.Config.Keys.TRACE
 import com.vaticle.typedb.simulation.common.params.Config.Keys.TRACE_SAMPLING
 import com.vaticle.typedb.common.yaml.YAML
 import com.vaticle.typedb.simulation.common.params.Config.Keys.ACTION
+import com.vaticle.typedb.simulation.common.params.Config.Keys.RUNS_PER_ITERATION
 import java.io.File
 import kotlin.math.ln
 
 class Config<out MODEL>(val agents: List<Agent>, val traceSampling: TraceSampling?, val run: Run, val model: MODEL) {
 
-    class Agent(val name: String, val action: String, val isEnabled: Boolean, val trace: Boolean) {
+    class Agent(val name: String, val action: String, val runsPerIteration: Int, val trace: Boolean) {
 
         companion object {
             const val DEFAULT_ACTION = "run"
+            const val DEFAULT_RUNS_PER_ITERATION = 1
 
             internal fun of(yaml: YAML.Map) = Agent(
                 name = yaml[NAME].asString().value(),
                 action = yaml[ACTION]?.asString()?.value() ?: DEFAULT_ACTION,
-                isEnabled = yaml[IS_ENABLED].asBoolean().value(),
+                runsPerIteration = yaml[RUNS_PER_ITERATION]?.asInt()?.value() ?: DEFAULT_RUNS_PER_ITERATION,
                 trace = yaml[TRACE].asBoolean().value()
             )
         }
@@ -111,11 +112,11 @@ class Config<out MODEL>(val agents: List<Agent>, val traceSampling: TraceSamplin
         const val ARG = "arg"
         const val DATABASE_NAME = "databaseName"
         const val FUNCTION = "function"
-        const val IS_ENABLED = "isEnabled"
         const val ITERATIONS = "iterations"
         const val NAME = "name"
         const val RANDOM_SEED = "randomSeed"
         const val RUN = "run"
+        const val RUNS_PER_ITERATION = "runsPerIteration"
         const val TRACE = "trace"
         const val TRACE_SAMPLING = "traceSampling"
     }
