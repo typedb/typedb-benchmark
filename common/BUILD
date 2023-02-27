@@ -34,9 +34,6 @@ kt_jvm_library(
         "@maven//:org_slf4j_slf4j_api",
         "@maven//:org_yaml_snakeyaml",
     ],
-    data = [
-        "//data",
-    ],
 )
 
 checkstyle_test(

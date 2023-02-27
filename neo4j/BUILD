@@ -20,11 +20,11 @@ load("@vaticle_dependencies//tool/checkstyle:rules.bzl", "checkstyle_test")
 
 kt_jvm_library(
     name = "neo4j",
-    srcs = glob(["*.kt", "*/*.kt", "*/*/*.kt"]),
+    srcs = glob(["*.kt"]),
     visibility = ["//visibility:public"],
     deps = [
         "//common",
-        "//simulation",
+        "//:typedb_simulation",
 
         # External Vaticle Dependencies
         "@vaticle_typedb_common//:common",

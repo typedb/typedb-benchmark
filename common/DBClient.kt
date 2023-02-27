@@ -14,16 +14,11 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.vaticle.typedb.simulation.neo4j
+package com.vaticle.typedb.simulation.common
 
-object Keywords {
-    const val ASSERT = "ASSERT"
-    const val CONSTRAINT = "CONSTRAINT"
-    const val CREATE = "CREATE"
-    const val DELETE = "DELETE"
-    const val DETACH = "DETACH"
-    const val IS_UNIQUE = "IS UNIQUE"
-    const val MATCH = "MATCH"
-    const val ON = "ON"
-    const val RETURN = "RETURN"
+interface DBClient<out SESSION> : AutoCloseable {
+    fun session(partition: Partition): SESSION
+    fun closeSessions()
+    fun printStatistics(): String
+    override fun close()
 }

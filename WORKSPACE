@@ -67,10 +67,6 @@ vaticle_dependencies_ci_pip()
 load("@vaticle_dependencies//tool/checkstyle:deps.bzl", checkstyle_deps = "deps")
 checkstyle_deps()
 
-# Load //tool/unuseddeps
-load("@vaticle_dependencies//tool/unuseddeps:deps.bzl", unuseddeps_deps = "deps")
-unuseddeps_deps()
-
 # Load //tool/sonarcloud
 load("@vaticle_dependencies//tool/sonarcloud:deps.bzl", "sonarcloud_dependencies")
 sonarcloud_dependencies()
@@ -83,10 +79,10 @@ load("@vaticle_dependencies//distribution:deps.bzl", "vaticle_bazel_distribution
 vaticle_bazel_distribution()
 
 # Load //common
-load("@vaticle_bazel_distribution//common:deps.bzl", "rules_pkg")
-rules_pkg()
-load("@rules_pkg//:deps.bzl", "rules_pkg_dependencies")
-rules_pkg_dependencies()
+#load("@vaticle_bazel_distribution//common:deps.bzl", "rules_pkg")
+#rules_pkg()
+#load("@rules_pkg//:deps.bzl", "rules_pkg_dependencies")
+#rules_pkg_dependencies()
 
 ################################
 # Load @vaticle dependencies #
@@ -100,11 +96,6 @@ load("@vaticle_typedb_client_java//dependencies/vaticle:repositories.bzl", "vati
 vaticle_typedb_common()
 vaticle_typeql()
 vaticle_typedb_protocol()
-
-# Load artifact
-load("//dependencies/vaticle:artifacts.bzl", "vaticle_typedb_artifacts", "vaticle_typedb_cluster_artifacts")
-vaticle_typedb_artifacts()
-vaticle_typedb_cluster_artifacts()
 
 # Load maven
 load("//dependencies/maven:artifacts.bzl", vaticle_typedb_benchmark_artifacts = "artifacts")

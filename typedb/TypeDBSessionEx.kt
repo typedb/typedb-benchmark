@@ -14,16 +14,14 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.vaticle.typedb.simulation.neo4j
+package com.vaticle.typedb.simulation.typedb
 
-object Keywords {
-    const val ASSERT = "ASSERT"
-    const val CONSTRAINT = "CONSTRAINT"
-    const val CREATE = "CREATE"
-    const val DELETE = "DELETE"
-    const val DETACH = "DETACH"
-    const val IS_UNIQUE = "IS UNIQUE"
-    const val MATCH = "MATCH"
-    const val ON = "ON"
-    const val RETURN = "RETURN"
+import com.vaticle.typedb.client.api.TypeDBOptions
+import com.vaticle.typedb.client.api.TypeDBSession
+import com.vaticle.typedb.client.api.TypeDBTransaction.Type.READ
+import com.vaticle.typedb.client.api.TypeDBTransaction.Type.WRITE
+
+object TypeDBSessionEx {
+    fun TypeDBSession.readTransaction(infer: Boolean) = transaction(READ, TypeDBOptions.core().infer(infer))
+    fun TypeDBSession.writeTransaction() = transaction(WRITE)
 }

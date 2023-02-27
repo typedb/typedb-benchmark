@@ -16,14 +16,11 @@
  */
 package com.vaticle.typedb.simulation.neo4j
 
-object Keywords {
-    const val ASSERT = "ASSERT"
-    const val CONSTRAINT = "CONSTRAINT"
-    const val CREATE = "CREATE"
-    const val DELETE = "DELETE"
-    const val DETACH = "DETACH"
-    const val IS_UNIQUE = "IS UNIQUE"
-    const val MATCH = "MATCH"
-    const val ON = "ON"
-    const val RETURN = "RETURN"
+import org.neo4j.driver.Session
+
+object Neo4jSessionEx {
+
+//    fun Session.readTransaction() {
+//
+//    }
 }
