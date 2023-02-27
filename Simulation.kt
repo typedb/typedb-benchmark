@@ -42,7 +42,7 @@ abstract class Simulation<CLIENT: DBClient<*>, out CONTEXT: Context<*, *>>(
     abstract fun init(randomSource: RandomSource)
 
     private fun initAgents(): List<Agent<*, *, *>> {
-        return context.agentConfigs.filter { it.isEnabled }.map { agentConfig ->
+        return context.agentConfigs.map { agentConfig ->
             val className = "$agentPackage.${agentConfig.name}"
             val agentClass = Class.forName(className) as Class<out Agent<*, *, *>>
             val agent = agentFactory[agentClass]?.let { it() } ?: throw RuntimeException("${agentConfig.name} is not registered as an agent")
