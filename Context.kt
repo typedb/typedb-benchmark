@@ -34,6 +34,8 @@ open class Context<out SEED_DATA, out MODEL_PARAMS>(
     val seed = config.run.randomSeed
     val dbName = config.run.databaseName
     val iterationMax = config.run.iterations
+    val partitionCount = config.run.partitions
+
     val model = config.model
 
     val iterationNumber get(): Int {

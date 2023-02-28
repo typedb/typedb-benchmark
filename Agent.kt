@@ -63,7 +63,9 @@ abstract class Agent<PARTITION: Partition, SESSION, CONTEXT: Context<*, *>> prot
     fun iterate(randomSrc: RandomSource): Map<String, List<Report>> {
         val reports = ConcurrentHashMap<String, List<Report>>()
         // We need to generate pairs of Partition and Random deterministically before passing them to a parallel stream
-        val asyncRuns = partitions.map { partition ->
+        if (context.partitionCount > partitions.size) throw IllegalArgumentException("Partition count exceeds supplied number of partitions.")
+        val validPartitions = partitions.subList(0, context.partitionCount)
+        val asyncRuns = validPartitions.map { partition ->
             val randomSrc2 = randomSrc.nextSource()
             CompletableFuture.runAsync(
                 {
