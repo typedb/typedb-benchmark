@@ -44,14 +44,6 @@ open class Context<out SEED_DATA, out MODEL_PARAMS>(
         iteration.incrementAndGet()
     }
 
-    fun today(): LocalDateTime {
-        return startDay().plusYears((iteration.get() - 1).toLong())
-    }
-
-    fun startDay(): LocalDateTime {
-        return LocalDateTime.of(LocalDate.ofYearDay(2000, 1), LocalTime.of(0, 0, 0))
-    }
-
     val isTracing get(): Boolean {
         if (!_isTracing) return false
         val traceSampling = requireNotNull(config.traceSampling) { "Tracing was requested, but 'traceSampling' is not configured" }
