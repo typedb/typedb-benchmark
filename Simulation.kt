@@ -49,6 +49,7 @@ abstract class Simulation<CLIENT: DBClient<*>, out CONTEXT: Context<*, *>>(
             agent.apply {
                 action = agentConfig.action
                 tracingEnabled = agentConfig.trace
+                runsPerIteration = agentConfig.runsPerIteration
             }.also { _registeredAgents += agentClass }
         }
     }
