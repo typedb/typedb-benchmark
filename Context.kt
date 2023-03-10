@@ -35,6 +35,7 @@ open class Context<out SEED_DATA, out MODEL_PARAMS>(
     val dbName = config.run.databaseName
     val iterationMax = config.run.iterations
     val partitionCount = config.run.partitions
+    val recreateDatabase = config.run.recreateDatabase
 
     val model = config.model
 

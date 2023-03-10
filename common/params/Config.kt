@@ -29,6 +29,7 @@ import com.vaticle.typedb.simulation.common.params.Config.Keys.TRACE_SAMPLING
 import com.vaticle.typedb.common.yaml.YAML
 import com.vaticle.typedb.simulation.common.params.Config.Keys.ACTION
 import com.vaticle.typedb.simulation.common.params.Config.Keys.PARTITIONS
+import com.vaticle.typedb.simulation.common.params.Config.Keys.RECREATE_DATABASE
 import com.vaticle.typedb.simulation.common.params.Config.Keys.RUNS_PER_ITERATION
 import java.io.File
 import kotlin.math.ln
@@ -82,13 +83,14 @@ class Config<out MODEL>(val agents: List<Agent>, val traceSampling: TraceSamplin
         }
     }
 
-    class Run(val randomSeed: Long, val iterations: Int, val partitions: Int, val databaseName: String) {
+    class Run(val randomSeed: Long, val iterations: Int, val partitions: Int, val databaseName: String, val recreateDatabase: Boolean) {
         companion object {
             internal fun of(yaml: YAML.Map) = Run(
                 databaseName = yaml[DATABASE_NAME].asString().value(),
                 iterations = yaml[ITERATIONS].asInt().value(),
                 partitions = yaml[PARTITIONS].asInt().value(),
-                randomSeed = yaml[RANDOM_SEED].asInt().value().toLong()
+                randomSeed = yaml[RANDOM_SEED].asInt().value().toLong(),
+                recreateDatabase = yaml[RECREATE_DATABASE].asBoolean().value()
             )
         }
     }
@@ -118,6 +120,7 @@ class Config<out MODEL>(val agents: List<Agent>, val traceSampling: TraceSamplin
         const val PARTITIONS = "partitions"
         const val NAME = "name"
         const val RANDOM_SEED = "randomSeed"
+        const val RECREATE_DATABASE = "recreateDatabase"
         const val RUN = "run"
         const val RUNS_PER_ITERATION = "runsPerIteration"
         const val TRACE = "trace"
