@@ -77,7 +77,7 @@ abstract class Simulation<CLIENT: DBClient<*>, out CONTEXT: Context<*, *>>(
         agents.forEach { agent ->
             val start = Instant.now()
             val reports = agent.iterate(randomSource.nextSource())
-            LOGGER.info("{}.{} took: {}", agent.javaClass.simpleName,  agent.action, printDuration(start, Instant.now()))
+            LOGGER.info("{}.{} × {} took: {}", agent.javaClass.simpleName,  agent.action, agent.runsPerIteration, printDuration(start, Instant.now()))
             agentReports[agent.javaClass.superclass.simpleName] = reports
         }
         context.incrementIteration()
