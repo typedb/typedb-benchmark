@@ -43,7 +43,7 @@ abstract class TypeDBSimulation<out CONTEXT: Context<*, *>> protected constructo
         nativeClient.session(context.dbName, DATA).use { nativeSession ->
             LOGGER.info("TypeDB initialisation of $name simulation data started ...")
             val start = Instant.now()
-            initData(nativeSession, randomSource)
+            if (context.recreateDatabase) initData(nativeSession, randomSource)
             LOGGER.info("TypeDB initialisation of $name simulation data ended in: {}", printDuration(start, Instant.now()))
         }
     }

@@ -39,7 +39,7 @@ abstract class Neo4jSimulation<out CONTEXT: Context<*, *>> protected constructor
         if (context.recreateDatabase) initDatabase(nativeDriver)
         LOGGER.info("Neo4j initialisation of $name simulation data started ...")
         val start = Instant.now()
-        initData(nativeDriver, randomSource)
+        if (context.recreateDatabase) initData(nativeDriver, randomSource)
         LOGGER.info("Neo4j initialisation of $name simulation data ended in: {}", printDuration(start, Instant.now()))
     }
 
