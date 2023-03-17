@@ -36,10 +36,10 @@ abstract class Neo4jSimulation<out CONTEXT: Context<*, *>> protected constructor
 
     override fun init(randomSource: RandomSource) {
         val nativeDriver = client.unpack()
-        if (context.recreateDatabase) initDatabase(nativeDriver)
+        initDatabase(nativeDriver)
         LOGGER.info("Neo4j initialisation of $name simulation data started ...")
         val start = Instant.now()
-        if (context.recreateDatabase) initData(nativeDriver, randomSource)
+        initData(nativeDriver, randomSource)
         LOGGER.info("Neo4j initialisation of $name simulation data ended in: {}", printDuration(start, Instant.now()))
     }
 

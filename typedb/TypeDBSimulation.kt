@@ -38,14 +38,12 @@ abstract class TypeDBSimulation<out CONTEXT: Context<*, *>> protected constructo
 
     override fun init(randomSource: RandomSource) {
         val nativeClient = client.unpack()
-        if (context.recreateDatabase) {
-            initDatabase(nativeClient)
-            initSchema(nativeClient)
-        }
+        initDatabase(nativeClient)
+        initSchema(nativeClient)
         nativeClient.session(context.dbName, DATA).use { nativeSession ->
             LOGGER.info("TypeDB initialisation of $name simulation data started ...")
             val start = Instant.now()
-            if (context.recreateDatabase) initData(nativeSession, randomSource)
+            initData(nativeSession, randomSource)
             LOGGER.info("TypeDB initialisation of $name simulation data ended in: {}", printDuration(start, Instant.now()))
         }
     }
