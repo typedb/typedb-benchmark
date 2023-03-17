@@ -36,8 +36,8 @@ abstract class Simulation<CLIENT: DBClient<*>, out CONTEXT: Context<*, *>>(
     protected abstract val name: String
 
     fun init() {
-        if (context.recreateDatabase) init(randomSource.nextSource())
-        else randomSource.increment()
+        val randomSource2 = randomSource.nextSource()
+        if (context.recreateDatabase) init(randomSource2)
     }
 
     abstract fun init(randomSource: RandomSource)

@@ -51,7 +51,7 @@ abstract class Agent<PARTITION: Partition, SESSION, CONTEXT: Context<*, *>> prot
 
     fun run(session: SESSION, partition: PARTITION, random: RandomSource): List<Report> {
         return actionHandlers[action]?.let {
-            (0 until runsPerIteration).flatMap { it(session, partition, random) }
+            (0 until runsPerIteration).flatMap { it(session, partition, random.nextSource()) }
         } ?: throw IllegalArgumentException("The action '$action' has no registered handler in '${javaClass.simpleName}'"
                 + if (action == DEFAULT_ACTION) " (help: '$action' is the default action)" else "")
     }

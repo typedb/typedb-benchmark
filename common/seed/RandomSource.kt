@@ -21,10 +21,6 @@ import java.util.Random
 class RandomSource(seed: Long) {
     private val random = Random(seed)
 
-    fun increment() {
-        random.nextBoolean()
-    }
-
     fun nextSource(): RandomSource {
         return RandomSource(random.nextLong())
     }
