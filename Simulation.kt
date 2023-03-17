@@ -37,6 +37,7 @@ abstract class Simulation<CLIENT: DBClient<*>, out CONTEXT: Context<*, *>>(
 
     fun init() {
         if (context.recreateDatabase) init(randomSource.nextSource())
+        else randomSource.increment()
     }
 
     abstract fun init(randomSource: RandomSource)
