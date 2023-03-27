@@ -60,16 +60,15 @@ abstract class Agent<PARTITION: Partition, SESSION, CONTEXT: Context<*, *>> prot
         return context.isTracing && this.tracingEnabled
     }
 
-    fun iterate(randomSrc: RandomSource): Map<String, List<Report>> {
+    fun iterate(randomSource: RandomSource): Map<String, List<Report>> {
         val reports = ConcurrentHashMap<String, List<Report>>()
         // We need to generate pairs of Partition and Random deterministically before passing them to a parallel stream
         if (context.partitionCount > partitions.size) throw IllegalArgumentException("Partition count exceeds supplied number of partitions.")
         val validPartitions = partitions.subList(0, context.partitionCount)
         val asyncRuns = validPartitions.map { partition ->
-            val randomSrc2 = randomSrc.nextSource()
             CompletableFuture.runAsync(
                 {
-                    val report = runAndMayTrace(partition, randomSrc2)
+                    val report = runAndMayTrace(partition, randomSource)
                     if (context.isReporting) reports[partition.tracker] = report else assert(report.isEmpty())
                 }, context.executor
             )
@@ -78,13 +77,13 @@ abstract class Agent<PARTITION: Partition, SESSION, CONTEXT: Context<*, *>> prot
         return reports
     }
 
-    private fun runAndMayTrace(partition: PARTITION, random: RandomSource): List<Report> {
+    private fun runAndMayTrace(partition: PARTITION, randomSource: RandomSource): List<Report> {
         var tracingCtx: FactoryTracingThreadStatic.ThreadContext? = null
         return try {
             if (shouldTrace()) tracingCtx =
                 FactoryTracingThreadStatic.contextOnThread(partition.tracker, context.iterationNumber)
             val session = client.session(partition)
-            mayTrace(className(agentClass)) { run(session, partition, random) }
+            mayTrace(className(agentClass)) { run(session, partition, randomSource) }
         } finally {
             tracingCtx?.close()
         }
