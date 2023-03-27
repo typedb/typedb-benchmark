@@ -36,7 +36,12 @@ abstract class Simulation<CLIENT: DBClient<*>, out CONTEXT: Context<*, *>>(
     protected abstract val name: String
 
     fun init() {
-        init(randomSource.nextSource())
+        // The master random source is incremented regardless of whether the database is recreated or not to ensure determinism.
+        // The potentially redundant randomSource2 has to be created in this way for it to work.
+        // Please refer to: https://github.com/vaticle/typedb-simulation/issues/145
+
+        val randomSource2 = randomSource.nextSource()
+        if (context.recreateDatabase) init(randomSource2)
     }
 
     abstract fun init(randomSource: RandomSource)
@@ -76,8 +81,8 @@ abstract class Simulation<CLIENT: DBClient<*>, out CONTEXT: Context<*, *>>(
         val agents = initAgents()
         agents.forEach { agent ->
             val start = Instant.now()
-            val reports = agent.iterate(randomSource.nextSource())
-            LOGGER.info("{}.{} took: {}", agent.javaClass.simpleName,  agent.action, printDuration(start, Instant.now()))
+            val reports = agent.iterate(randomSource)
+            LOGGER.info("{}.{} × {} took: {}", agent.javaClass.simpleName,  agent.action, agent.runsPerIteration, printDuration(start, Instant.now()))
             agentReports[agent.javaClass.superclass.simpleName] = reports
         }
         context.incrementIteration()
