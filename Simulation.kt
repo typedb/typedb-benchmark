@@ -36,6 +36,10 @@ abstract class Simulation<CLIENT: DBClient<*>, out CONTEXT: Context<*, *>>(
     protected abstract val name: String
 
     fun init() {
+        // The master random source is incremented regardless of whether the database is recreated or not to ensure determinism.
+        // The potentially redundant randomSource2 has to be created in this way for it to work.
+        // Please refer to: https://github.com/vaticle/typedb-simulation/issues/145
+
         val randomSource2 = randomSource.nextSource()
         if (context.recreateDatabase) init(randomSource2)
     }
