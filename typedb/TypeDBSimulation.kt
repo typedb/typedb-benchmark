@@ -57,6 +57,7 @@ abstract class TypeDBSimulation<out CONTEXT: Context<*, *>> protected constructo
 
     private fun initSchema(nativeClient: com.vaticle.typedb.client.api.TypeDBClient) {
         nativeClient.session(context.dbName, SCHEMA).use { session ->
+            if (schemaFiles.isEmpty()) throw IllegalStateException("No schema files provided for simulation.")
             LOGGER.info("TypeDB initialisation of $name simulation schema started ...")
             val start = Instant.now()
             session.transaction(WRITE).use { tx ->
