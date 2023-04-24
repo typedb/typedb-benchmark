@@ -34,7 +34,7 @@ abstract class TypeDBSimulation<out CONTEXT: Context<*, *>> protected constructo
     client: TypeDBClient, context: CONTEXT, agentFactory: Agent.Factory
 ): Simulation<TypeDBClient, CONTEXT>(client, context, agentFactory) {
 
-    abstract val schemaFile: File
+    abstract val schemaFiles: List<File>
 
     override fun init(randomSource: RandomSource) {
         val nativeClient = client.unpack()
@@ -56,12 +56,15 @@ abstract class TypeDBSimulation<out CONTEXT: Context<*, *>> protected constructo
     }
 
     private fun initSchema(nativeClient: com.vaticle.typedb.client.api.TypeDBClient) {
+        if (schemaFiles.isEmpty()) throw IllegalStateException("No schema files provided for simulation.")
         nativeClient.session(context.dbName, SCHEMA).use { session ->
             LOGGER.info("TypeDB initialisation of $name simulation schema started ...")
             val start = Instant.now()
-            val schemaQuery = Files.readString(schemaFile.toPath())
             session.transaction(WRITE).use { tx ->
-                tx.query().define(TypeQL.parseQuery(schemaQuery))
+                schemaFiles.forEach { schemaFile ->
+                    val schemaQuery = Files.readString(schemaFile.toPath())
+                    tx.query().define(TypeQL.parseQuery(schemaQuery))
+                }
                 tx.commit()
             }
             LOGGER.info(
