@@ -57,13 +57,20 @@ abstract class TypeDBSimulation<out CONTEXT: Context<*, *>> protected constructo
 
     private fun initSchema(nativeClient: com.vaticle.typedb.client.api.TypeDBClient) {
         if (schemaFiles.isEmpty()) throw IllegalStateException("No schema files provided for simulation.")
+        val whitespaceRegex = Regex(WHITESPACE_REGEX, RegexOption.IGNORE_CASE)
         nativeClient.session(context.dbName, SCHEMA).use { session ->
             LOGGER.info("TypeDB initialisation of $name simulation schema started ...")
             val start = Instant.now()
             session.transaction(WRITE).use { tx ->
                 schemaFiles.forEach { schemaFile ->
-                    val schemaQuery = Files.readString(schemaFile.toPath())
-                    tx.query().define(TypeQL.parseQuery(schemaQuery))
+                    val schemaQueries = splitSchemaQueries(Files.readString(schemaFile.toPath()))
+                    schemaQueries.forEach { schemaQuery ->
+                        when (val firstWord = schemaQuery.trim().split(whitespaceRegex).first().lowercase()) {
+                            "define" -> tx.query().define(TypeQL.parseQuery(schemaQuery))
+                            "undefine" -> tx.query().undefine(TypeQL.parseQuery(schemaQuery))
+                            else -> throw IllegalArgumentException("Schema query must start with 'define' or 'undefine', not '$firstWord'.")
+                        }
+                    }
                 }
                 tx.commit()
             }
@@ -73,9 +80,58 @@ abstract class TypeDBSimulation<out CONTEXT: Context<*, *>> protected constructo
         }
     }
 
+    private fun splitSchemaQueries(queryString: String): List<String> {
+        val commentRegex = Regex(COMMENT_REGEX, RegexOption.IGNORE_CASE)
+        val whitespaceRegex = Regex(WHITESPACE_REGEX, RegexOption.IGNORE_CASE)
+        val firstWord = queryString
+            .replace(commentRegex, "")
+            .trim()
+            .split(whitespaceRegex)
+            .first()
+            .lowercase()
+        val secondWord: String
+        val firstRegex: Regex
+        val secondRegex: Regex
+        when (firstWord) {
+            "define" -> {
+                secondWord = "undefine"
+                firstRegex = Regex(DEFINE_REGEX, RegexOption.IGNORE_CASE)
+                secondRegex = Regex(UNDEFINE_REGEX, RegexOption.IGNORE_CASE)
+            }
+            "undefine" -> {
+                secondWord = "define"
+                firstRegex = Regex(UNDEFINE_REGEX, RegexOption.IGNORE_CASE)
+                secondRegex = Regex(DEFINE_REGEX, RegexOption.IGNORE_CASE)
+            }
+            else -> throw IllegalArgumentException("Schema query file must start with 'define' or 'undefine', not '$firstWord'.")
+        }
+        return queryString
+            .replace(commentRegex, "")
+            .split(firstRegex)
+            .asSequence()
+            .map { it.trim() }
+            .filter { it.isNotBlank() }
+            .map { "$firstWord $it" }
+            .map { queryBlock ->
+                queryBlock.split(secondRegex)
+                    .map { it.trim() }
+                    .filter { it.isNotBlank() }
+                    .map {
+                        when (it.trim().split(whitespaceRegex).first().lowercase()) {
+                            firstWord -> it
+                            else -> "$secondWord $it"
+                        }
+                    }
+            }.flatten().toList()
+    }
+
     protected abstract fun initData(nativeSession: com.vaticle.typedb.client.api.TypeDBSession, randomSource: RandomSource)
 
     companion object {
         private val LOGGER = KotlinLogging.logger {}
+        private const val DEFINE_REGEX = "(?<![\$\"]|un)define"
+        private const val UNDEFINE_REGEX = "(?<![\$\"])undefine"
+        private const val COMMENT_REGEX = "#.*"
+        private const val WHITESPACE_REGEX = "\\s+"
     }
 }
