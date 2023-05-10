@@ -25,10 +25,14 @@ import com.vaticle.typedb.client.api.TypeDBTransaction.Type.WRITE
 import com.vaticle.typedb.simulation.Agent
 import com.vaticle.typedb.simulation.common.seed.RandomSource
 import com.vaticle.typeql.lang.TypeQL
+import com.vaticle.typeql.lang.query.TypeQLQuery
+import com.vaticle.typeql.lang.query.TypeQLDefine
+import com.vaticle.typeql.lang.query.TypeQLUndefine
 import mu.KotlinLogging
 import java.io.File
 import java.nio.file.Files
 import java.time.Instant
+import kotlin.streams.toList
 
 abstract class TypeDBSimulation<out CONTEXT: Context<*, *>> protected constructor(
     client: TypeDBClient, context: CONTEXT, agentFactory: Agent.Factory
@@ -62,8 +66,14 @@ abstract class TypeDBSimulation<out CONTEXT: Context<*, *>> protected constructo
             val start = Instant.now()
             session.transaction(WRITE).use { tx ->
                 schemaFiles.forEach { schemaFile ->
-                    val schemaQuery = Files.readString(schemaFile.toPath())
-                    tx.query().define(TypeQL.parseQuery(schemaQuery))
+                    val schemaQueries = TypeQL.parseQueries<TypeQLQuery>(Files.readString(schemaFile.toPath())).toList()
+                    schemaQueries.forEach { schemaQuery ->
+                        when (schemaQuery) {
+                            is TypeQLDefine -> tx.query().define(schemaQuery)
+                            is TypeQLUndefine -> tx.query().undefine(schemaQuery)
+                            else -> throw IllegalArgumentException("Schema file contains query types other than 'define' and 'undefine'.")
+                        }
+                    }
                 }
                 tx.commit()
             }
