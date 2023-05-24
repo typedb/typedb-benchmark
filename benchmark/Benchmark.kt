@@ -16,22 +16,22 @@
  */
 package simulation
 
-import com.vaticle.typedb.benchmarks.storage.AgentFactory
-import com.vaticle.typedb.benchmarks.storage.PersonAgent
+import com.vaticle.typedb.benchmark.AgentFactory
+import com.vaticle.typedb.benchmark.PersonAgent
 import com.vaticle.typedb.client.api.TypeDBOptions
 import com.vaticle.typedb.client.api.TypeDBSession
-import com.vaticle.typedb.benchmarks.storage.common.Context
+import com.vaticle.typedb.benchmark.common.Context
 import com.vaticle.typedb.simulation.common.seed.RandomSource
 import com.vaticle.typedb.simulation.typedb.TypeDBClient
 import mu.KotlinLogging
 import java.nio.file.Paths
 
-class StorageBenchmark internal constructor(client: TypeDBClient, context: Context):
+class Benchmark internal constructor(client: TypeDBClient, context: Context):
     com.vaticle.typedb.simulation.typedb.TypeDBSimulation<Context>(client, context, AgentFactory(client, context)) {
 
     private val LOGGER = KotlinLogging.logger {}
     override val agentPackage = PersonAgent::class.java.packageName
-    override val name = "StorageBenchmark"
+    override val name = "Benchmark"
 
     override val schemaFiles = listOf(Paths.get("schema.tql").toFile())
     private val options = TypeDBOptions.core().infer(true)

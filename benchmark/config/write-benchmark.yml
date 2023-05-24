@@ -36,7 +36,7 @@ run:
   randomSeed: 1
   iterations: 2500
   partitions: 16
-  databaseName: "storage-benchmark-writes"
+  databaseName: "write-benchmark"
   recreateDatabase: true
 
 model:

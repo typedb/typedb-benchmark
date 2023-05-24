@@ -14,10 +14,10 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.vaticle.typedb.benchmarks.storage
+package com.vaticle.typedb.benchmark
 
 import com.vaticle.typedb.client.api.TypeDBSession
-import com.vaticle.typedb.benchmarks.storage.common.Context
+import com.vaticle.typedb.benchmark.common.Context
 import com.vaticle.typedb.client.api.TypeDBTransaction
 import com.vaticle.typedb.simulation.Agent
 import com.vaticle.typedb.simulation.common.seed.RandomSource

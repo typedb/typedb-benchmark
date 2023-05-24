@@ -19,7 +19,7 @@ load("@io_bazel_rules_kotlin//kotlin:jvm.bzl", "kt_jvm_library")
 load("@vaticle_dependencies//tool/checkstyle:rules.bzl", "checkstyle_test")
 
 kt_jvm_library(
-    name = "storage-benchmark",
+    name = "benchmark",
     srcs = glob(["*.kt"]),
 #    resource_strip_prefix = "config/",
     deps = [
@@ -44,8 +44,8 @@ kt_jvm_library(
 java_binary(
     name = "run",
     data = ["//benchmark/config:simulation_config"],
-    runtime_deps = [":storage-benchmark"],
-    main_class = "com.vaticle.typedb.benchmarks.storage.Runner",
+    runtime_deps = [":benchmark"],
+    main_class = "com.vaticle.typedb.benchmark.Runner",
     classpath_resources = ["//simulation/config:logback.xml"],
     visibility = ["//visibility:public"],
 )
