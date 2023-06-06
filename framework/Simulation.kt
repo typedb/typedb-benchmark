@@ -14,11 +14,11 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.vaticle.typedb.simulation
+package com.vaticle.typedb.benchmark.framework
 
-import com.vaticle.typedb.simulation.common.Util.printDuration
-import com.vaticle.typedb.simulation.common.DBClient
-import com.vaticle.typedb.simulation.common.seed.RandomSource
+import com.vaticle.typedb.benchmark.framework.common.Util.printDuration
+import com.vaticle.typedb.benchmark.framework.common.DBClient
+import com.vaticle.typedb.benchmark.framework.common.seed.RandomSource
 import mu.KotlinLogging
 import java.time.Instant
 import java.util.concurrent.ConcurrentHashMap

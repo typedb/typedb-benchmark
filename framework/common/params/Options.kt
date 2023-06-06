@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.vaticle.typedb.simulation.common.params
+package com.vaticle.typedb.benchmark.framework.common.params
 
 import picocli.CommandLine
 import picocli.CommandLine.ArgGroup
@@ -22,7 +22,7 @@ import picocli.CommandLine.ITypeConverter
 import picocli.CommandLine.ParameterException
 import java.io.File
 
-@CommandLine.Command(name = "simulation", mixinStandardHelpOptions = true)
+@CommandLine.Command(name = "framework", mixinStandardHelpOptions = true)
 class Options {
     @CommandLine.Option(
         names = ["--database"],

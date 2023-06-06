@@ -16,13 +16,13 @@
  */
 package com.vaticle.typedb.benchmarks.storage.common
 
-import com.vaticle.typedb.simulation.common.Partition
+import com.vaticle.typedb.benchmark.framework.common.Partition
 import mu.KotlinLogging
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicLong
 
 class Context private constructor(config: Config, isTracing: Boolean, isReporting: Boolean):
-    com.vaticle.typedb.simulation.Context<Void?, ModelParams>(null, config, isTracing, isReporting) {
+    com.vaticle.typedb.benchmark.framework.Context<Void?, ModelParams>(null, config, isTracing, isReporting) {
 
     val partitions : List<DBPartition> = createPartitionList(config.run.partitions)
 

@@ -14,16 +14,16 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.vaticle.typedb.simulation.typedb
+package com.vaticle.typedb.benchmark.framework.typedb
 
-import com.vaticle.typedb.simulation.common.Util.printDuration
-import com.vaticle.typedb.simulation.Context
-import com.vaticle.typedb.simulation.Simulation
+import com.vaticle.typedb.benchmark.framework.common.Util.printDuration
+import com.vaticle.typedb.benchmark.framework.Context
+import com.vaticle.typedb.benchmark.framework.Simulation
 import com.vaticle.typedb.client.api.TypeDBSession.Type.DATA
 import com.vaticle.typedb.client.api.TypeDBSession.Type.SCHEMA
 import com.vaticle.typedb.client.api.TypeDBTransaction.Type.WRITE
-import com.vaticle.typedb.simulation.Agent
-import com.vaticle.typedb.simulation.common.seed.RandomSource
+import com.vaticle.typedb.benchmark.framework.Agent
+import com.vaticle.typedb.benchmark.framework.common.seed.RandomSource
 import com.vaticle.typeql.lang.TypeQL
 import com.vaticle.typeql.lang.query.TypeQLQuery
 import com.vaticle.typeql.lang.query.TypeQLDefine

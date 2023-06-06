@@ -23,8 +23,8 @@ kt_jvm_library(
     srcs = glob(["*.kt"]),
     visibility = ["//visibility:public"],
     deps = [
-        "//simulation/common:common",
-        "//simulation:typedb_simulation",
+        "//framework/common:common",
+        "//framework:typedb_simulation",
 
         # External Vaticle Dependencies
         "@vaticle_typedb_common//:common",

@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.vaticle.typedb.simulation.common
+package com.vaticle.typedb.benchmark.framework.common
 
 import org.apache.commons.csv.CSVFormat
 import org.apache.commons.csv.CSVParser

@@ -14,13 +14,13 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.vaticle.typedb.simulation
+package com.vaticle.typedb.benchmark.framework
 
 import com.vaticle.factory.tracing.client.FactoryTracing
 import com.vaticle.factory.tracing.client.FactoryTracingThreadStatic
 import com.vaticle.typedb.common.yaml.YAML
-import com.vaticle.typedb.simulation.common.params.Config
-import com.vaticle.typedb.simulation.common.params.Options
+import com.vaticle.typedb.benchmark.framework.common.params.Config
+import com.vaticle.typedb.benchmark.framework.common.params.Options
 import mu.KotlinLogging
 import kotlin.system.exitProcess
 

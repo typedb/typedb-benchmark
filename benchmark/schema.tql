@@ -17,13 +17,13 @@
 define
 name sub attribute, value string;
 address sub attribute, value string;
-ssid sub attribute, value long;
+post-code sub attribute, value long;
 meeting-time sub attribute, value datetime;
 
 person sub entity,
     owns name,
     owns address,
-    owns ssid;
+    owns post-code;
 
 friendship sub relation,
     relates person,

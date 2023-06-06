@@ -14,14 +14,11 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.vaticle.typedb.simulation.typedb
+package com.vaticle.typedb.benchmark.framework.common
 
-import com.vaticle.typedb.client.api.TypeDBOptions
-import com.vaticle.typedb.client.api.TypeDBSession
-import com.vaticle.typedb.client.api.TypeDBTransaction.Type.READ
-import com.vaticle.typedb.client.api.TypeDBTransaction.Type.WRITE
-
-object TypeDBSessionEx {
-    fun TypeDBSession.readTransaction(infer: Boolean) = transaction(READ, TypeDBOptions.core().infer(infer))
-    fun TypeDBSession.writeTransaction() = transaction(WRITE)
+interface Partition {
+    val code: String
+    val name: String
+    val tracker: String
+    val group: String // Used to assign session keys for TypeDB model
 }

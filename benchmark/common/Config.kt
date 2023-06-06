@@ -16,6 +16,6 @@
  */
 package com.vaticle.typedb.benchmarks.storage.common
 
-import com.vaticle.typedb.simulation.common.params.Config
+import com.vaticle.typedb.benchmark.framework.common.params.Config
 
 typealias Config = Config<ModelParams>

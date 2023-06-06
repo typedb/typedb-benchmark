@@ -16,19 +16,17 @@
  */
 package com.vaticle.typedb.benchmarks.storage
 
-
 import com.vaticle.typedb.benchmarks.storage.common.Config
 import com.vaticle.typedb.benchmarks.storage.common.Context
 import com.vaticle.typedb.benchmarks.storage.common.ModelParams
-import com.vaticle.typedb.simulation.common.params.Database
-import com.vaticle.typedb.simulation.common.params.Options
-import com.vaticle.typedb.simulation.typedb.TypeDBClient
-import simulation.StorageBenchmark
+import com.vaticle.typedb.benchmark.framework.common.params.Database
+import com.vaticle.typedb.benchmark.framework.common.params.Options
+import com.vaticle.typedb.benchmark.framework.typedb.TypeDBClient
 import java.lang.IllegalArgumentException
 
-public class Runner : com.vaticle.typedb.simulation.Runner<ModelParams>() {
+class Runner : com.vaticle.typedb.benchmark.framework.Runner<ModelParams>() {
 
-    override fun initSimulation(options: Options, config: Config): com.vaticle.typedb.simulation.Simulation<*, *> {
+    override fun initSimulation(options: Options, config: Config): com.vaticle.typedb.benchmark.framework.Simulation<*, *> {
         val context = Context.create(config = config, isTracing = options.tracing != null, isReporting = false)
         return when (options.database) {
             Database.TYPEDB -> StorageBenchmark(TypeDBClient.core(options.address, context.dbName), context).apply { init() }

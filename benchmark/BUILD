@@ -23,12 +23,12 @@ kt_jvm_library(
     srcs = glob(["*.kt"]),
 #    resource_strip_prefix = "config/",
     deps = [
-        "//simulation/common",
+        "//benchmark/common",
 
         # External Vaticle Dependencies
-        "@vaticle_typedb_simulation//simulation:typedb_simulation",
-        "@vaticle_typedb_simulation//simulation/typedb:typedb",
-        "@vaticle_typedb_simulation//simulation/common:common",
+        "//framework:typedb_simulation",
+        "//framework/typedb:typedb",
+        "//framework/common:common",
         "@vaticle_typeql//java:typeql-lang",
         "@vaticle_typeql//java/pattern",
         "@vaticle_typeql//java/query",
@@ -38,15 +38,15 @@ kt_jvm_library(
         "@maven//:io_github_microutils_kotlin_logging_jvm",
         "@maven//:org_slf4j_slf4j_api",
     ],
-    data = ["//:schema.tql"]
+    data = [":schema.tql"]
 )
 
 java_binary(
     name = "run",
-    data = ["//simulation/config:simulation_config"],
+    data = ["//benchmark/config:simulation_config"],
     runtime_deps = [":storage-benchmark"],
     main_class = "com.vaticle.typedb.benchmarks.storage.Runner",
-    classpath_resources = ["//simulation/config:logback.xml"],
+    classpath_resources = ["//benchmark/config:logback.xml"],
     visibility = ["//visibility:public"],
 )
 

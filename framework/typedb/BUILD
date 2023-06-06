@@ -19,19 +19,20 @@ load("@io_bazel_rules_kotlin//kotlin:jvm.bzl", "kt_jvm_library")
 load("@vaticle_dependencies//tool/checkstyle:rules.bzl", "checkstyle_test")
 
 kt_jvm_library(
-    name = "typedb_simulation",
+    name = "typedb",
     srcs = glob(["*.kt"]),
-    resource_strip_prefix = "config/",
     visibility = ["//visibility:public"],
     deps = [
-        "//simulation/common:common",
+        "//framework/common:common",
+        "//framework:typedb_simulation",
 
         # External Vaticle Dependencies
-        "@vaticle_factory_tracing//client",
+        "@vaticle_typedb_client_java//api",
+        "@vaticle_typedb_client_java//:client-java",
         "@vaticle_typedb_common//:common",
+        "@vaticle_typeql//java:typeql-lang",
 
         # External Maven Dependencies
-        "@maven//:com_google_code_findbugs_jsr305",
         "@maven//:io_github_microutils_kotlin_logging_jvm",
         "@maven//:org_slf4j_slf4j_api",
     ],
@@ -39,6 +40,6 @@ kt_jvm_library(
 
 checkstyle_test(
     name = "checkstyle",
-    include = glob(["*"]),
+    include = glob(["*", "*/*", "*/*/*"]),
     license_type = "agpl-header",
 )

@@ -19,15 +19,13 @@ package com.vaticle.typedb.benchmarks.storage
 import com.vaticle.typedb.client.api.TypeDBSession
 import com.vaticle.typedb.benchmarks.storage.common.Context
 import com.vaticle.typedb.client.api.TypeDBTransaction
-import com.vaticle.typedb.simulation.Agent
-import com.vaticle.typedb.simulation.common.seed.RandomSource
-import com.vaticle.typedb.simulation.typedb.TypeDBClient
+import com.vaticle.typedb.benchmark.framework.Agent
+import com.vaticle.typedb.benchmark.framework.common.seed.RandomSource
+import com.vaticle.typedb.benchmark.framework.typedb.TypeDBClient
 
 import com.vaticle.typeql.lang.TypeQL
-import com.vaticle.typeql.lang.query.TypeQLInsert
 import java.time.LocalDateTime
 import java.util.*
-import kotlin.collections.ArrayList
 
 public class PersonAgent(client: TypeDBClient, context: Context) :
     Agent<Context.DBPartition, TypeDBSession, Context>(client, context) {

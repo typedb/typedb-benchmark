@@ -14,12 +14,12 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.vaticle.typedb.simulation.neo4j
+package com.vaticle.typedb.benchmark.framework.neo4j
 
-import com.vaticle.typedb.simulation.common.Partition
-import com.vaticle.typedb.simulation.neo4j.Keywords.MATCH
-import com.vaticle.typedb.simulation.neo4j.Keywords.RETURN
-import com.vaticle.typedb.simulation.common.DBClient
+import com.vaticle.typedb.benchmark.framework.common.Partition
+import com.vaticle.typedb.benchmark.framework.neo4j.Keywords.MATCH
+import com.vaticle.typedb.benchmark.framework.neo4j.Keywords.RETURN
+import com.vaticle.typedb.benchmark.framework.common.DBClient
 import org.neo4j.driver.AuthTokens
 import org.neo4j.driver.Driver
 import org.neo4j.driver.GraphDatabase

@@ -14,10 +14,10 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.vaticle.typedb.simulation.typedb
+package com.vaticle.typedb.benchmark.framework.typedb
 
-import com.vaticle.typedb.simulation.common.Partition
-import com.vaticle.typedb.simulation.common.DBClient
+import com.vaticle.typedb.benchmark.framework.common.Partition
+import com.vaticle.typedb.benchmark.framework.common.DBClient
 import com.vaticle.typedb.client.TypeDB
 import com.vaticle.typedb.client.api.TypeDBCredential
 import com.vaticle.typedb.client.api.TypeDBSession

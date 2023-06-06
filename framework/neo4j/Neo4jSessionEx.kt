@@ -14,11 +14,13 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.vaticle.typedb.simulation.common
+package com.vaticle.typedb.benchmark.framework.neo4j
 
-interface DBClient<out SESSION> : AutoCloseable {
-    fun session(partition: Partition): SESSION
-    fun closeSessions()
-    fun printStatistics(): String
-    override fun close()
+import org.neo4j.driver.Session
+
+object Neo4jSessionEx {
+
+//    fun Session.readTransaction() {
+//
+//    }
 }

@@ -14,16 +14,16 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.vaticle.typedb.simulation.neo4j
+package com.vaticle.typedb.benchmark.framework.neo4j
 
-import com.vaticle.typedb.simulation.Agent
-import com.vaticle.typedb.simulation.common.Util.printDuration
-import com.vaticle.typedb.simulation.neo4j.Keywords.DELETE
-import com.vaticle.typedb.simulation.neo4j.Keywords.DETACH
-import com.vaticle.typedb.simulation.neo4j.Keywords.MATCH
-import com.vaticle.typedb.simulation.Context
-import com.vaticle.typedb.simulation.Simulation
-import com.vaticle.typedb.simulation.common.seed.RandomSource
+import com.vaticle.typedb.benchmark.framework.Agent
+import com.vaticle.typedb.benchmark.framework.common.Util.printDuration
+import com.vaticle.typedb.benchmark.framework.neo4j.Keywords.DELETE
+import com.vaticle.typedb.benchmark.framework.neo4j.Keywords.DETACH
+import com.vaticle.typedb.benchmark.framework.neo4j.Keywords.MATCH
+import com.vaticle.typedb.benchmark.framework.Context
+import com.vaticle.typedb.benchmark.framework.Simulation
+import com.vaticle.typedb.benchmark.framework.common.seed.RandomSource
 import mu.KotlinLogging
 import org.neo4j.driver.Driver
 import org.neo4j.driver.Query

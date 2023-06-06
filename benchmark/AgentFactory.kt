@@ -17,10 +17,10 @@
 package com.vaticle.typedb.benchmarks.storage
 
 import com.vaticle.typedb.benchmarks.storage.common.Context
-import com.vaticle.typedb.simulation.Agent
-import com.vaticle.typedb.simulation.typedb.TypeDBClient
+import com.vaticle.typedb.benchmark.framework.Agent
+import com.vaticle.typedb.benchmark.framework.typedb.TypeDBClient
 
-class AgentFactory(client: TypeDBClient, context: Context): com.vaticle.typedb.simulation.Agent.Factory() {
+class AgentFactory(client: TypeDBClient, context: Context): Agent.Factory() {
     override val map: Map<Class<out Agent<*, *, *>>, () -> Agent<*, *, *>> = mapOf(
         PersonAgent::class.java to { graph(client, context) },
     )

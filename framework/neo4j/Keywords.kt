@@ -14,11 +14,16 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.vaticle.typedb.simulation.common
+package com.vaticle.typedb.benchmark.framework.neo4j
 
-interface Partition {
-    val code: String
-    val name: String
-    val tracker: String
-    val group: String // Used to assign session keys for TypeDB model
+object Keywords {
+    const val ASSERT = "ASSERT"
+    const val CONSTRAINT = "CONSTRAINT"
+    const val CREATE = "CREATE"
+    const val DELETE = "DELETE"
+    const val DETACH = "DETACH"
+    const val IS_UNIQUE = "IS UNIQUE"
+    const val MATCH = "MATCH"
+    const val ON = "ON"
+    const val RETURN = "RETURN"
 }

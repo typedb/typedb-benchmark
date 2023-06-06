@@ -14,15 +14,15 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.vaticle.typedb.simulation
+package com.vaticle.typedb.benchmark.framework
 
 import com.vaticle.factory.tracing.client.FactoryTracingThreadStatic
-import com.vaticle.typedb.simulation.common.Partition
-import com.vaticle.typedb.simulation.common.seed.RandomSource
-import com.vaticle.typedb.simulation.common.DBClient
+import com.vaticle.typedb.benchmark.framework.common.Partition
+import com.vaticle.typedb.benchmark.framework.common.seed.RandomSource
+import com.vaticle.typedb.benchmark.framework.common.DBClient
 import com.vaticle.typedb.common.util.Objects.className
-import com.vaticle.typedb.simulation.common.params.Config.Agent.Companion.DEFAULT_ACTION
-import com.vaticle.typedb.simulation.common.params.Config.Agent.Companion.DEFAULT_RUNS_PER_ITERATION
+import com.vaticle.typedb.benchmark.framework.common.params.Config.Agent.Companion.DEFAULT_ACTION
+import com.vaticle.typedb.benchmark.framework.common.params.Config.Agent.Companion.DEFAULT_RUNS_PER_ITERATION
 import java.util.Objects.hash
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ConcurrentHashMap

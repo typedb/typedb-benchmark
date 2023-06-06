@@ -17,15 +17,16 @@
 
 load("@vaticle_dependencies//tool/checkstyle:rules.bzl", "checkstyle_test")
 
-package(default_visibility = ["//simulation:__pkg__"])
+package(default_visibility = ["//benchmark:__pkg__"])
 
 filegroup(
     name = "simulation_config",
     srcs = [
         "logback.xml",
-        "write-benchmark.yml",
+        "ci-tests.yml",
+        "large-data-benchmark.yml",
         "read-write-benchmark.yml",
-        "large-data-benchmark.yml"
+        "write-benchmark.yml",
     ],
 )
 

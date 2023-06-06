@@ -14,9 +14,9 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.vaticle.typedb.simulation
+package com.vaticle.typedb.benchmark.framework
 
-import com.vaticle.typedb.simulation.common.params.Config
+import com.vaticle.typedb.benchmark.framework.common.params.Config
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime

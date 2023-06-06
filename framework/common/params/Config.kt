@@ -14,23 +14,23 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.vaticle.typedb.simulation.common.params
+package com.vaticle.typedb.benchmark.framework.common.params
 
-import com.vaticle.typedb.simulation.common.params.Config.Keys.AGENTS
-import com.vaticle.typedb.simulation.common.params.Config.Keys.ARG
-import com.vaticle.typedb.simulation.common.params.Config.Keys.DATABASE_NAME
-import com.vaticle.typedb.simulation.common.params.Config.Keys.FUNCTION
-import com.vaticle.typedb.simulation.common.params.Config.Keys.ITERATIONS
-import com.vaticle.typedb.simulation.common.params.Config.Keys.NAME
-import com.vaticle.typedb.simulation.common.params.Config.Keys.RANDOM_SEED
-import com.vaticle.typedb.simulation.common.params.Config.Keys.RUN
-import com.vaticle.typedb.simulation.common.params.Config.Keys.TRACE
-import com.vaticle.typedb.simulation.common.params.Config.Keys.TRACE_SAMPLING
+import com.vaticle.typedb.benchmark.framework.common.params.Config.Keys.AGENTS
+import com.vaticle.typedb.benchmark.framework.common.params.Config.Keys.ARG
+import com.vaticle.typedb.benchmark.framework.common.params.Config.Keys.DATABASE_NAME
+import com.vaticle.typedb.benchmark.framework.common.params.Config.Keys.FUNCTION
+import com.vaticle.typedb.benchmark.framework.common.params.Config.Keys.ITERATIONS
+import com.vaticle.typedb.benchmark.framework.common.params.Config.Keys.NAME
+import com.vaticle.typedb.benchmark.framework.common.params.Config.Keys.RANDOM_SEED
+import com.vaticle.typedb.benchmark.framework.common.params.Config.Keys.RUN
+import com.vaticle.typedb.benchmark.framework.common.params.Config.Keys.TRACE
+import com.vaticle.typedb.benchmark.framework.common.params.Config.Keys.TRACE_SAMPLING
 import com.vaticle.typedb.common.yaml.YAML
-import com.vaticle.typedb.simulation.common.params.Config.Keys.ACTION
-import com.vaticle.typedb.simulation.common.params.Config.Keys.PARTITIONS
-import com.vaticle.typedb.simulation.common.params.Config.Keys.RECREATE_DATABASE
-import com.vaticle.typedb.simulation.common.params.Config.Keys.RUNS_PER_ITERATION
+import com.vaticle.typedb.benchmark.framework.common.params.Config.Keys.ACTION
+import com.vaticle.typedb.benchmark.framework.common.params.Config.Keys.PARTITIONS
+import com.vaticle.typedb.benchmark.framework.common.params.Config.Keys.RECREATE_DATABASE
+import com.vaticle.typedb.benchmark.framework.common.params.Config.Keys.RUNS_PER_ITERATION
 import java.io.File
 import kotlin.math.ln
 

@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.vaticle.typedb.simulation.common.params
+package com.vaticle.typedb.benchmark.framework.common.params
 
 enum class Database(val key: String, val fullName: String, val defaultAddress: String) {
     TYPEDB(key = "typedb", fullName = "TypeDB", defaultAddress = "localhost:1729"),
