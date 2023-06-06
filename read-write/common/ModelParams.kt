@@ -15,10 +15,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.vaticle.typedb.benchmarks.storage.common
+package com.vaticle.typedb.benchmark.readwrite.common
 
-import com.vaticle.typedb.benchmarks.storage.common.Util.int
-import com.vaticle.typedb.benchmarks.storage.common.Util.map
+import com.vaticle.typedb.benchmark.readwrite.common.Util.int
+import com.vaticle.typedb.benchmark.readwrite.common.Util.map
 import com.vaticle.typedb.common.yaml.YAML
 
 class ModelParams private constructor(val personPerBatch: Int, val friendshipPerBatch: Int, val nPostCodes: Int) {

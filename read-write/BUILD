@@ -23,7 +23,7 @@ kt_jvm_library(
     srcs = glob(["*.kt"]),
 #    resource_strip_prefix = "config/",
     deps = [
-        "//benchmark/common",
+        "//read-write/common",
 
         # External Vaticle Dependencies
         "//framework:typedb_simulation",
@@ -43,10 +43,10 @@ kt_jvm_library(
 
 java_binary(
     name = "run",
-    data = ["//benchmark/config:simulation_config"],
+    data = ["//read-write/config:simulation_config"],
     runtime_deps = [":storage-benchmark"],
-    main_class = "com.vaticle.typedb.benchmarks.storage.Runner",
-    classpath_resources = ["//benchmark/config:logback.xml"],
+    main_class = "com.vaticle.typedb.benchmark.readwrite.Runner",
+    classpath_resources = ["//read-write/config:logback.xml"],
     visibility = ["//visibility:public"],
 )
 

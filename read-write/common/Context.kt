@@ -14,12 +14,11 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.vaticle.typedb.benchmarks.storage.common
+package com.vaticle.typedb.benchmark.readwrite.common
 
 import com.vaticle.typedb.benchmark.framework.common.Partition
 import mu.KotlinLogging
 import java.util.concurrent.atomic.AtomicInteger
-import java.util.concurrent.atomic.AtomicLong
 
 class Context private constructor(config: Config, isTracing: Boolean, isReporting: Boolean):
     com.vaticle.typedb.benchmark.framework.Context<Void?, ModelParams>(null, config, isTracing, isReporting) {

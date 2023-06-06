@@ -14,11 +14,11 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.vaticle.typedb.benchmarks.storage
+package com.vaticle.typedb.benchmark.readwrite
 
 import com.vaticle.typedb.client.api.TypeDBOptions
 import com.vaticle.typedb.client.api.TypeDBSession
-import com.vaticle.typedb.benchmarks.storage.common.Context
+import com.vaticle.typedb.benchmark.readwrite.common.Context
 import com.vaticle.typedb.benchmark.framework.common.seed.RandomSource
 import com.vaticle.typedb.benchmark.framework.typedb.TypeDBClient
 import mu.KotlinLogging
@@ -32,7 +32,7 @@ class StorageBenchmark internal constructor(client: TypeDBClient, context: Conte
     override val name = "StorageBenchmark"
 
     // TODO: Update this filepath
-    override val schemaFiles = listOf(Paths.get("benchmark/schema.tql").toFile())
+    override val schemaFiles = listOf(Paths.get("read-write/schema.tql").toFile())
     private val options = TypeDBOptions.core().infer(true)
 
     override fun initData(nativeSession: TypeDBSession, randomSource: RandomSource) {
