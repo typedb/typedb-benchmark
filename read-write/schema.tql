@@ -28,4 +28,5 @@ person sub entity,
 friendship sub relation,
     relates person,
     owns meeting-time;
+
 person plays friendship:person;

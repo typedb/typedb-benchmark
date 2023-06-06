@@ -13,10 +13,12 @@ The easiest way to run the benchmark is through bazel:
 bazel run //read-write:run -- --database=typedb --address=127.0.0.1:1729 --config=read-write/config/<config-file>.yml
 ```
 
+Replace the address if you're not running the server on the same machine or using TypeDB's default port. 
+
 The <config-file> determines which queries will be run.
 * `ci-tests.yml`: Runs a few iterations to ensure everything is working properly (< 1 GB)
-* `write-benchmark.yml`: Only performs the write queries (~10 GB)
 * `read-write-benchmark.yml`: Performs (all) read & write queries described below (~10 GB)
+* `write-benchmark.yml`: Only performs write queries described below (~350 GB)
 * `large-data-benchmark.yml`: Performs all queries except `readAddressFromPostCode` for a lage number of iterations (~350 GB)
 
 ### Benchmark
