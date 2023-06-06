@@ -15,22 +15,24 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.vaticle.typedb.benchmark.common
+package com.vaticle.typedb.benchmarks.storage.common
 
-import com.vaticle.typedb.benchmark.common.Util.int
-import com.vaticle.typedb.benchmark.common.Util.map
+import com.vaticle.typedb.benchmarks.storage.common.Util.int
+import com.vaticle.typedb.benchmarks.storage.common.Util.map
 import com.vaticle.typedb.common.yaml.YAML
 
-class ModelParams private constructor(val personPerBatch: Int, val friendshipPerBatch: Int) {
+class ModelParams private constructor(val personPerBatch: Int, val friendshipPerBatch: Int, val nPostCodes: Int) {
 
     companion object {
         private const val PERSON_PER_ITER = "personPerIteration"
         private const val FRIENDSHIP_PER_ITER = "friendshipPerIteration"
+        private const val POST_CODES = "postCodes"
 
         fun of(yaml: YAML.Map): ModelParams {
             val nPersonPerBatch = int(map(yaml["model"])[PERSON_PER_ITER])
             val friendshipPerBatch = int(map(yaml["model"])[FRIENDSHIP_PER_ITER])
-            return ModelParams(nPersonPerBatch, friendshipPerBatch)
+            val postCodes = int(map(yaml["model"])[POST_CODES])
+            return ModelParams(nPersonPerBatch, friendshipPerBatch, postCodes)
         }
     }
 }

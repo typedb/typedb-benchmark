@@ -14,18 +14,20 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.vaticle.typedb.benchmark
+package com.vaticle.typedb.benchmarks.storage
 
 import com.vaticle.typedb.client.api.TypeDBSession
-import com.vaticle.typedb.benchmark.common.Context
+import com.vaticle.typedb.benchmarks.storage.common.Context
 import com.vaticle.typedb.client.api.TypeDBTransaction
 import com.vaticle.typedb.simulation.Agent
 import com.vaticle.typedb.simulation.common.seed.RandomSource
 import com.vaticle.typedb.simulation.typedb.TypeDBClient
 
 import com.vaticle.typeql.lang.TypeQL
+import com.vaticle.typeql.lang.query.TypeQLInsert
 import java.time.LocalDateTime
 import java.util.*
+import kotlin.collections.ArrayList
 
 public class PersonAgent(client: TypeDBClient, context: Context) :
     Agent<Context.DBPartition, TypeDBSession, Context>(client, context) {
@@ -39,8 +41,8 @@ public class PersonAgent(client: TypeDBClient, context: Context) :
         return Objects.hash("name", partitionId, id).toString() + "-" + partitionId + ":" + id
     }
 
-    private fun ssidFrom(partitionId: Int, id: Int): Long {
-        return Objects.hash("ssid", partitionId, id).toLong()
+    private fun postCodeFrom(partitionId: Int, id: Int): Long {
+        return (Objects.hash(partitionId, id) % context.model.nPostCodes).toLong()
     }
 
     private fun addressFrom(partitionId: Int, id: Int): String {
@@ -56,17 +58,15 @@ public class PersonAgent(client: TypeDBClient, context: Context) :
         dbPartition: Context.DBPartition,
         randomSource: RandomSource
     ): List<Agent.Report> {
+        val inserts = List(context.model.personPerBatch) {
+            val id: Int = dbPartition.idCtr.addAndGet(1)
+            TypeQL.`var`("p_" + it).isa("person")
+                .has("name", nameFrom(dbPartition.partitionId, id))
+                .has("post-code", postCodeFrom(dbPartition.partitionId, id))
+                .has("address", addressFrom(dbPartition.partitionId, id))
+        }
         session.transaction(TypeDBTransaction.Type.WRITE).use { tx ->
-            for (i in 1..context.model.personPerBatch) {
-                val id: Int = dbPartition.idCtr.addAndGet(1)
-                tx.query().insert(TypeQL.insert(
-                    TypeQL.`var`("p").isa("person")
-                        .has("name", nameFrom(dbPartition.partitionId, id))
-                        .has("ssid", ssidFrom(dbPartition.partitionId, id))
-                        .has("address", addressFrom(dbPartition.partitionId, id))
-
-                ))
-            }
+            tx.query().insert(TypeQL.insert(inserts))
             tx.commit()
         }
         return listOf()
@@ -79,23 +79,103 @@ public class PersonAgent(client: TypeDBClient, context: Context) :
     ): List<Agent.Report> {
         session.transaction(TypeDBTransaction.Type.WRITE).use { tx ->
             for (i in 1..context.model.friendshipPerBatch) {
-                val first : Int = 1 + randomSource.nextInt(dbPartition.idCtr.get())
-                val second : Int = 1 + randomSource.nextInt(dbPartition.idCtr.get())
-                tx.query().insert(TypeQL.match(
-                    TypeQL.`var`("p1").isa("person").has("name", nameFrom(dbPartition.partitionId, first)),
-                    TypeQL.`var`("p2").isa("person").has("name", nameFrom(dbPartition.partitionId, second)),
+                val first: Int = 1 + randomSource.nextInt(dbPartition.idCtr.get())
+                val second: Int = 1 + randomSource.nextInt(dbPartition.idCtr.get())
+                tx.query().insert(
+                    TypeQL.match(
+                        TypeQL.`var`("p1").isa("person").has("name", nameFrom(dbPartition.partitionId, first)),
+                        TypeQL.`var`("p2").isa("person").has("name", nameFrom(dbPartition.partitionId, second)),
                     ).insert(
-                        TypeQL.rel("person","p1").rel("person","p1").isa("friendship")
+                        TypeQL.rel("person", "p1").rel("person", "p1").isa("friendship")
                             .has("meeting-time", dateFrom(first, second))
-                    ))
+                    )
+                )
             }
             tx.commit()
         }
         return listOf()
     }
 
+    fun readFriendsOf(
+        session: TypeDBSession,
+        dbPartition: Context.DBPartition,
+        randomSource: RandomSource
+    ): List<Agent.Report> {
+        session.transaction(TypeDBTransaction.Type.WRITE).use { tx ->
+            val id: Int = 1 + randomSource.nextInt(dbPartition.idCtr.get())
+            tx.query().match(
+                TypeQL.match(
+                    TypeQL.`var`("p1").isa("person").has("name", nameFrom(dbPartition.partitionId, id)),
+                    TypeQL.rel("person", "p1").rel("person", "p2").isa("friendship"),
+                    TypeQL.`var`("p2").isa("person").has("name", TypeQL.`var`("n2")),
+                ).count()
+            ).get()
+        }
+        return listOf()
+    }
+
+    fun readFriendsOfFriends(
+        session: TypeDBSession,
+        dbPartition: Context.DBPartition,
+        randomSource: RandomSource
+    ): List<Agent.Report> {
+        session.transaction(TypeDBTransaction.Type.WRITE).use { tx ->
+            val id: Int = 1 + randomSource.nextInt(dbPartition.idCtr.get())
+            tx.query().match(
+                TypeQL.match(
+                    TypeQL.`var`("p1").isa("person").has("name", nameFrom(dbPartition.partitionId, id)),
+                    TypeQL.rel("person", "p1").rel("person", "p2").isa("friendship"),
+                    TypeQL.rel("person", "p2").rel("person", "p3").isa("friendship"),
+                    TypeQL.`var`("p3").isa("person").has("name", TypeQL.`var`("n3")),
+                ).count()
+            ).get()
+        }
+        return listOf()
+    }
+
+    fun readPersonsByPostCode(
+        session: TypeDBSession,
+        dbPartition: Context.DBPartition,
+        randomSource: RandomSource
+    ): List<Agent.Report> {
+        session.transaction(TypeDBTransaction.Type.WRITE).use { tx ->
+            val postCode: Long =
+                postCodeFrom(dbPartition.partitionId, randomSource.nextInt(context.model.nPostCodes))
+            tx.query().match(
+                TypeQL.match(
+                    TypeQL.`var`("p1").isa("person")
+                        .has("post-code", postCode)
+                        .has("name", TypeQL.`var`("name")),
+                ).count()
+            ).get()
+        }
+        return listOf()
+    }
+
+    fun readAddressFromName(
+        session: TypeDBSession,
+        dbPartition: Context.DBPartition,
+        randomSource: RandomSource
+    ): List<Agent.Report> {
+        session.transaction(TypeDBTransaction.Type.WRITE).use { tx ->
+            val id: Int = 1 + randomSource.nextInt(dbPartition.idCtr.get())
+            tx.query().match(
+                TypeQL.match(
+                    TypeQL.`var`("p1").isa("person")
+                        .has("name", nameFrom(dbPartition.partitionId, id))
+                        .has("address", TypeQL.`var`("addr")),
+                )
+            ).count()
+        }
+        return listOf()
+    }
+
     override val actionHandlers = mapOf(
         "createPerson" to ::createPerson,
-        "createFriendship" to ::createFriendship
+        "createFriendship" to ::createFriendship,
+        "readAddressFromName" to ::readAddressFromName,
+        "readFriendsOf" to ::readFriendsOf,
+        "readFriendsOfFriends" to ::readFriendsOfFriends,
+        "readPersonsByPostCode" to ::readPersonsByPostCode,
     )
 }

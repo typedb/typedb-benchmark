@@ -18,16 +18,15 @@
 load("@io_bazel_rules_kotlin//kotlin:jvm.bzl", "kt_jvm_library")
 load("@vaticle_dependencies//tool/checkstyle:rules.bzl", "checkstyle_test")
 
-package(default_visibility = ["//benchmark:__pkg__"])
-
 kt_jvm_library(
     name = "common",
     srcs = glob(["*.kt"]),
+    visibility = ["//visibility:public"],
     deps = [
         # External Vaticle Dependencies
         "@vaticle_typedb_common//:common",
-        "//simulation/common:common",
-        "//simulation:typedb_simulation",
+        "@vaticle_typedb_simulation//simulation/common",
+        "@vaticle_typedb_simulation//simulation:typedb_simulation",
         "@vaticle_typedb_client_java//common",
         "@vaticle_typedb_client_java//api",
 

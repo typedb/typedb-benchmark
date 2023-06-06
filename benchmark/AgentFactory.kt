@@ -14,17 +14,17 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.vaticle.typedb.benchmark
+package com.vaticle.typedb.benchmarks.storage
 
-import com.vaticle.typedb.benchmark.common.Context
+import com.vaticle.typedb.benchmarks.storage.common.Context
 import com.vaticle.typedb.simulation.Agent
 import com.vaticle.typedb.simulation.typedb.TypeDBClient
 
 class AgentFactory(client: TypeDBClient, context: Context): com.vaticle.typedb.simulation.Agent.Factory() {
     override val map: Map<Class<out Agent<*, *, *>>, () -> Agent<*, *, *>> = mapOf(
-        PersonAgent::class.java to { person(client, context) },
+        PersonAgent::class.java to { graph(client, context) },
     )
 
-    fun person(client: TypeDBClient, context: Context) = PersonAgent(client, context)
+    fun graph(client: TypeDBClient, context: Context) = PersonAgent(client, context)
 
 }

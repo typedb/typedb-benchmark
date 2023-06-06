@@ -19,16 +19,16 @@ load("@io_bazel_rules_kotlin//kotlin:jvm.bzl", "kt_jvm_library")
 load("@vaticle_dependencies//tool/checkstyle:rules.bzl", "checkstyle_test")
 
 kt_jvm_library(
-    name = "benchmark",
+    name = "storage-benchmark",
     srcs = glob(["*.kt"]),
 #    resource_strip_prefix = "config/",
     deps = [
-        "//benchmark/common",
+        "//simulation/common",
 
         # External Vaticle Dependencies
-        "//simulation:typedb_simulation",
-        "//simulation/typedb:typedb",
-        "//simulation/common:common",
+        "@vaticle_typedb_simulation//simulation:typedb_simulation",
+        "@vaticle_typedb_simulation//simulation/typedb:typedb",
+        "@vaticle_typedb_simulation//simulation/common:common",
         "@vaticle_typeql//java:typeql-lang",
         "@vaticle_typeql//java/pattern",
         "@vaticle_typeql//java/query",
@@ -38,14 +38,14 @@ kt_jvm_library(
         "@maven//:io_github_microutils_kotlin_logging_jvm",
         "@maven//:org_slf4j_slf4j_api",
     ],
-    data = [":schema.tql"]
+    data = ["//:schema.tql"]
 )
 
 java_binary(
     name = "run",
-    data = ["//benchmark/config:simulation_config"],
-    runtime_deps = [":benchmark"],
-    main_class = "com.vaticle.typedb.benchmark.Runner",
+    data = ["//simulation/config:simulation_config"],
+    runtime_deps = [":storage-benchmark"],
+    main_class = "com.vaticle.typedb.benchmarks.storage.Runner",
     classpath_resources = ["//simulation/config:logback.xml"],
     visibility = ["//visibility:public"],
 )
