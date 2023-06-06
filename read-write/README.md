@@ -47,7 +47,7 @@ The `PersonAgent` currently implements 6 queries.
 
 ### Storage perspective
 This section describes the operations at the storage level for each of the queries above.
-Traversals are performed depth-first.
+Traversals are performed depth-first. The number of results described is for the `large-data-benchmark.yml` config.
 
 * `createPerson`: pure writes
     * inserts 10 keys: 1 entity + 3 attributes + 3 edges * 2 keys/edge 
@@ -56,26 +56,26 @@ Traversals are performed depth-first.
   * inserts 8 keys: 1 relation + 1 attribute + 3 edges * 2 keys/edge.
 * `readAddressFromName`: Point lookups
   * Does a point lookup for the name
-  * Opens an iterator to the person with the name (1 result)
-  * Opens an iterator the address (1 result)
+  * Iterates over the edges to the persons with the name (1 result)
+  * Iterates over the edges to the addresses of the person (1 result)
 * `readFriendsOf`: iterates over a set of keys.
   * Does a point lookup for the name
-  * Opens an iterator to the person with the name (1 result)
-  * Opens an iterator to each friendship relation (~5 results).
+  *  Iterates over the edges to the persons with the name (1 result)
+  *  Iterates over the edges to each friendship relation of the person (~5 results).
   * For each relation:
-    * Opens an iterator to the associated friend (1 result)
+    *  Iterates over the edges to the associated friend (1 result)
 * `readFriendsOfFriends`: nested iteration
   * Does a point lookup for the name
-  * Opens an iterator to the person with the name (1 result)
-  * Opens an iterator to each friendship relation (~5 results).
+  * Iterates over the edges to the persons with the name (1 result)
+  * Iterates over the edges to each friendship relation of the person (~5 results).
   * For each relation:
-    * Opens an iterator to the associated friend (1 result)
+    * Iterates over the edges to the associated friend (1 result)
     * For each friend:
-      * Opens an iterator to each of _their_ friendship relations (~5 results).
+      * Iterates over the edges to each of _their_ friendship relations (~5 results).
       * For each relation:
-        * Opens an iterator to the associated friend (1 result)
+        * Iterates over the edges to the associated friend (1 result)
 
 * `readPersonsByPostCode`: iterates over a large number of keys.
   * Does a point lookup for the postCode
-  * Opens an iterator to every person entity having the postCode (nPersons/nPostCodes on average)
-  
+  * Iterates over the edges to every person entity having the postCode (nPersons/nPostCodes on average)
+    
