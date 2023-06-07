@@ -1,12 +1,17 @@
 ## TypeDB read-write benchmark
+
 This benchmark contains a 'minimal set of representative queries' to emulate a typical typedb workload.
 It was developed to evaluate the effects of replacing RocksDB with SpeeDB on read & write performance,
 and to evaluate the effect of any future changes on performance.
+
 ### Requirements 
+
 * Bazel v5.1.1
-* A running [typedb server](https://github.com/vaticle/typedb) v2.16.1 to benchmark against.
+* A running [typedb server](https://github.com/vaticle/typedb) v2.18.0 to benchmark against
+  - Or a newer version [compatible]((https://docs.vaticle.com/docs/client-api/java#version-compatibility)) with typedb java client v2.18.0
 
 ### Running
+
 The easiest way to run the benchmark is through bazel:
 
 ```bash
@@ -48,6 +53,7 @@ The `PersonAgent` currently implements 6 queries.
   * __Note__: Since the number of postCodes is fixed, this query scales linearly as more persons are inserted
 
 ### Storage perspective
+
 This section describes the operations at the storage level for each of the queries above.
 Traversals are performed depth-first. The number of results described is for the `large-data-benchmark.yml` config.
 
@@ -82,6 +88,7 @@ Traversals are performed depth-first. The number of results described is for the
   * Iterates over the edges to every person entity having the postCode (nPersons/nPostCodes on average)
 
 ### Benchmark architecture
+
 A benchmark is required to define a set of agents, each of which defines a set of actions it can perform.
 A configuration file determines which actions are run.
 
@@ -93,6 +100,7 @@ The framework adds all the instances to a thread pool, the size of which is dete
 Once all agents have performed the action `runsPerIteration` times, the framework reports the time taken.
 
 #### Parameters:
+
 * **agents** : Contains a list of tasks to be run
   - name: The name of the agent, which is mapped to a Kotlin class in the implementation
   - action: The name of the task, which is mapped to a function within the agent class.

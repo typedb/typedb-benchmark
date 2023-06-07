@@ -58,7 +58,7 @@ public class PersonAgent(client: TypeDBClient, context: Context) :
     ): List<Agent.Report> {
         val inserts = List(context.model.personPerBatch) {
             val id: Int = dbPartition.idCtr.addAndGet(1)
-            TypeQL.`var`("p_" + it).isa("person")
+            TypeQL.cVar("p_" + it).isa("person")
                 .has("name", nameFrom(dbPartition.partitionId, id))
                 .has("post-code", postCodeFrom(dbPartition.partitionId, id))
                 .has("address", addressFrom(dbPartition.partitionId, id))
@@ -81,10 +81,10 @@ public class PersonAgent(client: TypeDBClient, context: Context) :
                 val second: Int = 1 + randomSource.nextInt(dbPartition.idCtr.get())
                 tx.query().insert(
                     TypeQL.match(
-                        TypeQL.`var`("p1").isa("person").has("name", nameFrom(dbPartition.partitionId, first)),
-                        TypeQL.`var`("p2").isa("person").has("name", nameFrom(dbPartition.partitionId, second)),
+                        TypeQL.cVar("p1").isa("person").has("name", nameFrom(dbPartition.partitionId, first)),
+                        TypeQL.cVar("p2").isa("person").has("name", nameFrom(dbPartition.partitionId, second)),
                     ).insert(
-                        TypeQL.rel("person", "p1").rel("person", "p1").isa("friendship")
+                        TypeQL.rel("person", TypeQL.cVar("p1")).rel("person", TypeQL.cVar("p1")).isa("friendship")
                             .has("meeting-time", dateFrom(first, second))
                     )
                 )
@@ -103,9 +103,9 @@ public class PersonAgent(client: TypeDBClient, context: Context) :
             val id: Int = 1 + randomSource.nextInt(dbPartition.idCtr.get())
             tx.query().match(
                 TypeQL.match(
-                    TypeQL.`var`("p1").isa("person").has("name", nameFrom(dbPartition.partitionId, id)),
-                    TypeQL.rel("person", "p1").rel("person", "p2").isa("friendship"),
-                    TypeQL.`var`("p2").isa("person").has("name", TypeQL.`var`("n2")),
+                    TypeQL.cVar("p1").isa("person").has("name", nameFrom(dbPartition.partitionId, id)),
+                    TypeQL.rel("person", TypeQL.cVar("p1")).rel("person", TypeQL.cVar("p2")).isa("friendship"),
+                    TypeQL.cVar("p2").isa("person").has("name", TypeQL.cVar("n2")),
                 ).count()
             ).get()
         }
@@ -121,10 +121,10 @@ public class PersonAgent(client: TypeDBClient, context: Context) :
             val id: Int = 1 + randomSource.nextInt(dbPartition.idCtr.get())
             tx.query().match(
                 TypeQL.match(
-                    TypeQL.`var`("p1").isa("person").has("name", nameFrom(dbPartition.partitionId, id)),
-                    TypeQL.rel("person", "p1").rel("person", "p2").isa("friendship"),
-                    TypeQL.rel("person", "p2").rel("person", "p3").isa("friendship"),
-                    TypeQL.`var`("p3").isa("person").has("name", TypeQL.`var`("n3")),
+                    TypeQL.cVar("p1").isa("person").has("name", nameFrom(dbPartition.partitionId, id)),
+                    TypeQL.rel("person", TypeQL.cVar("p1")).rel("person", TypeQL.cVar("p2")).isa("friendship"),
+                    TypeQL.rel("person", TypeQL.cVar("p2")).rel("person", TypeQL.cVar("p3")).isa("friendship"),
+                    TypeQL.cVar("p3").isa("person").has("name", TypeQL.cVar("n3")),
                 ).count()
             ).get()
         }
@@ -141,9 +141,9 @@ public class PersonAgent(client: TypeDBClient, context: Context) :
                 postCodeFrom(dbPartition.partitionId, randomSource.nextInt(context.model.nPostCodes))
             tx.query().match(
                 TypeQL.match(
-                    TypeQL.`var`("p1").isa("person")
+                    TypeQL.cVar("p1").isa("person")
                         .has("post-code", postCode)
-                        .has("name", TypeQL.`var`("name")),
+                        .has("name", TypeQL.cVar("name")),
                 ).count()
             ).get()
         }
@@ -159,9 +159,9 @@ public class PersonAgent(client: TypeDBClient, context: Context) :
             val id: Int = 1 + randomSource.nextInt(dbPartition.idCtr.get())
             tx.query().match(
                 TypeQL.match(
-                    TypeQL.`var`("p1").isa("person")
+                    TypeQL.cVar("p1").isa("person")
                         .has("name", nameFrom(dbPartition.partitionId, id))
-                        .has("address", TypeQL.`var`("addr")),
+                        .has("address", TypeQL.cVar("addr")),
                 )
             ).count()
         }

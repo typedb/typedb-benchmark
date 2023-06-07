@@ -34,7 +34,6 @@ kt_jvm_library(
         "@vaticle_typeql//java/query",
 
         # External Maven Dependencies
-        "@maven//:com_google_code_findbugs_jsr305",
         "@maven//:io_github_microutils_kotlin_logging_jvm",
         "@maven//:org_slf4j_slf4j_api",
     ],

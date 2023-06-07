@@ -32,7 +32,6 @@ kt_jvm_library(
         "@maven//:io_github_microutils_kotlin_logging_jvm",
         "@maven//:org_apache_commons_commons_csv",
         "@maven//:org_slf4j_slf4j_api",
-#        "@maven//:org_yaml_snakeyaml",
     ],
 )
 
