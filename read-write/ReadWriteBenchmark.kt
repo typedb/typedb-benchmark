@@ -31,7 +31,7 @@ class ReadWriteBenchmark internal constructor(client: TypeDBClient, context: Con
     override val agentPackage = PersonAgent::class.java.packageName
     override val name = "ReadWriteBenchmark"
 
-    override val schemaFiles = listOf(Paths.get("benchmark-read-write/schema.tql").toFile())
+    override val schemaFiles = listOf(Paths.get("read-write/schema.tql").toFile())
     private val options = TypeDBOptions.core().infer(true)
 
     override fun initData(nativeSession: TypeDBSession, randomSource: RandomSource) {

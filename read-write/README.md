@@ -10,7 +10,7 @@ and to evaluate the effect of any future changes on performance.
 The easiest way to run the benchmark is through bazel:
 
 ```bash
-bazel run //benchmark-read-write:benchmark-runner -- --database=typedb --address=127.0.0.1:1729 --config=read-write/config/<config-file>.yml
+bazel run //read-write:benchmark-runner -- --database=typedb --address=127.0.0.1:1729 --config=read-write/config/<config-file>.yml
 ```
 
 Replace the address if you're not running the server on the same machine or using TypeDB's default port. 

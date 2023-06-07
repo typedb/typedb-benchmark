@@ -22,7 +22,7 @@ kt_jvm_library(
     name = "benchmark-read-write",
     srcs = glob(["*.kt"]),
     deps = [
-        "//benchmark-read-write/common",
+        "//read-write/common",
 
         "//framework:typedb-simulation-framework",
         "//framework/typedb:typedb",
@@ -43,10 +43,10 @@ kt_jvm_library(
 
 java_binary(
     name = "benchmark-runner",
-    data = ["//benchmark-read-write/config:benchmark-config"],
+    data = ["//read-write/config:benchmark-config"],
     runtime_deps = [":benchmark-read-write"],
     main_class = "com.vaticle.typedb.benchmark.readwrite.Runner",
-    classpath_resources = ["//benchmark-read-write/config:logback-config"],
+    classpath_resources = ["//read-write/config:logback-config"],
     visibility = ["//visibility:public"],
 )
 
