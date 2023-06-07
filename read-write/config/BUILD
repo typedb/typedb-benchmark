@@ -16,29 +16,28 @@
 #
 
 load("@vaticle_dependencies//tool/checkstyle:rules.bzl", "checkstyle_test")
-load("@io_bazel_rules_kotlin//kotlin:core.bzl", "define_kt_toolchain")
 
-define_kt_toolchain(
-    name = "kotlin_toolchain_strict_deps",
-    api_version = "1.7",
-    language_version = "1.7",
-    experimental_strict_kotlin_deps = "error",
+package(default_visibility = ["//read-write:__pkg__"])
+
+filegroup(
+    name = "logback-config",
+    srcs = [
+        "logback.xml",
+    ],
+)
+
+filegroup(
+    name = "benchmark-config",
+    srcs = [
+        "ci-tests.yml",
+        "large-data-benchmark.yml",
+        "read-write-benchmark.yml",
+        "write-benchmark.yml",
+    ],
 )
 
 checkstyle_test(
     name = "checkstyle",
-    include = glob(["*", ".factory/*"]),
-    exclude = glob([
-        ".bazelversion",
-        "LICENSE",
-        "README.md",
-        "docs/*",
-    ]),
+    include = glob(["*"]),
     license_type = "agpl-header",
-)
-
-checkstyle_test(
-    name = "checkstyle-license",
-    include = ["LICENSE"],
-    license_type = "agpl-fulltext",
 )

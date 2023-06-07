@@ -14,31 +14,19 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
+define
+name sub attribute, value string;
+address sub attribute, value string;
+post-code sub attribute, value long;
+meeting-time sub attribute, value datetime;
 
-load("@vaticle_dependencies//tool/checkstyle:rules.bzl", "checkstyle_test")
-load("@io_bazel_rules_kotlin//kotlin:core.bzl", "define_kt_toolchain")
+person sub entity,
+    owns name,
+    owns address,
+    owns post-code;
 
-define_kt_toolchain(
-    name = "kotlin_toolchain_strict_deps",
-    api_version = "1.7",
-    language_version = "1.7",
-    experimental_strict_kotlin_deps = "error",
-)
+friendship sub relation,
+    relates person,
+    owns meeting-time;
 
-checkstyle_test(
-    name = "checkstyle",
-    include = glob(["*", ".factory/*"]),
-    exclude = glob([
-        ".bazelversion",
-        "LICENSE",
-        "README.md",
-        "docs/*",
-    ]),
-    license_type = "agpl-header",
-)
-
-checkstyle_test(
-    name = "checkstyle-license",
-    include = ["LICENSE"],
-    license_type = "agpl-fulltext",
-)
+person plays friendship:person;

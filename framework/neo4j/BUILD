@@ -15,30 +15,30 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 
+load("@io_bazel_rules_kotlin//kotlin:jvm.bzl", "kt_jvm_library")
 load("@vaticle_dependencies//tool/checkstyle:rules.bzl", "checkstyle_test")
-load("@io_bazel_rules_kotlin//kotlin:core.bzl", "define_kt_toolchain")
 
-define_kt_toolchain(
-    name = "kotlin_toolchain_strict_deps",
-    api_version = "1.7",
-    language_version = "1.7",
-    experimental_strict_kotlin_deps = "error",
+kt_jvm_library(
+    name = "neo4j",
+    srcs = glob(["*.kt"]),
+    visibility = ["//visibility:public"],
+    deps = [
+        "//framework/common:common",
+        "//framework:typedb-simulation-framework",
+
+        # External Vaticle Dependencies
+        "@vaticle_typedb_common//:common",
+
+        # External Maven Dependencies
+        "@maven//:io_github_microutils_kotlin_logging_jvm",
+        # TODO: @neo4j ???
+        "@neo4j//:org_neo4j_driver_neo4j_java_driver",
+        "@maven//:org_slf4j_slf4j_api",
+    ],
 )
 
 checkstyle_test(
     name = "checkstyle",
-    include = glob(["*", ".factory/*"]),
-    exclude = glob([
-        ".bazelversion",
-        "LICENSE",
-        "README.md",
-        "docs/*",
-    ]),
+    include = glob(["*", "*/*", "*/*/*"]),
     license_type = "agpl-header",
-)
-
-checkstyle_test(
-    name = "checkstyle-license",
-    include = ["LICENSE"],
-    license_type = "agpl-fulltext",
 )
