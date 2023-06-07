@@ -27,26 +27,6 @@ agents:
     runsPerIteration: 100
     trace: false
 
-  - name: "PersonAgent"
-    action: "readAddressFromName"
-    runsPerIteration: 100
-    trace: false
-
-  - name: "PersonAgent"
-    action: "readFriendsOf"
-    runsPerIteration: 100
-    trace: false
-
-  - name: "PersonAgent"
-    action: "readFriendsOfFriends"
-    runsPerIteration: 100
-    trace: false
-
-  - name: "PersonAgent"
-    action: "readPersonsByPostCode"
-    runsPerIteration: 10
-    trace: false
-
 traceSampling:
   # Options: `"every"` for every K traces; `"log"` for logarithm with base N
   function: "every"
@@ -54,12 +34,12 @@ traceSampling:
 
 run:
   randomSeed: 1
-  iterations: 100
+  iterations: 2500
   partitions: 16
-  databaseName: "storage-benchmark-read-writes"
+  databaseName: "storage-benchmark-writes"
   recreateDatabase: true
 
 model:
-  personPerIteration: 100
-  friendshipPerIteration: 500
-  postCodes: 97
+  personsCreatedPerRun: 100
+  friendshipsCreatedPerRun: 100
+  postCodes: 997

@@ -19,7 +19,7 @@ load("@io_bazel_rules_kotlin//kotlin:jvm.bzl", "kt_jvm_library")
 load("@vaticle_dependencies//tool/checkstyle:rules.bzl", "checkstyle_test")
 
 kt_jvm_library(
-    name = "typedb_simulation",
+    name = "typedb-simulation-framework",
     srcs = glob(["*.kt"]),
     resource_strip_prefix = "config/",
     visibility = ["//visibility:public"],

@@ -24,15 +24,14 @@ import com.vaticle.typedb.benchmark.framework.typedb.TypeDBClient
 import mu.KotlinLogging
 import java.nio.file.Paths
 
-class StorageBenchmark internal constructor(client: TypeDBClient, context: Context) :
+class ReadWriteBenchmark internal constructor(client: TypeDBClient, context: Context) :
     com.vaticle.typedb.benchmark.framework.typedb.TypeDBSimulation<Context>(client, context, AgentFactory(client, context)) {
 
     private val LOGGER = KotlinLogging.logger {}
     override val agentPackage = PersonAgent::class.java.packageName
-    override val name = "StorageBenchmark"
+    override val name = "ReadWriteBenchmark"
 
-    // TODO: Update this filepath
-    override val schemaFiles = listOf(Paths.get("read-write/schema.tql").toFile())
+    override val schemaFiles = listOf(Paths.get("benchmark-read-write/schema.tql").toFile())
     private val options = TypeDBOptions.core().infer(true)
 
     override fun initData(nativeSession: TypeDBSession, randomSource: RandomSource) {

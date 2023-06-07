@@ -1,16 +1,16 @@
 # TypeDB read-write benchmark
 This benchmark contains a 'minimal set of representative queries' to emulate a typical typedb workload.
-It was developed to evaluate the effects of replacing RocksDB with SpeeDB on read & write performance.
-
+It was developed to evaluate the effects of replacing RocksDB with SpeeDB on read & write performance,
+and to evaluate the effect of any future changes on performance.
 ### Requirements 
 * Bazel v5.1.1
-* A running [typedb server](https://github.com/vaticle/typedb) to benchmark against.
+* A running [typedb server](https://github.com/vaticle/typedb) v2.16.1 to benchmark against.
 
 ### Running
 The easiest way to run the benchmark is through bazel:
 
 ```bash
-bazel run //read-write:run -- --database=typedb --address=127.0.0.1:1729 --config=read-write/config/<config-file>.yml
+bazel run //benchmark-read-write:benchmark-runner -- --database=typedb --address=127.0.0.1:1729 --config=read-write/config/<config-file>.yml
 ```
 
 Replace the address if you're not running the server on the same machine or using TypeDB's default port. 
@@ -19,9 +19,9 @@ The <config-file> determines which queries will be run.
 * `ci-tests.yml`: Runs a few iterations to ensure everything is working properly (< 1 GB)
 * `read-write-benchmark.yml`: Performs (all) read & write queries described below (~10 GB)
 * `write-benchmark.yml`: Only performs write queries described below (~350 GB)
-* `large-data-benchmark.yml`: Performs all queries except `readAddressFromPostCode` for a lage number of iterations (~350 GB)
+* `large-data-benchmark.yml`: Performs all queries except `readAddressFromPostCode` for a large number of iterations (~350 GB)
 
-### Benchmark
+### Benchmark Queries
 
 The `PersonAgent` currently implements 6 queries.
 * `createPerson`:

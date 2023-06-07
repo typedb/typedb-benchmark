@@ -24,7 +24,7 @@ kt_jvm_library(
     visibility = ["//visibility:public"],
     deps = [
         "//framework/common:common",
-        "//framework:typedb_simulation",
+        "//framework:typedb-simulation-framework",
 
         # External Vaticle Dependencies
         "@vaticle_typedb_client_java//api",

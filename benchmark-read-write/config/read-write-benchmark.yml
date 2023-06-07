@@ -19,27 +19,27 @@ agents:
 
   - name: "PersonAgent"
     action: "createPerson"
-    runsPerIteration: 5
+    runsPerIteration: 100
     trace: false
 
   - name: "PersonAgent"
     action: "createFriendship"
-    runsPerIteration: 10
+    runsPerIteration: 100
     trace: false
 
   - name: "PersonAgent"
     action: "readAddressFromName"
-    runsPerIteration: 1
+    runsPerIteration: 100
     trace: false
 
   - name: "PersonAgent"
     action: "readFriendsOf"
-    runsPerIteration: 1
+    runsPerIteration: 100
     trace: false
 
   - name: "PersonAgent"
     action: "readFriendsOfFriends"
-    runsPerIteration: 1
+    runsPerIteration: 100
     trace: false
 
   - name: "PersonAgent"
@@ -54,12 +54,12 @@ traceSampling:
 
 run:
   randomSeed: 1
-  iterations: 5
-  partitions: 4
-  databaseName: "benchmark-on-ci"
+  iterations: 100
+  partitions: 16
+  databaseName: "storage-benchmark-read-writes"
   recreateDatabase: true
 
 model:
-  personPerIteration: 10
-  friendshipPerIteration: 50
+  personsCreatedPerRun: 100
+  friendshipsCreatedPerRun: 500
   postCodes: 97

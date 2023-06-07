@@ -19,28 +19,39 @@ load("@io_bazel_rules_kotlin//kotlin:jvm.bzl", "kt_jvm_library")
 load("@vaticle_dependencies//tool/checkstyle:rules.bzl", "checkstyle_test")
 
 kt_jvm_library(
-    name = "common",
+    name = "benchmark-read-write",
     srcs = glob(["*.kt"]),
-    visibility = ["//visibility:public"],
     deps = [
+        "//benchmark-read-write/common",
+
+        "//framework:typedb-simulation-framework",
+        "//framework/typedb:typedb",
+        "//framework/common:common",
+
         # External Vaticle Dependencies
-        "@vaticle_typedb_common//:common",
-        "//framework/common",
-        "//framework:typedb_simulation",
-        "@vaticle_typedb_client_java//common",
-        "@vaticle_typedb_client_java//api",
+        "@vaticle_typeql//java:typeql-lang",
+        "@vaticle_typeql//java/pattern",
+        "@vaticle_typeql//java/query",
 
         # External Maven Dependencies
         "@maven//:com_google_code_findbugs_jsr305",
-        "@maven//:info_picocli_picocli",
         "@maven//:io_github_microutils_kotlin_logging_jvm",
         "@maven//:org_slf4j_slf4j_api",
-        "@maven//:org_yaml_snakeyaml",
     ],
+    data = [":schema.tql"]
+)
+
+java_binary(
+    name = "benchmark-runner",
+    data = ["//benchmark-read-write/config:benchmark-config"],
+    runtime_deps = [":benchmark-read-write"],
+    main_class = "com.vaticle.typedb.benchmark.readwrite.Runner",
+    classpath_resources = ["//benchmark-read-write/config:logback-config"],
+    visibility = ["//visibility:public"],
 )
 
 checkstyle_test(
     name = "checkstyle",
-    include = glob(["*"]),
+    include = glob(["*", "*/*"]),
     license_type = "agpl-header",
 )
