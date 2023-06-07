@@ -101,13 +101,13 @@ Once all agents have performed the action `runsPerIteration` times, the framewor
 
 * **run**: Parameters for the benchmark framework
   - randomSeed: The seed for the random number generator. (Each partition has an isolated RNG)
-    iterations: The total number of iterations to run the benchmark for. 
-    partitions: The number of partitions (= logical copies of each agent)
-    databaseName: The name of the database to create/use in typedb
-    recreateDatabase: if true, deletes and re-creates the typedb database.
-    parallelism: The size of the threadpool on which the partitions are executed
+  - iterations: The total number of iterations to run the benchmark for. 
+  - partitions: The number of partitions (= logical copies of each agent)
+  - databaseName: The name of the database to create/use in typedb
+  - recreateDatabase: if true, deletes and re-creates the typedb database.
+  - parallelism: The size of the threadpool on which the partitions are executed
 
 * **model**: Benchmark specific settings which are passed on to the agents
-  * personsCreatedPerRun: The number of persons inserted in each `CreatePerson` action
-  * friendshipsCreatedPerRun: The number of friendships inserted in each `CreatePerson` action
-  * postCodes: The number of `postCodes` which exist.
+  - personsCreatedPerRun: The number of persons inserted in each `CreatePerson` action
+  - friendshipsCreatedPerRun: The number of friendships inserted in each `CreatePerson` action
+  - postCodes: The number of `postCodes` which exist.
