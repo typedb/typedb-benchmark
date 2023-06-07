@@ -1,4 +1,4 @@
-# TypeDB read-write benchmark
+## TypeDB read-write benchmark
 This benchmark contains a 'minimal set of representative queries' to emulate a typical typedb workload.
 It was developed to evaluate the effects of replacing RocksDB with SpeeDB on read & write performance,
 and to evaluate the effect of any future changes on performance.
@@ -80,4 +80,34 @@ Traversals are performed depth-first. The number of results described is for the
 * `readPersonsByPostCode`: iterates over a large number of keys.
   * Does a point lookup for the postCode
   * Iterates over the edges to every person entity having the postCode (nPersons/nPostCodes on average)
-    
+
+### Benchmark architecture
+A benchmark is required to define a set of agents, each of which defines a set of actions it can perform.
+A configuration file determines which actions are run.
+
+The benchmark will repeat the set of actions for a number of iterations defined by the `run.Iterations` parameter.
+Actions are run serially, reflecting the order in which they appear under `agents`.
+
+For each action, the framework will create `run.nPartition` instances of the corresponding agent. Each agent is to execute the task `agent.<action>.runsPerIteration` times.
+The framework adds all the instances to a thread pool, the size of which is determined by the `run.parallelism` parameter.
+Once all agents have performed the action `runsPerIteration` times, the framework reports the time taken.
+
+#### Parameters:
+* **agents** : Contains a list of tasks to be run
+  - name: The name of the agent, which is mapped to a Kotlin class in the implementation
+  - action: The name of the task, which is mapped to a function within the agent class.
+  - runsPerIteration: The number of times per iteration (and per partition) this task will be performed.
+  - trace: Enable factory tracing (internal) 
+
+* **run**: Parameters for the benchmark framework
+  - randomSeed: The seed for the random number generator. (Each partition has an isolated RNG)
+    iterations: The total number of iterations to run the benchmark for. 
+    partitions: The number of partitions (= logical copies of each agent)
+    databaseName: The name of the database to create/use in typedb
+    recreateDatabase: if true, deletes and re-creates the typedb database.
+    parallelism: The size of the threadpool on which the partitions are executed
+
+* **model**: Benchmark specific settings which are passed on to the agents
+  * personsCreatedPerRun: The number of persons inserted in each `CreatePerson` action
+  * friendshipsCreatedPerRun: The number of friendships inserted in each `CreatePerson` action
+  * postCodes: The number of `postCodes` which exist.
