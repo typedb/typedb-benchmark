@@ -58,6 +58,7 @@ run:
   partitions: 16
   databaseName: "benchmark-read-writes"
   recreateDatabase: true
+  parallelism: 16
 
 model:
   personsCreatedPerRun: 100

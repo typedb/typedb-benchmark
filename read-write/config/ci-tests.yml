@@ -56,8 +56,9 @@ run:
   randomSeed: 1
   iterations: 5
   partitions: 4
-  databaseName: "benchmark-on-ci"
+  databaseName: "benchmark-ci-tests"
   recreateDatabase: true
+  parallelism: 4
 
 model:
   personsCreatedPerRun: 10

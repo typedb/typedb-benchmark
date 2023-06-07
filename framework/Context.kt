@@ -29,7 +29,7 @@ open class Context<out SEED_DATA, out MODEL_PARAMS>(
     private val _isTracing: Boolean, val isReporting: Boolean
 ) : AutoCloseable {
     private val iteration = AtomicInteger(1)
-    val executor: ExecutorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors())
+    val executor: ExecutorService = Executors.newFixedThreadPool(config.run.parallelism)
     val agentConfigs = config.agents
     val seed = config.run.randomSeed
     val dbName = config.run.databaseName

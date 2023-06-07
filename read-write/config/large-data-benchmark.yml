@@ -53,6 +53,7 @@ run:
   partitions: 16
   databaseName: "benchmark-large-data"
   recreateDatabase: true
+  parallelism: 16
 
 model:
   personsCreatedPerRun: 100
