@@ -33,6 +33,8 @@ public class PersonAgent(client: TypeDBClient, context: Context) :
     override val agentClass = PersonAgent::class.java
     override val partitions = context.partitions
 
+    val options = com.vaticle.typedb.client.api.TypeDBOptions.core().parallel(false);
+
     val timeZero: LocalDateTime = LocalDateTime.now().withNano(0);
 
     private fun nameFrom(partitionId: Int, id: Int): String {
@@ -63,7 +65,7 @@ public class PersonAgent(client: TypeDBClient, context: Context) :
                 .has("post-code", postCodeFrom(dbPartition.partitionId, id))
                 .has("address", addressFrom(dbPartition.partitionId, id))
         }
-        session.transaction(TypeDBTransaction.Type.WRITE).use { tx ->
+        session.transaction(TypeDBTransaction.Type.WRITE, options).use { tx ->
             tx.query().insert(TypeQL.insert(inserts))
             tx.commit()
         }
@@ -75,7 +77,7 @@ public class PersonAgent(client: TypeDBClient, context: Context) :
         dbPartition: Context.DBPartition,
         randomSource: RandomSource
     ): List<Agent.Report> {
-        session.transaction(TypeDBTransaction.Type.WRITE).use { tx ->
+        session.transaction(TypeDBTransaction.Type.WRITE, options).use { tx ->
             for (i in 1..context.model.friendshipPerBatch) {
                 val first: Int = 1 + randomSource.nextInt(dbPartition.idCtr.get())
                 val second: Int = 1 + randomSource.nextInt(dbPartition.idCtr.get())
@@ -99,7 +101,7 @@ public class PersonAgent(client: TypeDBClient, context: Context) :
         dbPartition: Context.DBPartition,
         randomSource: RandomSource
     ): List<Agent.Report> {
-        session.transaction(TypeDBTransaction.Type.WRITE).use { tx ->
+        session.transaction(TypeDBTransaction.Type.WRITE, options).use { tx ->
             val id: Int = 1 + randomSource.nextInt(dbPartition.idCtr.get())
             tx.query().match(
                 TypeQL.match(
@@ -117,7 +119,7 @@ public class PersonAgent(client: TypeDBClient, context: Context) :
         dbPartition: Context.DBPartition,
         randomSource: RandomSource
     ): List<Agent.Report> {
-        session.transaction(TypeDBTransaction.Type.WRITE).use { tx ->
+        session.transaction(TypeDBTransaction.Type.WRITE, options).use { tx ->
             val id: Int = 1 + randomSource.nextInt(dbPartition.idCtr.get())
             tx.query().match(
                 TypeQL.match(
@@ -136,7 +138,7 @@ public class PersonAgent(client: TypeDBClient, context: Context) :
         dbPartition: Context.DBPartition,
         randomSource: RandomSource
     ): List<Agent.Report> {
-        session.transaction(TypeDBTransaction.Type.WRITE).use { tx ->
+        session.transaction(TypeDBTransaction.Type.WRITE, options).use { tx ->
             val postCode: Long =
                 postCodeFrom(dbPartition.partitionId, randomSource.nextInt(context.model.nPostCodes))
             tx.query().match(
@@ -155,7 +157,7 @@ public class PersonAgent(client: TypeDBClient, context: Context) :
         dbPartition: Context.DBPartition,
         randomSource: RandomSource
     ): List<Agent.Report> {
-        session.transaction(TypeDBTransaction.Type.WRITE).use { tx ->
+        session.transaction(TypeDBTransaction.Type.WRITE, options).use { tx ->
             val id: Int = 1 + randomSource.nextInt(dbPartition.idCtr.get())
             tx.query().match(
                 TypeQL.match(
