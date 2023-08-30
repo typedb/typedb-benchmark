@@ -108,10 +108,10 @@ public class PersonAgent(client: TypeDBClient, context: Context) :
                         TypeQL.match(
                                 TypeQL.cVar("p1").isa("person")
                                         .has("name", TypeQL.cVar("name"))
-                                        .has("address", TypeQL.cVar("addr"))
-                                        .has("post-code", postCodeFrom(dbPartition.partitionId, id)),
+                                        .has("address", TypeQL.cVar("addr")),
                                 TypeQL.cVar("f").rel(TypeQL.cVar("p1")).isa("friendship")
-                                        .has("meeting-time", TypeQL.cVar("mt"))
+                                        .has("meeting-time", TypeQL.cVar("mt")),
+                                TypeQL.cVar("name").eq(nameFrom(dbPartition.partitionId, id))
                         ).delete(
                                 TypeQL.cVar("p1").isa("person"),
                                 TypeQL.cVar("name").isa("name"),
@@ -121,7 +121,11 @@ public class PersonAgent(client: TypeDBClient, context: Context) :
                         )
                 )
             }
-            tx.commit()
+            try {
+                tx.commit()
+            } catch (_: Exception) {
+
+            }
         }
         return listOf()
     }
