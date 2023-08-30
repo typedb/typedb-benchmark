@@ -21,18 +21,24 @@ import com.vaticle.typedb.benchmark.readwrite.common.Util.int
 import com.vaticle.typedb.benchmark.readwrite.common.Util.map
 import com.vaticle.typedb.common.yaml.YAML
 
-class ModelParams private constructor(val personPerBatch: Int, val friendshipPerBatch: Int, val nPostCodes: Int) {
+class ModelParams private constructor(val personCreatePerAction: Int, val friendshipCreatePerAction: Int, val tryPersonDeletePerAction: Int, val nPostCodes: Int) {
 
     companion object {
-        private const val PERSONS_PER_RUN = "personsCreatedPerAction"
-        private const val FRIENDSHIPS_PER_RUN = "friendshipsCreatedPerAction"
+        private const val PERSON_CREATE_PER_ACTION = "personsCreatedPerAction"
+        private const val FRIENDSHIP_CREATE_PER_ACTION = "friendshipsCreatedPerAction"
+        private const val TRY_PERSON_DELETE_PER_ACTION = "tryPersonsDeletedPerAction"
         private const val POST_CODES = "postCodes"
 
         fun of(yaml: YAML.Map): ModelParams {
-            val nPersonPerBatch = int(map(yaml["model"])[PERSONS_PER_RUN])
-            val friendshipPerBatch = int(map(yaml["model"])[FRIENDSHIPS_PER_RUN])
+            val personCreatePerAction = int(map(yaml["model"])[PERSON_CREATE_PER_ACTION])
+            val friendshipCreatePerAction = int(map(yaml["model"])[FRIENDSHIP_CREATE_PER_ACTION])
+            val tryPersonDeletePerAction = intGetOrDefault(yaml["model"].asMap(), TRY_PERSON_DELETE_PER_ACTION, 0)
             val postCodes = int(map(yaml["model"])[POST_CODES])
-            return ModelParams(nPersonPerBatch, friendshipPerBatch, postCodes)
+            return ModelParams(personCreatePerAction, friendshipCreatePerAction, tryPersonDeletePerAction, postCodes)
+        }
+
+        fun intGetOrDefault(yaml: YAML.Map, key: String, default: Int): Int {
+            return if (yaml[key] == null) default else int(yaml[key])
         }
     }
 }
