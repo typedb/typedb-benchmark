@@ -39,7 +39,7 @@ traceSampling:
 
 run:
   randomSeed: 1
-  iterations: 2500
+  iterations: 100
   partitions: 16
   databaseName: "benchmark-large-delete"
   recreateDatabase: true
