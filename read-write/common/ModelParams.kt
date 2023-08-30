@@ -24,8 +24,8 @@ import com.vaticle.typedb.common.yaml.YAML
 class ModelParams private constructor(val personPerBatch: Int, val friendshipPerBatch: Int, val nPostCodes: Int) {
 
     companion object {
-        private const val PERSONS_PER_RUN = "personsCreatedPerRun"
-        private const val FRIENDSHIPS_PER_RUN = "friendshipsCreatedPerRun"
+        private const val PERSONS_PER_RUN = "personsCreatedPerAction"
+        private const val FRIENDSHIPS_PER_RUN = "friendshipsCreatedPerAction"
         private const val POST_CODES = "postCodes"
 
         fun of(yaml: YAML.Map): ModelParams {

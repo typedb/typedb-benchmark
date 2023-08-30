@@ -54,7 +54,7 @@ abstract class Simulation<CLIENT: DBClient<*>, out CONTEXT: Context<*, *>>(
             agent.apply {
                 action = agentConfig.action
                 tracingEnabled = agentConfig.trace
-                runsPerIteration = agentConfig.runsPerIteration
+                actionsPerIteration = agentConfig.actionsPerIteration
             }.also { _registeredAgents += agentClass }
         }
     }
@@ -82,7 +82,7 @@ abstract class Simulation<CLIENT: DBClient<*>, out CONTEXT: Context<*, *>>(
         agents.forEach { agent ->
             val start = Instant.now()
             val reports = agent.iterate(randomSource)
-            LOGGER.info("{}.{} × {} took: {}", agent.javaClass.simpleName,  agent.action, agent.runsPerIteration, printDuration(start, Instant.now()))
+            LOGGER.info("{}.{} × {} took: {}", agent.javaClass.simpleName,  agent.action, agent.actionsPerIteration, printDuration(start, Instant.now()))
             agentReports[agent.javaClass.superclass.simpleName] = reports
         }
         context.incrementIteration()

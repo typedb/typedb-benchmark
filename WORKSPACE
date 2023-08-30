@@ -78,12 +78,6 @@ sonarcloud_dependencies()
 load("@vaticle_dependencies//distribution:deps.bzl", "vaticle_bazel_distribution")
 vaticle_bazel_distribution()
 
-# Load //common
-#load("@vaticle_bazel_distribution//common:deps.bzl", "rules_pkg")
-#rules_pkg()
-#load("@rules_pkg//:deps.bzl", "rules_pkg_dependencies")
-#rules_pkg_dependencies()
-
 ################################
 # Load @vaticle dependencies #
 ################################

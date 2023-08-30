@@ -31,22 +31,22 @@ import com.vaticle.typedb.benchmark.framework.common.params.Config.Keys.ACTION
 import com.vaticle.typedb.benchmark.framework.common.params.Config.Keys.PARALLELISM
 import com.vaticle.typedb.benchmark.framework.common.params.Config.Keys.PARTITIONS
 import com.vaticle.typedb.benchmark.framework.common.params.Config.Keys.RECREATE_DATABASE
-import com.vaticle.typedb.benchmark.framework.common.params.Config.Keys.RUNS_PER_ITERATION
+import com.vaticle.typedb.benchmark.framework.common.params.Config.Keys.ACTIONS_PER_ITERATION
 import java.io.File
 import kotlin.math.ln
 
 class Config<out MODEL>(val agents: List<Agent>, val traceSampling: TraceSampling?, val run: Run, val model: MODEL) {
 
-    class Agent(val name: String, val action: String, val runsPerIteration: Int, val trace: Boolean) {
+    class Agent(val name: String, val action: String, val actionsPerIteration: Int, val trace: Boolean) {
 
         companion object {
             const val DEFAULT_ACTION = "run"
-            const val DEFAULT_RUNS_PER_ITERATION = 1
+            const val DEFAULT_ACTIONS_PER_ITERATION = 1
 
             internal fun of(yaml: YAML.Map) = Agent(
                 name = yaml[NAME].asString().value(),
                 action = yaml[ACTION]?.asString()?.value() ?: DEFAULT_ACTION,
-                runsPerIteration = yaml[RUNS_PER_ITERATION]?.asInt()?.value() ?: DEFAULT_RUNS_PER_ITERATION,
+                actionsPerIteration = yaml[ACTIONS_PER_ITERATION]?.asInt()?.value() ?: DEFAULT_ACTIONS_PER_ITERATION,
                 trace = yaml[TRACE].asBoolean().value()
             )
         }
@@ -125,7 +125,7 @@ class Config<out MODEL>(val agents: List<Agent>, val traceSampling: TraceSamplin
         const val RANDOM_SEED = "randomSeed"
         const val RECREATE_DATABASE = "recreateDatabase"
         const val RUN = "run"
-        const val RUNS_PER_ITERATION = "runsPerIteration"
+        const val ACTIONS_PER_ITERATION = "actionsPerIteration"
         const val TRACE = "trace"
         const val TRACE_SAMPLING = "traceSampling"
     }

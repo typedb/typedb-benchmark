@@ -21,10 +21,10 @@ bazel run //read-write:benchmark-runner -- --database=typedb --address=127.0.0.1
 Replace the address if you're not running the server on the same machine or using TypeDB's default port. 
 
 The <config-file> determines which queries will be run.
-* `ci-tests.yml`: Runs a few iterations to ensure everything is working properly (< 1 GB)
-* `read-write-benchmark.yml`: Performs (all) read & write queries described below (~10 GB)
-* `write-benchmark.yml`: Only performs write queries described below (~350 GB)
-* `large-data-benchmark.yml`: Performs all queries except `readAddressFromPostCode` for a large number of iterations (~350 GB)
+* `tiny-read-write-benchmark.yml`: Runs a few iterations to ensure everything is working properly (< 1 GB)
+* `medium-linear-read-write-benchmark.yml`: Performs (all) read & write queries described below (~10 GB)
+* `large-write-benchmark.yml`: Only performs write queries described below (~350 GB)
+* `large-read-write-benchmark.yml`: Performs all queries except `readAddressFromPostCode` for a large number of iterations (~350 GB)
 
 ### Benchmark Queries
 
@@ -55,7 +55,7 @@ The `PersonAgent` currently implements 6 queries.
 ### Storage perspective
 
 This section describes the operations at the storage level for each of the queries above.
-Traversals are performed depth-first. The number of results described is for the `large-data-benchmark.yml` config.
+Traversals are performed depth-first. The number of results described is for the `large-read-write-benchmark.yml` config.
 
 * `createPerson`: pure writes
     * inserts 10 keys: 1 entity + 3 attributes + 3 edges * 2 keys/edge 
@@ -95,16 +95,16 @@ A configuration file determines which actions are run.
 The benchmark will repeat the set of actions for a number of iterations defined by the `run.Iterations` parameter.
 Actions are run serially, reflecting the order in which they appear under `agents`.
 
-For each action, the framework will create `run.nPartition` instances of the corresponding agent. Each agent is to execute the task `agent.<action>.runsPerIteration` times.
+For each action, the framework will create `run.nPartition` instances of the corresponding agent. Each agent is to execute the task `agent.<action>.actionsPerIteration` times.
 The framework adds all the instances to a thread pool, the size of which is determined by the `run.parallelism` parameter.
-Once all agents have performed the action `runsPerIteration` times, the framework reports the time taken.
+Once all agents have performed the action `actionsPerIteration` times, the framework reports the time taken.
 
 #### Parameters:
 
 * **agents** : Contains a list of tasks to be run
   - name: The name of the agent, which is mapped to a Kotlin class in the implementation
   - action: The name of the task, which is mapped to a function within the agent class.
-  - runsPerIteration: The number of times per iteration (and per partition) this task will be performed.
+  - actionsPerIteration: The number of times per iteration (and per partition) this task will be performed.
   - trace: Enable factory tracing (internal) 
 
 * **run**: Parameters for the benchmark framework
@@ -116,6 +116,6 @@ Once all agents have performed the action `runsPerIteration` times, the framewor
   - parallelism: The size of the threadpool on which the partitions are executed
 
 * **model**: Benchmark specific settings which are passed on to the agents
-  - personsCreatedPerRun: The number of persons inserted in each `CreatePerson` action
-  - friendshipsCreatedPerRun: The number of friendships inserted in each `CreatePerson` action
+  - personsCreatedPerAction: The number of persons inserted in each `CreatePerson` action
+  - friendshipsCreatedPerAction: The number of friendships inserted in each `CreatePerson` action
   - postCodes: The number of `postCodes` which exist.

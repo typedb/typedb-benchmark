@@ -29,10 +29,10 @@ filegroup(
 filegroup(
     name = "benchmark-config",
     srcs = [
-        "ci-tests.yml",
-        "large-data-benchmark.yml",
-        "read-write-benchmark.yml",
-        "write-benchmark.yml",
+        "tiny-read-write-benchmark.yml",
+        "medium-linear-read-write-benchmark.yml",
+        "large-write-benchmark.yml",
+        "large-read-write-benchmark.yml",
     ],
 )
 

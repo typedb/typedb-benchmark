@@ -22,7 +22,7 @@ import com.vaticle.typedb.benchmark.framework.common.seed.RandomSource
 import com.vaticle.typedb.benchmark.framework.common.DBClient
 import com.vaticle.typedb.common.util.Objects.className
 import com.vaticle.typedb.benchmark.framework.common.params.Config.Agent.Companion.DEFAULT_ACTION
-import com.vaticle.typedb.benchmark.framework.common.params.Config.Agent.Companion.DEFAULT_RUNS_PER_ITERATION
+import com.vaticle.typedb.benchmark.framework.common.params.Config.Agent.Companion.DEFAULT_ACTIONS_PER_ITERATION
 import java.util.Objects.hash
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ConcurrentHashMap
@@ -42,7 +42,7 @@ abstract class Agent<PARTITION: Partition, SESSION, CONTEXT: Context<*, *>> prot
     private val client: DBClient<SESSION>, protected val context: CONTEXT
 ) {
     var action = DEFAULT_ACTION
-    var runsPerIteration = DEFAULT_RUNS_PER_ITERATION
+    var actionsPerIteration = DEFAULT_ACTIONS_PER_ITERATION
     var tracingEnabled = true
     protected abstract val agentClass: Class<out Agent<*, *, *>>
     protected abstract val partitions: List<PARTITION>
@@ -51,7 +51,7 @@ abstract class Agent<PARTITION: Partition, SESSION, CONTEXT: Context<*, *>> prot
 
     fun run(session: SESSION, partition: PARTITION, random: RandomSource): List<Report> {
         return actionHandlers[action]?.let {
-            (0 until runsPerIteration).flatMap { it(session, partition, random.nextSource()) }
+            (0 until actionsPerIteration).flatMap { it(session, partition, random.nextSource()) }
         } ?: throw IllegalArgumentException("The action '$action' has no registered handler in '${javaClass.simpleName}'"
                 + if (action == DEFAULT_ACTION) " (help: '$action' is the default action)" else "")
     }
