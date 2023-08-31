@@ -28,7 +28,7 @@ import java.time.LocalDateTime
 import java.util.*
 
 public class PersonAgent(client: TypeDBClient, context: Context) :
-    Agent<Context.DBPartition, TypeDBSession, Context>(client, context) {
+        Agent<Context.DBPartition, TypeDBSession, Context>(client, context) {
 
     override val agentClass = PersonAgent::class.java
     override val partitions = context.partitions
@@ -54,16 +54,16 @@ public class PersonAgent(client: TypeDBClient, context: Context) :
     }
 
     fun createPerson(
-        session: TypeDBSession,
-        dbPartition: Context.DBPartition,
-        randomSource: RandomSource
+            session: TypeDBSession,
+            dbPartition: Context.DBPartition,
+            randomSource: RandomSource
     ): List<Agent.Report> {
-        val inserts = List(context.model.personPerBatch) {
+        val inserts = List(context.model.personCreatePerAction) {
             val id: Int = dbPartition.idCtr.addAndGet(1)
             TypeQL.cVar("p_" + it).isa("person")
-                .has("name", nameFrom(dbPartition.partitionId, id))
-                .has("post-code", postCodeFrom(dbPartition.partitionId, id))
-                .has("address", addressFrom(dbPartition.partitionId, id))
+                    .has("name", nameFrom(dbPartition.partitionId, id))
+                    .has("post-code", postCodeFrom(dbPartition.partitionId, id))
+                    .has("address", addressFrom(dbPartition.partitionId, id))
         }
         session.transaction(TypeDBTransaction.Type.WRITE, options).use { tx ->
             tx.query().insert(TypeQL.insert(inserts))
@@ -73,22 +73,22 @@ public class PersonAgent(client: TypeDBClient, context: Context) :
     }
 
     fun createFriendship(
-        session: TypeDBSession,
-        dbPartition: Context.DBPartition,
-        randomSource: RandomSource
+            session: TypeDBSession,
+            dbPartition: Context.DBPartition,
+            randomSource: RandomSource
     ): List<Agent.Report> {
         session.transaction(TypeDBTransaction.Type.WRITE, options).use { tx ->
-            for (i in 1..context.model.friendshipPerBatch) {
+            for (i in 1..context.model.friendshipCreatePerAction) {
                 val first: Int = 1 + randomSource.nextInt(dbPartition.idCtr.get())
                 val second: Int = 1 + randomSource.nextInt(dbPartition.idCtr.get())
                 tx.query().insert(
-                    TypeQL.match(
-                        TypeQL.cVar("p1").isa("person").has("name", nameFrom(dbPartition.partitionId, first)),
-                        TypeQL.cVar("p2").isa("person").has("name", nameFrom(dbPartition.partitionId, second)),
-                    ).insert(
-                        TypeQL.rel("person", TypeQL.cVar("p1")).rel("person", TypeQL.cVar("p1")).isa("friendship")
-                            .has("meeting-time", dateFrom(first, second))
-                    )
+                        TypeQL.match(
+                                TypeQL.cVar("p1").isa("person").has("name", nameFrom(dbPartition.partitionId, first)),
+                                TypeQL.cVar("p2").isa("person").has("name", nameFrom(dbPartition.partitionId, second)),
+                        ).insert(
+                                TypeQL.rel("person", TypeQL.cVar("p1")).rel("person", TypeQL.cVar("p1")).isa("friendship")
+                                        .has("meeting-time", dateFrom(first, second))
+                        )
                 )
             }
             tx.commit()
@@ -96,86 +96,121 @@ public class PersonAgent(client: TypeDBClient, context: Context) :
         return listOf()
     }
 
+    fun deletePersons(
+            session: TypeDBSession,
+            dbPartition: Context.DBPartition,
+            randomSource: RandomSource
+    ): List<Agent.Report> {
+        session.transaction(TypeDBTransaction.Type.WRITE, options).use { tx ->
+            for (i in 1..context.model.tryPersonDeletePerAction) {
+                val id: Int = randomSource.nextInt(dbPartition.idCtr.get())
+                tx.query().delete(
+                        TypeQL.match(
+                                TypeQL.cVar("p1").isa("person")
+                                        .has("name", TypeQL.cVar("name"))
+                                        .has("address", TypeQL.cVar("addr")),
+                                TypeQL.cVar("f").rel(TypeQL.cVar("p1")).isa("friendship")
+                                        .has("meeting-time", TypeQL.cVar("mt")),
+                                TypeQL.cVar("name").eq(nameFrom(dbPartition.partitionId, id))
+                        ).delete(
+                                TypeQL.cVar("p1").isa("person"),
+                                TypeQL.cVar("name").isa("name"),
+                                TypeQL.cVar("addr").isa("address"),
+                                TypeQL.cVar("f").isa("friendship"),
+                                TypeQL.cVar("mt").isa("meeting-time")
+                        )
+                )
+            }
+            try {
+                tx.commit()
+            } catch (_: Exception) {
+
+            }
+        }
+        return listOf()
+    }
+
     fun readFriendsOf(
-        session: TypeDBSession,
-        dbPartition: Context.DBPartition,
-        randomSource: RandomSource
+            session: TypeDBSession,
+            dbPartition: Context.DBPartition,
+            randomSource: RandomSource
     ): List<Agent.Report> {
         session.transaction(TypeDBTransaction.Type.WRITE, options).use { tx ->
             val id: Int = 1 + randomSource.nextInt(dbPartition.idCtr.get())
             tx.query().match(
-                TypeQL.match(
-                    TypeQL.cVar("p1").isa("person").has("name", nameFrom(dbPartition.partitionId, id)),
-                    TypeQL.rel("person", TypeQL.cVar("p1")).rel("person", TypeQL.cVar("p2")).isa("friendship"),
-                    TypeQL.cVar("p2").isa("person").has("name", TypeQL.cVar("n2")),
-                ).count()
+                    TypeQL.match(
+                            TypeQL.cVar("p1").isa("person").has("name", nameFrom(dbPartition.partitionId, id)),
+                            TypeQL.rel("person", TypeQL.cVar("p1")).rel("person", TypeQL.cVar("p2")).isa("friendship"),
+                            TypeQL.cVar("p2").isa("person").has("name", TypeQL.cVar("n2")),
+                    ).count()
             ).get()
         }
         return listOf()
     }
 
     fun readFriendsOfFriends(
-        session: TypeDBSession,
-        dbPartition: Context.DBPartition,
-        randomSource: RandomSource
+            session: TypeDBSession,
+            dbPartition: Context.DBPartition,
+            randomSource: RandomSource
     ): List<Agent.Report> {
         session.transaction(TypeDBTransaction.Type.WRITE, options).use { tx ->
             val id: Int = 1 + randomSource.nextInt(dbPartition.idCtr.get())
             tx.query().match(
-                TypeQL.match(
-                    TypeQL.cVar("p1").isa("person").has("name", nameFrom(dbPartition.partitionId, id)),
-                    TypeQL.rel("person", TypeQL.cVar("p1")).rel("person", TypeQL.cVar("p2")).isa("friendship"),
-                    TypeQL.rel("person", TypeQL.cVar("p2")).rel("person", TypeQL.cVar("p3")).isa("friendship"),
-                    TypeQL.cVar("p3").isa("person").has("name", TypeQL.cVar("n3")),
-                ).count()
+                    TypeQL.match(
+                            TypeQL.cVar("p1").isa("person").has("name", nameFrom(dbPartition.partitionId, id)),
+                            TypeQL.rel("person", TypeQL.cVar("p1")).rel("person", TypeQL.cVar("p2")).isa("friendship"),
+                            TypeQL.rel("person", TypeQL.cVar("p2")).rel("person", TypeQL.cVar("p3")).isa("friendship"),
+                            TypeQL.cVar("p3").isa("person").has("name", TypeQL.cVar("n3")),
+                    ).count()
             ).get()
         }
         return listOf()
     }
 
     fun readPersonsByPostCode(
-        session: TypeDBSession,
-        dbPartition: Context.DBPartition,
-        randomSource: RandomSource
+            session: TypeDBSession,
+            dbPartition: Context.DBPartition,
+            randomSource: RandomSource
     ): List<Agent.Report> {
         session.transaction(TypeDBTransaction.Type.WRITE, options).use { tx ->
             val postCode: Long =
-                postCodeFrom(dbPartition.partitionId, randomSource.nextInt(context.model.nPostCodes))
+                    postCodeFrom(dbPartition.partitionId, randomSource.nextInt(context.model.nPostCodes))
             tx.query().match(
-                TypeQL.match(
-                    TypeQL.cVar("p1").isa("person")
-                        .has("post-code", postCode)
-                        .has("name", TypeQL.cVar("name")),
-                ).count()
+                    TypeQL.match(
+                            TypeQL.cVar("p1").isa("person")
+                                    .has("post-code", postCode)
+                                    .has("name", TypeQL.cVar("name")),
+                    ).count()
             ).get()
         }
         return listOf()
     }
 
     fun readAddressFromName(
-        session: TypeDBSession,
-        dbPartition: Context.DBPartition,
-        randomSource: RandomSource
+            session: TypeDBSession,
+            dbPartition: Context.DBPartition,
+            randomSource: RandomSource
     ): List<Agent.Report> {
         session.transaction(TypeDBTransaction.Type.WRITE, options).use { tx ->
             val id: Int = 1 + randomSource.nextInt(dbPartition.idCtr.get())
             tx.query().match(
-                TypeQL.match(
-                    TypeQL.cVar("p1").isa("person")
-                        .has("name", nameFrom(dbPartition.partitionId, id))
-                        .has("address", TypeQL.cVar("addr")),
-                )
+                    TypeQL.match(
+                            TypeQL.cVar("p1").isa("person")
+                                    .has("name", nameFrom(dbPartition.partitionId, id))
+                                    .has("address", TypeQL.cVar("addr")),
+                    )
             ).count()
         }
         return listOf()
     }
 
     override val actionHandlers = mapOf(
-        "createPerson" to ::createPerson,
-        "createFriendship" to ::createFriendship,
-        "readAddressFromName" to ::readAddressFromName,
-        "readFriendsOf" to ::readFriendsOf,
-        "readFriendsOfFriends" to ::readFriendsOfFriends,
-        "readPersonsByPostCode" to ::readPersonsByPostCode,
+            "createPerson" to ::createPerson,
+            "createFriendship" to ::createFriendship,
+            "readAddressFromName" to ::readAddressFromName,
+            "readFriendsOf" to ::readFriendsOf,
+            "readFriendsOfFriends" to ::readFriendsOfFriends,
+            "readPersonsByPostCode" to ::readPersonsByPostCode,
+            "deletePersons" to ::deletePersons
     )
 }

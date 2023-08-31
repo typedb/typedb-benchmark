@@ -30,6 +30,7 @@ filegroup(
     name = "benchmark-config",
     srcs = [
         "tiny-read-write-benchmark.yml",
+        "medium-delete-benchmark.yml",
         "medium-linear-read-write-benchmark.yml",
         "large-write-benchmark.yml",
         "large-read-write-benchmark.yml",
