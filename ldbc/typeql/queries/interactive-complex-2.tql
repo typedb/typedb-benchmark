@@ -1,0 +1,31 @@
+# Q2. Fetch recent messages by friends of a given person
+# Parameters: :personId (target person's ID), :maxDate (upper limit for message creation date)
+
+# Identify the target person
+match
+    $targetPerson isa Person, has id :personId;
+
+# Match friends of the target person
+    $knowsRelation(friend: $targetPerson, friend: $friend) isa knows;
+    $friend isa Person, has id $friendId, has firstName $friendFirstName, has lastName $friendLastName;
+
+# Find messages created by these friends
+    $creatorRelation(created: $message, creator: $friend) isa hasCreator;
+    $message isa Message, has id $messageId, has content $messageContent, has creationDate $messageCreationDate;
+    $messageCreationDate < :maxDate;  # Filter messages by date
+
+# Retrieve relevant attributes
+fetch
+    $friendId;
+    $friendFirstName;
+    $friendLastName;
+    $messageId;
+    $messageContent;
+    $messageCreationDate;
+
+# Sort results by recent message dates, message IDs, and friend's first name
+sort
+    $messageCreationDate desc, $messageId asc, $friendFirstName asc;
+
+# Limit to top 20 results
+limit 20;

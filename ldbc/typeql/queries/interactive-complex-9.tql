@@ -1,0 +1,49 @@
+# // Q9. Recent messages by friends or friends of friends
+# /*
+# :params { personId: 4398046511268, maxDate: 1289908800000 }
+# */
+
+match 
+    # $person isa Person, has id 478;
+    $person isa Person, has id :personId;
+    $other-person isa Person,
+        has id $other-id,
+        has firstName $firstname,
+        has lastName $lastname;
+    {
+        $r1(friend: $person, friend: $other-person) isa knows;
+    } or {
+        $r1(friend: $person, friend: $intermediate) isa knows;
+        $r2(friend: $intermediate, friend: $other-person) isa knows;
+        not { $person is $other-person; };
+    };
+
+    $r3(created: $message, creator: $other-person) isa hasCreator;
+
+    $message isa Message,
+        has id $message-id,
+        has creationDate $date;
+    
+    ?messageContent = ?localContent;
+    {
+        $message has imageFile $image;
+        ?localContent = $image;
+    } or {
+        $message has content $text;
+        ?localContent = $text;
+    };
+
+    $date > :maxDate;
+    # $date < 2011-04-14;
+
+    ?sorter = "";
+
+get 
+    $other-id, $firstname, $lastname, $message-id, ?messageContent, $date, ?sorter;
+
+sort
+    $date desc,
+    $message-id asc,
+    ?sorter asc;
+
+limit 20;

@@ -1,0 +1,59 @@
+# // Q7. Recent likers
+# /*
+# :params { personId: 4398046511268 }
+# */
+
+match
+    # $person isa Person, has id :personId;
+    $person isa Person, has id 478;
+
+    $liker 
+        isa Person, 
+        has id $likerId,
+        has firstName $likerFirstName,
+        has lastName $likerLastName;
+
+    $r1 (created: $message, creator: $person) 
+        isa hasCreator;
+    $message
+        isa Message,
+        has id $messageId,
+        has creationDate $date;
+
+    ?messageContent = ?localContent;
+    {
+        $message has imageFile $image;
+        ?localContent = $image;
+    } or {
+        $message has content $text;
+        ?localContent = $text;
+    };
+
+    $r2 (message: $message, liker: $liker) 
+        isa likes,
+        has creationDate $likesDate;
+
+    ?isNew = ?localIsNew;
+    {
+        $r3 (friend: $person, friend: $liker) isa knows;
+        ?localIsNew = false;
+    } or {
+        not {
+            $r3 (friend: $person, friend: $liker) isa knows;
+        };
+        ?localIsNew = true;
+    };
+
+get
+    $likerId, $likerFirstName, $likerLastName,
+    $likesDate, 
+    $messageId, ?messageContent, ?isNew, $date;
+
+sort
+    $likesDate desc,
+    $likerId asc,
+    $likerFirstName asc;
+
+limit 20;
+
+

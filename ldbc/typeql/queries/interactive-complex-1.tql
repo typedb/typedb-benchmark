@@ -1,0 +1,113 @@
+# Find friends within 3 degrees of separation from a specified person and fetch their details
+# Parameters:
+    # :personId (ID of the person), 
+    # :firstName (first name to match among friends)
+
+# Match the target person by ID
+match
+    # $person isa Person, has id 4398046511273;
+    $person isa Person, has id :personId;
+
+    # Match other persons potentially within the friend network
+    $friend isa Person,
+        has firstName :firstName;
+        # has firstName "Aaron";
+
+    # Determine the degree of separation between the target person and their friends
+    ?distance = ?local_distance;
+    {
+        # Direct friends (1 degree of separation)
+        ?local_distance = 1;
+        $r1(friend: $person, friend: $friend) isa knows;
+    } or {
+        # Friends of friends (2 degrees of separation)
+        ?local_distance = 2;
+        $r1(friend: $person, friend: $intermediateFriend) isa knows;
+        $r2(friend: $intermediateFriend, friend: $friend) isa knows;
+        not {$friend is $person;};
+    } or {
+        # Friends within 3 degrees of separation
+        ?local_distance = 3;
+        $r1(friend: $person, friend: $intermediateFriend1) isa knows;
+        $r2(friend: $intermediateFriend1, friend: $intermediateFriend2) isa knows;
+        $r3(friend: $intermediateFriend2, friend: $friend) isa knows;
+        not {$intermediateFriend2 is $person;};
+        not {$friend is $person;};
+        not {$friend is $intermediateFriend1;};
+    };
+
+    # Fetch attributes of the friends
+    $friend has id $friendId;
+    $friend has lastName $friendLastName;
+    $friend has birthday $friendBirthday;
+    $friend has creationDate $friendCreationDate;
+    $friend has gender $friendGender;
+    $friend has browserUsed $friendBrowserUsed;
+    $friend has locationIP $friendLocationIP;
+
+    # Fetch the city where the friend is located
+    $cityRelation(location: $friend, locatedIn: $city) isa isLocatedIn;
+    $city has name $friendCityName;
+
+# Fetch main attributes and additional details
+fetch
+    $friendId;
+    $friendLastName;
+    $friendBirthday; 
+    $friendCreationDate; 
+    $friendGender; 
+    $friendBrowserUsed; 
+    $friendLocationIP; 
+    $friendCityName; 
+    ?distance;
+
+    # Fetch friend's email
+    friendEmail: {
+        match
+            $friend has email $email;
+        fetch
+            $email;
+    };
+
+    # Fetch friend's spoken languages
+    friendLanguages: {
+        match
+            $friend has speaks $language;
+        fetch
+            $language;
+    };
+
+    # Fetch friend's university details
+    friendUniversity: {
+        match
+            $uniRelation(student: $friend, university: $university) isa studyAt,
+                has classYear $classYear;
+            $university has name $universityName;
+            $cityRelation(location: $university, locatedIn: $uniCity) isa isLocatedIn;
+            $uniCity has name $uniCityName;
+        fetch
+            $universityName;
+            $classYear;
+            $uniCityName;
+    };
+
+    # Fetch friend's company details
+    friendCompany: {
+        match
+            $friend has id 483;
+            $companyRelation(employee: $friend, employer: $company) isa workAt,
+                has workFrom $workFrom;
+            $company has name $companyName;
+            $cityRelation(location: $company, locatedIn: $companyCountry) isa isLocatedIn;
+            $companyCountry has name $companyCityName;
+        fetch
+            $companyName;
+            $workFrom;
+            $companyCityName;
+    };
+
+# Sort results by distance, friend's last name, and friend's ID
+sort ?distance, $friendLastName, $friendId;
+
+# Limit results to top 20 entries
+limit 20;
