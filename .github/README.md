@@ -1,6 +1,6 @@
 # TypeDB Benchmark
 
-Tools to runn benchmarks for TypeDB.
+Tools to run benchmarks for TypeDB.
 
 ## TypeDB Simulation
 
