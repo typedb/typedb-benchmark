@@ -13,7 +13,7 @@ TODO
 
 * Install `typedb`
 * Start typedb with `typedb server`
-* Install python driver: `pip install typebd`
+* Install python driver: `pip install typedb`
 
 See `launch.json` config for TPCC running options.
 

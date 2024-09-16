@@ -5,15 +5,15 @@
     "LdbcQuery2" : 0
   },
   "min_delay_as_milli" : 0,
-  "max_delay_as_milli" : 968,
-  "mean_delay_as_milli" : 377,
+  "max_delay_as_milli" : 586,
+  "mean_delay_as_milli" : 140,
   "min_delay_as_milli_per_type" : {
     "LdbcQuery2" : 0
   },
   "max_delay_as_milli_per_type" : {
-    "LdbcQuery2" : 968
+    "LdbcQuery2" : 586
   },
   "mean_delay_as_milli_per_type" : {
-    "LdbcQuery2" : 377
+    "LdbcQuery2" : 140
   }
 }

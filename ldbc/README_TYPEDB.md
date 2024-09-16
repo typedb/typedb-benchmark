@@ -1,35 +1,37 @@
 # Notes on LDBC (for TypeDB)
 
-Key components
+This is the Driver Implementation (IMPL), one of three key components
 
-* DATAGEN: ***Datagen generates data***
-* DRIVER: ***Driver generates the parameters and update streams***
-* IMPL: ***Driver Impls runs the queries on the databases***
+1.  DATAGEN: ***This generates data*** (we assume this is cloned to `~/Git/ldbc_snb_datagen_spark`)
+1.  DRIVER: ***This generates the parameters and update streams and runs the workload*** (we assume this is cloned to `~/Git/ldbc_snb_interactive_v2_driver`)
+1.  IMPL: ***This provides the DRIVER with the implementations of the queries for the specific database to be benchmarked*** (this is the project you are looking at right now)
 
 ## Installation
 
 ### Install Datagen
 * set you JAVA_HOME to use java 11
-  ***SPARK NEEDS JAVA 11*** !!!
-* `conda activate datagen`
-   * (in particular need to install dependencies:
-     `pip install duckdb pytz networkit pandas==2.0.3`)
+  (Spark needs Java 11)
+* Ensure the following are installed:
+     `pip install duckdb pytz networkit pandas==2.0.3` (there might be more dependencies)
 * build project as in README and set ALL the environment vars
+<!-- `conda activate datagen` -->
 
 ### Install Driver
 * Note there is an install dependencies script
-* follow README
+* Follow README to build the project
 
 ### Install Implementation
-* build JAVA projects, e.g. `postgres/scripts/build.sh`
-* set vars
+* Build JAVA projects, e.g. `postgres/scripts/build.sh`
+* Set the following vars
+
 ```
-export SF = 0.003
-export LDBC_SNB_DATAGEN_DIR=/Users/cxdorn/Git/ldbc_snb_datagen_spark
-export LDBC_SNB_DRIVER_DIR=/Users/cxdorn/Git/ldbc_snb_interactive_v2_driver
-export DATA_INPUT_TYPE=parquet
-export LDBC_SNB_DATAGEN_MAX_MEM=4g
+export SF=0.003 \
+LDBC_SNB_DATAGEN_DIR=~/Git/ldbc_snb_datagen_spark \
+LDBC_SNB_DRIVER_DIR=~/Git/ldbc_snb_interactive_v2_driver \
+DATA_INPUT_TYPE=parquet \
+LDBC_SNB_DATAGEN_MAX_MEM=4g
 ```
+
 
 ## Data and parameters
 
@@ -49,15 +51,20 @@ The `IMPL/scripts/generate-scripts.sh` automates the below.
 ## Benchmarking Postgres
 
 ### Installation
+* If not built, yet: `postgres/scripts/build.sh`
 * install psycopg with `pip install "psycopg[binary,pool]"` (see https://pypi.org/project/psycopg/)
 
 ### Loading data
-* provide the generate data in `env` variable
+* provide the generated data folder as `POSTGRES_CSV_DIR` in environment (see README)
+```
+export POSTGRES_CSV_DIR=${LDBC_SNB_DATAGEN_DIR}/out-sf${SF}/graphs/csv/bi/composite-merged-fk/
+```
+
 * Run PostrgreSQL in docker (this is automatically done by the `start.sh` script)
 * (Note if running postgres yourself: file sharing needs to be set use gRPC in Docker Preferences)
 
 ### Benchmarking
-* Set the parameters and update_stream parameters in the `property` files to point to the right directories!
+* Set the parameters and `update_stream` parameters in the `property` files to point to the right directories!
 * In theory the README says to run
 ```
 driver/create-validation-parameters.sh
@@ -66,8 +73,10 @@ driver/benchmark.sh
 ```
 As I understand you don't really need the first two steps, which are purely for validating loaded data vs parameters.
 
-### Development
-*
+### IntelliJ Development
+* Select Java SDK in Project Structure settings
+* Ensure Postgres is running. `docker run --name some-other-postgres -e POSTGRES_PASSWORD=mysecretpassword -p 5432:5432 -d postgres` should to the job but there is also a `docker-compose.yml` provided (run with `docker-compose up -d` after setting required params)
+* 
 
 ## TypeDB
 
