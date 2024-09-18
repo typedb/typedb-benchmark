@@ -1,6 +1,8 @@
 package org.ldbcouncil.snb.impls.workloads.typeql;
 
+import com.vaticle.typedb.driver.api.TypeDBTransaction;
 import org.ldbcouncil.snb.driver.DbException;
+import org.ldbcouncil.snb.driver.ResultReporter;
 import org.ldbcouncil.snb.driver.control.LoggingService;
 import org.ldbcouncil.snb.driver.workloads.interactive.queries.*;
 import org.ldbcouncil.snb.driver.workloads.interactive.queries.LdbcInsert1AddPerson.Organization;
@@ -17,7 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.time.ZoneId;
-
+import java.util.stream.Stream;
 
 
 public abstract class TypeQLDb extends BaseDb<TypeQLQueryStore> {
@@ -33,80 +35,80 @@ public abstract class TypeQLDb extends BaseDb<TypeQLQueryStore> {
 
     // Interactive Complex Reads
     
-    // public static class InteractiveQuery1 extends TypeQLListOperationHandler<LdbcQuery1,LdbcQuery1Result>
-    // {
+     public static class InteractiveQuery1 extends TypeQLListOperationHandler<LdbcQuery1,LdbcQuery1Result>
+     {
 
-    //     @Override
-    //     public String getQueryString(TypeQLDbConnectionState state, LdbcQuery1 operation) {
-    //         return state.getQueryStore().getParameterizedQuery(QueryType.InteractiveComplexQuery1);
-    //     }
+         @Override
+         public String getQueryString(TypeQLDbConnectionState state, LdbcQuery1 operation) {
+             return state.getQueryStore().getParameterizedQuery(QueryType.InteractiveComplexQuery1);
+         }
 
-    //     @Override
-    //     public Map<String, Object> getParameters(TypeQLDbConnectionState state, LdbcQuery1 operation) {
-    //         return state.getQueryStore().getQuery1Map(operation);
-    //     }
+         @Override
+         public Map<String, Object> getParameters(TypeQLDbConnectionState state, LdbcQuery1 operation) {
+             return state.getQueryStore().getQuery1Map(operation);
+         }
 
-    //     @Override
-    //     public LdbcQuery1Result toResult(JSON result) throws ParseException {
-    //         if (result != null) {
-    //             Map<String, JSON> jsonMap = result.asObject();
+         @Override
+         public LdbcQuery1Result toResult(JSON result) throws ParseException {
+             if (result != null) {
+                 Map<String, JSON> jsonMap = result.asObject();
 
-    //             // Extracting individual attributes
-    //             long friendId = (long)jsonMap.get("friendId").asObject().get("value").asNumber();
-    //             String friendLastName = jsonMap.get("friendLastName").asObject().get("value").asString();
-    //             int distanceFromPerson = (int)jsonMap.get("distance").asObject().get("value").asNumber();
-    //             long friendBirthday = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS").parse(jsonMap.get("friendBirthday").asObject().get("value").asString()).getTime();
-    //             long friendCreationDate = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS").parse(jsonMap.get("friendCreationDate").asObject().get("value").asString()).getTime();
-    //             String friendGender = jsonMap.get("friendGender").asObject().get("value").asString();
-    //             String friendBrowserUsed = jsonMap.get("friendBrowserUsed").asObject().get("value").asString();
-    //             String friendLocationIp = jsonMap.get("friendLocationIP").asObject().get("value").asString();
-    //             String friendCityName = jsonMap.get("friendCityName").asObject().get("value").asString();
+                 // Extracting individual attributes
+                 long friendId = (long)jsonMap.get("friendId").asObject().get("value").asNumber();
+                 String friendLastName = jsonMap.get("friendLastName").asObject().get("value").asString();
+                 int distanceFromPerson = (int)jsonMap.get("distance").asObject().get("value").asNumber();
+                 long friendBirthday = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS").parse(jsonMap.get("friendBirthday").asObject().get("value").asString()).getTime();
+                 long friendCreationDate = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS").parse(jsonMap.get("friendCreationDate").asObject().get("value").asString()).getTime();
+                 String friendGender = jsonMap.get("friendGender").asObject().get("value").asString();
+                 String friendBrowserUsed = jsonMap.get("friendBrowserUsed").asObject().get("value").asString();
+                 String friendLocationIp = jsonMap.get("friendLocationIP").asObject().get("value").asString();
+                 String friendCityName = jsonMap.get("friendCityName").asObject().get("value").asString();
 
-    //             // Extracting lists
-    //             Iterable<String> emails = Arrays.asList(jsonMap.get("friendEmail").asArray().get(0).asObject().get("value").asString().split(";"));
-    //             Iterable<String> languages = jsonMap.get("friendLanguages").asArray().stream()
-    //                                             .map(lang -> lang.asObject().get("value").asString())
-    //                                             .collect(Collectors.toList());
-    //             // Assuming JSON structure for universities and companies
-    //             Iterable<LdbcQuery1Result.Organization> universities = jsonMap.get("friendUniversity").asArray().stream()
-    //                 .map(uniJson -> {
-    //                     String universityName = uniJson.asObject().get("universityName").asObject().get("value").asString();
-    //                     int classYear = (int)uniJson.asObject().get("classYear").asObject().get("value").asNumber();
-    //                     String uniCityName = uniJson.asObject().get("uniCityName").asObject().get("value").asString();
-    //                     return new LdbcQuery1Result.Organization(universityName, classYear, uniCityName);
-    //                 })
-    //                 .collect(Collectors.toList());
+                 // Extracting lists
+                 Iterable<String> emails = jsonMap.get("friendEmail").asArray().stream()
+                         .map(emailJson -> emailJson.asObject().get("email").asObject().get("value").asString())
+                         .collect(Collectors.toList());
+                 Iterable<String> languages = jsonMap.get("friendLanguages").asArray().stream()
+                                                 .map(lang -> lang.asObject().get("language").asObject().get("value").asString())
+                                                 .collect(Collectors.toList());
+                 // Assuming JSON structure for universities and companies
+                 Iterable<LdbcQuery1Result.Organization> universities = jsonMap.get("friendUniversity").asArray().stream()
+                     .map(uniJson -> new LdbcQuery1Result.Organization(
+                             uniJson.asObject().get("universityName").asObject().get("value").asString(),
+                             (int) uniJson.asObject().get("classYear").asObject().get("value").asNumber(),
+                             uniJson.asObject().get("uniCityName").asObject().get("value").asString()
+                     ))
+                     .collect(Collectors.toList());
 
-    //             Iterable<LdbcQuery1Result.Organization> companies = jsonMap.get("friendCompany").asArray().stream()
-    //                 .map(orgJson -> new LdbcQuery1Result.Organization(
-    //                     orgJson.asObject().get("organizationName").asString(),
-    //                     (int)orgJson.asObject().get("year").asNumber(),
-    //                     orgJson.asObject().get("placeName").asString()
-    //                 ))
-    //                 .collect(Collectors.toList());
+                 Iterable<LdbcQuery1Result.Organization> companies = jsonMap.get("friendCompany").asArray().stream()
+                     .map(orgJson -> new LdbcQuery1Result.Organization(
+                         orgJson.asObject().get("companyName").asObject().get("value").asString(),
+                         (int) orgJson.asObject().get("workFrom").asObject().get("value").asNumber(),
+                         orgJson.asObject().get("companyCityName").asObject().get("value").asString()
+                     ))
+                     .collect(Collectors.toList());
 
-    //             // Constructing the result
-    //             return new LdbcQuery1Result(
-    //                     friendId,
-    //                     friendLastName,
-    //                     distanceFromPerson,
-    //                     friendBirthday,
-    //                     friendCreationDate,
-    //                     friendGender,
-    //                     friendBrowserUsed,
-    //                     friendLocationIp,
-    //                     emails,
-    //                     languages,
-    //                     friendCityName,
-    //                     universities,
-    //                     companies
-    //             );
-    //         } else {
-    //             return null;
-    //         }
-    //     }
-
-    // }
+                 // Constructing the result
+                 return new LdbcQuery1Result(
+                         friendId,
+                         friendLastName,
+                         distanceFromPerson,
+                         friendBirthday,
+                         friendCreationDate,
+                         friendGender,
+                         friendBrowserUsed,
+                         friendLocationIp,
+                         emails,
+                         languages,
+                         friendCityName,
+                         universities,
+                         companies
+                 );
+             } else {
+                 return null;
+             }
+         }
+     }
 
     public static class InteractiveQuery2 extends TypeQLListOperationHandler<LdbcQuery2,LdbcQuery2Result>
     {
@@ -146,6 +148,43 @@ public abstract class TypeQLDb extends BaseDb<TypeQLQueryStore> {
                 );
             } else {
                 return null;
+            }
+        }
+
+        @Override
+        public void executeOperation(LdbcQuery2 operation, TypeQLDbConnectionState state,
+                                     ResultReporter resultReporter) throws DbException
+        {
+            System.out.println("[LOG] Executing operation: " + LdbcQuery2.class.getSimpleName());
+            String query = getQueryString(state, operation);
+            final Map<String, Object> parameters = getParameters(state, operation);
+            // Replace parameters in query
+            for (Map.Entry<String, Object> entry : parameters.entrySet()) {
+                String valueString = entry.getValue().toString().replace("\"", "").replace("\'","");
+                query = query.replace(":" + entry.getKey(), valueString);
+            }
+            System.out.println("[LOG] Query: " + query);
+            final List<LdbcQuery2Result> results = new ArrayList<>();
+
+            try(TypeDBTransaction transaction = state.getTransaction()){
+                System.out.println("[LOG] Transaction: " + transaction);
+
+                final Stream<JSON> result = transaction.query().fetch(query);
+
+                // Convert and collect results
+                result.forEach(concept -> {
+                    try {
+                        results.add(toResult(concept));
+                    } catch (ParseException e) {
+                        // Swallow the error
+                        System.err.println("[ERR] Error parsing concept: " + e.getMessage());
+                    }
+                });
+                transaction.close();
+                resultReporter.report(results.size(), results, operation);
+            } catch (Exception e) {
+                System.err.println("[ERR] Error executing operation: " + operation.getClass().getSimpleName());
+                e.printStackTrace();
             }
         }
     }

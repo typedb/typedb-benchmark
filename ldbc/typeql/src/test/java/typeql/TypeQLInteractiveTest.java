@@ -13,25 +13,26 @@ public class TypeQLInteractiveTest extends InteractiveTest {
         super(new TypeQLInteractiveDb());
     }
 
-    String endpoint = "jdbc:postgresql://localhost:5432/ldbcsnb";
-    String user = "postgres";
-    String password = "mysecretpassword";
+    String endpoint = "localhost:1729";
     String databaseName = "ldbcsnb";
-    String jdbcDriver = "org.postgresql.Driver";
     String queryDir = "queries";
 
     public Map<String, String> getProperties() {
         Map<String, String> properties = new HashMap<>();
         properties.put("endpoint", endpoint);
-        properties.put("user", user);
-        properties.put("password", password);
+//        properties.put("user", user);
+//        properties.put("password", password);
         properties.put("databaseName", databaseName);
-        properties.put("jdbcDriver", jdbcDriver);
         properties.put("printQueryNames", "true");
         properties.put("printQueryStrings", "true");
         properties.put("printQueryResults", "true");
         properties.put("queryDir", queryDir);
         return properties;
+    }
+
+    @Test
+    public void runTestQuery1() throws Exception {
+        testQuery1();
     }
 
     @Test

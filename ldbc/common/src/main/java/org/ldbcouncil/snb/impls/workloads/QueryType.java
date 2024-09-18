@@ -5,7 +5,7 @@ package org.ldbcouncil.snb.impls.workloads;
 
 public enum QueryType {
         // interactive complex queries
-        // InteractiveComplexQuery1 ("interactive-complex-1" ),
+            InteractiveComplexQuery1 ("interactive-complex-1" ),
             InteractiveComplexQuery2 ("interactive-complex-2" ),
         // InteractiveComplexQuery3 ("interactive-complex-3" ),
         // InteractiveComplexQuery4 ("interactive-complex-4" ),

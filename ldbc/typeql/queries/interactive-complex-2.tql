@@ -23,7 +23,8 @@ fetch
     $messageContent;
     $messageCreationDate;
 
-# Sort results by recent message dates, message IDs, and friend's first name
+# Sort results by recent message dates, message IDs (as per LDBC SNB spec)
+# Hack: also sort friend's first name (string attribute) to re-enable planning
 sort
     $messageCreationDate desc, $messageId asc, $friendFirstName asc;
 

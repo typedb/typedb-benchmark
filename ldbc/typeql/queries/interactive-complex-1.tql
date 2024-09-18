@@ -10,7 +10,7 @@ match
 
     # Match other persons potentially within the friend network
     $friend isa Person,
-        has firstName :firstName;
+        has firstName ":firstName";
         # has firstName "Aaron";
 
     # Determine the degree of separation between the target person and their friends
@@ -83,7 +83,7 @@ fetch
             $uniRelation(student: $friend, university: $university) isa studyAt,
                 has classYear $classYear;
             $university has name $universityName;
-            $cityRelation(location: $university, locatedIn: $uniCity) isa isLocatedIn;
+            (location: $university, locatedIn: $uniCity) isa isLocatedIn;
             $uniCity has name $uniCityName;
         fetch
             $universityName;
@@ -94,11 +94,10 @@ fetch
     # Fetch friend's company details
     friendCompany: {
         match
-            $friend has id 483;
             $companyRelation(employee: $friend, employer: $company) isa workAt,
                 has workFrom $workFrom;
             $company has name $companyName;
-            $cityRelation(location: $company, locatedIn: $companyCountry) isa isLocatedIn;
+            (location: $company, locatedIn: $companyCountry) isa isLocatedIn;
             $companyCountry has name $companyCityName;
         fetch
             $companyName;

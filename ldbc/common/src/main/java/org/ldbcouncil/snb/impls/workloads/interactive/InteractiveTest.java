@@ -20,13 +20,13 @@ public abstract class InteractiveTest<D extends Db> extends SnbTest<D>
     @Test
     public void testQuery1() throws Exception
     {
-        run( db, new LdbcQuery1( 30786325579101L, "Ian", LIMIT ) );
+        run( db, new LdbcQuery1( 14L, "Jan", LIMIT ) );
     }
 
     @Test
     public void testQuery2() throws Exception
     {
-        run( db, new LdbcQuery2( 19791209300143L, new Date( 1354060800000L ), LIMIT ) );
+        run( db, new LdbcQuery2( 14L, new Date( 1354060800000L ), LIMIT ) );
     }
 
     @Test

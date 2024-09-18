@@ -13,7 +13,7 @@ public class TypeQLInteractiveDb extends TypeQLDb {
     protected void onInit(Map<String, String> properties, LoggingService loggingService) throws DbException {
         super.onInit(properties, loggingService);
 
-        // registerOperationHandler(LdbcQuery1.class, InteractiveQuery1.class);
+        registerOperationHandler(LdbcQuery1.class, InteractiveQuery1.class);
         registerOperationHandler(LdbcQuery2.class, InteractiveQuery2.class);
         // registerOperationHandler(LdbcQuery3.class, InteractiveQuery3.class);
         // registerOperationHandler(LdbcQuery3b.class, InteractiveQuery3b.class);
