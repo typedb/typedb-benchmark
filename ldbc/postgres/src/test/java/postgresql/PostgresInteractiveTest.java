@@ -38,4 +38,9 @@ public class PostgresInteractiveTest extends InteractiveTest {
     public void runTestQuery2() throws Exception {
         testQuery2();
     }
+
+    @Test
+    public void runTestQuery3() throws Exception {
+        testQuery3();
+    }
 }

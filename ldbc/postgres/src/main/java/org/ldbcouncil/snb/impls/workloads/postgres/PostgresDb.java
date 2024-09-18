@@ -34,33 +34,33 @@ public abstract class PostgresDb extends BaseDb<PostgresQueryStore> {
 
     // Interactive complex reads
 
-//    public static class Query1 extends PostgresListOperationHandler<LdbcQuery1, LdbcQuery1Result> {
-//
-//        @Override
-//        public String getQueryString(PostgresDbConnectionState state, LdbcQuery1 operation) {
-//            return state.getQueryStore().getParameterizedQuery(QueryType.InteractiveComplexQuery1);
-//        }
-//
-//        @Override
-//        public LdbcQuery1Result convertSingleResult(ResultSet result) throws SQLException {
-//            LdbcQuery1Result qr = new LdbcQuery1Result(
-//                    result.getLong(1),
-//                    result.getString(2),
-//                    result.getInt(3),
-//                    PostgresConverter.stringTimestampToEpoch(result, 4),
-//                    PostgresConverter.stringTimestampToEpoch(result, 5),
-//                    result.getString(6),
-//                    result.getString(7),
-//                    result.getString(8),
-//                    PostgresConverter.arrayToStringArray(result, 9),
-//                    PostgresConverter.arrayToStringArray(result, 10),
-//                    result.getString(11),
-//                    PostgresConverter.arrayToOrganizationArray(result, 12),
-//                    PostgresConverter.arrayToOrganizationArray(result, 13));
-//            return qr;
-//        }
-//    }
-//
+    public static class Query1 extends PostgresListOperationHandler<LdbcQuery1, LdbcQuery1Result> {
+
+        @Override
+        public String getQueryString(PostgresDbConnectionState state, LdbcQuery1 operation) {
+            return state.getQueryStore().getParameterizedQuery(QueryType.InteractiveComplexQuery1);
+        }
+
+        @Override
+        public LdbcQuery1Result convertSingleResult(ResultSet result) throws SQLException {
+            LdbcQuery1Result qr = new LdbcQuery1Result(
+                    result.getLong(1),
+                    result.getString(2),
+                    result.getInt(3),
+                    PostgresConverter.stringTimestampToEpoch(result, 4),
+                    PostgresConverter.stringTimestampToEpoch(result, 5),
+                    result.getString(6),
+                    result.getString(7),
+                    result.getString(8),
+                    PostgresConverter.arrayToStringArray(result, 9),
+                    PostgresConverter.arrayToStringArray(result, 10),
+                    result.getString(11),
+                    PostgresConverter.arrayToOrganizationArray(result, 12),
+                    PostgresConverter.arrayToOrganizationArray(result, 13));
+            return qr;
+        }
+    }
+
     public static class Query2 extends PostgresListOperationHandler<LdbcQuery2, LdbcQuery2Result> {
 
         @Override
@@ -80,44 +80,44 @@ public abstract class PostgresDb extends BaseDb<PostgresQueryStore> {
         }
 
     }
-//
-//    public static class Query3a extends PostgresListOperationHandler<LdbcQuery3a, LdbcQuery3Result> {
-//
-//        @Override
-//        public String getQueryString(PostgresDbConnectionState state, LdbcQuery3a operation) {
-//            return state.getQueryStore().getParameterizedQuery(QueryType.InteractiveComplexQuery3);
-//        }
-//
-//        @Override
-//        public LdbcQuery3Result convertSingleResult(ResultSet result) throws SQLException {
-//            return new LdbcQuery3Result(
-//                    result.getLong(1),
-//                    result.getString(2),
-//                    result.getString(3),
-//                    result.getInt(4),
-//                    result.getInt(5),
-//                    result.getInt(6));
-//        }
-//    }
-//
-//    public static class Query3b extends PostgresListOperationHandler<LdbcQuery3b, LdbcQuery3Result> {
-//
-//        @Override
-//        public String getQueryString(PostgresDbConnectionState state, LdbcQuery3b operation) {
-//            return state.getQueryStore().getParameterizedQuery(QueryType.InteractiveComplexQuery3);
-//        }
-//
-//        @Override
-//        public LdbcQuery3Result convertSingleResult(ResultSet result) throws SQLException {
-//            return new LdbcQuery3Result(
-//                    result.getLong(1),
-//                    result.getString(2),
-//                    result.getString(3),
-//                    result.getInt(4),
-//                    result.getInt(5),
-//                    result.getInt(6));
-//        }
-//    }
+
+    public static class Query3a extends PostgresListOperationHandler<LdbcQuery3a, LdbcQuery3Result> {
+
+        @Override
+        public String getQueryString(PostgresDbConnectionState state, LdbcQuery3a operation) {
+            return state.getQueryStore().getParameterizedQuery(QueryType.InteractiveComplexQuery3);
+        }
+
+        @Override
+        public LdbcQuery3Result convertSingleResult(ResultSet result) throws SQLException {
+            return new LdbcQuery3Result(
+                    result.getLong(1),
+                    result.getString(2),
+                    result.getString(3),
+                    result.getInt(4),
+                    result.getInt(5),
+                    result.getInt(6));
+        }
+    }
+
+    public static class Query3b extends PostgresListOperationHandler<LdbcQuery3b, LdbcQuery3Result> {
+
+        @Override
+        public String getQueryString(PostgresDbConnectionState state, LdbcQuery3b operation) {
+            return state.getQueryStore().getParameterizedQuery(QueryType.InteractiveComplexQuery3);
+        }
+
+        @Override
+        public LdbcQuery3Result convertSingleResult(ResultSet result) throws SQLException {
+            return new LdbcQuery3Result(
+                    result.getLong(1),
+                    result.getString(2),
+                    result.getString(3),
+                    result.getInt(4),
+                    result.getInt(5),
+                    result.getInt(6));
+        }
+    }
 //
 //    public static class Query4 extends PostgresListOperationHandler<LdbcQuery4, LdbcQuery4Result> {
 //

@@ -150,41 +150,68 @@ public abstract class TypeQLDb extends BaseDb<TypeQLQueryStore> {
                 return null;
             }
         }
+    }
+
+    public static class Query3a extends TypeQLListOperationHandler<LdbcQuery3a, LdbcQuery3Result> {
 
         @Override
-        public void executeOperation(LdbcQuery2 operation, TypeQLDbConnectionState state,
-                                     ResultReporter resultReporter) throws DbException
-        {
-            System.out.println("[LOG] Executing operation: " + LdbcQuery2.class.getSimpleName());
-            String query = getQueryString(state, operation);
-            final Map<String, Object> parameters = getParameters(state, operation);
-            // Replace parameters in query
-            for (Map.Entry<String, Object> entry : parameters.entrySet()) {
-                String valueString = entry.getValue().toString().replace("\"", "").replace("\'","");
-                query = query.replace(":" + entry.getKey(), valueString);
+        public String getQueryString(TypeQLDbConnectionState state, LdbcQuery3a operation) {
+            return state.getQueryStore().getParameterizedQuery(QueryType.InteractiveComplexQuery3);
+        }
+
+        @Override
+        public Map<String, Object> getParameters(TypeQLDbConnectionState state, LdbcQuery3a operation) {
+            return state.getQueryStore().getQuery3Map(operation);
+        }
+
+        @Override
+        public LdbcQuery3Result toResult(JSON result) throws ParseException {
+            if (result != null) {
+                Map<String, JSON> jsonMap = result.asObject();
+
+                // Constructing the result
+                return new LdbcQuery3Result(
+                        0,
+                        "",
+                        "",
+                        0,
+                        0,
+                        0
+                );
+            } else {
+                return null;
             }
-            System.out.println("[LOG] Query: " + query);
-            final List<LdbcQuery2Result> results = new ArrayList<>();
+        }
+    }
 
-            try(TypeDBTransaction transaction = state.getTransaction()){
-                System.out.println("[LOG] Transaction: " + transaction);
+    public static class Query3b extends TypeQLListOperationHandler<LdbcQuery3b, LdbcQuery3Result> {
 
-                final Stream<JSON> result = transaction.query().fetch(query);
+        @Override
+        public String getQueryString(TypeQLDbConnectionState state, LdbcQuery3b operation) {
+            return state.getQueryStore().getParameterizedQuery(QueryType.InteractiveComplexQuery3);
+        }
 
-                // Convert and collect results
-                result.forEach(concept -> {
-                    try {
-                        results.add(toResult(concept));
-                    } catch (ParseException e) {
-                        // Swallow the error
-                        System.err.println("[ERR] Error parsing concept: " + e.getMessage());
-                    }
-                });
-                transaction.close();
-                resultReporter.report(results.size(), results, operation);
-            } catch (Exception e) {
-                System.err.println("[ERR] Error executing operation: " + operation.getClass().getSimpleName());
-                e.printStackTrace();
+        @Override
+        public Map<String, Object> getParameters(TypeQLDbConnectionState state, LdbcQuery3b operation) {
+            return state.getQueryStore().getQuery3Map(operation);
+        }
+
+        @Override
+        public LdbcQuery3Result toResult(JSON result) throws ParseException {
+            if (result != null) {
+                Map<String, JSON> jsonMap = result.asObject();
+
+                // Constructing the result
+                return new LdbcQuery3Result(
+                        0,
+                        "",
+                        "",
+                        0,
+                        0,
+                        0
+                );
+            } else {
+                return null;
             }
         }
     }

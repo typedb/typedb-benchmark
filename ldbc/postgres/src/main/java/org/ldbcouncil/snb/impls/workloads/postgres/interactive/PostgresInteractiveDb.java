@@ -13,10 +13,10 @@ public class PostgresInteractiveDb extends PostgresDb {
     protected void onInit(Map<String, String> properties, LoggingService loggingService) throws DbException {
         super.onInit(properties, loggingService);
 
-//        registerOperationHandler(LdbcQuery1.class, Query1.class);
+        registerOperationHandler(LdbcQuery1.class, Query1.class);
         registerOperationHandler(LdbcQuery2.class, Query2.class);
-//        registerOperationHandler(LdbcQuery3a.class, Query3a.class);
-//        registerOperationHandler(LdbcQuery3b.class, Query3b.class);
+        registerOperationHandler(LdbcQuery3a.class, Query3a.class);
+        registerOperationHandler(LdbcQuery3b.class, Query3b.class);
 //        registerOperationHandler(LdbcQuery4.class, Query4.class);
 //        registerOperationHandler(LdbcQuery5.class, Query5.class);
 //        registerOperationHandler(LdbcQuery6.class, Query6.class);
