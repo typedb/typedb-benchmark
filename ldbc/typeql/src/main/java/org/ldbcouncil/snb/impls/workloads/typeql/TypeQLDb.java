@@ -5,7 +5,6 @@ import org.ldbcouncil.snb.driver.DbException;
 import org.ldbcouncil.snb.driver.ResultReporter;
 import org.ldbcouncil.snb.driver.control.LoggingService;
 import org.ldbcouncil.snb.driver.workloads.interactive.queries.*;
-import org.ldbcouncil.snb.driver.workloads.interactive.queries.LdbcInsert1AddPerson.Organization;
 import org.ldbcouncil.snb.impls.workloads.QueryType;
 import org.ldbcouncil.snb.impls.workloads.db.BaseDb;
 import org.ldbcouncil.snb.impls.workloads.typeql.operationhandlers.*;
@@ -14,11 +13,12 @@ import com.vaticle.typedb.driver.api.answer.JSON;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import java.time.ZoneId;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.stream.Stream;
 
 
@@ -35,8 +35,8 @@ public abstract class TypeQLDb extends BaseDb<TypeQLQueryStore> {
 
     // Interactive Complex Reads
     
-     public static class InteractiveQuery1 extends TypeQLListOperationHandler<LdbcQuery1,LdbcQuery1Result>
-     {
+    public static class InteractiveQuery1 extends TypeQLListOperationHandler<LdbcQuery1,LdbcQuery1Result>
+    {
 
          @Override
          public String getQueryString(TypeQLDbConnectionState state, LdbcQuery1 operation) {
@@ -152,7 +152,7 @@ public abstract class TypeQLDb extends BaseDb<TypeQLQueryStore> {
         }
     }
 
-    public static class Query3a extends TypeQLListOperationHandler<LdbcQuery3a, LdbcQuery3Result> {
+    public static class InteractiveQuery3a extends TypeQLListOperationHandler<LdbcQuery3a, LdbcQuery3Result> {
 
         @Override
         public String getQueryString(TypeQLDbConnectionState state, LdbcQuery3a operation) {
@@ -161,7 +161,14 @@ public abstract class TypeQLDb extends BaseDb<TypeQLQueryStore> {
 
         @Override
         public Map<String, Object> getParameters(TypeQLDbConnectionState state, LdbcQuery3a operation) {
-            return state.getQueryStore().getQuery3Map(operation);
+            Map<String, Object> parameters = new HashMap(state.getQueryStore().getQuery3Map(operation));
+            LocalDate start_date = LocalDate.parse(parameters.get("startDate").toString().replace("\'",""), DateTimeFormatter.ISO_LOCAL_DATE);
+            String daysToAddStr = parameters.get("durationDays").toString();
+            int daysToAdd = Integer.parseInt(daysToAddStr);
+            LocalDate end_date = start_date.plusDays(daysToAdd);
+            parameters.remove("durationDays");
+            parameters.put("endDate", end_date.format(DateTimeFormatter.ISO_LOCAL_DATE));
+            return parameters;
         }
 
         @Override
@@ -169,14 +176,16 @@ public abstract class TypeQLDb extends BaseDb<TypeQLQueryStore> {
             if (result != null) {
                 Map<String, JSON> jsonMap = result.asObject();
 
+                int xCount = (int) result.asObject().get("xCount").asObject().get("value").asNumber();
+                int yCount = (int) result.asObject().get("yCount").asObject().get("value").asNumber();
                 // Constructing the result
                 return new LdbcQuery3Result(
-                        0,
-                        "",
-                        "",
-                        0,
-                        0,
-                        0
+                        (int) result.asObject().get("otherPerson_id").asObject().get("value").asNumber(),
+                        result.asObject().get("otherPerson_firstName").asObject().get("value").asString(),
+                        result.asObject().get("otherPerson_lastName").asObject().get("value").asString(),
+                        xCount,
+                        yCount,
+                        xCount + yCount
                 );
             } else {
                 return null;
@@ -184,7 +193,7 @@ public abstract class TypeQLDb extends BaseDb<TypeQLQueryStore> {
         }
     }
 
-    public static class Query3b extends TypeQLListOperationHandler<LdbcQuery3b, LdbcQuery3Result> {
+    public static class InteractiveQuery3b extends TypeQLListOperationHandler<LdbcQuery3b, LdbcQuery3Result> {
 
         @Override
         public String getQueryString(TypeQLDbConnectionState state, LdbcQuery3b operation) {
@@ -193,7 +202,14 @@ public abstract class TypeQLDb extends BaseDb<TypeQLQueryStore> {
 
         @Override
         public Map<String, Object> getParameters(TypeQLDbConnectionState state, LdbcQuery3b operation) {
-            return state.getQueryStore().getQuery3Map(operation);
+            Map<String, Object> parameters = new HashMap(state.getQueryStore().getQuery3Map(operation));
+            LocalDate start_date = LocalDate.parse(parameters.get("startDate").toString().replace("\'",""), DateTimeFormatter.ISO_LOCAL_DATE);
+            String daysToAddStr = parameters.get("durationDays").toString();
+            int daysToAdd = Integer.parseInt(daysToAddStr);
+            LocalDate end_date = start_date.plusDays(daysToAdd);
+            parameters.remove("durationDays");
+            parameters.put("endDate", end_date.format(DateTimeFormatter.ISO_LOCAL_DATE));
+            return parameters;
         }
 
         @Override
@@ -201,14 +217,16 @@ public abstract class TypeQLDb extends BaseDb<TypeQLQueryStore> {
             if (result != null) {
                 Map<String, JSON> jsonMap = result.asObject();
 
+                int xCount = (int) result.asObject().get("xCount").asObject().get("value").asNumber();
+                int yCount = (int) result.asObject().get("yCount").asObject().get("value").asNumber();
                 // Constructing the result
                 return new LdbcQuery3Result(
-                        0,
-                        "",
-                        "",
-                        0,
-                        0,
-                        0
+                        (int) result.asObject().get("otherPerson_id").asObject().get("value").asNumber(),
+                        result.asObject().get("otherPerson_firstName").asObject().get("value").asString(),
+                        result.asObject().get("otherPerson_lastName").asObject().get("value").asString(),
+                        xCount,
+                        yCount,
+                        xCount + yCount
                 );
             } else {
                 return null;

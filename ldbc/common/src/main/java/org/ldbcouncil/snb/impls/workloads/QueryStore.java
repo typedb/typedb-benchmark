@@ -445,26 +445,26 @@ public abstract class QueryStore {
 //                .build();
 //    }
 //
-//    /**
-//     * Get prepared LdbcShortQuery1PersonProfile string
-//     * @param operation LdbcShortQuery1PersonProfile operation containing parameter values
-//     * @return Prepared LdbcShortQuery1PersonProfile string
-//     */
-//    public String getShortQuery1PersonProfile(LdbcShortQuery1PersonProfile operation) {
-//        return prepare(
-//                QueryType.InteractiveShortQuery1,getShortQuery1PersonProfileMap(operation)
-//        );
-//    }
-//
-//    /**
-//     * Get LdbcShortQuery1PersonProfile Map. This map contain the name of the parameter and the value as string.
-//     * @param operation LdbcShortQuery1PersonProfile operation containing parameter values
-//     * @return Map with parameters and values as string.
-//     */
-//    public Map<String, Object> getShortQuery1PersonProfileMap(LdbcShortQuery1PersonProfile operation) {
-//        return ImmutableMap.of(LdbcShortQuery1PersonProfile.PERSON_ID, getConverter().convertId(operation.getPersonIdSQ1()));
-//    }
-//
+    /**
+     * Get prepared LdbcShortQuery1PersonProfile string
+     * @param operation LdbcShortQuery1PersonProfile operation containing parameter values
+     * @return Prepared LdbcShortQuery1PersonProfile string
+     */
+    public String getShortQuery1PersonProfile(LdbcShortQuery1PersonProfile operation) {
+        return prepare(
+                QueryType.InteractiveShortQuery1,getShortQuery1PersonProfileMap(operation)
+        );
+    }
+
+    /**
+     * Get LdbcShortQuery1PersonProfile Map. This map contain the name of the parameter and the value as string.
+     * @param operation LdbcShortQuery1PersonProfile operation containing parameter values
+     * @return Map with parameters and values as string.
+     */
+    public Map<String, Object> getShortQuery1PersonProfileMap(LdbcShortQuery1PersonProfile operation) {
+        return ImmutableMap.of(LdbcShortQuery1PersonProfile.PERSON_ID, getConverter().convertId(operation.getPersonIdSQ1()));
+    }
+
 //    /**
 //     * Get prepared LdbcShortQuery2PersonPosts string
 //     * @param operation LdbcShortQuery2PersonPosts operation containing parameter values
