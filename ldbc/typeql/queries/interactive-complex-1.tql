@@ -22,15 +22,15 @@ match
     } or {
         # Friends of friends (2 degrees of separation)
         ?local_distance = 2;
-        $r1(friend: $person, friend: $intermediateFriend) isa knows;
-        $r2(friend: $intermediateFriend, friend: $friend) isa knows;
+        (friend: $person, friend: $intermediateFriend) isa knows;
+        (friend: $intermediateFriend, friend: $friend) isa knows;
         not {$friend is $person;};
     } or {
         # Friends within 3 degrees of separation
         ?local_distance = 3;
-        $r1(friend: $person, friend: $intermediateFriend1) isa knows;
-        $r2(friend: $intermediateFriend1, friend: $intermediateFriend2) isa knows;
-        $r3(friend: $intermediateFriend2, friend: $friend) isa knows;
+        (friend: $person, friend: $intermediateFriend1) isa knows;
+        (friend: $intermediateFriend1, friend: $intermediateFriend2) isa knows;
+        (friend: $intermediateFriend2, friend: $friend) isa knows;
         not {$intermediateFriend2 is $person;};
         not {$friend is $person;};
         not {$friend is $intermediateFriend1;};

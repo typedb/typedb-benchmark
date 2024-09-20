@@ -191,49 +191,49 @@ public abstract class QueryStore {
                 .put(LdbcQuery3b.DURATION_DAYS, getConverter().convertInteger(operation.getDurationDays()))
                 .build();
     }
-//
-//    /**
-//     * Get prepared Query4 string
-//     * @param operation LdbcQuery4 operation containing parameter values
-//     * @return Prepared Query4 string
-//     */
-//    public String getQuery4(LdbcQuery4 operation) {
-//        return prepare(QueryType.InteractiveComplexQuery4, getQuery4Map(operation));
-//    }
-//
-//    /**
-//     * Get Query4 Map. This map contain the name of the parameter and the value as string.
-//     * @param operation LdbcQuery4 operation containing parameter values
-//     * @return Map with parameters and values as string.
-//     */
-//    public Map<String, Object> getQuery4Map(LdbcQuery4 operation) {
-//        return new ImmutableMap.Builder<String, Object>()
-//                .put(LdbcQuery4.PERSON_ID, getConverter().convertId(operation.getPersonIdQ4()))
-//                .put(LdbcQuery4.START_DATE, getConverter().convertDate(operation.getStartDate()))
-//                .put(LdbcQuery4.DURATION_DAYS, getConverter().convertInteger(operation.getDurationDays()))
-//                .build();
-//    }
-//
-//    /**
-//     * Get prepared Query5 string
-//     * @param operation LdbcQuery5 operation containing parameter values
-//     * @return Prepared Query5 string
-//     */
-//    public String getQuery5(LdbcQuery5 operation) {
-//        return prepare(QueryType.InteractiveComplexQuery5, getQuery5Map(operation));
-//    }
-//
-//    /**
-//     * Get Query5 Map. This map contain the name of the parameter and the value as string.
-//     * @param operation LdbcQuery5 operation containing parameter values
-//     * @return Map with parameters and values as string.
-//     */
-//    public Map<String, Object> getQuery5Map(LdbcQuery5 operation) {
-//        return new ImmutableMap.Builder<String, Object>()
-//                .put(LdbcQuery5.PERSON_ID, getConverter().convertId(operation.getPersonIdQ5()))
-//                .put(LdbcQuery5.MIN_DATE, getConverter().convertDate(operation.getMinDate()))
-//                .build();
-//    }
+
+    /**
+     * Get prepared Query4 string
+     * @param operation LdbcQuery4 operation containing parameter values
+     * @return Prepared Query4 string
+     */
+    public String getQuery4(LdbcQuery4 operation) {
+        return prepare(QueryType.InteractiveComplexQuery4, getQuery4Map(operation));
+    }
+
+    /**
+     * Get Query4 Map. This map contain the name of the parameter and the value as string.
+     * @param operation LdbcQuery4 operation containing parameter values
+     * @return Map with parameters and values as string.
+     */
+    public Map<String, Object> getQuery4Map(LdbcQuery4 operation) {
+        return new ImmutableMap.Builder<String, Object>()
+                .put(LdbcQuery4.PERSON_ID, getConverter().convertId(operation.getPersonIdQ4()))
+                .put(LdbcQuery4.START_DATE, getConverter().convertDate(operation.getStartDate()))
+                .put(LdbcQuery4.DURATION_DAYS, getConverter().convertInteger(operation.getDurationDays()))
+                .build();
+    }
+
+    /**
+     * Get prepared Query5 string
+     * @param operation LdbcQuery5 operation containing parameter values
+     * @return Prepared Query5 string
+     */
+    public String getQuery5(LdbcQuery5 operation) {
+        return prepare(QueryType.InteractiveComplexQuery5, getQuery5Map(operation));
+    }
+
+    /**
+     * Get Query5 Map. This map contain the name of the parameter and the value as string.
+     * @param operation LdbcQuery5 operation containing parameter values
+     * @return Map with parameters and values as string.
+     */
+    public Map<String, Object> getQuery5Map(LdbcQuery5 operation) {
+        return new ImmutableMap.Builder<String, Object>()
+                .put(LdbcQuery5.PERSON_ID, getConverter().convertId(operation.getPersonIdQ5()))
+                .put(LdbcQuery5.MIN_DATE, getConverter().convertDate(operation.getMinDate()))
+                .build();
+    }
 //
 //    /**
 //     * Get prepared Query6 string

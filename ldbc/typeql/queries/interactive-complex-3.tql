@@ -25,9 +25,9 @@ match
     $MessageX isa Message, has creationDate $dateX;
     $MessageY isa Message, has creationDate $dateY;
     $dateX >= :startDate;
-    $dateX <= :endDate;
+    $dateX < :endDate;
     $dateY >= :startDate;
-    $dateY <= :endDate;
+    $dateY < :endDate;
     (creator: $otherPerson, created: $MessageX) isa hasCreator;
     (creator: $otherPerson, created: $MessageY) isa hasCreator;
     ($MessageX, $countryX) isa isLocatedIn;
@@ -55,3 +55,4 @@ fetch
             $countryZ isa Country, has name "Panama";
         get; count;    
     };
+limit 20;

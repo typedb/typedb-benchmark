@@ -17,8 +17,8 @@ public class TypeQLInteractiveDb extends TypeQLDb {
         registerOperationHandler(LdbcQuery2.class, InteractiveQuery2.class);
         registerOperationHandler(LdbcQuery3a.class, InteractiveQuery3a.class);
         registerOperationHandler(LdbcQuery3b.class, InteractiveQuery3b.class);
-        // registerOperationHandler(LdbcQuery4.class, InteractiveQuery4.class);
-        // registerOperationHandler(LdbcQuery5.class, InteractiveQuery5.class);
+        registerOperationHandler(LdbcQuery4.class, InteractiveQuery4.class);
+        registerOperationHandler(LdbcQuery5.class, InteractiveQuery5.class);
         // registerOperationHandler(LdbcQuery6.class, InteractiveQuery6.class);
         // registerOperationHandler(LdbcQuery7.class, InteractiveQuery7.class);
         // registerOperationHandler(LdbcQuery8.class, InteractiveQuery8.class);

@@ -1,6 +1,8 @@
 package org.ldbcouncil.snb.impls.workloads.typeql;
 
 import com.vaticle.typedb.driver.api.TypeDBTransaction;
+import com.vaticle.typedb.driver.api.answer.ConceptMap;
+import com.vaticle.typedb.driver.api.answer.ValueGroup;
 import org.ldbcouncil.snb.driver.DbException;
 import org.ldbcouncil.snb.driver.ResultReporter;
 import org.ldbcouncil.snb.driver.control.LoggingService;
@@ -12,10 +14,7 @@ import com.vaticle.typedb.driver.api.answer.JSON;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -233,38 +232,237 @@ public abstract class TypeQLDb extends BaseDb<TypeQLQueryStore> {
             }
         }
     }
+    public static class InteractiveQuery4 extends TypeQLListOperationHandler<LdbcQuery4, LdbcQuery4Result> {
 
-    // // public static class InteractiveQuery4 extends TypeQLListOperationHandler<LdbcQuery4,LdbcQuery4Result>
-    // // {
+        final int LIMIT = 10;
 
-    // //     @Override
-    // //     public String getQueryString(TypeQLDbConnectionState state, LdbcQuery4 operation) {
-    // //         return state.getQueryStore().getParameterizedQuery(QueryType.InteractiveComplexQuery4);
-    // //     }
+        @Override
+        public String getQueryString(TypeQLDbConnectionState state, LdbcQuery4 operation) {
+            return state.getQueryStore().getParameterizedQuery(QueryType.InteractiveComplexQuery4);
+        }
 
-    // //     @Override
-    // //     public Map<String, Object> getParameters(TypeQLDbConnectionState state, LdbcQuery4 operation) {
-    // //         return state.getQueryStore().getQuery4Map(operation);
-    // //     }
+        @Override
+        public Map<String, Object> getParameters(TypeQLDbConnectionState state, LdbcQuery4 operation) {
+            Map<String, Object> parameters = new HashMap<String, Object>(state.getQueryStore().getQuery4Map(operation));
+            LocalDate start_date = LocalDate.parse(parameters.get("startDate").toString().replace("\'",""), DateTimeFormatter.ISO_LOCAL_DATE);
+            String daysToAddStr = parameters.get("durationDays").toString();
+            int daysToAdd = Integer.parseInt(daysToAddStr);
+            LocalDate end_date = start_date.plusDays(daysToAdd);
+            parameters.remove("durationDays");
+            parameters.put("endDate", end_date.format(DateTimeFormatter.ISO_LOCAL_DATE));
+            return parameters;
+        }
 
-    // //     @Override
-    // //     public LdbcQuery4Result toResult(ConceptMap result) throws ParseException {
-    // //         if (result != null) {
-                
+        public LdbcQuery4Result toLdbcResult(List<Comparable> result) {
+            return new LdbcQuery4Result(
+                    (String) result.get(0),
+                    (int) result.get(1)
+            );
+        }
 
-    // //             return new LdbcQuery4Result(
-    // //                 friendId,
-    // //                 name,
-    // //                 surname,
-    // //                 messageId,
-    // //                 messageContent,
-    // //                 messageCreationDate
-    // //             );
-    // //         } else {
-    // //             return null;
-    // //         }
-    // //     }
-    // // }
+        public List<Comparable> toListResult(JSON result) throws ParseException {
+            return Arrays.asList(
+                    result.asObject().get("tag_name").asObject().get("value").asString(),
+                    (int) result.asObject().get("postCount").asObject().get("value").asNumber()
+            );
+        }
+
+        class Query4Comparator implements Comparator<List<Comparable>> {
+            @Override
+            public int compare(List<Comparable> o1, List<Comparable> o2) {
+                int comparison = -o1.get(1).compareTo(o2.get(1)); // Sort by postCount in descending order
+                if (comparison != 0) {
+                    return comparison;
+                }
+                return o1.get(0).compareTo(o2.get(0)); // Otherwise sort by tag_name
+            }
+        }
+
+        @Override
+        public void executeOperation(LdbcQuery4 operation, TypeQLDbConnectionState state,
+                                     ResultReporter resultReporter) throws DbException
+        {
+            String query = getQueryString(state, operation);
+            final Map<String, Object> parameters = getParameters(state, operation);
+            // Replace parameters in query
+            for (Map.Entry<String, Object> entry : parameters.entrySet()) {
+                String valueString = entry.getValue().toString().replace("\"", "").replace("\'","");
+                query = query.replace(":" + entry.getKey(), valueString);
+            }
+            final List<List<Comparable>> sortable_results = new ArrayList<>();
+
+            try(TypeDBTransaction transaction = state.getTransaction()){
+                final Stream<JSON> result = transaction.query().fetch(query);
+
+                // Convert and collect results
+                result.forEach(concept -> {
+                    try {
+                        sortable_results.add(toListResult(concept));
+                    } catch (ParseException e) {
+                        System.err.println("[ERR] Error parsing concept: " + e.getMessage());
+                    }
+                });
+                transaction.close();
+                Collections.sort(sortable_results, new Query4Comparator());
+                final List<LdbcQuery4Result> results = sortable_results
+                        .stream()
+                        .limit(LIMIT)
+                        .map(this::toLdbcResult)
+                        .collect(Collectors.toList());
+                resultReporter.report(results.size(), results, operation);
+            } catch (Exception e) {
+                System.err.println("[ERR] Error executing operation: " + operation.getClass().getSimpleName());
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public static class InteractiveQuery5 extends TypeQLListOperationHandler<LdbcQuery5, LdbcQuery5Result> {
+
+        final int LIMIT = 10;
+
+        @Override
+        public String getQueryString(TypeQLDbConnectionState state, LdbcQuery5 operation) {
+            return state.getQueryStore().getParameterizedQuery(QueryType.InteractiveComplexQuery5);
+        }
+
+        @Override
+        public Map<String, Object> getParameters(TypeQLDbConnectionState state, LdbcQuery5 operation) {
+            return state.getQueryStore().getQuery5Map(operation);
+        }
+
+        public LdbcQuery5Result toLdbcResult(List<Comparable> result) {
+            return new LdbcQuery5Result(
+                (String) result.get(1),
+                ((Long) result.get(2)).intValue()
+            );
+        }
+
+        public List<Comparable> toListResult(JSON result) throws ParseException {
+            return Arrays.asList(
+                    (int) result.asObject().get("forum_id").asObject().get("value").asNumber(),
+                    result.asObject().get("forum_title").asObject().get("value").asString(),
+                    (int) result.asObject().get("postCount").asObject().get("value").asNumber()
+            );
+        }
+
+        class Query5PreComparator implements Comparator<List<Comparable>> {
+            @Override
+            public int compare(List<Comparable> o1, List<Comparable> o2) {
+                return -o1.get(1).compareTo(o2.get(1)); // Sort by postCount in descending order
+            }
+        }
+
+        class Query5Comparator implements Comparator<List<Comparable>> {
+            @Override
+            public int compare(List<Comparable> o1, List<Comparable> o2) {
+                int comparison = -o1.get(2).compareTo(o2.get(2)); // Sort by postCount in descending order
+                if (comparison != 0) {
+                    return comparison;
+                }
+                return o1.get(0).compareTo(o2.get(0)); // Otherwise sort by forum_id
+            }
+        }
+
+        @Override
+        public void executeOperation(LdbcQuery5 operation, TypeQLDbConnectionState state,
+                                     ResultReporter resultReporter) throws DbException
+        {
+            String query = getQueryString(state, operation);
+            final Map<String, Object> parameters = getParameters(state, operation);
+            // Replace parameters in query
+            for (Map.Entry<String, Object> entry : parameters.entrySet()) {
+                String valueString = entry.getValue().toString().replace("\"", "").replace("\'","");
+                query = query.replace(":" + entry.getKey(), valueString);
+            }
+            String[] queryParts = query.split("#split#");
+            String firstQuery = queryParts[0];
+            String secondQuery = queryParts[1];
+
+            // Pre-results are computed using a get group aggregate
+            final List<List<Comparable>> preResults = new ArrayList<>();
+            // First results are adding forum id and title to pre-results
+            final List<List<Comparable>> firstResults = new ArrayList<>();
+            // Second results pad results with forums without any friend's posts
+            final List<List<Comparable>> secondResults = new ArrayList<>();
+
+            try(TypeDBTransaction transaction = state.getTransaction()){
+                // Generate pre-results
+                final Stream<ValueGroup> answers = transaction.query().getGroupAggregate(firstQuery);
+                answers.forEach(valueGroup -> {
+                    preResults.add(Arrays.asList(
+                            valueGroup.owner().asThing().getIID(),
+                            valueGroup.value().get().asLong()
+                    ));
+                });
+                Collections.sort(preResults, new Query5PreComparator());
+                final List<List<Comparable>> truncatedPreResult = new ArrayList<>();
+                truncatedPreResult.addAll(preResults.subList(0, Math.min(LIMIT, preResults.size())));
+                if (preResults.size() > LIMIT) {
+                    int extendedLimit = LIMIT;
+                    long lastCount = (long) preResults.get(extendedLimit-1).get(1);
+                    long nextCount = (long) preResults.get(extendedLimit).get(1);
+                    while (lastCount == nextCount) {
+                        truncatedPreResult.add(preResults.get(extendedLimit));
+                        if (preResults.size() > extendedLimit + 1) {
+                            extendedLimit++;
+                            nextCount = (long) preResults.get(extendedLimit).get(1);
+                        } else {
+                            break;
+                        }
+                    }
+                }
+
+                // Generate first results
+                truncatedPreResult.forEach(list -> {
+                    final Stream<ConceptMap> answers1 = transaction.query().get(
+                            String.format("match $x iid %s, has id $id, has title $title; get $id, $title;", list.get(0))
+                    );
+                    answers1.forEach(conceptMap -> {
+                        firstResults.add(Arrays.asList(
+                                conceptMap.get("id").asAttribute().getValue().asLong(),
+                                conceptMap.get("title").asAttribute().getValue().asString(),
+                                list.get(1)
+                        ));
+                    });
+                });
+                Collections.sort(firstResults, new Query5Comparator());
+
+                final List<LdbcQuery5Result> results = firstResults
+                        .stream()
+                        .limit(LIMIT)
+                        .map(this::toLdbcResult)
+                        .collect(Collectors.toList());
+
+                // Check if we have all results needed
+                // If not, still need to consider second query
+                if (results.size() == LIMIT) {
+                    resultReporter.report(results.size(), results, operation);
+                } else {
+                    secondQuery = secondQuery.replace(":LIMIT", String.valueOf(LIMIT - results.size()));
+                    final Stream<ConceptMap> answers2 = transaction.query().get(secondQuery);
+                    answers2.forEach(conceptMap -> {
+                        secondResults.add(Arrays.asList(
+                                conceptMap.get("forum_id").asAttribute().getValue().asLong(),
+                                conceptMap.get("forum_title").asAttribute().getValue().asString(),
+                                0L
+                        ));
+                    });
+                    Collections.sort(secondResults, new Query5Comparator());
+                    // Append LIMIT - results.size() elements from second query
+                    results.addAll(secondResults.stream()
+                            .limit(LIMIT - results.size())
+                            .map(this::toLdbcResult)
+                            .collect(Collectors.toList()));
+                    resultReporter.report(results.size(), results, operation);
+                }
+                transaction.close();
+            } catch (Exception e) {
+                System.err.println("[ERR] Error executing operation: " + operation.getClass().getSimpleName());
+                e.printStackTrace();
+            }
+        }
+    }
 
     // public static class InteractiveQuery7 extends TypeQLListOperationHandler<LdbcQuery7,LdbcQuery7Result>
     // {

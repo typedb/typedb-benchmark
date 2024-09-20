@@ -18,7 +18,9 @@ import java.util.stream.Stream;
 public abstract class TypeQLListOperationHandler<TOperation extends Operation<List<TOperationResult>>, TOperationResult>
         implements ListOperationHandler<TOperationResult,TOperation,TypeQLDbConnectionState>
 {
-    public abstract TOperationResult toResult(JSON concept) throws ParseException;
+    public TOperationResult toResult(JSON concept) throws ParseException  {
+        throw new UnsupportedOperationException("This operation is not supported by the subclass.");
+    }
 
     public abstract Map<String, Object> getParameters(TypeQLDbConnectionState<?> state, TOperation operation );
 
