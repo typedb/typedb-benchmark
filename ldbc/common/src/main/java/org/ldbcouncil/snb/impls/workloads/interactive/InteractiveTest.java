@@ -50,7 +50,7 @@ public abstract class InteractiveTest<D extends Db> extends SnbTest<D>
     @Test
     public void testQuery6() throws Exception
     {
-        run( db, new LdbcQuery6( 30786325579101L, "Shakira", LIMIT ) );
+        run( db, new LdbcQuery6(14L, "Friedrich_Schiller", LIMIT ) );
     }
 
     @Test

@@ -4,6 +4,17 @@
 # */
 
 match
+  $person isa Person, has id 14;
+  $message isa Message, has creationDate $message_creationDate;
+  ($person, $message) isa hasCreator;
+  $friend isa Person, has id $name;
+  $likes ($friend, $message) isa likes, has creationDate $likes_creationDate;
+get $friend, $likes, $likes_creationDate, $name;
+sort $likes_creationDate;
+limit 20;
+
+
+match
     # $person isa Person, has id :personId;
     $person isa Person, has id 478;
 

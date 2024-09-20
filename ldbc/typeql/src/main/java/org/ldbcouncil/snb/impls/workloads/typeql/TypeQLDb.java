@@ -3,6 +3,7 @@ package org.ldbcouncil.snb.impls.workloads.typeql;
 import com.vaticle.typedb.driver.api.TypeDBTransaction;
 import com.vaticle.typedb.driver.api.answer.ConceptMap;
 import com.vaticle.typedb.driver.api.answer.ValueGroup;
+import com.vaticle.typedb.driver.api.concept.type.AttributeType;
 import org.ldbcouncil.snb.driver.DbException;
 import org.ldbcouncil.snb.driver.ResultReporter;
 import org.ldbcouncil.snb.driver.control.LoggingService;
@@ -457,6 +458,94 @@ public abstract class TypeQLDb extends BaseDb<TypeQLQueryStore> {
                     resultReporter.report(results.size(), results, operation);
                 }
                 transaction.close();
+            } catch (Exception e) {
+                System.err.println("[ERR] Error executing operation: " + operation.getClass().getSimpleName());
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public static class InteractiveQuery6 extends TypeQLListOperationHandler<LdbcQuery6, LdbcQuery6Result> {
+
+        final int LIMIT = 10;
+
+        @Override
+        public String getQueryString(TypeQLDbConnectionState state, LdbcQuery6 operation) {
+            return state.getQueryStore().getParameterizedQuery(QueryType.InteractiveComplexQuery6);
+        }
+
+        @Override
+        public Map<String, Object> getParameters(TypeQLDbConnectionState state, LdbcQuery6 operation) {
+            return state.getQueryStore().getQuery6Map(operation);
+        }
+
+        public LdbcQuery6Result toLdbcResult(List<Comparable> result) {
+            return new LdbcQuery6Result(
+                    (String) result.get(0),
+                    ((Long) result.get(1)).intValue()
+            );
+        }
+
+        public List<Comparable> toListResult(JSON result) throws ParseException {
+            return Arrays.asList(
+                    result.asObject().get("tag_name").asObject().get("value").asString(),
+                    (int) result.asObject().get("postCount").asObject().get("value").asNumber()
+            );
+        }
+
+        class Query6Comparator implements Comparator<List<Comparable>> {
+            @Override
+            public int compare(List<Comparable> o1, List<Comparable> o2) {
+                int comparison = -o1.get(1).compareTo(o2.get(1)); // Sort by postCount in descending order
+                if (comparison != 0) {
+                    return comparison;
+                }
+                return o1.get(0).compareTo(o2.get(0)); // Otherwise sort by tag_name
+            }
+        }
+
+        @Override
+        public void executeOperation(LdbcQuery6 operation, TypeQLDbConnectionState state,
+                                     ResultReporter resultReporter) throws DbException
+        {
+            String query = getQueryString(state, operation);
+            final Map<String, Object> parameters = getParameters(state, operation);
+            // Replace parameters in query
+            for (Map.Entry<String, Object> entry : parameters.entrySet()) {
+                String valueString = entry.getValue().toString().replace("\"", "").replace("\'","");
+                query = query.replace(":" + entry.getKey(), valueString);
+            }
+            final List<List<Comparable>> sortable_results = new ArrayList<>();
+
+            try(TypeDBTransaction transaction = state.getTransaction()){
+                final Stream<ValueGroup> result = transaction.query().getGroupAggregate(query);
+                final AttributeType name = transaction
+                        .concepts()
+                        .getAttributeType("name")
+                        .resolve();
+
+                // Convert and collect results
+                result.forEach(valueGroup -> {
+                    sortable_results.add(Arrays.asList(
+                            valueGroup
+                                    .owner()
+                                    .asThing()
+                                    .getHas(transaction, name)
+                                    .limit(1)
+                                    .map(concept -> concept.asAttribute().getValue().asString())
+                                    .collect(Collectors.toList())
+                                    .get(0),
+                            valueGroup.value().get().asLong()
+                    ));
+                });
+                transaction.close();
+                Collections.sort(sortable_results, new Query6Comparator());
+                final List<LdbcQuery6Result> results = sortable_results
+                        .stream()
+                        .limit(LIMIT)
+                        .map(this::toLdbcResult)
+                        .collect(Collectors.toList());
+                resultReporter.report(results.size(), results, operation);
             } catch (Exception e) {
                 System.err.println("[ERR] Error executing operation: " + operation.getClass().getSimpleName());
                 e.printStackTrace();
