@@ -59,4 +59,9 @@ public class TypeQLInteractiveTest extends InteractiveTest {
     public void runTestQuery6() throws Exception {
         testQuery6();
     }
+
+    @Test
+    public void runTestQuery7() throws Exception {
+        testQuery7();
+    }
 }
