@@ -15,6 +15,7 @@ import com.vaticle.typedb.driver.api.answer.JSON;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.time.LocalDate;
@@ -553,46 +554,76 @@ public abstract class TypeQLDb extends BaseDb<TypeQLQueryStore> {
         }
     }
 
-    // public static class InteractiveQuery7 extends TypeQLListOperationHandler<LdbcQuery7,LdbcQuery7Result>
-    // {
+     public static class InteractiveQuery7 extends TypeQLListOperationHandler<LdbcQuery7,LdbcQuery7Result>
+     {
 
-    //     @Override
-    //     public String getQueryString(TypeQLDbConnectionState state, LdbcQuery7 operation) {
-    //         return state.getQueryStore().getParameterizedQuery(QueryType.InteractiveComplexQuery7);
-    //     }
+         @Override
+         public String getQueryString(TypeQLDbConnectionState state, LdbcQuery7 operation) {
+             return state.getQueryStore().getParameterizedQuery(QueryType.InteractiveComplexQuery7);
+         }
 
-    //     @Override
-    //     public Map<String, Object> getParameters(TypeQLDbConnectionState state, LdbcQuery7 operation) {
-    //         return state.getQueryStore().getQuery7Map(operation);
-    //     }
+         @Override
+         public Map<String, Object> getParameters(TypeQLDbConnectionState state, LdbcQuery7 operation) {
+             return state.getQueryStore().getQuery7Map(operation);
+         }
 
-    //     @Override
-    //     public LdbcQuery7Result toResult(ConceptMap result) throws ParseException {
-    //         if (result != null) {
-                
-    //             long likerId = result.get("likerId").asAttribute().asLong().getValue();
-    //             String likerFirstName = result.get("likerFirstName").asAttribute().asString().getValue();
-    //             String likerLastName = result.get("likerLastName").asAttribute().asString().getValue();
-    //             long likesDate = result.get("likesDate").asAttribute().asDateTime().getValue().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
-    //             long messageId = result.get("messageId").asAttribute().asLong().getValue();
-    //             String messageContent = result.get("messageContent").asValue().asString().getValue();
-    //             int minutesLatency = (int)((likesDate - result.get("date").asAttribute().asDateTime().getValue().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli())/60000);
-    //             boolean isNew = result.get("isNew").asValue().asBoolean().getValue();
-    //             return new LdbcQuery7Result(
-    //                 likerId,
-    //                 likerFirstName,
-    //                 likerLastName,
-    //                 likesDate,
-    //                 messageId,
-    //                 messageContent,
-    //                 minutesLatency,
-    //                 isNew
-    //             );
-    //         } else {
-    //             return null;
-    //         }
-    //     }
-    // }
+         public LdbcQuery7Result toResult(ConceptMap result) throws ParseException {
+             if (result != null) {
+                 long friend_id = result.get("friend_id").asAttribute().getValue().asLong();
+                 String friend_firstName = result.get("friend_firstName").asAttribute().getValue().asString();
+                 String friend_lastName = result.get("friend_lastName").asAttribute().getValue().asString();
+                 long likes_creationDate = result.get("likes_creationDate").asAttribute().getValue().asDateTime().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
+                 long message_id = result.get("message_id").asAttribute().getValue().asLong();
+                 String message_ContOrImg = result.get("message_content_or_imageFile").asValue().asString();
+                 int minutesLatency = (int)((likes_creationDate - result.get("message_creationDate").asAttribute().getValue().asDateTime().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli())/60000);
+                 boolean isNew = result.get("isNew").asValue().asBoolean();
+                 return new LdbcQuery7Result(
+                     friend_id,
+                     friend_firstName,
+                     friend_lastName,
+                     likes_creationDate,
+                     message_id,
+                     message_ContOrImg,
+                     minutesLatency,
+                     isNew
+                 );
+             } else {
+                 return null;
+             }
+         }
+
+         @Override
+         public void executeOperation(LdbcQuery7 operation, TypeQLDbConnectionState state,
+                                      ResultReporter resultReporter) throws DbException
+         {
+             String query = getQueryString(state, operation);
+             final Map<String, Object> parameters = getParameters(state, operation);
+             // Replace parameters in query
+             for (Map.Entry<String, Object> entry : parameters.entrySet()) {
+                 String valueString = entry.getValue().toString().replace("\"", "").replace("\'","");
+                 query = query.replace(":" + entry.getKey(), valueString);
+             }
+             final List<LdbcQuery7Result> results = new ArrayList<>();
+
+             try(TypeDBTransaction transaction = state.getTransaction()){
+                 final Stream<ConceptMap> result = transaction.query().get(query);
+
+                 // Convert and collect results
+                 result.forEach(concept -> {
+                     try {
+                         results.add(toResult(concept));
+                     } catch (ParseException e) {
+                         System.err.println("[ERR] Error parsing concept: " + e.getMessage());
+                     }
+                 });
+                 transaction.close();
+                 resultReporter.report(results.size(), results, operation);
+             } catch (Exception e) {
+                 System.err.println("[ERR] Error executing operation: " + operation.getClass().getSimpleName());
+                 e.printStackTrace();
+             }
+         }
+     }
 
     // public static class InteractiveQuery8 extends TypeQLListOperationHandler<LdbcQuery8,LdbcQuery8Result>
     // {

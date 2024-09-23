@@ -1,69 +1,56 @@
-# // Q7. Recent likers
-# /*
-# :params { personId: 4398046511268 }
-# */
-
 match
-  $person isa Person, has id 14;
-  $message isa Message, has creationDate $message_creationDate;
-  ($person, $message) isa hasCreator;
-  $friend isa Person, has id $name;
-  $likes ($friend, $message) isa likes, has creationDate $likes_creationDate;
-get $friend, $likes, $likes_creationDate, $name;
-sort $likes_creationDate;
-limit 20;
+  $person isa Person, has id :personId;
 
+  $friend
+    isa Person,
+    has id $friend_id,
+    has firstName $friend_firstName,
+    has lastName $friend_lastName;
 
-match
-    # $person isa Person, has id :personId;
-    $person isa Person, has id 478;
+  (creator: $person, created: $message)
+    isa hasCreator;
 
-    $liker 
-        isa Person, 
-        has id $likerId,
-        has firstName $likerFirstName,
-        has lastName $likerLastName;
+  $message
+    isa Message,
+    has id $message_id,
+    has creationDate $message_creationDate;
 
-    $r1 (created: $message, creator: $person) 
-        isa hasCreator;
-    $message
-        isa Message,
-        has id $messageId,
-        has creationDate $date;
+  $likes (liker: $friend, message: $message)
+    isa likes,
+    has creationDate $likes_creationDate;
 
-    ?messageContent = ?localContent;
+  ?isNew = ?localIsNew;
     {
-        $message has imageFile $image;
-        ?localContent = $image;
-    } or {
-        $message has content $text;
-        ?localContent = $text;
-    };
-
-    $r2 (message: $message, liker: $liker) 
-        isa likes,
-        has creationDate $likesDate;
-
-    ?isNew = ?localIsNew;
-    {
-        $r3 (friend: $person, friend: $liker) isa knows;
+        (friend: $person, friend: $friend) isa knows;
         ?localIsNew = false;
     } or {
         not {
-            $r3 (friend: $person, friend: $liker) isa knows;
+            (friend: $person, friend: $friend) isa knows;
         };
         ?localIsNew = true;
     };
 
+    ?message_content_or_imageFile = ?local;
+    {
+        $message has imageFile $image;
+        not { $image ""; };
+        ?local = $image;
+    } or {
+        $message has content $text;
+        not { $text ""; };
+        ?local = $text;
+    };
+
 get
-    $likerId, $likerFirstName, $likerLastName,
-    $likesDate, 
-    $messageId, ?messageContent, ?isNew, $date;
+    $friend_id, $friend_firstName, $friend_lastName,
+    $likes_creationDate,
+    $message_id, ?message_content_or_imageFile,
+    $message_creationDate, ?isNew;
 
 sort
-    $likesDate desc,
-    $likerId asc,
-    $likerFirstName asc;
+    $likes_creationDate desc,
+    $friend_id asc,
+    $friend_firstName asc;
 
 limit 20;
 
