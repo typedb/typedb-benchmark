@@ -1,32 +1,32 @@
-# // Q8. Recent replies
-# /*
-# :params { personId: 143 }
-# */
-
 match
     # $person isa Person, has id 478; 
     $person isa Person, has id :personId;
 
     $r1(created: $message, creator: $person) isa hasCreator;
     $r2(repliedTo: $message, reply: $reply) isa replyOf;
-    $r3(created: $reply, creator: $author) isa hasCreator;
+    $r3(created: $comment, creator: $commentAuthor) isa hasCreator;
 
-    $reply isa Comment,
-        has id $replyId,
-        has creationDate $date,
-        has content $content;
+    $comment isa Comment,
+        has id $comment_id,
+        has creationDate $comment_creationDate,
+        has content $comment_content;
 
-    $author isa Person,
-        has id $authorId,
-        has firstName $firstname,
-        has lastName $lastname;
+    $commenAuthor isa Person,
+        has id $commenAuthor_id,
+        has firstName $commenAuthor_firstName,
+        has lastName $commenAuthor_lastName;
     
 get
-    $authorId, $firstname, $lastname, $date, $replyId, $content;
+    $commenAuthor_id, 
+    $commenAuthor_firstName,
+    $commenAuthor_lastName, 
+    $comment_creationDate, 
+    $comment_id, 
+    $comment_content;
 
 sort
-    $date desc,
-    $replyId asc,
-    $firstname asc;
+    $comment_creationDate desc,
+    $comment_id asc,
+    $commenAuthor_firstName asc;
 
 limit 20;

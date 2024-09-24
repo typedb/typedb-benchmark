@@ -1,13 +1,12 @@
 package org.ldbcouncil.snb.impls.workloads.typeql.operationhandlers;
 
+import com.vaticle.typedb.driver.api.TypeDBTransaction;
+import com.vaticle.typedb.driver.api.answer.ConceptMap;
 import org.ldbcouncil.snb.driver.DbException;
 import org.ldbcouncil.snb.driver.Operation;
 import org.ldbcouncil.snb.driver.ResultReporter;
-import org.ldbcouncil.snb.impls.workloads.typeql.TypeQLDbConnectionState;
 import org.ldbcouncil.snb.impls.workloads.operationhandlers.ListOperationHandler;
-
-import com.vaticle.typedb.driver.api.TypeDBTransaction;
-import com.vaticle.typedb.driver.api.answer.JSON;
+import org.ldbcouncil.snb.impls.workloads.typeql.TypeQLDbConnectionState;
 
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -15,11 +14,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
-public abstract class TypeQLListOperationHandler<TOperation extends Operation<List<TOperationResult>>, TOperationResult>
+public abstract class TypeQLGetListOperationHandler<TOperation extends Operation<List<TOperationResult>>, TOperationResult>
         implements ListOperationHandler<TOperationResult,TOperation,TypeQLDbConnectionState>
 {
-    public TOperationResult toResult(JSON concept) throws ParseException  {
-        throw new UnsupportedOperationException("This operation is not supported by the subclass.");
+    public TOperationResult toResult(ConceptMap concept) throws ParseException  {
+        throw new UnsupportedOperationException("This operation is not supported by the query operation.");
     }
 
     public abstract Map<String, Object> getParameters(TypeQLDbConnectionState<?> state, TOperation operation );
@@ -28,7 +27,6 @@ public abstract class TypeQLListOperationHandler<TOperation extends Operation<Li
     public void executeOperation(TOperation operation, TypeQLDbConnectionState state,
                                  ResultReporter resultReporter) throws DbException
     {
-        System.out.println("[LOG] Executing operation: " + operation.getClass().getSimpleName());
         String query = getQueryString(state, operation);
         final Map<String, Object> parameters = getParameters(state, operation);
         // Replace parameters in query
@@ -36,20 +34,16 @@ public abstract class TypeQLListOperationHandler<TOperation extends Operation<Li
             String valueString = entry.getValue().toString().replace("\"", "").replace("\'","");
             query = query.replace(":" + entry.getKey(), valueString);
         }
-        System.out.println("[LOG] Query: " + query);
         final List<TOperationResult> results = new ArrayList<>();
 
         try(TypeDBTransaction transaction = state.getTransaction()){
-            System.out.println("[LOG] Transaction: " + transaction);
-            
-            final Stream<JSON> result = transaction.query().fetch(query);
-            
+            final Stream<ConceptMap> result = transaction.query().get(query);
+
             // Convert and collect results
             result.forEach(concept -> {
                 try {
                     results.add(toResult(concept));
                 } catch (ParseException e) {
-                    // Swallow the error
                     System.err.println("[ERR] Error parsing concept: " + e.getMessage());
                 }
             });

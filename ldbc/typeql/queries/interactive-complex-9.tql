@@ -1,49 +1,48 @@
-# // Q9. Recent messages by friends or friends of friends
-# /*
-# :params { personId: 4398046511268, maxDate: 1289908800000 }
-# */
+match
+    $person isa Person, has id 14;
 
-match 
-    # $person isa Person, has id 478;
-    $person isa Person, has id :personId;
     $other-person isa Person,
-        has id $other-id,
-        has firstName $firstname,
-        has lastName $lastname;
+        has id $otherPerson_id,
+        has firstName $otherPerson_firstName,
+        has lastName $otherPerson_lastName;
     {
-        $r1(friend: $person, friend: $other-person) isa knows;
+        (friend: $person, friend: $other-person) isa knows;
     } or {
-        $r1(friend: $person, friend: $intermediate) isa knows;
-        $r2(friend: $intermediate, friend: $other-person) isa knows;
+        (friend: $person, friend: $intermediate) isa knows;
+        (friend: $intermediate, friend: $other-person) isa knows;
         not { $person is $other-person; };
     };
 
-    $r3(created: $message, creator: $other-person) isa hasCreator;
+    (created: $message, creator: $other-person) isa hasCreator;
 
     $message isa Message,
-        has id $message-id,
-        has creationDate $date;
-    
-    ?messageContent = ?localContent;
+        has id $message_id,
+        has creationDate $message_creationDate;
+
+    ?message_content_or_imageFile = ?local;
     {
         $message has imageFile $image;
-        ?localContent = $image;
+        not { $image ""; };
+        ?local = $image;
     } or {
         $message has content $text;
-        ?localContent = $text;
+        not { $text ""; };
+        ?local = $text;
     };
 
-    $date > :maxDate;
-    # $date < 2011-04-14;
+    $message_creationDate < 2012-10-10;
 
-    ?sorter = "";
-
-get 
-    $other-id, $firstname, $lastname, $message-id, ?messageContent, $date, ?sorter;
+get
+    $otherPerson_id,
+    $otherPerson_firstName,
+    $otherPerson_lastName,
+    $message_id,
+    ?message_content_or_imageFile,
+    $message_creationDate;
 
 sort
-    $date desc,
-    $message-id asc,
-    ?sorter asc;
+    $message_creationDate desc,
+    $message_id asc,
+    $otherPerson_firstName asc;
 
 limit 20;

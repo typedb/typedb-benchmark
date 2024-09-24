@@ -36,7 +36,7 @@ public abstract class TypeQLDb extends BaseDb<TypeQLQueryStore> {
 
     // Interactive Complex Reads
     
-    public static class InteractiveQuery1 extends TypeQLListOperationHandler<LdbcQuery1,LdbcQuery1Result>
+    public static class InteractiveQuery1 extends TypeQLFetchListOperationHandler<LdbcQuery1,LdbcQuery1Result>
     {
 
          @Override
@@ -111,7 +111,7 @@ public abstract class TypeQLDb extends BaseDb<TypeQLQueryStore> {
          }
      }
 
-    public static class InteractiveQuery2 extends TypeQLListOperationHandler<LdbcQuery2,LdbcQuery2Result>
+    public static class InteractiveQuery2 extends TypeQLFetchListOperationHandler<LdbcQuery2,LdbcQuery2Result>
     {
 
         @Override
@@ -153,7 +153,7 @@ public abstract class TypeQLDb extends BaseDb<TypeQLQueryStore> {
         }
     }
 
-    public static class InteractiveQuery3a extends TypeQLListOperationHandler<LdbcQuery3a, LdbcQuery3Result> {
+    public static class InteractiveQuery3a extends TypeQLFetchListOperationHandler<LdbcQuery3a, LdbcQuery3Result> {
 
         @Override
         public String getQueryString(TypeQLDbConnectionState state, LdbcQuery3a operation) {
@@ -194,7 +194,7 @@ public abstract class TypeQLDb extends BaseDb<TypeQLQueryStore> {
         }
     }
 
-    public static class InteractiveQuery3b extends TypeQLListOperationHandler<LdbcQuery3b, LdbcQuery3Result> {
+    public static class InteractiveQuery3b extends TypeQLFetchListOperationHandler<LdbcQuery3b, LdbcQuery3Result> {
 
         @Override
         public String getQueryString(TypeQLDbConnectionState state, LdbcQuery3b operation) {
@@ -234,7 +234,7 @@ public abstract class TypeQLDb extends BaseDb<TypeQLQueryStore> {
             }
         }
     }
-    public static class InteractiveQuery4 extends TypeQLListOperationHandler<LdbcQuery4, LdbcQuery4Result> {
+    public static class InteractiveQuery4 extends TypeQLFetchListOperationHandler<LdbcQuery4, LdbcQuery4Result> {
 
         final int LIMIT = 10;
 
@@ -319,7 +319,7 @@ public abstract class TypeQLDb extends BaseDb<TypeQLQueryStore> {
         }
     }
 
-    public static class InteractiveQuery5 extends TypeQLListOperationHandler<LdbcQuery5, LdbcQuery5Result> {
+    public static class InteractiveQuery5 extends TypeQLFetchListOperationHandler<LdbcQuery5, LdbcQuery5Result> {
 
         final int LIMIT = 10;
 
@@ -466,7 +466,7 @@ public abstract class TypeQLDb extends BaseDb<TypeQLQueryStore> {
         }
     }
 
-    public static class InteractiveQuery6 extends TypeQLListOperationHandler<LdbcQuery6, LdbcQuery6Result> {
+    public static class InteractiveQuery6 extends TypeQLSpecialListOperationHandler<LdbcQuery6, LdbcQuery6Result> {
 
         final int LIMIT = 10;
 
@@ -554,8 +554,7 @@ public abstract class TypeQLDb extends BaseDb<TypeQLQueryStore> {
         }
     }
 
-     public static class InteractiveQuery7 extends TypeQLListOperationHandler<LdbcQuery7,LdbcQuery7Result>
-     {
+     public static class InteractiveQuery7 extends TypeQLGetListOperationHandler<LdbcQuery7,LdbcQuery7Result> {
 
          @Override
          public String getQueryString(TypeQLDbConnectionState state, LdbcQuery7 operation) {
@@ -575,131 +574,96 @@ public abstract class TypeQLDb extends BaseDb<TypeQLQueryStore> {
                  long likes_creationDate = result.get("likes_creationDate").asAttribute().getValue().asDateTime().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
                  long message_id = result.get("message_id").asAttribute().getValue().asLong();
                  String message_ContOrImg = result.get("message_content_or_imageFile").asValue().asString();
-                 int minutesLatency = (int)((likes_creationDate - result.get("message_creationDate").asAttribute().getValue().asDateTime().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli())/60000);
+                 int minutesLatency = (int) ((likes_creationDate - result.get("message_creationDate").asAttribute().getValue().asDateTime().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()) / 60000);
                  boolean isNew = result.get("isNew").asValue().asBoolean();
                  return new LdbcQuery7Result(
-                     friend_id,
-                     friend_firstName,
-                     friend_lastName,
-                     likes_creationDate,
-                     message_id,
-                     message_ContOrImg,
-                     minutesLatency,
-                     isNew
+                         friend_id,
+                         friend_firstName,
+                         friend_lastName,
+                         likes_creationDate,
+                         message_id,
+                         message_ContOrImg,
+                         minutesLatency,
+                         isNew
                  );
              } else {
                  return null;
              }
          }
+     }
+
+     public static class InteractiveQuery8 extends TypeQLGetListOperationHandler<LdbcQuery8,LdbcQuery8Result> {
 
          @Override
-         public void executeOperation(LdbcQuery7 operation, TypeQLDbConnectionState state,
-                                      ResultReporter resultReporter) throws DbException
-         {
-             String query = getQueryString(state, operation);
-             final Map<String, Object> parameters = getParameters(state, operation);
-             // Replace parameters in query
-             for (Map.Entry<String, Object> entry : parameters.entrySet()) {
-                 String valueString = entry.getValue().toString().replace("\"", "").replace("\'","");
-                 query = query.replace(":" + entry.getKey(), valueString);
-             }
-             final List<LdbcQuery7Result> results = new ArrayList<>();
+         public String getQueryString(TypeQLDbConnectionState state, LdbcQuery8 operation) {
+             return state.getQueryStore().getParameterizedQuery(QueryType.InteractiveComplexQuery8);
+         }
 
-             try(TypeDBTransaction transaction = state.getTransaction()){
-                 final Stream<ConceptMap> result = transaction.query().get(query);
+         @Override
+         public Map<String, Object> getParameters(TypeQLDbConnectionState state, LdbcQuery8 operation) {
+             return state.getQueryStore().getQuery8Map(operation);
+         }
 
-                 // Convert and collect results
-                 result.forEach(concept -> {
-                     try {
-                         results.add(toResult(concept));
-                     } catch (ParseException e) {
-                         System.err.println("[ERR] Error parsing concept: " + e.getMessage());
-                     }
-                 });
-                 transaction.close();
-                 resultReporter.report(results.size(), results, operation);
-             } catch (Exception e) {
-                 System.err.println("[ERR] Error executing operation: " + operation.getClass().getSimpleName());
-                 e.printStackTrace();
+         public LdbcQuery8Result toResult(ConceptMap result) throws ParseException {
+             if (result != null) {
+
+                 long authorId = result.get("commenAuthor_id").asAttribute().getValue().asLong();
+                 String firstname = result.get("commenAuthor_firstName").asAttribute().getValue().asString();
+                 String lastname = result.get("commenAuthor_lastName").asAttribute().getValue().asString();
+                 long date = result.get("comment_creationDate").asAttribute().getValue().asDateTime().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
+                 long replyId = result.get("comment_id").asAttribute().getValue().asLong();
+                 String content = result.get("comment_content").asAttribute().getValue().asString();
+
+                 return new LdbcQuery8Result(
+                         authorId,
+                         firstname,
+                         lastname,
+                         date,
+                         replyId,
+                         content
+                 );
+             } else {
+                 return null;
              }
          }
      }
 
-    // public static class InteractiveQuery8 extends TypeQLListOperationHandler<LdbcQuery8,LdbcQuery8Result>
-    // {
+     public static class InteractiveQuery9 extends TypeQLGetListOperationHandler<LdbcQuery9,LdbcQuery9Result>
+     {
 
-    //     @Override
-    //     public String getQueryString(TypeQLDbConnectionState state, LdbcQuery8 operation) {
-    //         return state.getQueryStore().getParameterizedQuery(QueryType.InteractiveComplexQuery8);
-    //     }
+         @Override
+         public String getQueryString(TypeQLDbConnectionState state, LdbcQuery9 operation) {
+             return state.getQueryStore().getParameterizedQuery(QueryType.InteractiveComplexQuery9);
+         }
 
-    //     @Override
-    //     public Map<String, Object> getParameters(TypeQLDbConnectionState state, LdbcQuery8 operation) {
-    //         return state.getQueryStore().getQuery8Map(operation);
-    //     }
+         @Override
+         public Map<String, Object> getParameters(TypeQLDbConnectionState state, LdbcQuery9 operation) {
+             return state.getQueryStore().getQuery9Map(operation);
+         }
 
-    //     @Override
-    //     public LdbcQuery8Result toResult(ConceptMap result) throws ParseException {
-    //         if (result != null) {
+         public LdbcQuery9Result toResult(ConceptMap result) throws ParseException {
+             if (result != null) {
                 
-    //             long authorId = result.get("authorId").asAttribute().asLong().getValue();
-    //             String firstname = result.get("firstname").asAttribute().asString().getValue();
-    //             String lastname = result.get("lastname").asAttribute().asString().getValue();
-    //             long date = result.get("date").asAttribute().asDateTime().getValue().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
-    //             long replyId = result.get("replyId").asAttribute().asLong().getValue();
-    //             String content = result.get("content").asAttribute().asString().getValue();
+                 long otherId = result.get("otherPerson_id").asAttribute().getValue().asLong();
+                 String firstname = result.get("otherPerson_firstName").asAttribute().getValue().asString();
+                 String lastname = result.get("otherPerson_lastName").asAttribute().getValue().asString();
+                 long messageId = result.get("message_id").asAttribute().getValue().asLong();
+                 String messageContent = result.get("message_content_or_imageFile").asValue().asString();
+                 long date = result.get("message_creationDate").asAttribute().getValue().asDateTime().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
 
-    //             return new LdbcQuery8Result(
-    //                 authorId,
-    //                 firstname,
-    //                 lastname,
-    //                 date,
-    //                 replyId,
-    //                 content
-    //             );
-    //         } else {
-    //             return null;
-    //         }
-    //     }
-    // }
-
-    // public static class InteractiveQuery9 extends TypeQLListOperationHandler<LdbcQuery9,LdbcQuery9Result>
-    // {
-
-    //     @Override
-    //     public String getQueryString(TypeQLDbConnectionState state, LdbcQuery9 operation) {
-    //         return state.getQueryStore().getParameterizedQuery(QueryType.InteractiveComplexQuery9);
-    //     }
-
-    //     @Override
-    //     public Map<String, Object> getParameters(TypeQLDbConnectionState state, LdbcQuery9 operation) {
-    //         return state.getQueryStore().getQuery9Map(operation);
-    //     }
-
-    //     @Override
-    //     public LdbcQuery9Result toResult(ConceptMap result) throws ParseException {
-    //         if (result != null) {
-                
-    //             long otherId = result.get("other-id").asAttribute().asLong().getValue();
-    //             String firstname = result.get("firstname").asAttribute().asString().getValue();
-    //             String lastname = result.get("lastname").asAttribute().asString().getValue();
-    //             long messageId = result.get("message-id").asAttribute().asLong().getValue();
-    //             String messageContent = result.get("messageContent").asValue().asString().getValue();
-    //             long date = result.get("date").asAttribute().asDateTime().getValue().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
-
-    //             return new LdbcQuery9Result(
-    //                 otherId,
-    //                 firstname,
-    //                 lastname,
-    //                 messageId,
-    //                 messageContent,
-    //                 date
-    //             );
-    //         } else {
-    //             return null;
-    //         }
-    //     }
-    // }
+                 return new LdbcQuery9Result(
+                     otherId,
+                     firstname,
+                     lastname,
+                     messageId,
+                     messageContent,
+                     date
+                 );
+             } else {
+                 return null;
+             }
+         }
+     }
 
     // Interactive short reads
     public static class ShortQuery1PersonProfile extends TypeQLSingletonOperationHandler<LdbcShortQuery1PersonProfile,LdbcShortQuery1PersonProfileResult>
