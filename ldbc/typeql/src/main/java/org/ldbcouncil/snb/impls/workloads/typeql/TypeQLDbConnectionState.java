@@ -33,12 +33,19 @@ public class TypeQLDbConnectionState<TDbQueryStore extends QueryStore> extends B
         return driver;
     }
     
-
-    public TypeDBTransaction getTransaction() throws DbException {
+    public TypeDBTransaction getReadTransaction() throws DbException {
         if (session == null || !session.isOpen()) {
             session = getDriver().session(dbName, TypeDBSession.Type.DATA);
         }
         TypeDBTransaction transaction = session.transaction(TypeDBTransaction.Type.READ);
+        return transaction;
+    }
+
+    public TypeDBTransaction getWriteTransaction() throws DbException {
+        if (session == null || !session.isOpen()) {
+            session = getDriver().session(dbName, TypeDBSession.Type.DATA);
+        }
+        TypeDBTransaction transaction = session.transaction(TypeDBTransaction.Type.WRITE);
         return transaction;
     }
 

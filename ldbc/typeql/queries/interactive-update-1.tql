@@ -1,25 +1,45 @@
-MATCH (c:City {id: $cityId})
-CREATE (p:Person {
-    id: $personId,
-    firstName: $personFirstName,
-    lastName: $personLastName,
-    gender: $gender,
-    birthday: $birthday,
-    creationDate: $creationDate,
-    locationIP: $locationIP,
-    browserUsed: $browserUsed,
-    languages: $languages,
-    email: $emails
-  })-[:IS_LOCATED_IN]->(c)
-WITH p, count(*) AS dummy1
-UNWIND $tagIds AS tagId
-  MATCH (t:Tag {id: tagId})
-  CREATE (p)-[:HAS_INTEREST]->(t)
-WITH p, count(*) AS dummy2
-UNWIND $studyAt AS s
-  MATCH (u:University {id: s[0]})
-  CREATE (p)-[:STUDY_AT {classYear: s[1]}]->(u)
-WITH p, count(*) AS dummy3
-UNWIND $workAt AS w
-  MATCH (comp:Company {id: w[0]})
-  CREATE (p)-[:WORKS_AT {workFrom: w[1]}]->(comp)
+match
+    $city isa City, has id :cityId;
+insert
+    $person isa Person,
+        has id :personId,
+        has firstName ":personFirstName",
+        has lastName ":personLastName",
+        has gender ":gender",
+        has birthday :birthday,
+        has creationDate :creationDate,
+        has locationIP ":locationIP",
+        has browserUsed ":browserUsed";
+    ($city, $person) isa isLocatedIn;
+#split#
+match
+    $person isa Person, has id :personId;
+insert
+    $person has speaks ":language";
+#split#
+match
+    $person isa Person, has id :personId;
+insert
+    $person has email ":email";
+#split#
+match
+    $person isa Person, has id :personId;
+    $tag isa Tag, has id :tagId;
+insert
+    ($person, $tag) isa hasInterest;
+#split#
+match
+    $person isa Person, has id :personId;
+    $university isa University, has id $id;
+    $id == :orgId;
+insert
+    ($person, $university) isa studyAt,
+        has classYear :studyYear;
+#split#
+match
+    $person isa Person, has id :personId;
+    $company isa Company, has id $id;
+    $id == :orgId;
+insert
+    ($person, $company) isa workAt,
+        has workFrom :workFrom;

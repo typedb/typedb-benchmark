@@ -80,43 +80,43 @@ public abstract class InteractiveTest<D extends Db> extends SnbTest<D>
     @Test
     public void testQuery11() throws Exception
     {
-        run( db, new LdbcQuery11( 30786325579101L, "Puerto_Rico", 2004, LIMIT ) );
+        run( db, new LdbcQuery11( 14L, "Puerto_Rico", 2004, LIMIT ) );
     }
 
     @Test
     public void testQuery12() throws Exception
     {
-        run( db, new LdbcQuery12( 19791209300143L, "BasketballPlayer", LIMIT ) );
+        run( db, new LdbcQuery12( 14L, "BasketballPlayer", LIMIT ) );
     }
 
     @Test
     public void testQuery13() throws Exception
     {
-        run( db, new LdbcQuery13a( 32985348833679L, 26388279067108L ) );
+        run( db, new LdbcQuery13a( 14L, 26388279067108L ) );
     }
 
     @Test
     public void testQuery14() throws Exception
     {
-        run( db, new LdbcQuery14a( 32985348833679L, 2199023256862L ) );
+        run( db, new LdbcQuery14a( 14L, 2199023256862L ) );
     }
 
     @Test
     public void testShortQuery1() throws Exception
     {
-        run( db, new LdbcShortQuery1PersonProfile( 32985348833679L ) );
+        run( db, new LdbcShortQuery1PersonProfile( 14L ) );
     }
 
     @Test
     public void testShortQuery2() throws Exception
     {
-        run( db, new LdbcShortQuery2PersonPosts( 32985348833679L, LIMIT ) );
+        run( db, new LdbcShortQuery2PersonPosts( 14L, LIMIT ) );
     }
 
     @Test
     public void testShortQuery3() throws Exception
     {
-        run( db, new LdbcShortQuery3PersonFriends( 32985348833679L ) );
+        run( db, new LdbcShortQuery3PersonFriends( 14L ) );
     }
 
     @Test
@@ -156,7 +156,7 @@ public abstract class InteractiveTest<D extends Db> extends SnbTest<D>
                      new Date( 1291394394934L ),
                      "193.104.227.215",
                      "Internet Explorer",
-                     1226L,
+                     246L,
                      ImmutableList.of( "ru", "en" ),
                      ImmutableList.of( "Almira10995116277777@gmail.com", "Almira10995116277777@gmx.com" ),
                      ImmutableList.of( 1916L ),
@@ -164,30 +164,36 @@ public abstract class InteractiveTest<D extends Db> extends SnbTest<D>
                      ImmutableList.of()
              )
         );
+
+        run( db, new LdbcDelete1RemovePerson( 10995116277777L ) );
     }
 
     @Test
     public void testUpdateQuery2() throws Exception
     {
         run( db, new LdbcInsert2AddPostLike( 8796093022239L, 206158430617L, new Date( 1290749436322L ) ) );
+        // add delete here
     }
 
     @Test
     public void testUpdateQuery3() throws Exception
     {
         run( db, new LdbcInsert3AddCommentLike( 4398046511123L, 343597384736L, new Date( 1290725729770L ) ) );
+        // add delete here
     }
 
     @Test
     public void testUpdateQuery4() throws Exception
     {
         run( db, new LdbcInsert4AddForum( 343597383803L, "Album 1 of Wolfgang Bauer", new Date( 1290883501867L ), 10, ImmutableList.of( 4844L ) ) );
+        // add delete here
     }
 
     @Test
     public void testUpdateQuery5() throws Exception
     {
         run( db, new LdbcInsert5AddForumMembership( 343597383798L, 8796093022252L, new Date( 1290748277090L ) ) );
+        // add delete here
     }
 
     @Test
@@ -207,6 +213,7 @@ public abstract class InteractiveTest<D extends Db> extends SnbTest<D>
                 50L,
                 ImmutableList.of()
         ) );
+        // add delete here
     }
 
     @Test
@@ -224,12 +231,14 @@ public abstract class InteractiveTest<D extends Db> extends SnbTest<D>
                 -1,
                 343597384736L,
                 ImmutableList.of() ) );
+        // add delete here
     }
 
     @Test
     public void testUpdateQuery8() throws Exception
     {
         run( db, new LdbcInsert8AddFriendship( 4398046511147L, 10995116277809L, new Date( 1290907550597L ) ) );
+        // add delete here
     }
 }
 

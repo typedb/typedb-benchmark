@@ -36,7 +36,7 @@ public abstract class TypeQLGetListOperationHandler<TOperation extends Operation
         }
         final List<TOperationResult> results = new ArrayList<>();
 
-        try(TypeDBTransaction transaction = state.getTransaction()){
+        try(TypeDBTransaction transaction = state.getReadTransaction()){
             final Stream<ConceptMap> result = transaction.query().get(query);
 
             // Convert and collect results

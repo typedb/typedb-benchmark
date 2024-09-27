@@ -17,13 +17,13 @@ public class PostgresInteractiveDb extends PostgresDb {
         registerOperationHandler(LdbcQuery2.class, Query2.class);
         registerOperationHandler(LdbcQuery3a.class, Query3a.class);
         registerOperationHandler(LdbcQuery3b.class, Query3b.class);
-//        registerOperationHandler(LdbcQuery4.class, Query4.class);
-//        registerOperationHandler(LdbcQuery5.class, Query5.class);
-//        registerOperationHandler(LdbcQuery6.class, Query6.class);
-//        registerOperationHandler(LdbcQuery7.class, Query7.class);
-//        registerOperationHandler(LdbcQuery8.class, Query8.class);
-//        registerOperationHandler(LdbcQuery9.class, Query9.class);
-//        registerOperationHandler(LdbcQuery10.class, Query10.class);
+        registerOperationHandler(LdbcQuery4.class, Query4.class);
+        registerOperationHandler(LdbcQuery5.class, Query5.class);
+        registerOperationHandler(LdbcQuery6.class, Query6.class);
+        registerOperationHandler(LdbcQuery7.class, Query7.class);
+        registerOperationHandler(LdbcQuery8.class, Query8.class);
+        registerOperationHandler(LdbcQuery9.class, Query9.class);
+        registerOperationHandler(LdbcQuery10.class, Query10.class);
 //        registerOperationHandler(LdbcQuery11.class, Query11.class);
 //        registerOperationHandler(LdbcQuery12.class, Query12.class);
 //        registerOperationHandler(LdbcQuery13a.class, Query13a.class);
@@ -39,7 +39,7 @@ public class PostgresInteractiveDb extends PostgresDb {
 //        registerOperationHandler(LdbcShortQuery6MessageForum.class, ShortQuery6MessageForum.class);
 //        registerOperationHandler(LdbcShortQuery7MessageReplies.class, ShortQuery7MessageReplies.class);
 
-//        registerOperationHandler(LdbcInsert1AddPerson.class, Insert1AddPerson.class);
+        registerOperationHandler(LdbcInsert1AddPerson.class, Insert1AddPerson.class);
 //        registerOperationHandler(LdbcInsert2AddPostLike.class, Insert2AddPostLike.class);
 //        registerOperationHandler(LdbcInsert3AddCommentLike.class, Insert3AddCommentLike.class);
 //        registerOperationHandler(LdbcInsert4AddForum.class, Insert4AddForum.class);

@@ -97,6 +97,17 @@ As I understand you don't really need the first two steps, which are purely for 
 * The file references `benchmark-sfXXX.properties` (replace with which ever property file you wish to use)
 * Ensure the right queries are toggled in the properties file
 
+### Development
+
+* `QueryType` holds a dictionary of query label to file name prefixes.
+* `QueryStore` contains useful methods, referring to both query operations and query types (so both need to be available) 
+* `LdbcOperation` is the superclass of specific operations, defining e.g. which parameters this operations take
+  * e.g. `LdbcQuery1` 
+  * e.g. `LdbcQuery1Result`
+  * e.g. `LdbcInsert1AddPerson`
+  * e.g. `LdbcDelete1RemovePerson`
+* For each operation, use `registerOperationHandler` to register a TypeQL class that will handle the operation
+
 ## Cypher
 
 ... not done yet, but similar
@@ -125,7 +136,7 @@ The execution in all three modes should be started after the initial data set wa
     * **Output:** The results will be stored in the validation parameters file (e.g. `validation_params.csv`) file set in the `create_validation_parameters` configuration property.
     * **Parallelism:** The execution must be single-threaded to ensure a deterministic order of operations.
 
-2. Validate against an existing reference output (called "validation parameters") with the `driver/validate.sh` script.
+2. Validate the implementation against an existing reference output (namely the "validation parameters" above) with the `driver/validate.sh` script. This runs a bunch of test queries (one for each type enabled in the properties file).
 
     * **Input:**
         * The query substitution parameters are taken from the validation parameters file (e.g. `validation_params.csv`) file set in the `validate_database` configuration property.

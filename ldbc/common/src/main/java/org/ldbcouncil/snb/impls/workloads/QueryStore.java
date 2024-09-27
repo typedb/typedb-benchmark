@@ -584,43 +584,43 @@ public abstract class QueryStore {
 //    public Map<String, Object> getShortQuery7MessageRepliesMap(LdbcShortQuery7MessageReplies operation) {
 //        return ImmutableMap.of(LdbcShortQuery7MessageReplies.MESSAGE_ID, getConverter().convertId(operation.getMessageRepliesId()));
 //    }
-//
-//
-//    /**
-//     * Get prepared UpdateQuery1 string
-//     * This is used for single query updates.
-//     * @param operation UpdateQuery1 operation containing parameter values
-//     * @return Prepared UpdateQuery1 string
-//     */
-//    public String getInsert1Single(LdbcInsert1AddPerson operation) {
-//        return prepare(
-//                QueryType.InteractiveInsert1, getInsert1SingleMap(operation)
-//        );
-//    }
-//
-//    /**
-//     * Get UpdateQuery1 Map. This map contain the name of the parameter and the value as string.
-//     * @param operation LdbcInsert1AddPerson operation containing parameter values
-//     * @return Map with parameters and values as string.
-//     */
-//    public Map<String, Object> getInsert1SingleMap(LdbcInsert1AddPerson operation) {
-//        return new ImmutableMap.Builder<String, Object>()
-//                .put(LdbcInsert1AddPerson.CREATION_DATE, getConverter().convertDateTime(operation.getCreationDate()))
-//                .put(LdbcInsert1AddPerson.PERSON_ID, getConverter().convertIdForInsertion(operation.getPersonId()))
-//                .put(LdbcInsert1AddPerson.PERSON_FIRST_NAME, getConverter().convertString(operation.getPersonFirstName()))
-//                .put(LdbcInsert1AddPerson.PERSON_LAST_NAME, getConverter().convertString(operation.getPersonLastName()))
-//                .put(LdbcInsert1AddPerson.GENDER, getConverter().convertString(operation.getGender()))
-//                .put(LdbcInsert1AddPerson.BIRTHDAY, getConverter().convertDate(operation.getBirthday()))
-//                .put(LdbcInsert1AddPerson.LOCATION_IP, getConverter().convertString(operation.getLocationIp()))
-//                .put(LdbcInsert1AddPerson.BROWSER_USED, getConverter().convertString(operation.getBrowserUsed()))
-//                .put(LdbcInsert1AddPerson.CITY_ID, getConverter().convertId(operation.getCityId()))
-//                .put(LdbcInsert1AddPerson.WORK_AT, getConverter().convertOrganisations(operation.getWorkAt()))
-//                .put(LdbcInsert1AddPerson.STUDY_AT, getConverter().convertOrganisations(operation.getStudyAt()))
-//                .put(LdbcInsert1AddPerson.EMAILS, getConverter().convertStringList(operation.getEmails()))
-//                .put(LdbcInsert1AddPerson.LANGUAGES, getConverter().convertStringList(operation.getLanguages()))
-//                .put(LdbcInsert1AddPerson.TAG_IDS, getConverter().convertLongList(operation.getTagIds()))
-//                .build();
-//    }
+
+
+    /**
+     * Get prepared UpdateQuery1 string
+     * This is used for single query updates.
+     * @param operation UpdateQuery1 operation containing parameter values
+     * @return Prepared UpdateQuery1 string
+     */
+    public String getInsert1Single(LdbcInsert1AddPerson operation) {
+        return prepare(
+                QueryType.InteractiveInsert1, getInsert1SingleMap(operation)
+        );
+    }
+
+    /**
+     * Get UpdateQuery1 Map. This map contain the name of the parameter and the value as string.
+     * @param operation LdbcInsert1AddPerson operation containing parameter values
+     * @return Map with parameters and values as string.
+     */
+    public Map<String, Object> getInsert1SingleMap(LdbcInsert1AddPerson operation) {
+        return new ImmutableMap.Builder<String, Object>()
+                .put(LdbcInsert1AddPerson.CREATION_DATE, getConverter().convertDateTime(operation.getCreationDate()))
+                .put(LdbcInsert1AddPerson.PERSON_ID, getConverter().convertIdForInsertion(operation.getPersonId()))
+                .put(LdbcInsert1AddPerson.PERSON_FIRST_NAME, getConverter().convertString(operation.getPersonFirstName()))
+                .put(LdbcInsert1AddPerson.PERSON_LAST_NAME, getConverter().convertString(operation.getPersonLastName()))
+                .put(LdbcInsert1AddPerson.GENDER, getConverter().convertString(operation.getGender()))
+                .put(LdbcInsert1AddPerson.BIRTHDAY, getConverter().convertDate(operation.getBirthday()))
+                .put(LdbcInsert1AddPerson.LOCATION_IP, getConverter().convertString(operation.getLocationIp()))
+                .put(LdbcInsert1AddPerson.BROWSER_USED, getConverter().convertString(operation.getBrowserUsed()))
+                .put(LdbcInsert1AddPerson.CITY_ID, getConverter().convertId(operation.getCityId()))
+                .put(LdbcInsert1AddPerson.WORK_AT, getConverter().convertOrganisations(operation.getWorkAt()))
+                .put(LdbcInsert1AddPerson.STUDY_AT, getConverter().convertOrganisations(operation.getStudyAt()))
+                .put(LdbcInsert1AddPerson.EMAILS, getConverter().convertStringList(operation.getEmails()))
+                .put(LdbcInsert1AddPerson.LANGUAGES, getConverter().convertStringList(operation.getLanguages()))
+                .put(LdbcInsert1AddPerson.TAG_IDS, getConverter().convertLongList(operation.getTagIds()))
+                .build();
+    }
 //
 //    /**
 //     * Get prepared UpdateQuery2 string
@@ -976,29 +976,29 @@ public abstract class QueryStore {
 //        return list;
 //    }
 //
-//    // Deletions
-//    /**
-//     * Get prepared DeleteQuery1 string
-//     * @param operation LdbcDelete1RemovePerson operation containing parameter values
-//     * @return Prepared DeleteQuery1 string
-//     */
-//    public String getDelete1(LdbcDelete1RemovePerson operation) {
-//        return prepare(
-//                QueryType.InteractiveDelete1, getDelete1Map(operation)
-//        );
-//    }
-//
-//    /**
-//     * Get DeleteQuery1 Map. This map contain the name of the parameter and the value as string.
-//     * @param operation LdbcDelete1RemovePerson operation containing parameter values
-//     * @return Map with parameters and values as string.
-//     */
-//    public Map<String, Object> getDelete1Map(LdbcDelete1RemovePerson operation) {
-//        return ImmutableMap.of(
-//                LdbcDelete1RemovePerson.PERSON_ID, getConverter().convertId(operation.getremovePersonIdD1())
-//        );
-//    }
-//
+    // Deletions
+    /**
+     * Get prepared DeleteQuery1 string
+     * @param operation LdbcDelete1RemovePerson operation containing parameter values
+     * @return Prepared DeleteQuery1 string
+     */
+    public String getDelete1(LdbcDelete1RemovePerson operation) {
+        return prepare(
+                QueryType.InteractiveDelete1, getDelete1Map(operation)
+        );
+    }
+
+    /**
+     * Get DeleteQuery1 Map. This map contain the name of the parameter and the value as string.
+     * @param operation LdbcDelete1RemovePerson operation containing parameter values
+     * @return Map with parameters and values as string.
+     */
+    public Map<String, Object> getDelete1Map(LdbcDelete1RemovePerson operation) {
+        return ImmutableMap.of(
+                LdbcDelete1RemovePerson.PERSON_ID, getConverter().convertId(operation.getremovePersonIdD1())
+        );
+    }
+
 //    /**
 //     * Get prepared DeleteQuery2 string
 //     * @param operation LdbcDelete2RemovePostLike operation containing parameter values

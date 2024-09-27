@@ -28,10 +28,10 @@ public abstract class TypeQLSingletonOperationHandler<TOperation extends Operati
         String query = getQueryString(state, operation);
         final Map<String, Object> parameters = getParameters(state, operation);
 
-        try(TypeDBTransaction transaction = state.getTransaction()){
+        try(TypeDBTransaction transaction = state.getReadTransaction()){
                 //replace parameters in query
                 for (Map.Entry<String, Object> entry : parameters.entrySet()) {
-                    query = query.replace(entry.getKey(), entry.getValue().toString());
+                    query = query.replace(":" + entry.getKey(), entry.getValue().toString());
                 }
 
                 Iterator<JSON> result = transaction.query().fetch(query).iterator();

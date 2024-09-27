@@ -33,7 +33,7 @@ public enum QueryType {
 //    InteractiveShortQuery7("interactive-short-7"),
 
     // interactive updates (single queries)
-//    InteractiveInsert1("interactive-update-1"),
+    InteractiveInsert1("interactive-update-1"),
 //    InteractiveInsert2("interactive-update-2"),
 //    InteractiveInsert3("interactive-update-3"),
 //    InteractiveInsert4("interactive-update-4"),
@@ -43,12 +43,12 @@ public enum QueryType {
 //    InteractiveInsert8("interactive-update-8"),
 
     // interactive updates (additional queries for systems that perform them as multiple queries)
-//    InteractiveInsert1AddPerson            ("interactive-update-1-add-person"),
-//    InteractiveInsert1AddPersonCompanies   ("interactive-update-1-add-person-companies"),
-//    InteractiveInsert1AddPersonEmails      ("interactive-update-1-add-person-emails"),
-//    InteractiveInsert1AddPersonLanguages   ("interactive-update-1-add-person-languages"),
-//    InteractiveInsert1AddPersonTags        ("interactive-update-1-add-person-tags"),
-//    InteractiveInsert1AddPersonUniversities("interactive-update-1-add-person-universities"),
+    InteractiveInsert1AddPerson            ("interactive-update-1-add-person"),
+    InteractiveInsert1AddPersonCompanies   ("interactive-update-1-add-person-companies"),
+    InteractiveInsert1AddPersonEmails      ("interactive-update-1-add-person-emails"),
+    InteractiveInsert1AddPersonLanguages   ("interactive-update-1-add-person-languages"),
+    InteractiveInsert1AddPersonTags        ("interactive-update-1-add-person-tags"),
+    InteractiveInsert1AddPersonUniversities("interactive-update-1-add-person-universities"),
 //
 //    InteractiveInsert4AddForum             ("interactive-update-4-add-forum"),
 //    InteractiveInsert4AddForumTags         ("interactive-update-4-add-forum-tags"),
@@ -65,7 +65,7 @@ public enum QueryType {
 //    InteractiveInsert6AddPostImageFile     ("interactive-update-6-add-post-imagefile"),
 
     // Deletes
-//    InteractiveDelete1("interactive-delete-1"),
+    InteractiveDelete1("interactive-delete-1"),
 //    InteractiveDelete2("interactive-delete-2"),
 //    InteractiveDelete3("interactive-delete-3"),
 //    InteractiveDelete4("interactive-delete-4"),

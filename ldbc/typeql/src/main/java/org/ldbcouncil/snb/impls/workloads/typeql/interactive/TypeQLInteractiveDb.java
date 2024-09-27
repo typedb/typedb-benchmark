@@ -39,7 +39,7 @@ public class TypeQLInteractiveDb extends TypeQLDb {
         // registerOperationHandler(LdbcShortQuery6MessageForum.class, ShortQuery6MessageForum.class);
         // registerOperationHandler(LdbcShortQuery7MessageReplies.class, ShortQuery7MessageReplies.class);
 
-        // registerOperationHandler(LdbcInsert1AddPerson.class, Insert1AddPerson.class);
+         registerOperationHandler(LdbcInsert1AddPerson.class, Insert1AddPerson.class);
         // registerOperationHandler(LdbcInsert2AddPostLike.class, Insert2AddPostLike.class);
         // registerOperationHandler(LdbcInsert3AddCommentLike.class, Insert3AddCommentLike.class);
         // registerOperationHandler(LdbcInsert4AddForum.class, Insert4AddForum.class);
@@ -48,7 +48,7 @@ public class TypeQLInteractiveDb extends TypeQLDb {
         // registerOperationHandler(LdbcInsert7AddComment.class, Insert7AddComment.class);
         // registerOperationHandler(LdbcInsert8AddFriendship.class, Insert8AddFriendship.class);
 
-        // registerOperationHandler(LdbcDelete1RemovePerson.class, Delete1RemovePerson.class);
+         registerOperationHandler(LdbcDelete1RemovePerson.class, Delete1RemovePerson.class);
         // registerOperationHandler(LdbcDelete2RemovePostLike.class, Delete2RemovePostLike.class);
         // registerOperationHandler(LdbcDelete3RemoveCommentLike.class, Delete3RemoveCommentLike.class);
         // registerOperationHandler(LdbcDelete4RemoveForum.class, Delete4RemoveForum.class);

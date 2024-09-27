@@ -28,7 +28,7 @@ public abstract class TypeQLFetchListOperationHandler<TOperation extends Operati
     public void executeOperation(TOperation operation, TypeQLDbConnectionState state,
                                  ResultReporter resultReporter) throws DbException
     {
-        System.out.println("[LOG] Executing operation: " + operation.getClass().getSimpleName());
+//        System.out.println("[LOG] Executing operation: " + operation.getClass().getSimpleName());
         String query = getQueryString(state, operation);
         final Map<String, Object> parameters = getParameters(state, operation);
         // Replace parameters in query
@@ -36,11 +36,11 @@ public abstract class TypeQLFetchListOperationHandler<TOperation extends Operati
             String valueString = entry.getValue().toString().replace("\"", "").replace("\'","");
             query = query.replace(":" + entry.getKey(), valueString);
         }
-        System.out.println("[LOG] Query: " + query);
+//        System.out.println("[LOG] Query: " + query);
         final List<TOperationResult> results = new ArrayList<>();
 
-        try(TypeDBTransaction transaction = state.getTransaction()){
-            System.out.println("[LOG] Transaction: " + transaction);
+        try(TypeDBTransaction transaction = state.getReadTransaction()){
+//            System.out.println("[LOG] Transaction: " + transaction);
             
             final Stream<JSON> result = transaction.query().fetch(query);
             

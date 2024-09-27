@@ -74,8 +74,23 @@ public class TypeQLInteractiveTest extends InteractiveTest {
     public void runTestQuery9() throws Exception {
         testQuery9();
     }
+
     @Test
     public void runTestQuery10() throws Exception {
         testQuery10();
+    }
+
+    // SHORT READS
+
+    @Test
+    public void runTestShortQuery1() throws Exception {
+        testShortQuery1();
+    }
+
+    // INSERT-DELETES
+
+    @Test
+    public void runTestUpdateQuery1() throws Exception {
+        testUpdateQuery1();
     }
 }

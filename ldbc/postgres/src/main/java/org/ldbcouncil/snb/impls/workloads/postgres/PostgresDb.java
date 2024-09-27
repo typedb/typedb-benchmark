@@ -118,136 +118,136 @@ public abstract class PostgresDb extends BaseDb<PostgresQueryStore> {
                     result.getInt(6));
         }
     }
-//
-//    public static class Query4 extends PostgresListOperationHandler<LdbcQuery4, LdbcQuery4Result> {
-//
-//        @Override
-//        public String getQueryString(PostgresDbConnectionState state, LdbcQuery4 operation) {
-//            return state.getQueryStore().getParameterizedQuery(QueryType.InteractiveComplexQuery4);
-//        }
-//
-//        @Override
-//        public LdbcQuery4Result convertSingleResult(ResultSet result) throws SQLException {
-//            return new LdbcQuery4Result(
-//                    result.getString(1),
-//                    result.getInt(2));
-//        }
-//
-//    }
-//
-//    public static class Query5 extends PostgresListOperationHandler<LdbcQuery5, LdbcQuery5Result> {
-//
-//        @Override
-//        public String getQueryString(PostgresDbConnectionState state, LdbcQuery5 operation) {
-//            return state.getQueryStore().getParameterizedQuery(QueryType.InteractiveComplexQuery5);
-//        }
-//
-//        @Override
-//        public LdbcQuery5Result convertSingleResult(ResultSet result) throws SQLException {
-//            return new LdbcQuery5Result(
-//                    result.getString(1),
-//                    result.getInt(2));
-//        }
-//
-//    }
-//
-//    public static class Query6 extends PostgresListOperationHandler<LdbcQuery6, LdbcQuery6Result> {
-//
-//        @Override
-//        public String getQueryString(PostgresDbConnectionState state, LdbcQuery6 operation) {
-//            return state.getQueryStore().getParameterizedQuery(QueryType.InteractiveComplexQuery6);
-//        }
-//
-//        @Override
-//        public LdbcQuery6Result convertSingleResult(ResultSet result) throws SQLException {
-//            return new LdbcQuery6Result(
-//                    result.getString(1),
-//                    result.getInt(2));
-//        }
-//
-//    }
-//
-//    public static class Query7 extends PostgresListOperationHandler<LdbcQuery7, LdbcQuery7Result> {
-//
-//        @Override
-//        public String getQueryString(PostgresDbConnectionState state, LdbcQuery7 operation) {
-//            return state.getQueryStore().getParameterizedQuery(QueryType.InteractiveComplexQuery7);
-//        }
-//
-//        @Override
-//        public LdbcQuery7Result convertSingleResult(ResultSet result) throws SQLException {
-//            return new LdbcQuery7Result(
-//                    result.getLong(1),
-//                    result.getString(2),
-//                    result.getString(3),
-//                    PostgresConverter.stringTimestampToEpoch(result, 4),
-//                    result.getLong(5),
-//                    result.getString(6),
-//                    result.getInt(7),
-//                    result.getBoolean(8));
-//        }
-//
-//    }
-//
-//    public static class Query8 extends PostgresListOperationHandler<LdbcQuery8, LdbcQuery8Result> {
-//
-//        @Override
-//        public String getQueryString(PostgresDbConnectionState state, LdbcQuery8 operation) {
-//            return state.getQueryStore().getParameterizedQuery(QueryType.InteractiveComplexQuery8);
-//        }
-//
-//        @Override
-//        public LdbcQuery8Result convertSingleResult(ResultSet result) throws SQLException {
-//            return new LdbcQuery8Result(
-//                    result.getLong(1),
-//                    result.getString(2),
-//                    result.getString(3),
-//                    PostgresConverter.stringTimestampToEpoch(result, 4),
-//                    result.getLong(5),
-//                    result.getString(6));
-//        }
-//
-//    }
-//
-//    public static class Query9 extends PostgresListOperationHandler<LdbcQuery9, LdbcQuery9Result> {
-//
-//        @Override
-//        public String getQueryString(PostgresDbConnectionState state, LdbcQuery9 operation) {
-//            return state.getQueryStore().getParameterizedQuery(QueryType.InteractiveComplexQuery9);
-//        }
-//
-//        @Override
-//        public LdbcQuery9Result convertSingleResult(ResultSet result) throws SQLException {
-//            return new LdbcQuery9Result(
-//                    result.getLong(1),
-//                    result.getString(2),
-//                    result.getString(3),
-//                    result.getLong(4),
-//                    result.getString(5),
-//                    PostgresConverter.stringTimestampToEpoch(result, 6));
-//        }
-//
-//    }
-//
-//    public static class Query10 extends PostgresListOperationHandler<LdbcQuery10, LdbcQuery10Result> {
-//
-//        @Override
-//        public String getQueryString(PostgresDbConnectionState state, LdbcQuery10 operation) {
-//            return state.getQueryStore().getParameterizedQuery(QueryType.InteractiveComplexQuery10);
-//        }
-//
-//        @Override
-//        public LdbcQuery10Result convertSingleResult(ResultSet result) throws SQLException {
-//            return new LdbcQuery10Result(
-//                    result.getLong(1),
-//                    result.getString(2),
-//                    result.getString(3),
-//                    result.getInt(4),
-//                    result.getString(5),
-//                    result.getString(6));
-//        }
-//
-//    }
+
+    public static class Query4 extends PostgresListOperationHandler<LdbcQuery4, LdbcQuery4Result> {
+
+        @Override
+        public String getQueryString(PostgresDbConnectionState state, LdbcQuery4 operation) {
+            return state.getQueryStore().getParameterizedQuery(QueryType.InteractiveComplexQuery4);
+        }
+
+        @Override
+        public LdbcQuery4Result convertSingleResult(ResultSet result) throws SQLException {
+            return new LdbcQuery4Result(
+                    result.getString(1),
+                    result.getInt(2));
+        }
+
+    }
+
+    public static class Query5 extends PostgresListOperationHandler<LdbcQuery5, LdbcQuery5Result> {
+
+        @Override
+        public String getQueryString(PostgresDbConnectionState state, LdbcQuery5 operation) {
+            return state.getQueryStore().getParameterizedQuery(QueryType.InteractiveComplexQuery5);
+        }
+
+        @Override
+        public LdbcQuery5Result convertSingleResult(ResultSet result) throws SQLException {
+            return new LdbcQuery5Result(
+                    result.getString(1),
+                    result.getInt(2));
+        }
+
+    }
+
+    public static class Query6 extends PostgresListOperationHandler<LdbcQuery6, LdbcQuery6Result> {
+
+        @Override
+        public String getQueryString(PostgresDbConnectionState state, LdbcQuery6 operation) {
+            return state.getQueryStore().getParameterizedQuery(QueryType.InteractiveComplexQuery6);
+        }
+
+        @Override
+        public LdbcQuery6Result convertSingleResult(ResultSet result) throws SQLException {
+            return new LdbcQuery6Result(
+                    result.getString(1),
+                    result.getInt(2));
+        }
+
+    }
+
+    public static class Query7 extends PostgresListOperationHandler<LdbcQuery7, LdbcQuery7Result> {
+
+        @Override
+        public String getQueryString(PostgresDbConnectionState state, LdbcQuery7 operation) {
+            return state.getQueryStore().getParameterizedQuery(QueryType.InteractiveComplexQuery7);
+        }
+
+        @Override
+        public LdbcQuery7Result convertSingleResult(ResultSet result) throws SQLException {
+            return new LdbcQuery7Result(
+                    result.getLong(1),
+                    result.getString(2),
+                    result.getString(3),
+                    PostgresConverter.stringTimestampToEpoch(result, 4),
+                    result.getLong(5),
+                    result.getString(6),
+                    result.getInt(7),
+                    result.getBoolean(8));
+        }
+
+    }
+
+    public static class Query8 extends PostgresListOperationHandler<LdbcQuery8, LdbcQuery8Result> {
+
+        @Override
+        public String getQueryString(PostgresDbConnectionState state, LdbcQuery8 operation) {
+            return state.getQueryStore().getParameterizedQuery(QueryType.InteractiveComplexQuery8);
+        }
+
+        @Override
+        public LdbcQuery8Result convertSingleResult(ResultSet result) throws SQLException {
+            return new LdbcQuery8Result(
+                    result.getLong(1),
+                    result.getString(2),
+                    result.getString(3),
+                    PostgresConverter.stringTimestampToEpoch(result, 4),
+                    result.getLong(5),
+                    result.getString(6));
+        }
+
+    }
+
+    public static class Query9 extends PostgresListOperationHandler<LdbcQuery9, LdbcQuery9Result> {
+
+        @Override
+        public String getQueryString(PostgresDbConnectionState state, LdbcQuery9 operation) {
+            return state.getQueryStore().getParameterizedQuery(QueryType.InteractiveComplexQuery9);
+        }
+
+        @Override
+        public LdbcQuery9Result convertSingleResult(ResultSet result) throws SQLException {
+            return new LdbcQuery9Result(
+                    result.getLong(1),
+                    result.getString(2),
+                    result.getString(3),
+                    result.getLong(4),
+                    result.getString(5),
+                    PostgresConverter.stringTimestampToEpoch(result, 6));
+        }
+
+    }
+
+    public static class Query10 extends PostgresListOperationHandler<LdbcQuery10, LdbcQuery10Result> {
+
+        @Override
+        public String getQueryString(PostgresDbConnectionState state, LdbcQuery10 operation) {
+            return state.getQueryStore().getParameterizedQuery(QueryType.InteractiveComplexQuery10);
+        }
+
+        @Override
+        public LdbcQuery10Result convertSingleResult(ResultSet result) throws SQLException {
+            return new LdbcQuery10Result(
+                    result.getLong(1),
+                    result.getString(2),
+                    result.getString(3),
+                    result.getInt(4),
+                    result.getString(5),
+                    result.getString(6));
+        }
+
+    }
 //
 //    public static class Query11 extends PostgresListOperationHandler<LdbcQuery11, LdbcQuery11Result> {
 //
@@ -478,70 +478,70 @@ public abstract class PostgresDb extends BaseDb<PostgresQueryStore> {
 //    }
 //
 //
-//    public static class Insert1AddPerson extends PostgresMultipleUpdateOperationHandler<LdbcInsert1AddPerson> {
-//
-//        @Override
-//        public void executeOperation(LdbcInsert1AddPerson operation, PostgresDbConnectionState state, ResultReporter resultReporter) throws DbException {
-//            try (Connection conn = state.getConnection()) {
-//                // InteractiveInsert1AddPerson
-//                String queryStringAddPerson = state.getQueryStore().getParameterizedQuery(QueryType.InteractiveInsert1AddPerson);
-//                replaceParameterNamesWithQuestionMarks(operation, queryStringAddPerson);
-//                state.logQuery(operation.getClass().getSimpleName(), queryStringAddPerson);
-//                try ( PreparedStatement stmt1 = prepareAndSetParametersInPreparedStatement(operation, queryStringAddPerson, conn)){
-//                    stmt1.executeUpdate();
-//                }
-//
-//                // InteractiveInsert1AddPersonCompanies
-//                String queryStringAddPersonCompanies = state.getQueryStore().getParameterizedQuery(QueryType.InteractiveInsert1AddPersonCompanies);
-//                replaceParameterNamesWithQuestionMarks(operation, queryStringAddPersonCompanies, ImmutableList.of("organizationId", "worksFromYear"));
-//                state.logQuery(operation.getClass().getSimpleName(), queryStringAddPersonCompanies);
-//                try (final PreparedStatement stmt2 = prepareSnbStatement(queryStringAddPersonCompanies, conn)) {
-//                    for (LdbcInsert1AddPerson.Organization o : operation.getWorkAt()) {
-//                        stmt2.setObject(1, PostgresConverter.convertDateToOffsetDateTime(operation.getCreationDate()));
-//                        stmt2.setLong(2, operation.getPersonId());
-//                        stmt2.setLong(3, o.getOrganizationId());
-//                        stmt2.setInt(4, o.getYear());
-//                        stmt2.addBatch();
-//                    }
-//                    stmt2.executeBatch();
-//                }
-//
-//                // InteractiveInsert1AddPersonTags
-//                String queryStringAddPersonTags = state.getQueryStore().getParameterizedQuery(QueryType.InteractiveInsert1AddPersonTags);
-//                replaceParameterNamesWithQuestionMarks(operation, queryStringAddPersonTags, ImmutableList.of("tagId"));
-//                state.logQuery(operation.getClass().getSimpleName(), queryStringAddPersonTags);
-//                try (PreparedStatement stmt5 = prepareSnbStatement(queryStringAddPersonTags, conn))
-//                {
-//                    for (long tagId : operation.getTagIds()) {
-//                        stmt5.setObject(1, PostgresConverter.convertDateToOffsetDateTime(operation.getCreationDate()));
-//                        stmt5.setLong(2, operation.getPersonId());
-//                        stmt5.setLong(3, tagId);
-//                        stmt5.addBatch();
-//                    }
-//                    stmt5.executeBatch();
-//                }
-//
-//                // InteractiveInsert1AddPersonUniversities
-//                String queryStringAddPersonUniversities = state.getQueryStore().getParameterizedQuery(QueryType.InteractiveInsert1AddPersonUniversities);
-//                replaceParameterNamesWithQuestionMarks(operation, queryStringAddPersonUniversities, ImmutableList.of("organizationId", "studiesFromYear"));
-//                state.logQuery(operation.getClass().getSimpleName(), queryStringAddPersonUniversities);
-//                try ( PreparedStatement stmt6 = prepareSnbStatement(queryStringAddPersonUniversities, conn)){
-//                    for (LdbcInsert1AddPerson.Organization o : operation.getStudyAt()) {
-//                        stmt6.setObject(1, PostgresConverter.convertDateToOffsetDateTime(operation.getCreationDate()));
-//                        stmt6.setLong(2, operation.getPersonId());
-//                        stmt6.setLong(3, o.getOrganizationId());
-//                        stmt6.setInt(4, o.getYear());
-//                        stmt6.addBatch();
-//                    }
-//                    stmt6.executeBatch();
-//                }
-//
-//            } catch (Exception e) {
-//                throw new DbException(e);
-//            }
-//            resultReporter.report(0, LdbcNoResult.INSTANCE, operation);
-//        }
-//    }
+    public static class Insert1AddPerson extends PostgresMultipleUpdateOperationHandler<LdbcInsert1AddPerson> {
+
+        @Override
+        public void executeOperation(LdbcInsert1AddPerson operation, PostgresDbConnectionState state, ResultReporter resultReporter) throws DbException {
+            try (Connection conn = state.getConnection()) {
+                // InteractiveInsert1AddPerson
+                String queryStringAddPerson = state.getQueryStore().getParameterizedQuery(QueryType.InteractiveInsert1AddPerson);
+                replaceParameterNamesWithQuestionMarks(operation, queryStringAddPerson);
+                state.logQuery(operation.getClass().getSimpleName(), queryStringAddPerson);
+                try ( PreparedStatement stmt1 = prepareAndSetParametersInPreparedStatement(operation, queryStringAddPerson, conn)){
+                    stmt1.executeUpdate();
+                }
+
+                // InteractiveInsert1AddPersonCompanies
+                String queryStringAddPersonCompanies = state.getQueryStore().getParameterizedQuery(QueryType.InteractiveInsert1AddPersonCompanies);
+                replaceParameterNamesWithQuestionMarks(operation, queryStringAddPersonCompanies, ImmutableList.of("organizationId", "worksFromYear"));
+                state.logQuery(operation.getClass().getSimpleName(), queryStringAddPersonCompanies);
+                try (final PreparedStatement stmt2 = prepareSnbStatement(queryStringAddPersonCompanies, conn)) {
+                    for (LdbcInsert1AddPerson.Organization o : operation.getWorkAt()) {
+                        stmt2.setObject(1, PostgresConverter.convertDateToOffsetDateTime(operation.getCreationDate()));
+                        stmt2.setLong(2, operation.getPersonId());
+                        stmt2.setLong(3, o.getOrganizationId());
+                        stmt2.setInt(4, o.getYear());
+                        stmt2.addBatch();
+                    }
+                    stmt2.executeBatch();
+                }
+
+                // InteractiveInsert1AddPersonTags
+                String queryStringAddPersonTags = state.getQueryStore().getParameterizedQuery(QueryType.InteractiveInsert1AddPersonTags);
+                replaceParameterNamesWithQuestionMarks(operation, queryStringAddPersonTags, ImmutableList.of("tagId"));
+                state.logQuery(operation.getClass().getSimpleName(), queryStringAddPersonTags);
+                try (PreparedStatement stmt5 = prepareSnbStatement(queryStringAddPersonTags, conn))
+                {
+                    for (long tagId : operation.getTagIds()) {
+                        stmt5.setObject(1, PostgresConverter.convertDateToOffsetDateTime(operation.getCreationDate()));
+                        stmt5.setLong(2, operation.getPersonId());
+                        stmt5.setLong(3, tagId);
+                        stmt5.addBatch();
+                    }
+                    stmt5.executeBatch();
+                }
+
+                // InteractiveInsert1AddPersonUniversities
+                String queryStringAddPersonUniversities = state.getQueryStore().getParameterizedQuery(QueryType.InteractiveInsert1AddPersonUniversities);
+                replaceParameterNamesWithQuestionMarks(operation, queryStringAddPersonUniversities, ImmutableList.of("organizationId", "studiesFromYear"));
+                state.logQuery(operation.getClass().getSimpleName(), queryStringAddPersonUniversities);
+                try ( PreparedStatement stmt6 = prepareSnbStatement(queryStringAddPersonUniversities, conn)){
+                    for (LdbcInsert1AddPerson.Organization o : operation.getStudyAt()) {
+                        stmt6.setObject(1, PostgresConverter.convertDateToOffsetDateTime(operation.getCreationDate()));
+                        stmt6.setLong(2, operation.getPersonId());
+                        stmt6.setLong(3, o.getOrganizationId());
+                        stmt6.setInt(4, o.getYear());
+                        stmt6.addBatch();
+                    }
+                    stmt6.executeBatch();
+                }
+
+            } catch (Exception e) {
+                throw new DbException(e);
+            }
+            resultReporter.report(0, LdbcNoResult.INSTANCE, operation);
+        }
+    }
 //
 //    public static class Insert2AddPostLike extends PostgresUpdateOperationHandler<LdbcInsert2AddPostLike> {
 //
