@@ -234,7 +234,8 @@ public abstract class TypeQLDb extends BaseDb<TypeQLQueryStore> {
             }
         }
     }
-    public static class InteractiveQuery4 extends TypeQLFetchListOperationHandler<LdbcQuery4, LdbcQuery4Result> {
+
+    public static class InteractiveQuery4 extends TypeQLSpecialListOperationHandler<LdbcQuery4, LdbcQuery4Result> {
 
         final int LIMIT = 10;
 
@@ -664,6 +665,109 @@ public abstract class TypeQLDb extends BaseDb<TypeQLQueryStore> {
              }
          }
      }
+    public static class InteractiveQuery10 extends TypeQLSpecialListOperationHandler<LdbcQuery10, LdbcQuery10Result> {
+
+        final int LIMIT = 10;
+
+        @Override
+        public String getQueryString(TypeQLDbConnectionState state, LdbcQuery10 operation) {
+            return state.getQueryStore().getParameterizedQuery(QueryType.InteractiveComplexQuery10);
+        }
+
+        @Override
+        public Map<String, Object> getParameters(TypeQLDbConnectionState state, LdbcQuery10 operation) {
+            return state.getQueryStore().getQuery10Map(operation);
+        }
+
+        public LdbcQuery10Result toLdbcResult(List<Comparable> result) {
+            return new LdbcQuery10Result(
+                    (long) result.get(1),
+                    (String) result.get(2),
+                    (String) result.get(3),
+                    ((Integer) result.get(0)).intValue(),
+                    (String) result.get(4),
+                    (String) result.get(5)
+            );
+        }
+
+        private List<Comparable> toFoafResult(ConceptMap map) {
+            return Arrays.asList(
+                    map.get("foaf").asThing().getIID(),
+                    map.get("foaf_birthday").asAttribute().getValue().asDateTime().atZone(ZoneId.systemDefault()).toLocalDate()
+            );
+        }
+
+        class Query10Comparator implements Comparator<List<Comparable>> {
+            @Override
+            public int compare(List<Comparable> o1, List<Comparable> o2) {
+                int comparison = -o1.get(0).compareTo(o2.get(0)); // Sort by commonality score
+                if (comparison != 0) {
+                    return comparison;
+                }
+                return o1.get(1).compareTo(o2.get(1)); // Otherwise sort by friend_id
+            }
+        }
+
+        @Override
+        public void executeOperation(LdbcQuery10 operation, TypeQLDbConnectionState state,
+                                     ResultReporter resultReporter) throws DbException
+        {
+            String query = getQueryString(state, operation);
+            final Map<String, Object> parameters = getParameters(state, operation);
+            query = query.replace(":personId", parameters.get("personId").toString());
+            String[] queries = query.split("#split#");
+            String foaf_query = queries[0];
+            final String[] common_query = {queries[1]};
+
+            try(TypeDBTransaction transaction = state.getTransaction()){
+                final Stream<ConceptMap> result = transaction.query().get(foaf_query);
+                final List<List<Comparable>> foaf_results = new ArrayList<>();
+                final List<List<Comparable>> sortable_common_results = new ArrayList<>();
+                result.forEach(map -> {
+                    foaf_results.add(toFoafResult(map));
+                });
+                // Filter results to only include those with a birthday
+                // between 21-month and 22-(month+1) where
+                // month = parameters.get("month")
+                foaf_results.stream().filter(list -> {
+                    LocalDate birthday = (LocalDate) list.get(1);
+                    int month = Integer.parseInt((String) parameters.get("month"));
+                    LocalDate startDate = LocalDate.of(birthday.getYear(), month, 21);
+                    LocalDate endDate = startDate.plusMonths(1).withDayOfMonth(22);
+                    return !birthday.isBefore(startDate) && birthday.isBefore(endDate);
+                }).forEach(list -> {
+                    String foaf_id = (String) list.get(0);
+                    String common_query_foaf = common_query[0].replace(":foafId", foaf_id);
+                    final Stream<JSON> common_result = transaction.query().fetch(common_query_foaf);
+                    common_result.forEach(json -> {
+                        Map<String, JSON> jsonMap = json.asObject();
+                        sortable_common_results.add(Arrays.asList(
+                                (int) jsonMap.get("common").asObject().get("value").asNumber()
+                                       - (int) jsonMap.get("uncommon").asObject().get("value").asNumber(),
+                                (long) jsonMap.get("foaf_id").asObject().get("value").asNumber(),
+                                jsonMap.get("foaf_firstName").asObject().get("value").asString(),
+                                jsonMap.get("foaf_lastName").asObject().get("value").asString(),
+                                jsonMap.get("foaf_gender").asObject().get("value").asString(),
+                                jsonMap.get("city_name").asObject().get("value").asString()
+                        ));
+                    });
+                });
+
+                transaction.close();
+                Collections.sort(sortable_common_results, new Query10Comparator());
+                final List<LdbcQuery10Result> results = sortable_common_results
+                        .stream()
+                        .limit(LIMIT)
+                        .map(this::toLdbcResult)
+                        .collect(Collectors.toList());
+                resultReporter.report(results.size(), results, operation);
+            } catch (Exception e) {
+                System.err.println("[ERR] Error executing operation: " + operation.getClass().getSimpleName());
+                e.printStackTrace();
+            }
+        }
+
+    }
 
     // Interactive short reads
     public static class ShortQuery1PersonProfile extends TypeQLSingletonOperationHandler<LdbcShortQuery1PersonProfile,LdbcShortQuery1PersonProfileResult>
