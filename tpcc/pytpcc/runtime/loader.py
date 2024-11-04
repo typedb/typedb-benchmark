@@ -148,13 +148,13 @@ class Loader:
                 ## This is a new order: make one for it
                 if newOrder: no_tuples.append([o_id, d_id, w_id])
             ## FOR
-            #
-            # print("Loading DISTRICT")
-            # self.handle.loadTuples(constants.TABLENAME_DISTRICT, d_tuples)
-            # print("Loading CUSTOMER")
-            # self.handle.loadTuples(constants.TABLENAME_CUSTOMER, c_tuples)
-            # print("Loading ORDERS")
-            # self.handle.loadTuples(constants.TABLENAME_ORDERS, o_tuples)
+
+            print("Loading DISTRICT")
+            self.handle.loadTuples(constants.TABLENAME_DISTRICT, d_tuples)
+            print("Loading CUSTOMER")
+            self.handle.loadTuples(constants.TABLENAME_CUSTOMER, c_tuples)
+            print("Loading ORDERS")
+            self.handle.loadTuples(constants.TABLENAME_ORDERS, o_tuples)
             print("Loading ORDER_LINE")
             self.handle.loadTuples(constants.TABLENAME_ORDER_LINE, ol_tuples)
             print("Loading NEW_ORDER")

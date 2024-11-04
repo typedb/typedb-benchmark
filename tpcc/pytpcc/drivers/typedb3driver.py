@@ -82,8 +82,6 @@ class Typedb3Driver(AbstractDriver):
         if self.edition is EDITION.Core:
             self.driver = TypeDB.core_driver(self.addr)
         if self.edition is EDITION.Cloud:
-            # self.credentials = TypeDBCredential(self.username, self.password, tls_enabled=True)
-            # self.driver =  TypeDB.cloud_driver(self.addr, self.credentials)
             raise "Unimplemented"
 
         if config["reset"] and self.driver.databases.contains(self.database):
