@@ -1,0 +1,48 @@
+match
+    $person isa Person, has id 14;
+
+    $other-person isa Person,
+        has id $otherPerson_id,
+        has firstName $otherPerson_firstName,
+        has lastName $otherPerson_lastName;
+    {
+        (friend: $person, friend: $other-person) isa knows;
+    } or {
+        (friend: $person, friend: $intermediate) isa knows;
+        (friend: $intermediate, friend: $other-person) isa knows;
+        not { $person is $other-person; };
+    };
+
+    (created: $message, creator: $other-person) isa hasCreator;
+
+    $message isa Message,
+        has id $message_id,
+        has creationDate $message_creationDate;
+
+    ?message_content_or_imageFile = ?local;
+    {
+        $message has imageFile $image;
+        not { $image ""; };
+        ?local = $image;
+    } or {
+        $message has content $text;
+        not { $text ""; };
+        ?local = $text;
+    };
+
+    $message_creationDate < 2012-10-10;
+
+get
+    $otherPerson_id,
+    $otherPerson_firstName,
+    $otherPerson_lastName,
+    $message_id,
+    ?message_content_or_imageFile,
+    $message_creationDate;
+
+sort
+    $message_creationDate desc,
+    $message_id asc,
+    $otherPerson_firstName asc;
+
+limit 20;

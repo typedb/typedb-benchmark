@@ -1,6 +1,0 @@
-operation_type|scheduled_start_time|actual_start_time|execution_duration_MILLISECONDS|result_code|original_start_time
-LdbcQuery10|1727612019247|1727612019248|946|2|16886
-LdbcShortQuery1PersonProfile|1727612020194|1727612020194|40|1|-1
-LdbcShortQuery1PersonProfile|1727612020234|1727612020235|9|1|-1
-LdbcQuery4|1727612019247|1727612020244|50|0|16886
-LdbcQuery5|1727612019247|1727612020295|847|10|16886
