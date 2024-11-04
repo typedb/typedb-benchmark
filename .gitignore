@@ -47,3 +47,4 @@ __pycache__
 # Bazel
 bazel-*
 /ldbc/typeql/results
+/.py311
