@@ -1,0 +1,3 @@
+match $p isa Organisation, has name $x;
+get $p , $x;
+

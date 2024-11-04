@@ -1,0 +1,19 @@
+match
+    $person isa Person, has id :personId;
+    $otherPerson isa Person;
+    {
+        (friend: $person, friend: $otherPerson) isa knows;
+    } or {
+        (friend: $person, friend: $intermediateFriend) isa knows;
+        (friend: $intermediateFriend, friend: $otherPerson) isa knows;
+        not {$otherPerson is $person;};
+    };
+    $tag isa Tag, has name ":tagName";
+    $otherTag isa Tag, has name $tag_name;
+    ($post, $otherPerson) isa hasCreator;
+    ($post, $tag) isa hasTag;
+    ($post, $otherTag) isa hasTag;
+    not { $tag is $otherTag; };
+get $post, $otherTag;
+group $otherTag;
+count;

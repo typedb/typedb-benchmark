@@ -1,0 +1,44 @@
+// Q11. Job referral
+/*
+:params {
+  personId: 10995116277918,
+  countryName: "Hungary",
+  workFromYear: 2011
+}
+*/
+match
+    # The starting person with given id
+    $person isa Person, has id :personId;
+
+    # The friend or friend-of-friend
+    $other-person isa Person, has id $otherPersonId, has firstName $otherPersonFirstName, has lastName $otherPersonLastName;
+    {
+        # Direct friend
+        ($person, $other-person) isa knows;
+    } or {
+        # Friend-of-friend
+        ($person, $intermediate) isa knows;
+        ($intermediate, $other-person) isa knows;
+        not { $person is $other-person; };
+    };
+
+    # The company that the friend or friend-of-friend works at
+    ($other-person, $company) isa workAt, has workFrom $workDate;
+    $company isa Company, has name $companyName;
+
+    # The country where the company is located
+    $country isa Country, has name :countryName;
+    ($company, $country) isa isLocatedIn;
+
+    # Filter on the workFromYear
+    $workDate < :workFromYear;
+
+get
+    $otherPersonId, $otherPersonFirstName, $otherPersonLastName, $companyName, $workDate;
+
+sort 
+    $workDate asc, 
+    $otherPersonId asc, 
+    $companyName desc;
+
+limit 10;

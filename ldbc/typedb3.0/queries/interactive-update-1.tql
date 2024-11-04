@@ -1,0 +1,45 @@
+match
+    $city isa City, has id :cityId;
+insert
+    $person isa Person,
+        has id :personId,
+        has firstName ":personFirstName",
+        has lastName ":personLastName",
+        has gender ":gender",
+        has birthday :birthday,
+        has creationDate :creationDate,
+        has locationIP ":locationIP",
+        has browserUsed ":browserUsed";
+    ($city, $person) isa isLocatedIn;
+#split#
+match
+    $person isa Person, has id :personId;
+insert
+    $person has speaks ":language";
+#split#
+match
+    $person isa Person, has id :personId;
+insert
+    $person has email ":email";
+#split#
+match
+    $person isa Person, has id :personId;
+    $tag isa Tag, has id :tagId;
+insert
+    ($person, $tag) isa hasInterest;
+#split#
+match
+    $person isa Person, has id :personId;
+    $university isa University, has id $id;
+    $id == :orgId;
+insert
+    ($person, $university) isa studyAt,
+        has classYear :studyYear;
+#split#
+match
+    $person isa Person, has id :personId;
+    $company isa Company, has id $id;
+    $id == :orgId;
+insert
+    ($person, $company) isa workAt,
+        has workFrom :workFrom;

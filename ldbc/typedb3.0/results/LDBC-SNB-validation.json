@@ -1,0 +1,63 @@
+{
+  "excessive_delay_threshold_as_milli" : 1000,
+  "excessive_delay_count" : 6,
+  "excessive_delay_count_per_type" : {
+    "LdbcShortQuery1PersonProfile" : 0,
+    "LdbcQuery8" : 1,
+    "LdbcQuery7" : 0,
+    "LdbcQuery9" : 0,
+    "LdbcQuery4" : 1,
+    "LdbcQuery6" : 1,
+    "LdbcQuery5" : 0,
+    "LdbcQuery3a" : 1,
+    "LdbcQuery3b" : 0,
+    "LdbcQuery2" : 1,
+    "LdbcQuery10" : 1,
+    "LdbcQuery1" : 0
+  },
+  "min_delay_as_milli" : 0,
+  "max_delay_as_milli" : 1593,
+  "mean_delay_as_milli" : 241,
+  "min_delay_as_milli_per_type" : {
+    "LdbcShortQuery1PersonProfile" : 0,
+    "LdbcQuery8" : 1176,
+    "LdbcQuery7" : 524,
+    "LdbcQuery9" : 425,
+    "LdbcQuery4" : 1140,
+    "LdbcQuery6" : 310,
+    "LdbcQuery5" : 706,
+    "LdbcQuery3a" : 241,
+    "LdbcQuery3b" : 0,
+    "LdbcQuery2" : 210,
+    "LdbcQuery10" : 1059,
+    "LdbcQuery1" : 886
+  },
+  "max_delay_as_milli_per_type" : {
+    "LdbcShortQuery1PersonProfile" : 2,
+    "LdbcQuery8" : 1176,
+    "LdbcQuery7" : 524,
+    "LdbcQuery9" : 563,
+    "LdbcQuery4" : 1140,
+    "LdbcQuery6" : 1179,
+    "LdbcQuery5" : 706,
+    "LdbcQuery3a" : 1593,
+    "LdbcQuery3b" : 0,
+    "LdbcQuery2" : 1534,
+    "LdbcQuery10" : 1059,
+    "LdbcQuery1" : 886
+  },
+  "mean_delay_as_milli_per_type" : {
+    "LdbcShortQuery1PersonProfile" : 1,
+    "LdbcQuery8" : 1176,
+    "LdbcQuery7" : 524,
+    "LdbcQuery9" : 494,
+    "LdbcQuery4" : 1140,
+    "LdbcQuery6" : 745,
+    "LdbcQuery5" : 706,
+    "LdbcQuery3a" : 917,
+    "LdbcQuery3b" : 0,
+    "LdbcQuery2" : 872,
+    "LdbcQuery10" : 1059,
+    "LdbcQuery1" : 886
+  }
+}

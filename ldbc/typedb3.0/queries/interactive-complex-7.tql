@@ -1,0 +1,57 @@
+match
+  $person isa Person, has id :personId;
+
+  $friend
+    isa Person,
+    has id $friend_id,
+    has firstName $friend_firstName,
+    has lastName $friend_lastName;
+
+  (creator: $person, created: $message)
+    isa hasCreator;
+
+  $message
+    isa Message,
+    has id $message_id,
+    has creationDate $message_creationDate;
+
+  $likes (liker: $friend, message: $message)
+    isa likes,
+    has creationDate $likes_creationDate;
+
+  ?isNew = ?localIsNew;
+    {
+        (friend: $person, friend: $friend) isa knows;
+        ?localIsNew = false;
+    } or {
+        not {
+            (friend: $person, friend: $friend) isa knows;
+        };
+        ?localIsNew = true;
+    };
+
+    ?message_content_or_imageFile = ?local;
+    {
+        $message has imageFile $image;
+        not { $image ""; };
+        ?local = $image;
+    } or {
+        $message has content $text;
+        not { $text ""; };
+        ?local = $text;
+    };
+
+get
+    $friend_id, $friend_firstName, $friend_lastName,
+    $likes_creationDate,
+    $message_id, ?message_content_or_imageFile,
+    $message_creationDate, ?isNew;
+
+sort
+    $likes_creationDate desc,
+    $friend_id asc,
+    $friend_firstName asc;
+
+limit 20;
+
+

@@ -1,0 +1,90 @@
+{
+  "all_metrics" : [ {
+    "name" : "LdbcQuery10",
+    "unit" : "MILLISECONDS",
+    "count" : 1,
+    "run_time" : {
+      "name" : "Runtime",
+      "unit" : "MILLISECONDS",
+      "count" : 1,
+      "mean" : 946.0,
+      "min" : 946,
+      "max" : 946,
+      "25th_percentile" : 946,
+      "50th_percentile" : 946,
+      "75th_percentile" : 946,
+      "90th_percentile" : 946,
+      "95th_percentile" : 946,
+      "99th_percentile" : 946,
+      "99.9th_percentile" : 946,
+      "std_dev" : 0.0
+    }
+  }, {
+    "name" : "LdbcQuery4",
+    "unit" : "MILLISECONDS",
+    "count" : 1,
+    "run_time" : {
+      "name" : "Runtime",
+      "unit" : "MILLISECONDS",
+      "count" : 1,
+      "mean" : 50.0,
+      "min" : 50,
+      "max" : 50,
+      "25th_percentile" : 50,
+      "50th_percentile" : 50,
+      "75th_percentile" : 50,
+      "90th_percentile" : 50,
+      "95th_percentile" : 50,
+      "99th_percentile" : 50,
+      "99.9th_percentile" : 50,
+      "std_dev" : 0.0
+    }
+  }, {
+    "name" : "LdbcQuery5",
+    "unit" : "MILLISECONDS",
+    "count" : 1,
+    "run_time" : {
+      "name" : "Runtime",
+      "unit" : "MILLISECONDS",
+      "count" : 1,
+      "mean" : 847.0,
+      "min" : 847,
+      "max" : 847,
+      "25th_percentile" : 847,
+      "50th_percentile" : 847,
+      "75th_percentile" : 847,
+      "90th_percentile" : 847,
+      "95th_percentile" : 847,
+      "99th_percentile" : 847,
+      "99.9th_percentile" : 847,
+      "std_dev" : 0.0
+    }
+  }, {
+    "name" : "LdbcShortQuery1PersonProfile",
+    "unit" : "MILLISECONDS",
+    "count" : 2,
+    "run_time" : {
+      "name" : "Runtime",
+      "unit" : "MILLISECONDS",
+      "count" : 2,
+      "mean" : 24.5,
+      "min" : 9,
+      "max" : 40,
+      "25th_percentile" : 9,
+      "50th_percentile" : 9,
+      "75th_percentile" : 40,
+      "90th_percentile" : 40,
+      "95th_percentile" : 40,
+      "99th_percentile" : 40,
+      "99.9th_percentile" : 40,
+      "std_dev" : 15.5
+    }
+  } ],
+  "format_version" : 3,
+  "unit" : "MILLISECONDS",
+  "start_time" : 1727612019248,
+  "latest_finish_time" : 1727612021142,
+  "total_duration" : 1894,
+  "total_count" : 5,
+  "throughput" : 2.6399155227032733
+}
