@@ -47,4 +47,9 @@ __pycache__
 # Bazel
 bazel-*
 /ldbc/typeql/results
+
+# Local python env
 /.py311
+
+# TypeDB Studio
+.typedb_studio

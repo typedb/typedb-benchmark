@@ -15,7 +15,7 @@ import os
 import logging
 from pprint import pformat
 import time
-from typedb.driver import TypeDB, SessionType, TransactionType, TypeDBOptions, TypeDBCredential
+from typedb.driver import TypeDB, TransactionType
 
 import sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -31,56 +31,58 @@ DPW = constants.DISTRICTS_PER_WAREHOUSE
 CPD = constants.CUSTOMERS_PER_DISTRICT
 
 ## ==============================================
-## TypeDBDriver
+## TypeDB3Driver
 ## ==============================================
-class TypedbDriver(AbstractDriver):
+class Typedb3Driver(AbstractDriver):
     DEFAULT_CONFIG = {
         "database": ("Name of DB", "tpcc" ),
         "addr": ("Address of server", "127.0.0.1:1729" ),
         "edition": ("TypeDB Edition (Core or Cloud)", "Core" ),
         "user": ("DB User", "admin" ),
         "password": ("DB Password", "password"),
-        "schema": ("Script-relative path to schema file", "tql/tpcc-schema.tql"),
+        "schema": ("Script-relative path to schema file", "tql3/tpcc-schema.tql"),
     }
     
     def __init__(self, ddl):
-        super(TypedbDriver, self).__init__("typedb", ddl)
+        super(Typedb3Driver, self).__init__("typedb", ddl)
         self.database = None
         self.addr = None
         self.edition = None
         self.user = None
         self.password = None
         self.driver = None
-        self.session = None
         self.tx = None
     
     ## ----------------------------------------------
     ## makeDefaultConfig
     ## ----------------------------------------------
     def makeDefaultConfig(self):
-        return TypedbDriver.DEFAULT_CONFIG
+        return Typedb3Driver.DEFAULT_CONFIG
     
     ## ----------------------------------------------
     ## loadConfig
     ## ----------------------------------------------
     def loadConfig(self, config):
         # Config passed here contains some extra parameters (see `driver.loadConfig` in tpcc.py)
-        for key in TypedbDriver.DEFAULT_CONFIG.keys():
+        for key in Typedb3Driver.DEFAULT_CONFIG.keys():
             assert key in config, "Missing parameter '%s' in %s configuration" % (key, self.name)
         
         self.database = str(config["database"])
         self.addr = str(config["addr"])
-        if config["edition"] == "Core":
+        edition = config["edition"]
+        if edition == "Core":
             self.edition = EDITION.Core
-        if config["edition"] == "Cloud":
+        elif edition == "Cloud":
             self.edition = EDITION.Cloud
+        else:
+            raise Exception(f"Did not open a driver for edition: {edition}")
+
         self.schema = str(config["schema"])
 
         if self.edition is EDITION.Core:
             self.driver = TypeDB.core_driver(self.addr)
         if self.edition is EDITION.Cloud:
-            self.credentials = TypeDBCredential(self.username, self.password, tls_enabled=True)
-            self.driver =  TypeDB.cloud_driver(self.addr, self.credentials)
+            raise "Unimplemented"
 
         if config["reset"] and self.driver.databases.contains(self.database):
             logging.debug("Deleting database '%s'" % self.database)
@@ -89,24 +91,22 @@ class TypedbDriver(AbstractDriver):
         if not self.driver.databases.contains(self.database):
             logging.debug("Creating database'%s'" % (self.database))
             self.driver.databases.create(self.database)
-            with self.driver.session(self.database, SessionType.SCHEMA) as session:
-                logging.debug("Loading schema file'%s'" % (self.schema))
-                script_dir = os.path.dirname(os.path.abspath(__file__))
-                full_path = os.path.join(script_dir, self.schema)
-                with open(full_path, 'r') as data:
-                    define_query = data.read()
-                logging.debug("Writing schema")
-                with session.transaction(TransactionType.WRITE) as tx:
-                    tx.query.define(define_query)
-                    tx.commit()
-                logging.debug("Committed schema")
+            logging.debug("Loading schema file'%s'" % (self.schema))
+            script_dir = os.path.dirname(os.path.abspath(__file__))
+            full_path = os.path.join(script_dir, self.schema)
+            with open(full_path, 'r') as data:
+                define_query = data.read()
+            logging.debug("Writing schema")
+            with driver.transaction(self.database, TransactionType.WRITE) as tx:
+                tx.query(define_query)
+                tx.commit()
+            logging.debug("Committed schema")
         ## IF
     ## ----------------------------------------------
     ## loadStart
     ## ----------------------------------------------
     def loadStart(self):
-        self.session = self.driver.session(self.database, SessionType.DATA)
-        return None 
+        return None
 
     ## ----------------------------------------------
     ## loadTuples
@@ -114,9 +114,8 @@ class TypedbDriver(AbstractDriver):
     def loadTuples(self, tableName, tuples):
         if len(tuples) == 0: return
 
-        with self.session.transaction(TransactionType.WRITE) as tx:
+        with self.driver.transaction(self.database, TransactionType.WRITE) as tx:
             write_query = [ ]
-            is_update = False;
 
             if tableName == "WAREHOUSE":
                 for tuple in tuples:
@@ -156,7 +155,7 @@ has W_ZIP "{w_zip}", has W_TAX {w_tax}, has W_YTD {w_ytd};"""
 match 
 $w isa WAREHOUSE, has W_ID {d_w_id};
 insert 
-$district (warehouse: $w) isa DISTRICT,
+$district links (warehouse: $w), isa DISTRICT,
 has D_ID {d_w_id * DPW + d_id}, has D_NAME "{d_name}",
 has D_STREET_1 "{d_street_1}", has D_STREET_2 "{d_street_2}",
 has D_CITY "{d_city}", has D_STATE "{d_state}", has D_ZIP "{d_zip}",
@@ -206,7 +205,7 @@ has I_PRICE {i_price}, has I_DATA "{i_data}";"""
 match
 $d isa DISTRICT, has D_ID {c_w_id * DPW + c_d_id};
 insert 
-$customer (district: $d) isa CUSTOMER,
+$customer links (district: $d), isa CUSTOMER,
 has C_ID {c_w_id * DPW * CPD + c_d_id * CPD + c_id}, 
 has C_FIRST "{c_first}", has C_MIDDLE "{c_middle}", has C_LAST "{c_last}",
 has C_STREET_1 "{c_street_1}", has C_STREET_2 "{c_street_2}",
@@ -233,14 +232,13 @@ has C_DATA "{c_data}";"""
 match 
 $c isa CUSTOMER, has C_ID {o_w_id * DPW * CPD + o_d_id * CPD + o_c_id};
 insert 
-$order (customer: $c) isa ORDER,
+$order links (customer: $c), isa ORDER,
 has O_ID {o_id},
 has O_ENTRY_D {o_entry_d}, has O_CARRIER_ID {o_carrier_id},
 has O_OL_CNT {o_ol_cnt}, has O_ALL_LOCAL {o_all_local}, has O_NEW_ORDER false;"""
                     write_query.append(q)
 
             if tableName == "NEW_ORDER":
-                is_update = True;
                 for tuple in tuples:
                     no_o_id = tuple[0]
                     no_d_id = tuple[1]
@@ -249,8 +247,8 @@ has O_OL_CNT {o_ol_cnt}, has O_ALL_LOCAL {o_all_local}, has O_NEW_ORDER false;""
                     q = f"""
 match 
 $d isa DISTRICT, has D_ID {no_w_id * DPW + no_d_id};
-$order (district: $d) isa ORDER, has O_ID {no_o_id}, has O_NEW_ORDER $status;
-delete $order has $status;
+$order links (district: $d), isa ORDER, has O_ID {no_o_id}, has O_NEW_ORDER $status;
+delete $status of $order;
 insert $order has O_NEW_ORDER true;
 """
                     write_query.append(q)
@@ -276,10 +274,10 @@ insert $order has O_NEW_ORDER true;
 match 
 $w isa WAREHOUSE, has W_ID {ol_w_id};
 $d isa DISTRICT, has D_ID {ol_w_id * DPW + ol_d_id};
-$order (district: $d) isa ORDER, has O_ID {ol_o_id};
+$order links (district: $d), isa ORDER, has O_ID {ol_o_id};
 $item has I_ID {ol_i_id};
 insert 
-$order_line (order: $order, item: $item) isa ORDER_LINE,
+$order_line links (order: $order, item: $item), isa ORDER_LINE,
 has OL_NUMBER {ol_number}, has OL_SUPPLY_W_ID {ol_supply_w_id},
 """ + has_ol_delivery_d + f"""
 has OL_QUANTITY {ol_quantity}, has OL_AMOUNT {ol_amount},
@@ -302,7 +300,7 @@ match
 $i isa ITEM, has I_ID {s_i_id};   
 $w isa WAREHOUSE, has W_ID {s_w_id};
 insert 
-$stock (item: $i, warehouse: $w) isa STOCKING, 
+$stock links (item: $i, warehouse: $w), isa STOCKING, 
 has S_QUANTITY {s_quantity}, has S_YTD {s_ytd}, has S_ORDER_CNT {s_order_cnt},
 has S_REMOTE_CNT {s_remote_cnt}, has S_DATA "{s_data}";"""
                     write_query.append(q_stock)
@@ -313,7 +311,7 @@ has S_REMOTE_CNT {s_remote_cnt}, has S_DATA "{s_data}";"""
 match 
 $i isa ITEM, has I_ID {s_i_id};
 $w isa WAREHOUSE, has W_ID {s_w_id};   
-$stock (item: $i, warehouse: $w) isa STOCKING;
+$stock links (item: $i, warehouse: $w), isa STOCKING;
 insert
 $stock has S_DIST_{i} "{tuple[2+i]}";"""
                         write_query.append(q_stock_info)
@@ -333,28 +331,24 @@ $stock has S_DIST_{i} "{tuple[2+i]}";"""
 match 
 $c isa CUSTOMER, has C_ID {h_w_id * DPW * CPD + h_d_id * CPD + h_c_id};
 insert 
-$history (customer: $c) isa CUSTOMER_HISTORY,
+$history links (customer: $c), isa CUSTOMER_HISTORY,
 has H_DATE {h_date}, has H_AMOUNT {h_amount}, has H_DATA "{h_data}";"""
                     write_query.append(q)
     
             for query in write_query:
-                if is_update:
-                    tx.query.update(query)
-                else:
-                    tx.query.insert(query)
+                # NOTE: one query at a time is finished
+                tx.query(query).resolve()
 
             logging.info("Committing %d queries for type %s" % (len(tuples), tableName))
             start_time = time.time()
             tx.commit()
-            logging.info(f"Committed! Time per query: {(time.time() - start_time) / len(tuples)}")
+            logging.info(f"Committed! Time per query (without any concurrency): {(time.time() - start_time) / len(tuples)}")
         return
 
     ## ----------------------------------------------
     ## loadFinish
     ## ----------------------------------------------
     def loadFinish(self):
-        logging.info("Closing write session")
-        self.session.close()
         return None
 
     ## ----------------------------------------------
@@ -403,8 +397,8 @@ match
 $i isa ITEM, has I_ID {i_ids[i]}, 
   has I_NAME $i_name, has I_PRICE $i_price, 
   has I_DATA $i_data; 
-get $i_name, $i_price, $i_data;"""
-                    item = list(tx.query.get(q))
+select $i_name, $i_price, $i_data;"""
+                    item = list(tx.query(q).resolve().as_concept_rows())
                     if len(item) == 0:
                         return (None, 0)
                     items.append({ 'name': item[0].get('i_name').as_attribute().get_value(), 
@@ -419,8 +413,8 @@ $w isa WAREHOUSE, has W_ID {w_id}, has W_TAX $w_tax;
 $d isa DISTRICT, has D_ID {w_id * DPW + d_id}, has D_TAX $d_tax, has D_NEXT_O_ID $d_next_o_id;
 $c isa CUSTOMER, has C_ID {w_id * DPW * CPD + d_id * CPD + c_id}, 
   has C_DISCOUNT $c_discount, has C_LAST $c_last, has C_CREDIT $c_credit;
-get $w_tax, $d_tax, $d_next_o_id, $c_discount, $c_last, $c_credit;"""
-                general_info = list(tx.query.get(q))
+select $w_tax, $d_tax, $d_next_o_id, $c_discount, $c_last, $c_credit;"""
+                general_info = list(tx.query(q).resolve().as_concept_rows())
                 
                 if len(general_info) == 0:
                     logging.warn("No general info for warehouse %d" % w_id)
@@ -443,14 +437,14 @@ match
 $d isa DISTRICT, has D_ID {w_id * DPW + d_id}, has D_NEXT_O_ID $d_next_o_id;
 $c isa CUSTOMER, has C_ID {w_id * DPW * CPD + d_id * CPD + c_id};
 delete 
-$d has $d_next_o_id;
+$d_next_o_id of $d;
 insert 
 $d has D_NEXT_O_ID {d_next_o_id + 1};
-$order (district: $d, customer: $c) isa ORDER,
+$order links (district: $d, customer: $c), isa ORDER,
 has O_ID {d_next_o_id},
 has O_ENTRY_D {o_entry_d}, has O_CARRIER_ID {o_carrier_id},
 has O_OL_CNT {ol_cnt}, has O_ALL_LOCAL {all_local_int}, has O_NEW_ORDER true;"""
-                tx.query.update(q)
+                tx.query(q).resolve()
 
                 for i in range(len(i_ids)):
                     ol_number = i + 1
@@ -467,12 +461,12 @@ has O_OL_CNT {ol_cnt}, has O_ALL_LOCAL {all_local_int}, has O_NEW_ORDER true;"""
 match
 $i isa ITEM, has I_ID {ol_i_id}; 
 $w isa WAREHOUSE, has W_ID {ol_supply_w_id};
-$s (item: $i, warehouse: $w) isa STOCKING, 
+$s links (item: $i, warehouse: $w), isa STOCKING, 
     has S_QUANTITY $s_quantity, has S_DATA $s_data, has S_YTD $s_ytd, 
     has S_ORDER_CNT $s_order_cnt, has S_REMOTE_CNT $s_remote_cnt, 
     has S_DIST_{d_id} $s_dist_xx;
-get $s_quantity, $s_data, $s_ytd, $s_order_cnt, $s_remote_cnt, $s_dist_xx;"""
-                    stock_info = list(tx.query.get(q))
+select $s_quantity, $s_data, $s_ytd, $s_order_cnt, $s_remote_cnt, $s_dist_xx;"""
+                    stock_info = list(tx.query(q).resolve().as_concept_rows())
 
                     if len(stock_info) == 0:
                         logging.warn("No STOCK record for (ol_i_id=%d, ol_supply_w_id=%d)" % (ol_i_id, ol_supply_w_id))
@@ -507,13 +501,15 @@ match
 $i isa ITEM, has I_ID {ol_i_id};
 $w isa WAREHOUSE, has W_ID {ol_supply_w_id};
 $d isa DISTRICT, has D_ID {w_id * DPW + d_id};
-$o (district: $d) isa ORDER, has O_ID {d_next_o_id};
-$s (item: $i, warehouse: $w) isa STOCKING, 
+$o links (district: $d), isa ORDER, has O_ID {d_next_o_id};
+$s links (item: $i, warehouse: $w), isa STOCKING, 
   has S_QUANTITY $s_quantity, has S_YTD $s_ytd, 
   has S_ORDER_CNT $s_order_cnt, has S_REMOTE_CNT $s_remote_cnt;
 delete 
-$s has $s_quantity, has $s_ytd, 
-  has $s_order_cnt, has $s_remote_cnt;
+$s_quantity of $s;
+$s_ytd of $s;
+$s_order_cnt of $s;
+$s_remote_cnt of $s;
 insert 
 $s has S_QUANTITY {s_quantity}, has S_YTD {s_ytd}, 
   has S_ORDER_CNT {s_order_cnt}, has S_REMOTE_CNT {s_remote_cnt};
@@ -522,7 +518,7 @@ $s has S_QUANTITY {s_quantity}, has S_YTD {s_ytd},
   has OL_DELIVERY_D {o_entry_d}, has OL_QUANTITY {ol_quantity}, 
   has OL_AMOUNT {ol_amount}, has OL_DIST_INFO "{s_dist_xx}";"""
                     
-                    tx.query.update(q)
+                    tx.query(q).resolve()
 
                     ## Transaction profile states to use "ol_quantity * i_price"
                     total += ol_amount
@@ -566,11 +562,11 @@ $s has S_QUANTITY {s_quantity}, has S_YTD {s_ytd},
                     q = f"""
 match
 $d isa DISTRICT, has D_ID {w_id * DPW + d_id};
-$o (customer: $c, district: $d) isa ORDER, has O_ID $o_id, has O_NEW_ORDER true;
+$o links, (customer: $c, district: $d) isa ORDER, has O_ID $o_id, has O_NEW_ORDER true;
 $c isa CUSTOMER, has C_ID $c_id;
-get $o_id, $c_id;
+select $o_id, $c_id;
 """
-                    new_order_info = list(tx.query.get(q))
+                    new_order_info = list(tx.query(q).resolve().as_concept_rows())
                     if len(new_order_info) == 0:
                         ## No orders for this district: skip it. Note: This must be reported if > 1%
                         continue
@@ -581,13 +577,13 @@ get $o_id, $c_id;
                     q = f"""
 match
 $d isa DISTRICT, has D_ID {w_id * DPW + d_id};
-$o (district: $d) isa ORDER, has O_ID {no_o_id};
-$ol (order: $o, item: $i) isa ORDER_LINE, has OL_QUANTITY $ol_quantity;
-get $ol_quantity;
-sum $ol_quantity;
+$o links (district: $d), isa ORDER, has O_ID {no_o_id};
+$ol links  (order: $o, item: $i),  isa ORDER_LINE, has OL_QUANTITY $ol_quantity;
+select $ol_quantity;
+reduce $sum = sum($ol_quantity);
 """
-                    response = tx.query.get_aggregate(q)
-                    ol_total = response.resolve().as_value().as_long()
+                    response = list(tx.query(q).resolve().as_concept_rows())[0]
+                    ol_total = response.get("sum").as_value().as_long()
                     
                     q = f"""
 match
@@ -595,23 +591,24 @@ $c isa CUSTOMER, has C_ID {w_id * DPW * CPD + d_id * CPD + c_id}, has C_BALANCE 
 ?c_balance_new = $c_balance + {ol_total};
 $o (customer: $c) isa ORDER, has O_ID {no_o_id}, has O_NEW_ORDER $o_new_order, has O_CARRIER_ID $o_carrier_id;
 delete 
-$o has $o_new_order, has $o_carrier_id;
-$c has $c_balance;
+$o_new_order of $o;
+$o_carrier_id of $o;
+$c_balance of $c;
 insert 
 $o has O_NEW_ORDER false, has O_CARRIER_ID {o_carrier_id};
 $c has C_BALANCE ?c_balance_new;
 """
-                    tx.query.update(q)
+                    tx.query(q).resolve()
 
                     q = f"""
 match
 $d isa DISTRICT, has D_ID {w_id * DPW + d_id};
-$o (district: $d) isa ORDER, has O_ID {no_o_id};
-$ol (order: $o, item: $i) isa ORDER_LINE;
+$o links (district: $d), isa ORDER, has O_ID {no_o_id};
+$ol links  (order: $o, item: $i), isa ORDER_LINE;
 insert
 $ol has OL_DELIVERY_D {ol_delivery_d};
 """
-                    tx.query.insert(q)
+                    tx.query(q).resolve()
 
                     # If there are no order lines, SUM returns null. There should always be order lines.
                     assert ol_total != None, "ol_total is NULL: there are no order lines. This should not happen"
@@ -654,9 +651,9 @@ match
 $c isa CUSTOMER, has C_ID {w_id * DPW * CPD + d_id * CPD + c_id},
 has C_FIRST $c_first, has C_MIDDLE $c_middle, has C_LAST $c_last,
 has C_BALANCE $c_balance;
-get $c_first, $c_middle, $c_last,$c_balance;
+select $c_first, $c_middle, $c_last,$c_balance;
 """
-                    customer = list(tx.query.get(q))
+                    customer = list(tx.query(q).resolve().as_concept_rows())
                     assert len(customer) == 1, f"doOrderStatus: no customer found for w_id {w_id}, d_id {d_id}, c_id {c_id}"
                     customer = customer[0]
                 else:
@@ -664,15 +661,15 @@ get $c_first, $c_middle, $c_last,$c_balance;
                     q = f"""
 match
 $d isa DISTRICT, has D_ID {w_id * DPW + d_id};
-$c (district: $d) isa CUSTOMER, has C_ID $c_id,
+$c links (district: $d), isa CUSTOMER, has C_ID $c_id,
 has C_FIRST $c_first, has C_MIDDLE $c_middle, has C_LAST $c_last,
 has C_BALANCE $c_balance;
 $c_last "{c_last}";
-get $c_id, $c_first, $c_middle, $c_last,$c_balance;
+select $c_id, $c_first, $c_middle, $c_last,$c_balance;
 sort $c_first asc;
 """
                     # Get the midpoint customer's id
-                    all_customers = list(tx.query.get(q))
+                    all_customers = list(tx.query(q).resolve().as_concept_rows())
                     assert len(all_customers) > 0
                     index = (len(all_customers) - 1) // 2
                     customer = all_customers[index]
@@ -692,11 +689,11 @@ sort $c_first asc;
                 q = f"""
 match
 $c isa CUSTOMER, has C_ID {w_id * DPW * CPD + d_id * CPD + c_id};
-$o (customer: $c) isa ORDER, has O_ID $o_id;
-get $o_id;
+$o links (customer: $c), isa ORDER, has O_ID $o_id;
+select $o_id;
 sort $o_id desc;
 limit 1;"""
-                order = list(tx.query.get(q))
+                order = list(tx.query(q).resolve().as_concept_rows())
                 orderLines_data = [ ]
 
                 if len(order) > 0:
@@ -705,13 +702,13 @@ limit 1;"""
                     q = f"""
 match
 $c isa CUSTOMER, has C_ID {w_id * DPW * CPD + d_id * CPD + c_id};
-$o (customer: $c) isa ORDER, has O_ID {o_id};
+$o links (customer: $c), isa ORDER, has O_ID {o_id};
 $i isa ITEM, has I_ID $i_id;
-$ol (order: $o, item: $i) isa ORDER_LINE, 
+$ol links (order: $o, item: $i), isa ORDER_LINE, 
 has OL_SUPPLY_W_ID $ol_supply_w_id, has OL_QUANTITY $ol_quantity, 
 has OL_AMOUNT $ol_amount, has OL_DIST_INFO $ol_dist_info;
-get $i_id, $ol_supply_w_id, $ol_quantity, $ol_amount, $ol_dist_info;"""
-                    orderLines = list(tx.query.get(q))
+select $i_id, $ol_supply_w_id, $ol_quantity, $ol_amount, $ol_dist_info;"""
+                    orderLines = list(tx.query(q).resolve().as_concept_rows())
                     for orderLine in orderLines:
                         orderLines_data.append([
                             orderLine.get('i_id').as_attribute().get_value(),
@@ -765,11 +762,11 @@ has C_SINCE $c_since, has C_CREDIT $c_credit, has C_CREDIT_LIM $c_credit_lim,
 has C_DISCOUNT $c_discount, has C_BALANCE $c_balance, has C_YTD_PAYMENT $c_ytd_payment, 
 has C_PAYMENT_CNT $c_payment_cnt, has C_DATA $c_data;
 $c_id {w_id * DPW * CPD + d_id * CPD + c_id};
-get $c_id, $c_first, $c_middle, $c_last, $c_street_1, $c_street_2, $c_city,
+select $c_id, $c_first, $c_middle, $c_last, $c_street_1, $c_street_2, $c_city,
 $c_state, $c_zip, $c_phone, $c_since, $c_credit, $c_credit_lim, $c_discount,
 $c_balance, $c_ytd_payment, $c_payment_cnt, $c_data;
 """
-                    customer = list(tx.query.get(q))
+                    customer = list(tx.query(q).resolve().as_concept_rows())
                     assert len(customer) == 1, f"doPayment: no customer found for w_id {w_id}, d_id {d_id}, c_id {c_id}"
                     customer = customer[0]
                 else:
@@ -777,7 +774,7 @@ $c_balance, $c_ytd_payment, $c_payment_cnt, $c_data;
                     q = f"""
 match
 $d isa DISTRICT, has D_ID {w_id * DPW + d_id};
-$c (district: $d)isa CUSTOMER, has C_ID $c_id,
+$c links (district: $d), isa CUSTOMER, has C_ID $c_id,
 has C_FIRST $c_first, has C_MIDDLE $c_middle, has C_LAST $c_last,
 has C_STREET_1 $c_street_1, has C_STREET_2 $c_street_2, has C_CITY $c_city,
 has C_STATE $c_state, has C_ZIP $c_zip, has C_PHONE $c_phone,
@@ -785,13 +782,13 @@ has C_SINCE $c_since, has C_CREDIT $c_credit, has C_CREDIT_LIM $c_credit_lim,
 has C_DISCOUNT $c_discount, has C_BALANCE $c_balance, has C_YTD_PAYMENT $c_ytd_payment, 
 has C_PAYMENT_CNT $c_payment_cnt, has C_DATA $c_data;
 $c_last "{c_last}";
-get $c_id, $c_first, $c_middle, $c_last, $c_street_1, $c_street_2, $c_city,
+select $c_id, $c_first, $c_middle, $c_last, $c_street_1, $c_street_2, $c_city,
 $c_state, $c_zip, $c_phone, $c_since, $c_credit, $c_credit_lim, $c_discount,
 $c_balance, $c_ytd_payment, $c_payment_cnt, $c_data;
 sort $c_first asc;
 """
                     # Get the midpoint customer's id
-                    all_customers = list(tx.query.get(q))
+                    all_customers = list(tx.query(q).resolve().as_concept_rows())
                     assert len(all_customers) > 0, f"doPayment: no customer found for w_id {w_id}, d_id {d_id}, c_last {c_last}"
                     namecnt = len(all_customers)
                     index = (namecnt-1) // 2
@@ -829,9 +826,9 @@ match
 $w isa WAREHOUSE, has W_ID {w_id}, has W_NAME $w_name, 
 has W_STREET_1 $w_street_1, has W_STREET_2 $w_street_2, 
 has W_CITY $w_city, has W_STATE $w_state, has W_ZIP $w_zip;
-get $w_name, $w_street_1, $w_street_2, $w_city, $w_state, $w_zip;
+select $w_name, $w_street_1, $w_street_2, $w_city, $w_state, $w_zip;
 """
-                warehouse = list(tx.query.get(q))
+                warehouse = list(tx.query(q).resolve().as_concept_rows())
                 assert len(warehouse) == 1
                 warehouse_data = [
                     warehouse[0].get('w_name').as_attribute().get_value(),
@@ -849,9 +846,9 @@ $d isa DISTRICT, has D_ID {w_id * DPW + d_id},
 has D_NAME $d_name, has D_STREET_1 $d_street_1, 
 has D_STREET_2 $d_street_2, has D_CITY $d_city, 
 has D_STATE $d_state, has D_ZIP $d_zip;
-get $d_name, $d_street_1, $d_street_2, $d_city, $d_state, $d_zip;
+select $d_name, $d_street_1, $d_street_2, $d_city, $d_state, $d_zip;
 """
-                district = list(tx.query.get(q))
+                district = list(tx.query(q).resolve().as_concept_rows())
                 assert len(district) == 1
                 district_data = [
                     district[0].get('d_name').as_attribute().get_value(),
@@ -867,19 +864,19 @@ get $d_name, $d_street_1, $d_street_2, $d_city, $d_state, $d_zip;
 match
 $w isa WAREHOUSE, has W_ID {w_id}, has W_YTD $w_ytd;
 ?w_ytd_new = $w_ytd + {h_amount};
-delete $w has $w_ytd;
+delete $w_ytd of $w;
 insert $w has W_YTD ?w_ytd_new;
 """
-                tx.query.update(q)
+                tx.query(q).resolve()
 
                 q = f"""
 match
 $d isa DISTRICT, has D_ID {w_id * DPW + d_id}, has D_YTD $d_ytd;
 ?d_ytd_new = $d_ytd + {h_amount};
-delete $d has $d_ytd;
+delete $d_ytd of $d;
 insert $d has D_YTD ?d_ytd_new;
 """
-                tx.query.update(q)
+                tx.query(q).resolve()
 
                 h_data = "%s    %s" % (warehouse_data[0], district_data[0])
 
@@ -894,23 +891,30 @@ match
 $c isa CUSTOMER, has C_ID {c_w_id * DPW * CPD + c_d_id * CPD + c_id}, 
 has C_BALANCE $c_balance, has C_YTD_PAYMENT $c_ytd_payment, 
 has C_PAYMENT_CNT $c_payment_cnt, has C_DATA $c_data;
-delete $c has $c_balance, has $c_ytd_payment, has $c_payment_cnt, has $c_data;
+delete 
+$c_balance of $c; 
+$c_ytd_payment of $c;
+$c_payment_cnt of $c; 
+$c_data of $c;
 insert $c has C_BALANCE {c_balance}, has C_YTD_PAYMENT {c_ytd_payment}, 
 has C_PAYMENT_CNT {c_payment_cnt}, has C_DATA "{c_data}";
 """
-                    tx.query.update(q)
+                    tx.query(q).resolve()
                 else:
                     q = f"""
 match
 $c isa CUSTOMER, has C_ID {c_w_id * DPW * CPD + c_d_id * CPD + c_id}, 
 has C_BALANCE $c_balance, has C_YTD_PAYMENT $c_ytd_payment, 
 has C_PAYMENT_CNT $c_payment_cnt;
-delete $c has $c_balance, has $c_ytd_payment, has $c_payment_cnt;
+delete 
+$c_balance of $c; 
+$c_ytd_payment of $c;
+$c_payment_cnt of $c;
 insert 
 $c has C_BALANCE {c_balance}, has C_YTD_PAYMENT {c_ytd_payment}, 
 has C_PAYMENT_CNT {c_payment_cnt};
 """
-                    tx.query.update(q)
+                    tx.query(q).resolve()
 
                 # Concatenate w_name, four spaces, d_name
                 # Create the history record
@@ -920,9 +924,9 @@ has C_PAYMENT_CNT {c_payment_cnt};
 match
 $c isa CUSTOMER, has C_ID {c_w_id * DPW * CPD + c_d_id * CPD + c_id}; 
 insert
-$h (customer: $c) isa CUSTOMER_HISTORY, has H_DATE {h_date}, has H_AMOUNT {h_amount}, has H_DATA "{h_data}";
+$h links (customer: $c), isa CUSTOMER_HISTORY, has H_DATE {h_date}, has H_AMOUNT {h_amount}, has H_DATA "{h_data}";
 """
-                tx.query.insert(q)
+                tx.query(q).resolve()
                 tx.commit()
 
                 # TPC-C 2.5.3.3: Must display the following fields:
@@ -962,9 +966,9 @@ $h (customer: $c) isa CUSTOMER_HISTORY, has H_DATE {h_date}, has H_AMOUNT {h_amo
                 q = f"""
 match
 $d isa DISTRICT, has D_ID {w_id * DPW + d_id}, has D_NEXT_O_ID $d_next_o_id;
-get $d_next_o_id;
+select $d_next_o_id;
 """
-                result = list(tx.query.get(q))
+                result = list(tx.query(q).resolve().as_concept_rows())
                 assert len(result) == 1, f"doStockLevel: no district found for w_id {w_id}, d_id {d_id}"
                 o_id = result[0].get('d_next_o_id').as_attribute().get_value()
 
@@ -972,14 +976,14 @@ get $d_next_o_id;
 match
 $w isa WAREHOUSE, has W_ID {w_id};
 $d isa DISTRICT, has D_ID {w_id * DPW + d_id};
-$s (item: $i, warehouse: $w) isa STOCKING, has S_QUANTITY < {threshold};
-$ol (item: $i, order: $o) isa ORDER_LINE;
-$o (district: $d) isa ORDER, has O_ID $o_id;
+$s links (item: $i, warehouse: $w), isa STOCKING, has S_QUANTITY < {threshold};
+$ol links  (item: $i, order: $o), isa ORDER_LINE;
+$o links (district: $d), isa ORDER, has O_ID $o_id;
 $o_id < {o_id};
 $o_id >= {o_id - 20};
-get $i;
-count;"""
-                response = tx.query.get_aggregate(q)
+select $i;
+reduce $count = count();"""
+                response = tx.query(q).resolve().as_concept_rows()[0]
                 result = response.resolve().as_value().as_long()
                 
                 tx.commit()
