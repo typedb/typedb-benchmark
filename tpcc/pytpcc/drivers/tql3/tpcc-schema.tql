@@ -1,0 +1,189 @@
+define
+  entity WAREHOUSE,
+    plays DISTRICT:warehouse,
+    plays STOCKING:warehouse,
+    owns W_ID,
+    owns W_NAME,
+    owns W_STREET_1,
+    owns W_STREET_2,
+    owns W_CITY,
+    owns W_STATE,
+    owns W_ZIP,
+    owns W_TAX,
+    owns W_YTD;
+
+  attribute W_ID, value long;
+  attribute W_NAME, value string;
+  attribute W_STREET_1, value string;
+  attribute W_STREET_2, value string;
+  attribute W_CITY, value string;
+  attribute W_STATE, value string;
+  attribute W_ZIP, value string;
+  attribute W_TAX, value double;
+  attribute W_YTD, value double;
+
+  relation DISTRICT,
+    relates warehouse,
+    plays CUSTOMER:district,
+    plays ORDER:district,
+    owns D_ID,
+    owns D_NAME,
+    owns D_STREET_1,
+    owns D_STREET_2,
+    owns D_CITY,
+    owns D_STATE,
+    owns D_ZIP,
+    owns D_TAX,
+    owns D_YTD,
+    owns D_NEXT_O_ID;
+
+  attribute D_ID, value long;
+  attribute D_NAME, value string;
+  attribute D_STREET_1, value string;
+  attribute D_STREET_2, value string;
+  attribute D_CITY, value string;
+  attribute D_STATE, value string;
+  attribute D_ZIP, value string;
+  attribute D_TAX, value double;
+  attribute D_YTD, value double;
+  attribute D_NEXT_O_ID, value long;
+
+  entity ITEM,
+    plays STOCKING:item,
+    plays ORDER_LINE:item,
+    owns I_ID,
+    owns I_IM_ID,
+    owns I_NAME,
+    owns I_PRICE,
+    owns I_DATA;
+
+  attribute I_ID, value long;
+  attribute I_IM_ID, value long;
+  attribute I_NAME, value string;
+  attribute I_PRICE, value double;
+  attribute I_DATA, value string;
+
+  relation CUSTOMER,
+    relates district,
+    plays ORDER:customer,
+    plays CUSTOMER_HISTORY:customer,
+    owns C_ID,
+    owns C_FIRST,
+    owns C_MIDDLE,
+    owns C_LAST,
+    owns C_STREET_1,
+    owns C_STREET_2,
+    owns C_CITY,
+    owns C_STATE,
+    owns C_ZIP,
+    owns C_PHONE,
+    owns C_SINCE,
+    owns C_CREDIT,
+    owns C_CREDIT_LIM,
+    owns C_DISCOUNT,
+    owns C_BALANCE,
+    owns C_YTD_PAYMENT,
+    owns C_PAYMENT_CNT,
+    owns C_DELIVERY_CNT,
+    owns C_DATA;
+
+  attribute C_ID, value long;
+  attribute C_FIRST, value string;
+  attribute C_MIDDLE, value string;
+  attribute C_LAST, value string;
+  attribute C_STREET_1, value string;
+  attribute C_STREET_2, value string;
+  attribute C_CITY, value string;
+  attribute C_STATE, value string;
+  attribute C_ZIP, value string;
+  attribute C_PHONE, value string;
+  attribute C_SINCE, value datetime;
+  attribute C_CREDIT, value string;
+  attribute C_CREDIT_LIM, value double;
+  attribute C_DISCOUNT, value double;
+  attribute C_BALANCE, value double;
+  attribute C_YTD_PAYMENT, value double;
+  attribute C_PAYMENT_CNT, value long;
+  attribute C_DELIVERY_CNT, value long;
+  attribute C_DATA, value string;
+ 
+  relation ORDER,
+    relates district, 
+    relates customer,
+    plays ORDER_LINE:order,
+    owns O_ID,
+    owns O_ENTRY_D,
+    owns O_CARRIER_ID,
+    owns O_OL_CNT,
+    owns O_ALL_LOCAL,
+    owns O_NEW_ORDER;
+
+  attribute O_ID, value long;
+  attribute O_ENTRY_D, value datetime;
+  attribute O_CARRIER_ID, value long;
+  attribute O_OL_CNT, value long;
+  attribute O_ALL_LOCAL, value long;
+  attribute O_NEW_ORDER, value boolean;
+
+  relation ORDER_LINE,
+    relates order,
+    relates item,
+    owns OL_NUMBER,
+    owns OL_SUPPLY_W_ID,
+    owns OL_DELIVERY_D,
+    owns OL_QUANTITY,
+    owns OL_AMOUNT,
+    owns OL_DIST_INFO;
+
+  attribute OL_NUMBER, value long;
+  attribute OL_SUPPLY_W_ID, value long;
+  attribute OL_DELIVERY_D, value datetime;
+  attribute OL_QUANTITY, value long;
+  attribute OL_AMOUNT, value double;
+  attribute OL_DIST_INFO, value string;
+
+  # TODO: consider keeping track of warehouse w_id as well
+  relation CUSTOMER_HISTORY,
+    relates customer,
+    owns H_DATE,
+    owns H_AMOUNT,
+    owns H_DATA;
+
+  attribute H_DATE, value datetime;
+  attribute H_AMOUNT, value double;
+  attribute H_DATA, value string;
+
+  relation STOCKING,
+    relates warehouse,
+    relates item,
+    owns S_QUANTITY,
+    owns S_YTD,
+    owns S_ORDER_CNT,
+    owns S_REMOTE_CNT,
+    owns S_DATA,
+    owns S_DIST_1,
+    owns S_DIST_2,
+    owns S_DIST_3,
+    owns S_DIST_4,
+    owns S_DIST_5,
+    owns S_DIST_6,
+    owns S_DIST_7,
+    owns S_DIST_8,
+    owns S_DIST_9,
+    owns S_DIST_10;
+
+  attribute S_QUANTITY, value long;
+  attribute S_YTD, value long;
+  attribute S_ORDER_CNT, value long;
+  attribute S_REMOTE_CNT, value long;
+  attribute S_DATA, value string;
+  attribute S_DIST_1, value string;
+  attribute S_DIST_2, value string;
+  attribute S_DIST_3, value string;
+  attribute S_DIST_4, value string;
+  attribute S_DIST_5, value string;
+  attribute S_DIST_6, value string;
+  attribute S_DIST_7, value string;
+  attribute S_DIST_8, value string;
+  attribute S_DIST_9, value string;
+  attribute S_DIST_10, value string;

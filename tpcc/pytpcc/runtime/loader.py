@@ -148,16 +148,23 @@ class Loader:
                 ## This is a new order: make one for it
                 if newOrder: no_tuples.append([o_id, d_id, w_id])
             ## FOR
-
-            self.handle.loadTuples(constants.TABLENAME_DISTRICT, d_tuples)
-            self.handle.loadTuples(constants.TABLENAME_CUSTOMER, c_tuples)
-            self.handle.loadTuples(constants.TABLENAME_ORDERS, o_tuples)
+            #
+            # print("Loading DISTRICT")
+            # self.handle.loadTuples(constants.TABLENAME_DISTRICT, d_tuples)
+            # print("Loading CUSTOMER")
+            # self.handle.loadTuples(constants.TABLENAME_CUSTOMER, c_tuples)
+            # print("Loading ORDERS")
+            # self.handle.loadTuples(constants.TABLENAME_ORDERS, o_tuples)
+            print("Loading ORDER_LINE")
             self.handle.loadTuples(constants.TABLENAME_ORDER_LINE, ol_tuples)
+            print("Loading NEW_ORDER")
             self.handle.loadTuples(constants.TABLENAME_NEW_ORDER, no_tuples)
+            print("Loading HISTORY")
             self.handle.loadTuples(constants.TABLENAME_HISTORY, h_tuples)
             self.handle.loadFinishDistrict(w_id, d_id)
         ## FOR
 
+        println("Updating 10% of STOCK as original")
         ## Select 10% of the stock to be marked "original"
         s_tuples = [ ]
         selectedRows = rand.selectUniqueIds(self.scaleParameters.items // 10, 1, self.scaleParameters.items)

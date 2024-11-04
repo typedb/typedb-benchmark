@@ -47,3 +47,6 @@ __pycache__
 # Bazel
 bazel-*
 /ldbc/typeql/results
+
+# TypeDB Studio
+.typedb_studio

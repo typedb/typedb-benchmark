@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------
 # Copyright (C) 2011
@@ -74,7 +74,6 @@ def getDrivers():
     for f in [os.path.basename(drv).replace("driver.py", "") for drv in glob.glob(os.path.join(driver_dir, "*driver.py"))]:
         if f != "abstract":
             drivers.append(f)
-    return drivers
     return drivers
 ## DEF
 
