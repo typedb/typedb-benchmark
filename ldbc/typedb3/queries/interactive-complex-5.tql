@@ -1,0 +1,51 @@
+# First part considers only forums with posts in them
+match
+    $person isa Person, has id :personId;
+    $otherPerson isa Person;
+    {
+        (friend: $person, friend: $otherPerson) isa knows;
+    } or {
+        (friend: $person, friend: $intermediateFriend) isa knows;
+        (friend: $intermediateFriend, friend: $otherPerson) isa knows;
+        not {$otherPerson is $person;};
+    };
+    $hasMember ($otherPerson, $forum) isa hasMember, has creationDate > :minDate;
+    $forum isa Forum, has id $forum_id, has title $forum_title;
+    $Post isa Post;
+    ($otherPerson, $Post) isa hasCreator;
+    ($forum, $Post) isa containerOf;
+get $forum, $Post;
+group $forum;
+count;
+#split#
+# Second part considers forums without posts in them
+match
+    $person isa Person, has id 14;
+    $otherPerson isa Person;
+    {
+        (friend: $person, friend: $otherPerson) isa knows;
+    } or {
+        (friend: $person, friend: $intermediateFriend) isa knows;
+        (friend: $intermediateFriend, friend: $otherPerson) isa knows;
+        not {$otherPerson is $person;};
+    };
+    $hasMember ($otherPerson, $forum) isa hasMember, has creationDate > 2012-01-01;
+    $forum isa Forum, has id $forum_id, has title $forum_title;
+    not {
+        $yetOtherPerson isa Person;
+        {
+            (friend: $person, friend: $yetOtherPerson) isa knows;
+        } or {
+            (friend: $person, friend: $intermediateFriend) isa knows;
+            (friend: $intermediateFriend, friend: $yetOtherPerson) isa knows;
+            not {$yetOtherPerson is $person;};
+        };
+        $hasMember ($yetOtherPerson, $forum) isa hasMember, has creationDate > 2012-01-01;
+        $forum isa Forum, has id $forum_id, has title $forum_title;
+        $Post isa Post;
+        ($otherPerson, $Post) isa hasCreator;
+        ($forum, $Post) isa containerOf;
+    };
+get $forum_id, $forum_title;
+sort $forum_id desc;
+limit :LIMIT;

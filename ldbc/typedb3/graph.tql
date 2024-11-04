@@ -1,0 +1,3 @@
+insert $place isa Country, has id 29, has name "New_Zealand", has url "http://dbpedia.org/resource/New_Zealand";
+insert $place isa City, has id 535, has name "Auckland", has url "http://dbpedia.org/resource/Auckland";
+insert $place isa Continent, has id 1459, has name "Australia", has url "http://dbpedia.org/resource/Australia";

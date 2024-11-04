@@ -1,0 +1,1292 @@
+{
+    "globalConfig": {
+        "separator": "|",
+        "rowsPerCommit": 100,
+        "parallelisation": 36,
+        "schema": "/home/gitbashtry/Projects/ldbc_snb_interactive_v2_impls/typeql/schema.tql"
+    },
+    "entities": {
+        "City": {
+            "insert": {
+                "entity": "City",
+                "ownerships": [
+                    {
+                        "attribute": "id",
+                        "column": "id"
+                    },
+                    {
+                        "attribute": "name",
+                        "column": "name"
+                    },
+                    {
+                        "attribute": "url",
+                        "column": "url"
+                    }
+                ]
+            },
+            "data": [
+                "/home/gitbashtry/Projects/ldbc_snb_interactive_v2_impls/typeql/data/out-sf0.1/graphs/csv/bi/composite-merged-fk/initial_snapshot/static/Place/City/part-00000-825f6eff-8c46-4a3a-99be-2e1d42e14640-c000.csv"
+            ]
+        },
+        "Country": {
+            "insert": {
+                "entity": "Country",
+                "ownerships": [
+                    {
+                        "attribute": "id",
+                        "column": "id"
+                    },
+                    {
+                        "attribute": "name",
+                        "column": "name"
+                    },
+                    {
+                        "attribute": "url",
+                        "column": "url"
+                    }
+                ]
+            },
+            "data": [
+                "/home/gitbashtry/Projects/ldbc_snb_interactive_v2_impls/typeql/data/out-sf0.1/graphs/csv/bi/composite-merged-fk/initial_snapshot/static/Place/Country/part-00000-825f6eff-8c46-4a3a-99be-2e1d42e14640-c000.csv"
+            ]
+        },
+        "Continent": {
+            "insert": {
+                "entity": "Continent",
+                "ownerships": [
+                    {
+                        "attribute": "id",
+                        "column": "id"
+                    },
+                    {
+                        "attribute": "name",
+                        "column": "name"
+                    },
+                    {
+                        "attribute": "url",
+                        "column": "url"
+                    }
+                ]
+            },
+            "data": [
+                "/home/gitbashtry/Projects/ldbc_snb_interactive_v2_impls/typeql/data/out-sf0.1/graphs/csv/bi/composite-merged-fk/initial_snapshot/static/Place/Continent/part-00000-825f6eff-8c46-4a3a-99be-2e1d42e14640-c000.csv"
+            ]
+        },
+        "Company": {
+            "insert": {
+                "entity": "Company",
+                "ownerships": [
+                    {
+                        "attribute": "id",
+                        "column": "id"
+                    },
+                    {
+                        "attribute": "name",
+                        "column": "name"
+                    },
+                    {
+                        "attribute": "url",
+                        "column": "url"
+                    }
+                ]
+            },
+            "data": [
+                "/home/gitbashtry/Projects/ldbc_snb_interactive_v2_impls/typeql/data/out-sf0.1/graphs/csv/bi/composite-merged-fk/initial_snapshot/static/Organisation/Company/part-00000-53276568-0be7-423a-8ba7-0ae0422f539d-c000.csv"
+            ]
+        },
+        "University": {
+            "insert": {
+                "entity": "University",
+                "ownerships": [
+                    {
+                        "attribute": "id",
+                        "column": "id"
+                    },
+                    {
+                        "attribute": "name",
+                        "column": "name"
+                    },
+                    {
+                        "attribute": "url",
+                        "column": "url"
+                    }
+                ]
+            },
+            "data": [
+                "/home/gitbashtry/Projects/ldbc_snb_interactive_v2_impls/typeql/data/out-sf0.1/graphs/csv/bi/composite-merged-fk/initial_snapshot/static/Organisation/University/part-00000-53276568-0be7-423a-8ba7-0ae0422f539d-c000.csv"
+            ]
+        },
+        "TagClass": {
+            "insert": {
+                "entity": "TagClass",
+                "ownerships": [
+                    {
+                        "attribute": "id",
+                        "column": "id"
+                    },
+                    {
+                        "attribute": "name",
+                        "column": "name"
+                    },
+                    {
+                        "attribute": "url",
+                        "column": "url"
+                    }
+                ]
+            },
+            "data": [
+                "/home/gitbashtry/Projects/ldbc_snb_interactive_v2_impls/typeql/data/out-sf0.1/graphs/csv/bi/composite-merged-fk/initial_snapshot/static/TagClass/part-00000-b5e08b95-b0c4-4ded-bdfd-d33b037a34a5-c000.csv"
+            ]
+        },
+        "Tag": {
+            "insert": {
+                "entity": "Tag",
+                "ownerships": [
+                    {
+                        "attribute": "id",
+                        "column": "id"
+                    },
+                    {
+                        "attribute": "name",
+                        "column": "name"
+                    },
+                    {
+                        "attribute": "url",
+                        "column": "url"
+                    }
+                ]
+            },
+            "data": [
+                "/home/gitbashtry/Projects/ldbc_snb_interactive_v2_impls/typeql/data/out-sf0.1/graphs/csv/bi/composite-merged-fk/initial_snapshot/static/Tag/part-00000-3b58376e-ea9d-4764-abfa-07cdef12c555-c000.csv"
+            ]
+        },
+        "Person": {
+            "insert": {
+                "entity": "Person",
+                "ownerships": [
+                    {
+                        "attribute": "id",
+                        "column": "id"
+                    },
+                    {
+                        "attribute": "firstName",
+                        "column": "firstName"
+                    },
+                    {
+                        "attribute": "lastName",
+                        "column": "lastName"
+                    },
+                    {
+                        "attribute": "gender",
+                        "column": "gender"
+                    },
+                    {
+                        "attribute": "birthday",
+                        "column": "birthday"
+                    },
+                    {
+                        "attribute": "locationIP",
+                        "column": "locationIP"
+                    },
+                    {
+                        "attribute": "browserUsed",
+                        "column": "browserUsed"
+                    },
+                    {
+                        "attribute": "speaks",
+                        "column": "language",
+                        "listSeparator": ";"
+                    },
+                    {
+                        "attribute": "email",
+                        "column": "email",
+                        "listSeparator": ";"
+                    },
+                    {
+                        "attribute": "creationDate",
+                        "column": "creationDate"
+                    }
+                ]
+            },
+            "data": [
+                "/home/gitbashtry/Projects/ldbc_snb_interactive_v2_impls/typeql/data/out-sf0.1/graphs/csv/bi/composite-merged-fk/initial_snapshot/dynamic/Person/part-00000-410cad98-2d70-4d5d-9df5-6bdb360bd093-c000.csv"
+            ]
+        },
+        "Forum": {
+            "insert": {
+                "entity": "Forum",
+                "ownerships": [
+                    {
+                        "attribute": "id",
+                        "column": "id"
+                    },
+                    {
+                        "attribute": "title",
+                        "column": "title"
+                    },
+                    {
+                        "attribute": "creationDate",
+                        "column": "creationDate"
+                    }
+                ]
+            },
+            "data": [
+                "/home/gitbashtry/Projects/ldbc_snb_interactive_v2_impls/typeql/data/out-sf0.1/graphs/csv/bi/composite-merged-fk/initial_snapshot/dynamic/Forum/part-00000-13cfc757-22c1-4cbb-b481-c8f19dcfecb1-c000.csv"
+            ]
+        },
+        "Post": {
+            "insert": {
+                "entity": "Post",
+                "ownerships": [
+                    {
+                        "attribute": "id",
+                        "column": "id"
+                    },
+                    {
+                        "attribute": "imageFile",
+                        "column": "imageFile",
+                        "required": false
+                    },
+                    {
+                        "attribute": "creationDate",
+                        "column": "creationDate"
+                    },
+                    {
+                        "attribute": "locationIP",
+                        "column": "locationIP"
+                    },
+                    {
+                        "attribute": "browserUsed",
+                        "column": "browserUsed"
+                    },
+                    {
+                        "attribute": "language",
+                        "column": "language",
+                        "required": false
+                    },
+                    {
+                        "attribute": "content",
+                        "column": "content",
+                        "required": false
+                    }
+                ]
+            },
+            "data": [
+                "/home/gitbashtry/Projects/ldbc_snb_interactive_v2_impls/typeql/data/out-sf0.1/graphs/csv/bi/composite-merged-fk/initial_snapshot/dynamic/Post/part-00000-34ef1d72-75d7-4f46-8449-a6231e5dc7da-c000.csv"
+            ]
+        },
+        "Comment": {
+            "insert": {
+                "entity": "Comment",
+                "ownerships": [
+                    {
+                        "attribute": "id",
+                        "column": "id"
+                    },
+                    {
+                        "attribute": "creationDate",
+                        "column": "creationDate"
+                    },
+                    {
+                        "attribute": "locationIP",
+                        "column": "locationIP"
+                    },
+                    {
+                        "attribute": "browserUsed",
+                        "column": "browserUsed"
+                    },
+                    {
+                        "attribute": "content",
+                        "column": "content",
+                        "required": false
+                    },
+                    {
+                        "attribute": "length",
+                        "column": "length"
+                    }
+                ]
+            },
+            "data": [
+                "/home/gitbashtry/Projects/ldbc_snb_interactive_v2_impls/typeql/data/out-sf0.1/graphs/csv/bi/composite-merged-fk/initial_snapshot/dynamic/Comment/part-00000-f9f4cbc4-baa4-467c-be67-af1d735f44ee-c000.csv",
+                "/home/gitbashtry/Projects/ldbc_snb_interactive_v2_impls/typeql/data/out-sf0.1/graphs/csv/bi/composite-merged-fk/initial_snapshot/dynamic/Comment/part-00001-f9f4cbc4-baa4-467c-be67-af1d735f44ee-c000.csv"
+            ]
+        }
+    },
+    "relations": {
+        "isPartOfForCity": {
+            "insert": {
+                "relation": "isPartOf",
+                "players": [
+                    {
+                        "role": "part",
+                        "required": true,
+                        "match": {
+                            "type": "City",
+                            "ownerships": [
+                                {
+                                    "attribute": "id",
+                                    "column": "id"
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "role": "partOf",
+                        "required": true,
+                        "match": {
+                            "type": "Country",
+                            "ownerships": [
+                                {
+                                    "attribute": "id",
+                                    "column": "PartOfPlaceId"
+                                }
+                            ]
+                        }
+                    }
+                ]
+            },
+            "data": [
+                "/home/gitbashtry/Projects/ldbc_snb_interactive_v2_impls/typeql/data/out-sf0.1/graphs/csv/bi/composite-merged-fk/initial_snapshot/static/Place/City/part-00000-825f6eff-8c46-4a3a-99be-2e1d42e14640-c000.csv"
+            ]
+        },
+        "isPartOfForCountry": {
+            "insert": {
+                "relation": "isPartOf",
+                "players": [
+                    {
+                        "role": "part",
+                        "required": true,
+                        "match": {
+                            "type": "Country",
+                            "ownerships": [
+                                {
+                                    "attribute": "id",
+                                    "column": "id"
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "role": "partOf",
+                        "required": true,
+                        "match": {
+                            "type": "Continent",
+                            "ownerships": [
+                                {
+                                    "attribute": "id",
+                                    "column": "PartOfPlaceId"
+                                }
+                            ]
+                        }
+                    }
+                ]
+            },
+            "data": [
+                "/home/gitbashtry/Projects/ldbc_snb_interactive_v2_impls/typeql/data/out-sf0.1/graphs/csv/bi/composite-merged-fk/initial_snapshot/static/Place/Country/part-00000-825f6eff-8c46-4a3a-99be-2e1d42e14640-c000.csv"
+            ]
+        },
+        "isLocatedInForUniversity": {
+            "insert": {
+                "relation": "isLocatedIn",
+                "players": [
+                    {
+                        "role": "location",
+                        "required": true,
+                        "match": {
+                            "type": "University",
+                            "ownerships": [
+                                {
+                                    "attribute": "id",
+                                    "column": "id"
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "role": "locatedIn",
+                        "required": true,
+                        "match": {
+                            "type": "City",
+                            "ownerships": [
+                                {
+                                    "attribute": "id",
+                                    "column": "LocationPlaceId"
+                                }
+                            ]
+                        }
+                    }
+                ]
+            },
+            "data": [
+                "/home/gitbashtry/Projects/ldbc_snb_interactive_v2_impls/typeql/data/out-sf0.1/graphs/csv/bi/composite-merged-fk/initial_snapshot/static/Organisation/University/part-00000-53276568-0be7-423a-8ba7-0ae0422f539d-c000.csv"
+            ]
+        },
+        "isLocatedInForCompany": {
+            "insert": {
+                "relation": "isLocatedIn",
+                "players": [
+                    {
+                        "role": "location",
+                        "required": true,
+                        "match": {
+                            "type": "Company",
+                            "ownerships": [
+                                {
+                                    "attribute": "id",
+                                    "column": "id"
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "role": "locatedIn",
+                        "required": true,
+                        "match": {
+                            "type": "Country",
+                            "ownerships": [
+                                {
+                                    "attribute": "id",
+                                    "column": "LocationPlaceId"
+                                }
+                            ]
+                        }
+                    }
+                ]
+            },
+            "data": [
+                "/home/gitbashtry/Projects/ldbc_snb_interactive_v2_impls/typeql/data/out-sf0.1/graphs/csv/bi/composite-merged-fk/initial_snapshot/static/Organisation/Company/part-00000-53276568-0be7-423a-8ba7-0ae0422f539d-c000.csv"
+            ]
+        },
+        "isSubclassOf": {
+            "insert": {
+                "relation": "isSubclassOf",
+                "players": [
+                    {
+                        "role": "subclass",
+                        "required": true,
+                        "match": {
+                            "type": "TagClass",
+                            "ownerships": [
+                                {
+                                    "attribute": "id",
+                                    "column": "id"
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "role": "superclass",
+                        "required": true,
+                        "match": {
+                            "type": "TagClass",
+                            "ownerships": [
+                                {
+                                    "attribute": "id",
+                                    "column": "SubclassOfTagClassId",
+                                    "required": true
+                                }
+                            ]
+                        }
+                    }
+                ]
+            },
+            "data": [
+                "/home/gitbashtry/Projects/ldbc_snb_interactive_v2_impls/typeql/data/out-sf0.1/graphs/csv/bi/composite-merged-fk/initial_snapshot/static/TagClass/part-00000-b5e08b95-b0c4-4ded-bdfd-d33b037a34a5-c000.csv"
+            ]
+        },
+        "hasType": {
+            "insert": {
+                "relation": "hasType",
+                "players": [
+                    {
+                        "role": "tag",
+                        "required": true,
+                        "match": {
+                            "type": "Tag",
+                            "ownerships": [
+                                {
+                                    "attribute": "id",
+                                    "column": "id"
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "role": "tagClass",
+                        "required": true,
+                        "match": {
+                            "type": "TagClass",
+                            "ownerships": [
+                                {
+                                    "attribute": "id",
+                                    "column": "TypeTagClassId"
+                                }
+                            ]
+                        }
+                    }
+                ]
+            },
+            "data": [
+                "/home/gitbashtry/Projects/ldbc_snb_interactive_v2_impls/typeql/data/out-sf0.1/graphs/csv/bi/composite-merged-fk/initial_snapshot/static/Tag/part-00000-3b58376e-ea9d-4764-abfa-07cdef12c555-c000.csv"
+            ]
+        },
+        "isLocatedInForPerson": {
+            "insert": {
+                "relation": "isLocatedIn",
+                "players": [
+                    {
+                        "role": "location",
+                        "required": true,
+                        "match": {
+                            "type": "Person",
+                            "ownerships": [
+                                {
+                                    "attribute": "id",
+                                    "column": "id"
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "role": "locatedIn",
+                        "required": true,
+                        "match": {
+                            "type": "City",
+                            "ownerships": [
+                                {
+                                    "attribute": "id",
+                                    "column": "LocationCityId"
+                                }
+                            ]
+                        }
+                    }
+                ]
+            },
+            "data": [
+                "/home/gitbashtry/Projects/ldbc_snb_interactive_v2_impls/typeql/data/out-sf0.1/graphs/csv/bi/composite-merged-fk/initial_snapshot/dynamic/Person/part-00000-410cad98-2d70-4d5d-9df5-6bdb360bd093-c000.csv"
+            ]
+        },
+        "hasModerator": {
+            "insert": {
+                "relation": "hasModerator",
+                "players": [
+                    {
+                        "role": "moderated",
+                        "required": true,
+                        "match": {
+                            "type": "Forum",
+                            "ownerships": [
+                                {
+                                    "attribute": "id",
+                                    "column": "id"
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "role": "moderator",
+                        "required": true,
+                        "match": {
+                            "type": "Person",
+                            "ownerships": [
+                                {
+                                    "attribute": "id",
+                                    "column": "ModeratorPersonId"
+                                }
+                            ]
+                        }
+                    }
+                ]
+            },
+            "data": [
+                "/home/gitbashtry/Projects/ldbc_snb_interactive_v2_impls/typeql/data/out-sf0.1/graphs/csv/bi/composite-merged-fk/initial_snapshot/dynamic/Forum/part-00000-13cfc757-22c1-4cbb-b481-c8f19dcfecb1-c000.csv"
+            ]
+        },
+        "hasCreator": {
+            "insert": {
+                "relation": "hasCreator",
+                "players": [
+                    {
+                        "role": "created",
+                        "required": true,
+                        "match": {
+                            "type": "Post",
+                            "ownerships": [
+                                {
+                                    "attribute": "id",
+                                    "column": "id"
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "role": "creator",
+                        "required": true,
+                        "match": {
+                            "type": "Person",
+                            "ownerships": [
+                                {
+                                    "attribute": "id",
+                                    "column": "CreatorPersonId"
+                                }
+                            ]
+                        }
+                    }
+                ]
+            },
+            "data": [
+                "/home/gitbashtry/Projects/ldbc_snb_interactive_v2_impls/typeql/data/out-sf0.1/graphs/csv/bi/composite-merged-fk/initial_snapshot/dynamic/Post/part-00000-34ef1d72-75d7-4f46-8449-a6231e5dc7da-c000.csv"
+            ]
+        },
+        "containerOf": {
+            "insert": {
+                "relation": "containerOf",
+                "players": [
+                    {
+                        "role": "container",
+                        "required": true,
+                        "match": {
+                            "type": "Forum",
+                            "ownerships": [
+                                {
+                                    "attribute": "id",
+                                    "column": "ContainerForumId"
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "role": "contain",
+                        "required": true,
+                        "match": {
+                            "type": "Post",
+                            "ownerships": [
+                                {
+                                    "attribute": "id",
+                                    "column": "id"
+                                }
+                            ]
+                        }
+                    }
+                ]
+            },
+            "data": [
+                "/home/gitbashtry/Projects/ldbc_snb_interactive_v2_impls/typeql/data/out-sf0.1/graphs/csv/bi/composite-merged-fk/initial_snapshot/dynamic/Post/part-00000-34ef1d72-75d7-4f46-8449-a6231e5dc7da-c000.csv"
+            ]
+        },
+        "isLocatedInForPost": {
+            "insert": {
+                "relation": "isLocatedIn",
+                "players": [
+                    {
+                        "role": "location",
+                        "required": true,
+                        "match": {
+                            "type": "Post",
+                            "ownerships": [
+                                {
+                                    "attribute": "id",
+                                    "column": "id"
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "role": "locatedIn",
+                        "required": true,
+                        "match": {
+                            "type": "Country",
+                            "ownerships": [
+                                {
+                                    "attribute": "id",
+                                    "column": "LocationCountryId"
+                                }
+                            ]
+                        }
+                    }
+                ]
+            },
+            "data": [
+                "/home/gitbashtry/Projects/ldbc_snb_interactive_v2_impls/typeql/data/out-sf0.1/graphs/csv/bi/composite-merged-fk/initial_snapshot/dynamic/Post/part-00000-34ef1d72-75d7-4f46-8449-a6231e5dc7da-c000.csv"
+            ]
+        },
+        "hasCreatorForComments": {
+            "insert": {
+                "relation": "hasCreator",
+                "players": [
+                    {
+                        "role": "created",
+                        "required": true,
+                        "match": {
+                            "type": "Comment",
+                            "ownerships": [
+                                {
+                                    "attribute": "id",
+                                    "column": "id"
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "role": "creator",
+                        "required": true,
+                        "match": {
+                            "type": "Person",
+                            "ownerships": [
+                                {
+                                    "attribute": "id",
+                                    "column": "CreatorPersonId"
+                                }
+                            ]
+                        }
+                    }
+                ]
+            },
+            "data": [
+                "/home/gitbashtry/Projects/ldbc_snb_interactive_v2_impls/typeql/data/out-sf0.1/graphs/csv/bi/composite-merged-fk/initial_snapshot/dynamic/Comment/part-00000-f9f4cbc4-baa4-467c-be67-af1d735f44ee-c000.csv",
+                "/home/gitbashtry/Projects/ldbc_snb_interactive_v2_impls/typeql/data/out-sf0.1/graphs/csv/bi/composite-merged-fk/initial_snapshot/dynamic/Comment/part-00001-f9f4cbc4-baa4-467c-be67-af1d735f44ee-c000.csv"
+            ]
+        },
+        "isLocatedInForComments": {
+            "insert": {
+                "relation": "isLocatedIn",
+                "players": [
+                    {
+                        "role": "location",
+                        "required": true,
+                        "match": {
+                            "type": "Comment",
+                            "ownerships": [
+                                {
+                                    "attribute": "id",
+                                    "column": "id"
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "role": "locatedIn",
+                        "required": true,
+                        "match": {
+                            "type": "Country",
+                            "ownerships": [
+                                {
+                                    "attribute": "id",
+                                    "column": "LocationCountryId"
+                                }
+                            ]
+                        }
+                    }
+                ]
+            },
+            "data": [
+                "/home/gitbashtry/Projects/ldbc_snb_interactive_v2_impls/typeql/data/out-sf0.1/graphs/csv/bi/composite-merged-fk/initial_snapshot/dynamic/Comment/part-00000-f9f4cbc4-baa4-467c-be67-af1d735f44ee-c000.csv",
+                "/home/gitbashtry/Projects/ldbc_snb_interactive_v2_impls/typeql/data/out-sf0.1/graphs/csv/bi/composite-merged-fk/initial_snapshot/dynamic/Comment/part-00001-f9f4cbc4-baa4-467c-be67-af1d735f44ee-c000.csv"
+            ]
+        },
+        "replyOfPost": {
+            "insert": {
+                "relation": "replyOf",
+                "players": [
+                    {
+                        "role": "reply",
+                        "required": true,
+                        "match": {
+                            "type": "Comment",
+                            "ownerships": [
+                                {
+                                    "attribute": "id",
+                                    "column": "id"
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "role": "repliedTo",
+                        "required": true,
+                        "match": {
+                            "type": "Post",
+                            "ownerships": [
+                                {
+                                    "attribute": "id",
+                                    "column": "ParentPostId",
+                                    "required": true
+                                }
+                            ]
+                        }
+                    }
+                ]
+            },
+            "data": [
+                "/home/gitbashtry/Projects/ldbc_snb_interactive_v2_impls/typeql/data/out-sf0.1/graphs/csv/bi/composite-merged-fk/initial_snapshot/dynamic/Comment/part-00000-f9f4cbc4-baa4-467c-be67-af1d735f44ee-c000.csv",
+                "/home/gitbashtry/Projects/ldbc_snb_interactive_v2_impls/typeql/data/out-sf0.1/graphs/csv/bi/composite-merged-fk/initial_snapshot/dynamic/Comment/part-00001-f9f4cbc4-baa4-467c-be67-af1d735f44ee-c000.csv"
+            ]
+        },
+        "replyOfComment": {
+            "insert": {
+                "relation": "replyOf",
+                "players": [
+                    {
+                        "role": "reply",
+                        "required": true,
+                        "match": {
+                            "type": "Comment",
+                            "ownerships": [
+                                {
+                                    "attribute": "id",
+                                    "column": "id"
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "role": "repliedTo",
+                        "required": true,
+                        "match": {
+                            "type": "Comment",
+                            "ownerships": [
+                                {
+                                    "attribute": "id",
+                                    "column": "ParentCommentId",
+                                    "required": true
+                                }
+                            ]
+                        }
+                    }
+                ]
+            },
+            "data": [
+                "/home/gitbashtry/Projects/ldbc_snb_interactive_v2_impls/typeql/data/out-sf0.1/graphs/csv/bi/composite-merged-fk/initial_snapshot/dynamic/Comment/part-00000-f9f4cbc4-baa4-467c-be67-af1d735f44ee-c000.csv",
+                "/home/gitbashtry/Projects/ldbc_snb_interactive_v2_impls/typeql/data/out-sf0.1/graphs/csv/bi/composite-merged-fk/initial_snapshot/dynamic/Comment/part-00001-f9f4cbc4-baa4-467c-be67-af1d735f44ee-c000.csv"
+            ]
+        },
+        "hasTag": {
+            "insert": {
+                "relation": "hasTag",
+                "players": [
+                    {
+                        "role": "tagged",
+                        "required": true,
+                        "match": {
+                            "type": "Comment",
+                            "ownerships": [
+                                {
+                                    "attribute": "id",
+                                    "column": "CommentId"
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "role": "tag",
+                        "required": true,
+                        "match": {
+                            "type": "Tag",
+                            "ownerships": [
+                                {
+                                    "attribute": "id",
+                                    "column": "TagId"
+                                }
+                            ]
+                        }
+                    }
+                ],
+                "ownerships": [
+                    {
+                        "attribute": "creationDate",
+                        "column": "creationDate"
+                    }
+                ]
+            },
+            "data": [
+                "/home/gitbashtry/Projects/ldbc_snb_interactive_v2_impls/typeql/data/out-sf0.1/graphs/csv/bi/composite-merged-fk/initial_snapshot/dynamic/Comment_hasTag_Tag/part-00000-fb1d7c7c-ad67-4842-8e61-a8318d1e3b82-c000.csv"
+            ]
+        },
+        "hasMember": {
+            "insert": {
+                "relation": "hasMember",
+                "players": [
+                    {
+                        "role": "memberOf",
+                        "required": true,
+                        "match": {
+                            "type": "Forum",
+                            "ownerships": [
+                                {
+                                    "attribute": "id",
+                                    "column": "ForumId"
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "role": "member",
+                        "required": true,
+                        "match": {
+                            "type": "Person",
+                            "ownerships": [
+                                {
+                                    "attribute": "id",
+                                    "column": "PersonId"
+                                }
+                            ]
+                        }
+                    }
+                ],
+                "ownerships": [
+                    {
+                        "attribute": "creationDate",
+                        "column": "creationDate"
+                    }
+                ]
+            },
+            "data": [
+                "/home/gitbashtry/Projects/ldbc_snb_interactive_v2_impls/typeql/data/out-sf0.1/graphs/csv/bi/composite-merged-fk/initial_snapshot/dynamic/Forum_hasMember_Person/part-00000-daebe476-e39c-4dc1-9d1c-4f6d9b8a0e0e-c000.csv"
+            ]
+        },
+        "hasTagForum": {
+            "insert": {
+                "relation": "hasTag",
+                "players": [
+                    {
+                        "role": "tagged",
+                        "required": true,
+                        "match": {
+                            "type": "Forum",
+                            "ownerships": [
+                                {
+                                    "attribute": "id",
+                                    "column": "ForumId"
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "role": "tag",
+                        "required": true,
+                        "match": {
+                            "type": "Tag",
+                            "ownerships": [
+                                {
+                                    "attribute": "id",
+                                    "column": "TagId"
+                                }
+                            ]
+                        }
+                    }
+                ],
+                "ownerships": [
+                    {
+                        "attribute": "creationDate",
+                        "column": "creationDate"
+                    }
+                ]
+            },
+            "data": [
+                "/home/gitbashtry/Projects/ldbc_snb_interactive_v2_impls/typeql/data/out-sf0.1/graphs/csv/bi/composite-merged-fk/initial_snapshot/dynamic/Forum_hasTag_Tag/part-00000-a81f5ddd-393e-45f3-a409-a1481e6956fe-c000.csv"
+            ]
+        },
+        "hasTagPost": {
+            "insert": {
+                "relation": "hasTag",
+                "players": [
+                    {
+                        "role": "tagged",
+                        "required": true,
+                        "match": {
+                            "type": "Post",
+                            "ownerships": [
+                                {
+                                    "attribute": "id",
+                                    "column": "PostId"
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "role": "tag",
+                        "required": true,
+                        "match": {
+                            "type": "Tag",
+                            "ownerships": [
+                                {
+                                    "attribute": "id",
+                                    "column": "TagId"
+                                }
+                            ]
+                        }
+                    }
+                ],
+                "ownerships": [
+                    {
+                        "attribute": "creationDate",
+                        "column": "creationDate"
+                    }
+                ]
+            },
+            "data": [
+                "/home/gitbashtry/Projects/ldbc_snb_interactive_v2_impls/typeql/data/out-sf0.1/graphs/csv/bi/composite-merged-fk/initial_snapshot/dynamic/Post_hasTag_Tag/part-00000-0f646b2d-379a-4b7e-8486-1c4c8daa8330-c000.csv"
+            ]
+        },
+        "hasInterest": {
+            "insert": {
+                "relation": "hasInterest",
+                "players": [
+                    {
+                        "role": "interested",
+                        "required": true,
+                        "match": {
+                            "type": "Person",
+                            "ownerships": [
+                                {
+                                    "attribute": "id",
+                                    "column": "PersonId"
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "role": "interests",
+                        "required": true,
+                        "match": {
+                            "type": "Tag",
+                            "ownerships": [
+                                {
+                                    "attribute": "id",
+                                    "column": "TagId"
+                                }
+                            ]
+                        }
+                    }
+                ],
+                "ownerships": [
+                    {
+                        "attribute": "creationDate",
+                        "column": "creationDate"
+                    }
+                ]
+            },
+            "data": [
+                "/home/gitbashtry/Projects/ldbc_snb_interactive_v2_impls/typeql/data/out-sf0.1/graphs/csv/bi/composite-merged-fk/initial_snapshot/dynamic/Person_hasInterest_Tag/part-00000-3cd9f35a-2ca6-4959-83b2-6697e7823ca2-c000.csv"
+            ]
+        },
+        "knows": {
+            "insert": {
+                "relation": "knows",
+                "players": [
+                    {
+                        "role": "friend",
+                        "required": true,
+                        "match": {
+                            "type": "Person",
+                            "ownerships": [
+                                {
+                                    "attribute": "id",
+                                    "column": "Person1Id"
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "role": "friend",
+                        "required": true,
+                        "match": {
+                            "type": "Person",
+                            "ownerships": [
+                                {
+                                    "attribute": "id",
+                                    "column": "Person2Id"
+                                }
+                            ]
+                        }
+                    }
+                ],
+                "ownerships": [
+                    {
+                        "attribute": "creationDate",
+                        "column": "creationDate"
+                    }
+                ]
+            },
+            "data": [
+                "/home/gitbashtry/Projects/ldbc_snb_interactive_v2_impls/typeql/data/out-sf0.1/graphs/csv/bi/composite-merged-fk/initial_snapshot/dynamic/Person_knows_Person/part-00000-cf65f452-e219-4543-aa4a-ce39766c5972-c000.csv"
+            ]
+        },
+        "likesComment": {
+            "insert": {
+                "relation": "likes",
+                "players": [
+                    {
+                        "role": "liker",
+                        "required": true,
+                        "match": {
+                            "type": "Person",
+                            "ownerships": [
+                                {
+                                    "attribute": "id",
+                                    "column": "PersonId"
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "role": "message",
+                        "required": true,
+                        "match": {
+                            "type": "Comment",
+                            "ownerships": [
+                                {
+                                    "attribute": "id",
+                                    "column": "CommentId"
+                                }
+                            ]
+                        }
+                    }
+                ],
+                "ownerships": [
+                    {
+                        "attribute": "creationDate",
+                        "column": "creationDate"
+                    }
+                ]
+            },
+            "data": [
+                "/home/gitbashtry/Projects/ldbc_snb_interactive_v2_impls/typeql/data/out-sf0.1/graphs/csv/bi/composite-merged-fk/initial_snapshot/dynamic/Person_likes_Comment/part-00000-a87f1df9-116f-4139-b3ee-e4093f3de66c-c000.csv"
+            ]
+        },
+        "likesPost": {
+            "insert": {
+                "relation": "likes",
+                "players": [
+                    {
+                        "role": "liker",
+                        "required": true,
+                        "match": {
+                            "type": "Person",
+                            "ownerships": [
+                                {
+                                    "attribute": "id",
+                                    "column": "PersonId"
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "role": "message",
+                        "required": true,
+                        "match": {
+                            "type": "Post",
+                            "ownerships": [
+                                {
+                                    "attribute": "id",
+                                    "column": "PostId"
+                                }
+                            ]
+                        }
+                    }
+                ],
+                "ownerships": [
+                    {
+                        "attribute": "creationDate",
+                        "column": "creationDate"
+                    }
+                ]
+            },
+            "data": [
+                "/home/gitbashtry/Projects/ldbc_snb_interactive_v2_impls/typeql/data/out-sf0.1/graphs/csv/bi/composite-merged-fk/initial_snapshot/dynamic/Person_likes_Post/part-00000-1ef63664-e880-4b21-87d8-2038fb63270d-c000.csv"
+            ]
+        },
+        "studyAt": {
+            "insert": {
+                "relation": "studyAt",
+                "players": [
+                    {
+                        "role": "student",
+                        "required": true,
+                        "match": {
+                            "type": "Person",
+                            "ownerships": [
+                                {
+                                    "attribute": "id",
+                                    "column": "PersonId"
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "role": "university",
+                        "required": true,
+                        "match": {
+                            "type": "University",
+                            "ownerships": [
+                                {
+                                    "attribute": "id",
+                                    "column": "UniversityId"
+                                }
+                            ]
+                        }
+                    }
+                ],
+                "ownerships": [
+                    {
+                        "attribute": "classYear",
+                        "column": "classYear"
+                    },
+                    {
+                        "attribute": "creationDate",
+                        "column": "creationDate"
+                    }
+                ]
+            },
+            "data": [
+                "/home/gitbashtry/Projects/ldbc_snb_interactive_v2_impls/typeql/data/out-sf0.1/graphs/csv/bi/composite-merged-fk/initial_snapshot/dynamic/Person_studyAt_University/part-00000-22118d13-93f7-4fc9-85e2-4bb61d291d92-c000.csv"
+            ]
+        },
+        "workAt": {
+            "insert": {
+                "relation": "workAt",
+                "players": [
+                    {
+                        "role": "employee",
+                        "required": true,
+                        "match": {
+                            "type": "Person",
+                            "ownerships": [
+                                {
+                                    "attribute": "id",
+                                    "column": "PersonId"
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "role": "employer",
+                        "required": true,
+                        "match": {
+                            "type": "Company",
+                            "ownerships": [
+                                {
+                                    "attribute": "id",
+                                    "column": "CompanyId"
+                                }
+                            ]
+                        }
+                    }
+                ],
+                "ownerships": [
+                    {
+                        "attribute": "workFrom",
+                        "column": "workFrom"
+                    },
+                    {
+                        "attribute": "creationDate",
+                        "column": "creationDate"
+                    }
+                ]
+            },
+            "data": [
+                "/home/gitbashtry/Projects/ldbc_snb_interactive_v2_impls/typeql/data/out-sf0.1/graphs/csv/bi/composite-merged-fk/initial_snapshot/dynamic/Person_workAt_Company/part-00000-c66caf81-6774-4281-983f-95ec0acce206-c000.csv"
+            ]
+        }
+    }
+}

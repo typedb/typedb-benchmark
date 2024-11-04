@@ -1,0 +1,58 @@
+match
+    # $person isa Person, has id 4398046511273;
+    $person isa Person, has id :personId;
+
+    # Match other persons potentially within the friend network
+    $otherPerson isa Person, 
+        has id $otherPerson_id, 
+        has firstName $otherPerson_firstName, 
+        has lastName $otherPerson_lastName;
+    $city isa City;
+    ($otherPerson, $city) isa isLocatedIn;
+    ($city, $country) isa isPartOf;
+
+    ?distance = ?local_distance;
+    {
+        ?local_distance = 1;
+        $r1(friend: $person, friend: $otherPerson) isa knows;
+    } or {
+        ?local_distance = 2;
+        $r1(friend: $person, friend: $intermediateFriend) isa knows;
+        $r2(friend: $intermediateFriend, friend: $otherPerson) isa knows;
+        # not {$otherPerson is $person;}; # DOUBLE-CHECK ... NEEDED?
+    };
+    
+    $MessageX isa Message, has creationDate $dateX;
+    $MessageY isa Message, has creationDate $dateY;
+    $dateX >= :startDate;
+    $dateX < :endDate;
+    $dateY >= :startDate;
+    $dateY < :endDate;
+    (creator: $otherPerson, created: $MessageX) isa hasCreator;
+    (creator: $otherPerson, created: $MessageY) isa hasCreator;
+    ($MessageX, $countryX) isa isLocatedIn;
+    ($MessageY, $countryY) isa isLocatedIn;
+    $countryX isa Country, has name ":countryXName";
+    $countryY isa Country, has name ":countryYName";
+    not { $countryX is $countryY; };
+    not { $country is $countryY; };
+    not { $country is $countryX; };
+fetch
+    $otherPerson_id;
+    $otherPerson_firstName;
+    $otherPerson_lastName;
+    xCount: {
+        match
+            (creator: $otherPerson, created: $MessageZ) isa hasCreator;
+            ($MessageZ, $countryZ) isa isLocatedIn;
+            $countryZ isa Country, has name "Hungary";
+        get; count;
+    };
+    yCount: {
+        match
+            (creator: $otherPerson, created: $MessageZ) isa hasCreator;
+            ($MessageZ, $countryZ) isa isLocatedIn;
+            $countryZ isa Country, has name "Panama";
+        get; count;    
+    };
+limit 20;

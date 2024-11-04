@@ -1,0 +1,27 @@
+match
+  $person isa Person, has id :personId; #personId
+  ($person, $friend) isa knows;
+  ($friend, $post) isa hasCreator;
+  $post isa Post, has creationDate $date;
+  $date < :endDate; # endDate
+  $date >= :startDate; # startDate
+  $tag isa Tag, has name $tag_name;
+  ($post, $tag) isa hasTag;
+  not { 
+    $otherPost isa Post, has creationDate < :startDate; # startDate
+    not { $otherPost is $post; };
+    ($otherPost, $tag) isa hasTag;
+    ($person, $otherFriend) isa knows;
+    ($otherFriend, $otherPost) isa hasCreator;
+  };
+fetch
+ $date;
+ $tag_name;
+ postCount: {
+    match 
+        $sameTagPost isa Post, has creationDate $otherDate;
+        $otherDate < :endDate; # endDate
+        $otherDate >= :startDate; # startDate
+        ($sameTagPost, $tag) isa hasTag;
+    get; count;
+ };

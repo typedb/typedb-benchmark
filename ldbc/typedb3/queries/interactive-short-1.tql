@@ -1,0 +1,26 @@
+# IS1. Profile of a Person
+# set personId 17592186044461
+
+match
+    $person isa Person,
+        has id :personId,
+        # has id 478,
+        has firstName $firstName,
+        has lastName $lastName,
+        has birthday $birthday,
+        has locationIP $locationIP,
+        has browserUsed $browserUsed,
+        has gender $gender,
+        has creationDate $creationDate;
+    $relation (location: $person, locatedIn: $city) isa isLocatedIn;
+    $city isa City, has id $cityId;
+
+fetch
+    $firstName;
+    $lastName;
+    $birthday; 
+    $locationIP; 
+    $browserUsed; 
+    $cityId; 
+    $gender; 
+    $creationDate;

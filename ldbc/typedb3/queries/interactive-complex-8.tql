@@ -1,0 +1,32 @@
+match
+    # $person isa Person, has id 478; 
+    $person isa Person, has id :personId;
+
+    $r1(created: $message, creator: $person) isa hasCreator;
+    $r2(repliedTo: $message, reply: $reply) isa replyOf;
+    $r3(created: $comment, creator: $commentAuthor) isa hasCreator;
+
+    $comment isa Comment,
+        has id $comment_id,
+        has creationDate $comment_creationDate,
+        has content $comment_content;
+
+    $commenAuthor isa Person,
+        has id $commenAuthor_id,
+        has firstName $commenAuthor_firstName,
+        has lastName $commenAuthor_lastName;
+    
+get
+    $commenAuthor_id, 
+    $commenAuthor_firstName,
+    $commenAuthor_lastName, 
+    $comment_creationDate, 
+    $comment_id, 
+    $comment_content;
+
+sort
+    $comment_creationDate desc,
+    $comment_id asc,
+    $commenAuthor_firstName asc;
+
+limit 20;

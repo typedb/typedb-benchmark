@@ -1,0 +1,30 @@
+{
+  "all_metrics" : [ {
+    "name" : "LdbcQuery2",
+    "unit" : "MILLISECONDS",
+    "count" : 10,
+    "run_time" : {
+      "name" : "Runtime",
+      "unit" : "MILLISECONDS",
+      "count" : 10,
+      "mean" : 90.4,
+      "min" : 9,
+      "max" : 754,
+      "25th_percentile" : 9,
+      "50th_percentile" : 14,
+      "75th_percentile" : 26,
+      "90th_percentile" : 30,
+      "95th_percentile" : 754,
+      "99th_percentile" : 754,
+      "99.9th_percentile" : 754,
+      "std_dev" : 221.33106424539687
+    }
+  } ],
+  "format_version" : 3,
+  "unit" : "MILLISECONDS",
+  "start_time" : 1726162212335,
+  "latest_finish_time" : 1726162213871,
+  "total_duration" : 1536,
+  "total_count" : 10,
+  "throughput" : 6.510416666666667
+}

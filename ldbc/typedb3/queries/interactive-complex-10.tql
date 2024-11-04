@@ -1,0 +1,43 @@
+match 
+  $person isa Person, has id 14;
+  $foaf isa Person, has birthday $foaf_birthday;
+  ($person, $friend) isa knows;
+  ($foaf, $friend) isa knows;
+  not { $foaf is $person; };
+  not { ($person, $foaf) isa knows; };
+get $foaf, $foaf_birthday;
+#split#
+match $foaf iid :foafId,
+    has id $foaf_id,
+    has firstName $foaf_firstName,
+    has lastName $foaf_lastName,
+    has gender $foaf_gender;
+  $city isa City,
+    has name $city_name;
+  ($foaf, $city) isa isLocatedIn;
+fetch
+  $foaf_id;
+  $foaf_firstName;
+  $foaf_lastName;
+  $foaf_gender;
+  $city_name;
+  "common": {
+  match
+    $post isa Post;
+    ($foaf, $post) isa hasCreator;
+    $tag isa Tag;
+    ($post, $tag) isa hasTag;
+    ($person, $tag) isa hasInterest;
+  get $post; count;
+};
+  "uncommon": {
+  match
+    $post isa Post;
+    ($foaf, $post) isa hasCreator;
+    not { 
+      $tag isa Tag;
+      ($post, $tag) isa hasTag;
+      ($person, $tag) isa hasInterest;
+    };
+  get $post; count;
+};

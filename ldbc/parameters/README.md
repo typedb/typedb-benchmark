@@ -1,6 +1,8 @@
 # Parameters
 
-This directory contains the query substitution parameters (`interactive-*.csv`)
+This directory contains the query substitution parameters (`interactive-*.csv`), i.e., values to be subsituted in queries.
+
+**They should be in folders of the form `parameters-sfXX`**
 
 The headers of the parameters are specified as a pipe-separated CSV file. It makes use the syntax of the [Neo4j CSV import tool](https://neo4j.com/docs/operations-manual/4.2/tools/neo4j-admin-import/#import-tool-header-format) to specify the type of each parameter. For example, the header
 

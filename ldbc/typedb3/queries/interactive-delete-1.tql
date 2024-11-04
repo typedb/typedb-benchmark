@@ -1,0 +1,25 @@
+match
+   $person isa Person, has id :personId;
+   $message isa Message;
+   ($person, $message) isa hasCreator;
+delete
+   $message isa Message;
+#split#
+match
+   $person isa Person, has id :personId;
+   $message isa Message;
+   ($person, $message) isa hasCreator;
+delete
+   $message isa Message;
+#split#
+match
+   $person isa Person, has id :personId;
+   $forum isa Forum;
+   ($person, $forum) isa hasModerator;
+delete
+   $forum isa Forum;
+#split#
+match
+   $person isa Person, has id :personId;
+delete
+   $person isa Person;
