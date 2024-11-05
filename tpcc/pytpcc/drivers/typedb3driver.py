@@ -29,6 +29,8 @@ class EDITION(Enum):
 
 DPW = constants.DISTRICTS_PER_WAREHOUSE
 CPD = constants.CUSTOMERS_PER_DISTRICT
+DATA_COUNT = { }
+DRY_RUN = False;
 
 ## ==============================================
 ## TypeDB3Driver
@@ -97,7 +99,7 @@ class Typedb3Driver(AbstractDriver):
             with open(full_path, 'r') as data:
                 define_query = data.read()
             logging.debug("Writing schema")
-            with driver.transaction(self.database, TransactionType.WRITE) as tx:
+            with self.driver.transaction(self.database, TransactionType.SCHEMA) as tx:
                 tx.query(define_query)
                 tx.commit()
             logging.debug("Committed schema")
@@ -334,14 +336,21 @@ insert
 $history links (customer: $c), isa CUSTOMER_HISTORY,
 has H_DATE {h_date}, has H_AMOUNT {h_amount}, has H_DATA "{h_data}";"""
                     write_query.append(q)
-    
+
+            if tableName not in DATA_COUNT:
+                DATA_COUNT[tableName] = 0;
+            DATA_COUNT[tableName] += len(write_query);
+
+            logging.info("Running %d queries for type %s" % (len(tuples), tableName))
+            start_time = time.time()
             for query in write_query:
                 # NOTE: one query at a time is finished
-                tx.query(query).resolve()
+                if not DRY_RUN:
+                    tx.query(query).resolve()
 
             logging.info("Committing %d queries for type %s" % (len(tuples), tableName))
-            start_time = time.time()
-            tx.commit()
+            if not DRY_RUN:
+                tx.commit()
             logging.info(f"Committed! Time per query (without any concurrency): {(time.time() - start_time) / len(tuples)}")
         return
 
@@ -349,6 +358,7 @@ has H_DATE {h_date}, has H_AMOUNT {h_amount}, has H_DATA "{h_data}";"""
     ## loadFinish
     ## ----------------------------------------------
     def loadFinish(self):
+        logging.info("Data Count Summary:\n%s" % pformat(DATA_COUNT))
         return None
 
     ## ----------------------------------------------

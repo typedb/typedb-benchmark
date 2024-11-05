@@ -164,7 +164,7 @@ class Loader:
             self.handle.loadFinishDistrict(w_id, d_id)
         ## FOR
 
-        println("Updating 10% of STOCK as original")
+        print("Updating 10% of STOCK as original")
         ## Select 10% of the stock to be marked "original"
         s_tuples = [ ]
         selectedRows = rand.selectUniqueIds(self.scaleParameters.items // 10, 1, self.scaleParameters.items)

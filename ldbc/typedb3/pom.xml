@@ -21,9 +21,9 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.vaticle.typedb</groupId>
+            <groupId>com.typedb</groupId>
             <artifactId>typedb-driver</artifactId>
-            <version>2.28.4</version>
+            <version>3.0.0-alpha-7</version>
         </dependency>
         <dependency>
             <groupId>org.ldbcouncil.snb</groupId>
