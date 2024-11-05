@@ -976,12 +976,11 @@ def main():
         # Create a TypeDB database
         driver.databases.create("ldbcsnb")
         # print("hi")
-        with driver.session("ldbcsnb", SessionType.SCHEMA) as session:
-            with open("schema.tql", "r") as schema:
-                with session.transaction(TransactionType.WRITE) as tx:
-                    query = schema.read()
-                    tx.query.define(query)
-                    tx.commit()
+        with open("schema.tql", "r") as schema:
+            with driver.transaction(TransactionType.WRITE) as tx:
+                define_query = schema.read()
+                tx.query(define_query)
+                tx.commit()
 
         print("schema,",time.time() - start_time)
         # #static

@@ -1,96 +1,96 @@
 define
-birthday sub attribute,
+attribute birthday,
     value datetime;
-browserUsed sub attribute,
+attribute browserUsed,
     value string;
-classYear sub attribute,
+attribute classYear,
     value long;
-content sub attribute,
+attribute content,
     value string;
-creationDate sub attribute,
+attribute creationDate,
     value datetime;
-email sub attribute,
+attribute email,
     value string;
-firstName sub attribute,
+attribute firstName,
     value string;
-gender sub attribute,
+attribute gender,
     value string;
-id sub attribute,
+attribute id,
     value long;
-imageFile sub attribute,
+attribute imageFile,
     value string;
-language sub attribute,
+attribute language,
     value string;
-lastName sub attribute,
+attribute lastName,
     value string;
-length sub attribute,
+attribute length,
     value long;
-locationIP sub attribute,
+attribute locationIP,
     value string;
-name sub attribute,
+attribute name,
     value string;
-speaks sub attribute,
+attribute speaks,
     value string;
-title sub attribute,
+attribute title,
     value string;
-url sub attribute,
+attribute url,
     value string;
-workFrom sub attribute,
+attribute workFrom,
     value long;
-containerOf sub relation,
+relation containerOf,
     relates contain,
     relates container;
-hasCreator sub relation,
+relation hasCreator,
     relates created,
     relates creator;
-hasInterest sub relation,
+relation hasInterest,
     owns creationDate,
     relates interested,
     relates interests;
-hasMember sub relation,
+relation hasMember,
     owns creationDate,
     relates member,
     relates memberOf;
-hasModerator sub relation,
+relation hasModerator,
     relates moderated,
     relates moderator;
-hasTag sub relation,
+relation hasTag,
     owns creationDate,
     relates tag,
     relates tagged;
-hasType sub relation,
+relation hasType,
     relates tag,
     relates tagClass;
-isLocatedIn sub relation,
+relation isLocatedIn,
     relates locatedIn,
     relates location;
-isPartOf sub relation,
+relation isPartOf,
     relates part,
     relates partOf;
-isSubclassOf sub relation,
+relation isSubclassOf,
     relates subclass,
     relates superclass;
-knows sub relation,
+relation knows,
     owns creationDate,
     relates friend;
-likes sub relation,
+relation likes,
     owns creationDate,
     relates liker,
     relates message;
-replyOf sub relation,
+relation replyOf,
     relates repliedTo,
     relates reply;
-studyAt sub relation,
+relation studyAt,
     owns classYear,
     owns creationDate,
     relates student,
     relates university;
-workAt sub relation,
+relation workAt,
     owns creationDate,
     owns workFrom,
     relates employee,
     relates employer;
-Forum sub entity,
+entity Forum,
     owns id @key,
     owns creationDate,
     owns title,
@@ -98,7 +98,7 @@ Forum sub entity,
     plays hasMember:memberOf,
     plays hasModerator:moderated,
     plays hasTag:tagged;
-Message sub entity,
+entity Message,
     abstract,
     owns id @key,
     owns browserUsed,
@@ -117,7 +117,7 @@ Post sub Message,
     owns imageFile,
     owns language,
     plays containerOf:contain;
-Organisation sub entity,
+entity Organisation,
     abstract,
     owns id @key,
     owns name,
@@ -128,7 +128,7 @@ Company sub Organisation,
 University sub Organisation,
     plays isLocatedIn:location,
     plays studyAt:university;
-Person sub entity,
+entity Person,
     owns id @key,
     owns birthday,
     owns browserUsed,
@@ -148,7 +148,7 @@ Person sub entity,
     plays likes:liker,
     plays studyAt:student,
     plays workAt:employee;
-Place sub entity,
+entity Place,
     abstract,
     owns id @key,
     owns name,
@@ -162,14 +162,14 @@ Country sub Place,
     plays isLocatedIn:locatedIn,
     plays isPartOf:part,
     plays isPartOf:partOf;
-Tag sub entity,
+entity Tag,
     owns id @key,
     owns name,
     owns url,
     plays hasInterest:interests,
     plays hasTag:tag,
     plays hasType:tag;
-TagClass sub entity,
+entity TagClass,
     owns id @key,
     owns name,
     owns url,
