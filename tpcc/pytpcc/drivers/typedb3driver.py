@@ -1045,7 +1045,7 @@ $o links (district: $d), isa ORDER, has O_ID $o_id;
 $o_id < {o_id};
 $o_id >= {o_id - 20};
 select $i;
-reduce $count = count();"""
+reduce $count = count;"""
             self.start_checkpoint(q)
             response = tx.query(q).resolve().as_concept_rows()[0]
             self.end_checkpoint()
