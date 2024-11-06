@@ -54,6 +54,7 @@ class Typedb3Driver(AbstractDriver):
         self.password = None
         self.driver = None
         self.tx = None
+        self.checkpoint = time.time()
     
     ## ----------------------------------------------
     ## makeDefaultConfig
@@ -104,6 +105,19 @@ class Typedb3Driver(AbstractDriver):
                 tx.commit()
             logging.debug("Committed schema")
         ## IF
+
+    ## ----------------------------------------------
+    ## Simple query timer
+    ## ----------------------------------------------
+    def start_checkpoint(self, q):
+        print("===\n ... now running:")
+        print(q)
+
+    def end_checkpoint(self):
+        print(f"Time taken: {(time.time() - self.checkpoint)}")
+        self.checkpoint = time.time()
+        print("===\n\n")
+    
     ## ----------------------------------------------
     ## loadStart
     ## ----------------------------------------------
@@ -399,50 +413,54 @@ has H_DATE {h_date}, has H_AMOUNT {h_amount}, has H_DATA "{h_data}";"""
         for i in range(len(i_ids)):
             all_local = all_local and i_w_ids[i] == w_id
 
-        with self.driver.session(self.database, SessionType.DATA) as data_session:
-            with data_session.transaction(TransactionType.WRITE) as tx:
-                for i in range(len(i_ids)):
-                    q = f"""
+        with self.driver.transaction(self.database, TransactionType.WRITE) as tx:
+            for i in range(len(i_ids)):
+                q = f"""
 match 
 $i isa ITEM, has I_ID {i_ids[i]}, 
-  has I_NAME $i_name, has I_PRICE $i_price, 
-  has I_DATA $i_data; 
+has I_NAME $i_name, has I_PRICE $i_price, 
+has I_DATA $i_data; 
 select $i_name, $i_price, $i_data;"""
-                    item = list(tx.query(q).resolve().as_concept_rows())
-                    if len(item) == 0:
-                        return (None, 0)
-                    items.append({ 'name': item[0].get('i_name').as_attribute().get_value(), 
-                                   'price': item[0].get('i_price').as_attribute().get_value(), 
-                                   'data': item[0].get('i_data').as_attribute().get_value()})
+                self.start_checkpoint(q)
+                item = list(tx.query(q).resolve().as_concept_rows())
+                self.end_checkpoint()
+                if len(item) == 0:
+                    return (None, 0)
+                items.append({ 'name': item[0].get('i_name').as_attribute().get_value(), 
+                                'price': item[0].get('i_price').as_attribute().get_value(), 
+                                'data': item[0].get('i_data').as_attribute().get_value()})
+                break
 
-                # Query: get warhouse, district, and customer info
-                # TODO: potentially remove conditions for speed
-                q = f"""
+            # Query: get warhouse, district, and customer info
+            # TODO: potentially remove conditions for speed
+            q = f"""
 match 
 $w isa WAREHOUSE, has W_ID {w_id}, has W_TAX $w_tax;
 $d isa DISTRICT, has D_ID {w_id * DPW + d_id}, has D_TAX $d_tax, has D_NEXT_O_ID $d_next_o_id;
 $c isa CUSTOMER, has C_ID {w_id * DPW * CPD + d_id * CPD + c_id}, 
-  has C_DISCOUNT $c_discount, has C_LAST $c_last, has C_CREDIT $c_credit;
+has C_DISCOUNT $c_discount, has C_LAST $c_last, has C_CREDIT $c_credit;
 select $w_tax, $d_tax, $d_next_o_id, $c_discount, $c_last, $c_credit;"""
-                general_info = list(tx.query(q).resolve().as_concept_rows())
-                
-                if len(general_info) == 0:
-                    logging.warn("No general info for warehouse %d" % w_id)
-                    return (None, 0)
-                w_tax = general_info[0].get('w_tax').as_attribute().get_value()
-                d_tax = general_info[0].get('d_tax').as_attribute().get_value()
-                d_next_o_id = general_info[0].get('d_next_o_id').as_attribute().get_value()
-                c_discount = general_info[0].get('c_discount').as_attribute().get_value()
-                c_last = general_info[0].get('c_last').as_attribute().get_value()
-                c_credit = general_info[0].get('c_credit').as_attribute().get_value()
+            self.start_checkpoint(q)
+            general_info = list(tx.query(q).resolve().as_concept_rows())
+            self.end_checkpoint()
+            
+            if len(general_info) == 0:
+                logging.warn("No general info for warehouse %d" % w_id)
+                return (None, 0)
+            w_tax = general_info[0].get('w_tax').as_attribute().get_value()
+            d_tax = general_info[0].get('d_tax').as_attribute().get_value()
+            d_next_o_id = general_info[0].get('d_next_o_id').as_attribute().get_value()
+            c_discount = general_info[0].get('c_discount').as_attribute().get_value()
+            c_last = general_info[0].get('c_last').as_attribute().get_value()
+            c_credit = general_info[0].get('c_credit').as_attribute().get_value()
 
-                ol_cnt = len(i_ids)
-                o_carrier_id = constants.NULL_CARRIER_ID
+            ol_cnt = len(i_ids)
+            o_carrier_id = constants.NULL_CARRIER_ID
 
-                # Query: update district's next order id, and create new order
-                # TODO: experiment with constraining further
-                all_local_int = 1 if all_local else 0
-                q = f"""
+            # Query: update district's next order id, and create new order
+            # TODO: experiment with constraining further
+            all_local_int = 1 if all_local else 0
+            q = f"""
 match 
 $d isa DISTRICT, has D_ID {w_id * DPW + d_id}, has D_NEXT_O_ID $d_next_o_id;
 $c isa CUSTOMER, has C_ID {w_id * DPW * CPD + d_id * CPD + c_id};
@@ -454,67 +472,71 @@ $order links (district: $d, customer: $c), isa ORDER,
 has O_ID {d_next_o_id},
 has O_ENTRY_D {o_entry_d}, has O_CARRIER_ID {o_carrier_id},
 has O_OL_CNT {ol_cnt}, has O_ALL_LOCAL {all_local_int}, has O_NEW_ORDER true;"""
-                tx.query(q).resolve()
+            self.start_checkpoint(q)
+            tx.query(q).resolve()
+            self.end_checkpoint()
 
-                for i in range(len(i_ids)):
-                    ol_number = i + 1
-                    ol_supply_w_id = i_w_ids[i]
-                    ol_i_id = i_ids[i]
-                    ol_quantity = i_qtys[i]
+            for i in range(len(i_ids)):
+                ol_number = i + 1
+                ol_supply_w_id = i_w_ids[i]
+                ol_i_id = i_ids[i]
+                ol_quantity = i_qtys[i]
 
-                    i_name = items[i]['name']
-                    i_data = items[i]['data']
-                    i_price = items[i]['price']
+                i_name = items[i]['name']
+                i_data = items[i]['data']
+                i_price = items[i]['price']
 
-                    # Query: get stock info of item i
-                    q = f"""
+                # Query: get stock info of item i
+                q = f"""
 match
 $i isa ITEM, has I_ID {ol_i_id}; 
 $w isa WAREHOUSE, has W_ID {ol_supply_w_id};
 $s links (item: $i, warehouse: $w), isa STOCKING, 
-    has S_QUANTITY $s_quantity, has S_DATA $s_data, has S_YTD $s_ytd, 
-    has S_ORDER_CNT $s_order_cnt, has S_REMOTE_CNT $s_remote_cnt, 
-    has S_DIST_{d_id} $s_dist_xx;
+has S_QUANTITY $s_quantity, has S_DATA $s_data, has S_YTD $s_ytd, 
+has S_ORDER_CNT $s_order_cnt, has S_REMOTE_CNT $s_remote_cnt, 
+has S_DIST_{d_id} $s_dist_xx;
 select $s_quantity, $s_data, $s_ytd, $s_order_cnt, $s_remote_cnt, $s_dist_xx;"""
-                    stock_info = list(tx.query(q).resolve().as_concept_rows())
+                self.start_checkpoint(q)
+                stock_info = list(tx.query(q).resolve().as_concept_rows())
+                self.end_checkpoint()
 
-                    if len(stock_info) == 0:
-                        logging.warn("No STOCK record for (ol_i_id=%d, ol_supply_w_id=%d)" % (ol_i_id, ol_supply_w_id))
-                        continue
-                    s_quantity = stock_info[0].get('s_quantity').as_attribute().get_value()
-                    s_data = stock_info[0].get('s_data').as_attribute().get_value()
-                    s_ytd = stock_info[0].get('s_ytd').as_attribute().get_value()
-                    s_order_cnt = stock_info[0].get('s_order_cnt').as_attribute().get_value()
-                    s_remote_cnt = stock_info[0].get('s_remote_cnt').as_attribute().get_value()
-                    s_dist_xx = stock_info[0].get('s_dist_xx').as_attribute().get_value()
-                    
-                    # Compute auxilliary values
-                    s_ytd += ol_quantity
-                    if s_quantity >= ol_quantity + 10:
-                        s_quantity = s_quantity - ol_quantity
-                    else:
-                        s_quantity = s_quantity + 91 - ol_quantity
-                    s_order_cnt += 1
-                    
-                    if ol_supply_w_id != w_id: 
-                        s_remote_cnt += 1
+                if len(stock_info) == 0:
+                    logging.warn("No STOCK record for (ol_i_id=%d, ol_supply_w_id=%d)" % (ol_i_id, ol_supply_w_id))
+                    continue
+                s_quantity = stock_info[0].get('s_quantity').as_attribute().get_value()
+                s_data = stock_info[0].get('s_data').as_attribute().get_value()
+                s_ytd = stock_info[0].get('s_ytd').as_attribute().get_value()
+                s_order_cnt = stock_info[0].get('s_order_cnt').as_attribute().get_value()
+                s_remote_cnt = stock_info[0].get('s_remote_cnt').as_attribute().get_value()
+                s_dist_xx = stock_info[0].get('s_dist_xx').as_attribute().get_value()
+                
+                # Compute auxilliary values
+                s_ytd += ol_quantity
+                if s_quantity >= ol_quantity + 10:
+                    s_quantity = s_quantity - ol_quantity
+                else:
+                    s_quantity = s_quantity + 91 - ol_quantity
+                s_order_cnt += 1
+                
+                if ol_supply_w_id != w_id: 
+                    s_remote_cnt += 1
 
-                    if i_data.find(constants.ORIGINAL_STRING) != -1 and s_data.find(constants.ORIGINAL_STRING) != -1:
-                        brand_generic = 'B'
-                    else:
-                        brand_generic = 'G'
+                if i_data.find(constants.ORIGINAL_STRING) != -1 and s_data.find(constants.ORIGINAL_STRING) != -1:
+                    brand_generic = 'B'
+                else:
+                    brand_generic = 'G'
 
-                    ol_amount = ol_quantity * i_price
-                    # Query: update stock info of item i
-                    q = f"""
+                ol_amount = ol_quantity * i_price
+                # Query: update stock info of item i
+                q = f"""
 match
 $i isa ITEM, has I_ID {ol_i_id};
 $w isa WAREHOUSE, has W_ID {ol_supply_w_id};
 $d isa DISTRICT, has D_ID {w_id * DPW + d_id};
 $o links (district: $d), isa ORDER, has O_ID {d_next_o_id};
 $s links (item: $i, warehouse: $w), isa STOCKING, 
-  has S_QUANTITY $s_quantity, has S_YTD $s_ytd, 
-  has S_ORDER_CNT $s_order_cnt, has S_REMOTE_CNT $s_remote_cnt;
+has S_QUANTITY $s_quantity, has S_YTD $s_ytd, 
+has S_ORDER_CNT $s_order_cnt, has S_REMOTE_CNT $s_remote_cnt;
 delete 
 $s_quantity of $s;
 $s_ytd of $s;
@@ -522,27 +544,28 @@ $s_order_cnt of $s;
 $s_remote_cnt of $s;
 insert 
 $s has S_QUANTITY {s_quantity}, has S_YTD {s_ytd}, 
-  has S_ORDER_CNT {s_order_cnt}, has S_REMOTE_CNT {s_remote_cnt};
+has S_ORDER_CNT {s_order_cnt}, has S_REMOTE_CNT {s_remote_cnt};
 (item: $i, order: $o) isa ORDER_LINE, 
-  has OL_NUMBER {ol_number}, has OL_SUPPLY_W_ID {ol_supply_w_id}, 
-  has OL_DELIVERY_D {o_entry_d}, has OL_QUANTITY {ol_quantity}, 
-  has OL_AMOUNT {ol_amount}, has OL_DIST_INFO "{s_dist_xx}";"""
-                    
-                    tx.query(q).resolve()
+has OL_NUMBER {ol_number}, has OL_SUPPLY_W_ID {ol_supply_w_id}, 
+has OL_DELIVERY_D {o_entry_d}, has OL_QUANTITY {ol_quantity}, 
+has OL_AMOUNT {ol_amount}, has OL_DIST_INFO "{s_dist_xx}";"""
+                self.start_checkpoint(q)
+                tx.query(q).resolve()
+                self.end_checkpoint()
 
-                    ## Transaction profile states to use "ol_quantity * i_price"
-                    total += ol_amount
-        
-                    ## Add the info to be returned
-                    item_data.append( (i_name, s_quantity, brand_generic, i_price, ol_amount) )
-                ## FOR
-                tx.commit()
-                total *= (1 - c_discount) * (1 + w_tax + d_tax)
+                ## Transaction profile states to use "ol_quantity * i_price"
+                total += ol_amount
+    
+                ## Add the info to be returned
+                item_data.append( (i_name, s_quantity, brand_generic, i_price, ol_amount) )
+                break
+            ## FOR
+            tx.commit()
+            total *= (1 - c_discount) * (1 + w_tax + d_tax)
 
-                ## Pack up values the client is missing (see TPC-C 2.4.3.5)
-                misc = [ (w_tax, d_tax, d_next_o_id, total) ]
-                return ([ [c_discount, c_last, c_credit], misc, item_data ], 0)
-            ## WITH
+            ## Pack up values the client is missing (see TPC-C 2.4.3.5)
+            misc = [ (w_tax, d_tax, d_next_o_id, total) ]
+            return ([ [c_discount, c_last, c_credit], misc, item_data ], 0)
         ## WITH
 
     ## ----------------------------------------------
@@ -565,26 +588,27 @@ $s has S_QUANTITY {s_quantity}, has S_YTD {s_ytd},
         o_carrier_id = params["o_carrier_id"]
         ol_delivery_d = params["ol_delivery_d"].isoformat()[:-3]
 
-        with self.driver.session(self.database, SessionType.DATA) as data_session:
-            with data_session.transaction(TransactionType.WRITE) as tx:
-                result = [ ]
-                for d_id in range(1, constants.DISTRICTS_PER_WAREHOUSE+1):
-                    q = f"""
+        with self.driver.transaction(self.database, TransactionType.WRITE) as tx:
+            result = [ ]
+            for d_id in range(1, constants.DISTRICTS_PER_WAREHOUSE+1):
+                q = f"""
 match
 $d isa DISTRICT, has D_ID {w_id * DPW + d_id};
 $o links, (customer: $c, district: $d) isa ORDER, has O_ID $o_id, has O_NEW_ORDER true;
 $c isa CUSTOMER, has C_ID $c_id;
 select $o_id, $c_id;
 """
-                    new_order_info = list(tx.query(q).resolve().as_concept_rows())
-                    if len(new_order_info) == 0:
-                        ## No orders for this district: skip it. Note: This must be reported if > 1%
-                        continue
-                    assert new_order_info is not None
-                    no_o_id = new_order_info[0].get('o_id').as_attribute().get_value()
-                    c_id = new_order_info[0].get('c_id').as_attribute().get_value() % CPD
+                self.start_checkpoint(q)
+                new_order_info = list(tx.query(q).resolve().as_concept_rows())
+                self.end_checkpoint()
+                if len(new_order_info) == 0:
+                    ## No orders for this district: skip it. Note: This must be reported if > 1%
+                    continue
+                assert new_order_info is not None
+                no_o_id = new_order_info[0].get('o_id').as_attribute().get_value()
+                c_id = new_order_info[0].get('c_id').as_attribute().get_value() % CPD
 
-                    q = f"""
+                q = f"""
 match
 $d isa DISTRICT, has D_ID {w_id * DPW + d_id};
 $o links (district: $d), isa ORDER, has O_ID {no_o_id};
@@ -592,10 +616,12 @@ $ol links  (order: $o, item: $i),  isa ORDER_LINE, has OL_QUANTITY $ol_quantity;
 select $ol_quantity;
 reduce $sum = sum($ol_quantity);
 """
-                    response = list(tx.query(q).resolve().as_concept_rows())[0]
-                    ol_total = response.get("sum").as_value().as_long()
-                    
-                    q = f"""
+                self.start_checkpoint(q)
+                response = list(tx.query(q).resolve().as_concept_rows())[0]
+                self.end_checkpoint()
+                ol_total = response.get("sum").as_value().as_long()
+                
+                q = f"""
 match
 $c isa CUSTOMER, has C_ID {w_id * DPW * CPD + d_id * CPD + c_id}, has C_BALANCE $c_balance;
 ?c_balance_new = $c_balance + {ol_total};
@@ -608,9 +634,11 @@ insert
 $o has O_NEW_ORDER false, has O_CARRIER_ID {o_carrier_id};
 $c has C_BALANCE ?c_balance_new;
 """
-                    tx.query(q).resolve()
+                self.start_checkpoint(q)
+                tx.query(q).resolve()
+                self.end_checkpoint()
 
-                    q = f"""
+                q = f"""
 match
 $d isa DISTRICT, has D_ID {w_id * DPW + d_id};
 $o links (district: $d), isa ORDER, has O_ID {no_o_id};
@@ -618,19 +646,21 @@ $ol links  (order: $o, item: $i), isa ORDER_LINE;
 insert
 $ol has OL_DELIVERY_D {ol_delivery_d};
 """
-                    tx.query(q).resolve()
+                self.start_checkpoint(q)
+                tx.query(q).resolve()
+                self.end_checkpoint()
 
-                    # If there are no order lines, SUM returns null. There should always be order lines.
-                    assert ol_total != None, "ol_total is NULL: there are no order lines. This should not happen"
-                    assert ol_total > 0.0
+                # If there are no order lines, SUM returns null. There should always be order lines.
+                assert ol_total != None, "ol_total is NULL: there are no order lines. This should not happen"
+                assert ol_total > 0.0
 
-                    # These must be logged in the "result file" according to TPC-C 2.7.2.2 (page 39)
-                    # We remove the queued time, completed time, w_id, and o_carrier_id: the client can figure
-                    # them out
-                    result.append((d_id, no_o_id))
-                ## FOR
+                # These must be logged in the "result file" according to TPC-C 2.7.2.2 (page 39)
+                # We remove the queued time, completed time, w_id, and o_carrier_id: the client can figure
+                # them out
+                result.append((d_id, no_o_id))
+            ## FOR
 
-                tx.commit()
+            tx.commit()
         return (result,0)
 
     ## ----------------------------------------------
@@ -652,23 +682,22 @@ $ol has OL_DELIVERY_D {ol_delivery_d};
         
         assert w_id, pformat(params)
         assert d_id, pformat(params)
-        with self.driver.session(self.database, SessionType.DATA) as data_session:
-            with data_session.transaction(TransactionType.WRITE) as tx:
-                result = [ ]
-                if c_id != None:
-                    q = f"""
+        with self.driver.transaction(self.database, TransactionType.WRITE) as tx:
+            result = [ ]
+            if c_id != None:
+                q = f"""
 match
 $c isa CUSTOMER, has C_ID {w_id * DPW * CPD + d_id * CPD + c_id},
 has C_FIRST $c_first, has C_MIDDLE $c_middle, has C_LAST $c_last,
 has C_BALANCE $c_balance;
 select $c_first, $c_middle, $c_last,$c_balance;
 """
-                    customer = list(tx.query(q).resolve().as_concept_rows())
-                    assert len(customer) == 1, f"doOrderStatus: no customer found for w_id {w_id}, d_id {d_id}, c_id {c_id}"
-                    customer = customer[0]
-                else:
-                    # TODO: check whether it's faster to constrain customer through C_ID range
-                    q = f"""
+                customer = list(tx.query(q).resolve().as_concept_rows())
+                assert len(customer) == 1, f"doOrderStatus: no customer found for w_id {w_id}, d_id {d_id}, c_id {c_id}"
+                customer = customer[0]
+            else:
+                # TODO: check whether it's faster to constrain customer through C_ID range
+                q = f"""
 match
 $d isa DISTRICT, has D_ID {w_id * DPW + d_id};
 $c links (district: $d), isa CUSTOMER, has C_ID $c_id,
@@ -678,38 +707,42 @@ $c_last "{c_last}";
 select $c_id, $c_first, $c_middle, $c_last,$c_balance;
 sort $c_first asc;
 """
-                    # Get the midpoint customer's id
-                    all_customers = list(tx.query(q).resolve().as_concept_rows())
-                    assert len(all_customers) > 0
-                    index = (len(all_customers) - 1) // 2
-                    customer = all_customers[index]
-                    c_id = customer.get('c_id').as_attribute().get_value() % CPD
+                self.start_checkpoint(q)
+                # Get the midpoint customer's id
+                all_customers = list(tx.query(q).resolve().as_concept_rows())
+                self.end_checkpoint()
+                assert len(all_customers) > 0
+                index = (len(all_customers) - 1) // 2
+                customer = all_customers[index]
+                c_id = customer.get('c_id').as_attribute().get_value() % CPD
 
-                assert customer is not None
-                assert c_id != None
-                customer_data = [
-                    c_id,
-                    customer.get('c_first').as_attribute().get_value(),
-                    customer.get('c_middle').as_attribute().get_value(),
-                    customer.get('c_last').as_attribute().get_value(),
-                    customer.get('c_balance').as_attribute().get_value(),
-                ]
+            assert customer is not None
+            assert c_id != None
+            customer_data = [
+                c_id,
+                customer.get('c_first').as_attribute().get_value(),
+                customer.get('c_middle').as_attribute().get_value(),
+                customer.get('c_last').as_attribute().get_value(),
+                customer.get('c_balance').as_attribute().get_value(),
+            ]
 
 
-                q = f"""
+            q = f"""
 match
 $c isa CUSTOMER, has C_ID {w_id * DPW * CPD + d_id * CPD + c_id};
 $o links (customer: $c), isa ORDER, has O_ID $o_id;
 select $o_id;
 sort $o_id desc;
 limit 1;"""
-                order = list(tx.query(q).resolve().as_concept_rows())
-                orderLines_data = [ ]
+            self.start_checkpoint(q)
+            order = list(tx.query(q).resolve().as_concept_rows())
+            self.end_checkpoint()
+            orderLines_data = [ ]
 
-                if len(order) > 0:
-                    o_id = order[0].get('o_id').as_attribute().get_value()
-                    # OL_I_ID, OL_SUPPLY_W_ID, OL_QUANTITY, OL_AMOUNT, OL_DIST_INFO 
-                    q = f"""
+            if len(order) > 0:
+                o_id = order[0].get('o_id').as_attribute().get_value()
+                # OL_I_ID, OL_SUPPLY_W_ID, OL_QUANTITY, OL_AMOUNT, OL_DIST_INFO 
+                q = f"""
 match
 $c isa CUSTOMER, has C_ID {w_id * DPW * CPD + d_id * CPD + c_id};
 $o links (customer: $c), isa ORDER, has O_ID {o_id};
@@ -718,20 +751,22 @@ $ol links (order: $o, item: $i), isa ORDER_LINE,
 has OL_SUPPLY_W_ID $ol_supply_w_id, has OL_QUANTITY $ol_quantity, 
 has OL_AMOUNT $ol_amount, has OL_DIST_INFO $ol_dist_info;
 select $i_id, $ol_supply_w_id, $ol_quantity, $ol_amount, $ol_dist_info;"""
-                    orderLines = list(tx.query(q).resolve().as_concept_rows())
-                    for orderLine in orderLines:
-                        orderLines_data.append([
-                            orderLine.get('i_id').as_attribute().get_value(),
-                            orderLine.get('ol_supply_w_id').as_attribute().get_value(),
-                            orderLine.get('ol_quantity').as_attribute().get_value(),
-                            orderLine.get('ol_amount').as_attribute().get_value(),
-                            orderLine.get('ol_dist_info').as_attribute().get_value(),
-                        ])
-                else:
-                    o_id = None
+                self.start_checkpoint(q)
+                orderLines = list(tx.query(q).resolve().as_concept_rows())
+                self.end_checkpoint()
+                for orderLine in orderLines:
+                    orderLines_data.append([
+                        orderLine.get('i_id').as_attribute().get_value(),
+                        orderLine.get('ol_supply_w_id').as_attribute().get_value(),
+                        orderLine.get('ol_quantity').as_attribute().get_value(),
+                        orderLine.get('ol_amount').as_attribute().get_value(),
+                        orderLine.get('ol_dist_info').as_attribute().get_value(),
+                    ])
+            else:
+                o_id = None
 
-                tx.commit()
-                return ([ customer_data, [o_id] if o_id else [], orderLines_data ],0)
+            tx.commit()
+            return ([ customer_data, [o_id] if o_id else [], orderLines_data ],0)
 
     ## ----------------------------------------------
     ## T4: doPayment
@@ -759,10 +794,9 @@ select $i_id, $ol_supply_w_id, $ol_quantity, $ol_amount, $ol_dist_info;"""
         c_last = params["c_last"]
         h_date = params["h_date"].isoformat()[:-3]
 
-        with self.driver.session(self.database, SessionType.DATA) as data_session:
-            with data_session.transaction(TransactionType.WRITE) as tx:
-                if c_id != None:
-                    q = f"""
+        with self.driver.transaction(self.database, TransactionType.WRITE) as tx:
+            if c_id != None:
+                q = f"""
 match
 $c isa CUSTOMER, has C_ID $c_id,
 has C_FIRST $c_first, has C_MIDDLE $c_middle, has C_LAST $c_last,
@@ -771,17 +805,19 @@ has C_STATE $c_state, has C_ZIP $c_zip, has C_PHONE $c_phone,
 has C_SINCE $c_since, has C_CREDIT $c_credit, has C_CREDIT_LIM $c_credit_lim,
 has C_DISCOUNT $c_discount, has C_BALANCE $c_balance, has C_YTD_PAYMENT $c_ytd_payment, 
 has C_PAYMENT_CNT $c_payment_cnt, has C_DATA $c_data;
-$c_id {w_id * DPW * CPD + d_id * CPD + c_id};
+$c_id == {w_id * DPW * CPD + d_id * CPD + c_id};
 select $c_id, $c_first, $c_middle, $c_last, $c_street_1, $c_street_2, $c_city,
 $c_state, $c_zip, $c_phone, $c_since, $c_credit, $c_credit_lim, $c_discount,
 $c_balance, $c_ytd_payment, $c_payment_cnt, $c_data;
 """
-                    customer = list(tx.query(q).resolve().as_concept_rows())
-                    assert len(customer) == 1, f"doPayment: no customer found for w_id {w_id}, d_id {d_id}, c_id {c_id}"
-                    customer = customer[0]
-                else:
-                    # TODO: check whether it's faster to constrain customer through C_ID range
-                    q = f"""
+                self.start_checkpoint(q)
+                customer = list(tx.query(q).resolve().as_concept_rows())
+                self.end_checkpoint()
+                assert len(customer) == 1, f"doPayment: no customer found for w_id {w_id}, d_id {d_id}, c_id {c_id}"
+                customer = customer[0]
+            else:
+                # TODO: check whether it's faster to constrain customer through C_ID range
+                q = f"""
 match
 $d isa DISTRICT, has D_ID {w_id * DPW + d_id};
 $c links (district: $d), isa CUSTOMER, has C_ID $c_id,
@@ -791,66 +827,70 @@ has C_STATE $c_state, has C_ZIP $c_zip, has C_PHONE $c_phone,
 has C_SINCE $c_since, has C_CREDIT $c_credit, has C_CREDIT_LIM $c_credit_lim,
 has C_DISCOUNT $c_discount, has C_BALANCE $c_balance, has C_YTD_PAYMENT $c_ytd_payment, 
 has C_PAYMENT_CNT $c_payment_cnt, has C_DATA $c_data;
-$c_last "{c_last}";
+$c_last == "{c_last}";
 select $c_id, $c_first, $c_middle, $c_last, $c_street_1, $c_street_2, $c_city,
 $c_state, $c_zip, $c_phone, $c_since, $c_credit, $c_credit_lim, $c_discount,
 $c_balance, $c_ytd_payment, $c_payment_cnt, $c_data;
 sort $c_first asc;
 """
-                    # Get the midpoint customer's id
-                    all_customers = list(tx.query(q).resolve().as_concept_rows())
-                    assert len(all_customers) > 0, f"doPayment: no customer found for w_id {w_id}, d_id {d_id}, c_last {c_last}"
-                    namecnt = len(all_customers)
-                    index = (namecnt-1) // 2
-                    customer = all_customers[index]
-                    c_id = customer.get('c_id').as_attribute().get_value() % CPD
-                assert customer is not None
-                assert c_id != None
-                customer_data = [
-                    c_id,
-                    customer.get('c_first').as_attribute().get_value(),
-                    customer.get('c_middle').as_attribute().get_value(),
-                    customer.get('c_last').as_attribute().get_value(),
-                    customer.get('c_street_1').as_attribute().get_value(),
-                    customer.get('c_street_2').as_attribute().get_value(),
-                    customer.get('c_city').as_attribute().get_value(),
-                    customer.get('c_state').as_attribute().get_value(),
-                    customer.get('c_zip').as_attribute().get_value(),
-                    customer.get('c_phone').as_attribute().get_value(),
-                    customer.get('c_since').as_attribute().get_value(),
-                    customer.get('c_credit').as_attribute().get_value(),
-                    customer.get('c_credit_lim').as_attribute().get_value(),
-                    customer.get('c_discount').as_attribute().get_value(),
-                    customer.get('c_balance').as_attribute().get_value(),
-                    customer.get('c_ytd_payment').as_attribute().get_value(),
-                    customer.get('c_payment_cnt').as_attribute().get_value(),
-                    customer.get('c_data').as_attribute().get_value(),
-                ]
-                c_balance = customer_data[14] - h_amount
-                c_ytd_payment = customer_data[15] + h_amount
-                c_payment_cnt = customer_data[16] + 1
-                c_data = customer_data[17]
-                # W_NAME, W_STREET_1, W_STREET_2, W_CITY, W_STATE, W_ZIP
-                q = f"""
+                self.start_checkpoint(q)
+                # Get the midpoint customer's id
+                all_customers = list(tx.query(q).resolve().as_concept_rows())
+                self.end_checkpoint()
+                assert len(all_customers) > 0, f"doPayment: no customer found for w_id {w_id}, d_id {d_id}, c_last {c_last}"
+                namecnt = len(all_customers)
+                index = (namecnt-1) // 2
+                customer = all_customers[index]
+                c_id = customer.get('c_id').as_attribute().get_value() % CPD
+            assert customer is not None
+            assert c_id != None
+            customer_data = [
+                c_id,
+                customer.get('c_first').as_attribute().get_value(),
+                customer.get('c_middle').as_attribute().get_value(),
+                customer.get('c_last').as_attribute().get_value(),
+                customer.get('c_street_1').as_attribute().get_value(),
+                customer.get('c_street_2').as_attribute().get_value(),
+                customer.get('c_city').as_attribute().get_value(),
+                customer.get('c_state').as_attribute().get_value(),
+                customer.get('c_zip').as_attribute().get_value(),
+                customer.get('c_phone').as_attribute().get_value(),
+                customer.get('c_since').as_attribute().get_value(),
+                customer.get('c_credit').as_attribute().get_value(),
+                customer.get('c_credit_lim').as_attribute().get_value(),
+                customer.get('c_discount').as_attribute().get_value(),
+                customer.get('c_balance').as_attribute().get_value(),
+                customer.get('c_ytd_payment').as_attribute().get_value(),
+                customer.get('c_payment_cnt').as_attribute().get_value(),
+                customer.get('c_data').as_attribute().get_value(),
+            ]
+            c_balance = customer_data[14] - h_amount
+            c_ytd_payment = customer_data[15] + h_amount
+            c_payment_cnt = customer_data[16] + 1
+            c_data = customer_data[17]
+            # W_NAME, W_STREET_1, W_STREET_2, W_CITY, W_STATE, W_ZIP
+            q = f"""
 match
 $w isa WAREHOUSE, has W_ID {w_id}, has W_NAME $w_name, 
 has W_STREET_1 $w_street_1, has W_STREET_2 $w_street_2, 
 has W_CITY $w_city, has W_STATE $w_state, has W_ZIP $w_zip;
 select $w_name, $w_street_1, $w_street_2, $w_city, $w_state, $w_zip;
 """
-                warehouse = list(tx.query(q).resolve().as_concept_rows())
-                assert len(warehouse) == 1
-                warehouse_data = [
-                    warehouse[0].get('w_name').as_attribute().get_value(),
-                    warehouse[0].get('w_street_1').as_attribute().get_value(),
-                    warehouse[0].get('w_street_2').as_attribute().get_value(),
-                    warehouse[0].get('w_city').as_attribute().get_value(),
-                    warehouse[0].get('w_state').as_attribute().get_value(),
-                    warehouse[0].get('w_zip').as_attribute().get_value(),
-                ]
+            self.start_checkpoint(q)
+            warehouse = list(tx.query(q).resolve().as_concept_rows())
+            self.end_checkpoint()
+            assert len(warehouse) == 1
+            warehouse_data = [
+                warehouse[0].get('w_name').as_attribute().get_value(),
+                warehouse[0].get('w_street_1').as_attribute().get_value(),
+                warehouse[0].get('w_street_2').as_attribute().get_value(),
+                warehouse[0].get('w_city').as_attribute().get_value(),
+                warehouse[0].get('w_state').as_attribute().get_value(),
+                warehouse[0].get('w_zip').as_attribute().get_value(),
+            ]
 
-                # D_NAME, D_STREET_1, D_STREET_2, D_CITY, D_STATE, D_ZIP
-                q = f"""
+            # D_NAME, D_STREET_1, D_STREET_2, D_CITY, D_STATE, D_ZIP
+            q = f"""
 match
 $d isa DISTRICT, has D_ID {w_id * DPW + d_id}, 
 has D_NAME $d_name, has D_STREET_1 $d_street_1, 
@@ -858,45 +898,51 @@ has D_STREET_2 $d_street_2, has D_CITY $d_city,
 has D_STATE $d_state, has D_ZIP $d_zip;
 select $d_name, $d_street_1, $d_street_2, $d_city, $d_state, $d_zip;
 """
-                district = list(tx.query(q).resolve().as_concept_rows())
-                assert len(district) == 1
-                district_data = [
-                    district[0].get('d_name').as_attribute().get_value(),
-                    district[0].get('d_street_1').as_attribute().get_value(),
-                    district[0].get('d_street_2').as_attribute().get_value(),
-                    district[0].get('d_city').as_attribute().get_value(),
-                    district[0].get('d_state').as_attribute().get_value(),
-                    district[0].get('d_zip').as_attribute().get_value(),
-                ]
-                # UPDATE DISTRICT SET D_YTD = D_YTD + ? WHERE D_W_ID  = ? AND D_ID = ?
+            self.start_checkpoint(q)
+            district = list(tx.query(q).resolve().as_concept_rows())
+            self.end_checkpoint()
+            assert len(district) == 1
+            district_data = [
+                district[0].get('d_name').as_attribute().get_value(),
+                district[0].get('d_street_1').as_attribute().get_value(),
+                district[0].get('d_street_2').as_attribute().get_value(),
+                district[0].get('d_city').as_attribute().get_value(),
+                district[0].get('d_state').as_attribute().get_value(),
+                district[0].get('d_zip').as_attribute().get_value(),
+            ]
+            # UPDATE DISTRICT SET D_YTD = D_YTD + ? WHERE D_W_ID  = ? AND D_ID = ?
 
-                q = f"""
+            q = f"""
 match
 $w isa WAREHOUSE, has W_ID {w_id}, has W_YTD $w_ytd;
 ?w_ytd_new = $w_ytd + {h_amount};
 delete $w_ytd of $w;
 insert $w has W_YTD ?w_ytd_new;
 """
-                tx.query(q).resolve()
+            self.start_checkpoint(q)
+            tx.query(q).resolve()
+            self.end_checkpoint()
 
-                q = f"""
+            q = f"""
 match
 $d isa DISTRICT, has D_ID {w_id * DPW + d_id}, has D_YTD $d_ytd;
 ?d_ytd_new = $d_ytd + {h_amount};
 delete $d_ytd of $d;
 insert $d has D_YTD ?d_ytd_new;
 """
-                tx.query(q).resolve()
+            self.start_checkpoint(q)
+            tx.query(q).resolve()
+            self.end_checkpoint()
 
-                h_data = "%s    %s" % (warehouse_data[0], district_data[0])
+            h_data = "%s    %s" % (warehouse_data[0], district_data[0])
 
-                # Update customers and history
-                if customer_data[11] == constants.BAD_CREDIT:
-                    newData = " ".join(map(str, [c_id, c_d_id, c_w_id, d_id, w_id, h_amount]))
-                    c_data = (newData + "|" + c_data)
-                    if len(c_data) > constants.MAX_C_DATA: c_data = c_data[:constants.MAX_C_DATA]
-                    # "updateBCCustomer": "UPDATE CUSTOMER SET C_BALANCE = ?, C_YTD_PAYMENT = ?, C_PAYMENT_CNT = ?, C_DATA = ? WHERE C_W_ID = ? AND C_D_ID = ? AND C_ID = ?", # c_balance, c_ytd_payment, c_payment_cnt, c_data, c_w_id, c_d_id, c_id
-                    q = f"""
+            # Update customers and history
+            if customer_data[11] == constants.BAD_CREDIT:
+                newData = " ".join(map(str, [c_id, c_d_id, c_w_id, d_id, w_id, h_amount]))
+                c_data = (newData + "|" + c_data)
+                if len(c_data) > constants.MAX_C_DATA: c_data = c_data[:constants.MAX_C_DATA]
+                # "updateBCCustomer": "UPDATE CUSTOMER SET C_BALANCE = ?, C_YTD_PAYMENT = ?, C_PAYMENT_CNT = ?, C_DATA = ? WHERE C_W_ID = ? AND C_D_ID = ? AND C_ID = ?", # c_balance, c_ytd_payment, c_payment_cnt, c_data, c_w_id, c_d_id, c_id
+                q = f"""
 match
 $c isa CUSTOMER, has C_ID {c_w_id * DPW * CPD + c_d_id * CPD + c_id}, 
 has C_BALANCE $c_balance, has C_YTD_PAYMENT $c_ytd_payment, 
@@ -909,9 +955,11 @@ $c_data of $c;
 insert $c has C_BALANCE {c_balance}, has C_YTD_PAYMENT {c_ytd_payment}, 
 has C_PAYMENT_CNT {c_payment_cnt}, has C_DATA "{c_data}";
 """
-                    tx.query(q).resolve()
-                else:
-                    q = f"""
+                self.start_checkpoint(q)
+                tx.query(q).resolve()
+                self.end_checkpoint()
+            else:
+                q = f"""
 match
 $c isa CUSTOMER, has C_ID {c_w_id * DPW * CPD + c_d_id * CPD + c_id}, 
 has C_BALANCE $c_balance, has C_YTD_PAYMENT $c_ytd_payment, 
@@ -924,28 +972,32 @@ insert
 $c has C_BALANCE {c_balance}, has C_YTD_PAYMENT {c_ytd_payment}, 
 has C_PAYMENT_CNT {c_payment_cnt};
 """
-                    tx.query(q).resolve()
+                self.start_checkpoint(q)
+                tx.query(q).resolve()
+                self.end_checkpoint()
 
-                # Concatenate w_name, four spaces, d_name
-                # Create the history record
+            # Concatenate w_name, four spaces, d_name
+            # Create the history record
 
-                # TODO: consider keeping track of warehouse w_id as well
-                q = f"""
+            # TODO: consider keeping track of warehouse w_id as well
+            q = f"""
 match
 $c isa CUSTOMER, has C_ID {c_w_id * DPW * CPD + c_d_id * CPD + c_id}; 
 insert
 $h links (customer: $c), isa CUSTOMER_HISTORY, has H_DATE {h_date}, has H_AMOUNT {h_amount}, has H_DATA "{h_data}";
 """
-                tx.query(q).resolve()
-                tx.commit()
+            self.start_checkpoint(q)
+            tx.query(q).resolve()
+            self.end_checkpoint()
+            tx.commit()
 
-                # TPC-C 2.5.3.3: Must display the following fields:
-                # W_ID, D_ID, C_ID, C_D_ID, C_W_ID, W_STREET_1, W_STREET_2, W_CITY, W_STATE, W_ZIP,
-                # D_STREET_1, D_STREET_2, D_CITY, D_STATE, D_ZIP, C_FIRST, C_MIDDLE, C_LAST, C_STREET_1,
-                # C_STREET_2, C_CITY, C_STATE, C_ZIP, C_PHONE, C_SINCE, C_CREDIT, C_CREDIT_LIM,
-                # C_DISCOUNT, C_BALANCE, the first 200 characters of C_DATA (only if C_CREDIT = "BC"),
-                # H_AMOUNT, and H_DATE.
-                return ([ warehouse_data, district_data, customer_data ],0)
+            # TPC-C 2.5.3.3: Must display the following fields:
+            # W_ID, D_ID, C_ID, C_D_ID, C_W_ID, W_STREET_1, W_STREET_2, W_CITY, W_STATE, W_ZIP,
+            # D_STREET_1, D_STREET_2, D_CITY, D_STATE, D_ZIP, C_FIRST, C_MIDDLE, C_LAST, C_STREET_1,
+            # C_STREET_2, C_CITY, C_STATE, C_ZIP, C_PHONE, C_SINCE, C_CREDIT, C_CREDIT_LIM,
+            # C_DISCOUNT, C_BALANCE, the first 200 characters of C_DATA (only if C_CREDIT = "BC"),
+            # H_AMOUNT, and H_DATE.
+            return ([ warehouse_data, district_data, customer_data ],0)
 
 
         
@@ -971,18 +1023,19 @@ $h links (customer: $c), isa CUSTOMER_HISTORY, has H_DATE {h_date}, has H_AMOUNT
         d_id = params["d_id"]
         threshold = params["threshold"]
         
-        with self.driver.session(self.database, SessionType.DATA) as data_session:
-            with data_session.transaction(TransactionType.WRITE) as tx:
-                q = f"""
+        with self.driver.transaction(self.database, TransactionType.WRITE) as tx:
+            q = f"""
 match
 $d isa DISTRICT, has D_ID {w_id * DPW + d_id}, has D_NEXT_O_ID $d_next_o_id;
 select $d_next_o_id;
 """
-                result = list(tx.query(q).resolve().as_concept_rows())
-                assert len(result) == 1, f"doStockLevel: no district found for w_id {w_id}, d_id {d_id}"
-                o_id = result[0].get('d_next_o_id').as_attribute().get_value()
+            self.start_checkpoint(q)
+            result = list(tx.query(q).resolve().as_concept_rows())
+            self.end_checkpoint()
+            assert len(result) == 1, f"doStockLevel: no district found for w_id {w_id}, d_id {d_id}"
+            o_id = result[0].get('d_next_o_id').as_attribute().get_value()
 
-                q = f"""
+            q = f"""
 match
 $w isa WAREHOUSE, has W_ID {w_id};
 $d isa DISTRICT, has D_ID {w_id * DPW + d_id};
@@ -993,11 +1046,13 @@ $o_id < {o_id};
 $o_id >= {o_id - 20};
 select $i;
 reduce $count = count();"""
-                response = tx.query(q).resolve().as_concept_rows()[0]
-                result = response.resolve().as_value().as_long()
-                
-                tx.commit()
-                
-                return (int(result),0)
+            self.start_checkpoint(q)
+            response = tx.query(q).resolve().as_concept_rows()[0]
+            self.end_checkpoint()
+            result = response.resolve().as_value().as_long()
+            
+            tx.commit()
+            
+            return (int(result),0)
         
 ## CLASS

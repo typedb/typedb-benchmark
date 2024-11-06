@@ -9,89 +9,95 @@ from datetime import datetime
 from concurrent.futures import ThreadPoolExecutor
 import threading
 
-ROOT = os.getcwd()
+ROOT = os.path.dirname(os.path.abspath(__file__))
 SF = 0.003
+LDBC_DB = "ldbcsnb"
+DRY_RUN = True
+DATA_COUNT = {}
 
 def load_place(driver):
 
-    def insert_data(session, row):
+    def insert_data(row):
         # Insert entities and attributes
         query = f'insert $place isa {row[3]}, has id {row[0]}, has name "{row[1]}", has url "{row[2]}";'
         return query
 
-    def insert_relations(session, row):
+    def insert_relations(row):
         # Insert relations
         query = f"""
         match
-            $place1 isa Place, has id {row[0]};
-            $place2 isa Place, has id {row[4]};
+            $place1 isa $subpart, has id {row[0]};
+            $subpart plays isPartOf:part, sub Place;
+            $place2 isa $superpart, has id {row[4]};
+            $superpart plays isPartOf:partOf, sub Place;
         insert
-            (part: $place1, partOf: $place2) isa isPartOf;
+            $partOf isa isPartOf, links (part: $place1, partOf: $place2);
         """
         return query
 
     directory = os.path.join(ROOT, "data", f"out-sf{SF}", "graphs", "csv", "bi", "composite-merged-fk", "initial_snapshot", "static", "Place")
 
-    with driver.session("ldbcsnb", SessionType.DATA) as session:
-        # First Pass: Insert entities and attributes
-        for filename in os.listdir(directory):
-            if filename.endswith('.csv'):
-                filepath = os.path.join(directory, filename)
-                with open(filepath, encoding='utf-8') as csv_file:     
-                    csv_reader = csv.reader(csv_file, delimiter='|')
-                    next(csv_reader)  # Skip the header
+    DATA_COUNT["Place"] = 0
+    # First Pass: Insert entities and attributes
+    for filename in os.listdir(directory):
+        if filename.endswith('.csv'):
+            filepath = os.path.join(directory, filename)
+            with open(filepath, encoding='utf-8') as csv_file:     
+                csv_reader = csv.reader(csv_file, delimiter='|')
+                next(csv_reader)  # Skip the header
 
-                    with session.transaction(TransactionType.WRITE) as tx:
-                        for row in csv_reader:
-                            tx.query.insert(insert_data(session, row))
-                        tx.commit()
-                
-        # Second Pass: Insert relations
-        for filename in os.listdir(directory):
-            if filename.endswith('.csv'):
-                filepath = os.path.join(directory, filename)
-                with open(filepath, encoding='utf-8') as csv_file:  
-                    csv_reader = csv.reader(csv_file, delimiter='|')
-                    next(csv_reader)  # Skip the header
+                with driver.transaction(LDBC_DB, TransactionType.WRITE) as tx:
+                    for row in csv_reader:
+                        if not DRY_RUN:
+                            tx.query(insert_data(row)).resolve()
+                        DATA_COUNT["Place"] += 1
+                    tx.commit()
+            
+    # Second Pass: Insert relations
+    for filename in os.listdir(directory):
+        if filename.endswith('.csv'):
+            filepath = os.path.join(directory, filename)
+            with open(filepath, encoding='utf-8') as csv_file:  
+                csv_reader = csv.reader(csv_file, delimiter='|')
+                next(csv_reader)  # Skip the header
 
-                    with session.transaction(TransactionType.WRITE) as tx:
-                        for row in csv_reader:
-                            if row[4]:
-                                tx.query.insert(insert_relations(session, row))
-                        tx.commit()
+                with driver.transaction(LDBC_DB, TransactionType.WRITE) as tx:
+                    for row in csv_reader:
+                        if row[4]:
+                            tx.query(insert_relations(row)).resolve()
+                    tx.commit()
 
                 
 def load_organization(driver):
     directory = os.path.join(ROOT, "data", f"out-sf{SF}", "graphs", "csv", "bi", "composite-merged-fk", "initial_snapshot", "static", "Organisation")
 
-    with driver.session("ldbcsnb", SessionType.DATA) as session:
-        for filename in os.listdir(directory):
-            if filename.endswith('.csv'):
-                filepath = os.path.join(directory, filename)
-                with open(filepath, encoding='utf-8') as csv_file:  
-                    csv_reader = csv.reader(csv_file, delimiter='|')
-                    next(csv_reader)  # Skip the header
-                    with session.transaction(TransactionType.WRITE) as tx:
-                        for row in csv_reader:
-                            # Determine the specific subtype of Organisation based on the data
-                            organisation_type = row[1]  # It should be either 'University' or 'Company'
-                            
-                            # Construct the insert query based on the schema
-                            query = f'''
-                            match
-                                $place isa Place, has id {row[4]};
-                            insert
-                                $org isa {organisation_type}, 
-                                    has id {row[0]}, 
-                                    has name "{row[2]}", 
-                                    has url "{row[3]}";
-                                (location: $org, locatedIn: $place) isa isLocatedIn;
-                            '''
-                            tx.query.insert(query)
-                        tx.commit()
+    for filename in os.listdir(directory):
+        if filename.endswith('.csv'):
+            filepath = os.path.join(directory, filename)
+            with open(filepath, encoding='utf-8') as csv_file:  
+                csv_reader = csv.reader(csv_file, delimiter='|')
+                next(csv_reader)  # Skip the header
+                with driver.transaction(LDBC_DB, TransactionType.WRITE) as tx:
+                    for row in csv_reader:
+                        # Determine the specific subtype of Organisation based on the data
+                        organisation_type = row[1]  # It should be either 'University' or 'Company'
+                        
+                        # Construct the insert query based on the schema
+                        query = f'''
+                        match
+                            $place isa Place, has id {row[4]};
+                        insert
+                            $org isa {organisation_type}, 
+                                has id {row[0]}, 
+                                has name "{row[2]}", 
+                                has url "{row[3]}";
+                            (location: $org, locatedIn: $place) isa isLocatedIn;
+                        '''
+                        tx.query(query).resolve()
+                    tx.commit()
 
 def load_tagclass(driver):
-    def insert_entities_and_attributes(session, row, tx):
+    def insert_entities_and_attributes(row, tx):
         # Construct the insert query for entities and attributes
         tagclass_query = f'''
         insert $tagclass isa TagClass, 
@@ -100,9 +106,9 @@ def load_tagclass(driver):
             has url "{row[2]}";
         '''
         
-        tx.query.insert(tagclass_query)
+        tx.query(tagclass_query).resolve()
 
-    def insert_relations(session, row, tx):
+    def insert_relations(row, tx):
         # Check if there's a superclass (SubclassOfTagClassId is not empty)
         if row[3]:
             # Insert the isSubclassOf relation for the tagclass
@@ -114,72 +120,70 @@ def load_tagclass(driver):
                 (subclass: $tagclass, superclass: $superclass) isa isSubclassOf;
             '''
             
-            tx.query.insert(subclass_relation_query)
+            tx.query(subclass_relation_query).resolve()
 
     # Load the tagclasses, their attributes, and their relations
     directory = os.path.join(ROOT, "data", f"out-sf{SF}", "graphs", "csv", "bi", "composite-merged-fk", "initial_snapshot", "static", "TagClass")
     
-    with driver.session("ldbcsnb", SessionType.DATA) as session:
-        with session.transaction(TransactionType.WRITE) as tx:
-            for filename in os.listdir(directory):
-                if  filename.endswith('.csv'):
-                    filepath = os.path.join(directory, filename)
-                    with open(filepath, encoding='utf-8') as csv_file:
-                        csv_reader = csv.reader(csv_file, delimiter='|')
-                        next(csv_reader)  # Skip the header
-                        
-                        # First Pass: Insert entities and attributes
-                        for row in csv_reader:
-                            insert_entities_and_attributes(session, row, tx)
+    with driver.transaction(LDBC_DB, TransactionType.WRITE) as tx:
+        for filename in os.listdir(directory):
+            if  filename.endswith('.csv'):
+                filepath = os.path.join(directory, filename)
+                with open(filepath, encoding='utf-8') as csv_file:
+                    csv_reader = csv.reader(csv_file, delimiter='|')
+                    next(csv_reader)  # Skip the header
+                    
+                    # First Pass: Insert entities and attributes
+                    for row in csv_reader:
+                        insert_entities_and_attributes(row, tx)
 
-                        # Reset the file reader to start from the beginning again
-                        csv_file.seek(0)
-                        next(csv_reader)  # Skip the header
+                    # Reset the file reader to start from the beginning again
+                    csv_file.seek(0)
+                    next(csv_reader)  # Skip the header
 
-                        # Second Pass: Insert relations
-                        for row in csv_reader:
-                            insert_relations(session, row, tx)
-                    tx.commit()
+                    # Second Pass: Insert relations
+                    for row in csv_reader:
+                        insert_relations(row, tx)
+                tx.commit()
             
 def load_tags(driver, batch_size=1000):
 
     directory = os.path.join(ROOT, "data", f"out-sf{SF}", "graphs", "csv", "bi", "composite-merged-fk", "initial_snapshot", "static", "Tag")
 
-    with driver.session("ldbcsnb", SessionType.DATA) as session:
-        for filename in os.listdir(directory):
-            if filename.endswith('.csv'):
-                filepath = os.path.join(directory, filename)
-                with open(filepath, encoding='utf-8') as csv_file:
-                    csv_reader = csv.reader(csv_file, delimiter='|')
-                    next(csv_reader)  # Skip the header
+    for filename in os.listdir(directory):
+        if filename.endswith('.csv'):
+            filepath = os.path.join(directory, filename)
+            with open(filepath, encoding='utf-8') as csv_file:
+                csv_reader = csv.reader(csv_file, delimiter='|')
+                next(csv_reader)  # Skip the header
 
-                    processed_rows = 0
-                    tx = session.transaction(TransactionType.WRITE)  # Start the first transaction
+                processed_rows = 0
+                tx = driver.transaction(LDBC_DB, TransactionType.WRITE)  # Start the first transaction
+                
+                for row in csv_reader:
+                    # Construct the insert query for the tag, its attributes, and its hasType relation
+                    query = f'''
+                    match
+                        $tagclass isa TagClass, has id {row[3]};
+                    insert
+                        $tag isa Tag, 
+                            has id {row[0]}, 
+                            has name "{row[1]}",
+                            has url "{row[2]}";
+                        (tag: $tag, tagClass: $tagclass) isa hasType;
+                    '''
+                    tx.query(query).resolve()
                     
-                    for row in csv_reader:
-                        # Construct the insert query for the tag, its attributes, and its hasType relation
-                        query = f'''
-                        match
-                            $tagclass isa TagClass, has id {row[3]};
-                        insert
-                            $tag isa Tag, 
-                                has id {row[0]}, 
-                                has name "{row[1]}",
-                                has url "{row[2]}";
-                            (tag: $tag, tagClass: $tagclass) isa hasType;
-                        '''
-                        tx.query.insert(query)
-                        
-                        processed_rows += 1
-                        
-                        if processed_rows % batch_size == 0:
-                            tx.commit()
-                            
-                            tx = session.transaction(TransactionType.WRITE)
+                    processed_rows += 1
                     
-                    if processed_rows % batch_size != 0:
+                    if processed_rows % batch_size == 0:
                         tx.commit()
-            
+                        
+                        tx = driver.transaction(LDBC_DB, TransactionType.WRITE)
+                
+                if processed_rows % batch_size != 0:
+                    tx.commit()
+        
 
 def count_rows_in_directory(directory):
     total_rows = 0
@@ -192,57 +196,56 @@ def count_rows_in_directory(directory):
 def load_person(driver, batch_size=5000):
     directory = os.path.join(ROOT, "data", f"out-sf{SF}", "graphs", "csv", "bi", "composite-merged-fk", "initial_snapshot", "dynamic", "Person")
 
-    with driver.session("ldbcsnb", SessionType.DATA) as session:
-        for filename in os.listdir(directory):
-            if filename.endswith('.csv'):
-                filepath = os.path.join(directory, filename)
-                with open(filepath, encoding='utf-8') as csv_file:
-                    csv_reader = csv.reader(csv_file, delimiter='|')
-                    next(csv_reader)  # Skip the header
+    for filename in os.listdir(directory):
+        if filename.endswith('.csv'):
+            filepath = os.path.join(directory, filename)
+            with open(filepath, encoding='utf-8') as csv_file:
+                csv_reader = csv.reader(csv_file, delimiter='|')
+                next(csv_reader)  # Skip the header
 
-                    queries = []
-                    for row in csv_reader:
-                        # Parse and format the creation date
-                        creation_date = datetime.fromisoformat(row[0])
-                        formatted_date = creation_date.strftime('%Y-%m-%dT%H:%M:%S.%f')[:-3]
+                queries = []
+                for row in csv_reader:
+                    # Parse and format the creation date
+                    creation_date = datetime.fromisoformat(row[0])
+                    formatted_date = creation_date.strftime('%Y-%m-%dT%H:%M:%S.%f')[:-3]
 
-                        email_query = " ".join([f'has email "{email}",' for email in row[10].split(';')])
-                        language_query = " ".join([f'has speaks "{lang}",' for lang in row[9].split(';')])
+                    email_query = " ".join([f'has email "{email}",' for email in row[10].split(';')])
+                    language_query = " ".join([f'has speaks "{lang}",' for lang in row[9].split(';')])
 
-                        # Construct the insert query
-                        query = f'''
-                        match
-                            $city isa City, has id {row[8]};
-                        insert
-                            $person isa Person,
-                                has id {row[1]},
-                                has firstName "{row[2]}",
-                                has lastName "{row[3]}",
-                                has gender "{row[4]}",
-                                has birthday {row[5]},
-                                has locationIP "{row[6]}",
-                                has browserUsed "{row[7]}",
-                                {email_query}
-                                {language_query}
-                                has creationDate {formatted_date};
-                            (location: $person, locatedIn: $city) isa isLocatedIn;
-                        '''
-                        queries.append(query)
+                    # Construct the insert query
+                    query = f'''
+                    match
+                        $city isa City, has id {row[8]};
+                    insert
+                        $person isa Person,
+                            has id {row[1]},
+                            has firstName "{row[2]}",
+                            has lastName "{row[3]}",
+                            has gender "{row[4]}",
+                            has birthday {row[5]},
+                            has locationIP "{row[6]}",
+                            has browserUsed "{row[7]}",
+                            {email_query}
+                            {language_query}
+                            has creationDate {formatted_date};
+                        (location: $person, locatedIn: $city) isa isLocatedIn;
+                    '''
+                    queries.append(query)
 
-                        # If batch size is reached, execute the queries and clear the list
-                        if len(queries) == batch_size:
-                            with session.transaction(TransactionType.WRITE) as tx:
-                                for q in queries:
-                                    tx.query.insert(q)
-                                tx.commit()
-                            queries.clear()
-
-                    # If there are remaining queries, execute them
-                    if queries:
-                        with session.transaction(TransactionType.WRITE) as tx:
+                    # If batch size is reached, execute the queries and clear the list
+                    if len(queries) == batch_size:
+                        with driver.transaction(LDBC_DB, TransactionType.WRITE) as tx:
                             for q in queries:
-                                tx.query.insert(q)
+                                tx.query(q).resolve()
                             tx.commit()
+                        queries.clear()
+
+                # If there are remaining queries, execute them
+                if queries:
+                    with driver.transaction(LDBC_DB, TransactionType.WRITE) as tx:
+                        for q in queries:
+                            tx.query(q).resolve()
+                        tx.commit()
 
 def process_file(filename, driver, directory, batch_size, pbar, pbar_lock):
     filepath = os.path.join(directory, filename)
@@ -252,43 +255,42 @@ def process_file(filename, driver, directory, batch_size, pbar, pbar_lock):
 
         processed_rows = 0
 
-        with driver.session("ldbcsnb", SessionType.DATA) as session:
-            tx = session.transaction(TransactionType.WRITE)  # Start the first transaction
+        tx = driver.transaction(LDBC_DB, TransactionType.WRITE)  # Start the first transaction
 
-            for row in csv_reader:
-                # Parse and format the creation date
-                creation_date = datetime.fromisoformat(row[0])
-                formatted_date = creation_date.strftime('%Y-%m-%dT%H:%M:%S.%f')[:-3]
+        for row in csv_reader:
+            # Parse and format the creation date
+            creation_date = datetime.fromisoformat(row[0])
+            formatted_date = creation_date.strftime('%Y-%m-%dT%H:%M:%S.%f')[:-3]
 
-                # Construct the insert query for the forum, its attributes, and its hasModerator relation
-                query = f'''
-                match   
-                    $moderator isa Person, has id {row[3]};
-                insert
-                    $forum isa Forum,
-                        has id {row[1]},
-                        has title "{row[2]}",
-                        has creationDate {formatted_date};
-                    (moderator: $moderator, moderated: $forum) isa hasModerator;
-                '''
-                tx.query.insert(query)
+            # Construct the insert query for the forum, its attributes, and its hasModerator relation
+            query = f'''
+            match   
+                $moderator isa Person, has id {row[3]};
+            insert
+                $forum isa Forum,
+                    has id {row[1]},
+                    has title "{row[2]}",
+                    has creationDate {formatted_date};
+                (moderator: $moderator, moderated: $forum) isa hasModerator;
+            '''
+            tx.query(query).resolve()
 
-                processed_rows += 1
+            processed_rows += 1
 
-                # Commit and start a new transaction if batch size is reached
-                if processed_rows % batch_size == 0:
-                    tx.commit()
-                    tx = session.transaction(TransactionType.WRITE)
-                    
-                    with pbar_lock:  # Lock the progress bar for thread safety
-                        pbar.update(batch_size)
-
-            # Commit the last batch if there are any remaining rows
-            if processed_rows % batch_size != 0:
+            # Commit and start a new transaction if batch size is reached
+            if processed_rows % batch_size == 0:
                 tx.commit()
-
+                tx = driver.transaction(LDBC_DB, TransactionType.WRITE)
+                
                 with pbar_lock:  # Lock the progress bar for thread safety
-                    pbar.update(processed_rows % batch_size)
+                    pbar.update(batch_size)
+
+        # Commit the last batch if there are any remaining rows
+        if processed_rows % batch_size != 0:
+            tx.commit()
+
+            with pbar_lock:  # Lock the progress bar for thread safety
+                pbar.update(processed_rows % batch_size)
 
     return processed_rows
 
@@ -312,141 +314,139 @@ def load_forum(driver, batch_size=10000):
 
 
 def load_posts(driver, batch_size=10000):
-    with driver.session("ldbcsnb", SessionType.DATA) as session:
-        directory = os.path.join(ROOT, "data", f"out-sf{SF}", "graphs", "csv", "bi", "composite-merged-fk", "initial_snapshot", "dynamic", "Post")
-        
-        # Estimate total rows (this is a rough estimate, assuming average file sizes)
-        total_rows = count_rows_in_directory(directory)
-        pbar = tqdm(total=total_rows, desc="Processed rows")
-        
-        for filename in os.listdir(directory):
-            if filename.endswith('.csv'):
-                filepath = os.path.join(directory, filename)
-                with open(filepath, encoding='utf-8') as csv_file:
-                    csv_reader = csv.reader(csv_file, delimiter='|')
-                    next(csv_reader)  # Skip the header
+    directory = os.path.join(ROOT, "data", f"out-sf{SF}", "graphs", "csv", "bi", "composite-merged-fk", "initial_snapshot", "dynamic", "Post")
+    
+    # Estimate total rows (this is a rough estimate, assuming average file sizes)
+    total_rows = count_rows_in_directory(directory)
+    pbar = tqdm(total=total_rows, desc="Processed rows")
+    
+    for filename in os.listdir(directory):
+        if filename.endswith('.csv'):
+            filepath = os.path.join(directory, filename)
+            with open(filepath, encoding='utf-8') as csv_file:
+                csv_reader = csv.reader(csv_file, delimiter='|')
+                next(csv_reader)  # Skip the header
 
-                    processed_rows = 0
-                    tx = session.transaction(TransactionType.WRITE)  # Start the first transaction
+                processed_rows = 0
+                tx = driver.transaction(LDBC_DB, TransactionType.WRITE)  # Start the first transaction
+                
+                for row in csv_reader:
+                    # Parse and format the creation date
+                    creation_date = datetime.fromisoformat(row[0])
+                    formatted_date = creation_date.strftime('%Y-%m-%dT%H:%M:%S.%f')[:-3]
                     
-                    for row in csv_reader:
-                        # Parse and format the creation date
-                        creation_date = datetime.fromisoformat(row[0])
-                        formatted_date = creation_date.strftime('%Y-%m-%dT%H:%M:%S.%f')[:-3]
-                        
-                        # Construct the insert query for the post, its attributes, and its relations
-                        query = f'''
-                        match
-                            $creator isa Person, has id {row[8]};
-                            $forum isa Forum, has id {row[9]};
-                            $country isa Country, has id {row[10]};
-                        insert
-                            $post isa Post,
-                                has id {row[1]},
-                                has imageFile "{row[2]}",
-                                has locationIP "{row[3]}",
-                                has browserUsed "{row[4]}",
-                                has language "{row[5]}",
-                                has content "{row[6]}",
-                                has length {row[7]},
-                                has creationDate {formatted_date};
-                            (created: $post, creator: $creator) isa hasCreator;
-                            (contain: $post, container: $forum) isa containerOf;
-                            (location: $post, locatedIn: $country) isa isLocatedIn;
-                        '''
-                        tx.query.insert(query)
-                        
-                        processed_rows += 1
-                        
-                        # Commit and start a new transaction if batch size is reached
-                        if processed_rows % batch_size == 0:
-                            tx.commit()
-                            
-                            tx = session.transaction(TransactionType.WRITE)
-                            pbar.update(batch_size)  # Update the progress bar
+                    # Construct the insert query for the post, its attributes, and its relations
+                    query = f'''
+                    match
+                        $creator isa Person, has id {row[8]};
+                        $forum isa Forum, has id {row[9]};
+                        $country isa Country, has id {row[10]};
+                    insert
+                        $post isa Post,
+                            has id {row[1]},
+                            has imageFile "{row[2]}",
+                            has locationIP "{row[3]}",
+                            has browserUsed "{row[4]}",
+                            has language "{row[5]}",
+                            has content "{row[6]}",
+                            has length {row[7]},
+                            has creationDate {formatted_date};
+                        (created: $post, creator: $creator) isa hasCreator;
+                        (contain: $post, container: $forum) isa containerOf;
+                        (location: $post, locatedIn: $country) isa isLocatedIn;
+                    '''
+                    tx.query(query).resolve()
                     
-                    # Commit the last batch if there are any remaining rows
-                    if processed_rows % batch_size != 0:
+                    processed_rows += 1
+                    
+                    # Commit and start a new transaction if batch size is reached
+                    if processed_rows % batch_size == 0:
                         tx.commit()
                         
-                        pbar.update(processed_rows % batch_size)  # Update the progress bar
-        
-        pbar.close()
+                        tx = driver.transaction(LDBC_DB, TransactionType.WRITE)
+                        pbar.update(batch_size)  # Update the progress bar
+                
+                # Commit the last batch if there are any remaining rows
+                if processed_rows % batch_size != 0:
+                    tx.commit()
+                    
+                    pbar.update(processed_rows % batch_size)  # Update the progress bar
+    
+    pbar.close()
 
 def load_comments(driver, batch_size=10000):
-    with driver.session("ldbcsnb", SessionType.DATA) as session:
-        directory = os.path.join(ROOT, "data", f"out-sf{SF}", "graphs", "csv", "bi", "composite-merged-fk", "initial_snapshot", "dynamic", "Comment")
-
-        
-        # Estimate total rows (this is a rough estimate, assuming average file sizes)
-        total_rows = count_rows_in_directory(directory)
-        pbar = tqdm(total=total_rows, desc="Processed rows")
-        
-        for filename in os.listdir(directory):
-            if filename.endswith('.csv'):
-                filepath = os.path.join(directory, filename)
-                with open(filepath, encoding='utf-8') as csv_file:
-                    csv_reader = csv.reader(csv_file, delimiter='|')
-                    next(csv_reader)  # Skip the header
-
-                    processed_rows = 0
-                    tx = session.transaction(TransactionType.WRITE)  # Start the first transaction
+    directory = os.path.join(ROOT, "data", f"out-sf{SF}", "graphs", "csv", "bi", "composite-merged-fk", "initial_snapshot", "dynamic", "Comment")
+    
+    
+    # Estimate total rows (this is a rough estimate, assuming average file sizes)
+    total_rows = count_rows_in_directory(directory)
+    pbar = tqdm(total=total_rows, desc="Processed rows")
+    
+    for filename in os.listdir(directory):
+        if filename.endswith('.csv'):
+            filepath = os.path.join(directory, filename)
+            with open(filepath, encoding='utf-8') as csv_file:
+                csv_reader = csv.reader(csv_file, delimiter='|')
+                next(csv_reader)  # Skip the header
+    
+                processed_rows = 0
+                tx = driver.transaction(LDBC_DB, TransactionType.WRITE)  # Start the first transaction
+                
+                for row in csv_reader:
+                    # Parse and format the creation date
+                    creation_date = datetime.fromisoformat(row[0])
+                    formatted_date = creation_date.strftime('%Y-%m-%dT%H:%M:%S.%f')[:-3]
                     
-                    for row in csv_reader:
-                        # Parse and format the creation date
-                        creation_date = datetime.fromisoformat(row[0])
-                        formatted_date = creation_date.strftime('%Y-%m-%dT%H:%M:%S.%f')[:-3]
-                        
-                        # Parent relation setup (either to a Post or another Comment)
-                        parent_relation = ""
-                        if row[8]:  # ParentPostId
-                            parent_relation = f'(reply: $comment, repliedTo: $parentPost) isa replyOf;'
-                        elif row[9]:  # ParentCommentId
-                            parent_relation = f'(reply: $comment, repliedTo: $parentComment) isa replyOf;'
-                        
-                        # Construct the insert query for the comment, its attributes, and its relations
-                        query = f'''
-                        match
-                            $creator isa Person, has id {row[6]};
-                            $country isa Country, has id {row[7]};
-                        '''
-                        if row[8]:
-                            query += f'$parentPost isa Post, has id {row[8]};'
-                        elif row[9]:
-                            query += f'$parentComment isa Comment, has id {row[9]};'
-                        
-                        query += f'''
-                        insert
-                            $comment isa Comment,
-                                has id {row[1]},
-                                has locationIP "{row[2]}",
-                                has browserUsed "{row[3]}",
-                                has content "{row[4]}",
-                                has length {row[5]},
-                                has creationDate {formatted_date};
-                            (creator: $creator, created: $comment) isa hasCreator;
-                            (location: $comment, locatedIn: $country) isa isLocatedIn;
-                            {parent_relation}
-                        '''
-                        
-                        tx.query.insert(query)
-                        processed_rows += 1
-                        
-                        # Commit and start a new transaction if batch size is reached
-                        if processed_rows % batch_size == 0:
-                            tx.commit()
-                            
-                            tx = session.transaction(TransactionType.WRITE)
-                            pbar.update(batch_size)  # Update the progress bar
+                    # Parent relation setup (either to a Post or another Comment)
+                    parent_relation = ""
+                    if row[8]:  # ParentPostId
+                        parent_relation = f'(reply: $comment, repliedTo: $parentPost) isa replyOf;'
+                    elif row[9]:  # ParentCommentId
+                        parent_relation = f'(reply: $comment, repliedTo: $parentComment) isa replyOf;'
                     
-                    # Commit the last batch if there are any remaining rows
-                    if processed_rows % batch_size != 0:
+                    # Construct the insert query for the comment, its attributes, and its relations
+                    query = f'''
+                    match
+                        $creator isa Person, has id {row[6]};
+                        $country isa Country, has id {row[7]};
+                    '''
+                    if row[8]:
+                        query += f'$parentPost isa Post, has id {row[8]};'
+                    elif row[9]:
+                        query += f'$parentComment isa Comment, has id {row[9]};'
+                    
+                    query += f'''
+                    insert
+                        $comment isa Comment,
+                            has id {row[1]},
+                            has locationIP "{row[2]}",
+                            has browserUsed "{row[3]}",
+                            has content "{row[4]}",
+                            has length {row[5]},
+                            has creationDate {formatted_date};
+                        (creator: $creator, created: $comment) isa hasCreator;
+                        (location: $comment, locatedIn: $country) isa isLocatedIn;
+                        {parent_relation}
+                    '''
+                    
+                    tx.query(query).resolve()
+                    processed_rows += 1
+                    
+                    # Commit and start a new transaction if batch size is reached
+                    if processed_rows % batch_size == 0:
                         tx.commit()
                         
-                        pbar.update(processed_rows % batch_size)  # Update the progress bar
-
-        pbar.close()
-
+                        tx = driver.transaction(LDBC_DB, TransactionType.WRITE)
+                        pbar.update(batch_size)  # Update the progress bar
+                
+                # Commit the last batch if there are any remaining rows
+                if processed_rows % batch_size != 0:
+                    tx.commit()
+                    
+                    pbar.update(processed_rows % batch_size)  # Update the progress bar
+    
+    pbar.close()
+    
 
 def load_comment_hasTag_Tag(driver, directory, batch_size=1000):
     # Estimate total rows (this is a rough estimate, assuming average file sizes)
@@ -462,33 +462,32 @@ def load_comment_hasTag_Tag(driver, directory, batch_size=1000):
                 csv_reader = csv.reader(csv_file, delimiter='|')
                 next(csv_reader)  # Skip the header
 
-                with driver.session("ldbcsnb", SessionType.DATA) as session:
-                    tx = session.transaction(TransactionType.WRITE)  # Start the first transaction
+                tx = driver.transaction(LDBC_DB, TransactionType.WRITE)  # Start the first transaction
+                
+                for row in csv_reader:
+                    query = f'''
+                    match
+                        $comment isa Comment, has id {row[1]};
+                        $tag isa Tag, has id {row[2]};
+                    insert
+                        (tag: $tag, tagged: $comment) isa hasTag;
+                    '''
                     
-                    for row in csv_reader:
-                        query = f'''
-                        match
-                            $comment isa Comment, has id {row[1]};
-                            $tag isa Tag, has id {row[2]};
-                        insert
-                            (tag: $tag, tagged: $comment) isa hasTag;
-                        '''
-                        
-                        tx.query.insert(query)
-                        processed_rows += 1
-                        
-                        # Commit and start a new transaction if batch size is reached
-                        if processed_rows % batch_size == 0:
-                            tx.commit()
-                            
-                            tx = session.transaction(TransactionType.WRITE)
-                            pbar.update(batch_size)  # Update the progress bar
+                    tx.query(query).resolve()
+                    processed_rows += 1
                     
-                    # Commit the last batch if there are any remaining rows
-                    if processed_rows % batch_size != 0:
+                    # Commit and start a new transaction if batch size is reached
+                    if processed_rows % batch_size == 0:
                         tx.commit()
                         
-                        pbar.update(processed_rows % batch_size)  # Update the progress bar
+                        tx = driver.transaction(LDBC_DB, TransactionType.WRITE)
+                        pbar.update(batch_size)  # Update the progress bar
+                
+                # Commit the last batch if there are any remaining rows
+                if processed_rows % batch_size != 0:
+                    tx.commit()
+                    
+                    pbar.update(processed_rows % batch_size)  # Update the progress bar
 
     pbar.close()
 
@@ -506,38 +505,37 @@ def load_forum_hasMember_Person(driver, directory, batch_size=1000):
                 csv_reader = csv.reader(csv_file, delimiter='|')
                 next(csv_reader)  # Skip the header
 
-                with driver.session("ldbcsnb", SessionType.DATA) as session:
-                    tx = session.transaction(TransactionType.WRITE)  # Start the first transaction
-                    
-                    for row in csv_reader:
-                        # Extract and format the creation date
-                        creation_date = datetime.fromisoformat(row[0])
-                        formatted_date = creation_date.strftime('%Y-%m-%dT%H:%M:%S.%f')[:-3]
+                tx = driver.transaction(LDBC_DB, TransactionType.WRITE)  # Start the first transaction
+                
+                for row in csv_reader:
+                    # Extract and format the creation date
+                    creation_date = datetime.fromisoformat(row[0])
+                    formatted_date = creation_date.strftime('%Y-%m-%dT%H:%M:%S.%f')[:-3]
 
-                        query = f'''
-                        match
-                            $forum isa Forum, has id {row[1]};
-                            $person isa Person, has id {row[2]};
-                        insert
-                            $relation (member: $person, memberOf: $forum) isa hasMember;
-                            $relation has creationDate {formatted_date};
-                        '''
-                        
-                        tx.query.insert(query)
-                        processed_rows += 1
-                        
-                        # Commit and start a new transaction if batch size is reached
-                        if processed_rows % batch_size == 0:
-                            tx.commit()
-                            
-                            tx = session.transaction(TransactionType.WRITE)
-                            pbar.update(batch_size)  # Update the progress bar
+                    query = f'''
+                    match
+                        $forum isa Forum, has id {row[1]};
+                        $person isa Person, has id {row[2]};
+                    insert
+                        $relation (member: $person, memberOf: $forum) isa hasMember;
+                        $relation has creationDate {formatted_date};
+                    '''
                     
-                    # Commit the last batch if there are any remaining rows
-                    if processed_rows % batch_size != 0:
+                    tx.query(query).resolve()
+                    processed_rows += 1
+                    
+                    # Commit and start a new transaction if batch size is reached
+                    if processed_rows % batch_size == 0:
                         tx.commit()
                         
-                        pbar.update(processed_rows % batch_size)  # Update the progress bar
+                        tx = driver.transaction(LDBC_DB, TransactionType.WRITE)
+                        pbar.update(batch_size)  # Update the progress bar
+                
+                # Commit the last batch if there are any remaining rows
+                if processed_rows % batch_size != 0:
+                    tx.commit()
+                    
+                    pbar.update(processed_rows % batch_size)  # Update the progress bar
 
     pbar.close()
 
@@ -555,36 +553,35 @@ def load_forum_hasTag_Tag(driver, directory, batch_size=1000):
                 csv_reader = csv.reader(csv_file, delimiter='|')
                 next(csv_reader)  # Skip the header
 
-                with driver.session("ldbcsnb", SessionType.DATA) as session:
-                    tx = session.transaction(TransactionType.WRITE)  # Start the first transaction
-                    
-                    for row in csv_reader:
-                        # Extract and format the creation date
-                        creation_date = datetime.fromisoformat(row[0])
-                        formatted_date = creation_date.strftime('%Y-%m-%dT%H:%M:%S.%f')[:-3]
+                tx = driver.transaction(LDBC_DB, TransactionType.WRITE)  # Start the first transaction
+                
+                for row in csv_reader:
+                    # Extract and format the creation date
+                    creation_date = datetime.fromisoformat(row[0])
+                    formatted_date = creation_date.strftime('%Y-%m-%dT%H:%M:%S.%f')[:-3]
 
-                        query = f'''
-                        match
-                            $forum isa Forum, has id {row[1]};
-                            $tag isa Tag, has id {row[2]};
-                        insert
-                            $relation (tag: $tag, tagged: $forum) isa hasTag;
-                            $relation has creationDate {formatted_date};
-                        '''
-                        
-                        tx.query.insert(query)
-                        processed_rows += 1
-                        
-                        # Commit and start a new transaction if batch size is reached
-                        if processed_rows % batch_size == 0:
-                            tx.commit()
-                            tx = session.transaction(TransactionType.WRITE)
-                            pbar.update(batch_size)  # Update the progress bar
+                    query = f'''
+                    match
+                        $forum isa Forum, has id {row[1]};
+                        $tag isa Tag, has id {row[2]};
+                    insert
+                        $relation (tag: $tag, tagged: $forum) isa hasTag;
+                        $relation has creationDate {formatted_date};
+                    '''
                     
-                    # Commit the last batch if there are any remaining rows
-                    if processed_rows % batch_size != 0:
+                    tx.query(query).resolve()
+                    processed_rows += 1
+                    
+                    # Commit and start a new transaction if batch size is reached
+                    if processed_rows % batch_size == 0:
                         tx.commit()
-                        pbar.update(processed_rows % batch_size)  # Update the progress bar
+                        tx = driver.transaction(LDBC_DB, TransactionType.WRITE)
+                        pbar.update(batch_size)  # Update the progress bar
+                
+                # Commit the last batch if there are any remaining rows
+                if processed_rows % batch_size != 0:
+                    tx.commit()
+                    pbar.update(processed_rows % batch_size)  # Update the progress bar
 
     pbar.close()
 
@@ -602,36 +599,35 @@ def load_person_hasInterest_Tag(driver, directory, batch_size=1000):
                 csv_reader = csv.reader(csv_file, delimiter='|')
                 next(csv_reader)  # Skip the header
 
-                with driver.session("ldbcsnb", SessionType.DATA) as session:
-                    tx = session.transaction(TransactionType.WRITE)  # Start the first transaction
-                    
-                    for row in csv_reader:
-                        # Extract and format the creation date
-                        creation_date = datetime.fromisoformat(row[0])
-                        formatted_date = creation_date.strftime('%Y-%m-%dT%H:%M:%S.%f')[:-3]
+                tx = driver.transaction(LDBC_DB, TransactionType.WRITE)  # Start the first transaction
+                
+                for row in csv_reader:
+                    # Extract and format the creation date
+                    creation_date = datetime.fromisoformat(row[0])
+                    formatted_date = creation_date.strftime('%Y-%m-%dT%H:%M:%S.%f')[:-3]
 
-                        query = f'''
-                        match
-                            $person isa Person, has id {row[1]};
-                            $tag isa Tag, has id {row[2]};
-                        insert
-                            $relation (interested: $person, interests: $tag) isa hasInterest;
-                            $relation has creationDate {formatted_date};
-                        '''
-                        
-                        tx.query.insert(query)
-                        processed_rows += 1
-                        
-                        # Commit and start a new transaction if batch size is reached
-                        if processed_rows % batch_size == 0:
-                            tx.commit()
-                            tx = session.transaction(TransactionType.WRITE)
-                            pbar.update(batch_size)  # Update the progress bar
+                    query = f'''
+                    match
+                        $person isa Person, has id {row[1]};
+                        $tag isa Tag, has id {row[2]};
+                    insert
+                        $relation (interested: $person, interests: $tag) isa hasInterest;
+                        $relation has creationDate {formatted_date};
+                    '''
                     
-                    # Commit the last batch if there are any remaining rows
-                    if processed_rows % batch_size != 0:
+                    tx.query(query).resolve()
+                    processed_rows += 1
+                    
+                    # Commit and start a new transaction if batch size is reached
+                    if processed_rows % batch_size == 0:
                         tx.commit()
-                        pbar.update(processed_rows % batch_size)  # Update the progress bar
+                        tx = driver.transaction(LDBC_DB, TransactionType.WRITE)
+                        pbar.update(batch_size)  # Update the progress bar
+                
+                # Commit the last batch if there are any remaining rows
+                if processed_rows % batch_size != 0:
+                    tx.commit()
+                    pbar.update(processed_rows % batch_size)  # Update the progress bar
 
     pbar.close()
 
@@ -649,36 +645,35 @@ def load_person_knows_person(driver, directory, batch_size=1000):
                 csv_reader = csv.reader(csv_file, delimiter='|')
                 next(csv_reader)  # Skip the header
 
-                with driver.session("ldbcsnb", SessionType.DATA) as session:
-                    tx = session.transaction(TransactionType.WRITE)  # Start the first transaction
-                    
-                    for row in csv_reader:
-                        # Extract and format the creation date
-                        creation_date = datetime.fromisoformat(row[0])
-                        formatted_date = creation_date.strftime('%Y-%m-%dT%H:%M:%S.%f')[:-3]
+                tx = driver.transaction(LDBC_DB, TransactionType.WRITE)  # Start the first transaction
+                
+                for row in csv_reader:
+                    # Extract and format the creation date
+                    creation_date = datetime.fromisoformat(row[0])
+                    formatted_date = creation_date.strftime('%Y-%m-%dT%H:%M:%S.%f')[:-3]
 
-                        query = f'''
-                        match
-                            $person1 isa Person, has id {row[1]};
-                            $person2 isa Person, has id {row[2]};
-                        insert
-                            $relation (friend: $person1, friend: $person2) isa knows;
-                            $relation has creationDate {formatted_date};
-                        '''
-                        
-                        tx.query.insert(query)
-                        processed_rows += 1
-                        
-                        # Commit and start a new transaction if batch size is reached
-                        if processed_rows % batch_size == 0:
-                            tx.commit()
-                            tx = session.transaction(TransactionType.WRITE)
-                            pbar.update(batch_size)  # Update the progress bar
+                    query = f'''
+                    match
+                        $person1 isa Person, has id {row[1]};
+                        $person2 isa Person, has id {row[2]};
+                    insert
+                        $relation (friend: $person1, friend: $person2) isa knows;
+                        $relation has creationDate {formatted_date};
+                    '''
                     
-                    # Commit the last batch if there are any remaining rows
-                    if processed_rows % batch_size != 0:
+                    tx.query(query).resolve()
+                    processed_rows += 1
+                    
+                    # Commit and start a new transaction if batch size is reached
+                    if processed_rows % batch_size == 0:
                         tx.commit()
-                        pbar.update(processed_rows % batch_size)  # Update the progress bar
+                        tx = driver.transaction(LDBC_DB, TransactionType.WRITE)
+                        pbar.update(batch_size)  # Update the progress bar
+                
+                # Commit the last batch if there are any remaining rows
+                if processed_rows % batch_size != 0:
+                    tx.commit()
+                    pbar.update(processed_rows % batch_size)  # Update the progress bar
 
     pbar.close()
 
@@ -696,36 +691,35 @@ def load_person_likes_comment(driver, directory, batch_size=1000):
                 csv_reader = csv.reader(csv_file, delimiter='|')
                 next(csv_reader)  # Skip the header
 
-                with driver.session("ldbcsnb", SessionType.DATA) as session:
-                    tx = session.transaction(TransactionType.WRITE)  # Start the first transaction
+                tx = driver.transaction(LDBC_DB, TransactionType.WRITE)  # Start the first transaction
 
-                    for row in csv_reader:
-                        # Extract and format the creation date
-                        creation_date = datetime.fromisoformat(row[0])
-                        formatted_date = creation_date.strftime('%Y-%m-%dT%H:%M:%S.%f')[:-3]
+                for row in csv_reader:
+                    # Extract and format the creation date
+                    creation_date = datetime.fromisoformat(row[0])
+                    formatted_date = creation_date.strftime('%Y-%m-%dT%H:%M:%S.%f')[:-3]
 
-                        query = f'''
-                        match
-                            $person isa Person, has id {row[1]};
-                            $comment isa Comment, has id {row[2]};
-                        insert
-                            $relation (liker: $person, message: $comment) isa likes;
-                            $relation has creationDate {formatted_date};
-                        '''
+                    query = f'''
+                    match
+                        $person isa Person, has id {row[1]};
+                        $comment isa Comment, has id {row[2]};
+                    insert
+                        $relation (liker: $person, message: $comment) isa likes;
+                        $relation has creationDate {formatted_date};
+                    '''
 
-                        tx.query.insert(query)
-                        processed_rows += 1
+                    tx.query(query).resolve()
+                    processed_rows += 1
 
-                        # Commit and start a new transaction if batch size is reached
-                        if processed_rows % batch_size == 0:
-                            tx.commit()
-                            tx = session.transaction(TransactionType.WRITE)
-                            pbar.update(batch_size)  # Update the progress bar
-
-                    # Commit the last batch if there are any remaining rows
-                    if processed_rows % batch_size != 0:
+                    # Commit and start a new transaction if batch size is reached
+                    if processed_rows % batch_size == 0:
                         tx.commit()
-                        pbar.update(processed_rows % batch_size)  # Update the progress bar
+                        tx = driver.transaction(LDBC_DB, TransactionType.WRITE)
+                        pbar.update(batch_size)  # Update the progress bar
+
+                # Commit the last batch if there are any remaining rows
+                if processed_rows % batch_size != 0:
+                    tx.commit()
+                    pbar.update(processed_rows % batch_size)  # Update the progress bar
 
     pbar.close()
 
@@ -743,36 +737,35 @@ def load_person_likes_post(driver, directory, batch_size=1000):
                 csv_reader = csv.reader(csv_file, delimiter='|')
                 next(csv_reader)  # Skip the header
 
-                with driver.session("ldbcsnb", SessionType.DATA) as session:
-                    tx = session.transaction(TransactionType.WRITE)  # Start the first transaction
+                tx = driver.transaction(LDBC_DB, TransactionType.WRITE)  # Start the first transaction
 
-                    for row in csv_reader:
-                        # Extract and format the creation date
-                        creation_date = datetime.fromisoformat(row[0])
-                        formatted_date = creation_date.strftime('%Y-%m-%dT%H:%M:%S.%f')[:-3]
+                for row in csv_reader:
+                    # Extract and format the creation date
+                    creation_date = datetime.fromisoformat(row[0])
+                    formatted_date = creation_date.strftime('%Y-%m-%dT%H:%M:%S.%f')[:-3]
 
-                        query = f'''
-                        match
-                            $person isa Person, has id {row[1]};
-                            $post isa Post, has id {row[2]};
-                        insert
-                            $relation (liker: $person, message: $post) isa likes;
-                            $relation has creationDate {formatted_date};
-                        '''
+                    query = f'''
+                    match
+                        $person isa Person, has id {row[1]};
+                        $post isa Post, has id {row[2]};
+                    insert
+                        $relation (liker: $person, message: $post) isa likes;
+                        $relation has creationDate {formatted_date};
+                    '''
 
-                        tx.query.insert(query)
-                        processed_rows += 1
+                    tx.query(query).resolve()
+                    processed_rows += 1
 
-                        # Commit and start a new transaction if batch size is reached
-                        if processed_rows % batch_size == 0:
-                            tx.commit()
-                            tx = session.transaction(TransactionType.WRITE)
-                            pbar.update(batch_size)  # Update the progress bar
-
-                    # Commit the last batch if there are any remaining rows
-                    if processed_rows % batch_size != 0:
+                    # Commit and start a new transaction if batch size is reached
+                    if processed_rows % batch_size == 0:
                         tx.commit()
-                        pbar.update(processed_rows % batch_size)  # Update the progress bar
+                        tx = driver.transaction(LDBC_DB, TransactionType.WRITE)
+                        pbar.update(batch_size)  # Update the progress bar
+
+                # Commit the last batch if there are any remaining rows
+                if processed_rows % batch_size != 0:
+                    tx.commit()
+                    pbar.update(processed_rows % batch_size)  # Update the progress bar
 
     pbar.close()
 
@@ -783,44 +776,43 @@ def load_person_studyAt_university(driver, directory, batch_size=1000):
     
     processed_rows = 0
 
-    with driver.session("ldbcsnb", SessionType.DATA) as session:
-        for filename in os.listdir(directory):
-            if filename.endswith('.csv'):
-                filepath = os.path.join(directory, filename)
-                with open(filepath, encoding='utf-8') as csv_file:
-                    csv_reader = csv.reader(csv_file, delimiter='|')
-                    next(csv_reader)  # Skip the header
+    for filename in os.listdir(directory):
+        if filename.endswith('.csv'):
+            filepath = os.path.join(directory, filename)
+            with open(filepath, encoding='utf-8') as csv_file:
+                csv_reader = csv.reader(csv_file, delimiter='|')
+                next(csv_reader)  # Skip the header
 
-                    tx = session.transaction(TransactionType.WRITE)  # Start the first transaction
+                tx = driver.transaction(LDBC_DB, TransactionType.WRITE)  # Start the first transaction
 
-                    for row in csv_reader:
-                        # Extract and format the creation date
-                        creation_date = datetime.fromisoformat(row[0])
-                        formatted_date = creation_date.strftime('%Y-%m-%dT%H:%M:%S.%f')[:-3]
+                for row in csv_reader:
+                    # Extract and format the creation date
+                    creation_date = datetime.fromisoformat(row[0])
+                    formatted_date = creation_date.strftime('%Y-%m-%dT%H:%M:%S.%f')[:-3]
 
-                        query = f'''
-                        match
-                            $person isa Person, has id {row[1]};
-                            $university isa University, has id {row[2]};
-                        insert
-                            $relation (student: $person, university: $university) isa studyAt;
-                            $relation has creationDate {formatted_date};
-                            $relation has classYear {row[3]};
-                        '''
+                    query = f'''
+                    match
+                        $person isa Person, has id {row[1]};
+                        $university isa University, has id {row[2]};
+                    insert
+                        $relation (student: $person, university: $university) isa studyAt;
+                        $relation has creationDate {formatted_date};
+                        $relation has classYear {row[3]};
+                    '''
 
-                        tx.query.insert(query)
-                        processed_rows += 1
+                    tx.query(query).resolve()
+                    processed_rows += 1
 
-                        # Commit and start a new transaction if batch size is reached
-                        if processed_rows % batch_size == 0:
-                            tx.commit()
-                            tx = session.transaction(TransactionType.WRITE)
-                            pbar.update(batch_size)  # Update the progress bar
-
-                    # Commit the last batch if there are any remaining rows
-                    if processed_rows % batch_size != 0:
+                    # Commit and start a new transaction if batch size is reached
+                    if processed_rows % batch_size == 0:
                         tx.commit()
-                        pbar.update(processed_rows % batch_size)  # Update the progress bar
+                        tx = driver.transaction(LDBC_DB, TransactionType.WRITE)
+                        pbar.update(batch_size)  # Update the progress bar
+
+                # Commit the last batch if there are any remaining rows
+                if processed_rows % batch_size != 0:
+                    tx.commit()
+                    pbar.update(processed_rows % batch_size)  # Update the progress bar
 
     pbar.close()
 
@@ -838,37 +830,36 @@ def load_person_workAt_company(driver, directory, batch_size=1000):
                 csv_reader = csv.reader(csv_file, delimiter='|')
                 next(csv_reader)  # Skip the header
 
-                with driver.session("ldbcsnb", SessionType.DATA) as session:
-                    tx = session.transaction(TransactionType.WRITE)  # Start the first transaction
+                tx = driver.transaction(LDBC_DB, TransactionType.WRITE)  # Start the first transaction
 
-                    for row in csv_reader:
-                        # Extract and format the creation date
-                        creation_date = datetime.fromisoformat(row[0])
-                        formatted_date = creation_date.strftime('%Y-%m-%dT%H:%M:%S.%f')[:-3]
+                for row in csv_reader:
+                    # Extract and format the creation date
+                    creation_date = datetime.fromisoformat(row[0])
+                    formatted_date = creation_date.strftime('%Y-%m-%dT%H:%M:%S.%f')[:-3]
 
-                        query = f'''
-                        match
-                            $person isa Person, has id {row[1]};
-                            $company isa Company, has id {row[2]};
-                        insert
-                            $relation (employee: $person, employer: $company) isa workAt;
-                            $relation has creationDate {formatted_date};
-                            $relation has workFrom {row[3]};
-                        '''
+                    query = f'''
+                    match
+                        $person isa Person, has id {row[1]};
+                        $company isa Company, has id {row[2]};
+                    insert
+                        $relation (employee: $person, employer: $company) isa workAt;
+                        $relation has creationDate {formatted_date};
+                        $relation has workFrom {row[3]};
+                    '''
 
-                        tx.query.insert(query)
-                        processed_rows += 1
+                    tx.query(query).resolve()
+                    processed_rows += 1
 
-                        # Commit and start a new transaction if batch size is reached
-                        if processed_rows % batch_size == 0:
-                            tx.commit()
-                            tx = session.transaction(TransactionType.WRITE)
-                            pbar.update(batch_size)  # Update the progress bar
-
-                    # Commit the last batch if there are any remaining rows
-                    if processed_rows % batch_size != 0:
+                    # Commit and start a new transaction if batch size is reached
+                    if processed_rows % batch_size == 0:
                         tx.commit()
-                        pbar.update(processed_rows % batch_size)  # Update the progress bar
+                        tx = driver.transaction(LDBC_DB, TransactionType.WRITE)
+                        pbar.update(batch_size)  # Update the progress bar
+
+                # Commit the last batch if there are any remaining rows
+                if processed_rows % batch_size != 0:
+                    tx.commit()
+                    pbar.update(processed_rows % batch_size)  # Update the progress bar
 
     pbar.close()
 
@@ -886,36 +877,35 @@ def load_post_hasTag_tag(driver, directory, batch_size=1000):
                 csv_reader = csv.reader(csv_file, delimiter='|')
                 next(csv_reader)  # Skip the header
 
-                with driver.session("ldbcsnb", SessionType.DATA) as session:
-                    tx = session.transaction(TransactionType.WRITE)  # Start the first transaction
+                tx = driver.transaction(LDBC_DB, TransactionType.WRITE)  # Start the first transaction
 
-                    for row in csv_reader:
-                        # Extract and format the creation date
-                        creation_date = datetime.fromisoformat(row[0])
-                        formatted_date = creation_date.strftime('%Y-%m-%dT%H:%M:%S.%f')[:-3]
+                for row in csv_reader:
+                    # Extract and format the creation date
+                    creation_date = datetime.fromisoformat(row[0])
+                    formatted_date = creation_date.strftime('%Y-%m-%dT%H:%M:%S.%f')[:-3]
 
-                        query = f'''
-                        match
-                            $post isa Post, has id {row[1]};
-                            $tag isa Tag, has id {row[2]};
-                        insert
-                            $relation (tag: $tag, tagged: $post) isa hasTag;
-                            $relation has creationDate {formatted_date};
-                        '''
+                    query = f'''
+                    match
+                        $post isa Post, has id {row[1]};
+                        $tag isa Tag, has id {row[2]};
+                    insert
+                        $relation (tag: $tag, tagged: $post) isa hasTag;
+                        $relation has creationDate {formatted_date};
+                    '''
 
-                        tx.query.insert(query)
-                        processed_rows += 1
+                    tx.query(query).resolve()
+                    processed_rows += 1
 
-                        # Commit and start a new transaction if batch size is reached
-                        if processed_rows % batch_size == 0:
-                            tx.commit()
-                            tx = session.transaction(TransactionType.WRITE)
-                            pbar.update(batch_size)  # Update the progress bar
-
-                    # Commit the last batch if there are any remaining rows
-                    if processed_rows % batch_size != 0:
+                    # Commit and start a new transaction if batch size is reached
+                    if processed_rows % batch_size == 0:
                         tx.commit()
-                        pbar.update(processed_rows % batch_size)  # Update the progress bar
+                        tx = driver.transaction(LDBC_DB, TransactionType.WRITE)
+                        pbar.update(batch_size)  # Update the progress bar
+
+                # Commit the last batch if there are any remaining rows
+                if processed_rows % batch_size != 0:
+                    tx.commit()
+                    pbar.update(processed_rows % batch_size)  # Update the progress bar
 
     pbar.close()
 
@@ -971,13 +961,13 @@ def main():
     # Connect to the TypeDB server
     with TypeDB.core_driver("localhost:1729") as driver:
         # Check if the database exists
-        if driver.databases.contains("ldbcsnb"):
-            driver.databases.get("ldbcsnb").delete()
+        if driver.databases.contains(LDBC_DB):
+            driver.databases.get(LDBC_DB).delete()
         # Create a TypeDB database
-        driver.databases.create("ldbcsnb")
+        driver.databases.create(LDBC_DB)
         # print("hi")
-        with open("schema.tql", "r") as schema:
-            with driver.transaction(TransactionType.WRITE) as tx:
+        with open(os.path.join(ROOT, "schema.tql"), "r") as schema:
+            with driver.transaction(LDBC_DB, TransactionType.SCHEMA) as tx:
                 define_query = schema.read()
                 tx.query(define_query)
                 tx.commit()

@@ -98,8 +98,7 @@ entity Forum,
     plays hasMember:memberOf,
     plays hasModerator:moderated,
     plays hasTag:tagged;
-entity Message,
-    abstract,
+entity Message @abstract,
     owns id @key,
     owns browserUsed,
     owns content,
@@ -111,21 +110,20 @@ entity Message,
     plays isLocatedIn:location,
     plays likes:message,
     plays replyOf:repliedTo;
-Comment sub Message,
+entity Comment sub Message,
     plays replyOf:reply;
-Post sub Message,
+entity Post sub Message,
     owns imageFile,
     owns language,
     plays containerOf:contain;
-entity Organisation,
-    abstract,
+entity Organisation @abstract,
     owns id @key,
     owns name,
     owns url;
-Company sub Organisation,
+entity Company sub Organisation,
     plays isLocatedIn:location,
     plays workAt:employer;
-University sub Organisation,
+entity University sub Organisation,
     plays isLocatedIn:location,
     plays studyAt:university;
 entity Person,
@@ -148,17 +146,16 @@ entity Person,
     plays likes:liker,
     plays studyAt:student,
     plays workAt:employee;
-entity Place,
-    abstract,
+entity Place @abstract,
     owns id @key,
     owns name,
     owns url;
-City sub Place,
+entity City sub Place,
     plays isLocatedIn:locatedIn,
     plays isPartOf:part;
-Continent sub Place,
+entity Continent sub Place,
     plays isPartOf:partOf;
-Country sub Place,
+entity Country sub Place,
     plays isLocatedIn:locatedIn,
     plays isPartOf:part,
     plays isPartOf:partOf;
