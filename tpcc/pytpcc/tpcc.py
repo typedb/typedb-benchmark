@@ -256,7 +256,7 @@ if __name__ == '__main__':
     ## Create ScaleParameters
     scaleParameters = scaleparameters.makeWithScaleFactor(args['warehouses'], args['scalefactor'])
     if args['debug']:
-        logging.debug("Scale Parameters:\n%s", scaleParameters)
+        logging.info("Scale Parameters:\n%s", scaleParameters)
 
     ## DATA LOADER!!!
     load_time = None

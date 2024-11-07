@@ -392,6 +392,8 @@ has H_DATE {h_date}, has H_AMOUNT {h_amount}, has H_DATA "{h_data}";"""
         #     "updateStock": "UPDATE STOCK SET S_QUANTITY = ?, S_YTD = ?, S_ORDER_CNT = ?, S_REMOTE_CNT = ? WHERE S_I_ID = ? AND S_W_ID = ?", # s_quantity, s_order_cnt, s_remote_cnt, ol_i_id, ol_supply_w_id
         #     "createOrderLine": "INSERT INTO ORDER_LINE (OL_O_ID, OL_D_ID, OL_W_ID, OL_NUMBER, OL_I_ID, OL_SUPPLY_W_ID, OL_DELIVERY_D, OL_QUANTITY, OL_AMOUNT, OL_DIST_INFO) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", # o_id, d_id, w_id, ol_number, ol_i_id, ol_supply_w_id, ol_quantity, ol_amount, ol_dist_info        
         # }
+
+        print("--------> ENTERING T1")
         
         w_id = params["w_id"]
         d_id = params["d_id"]
@@ -583,6 +585,7 @@ has OL_AMOUNT {ol_amount}, has OL_DIST_INFO "{s_dist_xx}";"""
         #     "updateCustomer": "UPDATE CUSTOMER SET C_BALANCE = C_BALANCE + ? WHERE C_ID = ? AND C_D_ID = ? AND C_W_ID = ?", # ol_total, c_id, d_id, w_id
         # }
 
+        print("--------> ENTERING T2")
         
         w_id = params["w_id"]
         o_carrier_id = params["o_carrier_id"]
@@ -594,7 +597,7 @@ has OL_AMOUNT {ol_amount}, has OL_DIST_INFO "{s_dist_xx}";"""
                 q = f"""
 match
 $d isa DISTRICT, has D_ID {w_id * DPW + d_id};
-$o links, (customer: $c, district: $d) isa ORDER, has O_ID $o_id, has O_NEW_ORDER true;
+$o links (customer: $c, district: $d), isa ORDER, has O_ID $o_id, has O_NEW_ORDER true;
 $c isa CUSTOMER, has C_ID $c_id;
 select $o_id, $c_id;
 """
@@ -612,7 +615,7 @@ select $o_id, $c_id;
 match
 $d isa DISTRICT, has D_ID {w_id * DPW + d_id};
 $o links (district: $d), isa ORDER, has O_ID {no_o_id};
-$ol links  (order: $o, item: $i),  isa ORDER_LINE, has OL_QUANTITY $ol_quantity;
+$ol links (order: $o, item: $i),  isa ORDER_LINE, has OL_QUANTITY $ol_quantity;
 select $ol_quantity;
 reduce $sum = sum($ol_quantity);
 """
@@ -674,7 +677,9 @@ $ol has OL_DELIVERY_D {ol_delivery_d};
         # "getLastOrder": "SELECT O_ID FROM ORDERS WHERE O_W_ID = ? AND O_D_ID = ? AND O_C_ID = ?",
         # "getOrderLines": "SELECT OL_I_ID, OL_SUPPLY_W_ID, OL_QUANTITY, OL_AMOUNT, OL_DIST_INFO FROM ORDER_LINE WHERE OL_W_ID = ? AND OL_D_ID = ? AND OL_O_ID = ?",
         # }
-        
+
+        print("--------> ENTERING T3")
+
         w_id = params["w_id"]
         d_id = params["d_id"]
         c_id = params["c_id"]
@@ -784,6 +789,8 @@ select $i_id, $ol_supply_w_id, $ol_quantity, $ol_amount, $ol_dist_info;"""
         #     "updateGCCustomer": "UPDATE CUSTOMER SET C_BALANCE = ?, C_YTD_PAYMENT = ?, C_PAYMENT_CNT = ? WHERE C_W_ID = ? AND C_D_ID = ? AND C_ID = ?", # c_balance, c_ytd_payment, c_payment_cnt, c_w_id, c_d_id, c_id
         #     "insertHistory": "INSERT INTO HISTORY VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
         # }
+
+        print("--------> ENTERING T4")
 
         w_id = params["w_id"]
         d_id = params["d_id"]
@@ -915,9 +922,9 @@ select $d_name, $d_street_1, $d_street_2, $d_city, $d_state, $d_zip;
             q = f"""
 match
 $w isa WAREHOUSE, has W_ID {w_id}, has W_YTD $w_ytd;
-?w_ytd_new = $w_ytd + {h_amount};
+$w_ytd_new = $w_ytd + {h_amount};
 delete $w_ytd of $w;
-insert $w has W_YTD ?w_ytd_new;
+insert $w has W_YTD $w_ytd_new;
 """
             self.start_checkpoint(q)
             tx.query(q).resolve()
@@ -926,9 +933,9 @@ insert $w has W_YTD ?w_ytd_new;
             q = f"""
 match
 $d isa DISTRICT, has D_ID {w_id * DPW + d_id}, has D_YTD $d_ytd;
-?d_ytd_new = $d_ytd + {h_amount};
+$d_ytd_new = $d_ytd + {h_amount};
 delete $d_ytd of $d;
-insert $d has D_YTD ?d_ytd_new;
+insert $d has D_YTD $d_ytd_new;
 """
             self.start_checkpoint(q)
             tx.query(q).resolve()
@@ -1019,6 +1026,8 @@ $h links (customer: $c), isa CUSTOMER_HISTORY, has H_DATE {h_date}, has H_AMOUNT
         #         """,
         # }
 
+        print("--------> ENTERING T5")
+
         w_id = params["w_id"]
         d_id = params["d_id"]
         threshold = params["threshold"]
@@ -1047,9 +1056,10 @@ $o_id >= {o_id - 20};
 select $i;
 reduce $count = count;"""
             self.start_checkpoint(q)
-            response = tx.query(q).resolve().as_concept_rows()[0]
+            # Todo
+            first_response = list(tx.query(q).resolve().as_concept_rows())[0]
             self.end_checkpoint()
-            result = response.resolve().as_value().as_long()
+            result = first_response.get('count').as_long()
             
             tx.commit()
             
