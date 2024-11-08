@@ -924,7 +924,7 @@ match
 $w isa WAREHOUSE, has W_ID {w_id}, has W_YTD $w_ytd;
 $w_ytd_new = $w_ytd + {h_amount};
 delete $w_ytd of $w;
-insert $w has W_YTD $w_ytd_new;
+insert $w has W_YTD == $w_ytd_new;
 """
             self.start_checkpoint(q)
             tx.query(q).resolve()
