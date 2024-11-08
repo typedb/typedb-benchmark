@@ -140,7 +140,7 @@ class Executor:
         w_id = self.makeWarehouseId()
         d_id = self.makeDistrictId()
         c_id = self.makeCustomerId()
-        ol_cnt = rand.number(constants.MIN_OL_CNT, constants.MAX_OL_CNT)
+        ol_cnt = rand.number(constants.MIN_OL_CNT, min(constants.MAX_OL_CNT, self.scaleParameters.items))
         o_entry_d = datetime.now()
 
         ## 1% of transactions roll back

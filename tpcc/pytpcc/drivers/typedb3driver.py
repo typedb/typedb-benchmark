@@ -627,7 +627,7 @@ reduce $sum = sum($ol_quantity);
                 q = f"""
 match
 $c isa CUSTOMER, has C_ID {w_id * DPW * CPD + d_id * CPD + c_id}, has C_BALANCE $c_balance;
-?c_balance_new = $c_balance + {ol_total};
+$c_balance_new = $c_balance + {ol_total};
 $o (customer: $c) isa ORDER, has O_ID {no_o_id}, has O_NEW_ORDER $o_new_order, has O_CARRIER_ID $o_carrier_id;
 delete 
 $o_new_order of $o;
@@ -635,7 +635,7 @@ $o_carrier_id of $o;
 $c_balance of $c;
 insert 
 $o has O_NEW_ORDER false, has O_CARRIER_ID {o_carrier_id};
-$c has C_BALANCE ?c_balance_new;
+$c has C_BALANCE == $c_balance_new;
 """
                 self.start_checkpoint(q)
                 tx.query(q).resolve()
@@ -935,7 +935,7 @@ match
 $d isa DISTRICT, has D_ID {w_id * DPW + d_id}, has D_YTD $d_ytd;
 $d_ytd_new = $d_ytd + {h_amount};
 delete $d_ytd of $d;
-insert $d has D_YTD $d_ytd_new;
+insert $d has D_YTD == $d_ytd_new;
 """
             self.start_checkpoint(q)
             tx.query(q).resolve()
