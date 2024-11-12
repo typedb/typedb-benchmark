@@ -110,13 +110,15 @@ class Typedb3Driver(AbstractDriver):
     ## Simple query timer
     ## ----------------------------------------------
     def start_checkpoint(self, q):
-        print("===\n ... now running:")
-        print(q)
+        # print("===\n ... now running:")
+        # print(q)
+        return
 
     def end_checkpoint(self):
-        print(f"Time taken: {(time.time() - self.checkpoint)}")
-        self.checkpoint = time.time()
-        print("===\n\n")
+        # print(f"Time taken: {(time.time() - self.checkpoint)}")
+        # self.checkpoint = time.time()
+        # print("===\n\n")
+        return
     
     ## ----------------------------------------------
     ## loadStart
@@ -393,7 +395,7 @@ has H_DATE {h_date}, has H_AMOUNT {h_amount}, has H_DATA "{h_data}";"""
         #     "createOrderLine": "INSERT INTO ORDER_LINE (OL_O_ID, OL_D_ID, OL_W_ID, OL_NUMBER, OL_I_ID, OL_SUPPLY_W_ID, OL_DELIVERY_D, OL_QUANTITY, OL_AMOUNT, OL_DIST_INFO) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", # o_id, d_id, w_id, ol_number, ol_i_id, ol_supply_w_id, ol_quantity, ol_amount, ol_dist_info        
         # }
 
-        print("--------> ENTERING T1")
+        # print("--------> ENTERING T1")
         
         w_id = params["w_id"]
         d_id = params["d_id"]
@@ -549,8 +551,7 @@ $s has S_QUANTITY {s_quantity}, has S_YTD {s_ytd},
 has S_ORDER_CNT {s_order_cnt}, has S_REMOTE_CNT {s_remote_cnt};
 (item: $i, order: $o) isa ORDER_LINE, 
 has OL_NUMBER {ol_number}, has OL_SUPPLY_W_ID {ol_supply_w_id}, 
-has OL_DELIVERY_D {o_entry_d}, has OL_QUANTITY {ol_quantity}, 
-has OL_AMOUNT {ol_amount}, has OL_DIST_INFO "{s_dist_xx}";"""
+has OL_QUANTITY {ol_quantity}, has OL_AMOUNT {ol_amount}, has OL_DIST_INFO "{s_dist_xx}";"""
                 self.start_checkpoint(q)
                 tx.query(q).resolve()
                 self.end_checkpoint()
@@ -585,7 +586,7 @@ has OL_AMOUNT {ol_amount}, has OL_DIST_INFO "{s_dist_xx}";"""
         #     "updateCustomer": "UPDATE CUSTOMER SET C_BALANCE = C_BALANCE + ? WHERE C_ID = ? AND C_D_ID = ? AND C_W_ID = ?", # ol_total, c_id, d_id, w_id
         # }
 
-        print("--------> ENTERING T2")
+        # print("--------> ENTERING T2")
         
         w_id = params["w_id"]
         o_carrier_id = params["o_carrier_id"]
@@ -628,7 +629,7 @@ reduce $sum = sum($ol_quantity);
 match
 $c isa CUSTOMER, has C_ID {w_id * DPW * CPD + d_id * CPD + c_id}, has C_BALANCE $c_balance;
 $c_balance_new = $c_balance + {ol_total};
-$o (customer: $c) isa ORDER, has O_ID {no_o_id}, has O_NEW_ORDER $o_new_order, has O_CARRIER_ID $o_carrier_id;
+$o links (customer: $c), isa ORDER, has O_ID {no_o_id}, has O_NEW_ORDER $o_new_order, has O_CARRIER_ID $o_carrier_id;
 delete 
 $o_new_order of $o;
 $o_carrier_id of $o;
@@ -678,7 +679,7 @@ $ol has OL_DELIVERY_D {ol_delivery_d};
         # "getOrderLines": "SELECT OL_I_ID, OL_SUPPLY_W_ID, OL_QUANTITY, OL_AMOUNT, OL_DIST_INFO FROM ORDER_LINE WHERE OL_W_ID = ? AND OL_D_ID = ? AND OL_O_ID = ?",
         # }
 
-        print("--------> ENTERING T3")
+        # print("--------> ENTERING T3")
 
         w_id = params["w_id"]
         d_id = params["d_id"]
@@ -695,7 +696,7 @@ match
 $c isa CUSTOMER, has C_ID {w_id * DPW * CPD + d_id * CPD + c_id},
 has C_FIRST $c_first, has C_MIDDLE $c_middle, has C_LAST $c_last,
 has C_BALANCE $c_balance;
-select $c_first, $c_middle, $c_last,$c_balance;
+select $c_first, $c_middle, $c_last, $c_balance;
 """
                 customer = list(tx.query(q).resolve().as_concept_rows())
                 assert len(customer) == 1, f"doOrderStatus: no customer found for w_id {w_id}, d_id {d_id}, c_id {c_id}"
@@ -708,7 +709,7 @@ $d isa DISTRICT, has D_ID {w_id * DPW + d_id};
 $c links (district: $d), isa CUSTOMER, has C_ID $c_id,
 has C_FIRST $c_first, has C_MIDDLE $c_middle, has C_LAST $c_last,
 has C_BALANCE $c_balance;
-$c_last "{c_last}";
+$c_last == "{c_last}";
 select $c_id, $c_first, $c_middle, $c_last,$c_balance;
 sort $c_first asc;
 """
@@ -790,7 +791,7 @@ select $i_id, $ol_supply_w_id, $ol_quantity, $ol_amount, $ol_dist_info;"""
         #     "insertHistory": "INSERT INTO HISTORY VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
         # }
 
-        print("--------> ENTERING T4")
+        # print("--------> ENTERING T4")
 
         w_id = params["w_id"]
         d_id = params["d_id"]
@@ -1026,7 +1027,7 @@ $h links (customer: $c), isa CUSTOMER_HISTORY, has H_DATE {h_date}, has H_AMOUNT
         #         """,
         # }
 
-        print("--------> ENTERING T5")
+        # print("--------> ENTERING T5")
 
         w_id = params["w_id"]
         d_id = params["d_id"]
