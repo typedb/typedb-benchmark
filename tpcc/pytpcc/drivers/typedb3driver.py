@@ -435,15 +435,27 @@ select $i_name, $i_price, $i_data;"""
                                 'data': item[0].get('i_data').as_attribute().get_value()})
                 break
 
-            # Query: get warhouse, district, and customer info
-            # TODO: potentially remove conditions for speed
+            # Query: get warhouse, district, and customer info, then insert new order
+            all_local_int = 1 if all_local else 0
+            ol_cnt = len(i_ids)
+            o_carrier_id = constants.NULL_CARRIER_ID
             q = f"""
 match 
 $w isa WAREHOUSE, has W_ID {w_id}, has W_TAX $w_tax;
 $d isa DISTRICT, has D_ID {w_id * DPW + d_id}, has D_TAX $d_tax, has D_NEXT_O_ID $d_next_o_id;
 $c isa CUSTOMER, has C_ID {w_id * DPW * CPD + d_id * CPD + c_id}, 
 has C_DISCOUNT $c_discount, has C_LAST $c_last, has C_CREDIT $c_credit;
-select $w_tax, $d_tax, $d_next_o_id, $c_discount, $c_last, $c_credit;"""
+$d_next_o_id_old = $d_next_o_id;
+$d_next_o_id_new = $d_next_o_id_old + 1;
+delete 
+$d_next_o_id of $d;
+insert 
+$d has D_NEXT_O_ID == $d_next_o_id_new;
+$order links (district: $d, customer: $c), isa ORDER,
+has O_ID == $d_next_o_id_old,
+has O_ENTRY_D {o_entry_d}, has O_CARRIER_ID {o_carrier_id},
+has O_OL_CNT {ol_cnt}, has O_ALL_LOCAL {all_local_int}, has O_NEW_ORDER true;
+select $w_tax, $d_tax, $d_next_o_id_old, $c_discount, $c_last, $c_credit;"""
             self.start_checkpoint(q)
             general_info = list(tx.query(q).resolve().as_concept_rows())
             self.end_checkpoint()
@@ -453,32 +465,28 @@ select $w_tax, $d_tax, $d_next_o_id, $c_discount, $c_last, $c_credit;"""
                 return (None, 0)
             w_tax = general_info[0].get('w_tax').as_attribute().get_value()
             d_tax = general_info[0].get('d_tax').as_attribute().get_value()
-            d_next_o_id = general_info[0].get('d_next_o_id').as_attribute().get_value()
+            d_next_o_id = general_info[0].get('d_next_o_id_old').as_long()
             c_discount = general_info[0].get('c_discount').as_attribute().get_value()
             c_last = general_info[0].get('c_last').as_attribute().get_value()
             c_credit = general_info[0].get('c_credit').as_attribute().get_value()
 
-            ol_cnt = len(i_ids)
-            o_carrier_id = constants.NULL_CARRIER_ID
 
             # Query: update district's next order id, and create new order
-            # TODO: experiment with constraining further
-            all_local_int = 1 if all_local else 0
-            q = f"""
-match 
-$d isa DISTRICT, has D_ID {w_id * DPW + d_id}, has D_NEXT_O_ID $d_next_o_id;
-$c isa CUSTOMER, has C_ID {w_id * DPW * CPD + d_id * CPD + c_id};
-delete 
-$d_next_o_id of $d;
-insert 
-$d has D_NEXT_O_ID {d_next_o_id + 1};
-$order links (district: $d, customer: $c), isa ORDER,
-has O_ID {d_next_o_id},
-has O_ENTRY_D {o_entry_d}, has O_CARRIER_ID {o_carrier_id},
-has O_OL_CNT {ol_cnt}, has O_ALL_LOCAL {all_local_int}, has O_NEW_ORDER true;"""
-            self.start_checkpoint(q)
-            tx.query(q).resolve()
-            self.end_checkpoint()
+            # q = f"""
+# match 
+# $d isa DISTRICT, has D_ID {w_id * DPW + d_id}, has D_NEXT_O_ID $d_next_o_id;
+# $c isa CUSTOMER, has C_ID {w_id * DPW * CPD + d_id * CPD + c_id};
+# delete 
+# $d_next_o_id of $d;
+# insert 
+# $d has D_NEXT_O_ID {d_next_o_id + 1};
+# $order links (district: $d, customer: $c), isa ORDER,
+# has O_ID {d_next_o_id},
+# has O_ENTRY_D {o_entry_d}, has O_CARRIER_ID {o_carrier_id},
+# has O_OL_CNT {ol_cnt}, has O_ALL_LOCAL {all_local_int}, has O_NEW_ORDER true;"""
+            # self.start_checkpoint(q)
+            # tx.query(q).resolve()
+            # self.end_checkpoint()
 
             for i in range(len(i_ids)):
                 ol_number = i + 1
@@ -637,22 +645,27 @@ $c_balance of $c;
 insert 
 $o has O_NEW_ORDER false, has O_CARRIER_ID {o_carrier_id};
 $c has C_BALANCE == $c_balance_new;
-"""
-                self.start_checkpoint(q)
-                tx.query(q).resolve()
-                self.end_checkpoint()
-
-                q = f"""
-match
-$d isa DISTRICT, has D_ID {w_id * DPW + d_id};
-$o links (district: $d), isa ORDER, has O_ID {no_o_id};
-$ol links  (order: $o, item: $i), isa ORDER_LINE;
+select $o;
+match 
+$ol links  (order: $o), isa ORDER_LINE;
 insert
 $ol has OL_DELIVERY_D {ol_delivery_d};
 """
                 self.start_checkpoint(q)
                 tx.query(q).resolve()
                 self.end_checkpoint()
+
+#                 q = f"""
+# match
+# $d isa DISTRICT, has D_ID {w_id * DPW + d_id};
+# $o links (district: $d), isa ORDER, has O_ID {no_o_id};
+# $ol links  (order: $o, item: $i), isa ORDER_LINE;
+# insert
+# $ol has OL_DELIVERY_D {ol_delivery_d};
+# """
+#                 self.start_checkpoint(q)
+#                 tx.query(q).resolve()
+#                 self.end_checkpoint()
 
                 # If there are no order lines, SUM returns null. There should always be order lines.
                 assert ol_total != None, "ol_total is NULL: there are no order lines. This should not happen"
@@ -881,7 +894,10 @@ sort $c_first asc;
 match
 $w isa WAREHOUSE, has W_ID {w_id}, has W_NAME $w_name, 
 has W_STREET_1 $w_street_1, has W_STREET_2 $w_street_2, 
-has W_CITY $w_city, has W_STATE $w_state, has W_ZIP $w_zip;
+has W_CITY $w_city, has W_STATE $w_state, has W_ZIP $w_zip, has W_YTD $w_ytd;
+$w_ytd_new = $w_ytd + {h_amount};
+delete $w_ytd of $w;
+insert $w has W_YTD == $w_ytd_new;
 select $w_name, $w_street_1, $w_street_2, $w_city, $w_state, $w_zip;
 """
             self.start_checkpoint(q)
@@ -903,7 +919,10 @@ match
 $d isa DISTRICT, has D_ID {w_id * DPW + d_id}, 
 has D_NAME $d_name, has D_STREET_1 $d_street_1, 
 has D_STREET_2 $d_street_2, has D_CITY $d_city, 
-has D_STATE $d_state, has D_ZIP $d_zip;
+has D_STATE $d_state, has D_ZIP $d_zip, has D_YTD $d_ytd;
+$d_ytd_new = $d_ytd + {h_amount};
+delete $d_ytd of $d;
+insert $d has D_YTD == $d_ytd_new;
 select $d_name, $d_street_1, $d_street_2, $d_city, $d_state, $d_zip;
 """
             self.start_checkpoint(q)
@@ -919,29 +938,29 @@ select $d_name, $d_street_1, $d_street_2, $d_city, $d_state, $d_zip;
                 district[0].get('d_zip').as_attribute().get_value(),
             ]
             # UPDATE DISTRICT SET D_YTD = D_YTD + ? WHERE D_W_ID  = ? AND D_ID = ?
-
-            q = f"""
-match
-$w isa WAREHOUSE, has W_ID {w_id}, has W_YTD $w_ytd;
-$w_ytd_new = $w_ytd + {h_amount};
-delete $w_ytd of $w;
-insert $w has W_YTD == $w_ytd_new;
-"""
-            self.start_checkpoint(q)
-            tx.query(q).resolve()
-            self.end_checkpoint()
-
-            q = f"""
-match
-$d isa DISTRICT, has D_ID {w_id * DPW + d_id}, has D_YTD $d_ytd;
-$d_ytd_new = $d_ytd + {h_amount};
-delete $d_ytd of $d;
-insert $d has D_YTD == $d_ytd_new;
-"""
-            self.start_checkpoint(q)
-            tx.query(q).resolve()
-            self.end_checkpoint()
-
+# 
+            # q = f"""
+# match
+# $w isa WAREHOUSE, has W_ID {w_id}, has W_YTD $w_ytd;
+# $w_ytd_new = $w_ytd + {h_amount};
+# delete $w_ytd of $w;
+# insert $w has W_YTD == $w_ytd_new;
+# """
+            # self.start_checkpoint(q)
+            # tx.query(q).resolve()
+            # self.end_checkpoint()
+# 
+            # q = f"""
+# match
+# $d isa DISTRICT, has D_ID {w_id * DPW + d_id}, has D_YTD $d_ytd;
+# $d_ytd_new = $d_ytd + {h_amount};
+# delete $d_ytd of $d;
+# insert $d has D_YTD == $d_ytd_new;
+# """
+            # self.start_checkpoint(q)
+            # tx.query(q).resolve()
+            # self.end_checkpoint()
+# 
             h_data = "%s    %s" % (warehouse_data[0], district_data[0])
 
             # Update customers and history
@@ -962,7 +981,8 @@ $c_payment_cnt of $c;
 $c_data of $c;
 insert $c has C_BALANCE {c_balance}, has C_YTD_PAYMENT {c_ytd_payment}, 
 has C_PAYMENT_CNT {c_payment_cnt}, has C_DATA "{c_data}";
-"""
+$h links (customer: $c), isa CUSTOMER_HISTORY, has H_DATE {h_date}, has H_AMOUNT {h_amount}, has H_DATA "{h_data}";
+"""            # TODO: if histories keep track of w_id's this needs to be changed as well
                 self.start_checkpoint(q)
                 tx.query(q).resolve()
                 self.end_checkpoint()
@@ -979,7 +999,8 @@ $c_payment_cnt of $c;
 insert 
 $c has C_BALANCE {c_balance}, has C_YTD_PAYMENT {c_ytd_payment}, 
 has C_PAYMENT_CNT {c_payment_cnt};
-"""
+$h links (customer: $c), isa CUSTOMER_HISTORY, has H_DATE {h_date}, has H_AMOUNT {h_amount}, has H_DATA "{h_data}";
+"""             # TODO: if histories keep track of w_id's this needs to be changed as well
                 self.start_checkpoint(q)
                 tx.query(q).resolve()
                 self.end_checkpoint()
@@ -987,17 +1008,16 @@ has C_PAYMENT_CNT {c_payment_cnt};
             # Concatenate w_name, four spaces, d_name
             # Create the history record
 
-            # TODO: consider keeping track of warehouse w_id as well
-            q = f"""
-match
-$c isa CUSTOMER, has C_ID {c_w_id * DPW * CPD + c_d_id * CPD + c_id}; 
-insert
-$h links (customer: $c), isa CUSTOMER_HISTORY, has H_DATE {h_date}, has H_AMOUNT {h_amount}, has H_DATA "{h_data}";
-"""
-            self.start_checkpoint(q)
-            tx.query(q).resolve()
-            self.end_checkpoint()
-            tx.commit()
+            # q = f"""
+# match
+# $c isa CUSTOMER, has C_ID {c_w_id * DPW * CPD + c_d_id * CPD + c_id}; 
+# insert
+# $h links (customer: $c), isa CUSTOMER_HISTORY, has H_DATE {h_date}, has H_AMOUNT {h_amount}, has H_DATA "{h_data}";
+# """
+            # self.start_checkpoint(q)
+            # tx.query(q).resolve()
+            # self.end_checkpoint()
+            # tx.commit()
 
             # TPC-C 2.5.3.3: Must display the following fields:
             # W_ID, D_ID, C_ID, C_D_ID, C_W_ID, W_STREET_1, W_STREET_2, W_CITY, W_STATE, W_ZIP,
