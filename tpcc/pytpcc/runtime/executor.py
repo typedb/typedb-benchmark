@@ -106,18 +106,31 @@ class Executor:
         x = rand.number(1, 100)
         params = None
         txn = None
-        if x <= 4: ## 4%
-            txn, params = (constants.TransactionTypes.STOCK_LEVEL, self.generateStockLevelParams())
-        elif x <= 4 + 4: ## 4%
-            txn, params = (constants.TransactionTypes.DELIVERY, self.generateDeliveryParams())
-        elif x <= 4 + 4 + 4: ## 4%
-            txn, params = (constants.TransactionTypes.ORDER_STATUS, self.generateOrderStatusParams())
-        elif x <= 43 + 4 + 4 + 4: ## 43%
-            txn, params = (constants.TransactionTypes.PAYMENT, self.generatePaymentParams())
-        else: ## 45%
-            assert x > 100 - 45, "Random number wasn't within specified range or percentages don't add up (%d)" % x
-            txn, params = (constants.TransactionTypes.NEW_ORDER, self.generateNewOrderParams())
-
+        if constants.WORKLOAD is not None:
+            if constants.WORKLOAD == 1:
+                txn, params = (constants.TransactionTypes.NEW_ORDER, self.generateNewOrderParams())
+            elif constants.WORKLOAD == 2: 
+                txn, params = (constants.TransactionTypes.DELIVERY, self.generateDeliveryParams())
+            elif constants.WORKLOAD == 3:
+                txn, params = (constants.TransactionTypes.ORDER_STATUS, self.generateOrderStatusParams())
+            elif constants.WORKLOAD == 4:
+                txn, params = (constants.TransactionTypes.PAYMENT, self.generatePaymentParams())
+            elif constants.WORKLOAD == 5:
+                txn, params = (constants.TransactionTypes.STOCK_LEVEL, self.generateStockLevelParams())
+        else:
+            if x <= 4: ## 4%
+                txn, params = (constants.TransactionTypes.STOCK_LEVEL, self.generateStockLevelParams())
+            elif x <= 4 + 4: ## 4%
+                txn, params = (constants.TransactionTypes.DELIVERY, self.generateDeliveryParams())
+            elif x <= 4 + 4 + 4: ## 4%
+                txn, params = (constants.TransactionTypes.ORDER_STATUS, self.generateOrderStatusParams())
+            elif x <= 43 + 4 + 4 + 4: ## 43%
+                txn, params = (constants.TransactionTypes.PAYMENT, self.generatePaymentParams())
+            else: ## 45%
+                assert x > 100 - 45, "Random number wasn't within specified range or percentages don't add up (%d)" % x
+                txn, params = (constants.TransactionTypes.NEW_ORDER, self.generateNewOrderParams())
+    
+        
         return (txn, params)
     ## DEF
 

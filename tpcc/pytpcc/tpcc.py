@@ -37,6 +37,7 @@ import time
 import multiprocessing
 from configparser import ConfigParser
 from pprint import pprint, pformat
+import constants
 
 from util import results, scaleparameters
 from runtime import executor, loader
@@ -214,6 +215,8 @@ if __name__ == '__main__':
                          help='Disable loading the data')
     aparser.add_argument('--no-execute', action='store_true',
                          help='Disable executing the workload')
+    aparser.add_argument('--workload', default=None, type=int,
+                         help='Only run a specific workload')
     aparser.add_argument('--print-config', action='store_true',
                          help='Print out the default configuration file for the system and exit')
     aparser.add_argument('--debug', action='store_true',
@@ -233,6 +236,9 @@ if __name__ == '__main__':
         print(driver.formatConfig(config))
         print()
         sys.exit(0)
+
+    if args['workload']:
+        constants.WORKLOAD = args['workload']
 
     ## Load Configuration file
     if args['config']:

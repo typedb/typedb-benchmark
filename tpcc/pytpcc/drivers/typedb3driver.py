@@ -55,6 +55,12 @@ class Typedb3Driver(AbstractDriver):
         self.driver = None
         self.tx = None
         self.checkpoint = time.time()
+
+        self.debug_logger = logging.getLogger('debug_logger')
+        self.debug_logger.setLevel(logging.INFO)
+        handler = logging.FileHandler('debug_log.log')
+        handler.setFormatter(logging.Formatter('%(asctime)s - %(message)s'))
+        self.debug_logger.addHandler(handler)
     
     ## ----------------------------------------------
     ## makeDefaultConfig
@@ -110,14 +116,14 @@ class Typedb3Driver(AbstractDriver):
     ## Simple query timer
     ## ----------------------------------------------
     def start_checkpoint(self, q):
-        # print("===\n ... now running:")
-        # print(q)
+        print("===\n ... now running:")
+        print(q)
         return
 
     def end_checkpoint(self):
-        # print(f"Time taken: {(time.time() - self.checkpoint)}")
-        # self.checkpoint = time.time()
-        # print("===\n\n")
+        print(f"Time taken: {(time.time() - self.checkpoint)}")
+        self.checkpoint = time.time()
+        print("===\n\n")
         return
     
     ## ----------------------------------------------
@@ -248,9 +254,10 @@ has C_DATA "{c_data}";"""
 
                     q = f"""
 match 
+$d isa DISTRICT, has D_ID {o_w_id * DPW + o_d_id};
 $c isa CUSTOMER, has C_ID {o_w_id * DPW * CPD + o_d_id * CPD + o_c_id};
 insert 
-$order links (customer: $c), isa ORDER,
+$o links (customer: $c, district: $d), isa ORDER,
 has O_ID {o_id},
 has O_ENTRY_D {o_entry_d}, has O_CARRIER_ID {o_carrier_id},
 has O_OL_CNT {o_ol_cnt}, has O_ALL_LOCAL {o_all_local}, has O_NEW_ORDER false;"""
@@ -265,9 +272,9 @@ has O_OL_CNT {o_ol_cnt}, has O_ALL_LOCAL {o_all_local}, has O_NEW_ORDER false;""
                     q = f"""
 match 
 $d isa DISTRICT, has D_ID {no_w_id * DPW + no_d_id};
-$order links (district: $d), isa ORDER, has O_ID {no_o_id}, has O_NEW_ORDER $status;
-delete $status of $order;
-insert $order has O_NEW_ORDER true;
+$o links (district: $d), isa ORDER, has O_ID {no_o_id}, has O_NEW_ORDER $status;
+delete $status of $o;
+insert $o has O_NEW_ORDER true;
 """
                     write_query.append(q)
 
@@ -624,14 +631,18 @@ select $o_id, $c_id;
 match
 $d isa DISTRICT, has D_ID {w_id * DPW + d_id};
 $o links (district: $d), isa ORDER, has O_ID {no_o_id};
-$ol links (order: $o, item: $i),  isa ORDER_LINE, has OL_QUANTITY $ol_quantity;
-select $ol_quantity;
-reduce $sum = sum($ol_quantity);
+$ol links (order: $o, item: $i),  isa ORDER_LINE, has OL_AMOUNT $ol_amount;
+select $ol_amount;
+reduce $sum = sum($ol_amount);
 """
                 self.start_checkpoint(q)
                 response = list(tx.query(q).resolve().as_concept_rows())[0]
                 self.end_checkpoint()
-                ol_total = response.get("sum").as_value().as_long()
+                ol_total = response.get("sum").as_value().as_double()
+                # If there are no order lines, SUM returns null. There should always be order lines.
+                assert ol_total != None, "ol_total is NULL: there are no order lines. This should not happen"
+                assert ol_total > 0.0
+
                 
                 q = f"""
 match
@@ -667,9 +678,7 @@ $ol has OL_DELIVERY_D {ol_delivery_d};
 #                 tx.query(q).resolve()
 #                 self.end_checkpoint()
 
-                # If there are no order lines, SUM returns null. There should always be order lines.
-                assert ol_total != None, "ol_total is NULL: there are no order lines. This should not happen"
-                assert ol_total > 0.0
+
 
                 # These must be logged in the "result file" according to TPC-C 2.7.2.2 (page 39)
                 # We remove the queued time, completed time, w_id, and o_carrier_id: the client can figure

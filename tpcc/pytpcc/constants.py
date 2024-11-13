@@ -163,3 +163,5 @@ TransactionTypes = enum(
     "PAYMENT",
     "STOCK_LEVEL",
 )
+
+WORKLOAD = None
