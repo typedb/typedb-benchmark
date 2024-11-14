@@ -53,6 +53,7 @@ class TypedbDriver(AbstractDriver):
         self.driver = None
         self.session = None
         self.tx = None
+        self.items_complete_event = shared_event
     
     ## ----------------------------------------------
     ## makeDefaultConfig
@@ -117,6 +118,13 @@ class TypedbDriver(AbstractDriver):
         with self.session.transaction(TransactionType.WRITE) as tx:
             write_query = [ ]
             is_update = False;
+
+            if tableName == "ITEM":
+                pass
+            elif not self.items_complete_event.is_set():
+                logging.info("Waiting for ITEM loading to be complete ...")
+                self.items_complete_event.wait()  # Will wait until items are complete
+                logging.info("ITEM loading complete! Proceeding...")
 
             if tableName == "WAREHOUSE":
                 for tuple in tuples:
@@ -231,9 +239,10 @@ has C_DATA "{c_data}";"""
 
                     q = f"""
 match 
+$d isa DISTRICT, has D_ID {o_w_id * DPW + o_d_id};
 $c isa CUSTOMER, has C_ID {o_w_id * DPW * CPD + o_d_id * CPD + o_c_id};
 insert 
-$order (customer: $c) isa ORDER,
+$order (customer: $c, district: $d) isa ORDER,
 has O_ID {o_id},
 has O_ENTRY_D {o_entry_d}, has O_CARRIER_ID {o_carrier_id},
 has O_OL_CNT {o_ol_cnt}, has O_ALL_LOCAL {o_all_local}, has O_NEW_ORDER false;"""
@@ -355,6 +364,13 @@ has H_DATE {h_date}, has H_AMOUNT {h_amount}, has H_DATA "{h_data}";"""
     def loadFinish(self):
         logging.info("Closing write session")
         self.session.close()
+        return None
+    
+    ## ----------------------------------------------
+    ## loadFinishItem
+    ## ----------------------------------------------
+    def loadFinishItem(self):
+        self.items_complete_event.set()
         return None
 
     ## ----------------------------------------------
@@ -582,9 +598,9 @@ get $o_id, $c_id;
 match
 $d isa DISTRICT, has D_ID {w_id * DPW + d_id};
 $o (district: $d) isa ORDER, has O_ID {no_o_id};
-$ol (order: $o, item: $i) isa ORDER_LINE, has OL_QUANTITY $ol_quantity;
-get $ol_quantity;
-sum $ol_quantity;
+$ol (order: $o, item: $i) isa ORDER_LINE, has OL_AMOUNT $ol_amount;
+get $ol_amount;
+sum $ol_amount;
 """
                     response = tx.query.get_aggregate(q)
                     ol_total = response.resolve().as_value().as_long()

@@ -30,6 +30,7 @@ class Neo4JDriver(AbstractDriver):
         self.uri = None
         self.user = None
         self.password = None
+        self.items_complete_event = shared_event
     
     ## ----------------------------------------------
     ## makeDefaultConfig
@@ -75,6 +76,14 @@ class Neo4JDriver(AbstractDriver):
         if len(tuples) == 0: return
 
         with self.driver.session(database=self.database) as session:
+
+            if tableName == "ITEM":
+                pass
+            elif not self.items_complete_event.is_set():
+                logging.info("Waiting for ITEM loading to be complete ...")
+                self.items_complete_event.wait()  # Will wait until items are complete
+                logging.info("ITEM loading complete! Proceeding...")
+
             if tableName == "WAREHOUSE":
                 for tuple in tuples:
                     session.run("""
@@ -234,6 +243,13 @@ class Neo4JDriver(AbstractDriver):
     ## ----------------------------------------------
     def loadFinish(self):
         pass  # Neo4j doesn't require special handling for finishing bulk loading
+    
+    ## ----------------------------------------------
+    ## loadFinishItem
+    ## ----------------------------------------------
+    def loadFinishItem(self):
+        self.items_complete_event.set()
+        return None
 
     ## ----------------------------------------------
     ## T1: doNewOrder

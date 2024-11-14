@@ -394,12 +394,14 @@ class Typedb3Driver(AbstractDriver):
             start_time = time.time()
             for q in write_query:
                 # NOTE: one query at a time is finished
-                first_response = list(tx.query(q).resolve().as_concept_rows())[0]
-                if first_response.get('count').as_long() != 1:
-                    self.typedb_logger.debug(f"====\n INSERTING {tableName}:\n {q}\n--- FAILED ---")
+                if self.debug:
+                    first_response = list(tx.query(q).resolve().as_concept_rows())[0]
+                    if first_response.get('count').as_long() != 1:
+                        self.typedb_logger.debug(f"====\n INSERTING {tableName}:\n {q}\n--- FAILED ---")
+                    else:
+                        self.typedb_logger.debug(f"====\n INSERTING {tableName}:\n {q}\n--- SUCCESS ---")
                 else:
-                    self.typedb_logger.debug(f"====\n INSERTING {tableName}:\n {q}\n--- SUCCESS ---")
-
+                    tx.query(q).resolve()
 
             tx.commit()
             logging.info(f"Wrote {len(tuples)} instances of {tableName} with TPQ: {(time.time() - start_time) / len(tuples)}")
