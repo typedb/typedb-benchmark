@@ -211,7 +211,7 @@ class MongodbDriver(AbstractDriver):
     ]
 
 
-    def __init__(self, ddl):
+    def __init__(self, ddl, shared_event=None):
         super(MongodbDriver, self).__init__("mongodb", ddl)
         self.no_transactions = True
         self.find_and_modify = True

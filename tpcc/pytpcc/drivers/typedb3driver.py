@@ -22,6 +22,9 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import constants
 from drivers.abstractdriver import AbstractDriver
 from enum import Enum
+from multiprocessing import Event
+
+ITEMS_COMPLETE = Event()
 
 class EDITION(Enum):
     Cloud = 1
@@ -30,7 +33,6 @@ class EDITION(Enum):
 DPW = constants.DISTRICTS_PER_WAREHOUSE
 CPD = constants.CUSTOMERS_PER_DISTRICT
 DATA_COUNT = { }
-DRY_RUN = False;
 
 ## ==============================================
 ## TypeDB3Driver
@@ -43,9 +45,10 @@ class Typedb3Driver(AbstractDriver):
         "user": ("DB User", "admin" ),
         "password": ("DB Password", "password"),
         "schema": ("Script-relative path to schema file", "tql3/tpcc-schema.tql"),
+        "debug": ("Enable debug-level logging", "1"),
     }
     
-    def __init__(self, ddl):
+    def __init__(self, ddl, shared_event=None):
         super(Typedb3Driver, self).__init__("typedb", ddl)
         self.database = None
         self.addr = None
@@ -54,13 +57,17 @@ class Typedb3Driver(AbstractDriver):
         self.password = None
         self.driver = None
         self.tx = None
-        self.checkpoint = time.time()
+        self.execution_timer = None
+        self.items_complete_event = shared_event
+        self.debug = None
 
-        self.debug_logger = logging.getLogger('debug_logger')
-        self.debug_logger.setLevel(logging.INFO)
-        handler = logging.FileHandler('debug_log.log')
+        # Set up TypeDB specific logger
+        with open('typedb_log.log', 'w') as f:
+            f.write('')  # Write empty string to clear file
+        self.typedb_logger = logging.getLogger('typedb_logger')
+        handler = logging.FileHandler('typedb_log.log')
         handler.setFormatter(logging.Formatter('%(asctime)s - %(message)s'))
-        self.debug_logger.addHandler(handler)
+        self.typedb_logger.addHandler(handler)
     
     ## ----------------------------------------------
     ## makeDefaultConfig
@@ -88,6 +95,13 @@ class Typedb3Driver(AbstractDriver):
 
         self.schema = str(config["schema"])
 
+        self.debug = bool(config["debug"])
+        if self.debug:
+            self.typedb_logger.setLevel(logging.DEBUG)
+            self.execution_timer = time.time()
+        else:
+            self.typedb_logger.setLevel(logging.INFO)
+
         if self.edition is EDITION.Core:
             self.driver = TypeDB.core_driver(self.addr)
         if self.edition is EDITION.Cloud:
@@ -113,17 +127,15 @@ class Typedb3Driver(AbstractDriver):
         ## IF
 
     ## ----------------------------------------------
-    ## Simple query timer
+    ## Simple execution timer
     ## ----------------------------------------------
     def start_checkpoint(self, q):
-        print("===\n ... now running:")
-        print(q)
+        self.typedb_logger.debug(f"===Running query:\n {q}")
         return
 
     def end_checkpoint(self):
-        print(f"Time taken: {(time.time() - self.checkpoint)}")
-        self.checkpoint = time.time()
-        print("===\n\n")
+        self.typedb_logger.debug(f"Time taken: {(time.time() - self.execution_timer)}===\n\n")
+        self.execution_timer = time.time()
         return
     
     ## ----------------------------------------------
@@ -141,6 +153,13 @@ class Typedb3Driver(AbstractDriver):
         with self.driver.transaction(self.database, TransactionType.WRITE) as tx:
             write_query = [ ]
 
+            if tableName == "ITEM":
+                pass
+            elif not self.items_complete_event.is_set():
+                logging.info("Waiting for ITEM loading to be complete ...")
+                self.items_complete_event.wait()  # Will wait until items are complete
+                logging.info("ITEM loading complete! Proceeding...")
+
             if tableName == "WAREHOUSE":
                 for tuple in tuples:
                     w_id = tuple[0]
@@ -154,11 +173,12 @@ class Typedb3Driver(AbstractDriver):
                     w_ytd = tuple[8]
 
                     q = f"""
-insert 
-$warehouse isa WAREHOUSE, 
-has W_ID {w_id}, has W_NAME "{w_name}", has W_STREET_1 "{w_street_1}", 
-has W_STREET_2 "{w_street_2}", has W_CITY "{w_city}", has W_STATE "{w_state}", 
-has W_ZIP "{w_zip}", has W_TAX {w_tax}, has W_YTD {w_ytd};"""
+    insert 
+    $warehouse isa WAREHOUSE, 
+    has W_ID {w_id}, has W_NAME "{w_name}", has W_STREET_1 "{w_street_1}", 
+    has W_STREET_2 "{w_street_2}", has W_CITY "{w_city}", has W_STATE "{w_state}", 
+    has W_ZIP "{w_zip}", has W_TAX {w_tax}, has W_YTD {w_ytd};
+    reduce $count = count;"""
                     write_query.append(q)
 
             if tableName == "DISTRICT":
@@ -176,14 +196,15 @@ has W_ZIP "{w_zip}", has W_TAX {w_tax}, has W_YTD {w_ytd};"""
                     d_next_o_id = tuple[10]
 
                     q = f"""
-match 
-$w isa WAREHOUSE, has W_ID {d_w_id};
-insert 
-$district links (warehouse: $w), isa DISTRICT,
-has D_ID {d_w_id * DPW + d_id}, has D_NAME "{d_name}",
-has D_STREET_1 "{d_street_1}", has D_STREET_2 "{d_street_2}",
-has D_CITY "{d_city}", has D_STATE "{d_state}", has D_ZIP "{d_zip}",
-has D_TAX {d_tax}, has D_YTD {d_ytd}, has D_NEXT_O_ID {d_next_o_id};"""
+    match 
+    $w isa WAREHOUSE, has W_ID {d_w_id};
+    insert 
+    $district links (warehouse: $w), isa DISTRICT,
+    has D_ID {d_w_id * DPW + d_id}, has D_NAME "{d_name}",
+    has D_STREET_1 "{d_street_1}", has D_STREET_2 "{d_street_2}",
+    has D_CITY "{d_city}", has D_STATE "{d_state}", has D_ZIP "{d_zip}",
+    has D_TAX {d_tax}, has D_YTD {d_ytd}, has D_NEXT_O_ID {d_next_o_id};
+    reduce $count = count;"""
                     write_query.append(q)
 
             if tableName == "ITEM":
@@ -195,10 +216,11 @@ has D_TAX {d_tax}, has D_YTD {d_ytd}, has D_NEXT_O_ID {d_next_o_id};"""
                     i_data = tuple[4]
 
                     q = f"""
-insert 
-$item isa ITEM,
-has I_ID {i_id}, has I_IM_ID {i_im_id}, has I_NAME "{i_name}",
-has I_PRICE {i_price}, has I_DATA "{i_data}";"""
+    insert 
+    $item isa ITEM,
+    has I_ID {i_id}, has I_IM_ID {i_im_id}, has I_NAME "{i_name}",
+    has I_PRICE {i_price}, has I_DATA "{i_data}";
+    reduce $count = count;"""
                     write_query.append(q)
 
             if tableName == "CUSTOMER":
@@ -226,19 +248,20 @@ has I_PRICE {i_price}, has I_DATA "{i_data}";"""
                     c_data = tuple[20]
 
                     q = f"""
-match
-$d isa DISTRICT, has D_ID {c_w_id * DPW + c_d_id};
-insert 
-$customer links (district: $d), isa CUSTOMER,
-has C_ID {c_w_id * DPW * CPD + c_d_id * CPD + c_id}, 
-has C_FIRST "{c_first}", has C_MIDDLE "{c_middle}", has C_LAST "{c_last}",
-has C_STREET_1 "{c_street_1}", has C_STREET_2 "{c_street_2}",
-has C_CITY "{c_city}", has C_STATE "{c_state}", has C_ZIP "{c_zip}",
-has C_PHONE "{c_phone}", has C_SINCE {c_since}, has C_CREDIT "{c_credit}",
-has C_CREDIT_LIM {c_credit_lim}, has C_DISCOUNT {c_discount},
-has C_BALANCE {c_balance}, has C_YTD_PAYMENT {c_ytd_payment},
-has C_PAYMENT_CNT {c_payment_cnt}, has C_DELIVERY_CNT {c_delivery_cnt},
-has C_DATA "{c_data}";"""
+    match
+    $d isa DISTRICT, has D_ID {c_w_id * DPW + c_d_id};
+    insert 
+    $customer links (district: $d), isa CUSTOMER,
+    has C_ID {c_w_id * DPW * CPD + c_d_id * CPD + c_id}, 
+    has C_FIRST "{c_first}", has C_MIDDLE "{c_middle}", has C_LAST "{c_last}",
+    has C_STREET_1 "{c_street_1}", has C_STREET_2 "{c_street_2}",
+    has C_CITY "{c_city}", has C_STATE "{c_state}", has C_ZIP "{c_zip}",
+    has C_PHONE "{c_phone}", has C_SINCE {c_since}, has C_CREDIT "{c_credit}",
+    has C_CREDIT_LIM {c_credit_lim}, has C_DISCOUNT {c_discount},
+    has C_BALANCE {c_balance}, has C_YTD_PAYMENT {c_ytd_payment},
+    has C_PAYMENT_CNT {c_payment_cnt}, has C_DELIVERY_CNT {c_delivery_cnt},
+    has C_DATA "{c_data}";
+    reduce $count = count;"""
                     write_query.append(q)
 
             if tableName == "ORDERS":
@@ -253,14 +276,15 @@ has C_DATA "{c_data}";"""
                     o_all_local = tuple[7]
 
                     q = f"""
-match 
-$d isa DISTRICT, has D_ID {o_w_id * DPW + o_d_id};
-$c isa CUSTOMER, has C_ID {o_w_id * DPW * CPD + o_d_id * CPD + o_c_id};
-insert 
-$o links (customer: $c, district: $d), isa ORDER,
-has O_ID {o_id},
-has O_ENTRY_D {o_entry_d}, has O_CARRIER_ID {o_carrier_id},
-has O_OL_CNT {o_ol_cnt}, has O_ALL_LOCAL {o_all_local}, has O_NEW_ORDER false;"""
+    match 
+    $d isa DISTRICT, has D_ID {o_w_id * DPW + o_d_id};
+    $c isa CUSTOMER, has C_ID {o_w_id * DPW * CPD + o_d_id * CPD + o_c_id};
+    insert 
+    $o links (customer: $c, district: $d), isa ORDER,
+    has O_ID {o_id},
+    has O_ENTRY_D {o_entry_d}, has O_CARRIER_ID {o_carrier_id},
+    has O_OL_CNT {o_ol_cnt}, has O_ALL_LOCAL {o_all_local}, has O_NEW_ORDER false;
+    reduce $count = count;"""
                     write_query.append(q)
 
             if tableName == "NEW_ORDER":
@@ -270,12 +294,12 @@ has O_OL_CNT {o_ol_cnt}, has O_ALL_LOCAL {o_all_local}, has O_NEW_ORDER false;""
                     no_w_id = tuple[2]
 
                     q = f"""
-match 
-$d isa DISTRICT, has D_ID {no_w_id * DPW + no_d_id};
-$o links (district: $d), isa ORDER, has O_ID {no_o_id}, has O_NEW_ORDER $status;
-delete $status of $o;
-insert $o has O_NEW_ORDER true;
-"""
+    match 
+    $d isa DISTRICT, has D_ID {no_w_id * DPW + no_d_id};
+    $o links (district: $d), isa ORDER, has O_ID {no_o_id}, has O_NEW_ORDER $status;
+    delete $status of $o;
+    insert $o has O_NEW_ORDER true;
+    reduce $count = count;"""
                     write_query.append(q)
 
             if tableName == "ORDER_LINE":
@@ -296,18 +320,18 @@ insert $o has O_NEW_ORDER true;
                     ol_dist_info = tuple[9]
 
                     q = f"""
-match 
-$w isa WAREHOUSE, has W_ID {ol_w_id};
-$d isa DISTRICT, has D_ID {ol_w_id * DPW + ol_d_id};
-$order links (district: $d), isa ORDER, has O_ID {ol_o_id};
-$item has I_ID {ol_i_id};
-insert 
-$order_line links (order: $order, item: $item), isa ORDER_LINE,
-has OL_NUMBER {ol_number}, has OL_SUPPLY_W_ID {ol_supply_w_id},
-""" + has_ol_delivery_d + f"""
-has OL_QUANTITY {ol_quantity}, has OL_AMOUNT {ol_amount},
-has OL_DIST_INFO "{ol_dist_info}";
-"""
+    match 
+    $w isa WAREHOUSE, has W_ID {ol_w_id};
+    $d isa DISTRICT, has D_ID {ol_w_id * DPW + ol_d_id};
+    $order links (district: $d), isa ORDER, has O_ID {ol_o_id};
+    $item has I_ID {ol_i_id};
+    insert 
+    $order_line links (order: $order, item: $item), isa ORDER_LINE,
+    has OL_NUMBER {ol_number}, has OL_SUPPLY_W_ID {ol_supply_w_id},
+    """ + has_ol_delivery_d + f"""
+    has OL_QUANTITY {ol_quantity}, has OL_AMOUNT {ol_amount},
+    has OL_DIST_INFO "{ol_dist_info}";
+    reduce $count = count;"""
                     write_query.append(q)
     
             if tableName == "STOCK":
@@ -321,24 +345,26 @@ has OL_DIST_INFO "{ol_dist_info}";
                     s_data = tuple[16]
 
                     q_stock = f"""
-match 
-$i isa ITEM, has I_ID {s_i_id};   
-$w isa WAREHOUSE, has W_ID {s_w_id};
-insert 
-$stock links (item: $i, warehouse: $w), isa STOCKING, 
-has S_QUANTITY {s_quantity}, has S_YTD {s_ytd}, has S_ORDER_CNT {s_order_cnt},
-has S_REMOTE_CNT {s_remote_cnt}, has S_DATA "{s_data}";"""
+    match 
+    $i isa ITEM, has I_ID {s_i_id};   
+    $w isa WAREHOUSE, has W_ID {s_w_id};
+    insert 
+    $stock links (item: $i, warehouse: $w), isa STOCKING, 
+    has S_QUANTITY {s_quantity}, has S_YTD {s_ytd}, has S_ORDER_CNT {s_order_cnt},
+    has S_REMOTE_CNT {s_remote_cnt}, has S_DATA "{s_data}";
+    reduce $count = count;"""
                     write_query.append(q_stock)
     
                     for i in range(1, 11):
 
                         q_stock_info = f"""
-match 
-$i isa ITEM, has I_ID {s_i_id};
-$w isa WAREHOUSE, has W_ID {s_w_id};   
-$stock links (item: $i, warehouse: $w), isa STOCKING;
-insert
-$stock has S_DIST_{i} "{tuple[2+i]}";"""
+    match 
+    $i isa ITEM, has I_ID {s_i_id};
+    $w isa WAREHOUSE, has W_ID {s_w_id};   
+    $stock links (item: $i, warehouse: $w), isa STOCKING;
+    insert
+    $stock has S_DIST_{i} "{tuple[2+i]}";
+    reduce $count = count;"""
                         write_query.append(q_stock_info)
 
     
@@ -353,35 +379,44 @@ $stock has S_DIST_{i} "{tuple[2+i]}";"""
 
                     # TODO: consider keeping track of warehouse w_id as well 
                     q = f"""
-match 
-$c isa CUSTOMER, has C_ID {h_w_id * DPW * CPD + h_d_id * CPD + h_c_id};
-insert 
-$history links (customer: $c), isa CUSTOMER_HISTORY,
-has H_DATE {h_date}, has H_AMOUNT {h_amount}, has H_DATA "{h_data}";"""
+    match 
+    $c isa CUSTOMER, has C_ID {h_w_id * DPW * CPD + h_d_id * CPD + h_c_id};
+    insert 
+    $history links (customer: $c), isa CUSTOMER_HISTORY,
+    has H_DATE {h_date}, has H_AMOUNT {h_amount}, has H_DATA "{h_data}";
+    reduce $count = count;"""
                     write_query.append(q)
 
             if tableName not in DATA_COUNT:
                 DATA_COUNT[tableName] = 0;
             DATA_COUNT[tableName] += len(write_query);
 
-            logging.info("Running %d queries for type %s" % (len(tuples), tableName))
             start_time = time.time()
-            for query in write_query:
+            for q in write_query:
                 # NOTE: one query at a time is finished
-                if not DRY_RUN:
-                    tx.query(query).resolve()
+                first_response = list(tx.query(q).resolve().as_concept_rows())[0]
+                if first_response.get('count').as_long() != 1:
+                    self.typedb_logger.debug(f"====\n INSERTING {tableName}:\n {q}\n--- FAILED ---")
+                else:
+                    self.typedb_logger.debug(f"====\n INSERTING {tableName}:\n {q}\n--- SUCCESS ---")
 
-            logging.info("Committing %d queries for type %s" % (len(tuples), tableName))
-            if not DRY_RUN:
-                tx.commit()
-            logging.info(f"Committed! Time per query (without any concurrency): {(time.time() - start_time) / len(tuples)}")
+
+            tx.commit()
+            logging.info(f"Wrote {len(tuples)} instances of {tableName} with TPQ: {(time.time() - start_time) / len(tuples)}")
         return
 
     ## ----------------------------------------------
     ## loadFinish
     ## ----------------------------------------------
     def loadFinish(self):
-        logging.info("Data Count Summary:\n%s" % pformat(DATA_COUNT))
+        logging.info("COMPLETE! Data loaded by this worker thread:\n%s" % pformat(DATA_COUNT))
+        return None
+    
+    ## ----------------------------------------------
+    ## loadFinishItem
+    ## ----------------------------------------------
+    def loadFinishItem(self):
+        self.items_complete_event.set()
         return None
 
     ## ----------------------------------------------

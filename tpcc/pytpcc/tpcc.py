@@ -83,6 +83,8 @@ def getDrivers():
 ## ==============================================
 def startLoading(driverClass, scaleParameters, args, config):
     logging.debug("Creating client pool with %d processes", args['clients'])
+    manager = multiprocessing.Manager()
+    items_complete_event = manager.Event()
     pool = multiprocessing.Pool(args['clients'])
 
     # Split the warehouses into chunks
@@ -98,7 +100,7 @@ def startLoading(driverClass, scaleParameters, args, config):
     except KeyError:
         print()
     for i in range(args['clients']):
-        r = pool.apply_async(loaderFunc, (driverClass, scaleParameters, args, config, w_ids[i]))
+        r = pool.apply_async(loaderFunc, (driverClass, scaleParameters, args, config, w_ids[i], items_complete_event))
         loader_results.append(r)
     ## FOR
 
@@ -110,8 +112,8 @@ def startLoading(driverClass, scaleParameters, args, config):
 ## ==============================================
 ## loaderFunc
 ## ==============================================
-def loaderFunc(driverClass, scaleParameters, args, config, w_ids):
-    driver = driverClass(args['ddl'])
+def loaderFunc(driverClass, scaleParameters, args, config, w_ids, items_complete_event=None):
+    driver = driverClass(args['ddl'], items_complete_event)
     assert driver != None, "Driver in loadFunc is none!"
     logging.debug("Starting client execution: %s [warehouses=%d]", driver, len(w_ids))
 
