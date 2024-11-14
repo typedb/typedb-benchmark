@@ -113,7 +113,8 @@ def startLoading(driverClass, scaleParameters, args, config):
 ## loaderFunc
 ## ==============================================
 def loaderFunc(driverClass, scaleParameters, args, config, w_ids, items_complete_event=None):
-    driver = driverClass(args['ddl'], items_complete_event)
+    p_id = multiprocessing.current_process()
+    driver = driverClass(args['ddl'], p_id, items_complete_event)
     assert driver != None, "Driver in loadFunc is none!"
     logging.debug("Starting client execution: %s [warehouses=%d]", driver, len(w_ids))
 

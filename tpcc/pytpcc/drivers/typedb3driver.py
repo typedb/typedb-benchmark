@@ -48,7 +48,7 @@ class Typedb3Driver(AbstractDriver):
         "debug": ("Enable debug-level logging", "1"),
     }
     
-    def __init__(self, ddl, shared_event=None):
+    def __init__(self, ddl, p_id='Main', shared_event=None):
         super(Typedb3Driver, self).__init__("typedb", ddl)
         self.database = None
         self.addr = None
@@ -58,12 +58,14 @@ class Typedb3Driver(AbstractDriver):
         self.driver = None
         self.tx = None
         self.execution_timer = None
+        self.pid = p_id.name.replace('-','_') if hasattr(p_id, 'name') else p_id
         self.items_complete_event = shared_event
         self.debug = None
+        self.retry = False # TODO: remove retry code when not needed any longer
+        self.retry_wait_time = 0.005
+        self.max_retries = 10;
 
         # Set up TypeDB specific logger
-        with open('typedb_log.log', 'w') as f:
-            f.write('')  # Write empty string to clear file
         self.typedb_logger = logging.getLogger('typedb_logger')
         handler = logging.FileHandler('typedb_log.log')
         handler.setFormatter(logging.Formatter('%(asctime)s - %(message)s'))
@@ -130,18 +132,22 @@ class Typedb3Driver(AbstractDriver):
     ## Simple execution timer
     ## ----------------------------------------------
     def start_checkpoint(self, q):
-        self.typedb_logger.debug(f"===Running query:\n {q}")
+        if self.debug:
+            self.typedb_logger.debug(f"\n EXECUTING QUERY:\n{q}")
         return
 
     def end_checkpoint(self):
-        self.typedb_logger.debug(f"Time taken: {(time.time() - self.execution_timer)}===\n\n")
-        self.execution_timer = time.time()
+        if self.debug:
+            self.typedb_logger.debug(f"--- Time taken: {(time.time() - self.execution_timer)} ---\n\n")
+            self.execution_timer = time.time()
         return
     
     ## ----------------------------------------------
     ## loadStart
     ## ----------------------------------------------
     def loadStart(self):
+        with open('typedb_log.log', 'w') as f:
+            f.write('')
         return None
 
     ## ----------------------------------------------
@@ -157,7 +163,7 @@ class Typedb3Driver(AbstractDriver):
                 pass
             elif not self.items_complete_event.is_set():
                 logging.info("Waiting for ITEM loading to be complete ...")
-                self.items_complete_event.wait()  # Will wait until items are complete
+                self.items_complete_event.wait()  # We wait until item loading is complete
                 logging.info("ITEM loading complete! Proceeding...")
 
             if tableName == "WAREHOUSE":
@@ -393,17 +399,35 @@ class Typedb3Driver(AbstractDriver):
 
             start_time = time.time()
             for q in write_query:
-                # NOTE: one query at a time is finished
-                if self.debug:
-                    first_response = list(tx.query(q).resolve().as_concept_rows())[0]
-                    if first_response.get('count').as_long() != 1:
-                        self.typedb_logger.debug(f"====\n INSERTING {tableName}:\n {q}\n--- FAILED ---")
-                    else:
-                        self.typedb_logger.debug(f"====\n INSERTING {tableName}:\n {q}\n--- SUCCESS ---")
+                if self.retry:
+                    success = list(tx.query(q).resolve().as_concept_rows())[0].get('count').as_long()
+                    if self.debug and success != 1:
+                        self.typedb_logger.debug(f"PROCESS {self.pid}\n FAILED INSERT: COUNT {success}... retrying")
+                    retry_count = 0
+                    while success == 0 and retry_count < self.max_retries:
+                        time.sleep(self.retry_wait_time)
+                        retry_count += 1
+                        with self.driver.transaction(self.database, TransactionType.WRITE) as new_tx:
+                            success = list(new_tx.query(q).resolve().as_concept_rows())[0].get('count').as_long()
+                            new_tx.commit()
+                    if self.debug:
+                        if success != 1:
+                            self.typedb_logger.debug(f"PROCESS {self.pid}\n INSERTING {tableName}:{q}\n--- FAILED ({retry_count} retries) ---")
+                        else:
+                            self.typedb_logger.debug(f"PROCESS {self.pid}\n INSERTING {tableName}:{q}\n--- SUCCESS ({retry_count} retries) ---")
                 else:
-                    tx.query(q).resolve()
+                    if self.debug:
+                        success = list(tx.query(q).resolve().as_concept_rows())[0].get('count').as_long()
+                        if success != 1:
+                            self.typedb_logger.debug(f"PROCESS {self.pid}\n INSERTING {tableName}:{q}\n--- FAILED ---")
+                        else:
+                            self.typedb_logger.debug(f"PROCESS {self.pid}\n INSERTING {tableName}:{q}\n--- SUCCESS ---")
+                    else:
+                        tx.query(q).resolve()
 
             tx.commit()
+            if self.debug:
+                self.typedb_logger.debug(f"PROCESS {self.pid}\n=== COMMIT ({len(tuples)} {tableName}) ===")
             logging.info(f"Wrote {len(tuples)} instances of {tableName} with TPQ: {(time.time() - start_time) / len(tuples)}")
         return
 
@@ -506,6 +530,7 @@ select $w_tax, $d_tax, $d_next_o_id_old, $c_discount, $c_last, $c_credit;"""
             
             if len(general_info) == 0:
                 logging.warn("No general info for warehouse %d" % w_id)
+                self.typedb_logger.debug("--- FAILED ---")
                 return (None, 0)
             w_tax = general_info[0].get('w_tax').as_attribute().get_value()
             d_tax = general_info[0].get('d_tax').as_attribute().get_value()
