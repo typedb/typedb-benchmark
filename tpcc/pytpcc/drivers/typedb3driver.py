@@ -48,7 +48,7 @@ class Typedb3Driver(AbstractDriver):
         "debug": ("Enable debug-level logging", "0"),
     }
     
-    def __init__(self, ddl, p_id='Main', shared_event=None):
+    def __init__(self, ddl, shared_event=None):
         super(Typedb3Driver, self).__init__("typedb", ddl)
         self.database = None
         self.addr = None
@@ -58,7 +58,6 @@ class Typedb3Driver(AbstractDriver):
         self.driver = None
         self.tx = None
         self.execution_timer = None
-        self.pid = p_id.name.replace('-','_') if hasattr(p_id, 'name') else p_id
         self.items_complete_event = shared_event
         self.debug = None
 
