@@ -45,7 +45,7 @@ class Typedb3Driver(AbstractDriver):
         "user": ("DB User", "admin" ),
         "password": ("DB Password", "password"),
         "schema": ("Script-relative path to schema file", "tql3/tpcc-schema.tql"),
-        "debug": ("Enable debug-level logging", "1"),
+        "debug": ("Enable debug-level logging", "0"),
     }
     
     def __init__(self, ddl, p_id='Main', shared_event=None):
@@ -61,9 +61,6 @@ class Typedb3Driver(AbstractDriver):
         self.pid = p_id.name.replace('-','_') if hasattr(p_id, 'name') else p_id
         self.items_complete_event = shared_event
         self.debug = None
-        self.retry = False # TODO: remove retry code when not needed any longer
-        self.retry_wait_time = 0.005
-        self.max_retries = 10;
 
         # Set up TypeDB specific logger
         self.typedb_logger = logging.getLogger('typedb_logger')
@@ -398,36 +395,13 @@ class Typedb3Driver(AbstractDriver):
             DATA_COUNT[tableName] += len(write_query);
 
             start_time = time.time()
+            promises = [ ]
             for q in write_query:
-                if self.retry:
-                    success = list(tx.query(q).resolve().as_concept_rows())[0].get('count').as_long()
-                    if self.debug and success != 1:
-                        self.typedb_logger.debug(f"PROCESS {self.pid}\n FAILED INSERT: COUNT {success}... retrying")
-                    retry_count = 0
-                    while success == 0 and retry_count < self.max_retries:
-                        time.sleep(self.retry_wait_time)
-                        retry_count += 1
-                        with self.driver.transaction(self.database, TransactionType.WRITE) as new_tx:
-                            success = list(new_tx.query(q).resolve().as_concept_rows())[0].get('count').as_long()
-                            new_tx.commit()
-                    if self.debug:
-                        if success != 1:
-                            self.typedb_logger.debug(f"PROCESS {self.pid}\n INSERTING {tableName}:{q}\n--- FAILED ({retry_count} retries) ---")
-                        else:
-                            self.typedb_logger.debug(f"PROCESS {self.pid}\n INSERTING {tableName}:{q}\n--- SUCCESS ({retry_count} retries) ---")
-                else:
-                    if self.debug:
-                        success = list(tx.query(q).resolve().as_concept_rows())[0].get('count').as_long()
-                        if success != 1:
-                            self.typedb_logger.debug(f"PROCESS {self.pid}\n INSERTING {tableName}:{q}\n--- FAILED ---")
-                        else:
-                            self.typedb_logger.debug(f"PROCESS {self.pid}\n INSERTING {tableName}:{q}\n--- SUCCESS ---")
-                    else:
-                        tx.query(q).resolve()
+                promises.append(tx.query(q))
 
+            for p in promises:
+                p.resolve()
             tx.commit()
-            if self.debug:
-                self.typedb_logger.debug(f"PROCESS {self.pid}\n=== COMMIT ({len(tuples)} {tableName}) ===")
             logging.info(f"Wrote {len(tuples)} instances of {tableName} with TPQ: {(time.time() - start_time) / len(tuples)}")
         return
 
