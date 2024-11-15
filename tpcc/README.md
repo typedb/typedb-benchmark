@@ -65,7 +65,7 @@ There are 5 workloads (T1... T5):
 * Run the data loading:
 
   ```
-  tpcc.py --warehouses=X --scalefactor=100 --no-execute --reset --clients=Y typedb
+  tpcc.py --warehouses=X --scalefactor=100 --no-execute --reset --clients=Y typedb2
   ```
 
 #### Query the data
@@ -74,7 +74,7 @@ There are 5 workloads (T1... T5):
 * Run the workloads:
 
   ```
-  tpcc.py --warehouses=X --scalefactor=100 --no-load --clients=Y typedb
+  tpcc.py --warehouses=X --scalefactor=100 --no-load --clients=Y typedb2
   ```
 
 ### Postgres

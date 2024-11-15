@@ -33,7 +33,7 @@ CPD = constants.CUSTOMERS_PER_DISTRICT
 ## ==============================================
 ## TypeDBDriver
 ## ==============================================
-class TypedbDriver(AbstractDriver):
+class Typedb2Driver(AbstractDriver):
     DEFAULT_CONFIG = {
         "database": ("Name of DB", "tpcc" ),
         "addr": ("Address of server", "127.0.0.1:1729" ),
@@ -44,7 +44,7 @@ class TypedbDriver(AbstractDriver):
     }
     
     def __init__(self, ddl, shared_event=None):
-        super(TypedbDriver, self).__init__("typedb", ddl)
+        super(Typedb2Driver, self).__init__("typedb", ddl)
         self.database = None
         self.addr = None
         self.edition = None
@@ -59,14 +59,14 @@ class TypedbDriver(AbstractDriver):
     ## makeDefaultConfig
     ## ----------------------------------------------
     def makeDefaultConfig(self):
-        return TypedbDriver.DEFAULT_CONFIG
+        return Typedb2Driver.DEFAULT_CONFIG
     
     ## ----------------------------------------------
     ## loadConfig
     ## ----------------------------------------------
     def loadConfig(self, config):
         # Config passed here contains some extra parameters (see `driver.loadConfig` in tpcc.py)
-        for key in TypedbDriver.DEFAULT_CONFIG.keys():
+        for key in Typedb2Driver.DEFAULT_CONFIG.keys():
             assert key in config, "Missing parameter '%s' in %s configuration" % (key, self.name)
         
         self.database = str(config["database"])
