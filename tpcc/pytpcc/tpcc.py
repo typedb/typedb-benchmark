@@ -37,6 +37,7 @@ import time
 import multiprocessing
 from configparser import ConfigParser
 from pprint import pprint, pformat
+import constants
 
 from util import results, scaleparameters
 from runtime import executor, loader
@@ -82,6 +83,8 @@ def getDrivers():
 ## ==============================================
 def startLoading(driverClass, scaleParameters, args, config):
     logging.debug("Creating client pool with %d processes", args['clients'])
+    manager = multiprocessing.Manager()
+    items_complete_event = manager.Event()
     pool = multiprocessing.Pool(args['clients'])
 
     # Split the warehouses into chunks
@@ -97,7 +100,7 @@ def startLoading(driverClass, scaleParameters, args, config):
     except KeyError:
         print()
     for i in range(args['clients']):
-        r = pool.apply_async(loaderFunc, (driverClass, scaleParameters, args, config, w_ids[i]))
+        r = pool.apply_async(loaderFunc, (driverClass, scaleParameters, args, config, w_ids[i], items_complete_event))
         loader_results.append(r)
     ## FOR
 
@@ -109,8 +112,9 @@ def startLoading(driverClass, scaleParameters, args, config):
 ## ==============================================
 ## loaderFunc
 ## ==============================================
-def loaderFunc(driverClass, scaleParameters, args, config, w_ids):
-    driver = driverClass(args['ddl'])
+def loaderFunc(driverClass, scaleParameters, args, config, w_ids, items_complete_event=None):
+    # p_id = multiprocessing.current_process()
+    driver = driverClass(args['ddl'], items_complete_event)
     assert driver != None, "Driver in loadFunc is none!"
     logging.debug("Starting client execution: %s [warehouses=%d]", driver, len(w_ids))
 
@@ -214,6 +218,8 @@ if __name__ == '__main__':
                          help='Disable loading the data')
     aparser.add_argument('--no-execute', action='store_true',
                          help='Disable executing the workload')
+    aparser.add_argument('--workload', default=None, type=int,
+                         help='Only run a specific workload')
     aparser.add_argument('--print-config', action='store_true',
                          help='Print out the default configuration file for the system and exit')
     aparser.add_argument('--debug', action='store_true',
@@ -233,6 +239,9 @@ if __name__ == '__main__':
         print(driver.formatConfig(config))
         print()
         sys.exit(0)
+
+    if args['workload']:
+        constants.WORKLOAD = args['workload']
 
     ## Load Configuration file
     if args['config']:
@@ -256,7 +265,7 @@ if __name__ == '__main__':
     ## Create ScaleParameters
     scaleParameters = scaleparameters.makeWithScaleFactor(args['warehouses'], args['scalefactor'])
     if args['debug']:
-        logging.debug("Scale Parameters:\n%s", scaleParameters)
+        logging.info("Scale Parameters:\n%s", scaleParameters)
 
     ## DATA LOADER!!!
     load_time = None

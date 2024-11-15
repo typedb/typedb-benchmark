@@ -108,7 +108,7 @@ class SqliteDriver(AbstractDriver):
         "database": ("The path to the SQLite database", "/tmp/tpcc.db" ),
     }
     
-    def __init__(self, ddl):
+    def __init__(self, ddl, shared_event=None):
         super(SqliteDriver, self).__init__("sqlite", ddl)
         self.database = None
         self.conn = None
