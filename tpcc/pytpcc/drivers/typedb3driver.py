@@ -157,7 +157,7 @@ class Typedb3Driver(AbstractDriver):
 
             if tableName == "ITEM":
                 pass
-            elif not self.items_complete_event.is_set():
+            elif self.items_complete_event and not self.items_complete_event.is_set():
                 logging.info("Waiting for ITEM loading to be complete ...")
                 self.items_complete_event.wait()  # We wait until item loading is complete
                 logging.info("ITEM loading complete! Proceeding...")
@@ -415,7 +415,8 @@ class Typedb3Driver(AbstractDriver):
     ## loadFinishItem
     ## ----------------------------------------------
     def loadFinishItem(self):
-        self.items_complete_event.set()
+        if self.items_complete_event:
+            self.items_complete_event.set()
         return None
 
     ## ----------------------------------------------
