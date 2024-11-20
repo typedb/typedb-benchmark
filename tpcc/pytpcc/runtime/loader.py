@@ -148,7 +148,6 @@ class Loader:
                 ## This is a new order: make one for it
                 if newOrder: no_tuples.append([o_id, d_id, w_id])
             ## FOR
-
             logging.debug("Loading DISTRICT")
             self.handle.loadTuples(constants.TABLENAME_DISTRICT, d_tuples)
             logging.debug("Loading CUSTOMER")
@@ -161,7 +160,7 @@ class Loader:
             self.handle.loadTuples(constants.TABLENAME_NEW_ORDER, no_tuples)
             logging.debug("Loading HISTORY")
             self.handle.loadTuples(constants.TABLENAME_HISTORY, h_tuples)
-            self.handle.loadFinishDistrict(w_id, d_id)
+            self.handle.loadFinishDistrict(w_id, d_id, self.scaleParameters.districtsPerWarehouse)
         ## FOR
 
         logging.debug("Updating 10% of STOCK as original")

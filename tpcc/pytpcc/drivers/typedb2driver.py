@@ -121,7 +121,7 @@ class Typedb2Driver(AbstractDriver):
 
             if tableName == "ITEM":
                 pass
-            elif not self.items_complete_event.is_set():
+            elif self.items_complete_event and not self.items_complete_event.is_set():
                 logging.info("Waiting for ITEM loading to be complete ...")
                 self.items_complete_event.wait()  # Will wait until items are complete
                 logging.info("ITEM loading complete! Proceeding...")
@@ -370,7 +370,8 @@ has H_DATE {h_date}, has H_AMOUNT {h_amount}, has H_DATA "{h_data}";"""
     ## loadFinishItem
     ## ----------------------------------------------
     def loadFinishItem(self):
-        self.items_complete_event.set()
+        if self.items_complete_event:
+            self.items_complete_event.set()
         return None
 
     ## ----------------------------------------------
@@ -603,7 +604,7 @@ get $ol_amount;
 sum $ol_amount;
 """
                     response = tx.query.get_aggregate(q)
-                    ol_total = response.resolve().as_value().as_long()
+                    ol_total = response.resolve().as_value().as_double()
                     
                     q = f"""
 match

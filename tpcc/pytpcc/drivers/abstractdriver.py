@@ -80,7 +80,7 @@ class AbstractDriver(object):
         """Optional callback to indicate to the driver that the data for the given warehouse is finished."""
         return None
 
-    def loadFinishDistrict(self, w_id, d_id):
+    def loadFinishDistrict(self, w_id, d_id, d_total):
         """Optional callback to indicate to the driver that the data for the given district is finished."""
         return None
 

@@ -391,7 +391,7 @@ class Typedb3Driver(AbstractDriver):
 
             if tableName not in DATA_COUNT:
                 DATA_COUNT[tableName] = 0;
-            DATA_COUNT[tableName] += len(write_query);
+            DATA_COUNT[tableName] += len(tuples);
 
             start_time = time.time()
             promises = [ ]
@@ -408,7 +408,7 @@ class Typedb3Driver(AbstractDriver):
     ## loadFinish
     ## ----------------------------------------------
     def loadFinish(self):
-        logging.info("COMPLETE! Data loaded by this worker thread:\n%s" % pformat(DATA_COUNT))
+        logging.info("-- COMPLETE! Data loaded by this worker thread:\n%s --" % pformat(DATA_COUNT))
         return None
     
     ## ----------------------------------------------
@@ -417,6 +417,13 @@ class Typedb3Driver(AbstractDriver):
     def loadFinishItem(self):
         if self.items_complete_event:
             self.items_complete_event.set()
+        return None
+    
+    ## ----------------------------------------------
+    ## loadFinishItem
+    ## ----------------------------------------------
+    def loadFinishDistrict(self, w_id, d_id, d_total):
+        logging.info(f"-- Completed {int((d_id/d_total) * 100)}% of warehouse {w_id} --")
         return None
 
     ## ----------------------------------------------
