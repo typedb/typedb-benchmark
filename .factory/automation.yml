@@ -12,7 +12,7 @@ config:
 build:
   correctness:
     benchmark-tpcc:
-      image: typedb-ubuntu-20.04
+      image: typedb-ubuntu-22.04
       machine: 16-core-64-gb
       command: |
         # extract typedb
