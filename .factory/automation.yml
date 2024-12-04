@@ -1,0 +1,25 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+config:
+  version-candidate: VERSION
+  dependencies:
+    dependencies: [build]
+    typedb-behaviour: [build]
+    typedb-protocol: [build, release]
+
+build:
+  correctness:
+    benchmark-tpcc:
+      image: typedb-ubuntu-20.04
+      machine: 16-core-64-gb
+      command: |
+        # extract typedb
+        # run typedb in the background
+
+        # create venv
+        # install driver
+        
+        # run tpcc
+        echo hello
