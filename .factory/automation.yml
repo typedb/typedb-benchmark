@@ -15,11 +15,6 @@ build:
       image: typedb-ubuntu-22.04
       machine: 16-core-64-gb
       command: |
-        # extract typedb
-        # run typedb in the background
-
-        # create venv
-        # install driver
-        
-        # run tpcc
-        echo hello
+        tool/start-typedb-core.sh
+        tool/install-typedb-driver.sh
+        tool/execute-tpcc.sh
