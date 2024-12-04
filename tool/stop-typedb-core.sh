@@ -1,3 +1,13 @@
 set -e
 
+# config
+BASE_DIR="."
+VERSION="437562a05b797624c5a321f86d68080a4523aab5"
+DISTRIBUTION="typedb-all-linux-x86_64"
+DISTRIBUTION_DIR="$DISTRIBUTION-$VERSION"
+DISTRIBUTION_TARGZ="$DISTRIBUTION_DIR.tar.gz"
+
 kill $(ps aux | awk '/typedb[_server_bin]/ {print $2}')
+
+rm -rf "$DISTRIBUTION_DIR"
+rm "$DISTRIBUTION_DISTRIBUTION_TARGZ"
