@@ -2,15 +2,15 @@ set -e
 
 # config
 BASE_DIR="."
-ARCH="x86_64"
 VERSION="82d2e0646f9f5d70f3a8249bd376341dfa4346f6"
-DISTRIBUTION_DIR="typedb-all-mac-$ARCH-$VERSION"
-DISTRIBUTION_ZIP="$DISTRIBUTION_DIR.zip"
-DISTRIBUTION_URL="https://repo.typedb.com/public/public-snapshot/raw/names/typedb-all-mac-$ARCH/versions/$VERSION/$DISTRIBUTION_ZIP"
+DISTRIBUTION="typedb-all-linux-x86_64"
+DISTRIBUTION_DIR="$DISTRIBUTION-$VERSION"
+DISTRIBUTION_TARGZ="$DISTRIBUTION_DIR.tar.gz"
+DISTRIBUTION_URL="https://repo.typedb.com/public/public-snapshot/raw/names/$DISTRIBUTION/versions/$VERSION/$DISTRIBUTION_TARGZ"
 
 cd "$BASE_DIR"
-curl -o "$DISTRIBUTION_ZIP" "$DISTRIBUTION_URL"
-unzip "$DISTRIBUTION_ZIP"
+curl -o "$DISTRIBUTION_TARGZ" "$DISTRIBUTION_URL"
+tar -xf "$DISTRIBUTION_TARGZ"
 ./$DISTRIBUTION_DIR/typedb server &
 
 # wait until ready
