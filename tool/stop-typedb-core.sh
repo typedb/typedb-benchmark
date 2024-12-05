@@ -1,10 +1,10 @@
 set -e
 
-# config
+source tool/config.sh
+
 BASE_DIR="."
-VERSION="437562a05b797624c5a321f86d68080a4523aab5"
 DISTRIBUTION="typedb-all-linux-x86_64"
-DISTRIBUTION_DIR="$DISTRIBUTION-$VERSION"
+DISTRIBUTION_DIR="$DISTRIBUTION-$SERVER_VERSION"
 DISTRIBUTION_TARGZ="$DISTRIBUTION_DIR.tar.gz"
 
 kill $(ps aux | awk '/typedb[_server_bin]/ {print $2}')
