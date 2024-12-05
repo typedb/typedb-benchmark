@@ -440,7 +440,7 @@ get $w_tax, $d_tax, $d_next_o_id, $c_discount, $c_last, $c_credit;"""
                 general_info = list(tx.query.get(q))
                 
                 if len(general_info) == 0:
-                    logging.warn("No general info for warehouse %d" % w_id)
+                    logging.warning("No general info for warehouse %d" % w_id)
                     return (None, 0)
                 w_tax = general_info[0].get('w_tax').as_attribute().get_value()
                 d_tax = general_info[0].get('d_tax').as_attribute().get_value()
@@ -492,7 +492,7 @@ get $s_quantity, $s_data, $s_ytd, $s_order_cnt, $s_remote_cnt, $s_dist_xx;"""
                     stock_info = list(tx.query.get(q))
 
                     if len(stock_info) == 0:
-                        logging.warn("No STOCK record for (ol_i_id=%d, ol_supply_w_id=%d)" % (ol_i_id, ol_supply_w_id))
+                        logging.warning("No STOCK record for (ol_i_id=%d, ol_supply_w_id=%d)" % (ol_i_id, ol_supply_w_id))
                         continue
                     s_quantity = stock_info[0].get('s_quantity').as_attribute().get_value()
                     s_data = stock_info[0].get('s_data').as_attribute().get_value()

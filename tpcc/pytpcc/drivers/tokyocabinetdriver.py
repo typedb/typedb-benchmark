@@ -720,7 +720,7 @@ class TokyocabinetDriver(AbstractDriver):
 
 			stocks = stockQuery.filter(S_I_ID = ol_i_id, S_W_ID = ol_supply_w_id)
 			if len(stocks) == 0:
-				logging.warn("No STOCK record for (ol_i_id=%d, ol_supply_w_id=%d)"
+				logging.warning("No STOCK record for (ol_i_id=%d, ol_supply_w_id=%d)"
 								% (ol_i_id, ol_supply_w_id))
 				continue
 			stockInfo = stock.columns("S_QUANTITY", "S_DATA", "S_YTD", "S_ORDER_CNT",

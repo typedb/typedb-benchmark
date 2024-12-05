@@ -37,7 +37,6 @@ def makeForLoad():
     cId = random.randint(0, 1023)
     orderLineItemId = random.randint(0, 8191)
     return NURandC(cLast, cId, orderLineItemId)
-    return NURandC(cLast, cId, orderLineItemId)
 
 def validCRun(cRun, cLoad):
     """Returns true if the cRun value is valid for running. See TPC-C 2.1.6.1 (page 20)"""
