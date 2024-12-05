@@ -38,6 +38,7 @@ import urllib
 from pprint import pformat
 from time import sleep
 import pymongo
+from pymongo.client_session import TransactionOptions
 import os
 
 import sys
@@ -199,7 +200,7 @@ class MongodbDriver(AbstractDriver):
         "name":             ("Database name", "tpcc"),
         "denormalize":      ("If true, data will be denormalized using MongoDB schema design best practices", True),
         "notransactions":   ("If true, transactions will not be used (benchmarking only)", True),
-        "findandmodify":    ("If true, all things to update will be fetched via findAndModify", False),
+        "findandmodify":    ("If true, all things to update will be fetched via findAndModify", True),
         "secondary_reads":  ("If true, we will allow secondary reads", True),
         "retry_writes":     ("If true, we will enable retryable writes", True),
         "causal_consistency":  ("If true, we will perform causal reads ", True),
@@ -350,7 +351,6 @@ class MongodbDriver(AbstractDriver):
             return
         except pymongo.errors.PyMongoError as err:
             logging.error("Some general error (%s) when connected to %s: ", str(err), display_uri)
-            print("Got some other error: %s" % str(err))
             return
 
     ## ----------------------------------------------
@@ -416,7 +416,7 @@ class MongodbDriver(AbstractDriver):
 
         return
 
-    def loadFinishDistrict(self, w_id, d_id):
+    def loadFinishDistrict(self, w_id, d_id, d_total):
         if self.denormalize:
             logging.debug("Pushing %d denormalized ORDERS records for WAREHOUSE %d DISTRICT %d into MongoDB", len(self.w_orders), w_id, d_id)
             self.database[constants.TABLENAME_ORDERS].insert_many(self.w_orders.values())
@@ -596,7 +596,7 @@ class MongodbDriver(AbstractDriver):
                                                   session=s)
             if not d:
                 d1 = self.district.find_one({"D_ID": d_id, "D_W_ID": w_id, "$comment": "new order did not find district"})
-                print(d1, w_id, d_id, c_id, i_ids, i_w_ids, s_dist_col)
+                # print(d1, w_id, d_id, c_id, i_ids, i_w_ids, s_dist_col)
             assert d, "Couldn't find district in new order w_id %d d_id %d" % (w_id, d_id)
         else:
             d = self.district.find_one({"D_ID": d_id, "D_W_ID": w_id, "$comment": comment},
@@ -896,7 +896,7 @@ class MongodbDriver(AbstractDriver):
                                                   session=s)
             if not d:
                 d1 = self.district.find_one({"D_ID": d_id, "D_W_ID": w_id, "$comment": "payment did not find district"})
-                print(d1, w_id, d_id, h_amount, c_w_id, c_d_id, c_id, c_last, h_date)
+                # print(d1, w_id, d_id, h_amount, c_w_id, c_d_id, c_id, c_last, h_date)
             assert d, "Couldn't find district in payment w_id %d d_id %d" % (w_id, d_id)
         else:
             d = self.district.find_one({"D_W_ID": w_id, "D_ID": d_id, "$comment": comment},
@@ -1100,11 +1100,10 @@ class MongodbDriver(AbstractDriver):
                               exc.code, exc.details, name)
                 return (False, None)
             logging.error("Failed with unknown OperationFailure: %d", exc.code)
-            print("Failed with unknown OperationFailure: %d" % exc.code)
-            print(exc.details)
+            logging.error(exc.details)
             raise
         except pymongo.errors.ConnectionFailure:
-            print("ConnectionFailure during %s: " % name)
+            logging.error("ConnectionFailure during %s: " % name)
             return (False, None)
         ## TRY
 

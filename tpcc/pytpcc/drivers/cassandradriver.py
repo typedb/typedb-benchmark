@@ -547,7 +547,7 @@ class CassandraDriver(AbstractDriver):
             stockInfo = self.stockcf.get(str(ol_i_id).zfill(5)+str(ol_supply_w_id).zfill(5))
         #"updateStock": "UPDATE STOCK SET S_QUANTITY = ?, S_YTD = ?, S_ORDER_CNT = ?, S_REMOTE_CNT = ? WHERE S_I_ID = ? AND S_W_ID = ?", # s_quantity, s_order_cnt, s_remote_cnt, ol_i_id, ol_supply_w_id
             if len(stockInfo)==0:
-                 logging.warn("No STOCK record for (ol_i_id=%d, ol_supply_w_id=%d)" % (ol_i_id, ol_supply_w_id))
+                 logging.warning("No STOCK record for (ol_i_id=%d, ol_supply_w_id=%d)" % (ol_i_id, ol_supply_w_id))
                  continue
             s_quantity = int(stockInfo['S_QUANTITY'])
             s_ytd = int(stockInfo['S_YTD'])

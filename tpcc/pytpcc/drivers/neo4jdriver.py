@@ -79,9 +79,9 @@ class Neo4JDriver(AbstractDriver):
 
             if tableName == "ITEM":
                 pass
-            elif not self.items_complete_event.is_set():
+            elif self.items_complete_event and not self.items_complete_event.is_set():
                 logging.info("Waiting for ITEM loading to be complete ...")
-                self.items_complete_event.wait()  # Will wait until items are complete
+                self.items_complete_event.wait()  # We wait until item loading is complete
                 logging.info("ITEM loading complete! Proceeding...")
 
             if tableName == "WAREHOUSE":
@@ -248,7 +248,8 @@ class Neo4JDriver(AbstractDriver):
     ## loadFinishItem
     ## ----------------------------------------------
     def loadFinishItem(self):
-        self.items_complete_event.set()
+        if self.items_complete_event:
+            self.items_complete_event.set()
         return None
 
     ## ----------------------------------------------
@@ -296,7 +297,7 @@ class Neo4JDriver(AbstractDriver):
                 general_info = result.single()
                 
                 if not general_info:
-                    logging.warn(f"No general info for warehouse {w_id}")
+                    logging.warning(f"No general info for warehouse {w_id}")
                     return (None, 0)
 
                 w_tax = general_info['w_tax']

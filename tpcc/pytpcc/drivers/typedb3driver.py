@@ -430,22 +430,7 @@ class Typedb3Driver(AbstractDriver):
     ## T1: doNewOrder
     ## ----------------------------------------------
     def doNewOrder(self, params):
-        # For reference, the SQL queries are:
-        # q = { 
-        #     "getItemInfo": "SELECT I_PRICE, I_NAME, I_DATA FROM ITEM WHERE I_ID = ?", # ol_i_id
-        #     "getWarehouseTaxRate": "SELECT W_TAX FROM WAREHOUSE WHERE W_ID = ?", # w_id
-        #     "getDistrict": "SELECT D_TAX, D_NEXT_O_ID FROM DISTRICT WHERE D_ID = ? AND D_W_ID = ?", # d_id, w_id
-        #     "incrementNextOrderId": "UPDATE DISTRICT SET D_NEXT_O_ID = ? WHERE D_ID = ? AND D_W_ID = ?", # d_next_o_id, d_id, w_id
-        #     "getCustomer": "SELECT C_DISCOUNT, C_LAST, C_CREDIT FROM CUSTOMER WHERE C_W_ID = ? AND C_D_ID = ? AND C_ID = ?", # w_id, d_id, c_id
-        #     "createOrder": "INSERT INTO ORDERS (O_ID, O_D_ID, O_W_ID, O_C_ID, O_ENTRY_D, O_CARRIER_ID, O_OL_CNT, O_ALL_LOCAL) VALUES (?, ?, ?, ?, ?, ?, ?, ?)", # d_next_o_id, d_id, w_id, c_id, o_entry_d, o_carrier_id, o_ol_cnt, o_all_local
-        #     "createNewOrder": "INSERT INTO NEW_ORDER (NO_O_ID, NO_D_ID, NO_W_ID) VALUES (?, ?, ?)", # o_id, d_id, w_id
-        #     "getStockInfo": "SELECT S_QUANTITY, S_DATA, S_YTD, S_ORDER_CNT, S_REMOTE_CNT, S_DIST_%02d FROM STOCK WHERE S_I_ID = ? AND S_W_ID = ?", # d_id, ol_i_id, ol_supply_w_id
-        #     "updateStock": "UPDATE STOCK SET S_QUANTITY = ?, S_YTD = ?, S_ORDER_CNT = ?, S_REMOTE_CNT = ? WHERE S_I_ID = ? AND S_W_ID = ?", # s_quantity, s_order_cnt, s_remote_cnt, ol_i_id, ol_supply_w_id
-        #     "createOrderLine": "INSERT INTO ORDER_LINE (OL_O_ID, OL_D_ID, OL_W_ID, OL_NUMBER, OL_I_ID, OL_SUPPLY_W_ID, OL_DELIVERY_D, OL_QUANTITY, OL_AMOUNT, OL_DIST_INFO) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", # o_id, d_id, w_id, ol_number, ol_i_id, ol_supply_w_id, ol_quantity, ol_amount, ol_dist_info        
-        # }
 
-        # print("--------> ENTERING T1")
-        
         w_id = params["w_id"]
         d_id = params["d_id"]
         c_id = params["c_id"]
@@ -510,7 +495,7 @@ select $w_tax, $d_tax, $d_next_o_id_old, $c_discount, $c_last, $c_credit;"""
             self.end_checkpoint()
             
             if len(general_info) == 0:
-                logging.warn("No general info for warehouse %d" % w_id)
+                logging.warning("No general info for warehouse %d" % w_id)
                 self.typedb_logger.debug("--- FAILED ---")
                 return (None, 0)
             w_tax = general_info[0].get('w_tax').as_attribute().get_value()
@@ -563,7 +548,7 @@ select $s_quantity, $s_data, $s_ytd, $s_order_cnt, $s_remote_cnt, $s_dist_xx;"""
                 self.end_checkpoint()
 
                 if len(stock_info) == 0:
-                    logging.warn("No STOCK record for (ol_i_id=%d, ol_supply_w_id=%d)" % (ol_i_id, ol_supply_w_id))
+                    logging.warning("No STOCK record for (ol_i_id=%d, ol_supply_w_id=%d)" % (ol_i_id, ol_supply_w_id))
                     continue
                 s_quantity = stock_info[0].get('s_quantity').as_attribute().get_value()
                 s_data = stock_info[0].get('s_data').as_attribute().get_value()
@@ -633,18 +618,6 @@ has OL_QUANTITY {ol_quantity}, has OL_AMOUNT {ol_amount}, has OL_DIST_INFO "{s_d
     ## T2: doDelivery
     ## ----------------------------------------------
     def doDelivery(self, params):
-        # For reference, the SQL queries are:
-        # q = { 
-        #     "getNewOrder": "SELECT NO_O_ID FROM NEW_ORDER WHERE NO_D_ID = ? AND NO_W_ID = ? AND NO_O_ID > -1 LIMIT 1", #
-        #     "getCId": "SELECT O_C_ID FROM ORDERS WHERE O_ID = ? AND O_D_ID = ? AND O_W_ID = ?", # no_o_id, d_id, w_id
-        #     "sumOLAmount": "SELECT SUM(OL_AMOUNT) FROM ORDER_LINE WHERE OL_O_ID = ? AND OL_D_ID = ? AND OL_W_ID = ?", # no_o_id, d_id, w_id
-        #     "deleteNewOrder": "DELETE FROM NEW_ORDER WHERE NO_D_ID = ? AND NO_W_ID = ? AND NO_O_ID = ?", # d_id, w_id, no_o_id
-        #     "updateOrders": "UPDATE ORDERS SET O_CARRIER_ID = ? WHERE O_ID = ? AND O_D_ID = ? AND O_W_ID = ?", # o_carrier_id, no_o_id, d_id, w_id
-        #     "updateOrderLine": "UPDATE ORDER_LINE SET OL_DELIVERY_D = ? WHERE OL_O_ID = ? AND OL_D_ID = ? AND OL_W_ID = ?", # o_entry_d, no_o_id, d_id, w_id
-        #     "updateCustomer": "UPDATE CUSTOMER SET C_BALANCE = C_BALANCE + ? WHERE C_ID = ? AND C_D_ID = ? AND C_W_ID = ?", # ol_total, c_id, d_id, w_id
-        # }
-
-        # print("--------> ENTERING T2")
         
         w_id = params["w_id"]
         o_carrier_id = params["o_carrier_id"]
@@ -736,15 +709,6 @@ $ol has OL_DELIVERY_D {ol_delivery_d};
     ## T3: doOrderStatus
     ## ----------------------------------------------
     def doOrderStatus(self, params):
-        # For reference, the SQL queries are
-        # q = { 
-        # "getCustomerByCustomerId": "SELECT C_ID, C_FIRST, C_MIDDLE, C_LAST, C_STREET_1, C_STREET_2, C_CITY, C_STATE, C_ZIP, C_PHONE, C_SINCE, C_CREDIT, C_CREDIT_LIM, C_DISCOUNT, C_BALANCE, C_DATA FROM CUSTOMER WHERE C_W_ID = ? AND C_D_ID = ? AND C_ID = ?",
-        # "getCustomersByLastName": "SELECT C_ID, C_FIRST, C_MIDDLE, C_LAST, C_STREET_1, C_STREET_2, C_CITY, C_STATE, C_ZIP, C_PHONE, C_SINCE, C_CREDIT, C_CREDIT_LIM, C_DISCOUNT, C_BALANCE, C_DATA FROM CUSTOMER WHERE C_W_ID = ? AND C_D_ID = ? AND C_LAST = ?",
-        # "getLastOrder": "SELECT O_ID FROM ORDERS WHERE O_W_ID = ? AND O_D_ID = ? AND O_C_ID = ?",
-        # "getOrderLines": "SELECT OL_I_ID, OL_SUPPLY_W_ID, OL_QUANTITY, OL_AMOUNT, OL_DIST_INFO FROM ORDER_LINE WHERE OL_W_ID = ? AND OL_D_ID = ? AND OL_O_ID = ?",
-        # }
-
-        # print("--------> ENTERING T3")
 
         w_id = params["w_id"]
         d_id = params["d_id"]
@@ -843,20 +807,6 @@ select $i_id, $ol_supply_w_id, $ol_quantity, $ol_amount, $ol_dist_info;"""
     ## T4: doPayment
     ## ----------------------------------------------    
     def doPayment(self, params):
-        # For reference, the SQL queries are
-        # q = {
-        #     "getCustomerByCustomerId": "SELECT C_ID, C_FIRST, C_MIDDLE, C_LAST, C_STREET_1, C_STREET_2, C_CITY, C_STATE, C_ZIP, C_PHONE, C_SINCE, C_CREDIT, C_CREDIT_LIM, C_DISCOUNT, C_BALANCE, C_YTD_PAYMENT, C_PAYMENT_CNT, C_DATA FROM CUSTOMER WHERE C_W_ID = ? AND C_D_ID = ? AND C_ID = ?", # w_id, d_id, c_id
-        #     "getCustomersByLastName": "SELECT C_ID, C_FIRST, C_MIDDLE, C_LAST, C_STREET_1, C_STREET_2, C_CITY, C_STATE, C_ZIP, C_PHONE, C_SINCE, C_CREDIT, C_CREDIT_LIM, C_DISCOUNT, C_BALANCE, C_YTD_PAYMENT, C_PAYMENT_CNT, C_DATA FROM CUSTOMER WHERE C_W_ID = ? AND C_D_ID = ? AND C_LAST = ? ORDER BY C_FIRST", # w_id, d_id, c_last
-        #     "getWarehouse": "SELECT W_NAME, W_STREET_1, W_STREET_2, W_CITY, W_STATE, W_ZIP FROM WAREHOUSE WHERE W_ID = ?", # w_id
-        #     "getDistrict": "SELECT D_NAME, D_STREET_1, D_STREET_2, D_CITY, D_STATE, D_ZIP FROM DISTRICT WHERE D_W_ID = ? AND D_ID = ?", # w_id, d_id
-        #     "updateWarehouseBalance": "UPDATE WAREHOUSE SET W_YTD = W_YTD + ? WHERE W_ID = ?", # h_amount, w_id
-        #     "updateDistrictBalance": "UPDATE DISTRICT SET D_YTD = D_YTD + ? WHERE D_W_ID  = ? AND D_ID = ?", # h_amount, d_w_id, d_id
-        #     "updateBCCustomer": "UPDATE CUSTOMER SET C_BALANCE = ?, C_YTD_PAYMENT = ?, C_PAYMENT_CNT = ?, C_DATA = ? WHERE C_W_ID = ? AND C_D_ID = ? AND C_ID = ?", # c_balance, c_ytd_payment, c_payment_cnt, c_data, c_w_id, c_d_id, c_id
-        #     "updateGCCustomer": "UPDATE CUSTOMER SET C_BALANCE = ?, C_YTD_PAYMENT = ?, C_PAYMENT_CNT = ? WHERE C_W_ID = ? AND C_D_ID = ? AND C_ID = ?", # c_balance, c_ytd_payment, c_payment_cnt, c_w_id, c_d_id, c_id
-        #     "insertHistory": "INSERT INTO HISTORY VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-        # }
-
-        # print("--------> ENTERING T4")
 
         w_id = params["w_id"]
         d_id = params["d_id"]
@@ -1057,20 +1007,6 @@ $h links (customer: $c), isa CUSTOMER_HISTORY, has H_DATE {h_date}, has H_AMOUNT
                 tx.query(q).resolve()
                 self.end_checkpoint()
 
-            # Concatenate w_name, four spaces, d_name
-            # Create the history record
-
-            # q = f"""
-# match
-# $c isa CUSTOMER, has C_ID {c_w_id * DPW * CPD + c_d_id * CPD + c_id}; 
-# insert
-# $h links (customer: $c), isa CUSTOMER_HISTORY, has H_DATE {h_date}, has H_AMOUNT {h_amount}, has H_DATA "{h_data}";
-# """
-            # self.start_checkpoint(q)
-            # tx.query(q).resolve()
-            # self.end_checkpoint()
-            # tx.commit()
-
             # TPC-C 2.5.3.3: Must display the following fields:
             # W_ID, D_ID, C_ID, C_D_ID, C_W_ID, W_STREET_1, W_STREET_2, W_CITY, W_STATE, W_ZIP,
             # D_STREET_1, D_STREET_2, D_CITY, D_STATE, D_ZIP, C_FIRST, C_MIDDLE, C_LAST, C_STREET_1,
@@ -1085,21 +1021,6 @@ $h links (customer: $c), isa CUSTOMER_HISTORY, has H_DATE {h_date}, has H_AMOUNT
     ## T5: doStockLevel
     ## ----------------------------------------------    
     def doStockLevel(self, params):
-        # q = {
-        #     "getOId": "SELECT D_NEXT_O_ID FROM DISTRICT WHERE D_W_ID = ? AND D_ID = ?", 
-        #     "getStockCount": """
-        #         SELECT COUNT(DISTINCT(OL_I_ID)) FROM ORDER_LINE, STOCK
-        #         WHERE OL_W_ID = ?
-        #             AND OL_D_ID = ?
-        #             AND OL_O_ID < ?
-        #             AND OL_O_ID >= ?
-        #             AND S_W_ID = ?
-        #             AND S_I_ID = OL_I_ID
-        #             AND S_QUANTITY < ?
-        #         """,
-        # }
-
-        # print("--------> ENTERING T5")
 
         w_id = params["w_id"]
         d_id = params["d_id"]

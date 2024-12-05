@@ -163,7 +163,7 @@ class PostgresDriver(AbstractDriver):
         # Ensure durability (full fsync)
         self.cursor.execute("SHOW wal_sync_method;")
         wal_sync_method = self.cursor.fetchone()[0]
-        # assert str(wal_sync_method) == "fsync_writethrough"
+        assert str(wal_sync_method) == "fsync_writethrough"
 
 
     ## ----------------------------------------------
@@ -346,7 +346,7 @@ class PostgresDriver(AbstractDriver):
             self.cursor.execute(q["getStockInfo"] % (d_id, ol_i_id, ol_supply_w_id))
             stockInfo = self.cursor.fetchone()
             if len(stockInfo) == 0:
-                logging.warn("No STOCK record for (ol_i_id=%d, ol_supply_w_id=%d)" % (ol_i_id, ol_supply_w_id))
+                logging.warning("No STOCK record for (ol_i_id=%d, ol_supply_w_id=%d)" % (ol_i_id, ol_supply_w_id))
                 continue
             s_quantity = stockInfo[0]
             s_ytd = stockInfo[2]

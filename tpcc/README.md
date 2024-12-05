@@ -81,7 +81,7 @@ There are 5 workloads (T1... T5):
 
 #### Install
 
-* Install `postgresql` (tested with `postgresql@14`)
+* Install `postgresql` (tested with **Postgres 17**) and add to your path (e.g. `echo 'export PATH="/opt/homebrew/opt/postgresql@17/bin:$PATH"' >> ~/.zshrc`)
 * Install python driver: `pip install psycopg2-binary` 
 
 #### Configure and run
@@ -93,13 +93,13 @@ There are 5 workloads (T1... T5):
 
 #### Benchmark
 
-As before, replace `typedb` by `postrgres`
+As before, replace `typedb` by `postgres`
 
 ### MongoDB
 
 #### Install
 
-* Install `mongod`.
+* Install `mongod` (tested with **MongoDB 8**)
 * Install python driver: `pip install pymongo`
 
 #### Run
@@ -124,7 +124,7 @@ As before.
 
 #### Install
 
-* Install `neo4j 5`
+* Install `neo4j` (tested with **Neo4j 5**)
 * Install python driver: `pip install neo4j`
 
 #### Run
