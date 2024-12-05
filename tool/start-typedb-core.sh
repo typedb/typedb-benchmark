@@ -1,14 +1,12 @@
-set -e
+set -eu
 
 source tool/config.sh
 
-BASE_DIR="."
 DISTRIBUTION="typedb-all-linux-x86_64"
 DISTRIBUTION_DIR="$DISTRIBUTION-$SERVER_VERSION"
 DISTRIBUTION_TARGZ="$DISTRIBUTION_DIR.tar.gz"
 DISTRIBUTION_URL="https://repo.typedb.com/public/public-snapshot/raw/names/$DISTRIBUTION/versions/$SERVER_VERSION/$DISTRIBUTION_TARGZ"
 
-cd "$BASE_DIR"
 curl -o "$DISTRIBUTION_TARGZ" "$DISTRIBUTION_URL"
 tar -xf "$DISTRIBUTION_TARGZ"
 ./$DISTRIBUTION_DIR/typedb server &
