@@ -17,5 +17,5 @@ build:
       command: |
         tool/install-typedb-driver.sh
         tool/start-typedb-core.sh
-        tool/execute-tpcc.sh --scalefactor=100 --warehouses=4 typedb3
+        tool/execute-tpcc.sh --scalefactor=1 --warehouses=4 typedb3
         tool/stop-typedb-core.sh
