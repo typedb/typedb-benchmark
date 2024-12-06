@@ -202,7 +202,7 @@ class MongodbDriver(AbstractDriver):
         "notransactions":   ("If true, transactions will not be used (benchmarking only)", True),
         "findandmodify":    ("If true, all things to update will be fetched via findAndModify", True),
         "secondary_reads":  ("If true, we will allow secondary reads", True),
-        "retry_writes":     ("If true, we will enable retryable writes", True),
+        "retry_writes":     ("If true, we will enable retryable writes", False),
         "causal_consistency":  ("If true, we will perform causal reads ", True),
         "shards":          ("If >1 then sharded", "1")
     }
@@ -228,7 +228,7 @@ class MongodbDriver(AbstractDriver):
         # initialize
         self.causal_consistency = False
         self.secondary_reads = False
-        self.retry_writes = True
+        self.retry_writes = False
         self.read_concern = "majority"
         self.write_concern = pymongo.write_concern.WriteConcern(w=1)
         self.denormalize = False
@@ -416,12 +416,12 @@ class MongodbDriver(AbstractDriver):
 
         return
 
-    def loadFinishDistrict(self, w_id, d_id, d_total):
-        if self.denormalize:
-            logging.debug("Pushing %d denormalized ORDERS records for WAREHOUSE %d DISTRICT %d into MongoDB", len(self.w_orders), w_id, d_id)
-            self.database[constants.TABLENAME_ORDERS].insert_many(self.w_orders.values())
-            self.w_orders.clear()
-        ## IF
+    # def loadFinishDistrict(self, w_id, d_id, d_total):
+        # if self.denormalize:
+            # logging.debug("Pushing %d denormalized ORDERS records for WAREHOUSE %d DISTRICT %d into MongoDB", len(self.w_orders), w_id, d_id)
+            # self.database[constants.TABLENAME_ORDERS].insert_many(self.w_orders.values())
+            # self.w_orders.clear()
+        # IF
 
     # def executeStart(self):
     #     """Optional callback before the execution for each client starts"""
