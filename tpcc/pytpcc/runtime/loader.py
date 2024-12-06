@@ -42,8 +42,9 @@ from util.nurand import random
 
 class Loader:
 
-    def __init__(self, handle, scaleParameters, w_ids, needLoadItems):
-        self.handle = handle
+    def __init__(self, driver, scaleParameters, w_ids, verifier, needLoadItems):
+        self.driver = driver
+        self.verifier = verifier
         self.scaleParameters = scaleParameters
         self.w_ids = w_ids
         self.needLoadItems = needLoadItems
@@ -58,12 +59,16 @@ class Loader:
         if self.needLoadItems:
             logging.debug("Loading ITEM table")
             self.loadItems()
-            self.handle.loadFinishItem()
+            self.driver.loadFinishItem()
+            if self.verifier:
+                self.verifier.loadFinishItem()
 
         ## Then create the warehouse-specific tuples
         for w_id in self.w_ids:
             self.loadWarehouse(w_id)
-            self.handle.loadFinishWarehouse(w_id)
+            self.driver.loadFinishWarehouse(w_id)
+            if self.verifier:
+                self.verifier.loadFinishWarehouse(w_id)
         ## FOR
 
         return (None)
@@ -84,12 +89,16 @@ class Loader:
             total_tuples += 1
             if len(tuples) == self.batch_size:
                 logging.debug("LOAD - %s: %5d / %d" % (constants.TABLENAME_ITEM, total_tuples, self.scaleParameters.items))
-                self.handle.loadTuples(constants.TABLENAME_ITEM, tuples)
+                self.driver.loadTuples(constants.TABLENAME_ITEM, tuples)
+                if self.verifier:
+                    self.verifier.loadTuples(constants.TABLENAME_ITEM, tuples)
                 tuples = [ ]
         ## FOR
         if len(tuples) > 0:
             logging.debug("LOAD - %s: %5d / %d" % (constants.TABLENAME_ITEM, total_tuples, self.scaleParameters.items))
-            self.handle.loadTuples(constants.TABLENAME_ITEM, tuples)
+            self.driver.loadTuples(constants.TABLENAME_ITEM, tuples)
+            if self.verifier:
+                self.verifier.loadTuples(constants.TABLENAME_ITEM, tuples)
     ## DEF
 
     ## ==============================================
@@ -100,7 +109,9 @@ class Loader:
 
         ## WAREHOUSE
         w_tuples = [ self.generateWarehouse(w_id) ]
-        self.handle.loadTuples(constants.TABLENAME_WAREHOUSE, w_tuples)
+        self.driver.loadTuples(constants.TABLENAME_WAREHOUSE, w_tuples)
+        if self.verifier:
+            self.verifier.loadTuples(constants.TABLENAME_WAREHOUSE, w_tuples)
 
         ## DISTRICT
         d_tuples = [ ]
@@ -149,18 +160,30 @@ class Loader:
                 if newOrder: no_tuples.append([o_id, d_id, w_id])
             ## FOR
             logging.debug("Loading DISTRICT")
-            self.handle.loadTuples(constants.TABLENAME_DISTRICT, d_tuples)
+            self.driver.loadTuples(constants.TABLENAME_DISTRICT, d_tuples)
+            if self.verifier:
+                self.verifier.loadTuples(constants.TABLENAME_DISTRICT, d_tuples)
             logging.debug("Loading CUSTOMER")
-            self.handle.loadTuples(constants.TABLENAME_CUSTOMER, c_tuples)
+            self.driver.loadTuples(constants.TABLENAME_CUSTOMER, c_tuples)
+            if self.verifier:
+                self.verifier.loadTuples(constants.TABLENAME_CUSTOMER, c_tuples)
             logging.debug("Loading ORDERS")
-            self.handle.loadTuples(constants.TABLENAME_ORDERS, o_tuples)
+            self.driver.loadTuples(constants.TABLENAME_ORDERS, o_tuples)
+            if self.verifier:
+                self.verifier.loadTuples(constants.TABLENAME_ORDERS, o_tuples)
             logging.debug("Loading ORDER_LINE")
-            self.handle.loadTuples(constants.TABLENAME_ORDER_LINE, ol_tuples)
+            self.driver.loadTuples(constants.TABLENAME_ORDER_LINE, ol_tuples)
+            if self.verifier:
+                self.verifier.loadTuples(constants.TABLENAME_ORDER_LINE, ol_tuples)
             logging.debug("Loading NEW_ORDER")
-            self.handle.loadTuples(constants.TABLENAME_NEW_ORDER, no_tuples)
+            self.driver.loadTuples(constants.TABLENAME_NEW_ORDER, no_tuples)
+            if self.verifier:
+                self.verifier.loadTuples(constants.TABLENAME_NEW_ORDER, no_tuples)
             logging.debug("Loading HISTORY")
-            self.handle.loadTuples(constants.TABLENAME_HISTORY, h_tuples)
-            self.handle.loadFinishDistrict(w_id, d_id, self.scaleParameters.districtsPerWarehouse)
+            self.driver.loadTuples(constants.TABLENAME_HISTORY, h_tuples)
+            if self.verifier:
+                self.verifier.loadTuples(constants.TABLENAME_HISTORY, h_tuples)
+            self.driver.loadFinishDistrict(w_id, d_id, self.scaleParameters.districtsPerWarehouse)
         ## FOR
 
         logging.debug("Updating 10% of STOCK as original")
@@ -173,13 +196,17 @@ class Loader:
             s_tuples.append(self.generateStock(w_id, i_id, original))
             if len(s_tuples) >= self.batch_size:
                 logging.debug("LOAD - %s [W_ID=%d]: %5d / %d" % (constants.TABLENAME_STOCK, w_id, total_tuples, self.scaleParameters.items))
-                self.handle.loadTuples(constants.TABLENAME_STOCK, s_tuples)
+                self.driver.loadTuples(constants.TABLENAME_STOCK, s_tuples)
+                if self.verifier:
+                    self.verifier.loadTuples(constants.TABLENAME_STOCK, s_tuples)
                 s_tuples = [ ]
             total_tuples += 1
         ## FOR
         if len(s_tuples) > 0:
             logging.debug("LOAD - %s [W_ID=%d]: %5d / %d" % (constants.TABLENAME_STOCK, w_id, total_tuples, self.scaleParameters.items))
-            self.handle.loadTuples(constants.TABLENAME_STOCK, s_tuples)
+            self.driver.loadTuples(constants.TABLENAME_STOCK, s_tuples)
+            if self.verifier:
+                self.verifier.loadTuples(constants.TABLENAME_STOCK, s_tuples)
     ## DEF
 
     ## ==============================================

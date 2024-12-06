@@ -377,8 +377,8 @@ has H_DATE {h_date}, has H_AMOUNT {h_amount}, has H_DATA "{h_data}";"""
     ## ----------------------------------------------
     ## Post-load verification
     ## ----------------------------------------------
-    def executeVerify(self):
-        logging.info("Load verification results")
+    def loadVerify(self):
+        logging.info("TypeDB2:")
         logging.info(self.get_counts())
 
     ## ----------------------------------------------
@@ -1014,7 +1014,7 @@ count;"""
     ## Post-execution verification
     ## ----------------------------------------------
     def executeVerify(self):
-        logging.info("Execution verification results")
+        logging.info("TypeDB2:")
         logging.info(self.get_counts())
 
     def get_counts(self):      
@@ -1024,11 +1024,11 @@ count;"""
                 verification = "\n{\n"
                 for table in tables:
                     if table == "ORDERS":
-                        q = f"match $t isa {table}, has O_NEW_ORDER false; get $t; count;"
+                        q = f"match $t isa ORDER; get $t; count;"
                     elif table == "NEW_ORDER":
-                        q = f"match $t isa {table}, has O_NEW_ORDER true; get $t; count;"
+                        q = f"match $t isa ORDER, has O_NEW_ORDER true; get $t; count;"
                     else:
-                        q = f"match $t isa {table}; reduce $count=count;"
+                        q = f"match $t isa {table}; get $t; count;"
                     response = tx.query.get_aggregate(q)
                     result = response.resolve().as_value().as_long()
                     verification += f"    \"{table}\": {result}\n"

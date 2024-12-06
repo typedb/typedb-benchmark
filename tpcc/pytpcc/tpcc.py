@@ -227,8 +227,8 @@ if __name__ == '__main__':
                          help='Enable debug log messages')
     aparser.add_argument('--seed', default=None, type=int,
                          help='A <int> random seed to make the complete benchmark deterministic')
-    aparser.add_argument('--verify', default=None, type=int,
-                         help='Verify the benchmark (needs seed) and output DB endstate after loading and after execution with <int> transactions')
+    aparser.add_argument('--verify', action='store_true',
+                         help='Verify the benchmarks against the postgres implementation')
     args = vars(aparser.parse_args())
 
     if args['debug']:
@@ -239,6 +239,17 @@ if __name__ == '__main__':
     assert driverClass != None, "Failed to find '%s' class" % args['system']
     driver = driverClass(args['ddl'])
     assert driver != None, "Failed to create '%s' driver" % args['system']
+
+    verifier = None
+    if args['verify']:
+        constants.VERIFY = True
+        constants.VERIFY_COUNT = args['verify']
+        verifierClass = createDriverClass('postgres')
+        verifier = verifierClass(args['ddl'])
+        assert verifier != None, "Failed to create postgres verifier"
+        if args['clients'] > 1:
+            logging.error("WARNING: Verifying with multiple clients is not supported yet")
+
     if args['print_config']:
         config = driver.makeDefaultConfig()
         print(driver.formatConfig(config))
@@ -247,9 +258,7 @@ if __name__ == '__main__':
 
     if args['seed']:
         random.seed(args['seed'])
-        if args['verify']:
-            constants.VERIFY = True
-            constants.VERIFY_COUNT = args['verify']
+
 
     if args['workload']:
         constants.WORKLOAD = args['workload']
@@ -271,7 +280,15 @@ if __name__ == '__main__':
         logging.info("Reseting database")
     config['warehouses'] = args['warehouses']
     driver.loadConfig(config)
-    logging.info("Initializing TPC-C benchmark using %s", driver)
+    if args['verify']:
+        verifierDefaultConfig = verifier.makeDefaultConfig()
+        verifierConfig = dict([(param, verifierDefaultConfig[param][1]) for param in verifierDefaultConfig.keys()])
+        verifierConfig['reset'] = args['reset']
+        verifierConfig['load'] = False
+        verifierConfig['execute'] = False
+        if verifierConfig['reset']:
+            logging.info("POSTGRES: Reseting database")
+        verifier.loadConfig(verifierConfig)
 
     ## Create ScaleParameters
     scaleParameters = scaleparameters.makeWithScaleFactor(args['warehouses'], args['scalefactor'])
@@ -288,25 +305,37 @@ if __name__ == '__main__':
                 driver,
                 scaleParameters,
                 range(scaleParameters.starting_warehouse, scaleParameters.ending_warehouse+1),
+                verifier,
                 True
             )
             driver.loadStart()
+            if verifier:
+                verifier.loadStart()
             l.execute()
             driver.loadFinish()
+            if verifier:
+                verifier.loadFinish()
 
         else:
             startLoading(driverClass, scaleParameters, args, config)
         load_time = time.time() - load_start
         logging.info(f"Finished loading in {load_time} seconds")
-        if constants.VERIFY:
-            logging.info("Post-loading verification...")
+        if args['verify']:
+            logging.info("LOAD VERIFICATION")
             driver.loadVerify()
+            verifier.loadVerify()
+
     ## IF
 
     ## WORKLOAD DRIVER!!!
     if not args['no_execute']:
         if args['clients'] == 1:
-            e = executor.Executor(driver, scaleParameters, stop_on_error=args['stop_on_error'])
+            e = executor.Executor(
+                driver,
+                scaleParameters,
+                verifier,
+                stop_on_error=args['stop_on_error']
+            )
             driver.executeStart()
             results = e.execute(args['duration'])
             driver.executeFinish()
@@ -316,9 +345,10 @@ if __name__ == '__main__':
         logging.info("Final Results")
         logging.info("Threads: %d", args['clients'])
         logging.info(results.show(load_time, driver, args['clients']))
-        if constants.VERIFY:
-            logging.info("Post-execution verification...")
+        if args['verify']:
+            logging.info("EXECUTION VERIFICATION")
             driver.executeVerify()
+            verifier.executeVerify()
     ## IF
 
 ## MAIN

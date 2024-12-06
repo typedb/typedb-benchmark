@@ -256,7 +256,7 @@ class Neo4JDriver(AbstractDriver):
     ## loadVerify
     ## ----------------------------------------------
     def loadVerify(self):
-        logging.info("Loading verification results")
+        logging.info("Neo4j:")
         logging.info(self.get_counts())
 
     ## ----------------------------------------------
@@ -776,7 +776,7 @@ class Neo4JDriver(AbstractDriver):
     ## Post-execution verification
     ## ----------------------------------------------
     def executeVerify(self):
-        logging.info("Execution verification results")
+        logging.info("Neo4j:")
         logging.info(self.get_counts())
 
     ## ----------------------------------------------

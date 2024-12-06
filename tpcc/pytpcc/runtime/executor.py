@@ -42,7 +42,7 @@ from util import *
 
 class Executor:
 
-    def __init__(self, driver, scaleParameters, verifier=None, stop_on_error = False):
+    def __init__(self, driver, scaleParameters, verifier, stop_on_error = False):
         self.driver = driver
         self.verifier = verifier
         self.scaleParameters = scaleParameters
@@ -59,13 +59,16 @@ class Executor:
         batch_result = results.Results()
         start_batch = batch_result.startBenchmark()
         txn_count = 0
-        while (constants.VERIFY and txn_count < constants.VERIFY_COUNT) or ((not constants.VERIFY) and time.time() - start <= duration):
+        while time.time() - start <= duration:
             txn, params = self.doOne()
             global_txn_id = global_result.startTransaction(txn)
             batch_txn_id = batch_result.startTransaction(txn)
             if debug: logging.debug("Executing '%s' transaction" % txn)
             try:
                 (val, retries) = self.driver.executeTransaction(txn, params)
+                if self.verifier:
+                    (verify_val, verify_retries) = self.verifier.executeTransaction(txn, params)
+                    if debug: logging.debug(f"VERIFICATION:Got {val} vs {verify_val}")
             except KeyboardInterrupt:
                 return -1
             except (Exception, AssertionError) as ex:

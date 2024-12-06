@@ -430,7 +430,7 @@ class Typedb3Driver(AbstractDriver):
     ## Post-load verification
     ## ----------------------------------------------
     def loadVerify(self):
-        logging.info("Loading verification results:")
+        logging.info("TypeDB3:")
         logging.info(self.get_counts())
 
     ## ----------------------------------------------
@@ -1055,11 +1055,11 @@ reduce $count = count;"""
     ## Post-execution verification
     ## ----------------------------------------------
     def executeVerify(self):
-        logging.info("Execution verification results")
+        logging.info("TypeDB3:")
         logging.info(self.get_counts())
 
     def get_counts(self):      
-        tables = ["ITEM", "WAREHOUSE", "DISTRICT", "CUSTOMER", "STOCKING", "ORDERS", "NEW_ORDER", "ORDER_LINE", "CUSTOMER_HISTORY"]
+        tables = ["ITEM", "WAREHOUSE", "DISTRICT", "CUSTOMER", "STOCK", "ORDERS", "NEW_ORDER", "ORDER_LINE", "CUSTOMER_HISTORY"]
         with self.driver.transaction(self.database, TransactionType.READ) as txn:
             verification = "\n{\n"
             for table in tables:
@@ -1067,6 +1067,8 @@ reduce $count = count;"""
                     q = f"match $t isa ORDER; reduce $count = count;"
                 elif table == "NEW_ORDER":
                     q = f"match $t isa ORDER, has O_NEW_ORDER true; reduce $count = count;"
+                elif table == "STOCK":
+                    q = f"match $t isa STOCKING; reduce $count = count;"
                 else:
                     q = f"match $t isa {table}; reduce $count = count;"
                 result = list(txn.query(q).resolve().as_concept_rows())
