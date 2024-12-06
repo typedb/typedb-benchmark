@@ -138,6 +138,7 @@ class PostgresDriver(AbstractDriver):
             user=self.user,
             password=self.password
         )
+        self.conn.set_isolation_level(psycopg2.extensions.ISOLATION_LEVEL_READ_COMMITTED)
         self.cursor = self.conn.cursor()
 
         if config["reset"]:
@@ -220,6 +221,14 @@ class PostgresDriver(AbstractDriver):
         logging.info("Commiting changes to database")
         self.enable_trigger_validation()
         self.conn.commit()
+
+
+    ## ----------------------------------------------
+    ## loadVerify
+    ## ----------------------------------------------
+    def loadVerify(self):
+        logging.info("Loading verification results")
+        logging.info(self.log_counts())
 
     ## ----------------------------------------------
     ## T1: doDelivery
@@ -526,5 +535,22 @@ class PostgresDriver(AbstractDriver):
         self.conn.commit()
         
         return (int(result[0]),0)
+    
+    ## ----------------------------------------------
+    ## T6: executeVerify
+    ## ----------------------------------------------
+    def executeVerify(self):
+        logging.info("Execution verification results")
+        logging.info(self.log_counts())
+
+    def log_counts(self):
+        tables = ["ITEM", "WAREHOUSE", "DISTRICT", "CUSTOMER", "STOCK", "ORDERS", "NEW_ORDER", "ORDER_LINE", "HISTORY"]
+        verification = "\n{\n"
+        for table in tables:
+            self.cursor.execute(f"SELECT COUNT(*) FROM {table}")
+            count = self.cursor.fetchone()[0]
+            verification += f"    \"{table}\": {count}\n"
+        verification += "}"
+        return verification
         
 ## CLASS

@@ -87,6 +87,10 @@ class AbstractDriver(object):
     def loadTuples(self, tableName, tuples):
         """Load a list of tuples into the target table"""
         raise NotImplementedError("%s does not implement loadTuples" % (self.driver_name))
+    
+    def loadVerify(self):
+        """Retrieve and log DB state after loading"""
+        return None
 
     def executeStart(self):
         """Optional callback before the execution phase starts"""
@@ -94,6 +98,10 @@ class AbstractDriver(object):
 
     def executeFinish(self):
         """Callback after the execution phase finishes"""
+        return None
+    
+    def executeVerify(self):
+        """Retrieve and log DB state after execution"""
         return None
 
     def executeTransaction(self, txn, params):

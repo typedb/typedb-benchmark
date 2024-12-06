@@ -263,7 +263,7 @@ class Typedb3Driver(AbstractDriver):
     has C_BALANCE {c_balance}, has C_YTD_PAYMENT {c_ytd_payment},
     has C_PAYMENT_CNT {c_payment_cnt}, has C_DELIVERY_CNT {c_delivery_cnt},
     has C_DATA "{c_data}";
-    reduce $count = count;"""
+"""
                     write_query.append(q)
 
             if tableName == "ORDERS":
@@ -286,7 +286,7 @@ class Typedb3Driver(AbstractDriver):
     has O_ID {o_id},
     has O_ENTRY_D {o_entry_d}, has O_CARRIER_ID {o_carrier_id},
     has O_OL_CNT {o_ol_cnt}, has O_ALL_LOCAL {o_all_local}, has O_NEW_ORDER false;
-    reduce $count = count;"""
+"""
                     write_query.append(q)
 
             if tableName == "NEW_ORDER":
@@ -301,7 +301,7 @@ class Typedb3Driver(AbstractDriver):
     $o links (district: $d), isa ORDER, has O_ID {no_o_id}, has O_NEW_ORDER $status;
     delete $status of $o;
     insert $o has O_NEW_ORDER true;
-    reduce $count = count;"""
+"""
                     write_query.append(q)
 
             if tableName == "ORDER_LINE":
@@ -333,7 +333,7 @@ class Typedb3Driver(AbstractDriver):
     """ + has_ol_delivery_d + f"""
     has OL_QUANTITY {ol_quantity}, has OL_AMOUNT {ol_amount},
     has OL_DIST_INFO "{ol_dist_info}";
-    reduce $count = count;"""
+"""
                     write_query.append(q)
     
             if tableName == "STOCK":
@@ -354,7 +354,7 @@ class Typedb3Driver(AbstractDriver):
     $stock links (item: $i, warehouse: $w), isa STOCKING, 
     has S_QUANTITY {s_quantity}, has S_YTD {s_ytd}, has S_ORDER_CNT {s_order_cnt},
     has S_REMOTE_CNT {s_remote_cnt}, has S_DATA "{s_data}";
-    reduce $count = count;"""
+"""
                     write_query.append(q_stock)
     
                     for i in range(1, 11):
@@ -366,7 +366,7 @@ class Typedb3Driver(AbstractDriver):
     $stock links (item: $i, warehouse: $w), isa STOCKING;
     insert
     $stock has S_DIST_{i} "{tuple[2+i]}";
-    reduce $count = count;"""
+"""
                         write_query.append(q_stock_info)
 
     
@@ -386,7 +386,7 @@ class Typedb3Driver(AbstractDriver):
     insert 
     $history links (customer: $c), isa CUSTOMER_HISTORY,
     has H_DATE {h_date}, has H_AMOUNT {h_amount}, has H_DATA "{h_data}";
-    reduce $count = count;"""
+"""
                     write_query.append(q)
 
             if tableName not in DATA_COUNT:
@@ -425,6 +425,13 @@ class Typedb3Driver(AbstractDriver):
     def loadFinishDistrict(self, w_id, d_id, d_total):
         logging.info(f"-- Completed {int((d_id/d_total) * 100)}% of warehouse {w_id} --")
         return None
+
+    ## ----------------------------------------------
+    ## Post-load verification
+    ## ----------------------------------------------
+    def loadVerify(self):
+        logging.info("Loading verification results:")
+        logging.info(self.get_counts())
 
     ## ----------------------------------------------
     ## T1: doNewOrder
@@ -467,7 +474,6 @@ select $i_name, $i_price, $i_data;"""
                 items.append({ 'name': item[0].get('i_name').as_attribute().get_value(), 
                                 'price': item[0].get('i_price').as_attribute().get_value(), 
                                 'data': item[0].get('i_data').as_attribute().get_value()})
-                break
 
             # Query: get warhouse, district, and customer info, then insert new order
             all_local_int = 1 if all_local else 0
@@ -504,24 +510,6 @@ select $w_tax, $d_tax, $d_next_o_id_old, $c_discount, $c_last, $c_credit;"""
             c_discount = general_info[0].get('c_discount').as_attribute().get_value()
             c_last = general_info[0].get('c_last').as_attribute().get_value()
             c_credit = general_info[0].get('c_credit').as_attribute().get_value()
-
-
-            # Query: update district's next order id, and create new order
-            # q = f"""
-# match 
-# $d isa DISTRICT, has D_ID {w_id * DPW + d_id}, has D_NEXT_O_ID $d_next_o_id;
-# $c isa CUSTOMER, has C_ID {w_id * DPW * CPD + d_id * CPD + c_id};
-# delete 
-# $d_next_o_id of $d;
-# insert 
-# $d has D_NEXT_O_ID {d_next_o_id + 1};
-# $order links (district: $d, customer: $c), isa ORDER,
-# has O_ID {d_next_o_id},
-# has O_ENTRY_D {o_entry_d}, has O_CARRIER_ID {o_carrier_id},
-# has O_OL_CNT {ol_cnt}, has O_ALL_LOCAL {all_local_int}, has O_NEW_ORDER true;"""
-            # self.start_checkpoint(q)
-            # tx.query(q).resolve()
-            # self.end_checkpoint()
 
             for i in range(len(i_ids)):
                 ol_number = i + 1
@@ -594,18 +582,20 @@ $s has S_QUANTITY {s_quantity}, has S_YTD {s_ytd},
 has S_ORDER_CNT {s_order_cnt}, has S_REMOTE_CNT {s_remote_cnt};
 (item: $i, order: $o) isa ORDER_LINE, 
 has OL_NUMBER {ol_number}, has OL_SUPPLY_W_ID {ol_supply_w_id}, 
-has OL_QUANTITY {ol_quantity}, has OL_AMOUNT {ol_amount}, has OL_DIST_INFO "{s_dist_xx}";"""
+has OL_QUANTITY {ol_quantity}, has OL_AMOUNT {ol_amount}, has OL_DIST_INFO "{s_dist_xx}";
+reduce $count = count;"""
                 self.start_checkpoint(q)
-                tx.query(q).resolve()
+                count = list(tx.query(q).resolve().as_concept_rows())[0].get('count').as_value().as_long()
                 self.end_checkpoint()
+                assert count == 1, "Expected 1 ORDER_LINE to be inserted"
 
                 ## Transaction profile states to use "ol_quantity * i_price"
                 total += ol_amount
     
                 ## Add the info to be returned
                 item_data.append( (i_name, s_quantity, brand_generic, i_price, ol_amount) )
-                break
             ## FOR
+
             tx.commit()
             total *= (1 - c_discount) * (1 + w_tax + d_tax)
 
@@ -1013,6 +1003,8 @@ $h links (customer: $c), isa CUSTOMER_HISTORY, has H_DATE {h_date}, has H_AMOUNT
             # C_STREET_2, C_CITY, C_STATE, C_ZIP, C_PHONE, C_SINCE, C_CREDIT, C_CREDIT_LIM,
             # C_DISCOUNT, C_BALANCE, the first 200 characters of C_DATA (only if C_CREDIT = "BC"),
             # H_AMOUNT, and H_DATE.
+            
+            tx.commit()
             return ([ warehouse_data, district_data, customer_data ],0)
 
 
@@ -1058,5 +1050,29 @@ reduce $count = count;"""
             tx.commit()
             
             return (int(result),0)
-        
+           
+    ## ----------------------------------------------
+    ## Post-execution verification
+    ## ----------------------------------------------
+    def executeVerify(self):
+        logging.info("Execution verification results")
+        logging.info(self.get_counts())
+
+    def get_counts(self):      
+        tables = ["ITEM", "WAREHOUSE", "DISTRICT", "CUSTOMER", "STOCKING", "ORDERS", "NEW_ORDER", "ORDER_LINE", "CUSTOMER_HISTORY"]
+        with self.driver.transaction(self.database, TransactionType.READ) as txn:
+            verification = "\n{\n"
+            for table in tables:
+                if table == "ORDERS":
+                    q = f"match $t isa ORDER; reduce $count = count;"
+                elif table == "NEW_ORDER":
+                    q = f"match $t isa ORDER, has O_NEW_ORDER true; reduce $count = count;"
+                else:
+                    q = f"match $t isa {table}; reduce $count = count;"
+                result = list(txn.query(q).resolve().as_concept_rows())
+                count = result[0].get('count').as_long()
+                verification += f"    \"{table}\": {count}\n"
+            verification += "}"
+            return verification
+
 ## CLASS

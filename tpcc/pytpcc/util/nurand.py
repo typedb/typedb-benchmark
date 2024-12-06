@@ -31,6 +31,7 @@
 
 import random
 
+
 def makeForLoad():
     """Create random NURand constants, appropriate for loading the database."""
     cLast = random.randint(0, 255)

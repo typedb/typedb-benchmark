@@ -40,6 +40,7 @@ from pprint import pprint, pformat
 import constants
 
 from util import results, scaleparameters
+from util.nurand import random
 from runtime import executor, loader
 
 logging.basicConfig(level=logging.INFO,
@@ -224,6 +225,10 @@ if __name__ == '__main__':
                          help='Print out the default configuration file for the system and exit')
     aparser.add_argument('--debug', action='store_true',
                          help='Enable debug log messages')
+    aparser.add_argument('--seed', default=None, type=int,
+                         help='A <int> random seed to make the complete benchmark deterministic')
+    aparser.add_argument('--verify', default=None, type=int,
+                         help='Verify the benchmark (needs seed) and output DB endstate after loading and after execution with <int> transactions')
     args = vars(aparser.parse_args())
 
     if args['debug']:
@@ -239,6 +244,12 @@ if __name__ == '__main__':
         print(driver.formatConfig(config))
         print()
         sys.exit(0)
+
+    if args['seed']:
+        random.seed(args['seed'])
+        if args['verify']:
+            constants.VERIFY = True
+            constants.VERIFY_COUNT = args['verify']
 
     if args['workload']:
         constants.WORKLOAD = args['workload']
@@ -282,10 +293,14 @@ if __name__ == '__main__':
             driver.loadStart()
             l.execute()
             driver.loadFinish()
+
         else:
             startLoading(driverClass, scaleParameters, args, config)
         load_time = time.time() - load_start
         logging.info(f"Finished loading in {load_time} seconds")
+        if constants.VERIFY:
+            logging.info("Post-loading verification...")
+            driver.loadVerify()
     ## IF
 
     ## WORKLOAD DRIVER!!!
@@ -301,6 +316,9 @@ if __name__ == '__main__':
         logging.info("Final Results")
         logging.info("Threads: %d", args['clients'])
         logging.info(results.show(load_time, driver, args['clients']))
+        if constants.VERIFY:
+            logging.info("Post-execution verification...")
+            driver.executeVerify()
     ## IF
 
 ## MAIN

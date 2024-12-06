@@ -373,6 +373,13 @@ has H_DATE {h_date}, has H_AMOUNT {h_amount}, has H_DATA "{h_data}";"""
         if self.items_complete_event:
             self.items_complete_event.set()
         return None
+    
+    ## ----------------------------------------------
+    ## Post-load verification
+    ## ----------------------------------------------
+    def executeVerify(self):
+        logging.info("Load verification results")
+        logging.info(self.get_counts())
 
     ## ----------------------------------------------
     ## T1: doNewOrder
@@ -1002,5 +1009,30 @@ count;"""
                 tx.commit()
                 
                 return (int(result),0)
-        
+    
+    ## ----------------------------------------------
+    ## Post-execution verification
+    ## ----------------------------------------------
+    def executeVerify(self):
+        logging.info("Execution verification results")
+        logging.info(self.get_counts())
+
+    def get_counts(self):      
+        tables = ["ITEM", "WAREHOUSE", "DISTRICT", "CUSTOMER", "STOCKING", "ORDERS", "NEW_ORDER", "ORDER_LINE", "CUSTOMER_HISTORY"]
+        with self.driver.session(self.database, SessionType.DATA) as data_session:
+            with data_session.transaction(TransactionType.READ) as tx:
+                verification = "\n{\n"
+                for table in tables:
+                    if table == "ORDERS":
+                        q = f"match $t isa {table}, has O_NEW_ORDER false; get $t; count;"
+                    elif table == "NEW_ORDER":
+                        q = f"match $t isa {table}, has O_NEW_ORDER true; get $t; count;"
+                    else:
+                        q = f"match $t isa {table}; reduce $count=count;"
+                    response = tx.query.get_aggregate(q)
+                    result = response.resolve().as_value().as_long()
+                    verification += f"    \"{table}\": {result}\n"
+                verification += "}"
+                return verification
+
 ## CLASS

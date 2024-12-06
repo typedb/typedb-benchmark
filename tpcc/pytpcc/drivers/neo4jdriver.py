@@ -251,6 +251,13 @@ class Neo4JDriver(AbstractDriver):
         if self.items_complete_event:
             self.items_complete_event.set()
         return None
+    
+    ## ----------------------------------------------
+    ## loadVerify
+    ## ----------------------------------------------
+    def loadVerify(self):
+        logging.info("Loading verification results")
+        logging.info(self.get_counts())
 
     ## ----------------------------------------------
     ## T1: doNewOrder
@@ -765,4 +772,35 @@ class Neo4JDriver(AbstractDriver):
             ## WITH
         ## WITH
         
+    ## ----------------------------------------------
+    ## Post-execution verification
+    ## ----------------------------------------------
+    def executeVerify(self):
+        logging.info("Execution verification results")
+        logging.info(self.get_counts())
+
+    ## ----------------------------------------------
+    ## Get counts
+    ## ----------------------------------------------
+    def get_counts(self):
+        tables = ["ITEM", "WAREHOUSE", "DISTRICT", "CUSTOMER", "STOCK", "ORDERS", "NEW_ORDER", "ORDER_LINE", "HISTORY"]
+        with self.driver.session(database=self.database) as session:
+            verification = "\n{\n"
+            for table in tables:
+                if table == "ORDERS":
+                    # Count orders that are not new orders
+                    q = "MATCH (o:ORDER) WHERE NOT o.O_NEW_ORDER RETURN count(o) as count"
+                elif table == "NEW_ORDER":
+                    # Count orders that are new orders
+                    q = "MATCH (o:ORDER) WHERE o.O_NEW_ORDER RETURN count(o) as count"
+                else:
+                    # Count nodes with the given label
+                    q = f"MATCH (n:{table}) RETURN count(n) as count"
+                
+                result = session.run(q).single()
+                count = result["count"]
+                verification += f"    \"{table}\": {count}\n"
+            verification += "}"
+            return verification
+
 ## CLASS

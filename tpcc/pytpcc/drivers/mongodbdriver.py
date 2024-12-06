@@ -198,11 +198,11 @@ class MongodbDriver(AbstractDriver):
     DEFAULT_CONFIG = {
         "uri":              ("The mongodb connection string or URI", "mongodb://localhost:27017"),
         "name":             ("Database name", "tpcc"),
-        "denormalize":      ("If true, data will be denormalized using MongoDB schema design best practices", True),
+        "denormalize":      ("If true, data will be denormalized using MongoDB schema design best practices", False),
         "notransactions":   ("If true, transactions will not be used (benchmarking only)", True),
         "findandmodify":    ("If true, all things to update will be fetched via findAndModify", True),
         "secondary_reads":  ("If true, we will allow secondary reads", True),
-        "retry_writes":     ("If true, we will enable retryable writes", True),
+        "retry_writes":     ("If true, we will enable retryable writes", False),
         "causal_consistency":  ("If true, we will perform causal reads ", True),
         "shards":          ("If >1 then sharded", "1")
     }
@@ -214,7 +214,7 @@ class MongodbDriver(AbstractDriver):
 
     def __init__(self, ddl, shared_event=None):
         super(MongodbDriver, self).__init__("mongodb", ddl)
-        self.no_transactions = True
+        self.no_transactions = False
         self.find_and_modify = True
         self.read_preference = "primary"
         self.database = None
@@ -228,10 +228,10 @@ class MongodbDriver(AbstractDriver):
         # initialize
         self.causal_consistency = False
         self.secondary_reads = False
-        self.retry_writes = True
+        self.retry_writes = False
         self.read_concern = "majority"
         self.write_concern = pymongo.write_concern.WriteConcern(w=1)
-        self.denormalize = True
+        self.denormalize = False
         self.output = open('results.json','a')
         self.result_doc = {}
         self.warehouses = 0
@@ -416,21 +416,25 @@ class MongodbDriver(AbstractDriver):
 
         return
 
-    def loadFinishDistrict(self, w_id, d_id, d_total):
-        if self.denormalize:
-            logging.debug("Pushing %d denormalized ORDERS records for WAREHOUSE %d DISTRICT %d into MongoDB", len(self.w_orders), w_id, d_id)
-            self.database[constants.TABLENAME_ORDERS].insert_many(self.w_orders.values())
-            self.w_orders.clear()
-        ## IF
+    # def loadFinishDistrict(self, w_id, d_id, d_total):
+        # if self.denormalize:
+            # logging.debug("Pushing %d denormalized ORDERS records for WAREHOUSE %d DISTRICT %d into MongoDB", len(self.w_orders), w_id, d_id)
+            # self.database[constants.TABLENAME_ORDERS].insert_many(self.w_orders.values())
+            # self.w_orders.clear()
+        # IF
 
-    def executeStart(self):
-        """Optional callback before the execution for each client starts"""
-        return None
+    # def executeStart(self):
+    #     """Optional callback before the execution for each client starts"""
+    #     return None
 
-    def executeFinish(self):
-        """Callback after the execution for each client finishes"""
-        return None
-
+    # def executeFinish(self):
+    #     """Callback after the execution for each client finishes"""
+    #     return None
+    
+    def loadVerify(self):
+        logging.info("Loading verification results")
+        logging.info(self.get_counts())   
+    
     ## ----------------------------------------------
     ## doDelivery
     ## ----------------------------------------------
@@ -1155,5 +1159,41 @@ class MongodbDriver(AbstractDriver):
         self.result_doc['after']=self.get_server_status()
         # saving test results and server statuses ('before' and 'after') into MongoDB as a single document
         self.client.test.results.insert_one(self.result_doc)
+
+    def executeVerify(self):
+        logging.info("Execution verification results")
+        logging.info(self.get_counts())
+
+    def get_counts(self):
+        collections = {
+            "ITEM": self.item,
+            "WAREHOUSE": self.warehouse,
+            "DISTRICT": self.district,
+            "CUSTOMER": self.customer,
+            "STOCK": self.stock,
+            "ORDERS": self.orders,
+            "NEW_ORDER": self.new_order,
+            "ORDER_LINE": self.order_line,
+            "HISTORY": self.history
+        }
+        
+        counts = {}
+        for name, coll in collections.items():
+            if coll is None:
+                logging.warning(f"Collection {name} is not initialized")
+                counts[name] = 0
+            else:
+                try:
+                    count_result = list(coll.aggregate([{"$count": "c"}]))
+                    counts[name] = count_result[0]["c"] if count_result else 0
+                except Exception as e:
+                    logging.error(f"Error counting collection {name}: {str(e)}")
+                    counts[name] = 0
+        
+        verification = "Execution verification results\n{"
+        verification += "\n".join(f'    "{name}": {count}' for name, count in counts.items())
+        verification += "\n}"
+        return verification
+
 
 ## CLASS

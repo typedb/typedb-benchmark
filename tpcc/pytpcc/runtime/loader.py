@@ -34,11 +34,11 @@ import sys
 
 import logging
 from datetime import datetime
-from random import shuffle
 from pprint import pprint,pformat
 
 import constants
 from util import *
+from util.nurand import random
 
 class Loader:
 
@@ -127,7 +127,7 @@ class Loader:
             ## FOR
             assert cIdPermutation[0] == 1
             assert cIdPermutation[self.scaleParameters.customersPerDistrict - 1] == self.scaleParameters.customersPerDistrict
-            shuffle(cIdPermutation)
+            random.shuffle(cIdPermutation)
 
             o_tuples = [ ]
             ol_tuples = [ ]

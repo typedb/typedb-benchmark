@@ -29,8 +29,7 @@
 # OTHER DEALINGS IN THE SOFTWARE.
 # -----------------------------------------------------------------------
 
-import random
-from . import nurand
+from .nurand import random, makeForLoad
 
 SYLLABLES = [ "BAR", "OUGHT", "ABLE", "PRI", "PRES", "ESE", "ANTI", "CALLY", "ATION", "EING" ]
 
@@ -45,7 +44,7 @@ def NURand(a, x, y):
     global nurandVar
     assert x <= y
     if nurandVar is None:
-        setNURand(nurand.makeForLoad())
+        setNURand(makeForLoad())
 
     if a == 255:
         c = nurandVar.cLast
