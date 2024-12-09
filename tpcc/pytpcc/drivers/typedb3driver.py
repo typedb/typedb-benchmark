@@ -15,7 +15,7 @@ import os
 import logging
 from pprint import pformat
 import time
-from typedb.driver import TypeDB, TransactionType
+from typedb.driver import *
 
 import sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -47,7 +47,7 @@ class Typedb3Driver(AbstractDriver):
         "schema": ("Script-relative path to schema file", "tql3/tpcc-schema.tql"),
         "debug": ("Enable debug-level logging", "0"),
     }
-    
+   
     def __init__(self, ddl, shared_event=None):
         super(Typedb3Driver, self).__init__("typedb", ddl)
         self.database = None
@@ -63,7 +63,7 @@ class Typedb3Driver(AbstractDriver):
 
         # Set up TypeDB specific logger
         self.typedb_logger = logging.getLogger('typedb_logger')
-        handler = logging.FileHandler('typedb_log.log')
+        handler = logging.FileHandler('typedb.log')
         handler.setFormatter(logging.Formatter('%(asctime)s - %(message)s'))
         self.typedb_logger.addHandler(handler)
     
@@ -83,6 +83,8 @@ class Typedb3Driver(AbstractDriver):
         
         self.database = str(config["database"])
         self.addr = str(config["addr"])
+        self.user = str(config["user"])
+        self.password = str(config["password"])
         edition = config["edition"]
         if edition == "Core":
             self.edition = EDITION.Core
@@ -100,8 +102,10 @@ class Typedb3Driver(AbstractDriver):
         else:
             self.typedb_logger.setLevel(logging.INFO)
 
+        credentials = Credentials(self.user, self.password)
+
         if self.edition is EDITION.Core:
-            self.driver = TypeDB.core_driver(self.addr)
+            self.driver = TypeDB.core_driver(address=f"{self.addr}", credentials=credentials, driver_options=DriverOptions())
         if self.edition is EDITION.Cloud:
             raise "Unimplemented"
 
@@ -438,6 +442,9 @@ class Typedb3Driver(AbstractDriver):
     ## ----------------------------------------------
     def doNewOrder(self, params):
 
+        if self.debug:
+            self.typedb_logger.debug("--- START doNewOrder ---")
+
         w_id = params["w_id"]
         d_id = params["d_id"]
         c_id = params["c_id"]
@@ -506,7 +513,7 @@ select $w_tax, $d_tax, $d_next_o_id_old, $c_discount, $c_last, $c_credit;"""
                 return (None, 0)
             w_tax = general_info[0].get('w_tax').as_attribute().get_value()
             d_tax = general_info[0].get('d_tax').as_attribute().get_value()
-            d_next_o_id = general_info[0].get('d_next_o_id_old').as_long()
+            d_next_o_id = general_info[0].get('d_next_o_id_old').get_long()
             c_discount = general_info[0].get('c_discount').as_attribute().get_value()
             c_last = general_info[0].get('c_last').as_attribute().get_value()
             c_credit = general_info[0].get('c_credit').as_attribute().get_value()
@@ -585,7 +592,7 @@ has OL_NUMBER {ol_number}, has OL_SUPPLY_W_ID {ol_supply_w_id},
 has OL_QUANTITY {ol_quantity}, has OL_AMOUNT {ol_amount}, has OL_DIST_INFO "{s_dist_xx}";
 reduce $count = count;"""
                 self.start_checkpoint(q)
-                count = list(tx.query(q).resolve().as_concept_rows())[0].get('count').as_value().as_long()
+                count = list(tx.query(q).resolve().as_concept_rows())[0].get('count').as_value().get_long()
                 self.end_checkpoint()
                 assert count == 1, "Expected 1 ORDER_LINE to be inserted"
 
@@ -608,6 +615,9 @@ reduce $count = count;"""
     ## T2: doDelivery
     ## ----------------------------------------------
     def doDelivery(self, params):
+
+        if self.debug:
+            self.typedb_logger.debug("--- START doDelivery ---")
         
         w_id = params["w_id"]
         o_carrier_id = params["o_carrier_id"]
@@ -644,7 +654,7 @@ reduce $sum = sum($ol_amount);
                 self.start_checkpoint(q)
                 response = list(tx.query(q).resolve().as_concept_rows())[0]
                 self.end_checkpoint()
-                ol_total = response.get("sum").as_value().as_double()
+                ol_total = response.get("sum").as_value().get_double()
                 # If there are no order lines, SUM returns null. There should always be order lines.
                 assert ol_total != None, "ol_total is NULL: there are no order lines. This should not happen"
                 assert ol_total > 0.0
@@ -699,6 +709,9 @@ $ol has OL_DELIVERY_D {ol_delivery_d};
     ## T3: doOrderStatus
     ## ----------------------------------------------
     def doOrderStatus(self, params):
+
+        if self.debug:
+            self.typedb_logger.debug("--- START doOrderStatus ---")
 
         w_id = params["w_id"]
         d_id = params["d_id"]
@@ -797,6 +810,9 @@ select $i_id, $ol_supply_w_id, $ol_quantity, $ol_amount, $ol_dist_info;"""
     ## T4: doPayment
     ## ----------------------------------------------    
     def doPayment(self, params):
+
+        if self.debug:
+            self.typedb_logger.debug("--- START doPayment ---")
 
         w_id = params["w_id"]
         d_id = params["d_id"]
@@ -1014,6 +1030,9 @@ $h links (customer: $c), isa CUSTOMER_HISTORY, has H_DATE {h_date}, has H_AMOUNT
     ## ----------------------------------------------    
     def doStockLevel(self, params):
 
+        if self.debug:
+            self.typedb_logger.debug("--- START doStockLevel ---")
+
         w_id = params["w_id"]
         d_id = params["d_id"]
         threshold = params["threshold"]
@@ -1045,7 +1064,7 @@ reduce $count = count;"""
             # Todo
             first_response = list(tx.query(q).resolve().as_concept_rows())[0]
             self.end_checkpoint()
-            result = first_response.get('count').as_long()
+            result = first_response.get('count').get_long()
             
             tx.commit()
             
@@ -1072,7 +1091,7 @@ reduce $count = count;"""
                 else:
                     q = f"match $t isa {table}; reduce $count = count;"
                 result = list(txn.query(q).resolve().as_concept_rows())
-                count = result[0].get('count').as_long()
+                count = result[0].get('count').get_long()
                 verification += f"    \"{table}\": {count}\n"
             verification += "}"
             return verification

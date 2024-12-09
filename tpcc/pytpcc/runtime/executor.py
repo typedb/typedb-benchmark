@@ -109,7 +109,6 @@ class Executor:
         ## *minimum* percentages to be maintained. This is close to the right
         ## thing, but not precisely correct. See TPC-C 5.2.4 (page 68).
         x = rand.number(1, 100)
-        print(x)
         params = None
         txn = None
         if constants.WORKLOAD is not None:
