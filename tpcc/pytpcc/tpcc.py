@@ -127,7 +127,7 @@ def loaderFunc(driverClass, scaleParameters, args, config, w_ids, items_complete
 
     try:
         loadItems = (1 in w_ids)
-        l = loader.Loader(driver, scaleParameters, w_ids, loadItems, None, True)
+        l = loader.Loader(driver, scaleParameters, w_ids, None, loadItems)
         driver.loadStart()
         l.execute()
         driver.loadFinish()
