@@ -127,7 +127,7 @@ def loaderFunc(driverClass, scaleParameters, args, config, w_ids, items_complete
 
     try:
         loadItems = (1 in w_ids)
-        l = loader.Loader(driver, scaleParameters, w_ids, loadItems)
+        l = loader.Loader(driver, scaleParameters, w_ids, loadItems, None, True)
         driver.loadStart()
         l.execute()
         driver.loadFinish()
@@ -183,7 +183,7 @@ def executorFunc(driverClass, scaleParameters, args, config, debug):
     config['reset'] = False
     driver.loadConfig(config)
 
-    e = executor.Executor(driver, scaleParameters, stop_on_error=args['stop_on_error'])
+    e = executor.Executor(driver, scaleParameters, None, stop_on_error=args['stop_on_error'])
     driver.executeStart()
     results = e.execute(args['duration'])
     driver.executeFinish()
