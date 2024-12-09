@@ -26,5 +26,6 @@ build:
         tool/mongodb/install-server.sh
         tool/mongodb/install-driver.sh
         tool/mongodb/start-server.sh
+        tool/mongodb/init-replica-set.sh
         tool/execute-tpcc.sh --scalefactor=100 --warehouses=4 mongodb
         tool/mongodb/stop-server.sh
