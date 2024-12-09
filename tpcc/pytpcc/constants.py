@@ -164,4 +164,9 @@ TransactionTypes = enum(
     "STOCK_LEVEL",
 )
 
+# This sets a specific workload to be run
 WORKLOAD = None
+
+# Number of workloads to run in verification mode
+VERIFY = False
+VERIFY_COUNT = 0

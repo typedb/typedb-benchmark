@@ -138,11 +138,12 @@ class PostgresDriver(AbstractDriver):
             user=self.user,
             password=self.password
         )
+        self.conn.set_isolation_level(psycopg2.extensions.ISOLATION_LEVEL_READ_COMMITTED)
         self.cursor = self.conn.cursor()
 
         if config["reset"]:
             # Load the schema
-            logging.debug("Loading DDL file '%s'" % (self.ddl))
+            logging.debug(f"POSTGRES: Loading DDL file '{self.ddl}'")
             with open(self.ddl) as f:
                 ddl_script = f.read()
             
@@ -186,7 +187,7 @@ class PostgresDriver(AbstractDriver):
     ## ----------------------------------------------
     def loadTuples(self, tableName, tuples):
         if len(tuples) == 0: return
-        logging.info("Loading %d tuples for tableName %s" % (len(tuples), tableName))
+        logging.info("POSTGRES: Loading %d tuples for tableName %s" % (len(tuples), tableName))
 
         # Count the number of columns
         num_columns = len(tuples[0])
@@ -210,16 +211,24 @@ class PostgresDriver(AbstractDriver):
             logging.error(f"First tuple: {tuples[0]}")
             raise
         
-        logging.debug("Loaded %d tuples for tableName %s" % (len(tuples), tableName))
+        logging.debug(f"Loaded {len(tuples)} tuples for tableName {tableName}")
         return
 
     ## ----------------------------------------------
     ## loadFinish
     ## ----------------------------------------------
     def loadFinish(self):
-        logging.info("Commiting changes to database")
+        logging.info("POSTGRES: Commiting changes to database")
         self.enable_trigger_validation()
         self.conn.commit()
+
+
+    ## ----------------------------------------------
+    ## loadVerify
+    ## ----------------------------------------------
+    def loadVerify(self):
+        logging.info("POSTGRES:")
+        logging.info(self.log_counts())
 
     ## ----------------------------------------------
     ## T1: doDelivery
@@ -346,7 +355,7 @@ class PostgresDriver(AbstractDriver):
             self.cursor.execute(q["getStockInfo"] % (d_id, ol_i_id, ol_supply_w_id))
             stockInfo = self.cursor.fetchone()
             if len(stockInfo) == 0:
-                logging.warning("No STOCK record for (ol_i_id=%d, ol_supply_w_id=%d)" % (ol_i_id, ol_supply_w_id))
+                logging.warning("POSTGRES: No STOCK record for (ol_i_id=%d, ol_supply_w_id=%d)" % (ol_i_id, ol_supply_w_id))
                 continue
             s_quantity = stockInfo[0]
             s_ytd = stockInfo[2]
@@ -526,5 +535,22 @@ class PostgresDriver(AbstractDriver):
         self.conn.commit()
         
         return (int(result[0]),0)
+    
+    ## ----------------------------------------------
+    ## T6: executeVerify
+    ## ----------------------------------------------
+    def executeVerify(self):
+        logging.info("POSTGRES:")
+        logging.info(self.log_counts())
+
+    def log_counts(self):
+        tables = ["ITEM", "WAREHOUSE", "DISTRICT", "CUSTOMER", "STOCK", "ORDERS", "NEW_ORDER", "ORDER_LINE", "HISTORY"]
+        verification = "\n{\n"
+        for table in tables:
+            self.cursor.execute(f"SELECT COUNT(*) FROM {table}")
+            count = self.cursor.fetchone()[0]
+            verification += f"    \"{table}\": {count}\n"
+        verification += "}"
+        return verification
         
 ## CLASS

@@ -32,7 +32,6 @@
 import sys
 import multiprocessing
 import time
-import random
 import traceback
 import logging
 from datetime import datetime
@@ -41,11 +40,11 @@ from pprint import pprint,pformat
 import constants
 from util import *
 
-
 class Executor:
 
-    def __init__(self, driver, scaleParameters, stop_on_error = False):
+    def __init__(self, driver, scaleParameters, verifier, stop_on_error = False):
         self.driver = driver
+        self.verifier = verifier
         self.scaleParameters = scaleParameters
         self.stop_on_error = stop_on_error
     ## DEF
@@ -59,13 +58,17 @@ class Executor:
         # Batch Results
         batch_result = results.Results()
         start_batch = batch_result.startBenchmark()
-        while (time.time() - start) <= duration:
+        txn_count = 0
+        while time.time() - start <= duration:
             txn, params = self.doOne()
             global_txn_id = global_result.startTransaction(txn)
             batch_txn_id = batch_result.startTransaction(txn)
             if debug: logging.debug("Executing '%s' transaction" % txn)
             try:
                 (val, retries) = self.driver.executeTransaction(txn, params)
+                if self.verifier:
+                    (verify_val, verify_retries) = self.verifier.executeTransaction(txn, params)
+                    if debug: logging.debug(f"VERIFICATION:Got {val} vs {verify_val}")
             except KeyboardInterrupt:
                 return -1
             except (Exception, AssertionError) as ex:
@@ -91,6 +94,8 @@ class Executor:
                 batch_result = results.Results()
                 start_batch = batch_result.startBenchmark()
 
+            txn_count += 1
+
         ## WHILE
         batch_result.stopBenchmark()
         global_result.stopBenchmark()
@@ -104,6 +109,7 @@ class Executor:
         ## *minimum* percentages to be maintained. This is close to the right
         ## thing, but not precisely correct. See TPC-C 5.2.4 (page 68).
         x = rand.number(1, 100)
+        print(x)
         params = None
         txn = None
         if constants.WORKLOAD is not None:
