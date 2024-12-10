@@ -17,8 +17,9 @@ build:
       command: |
         tool/install-typedb-driver.sh
         tool/start-typedb-core.sh
-        tool/execute-tpcc.sh --scalefactor=100 --warehouses=4 typedb3
+        tool/execute-tpcc.sh --scalefactor=1 --warehouses=4 typedb3
         tool/stop-typedb-core.sh
+        sleep 600
     benchmark-tpcc-mongodb:
       image: typedb-ubuntu-22.04
       machine: 16-core-64-gb
@@ -27,5 +28,6 @@ build:
         tool/mongodb/install-driver.sh
         tool/mongodb/start-server.sh
         tool/mongodb/init-replica-set.sh
-        tool/execute-tpcc.sh --scalefactor=100 --warehouses=4 mongodb
+        tool/execute-tpcc.sh --scalefactor=1 --warehouses=4 mongodb
         tool/mongodb/stop-server.sh
+        sleep 600
