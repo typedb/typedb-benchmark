@@ -1,4 +1,4 @@
-set -eu
+set -eux
 
 source tool/typedb2/config.sh
 

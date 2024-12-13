@@ -15,29 +15,20 @@ build:
       image: typedb-ubuntu-22.04
       machine: 16-core-64-gb
       command: |
-        tool/typedb2/install-driver.sh
-        tool/typedb2/install-server.sh
-        tool/typedb2/start-server.sh
+        tool/typedb2/setup.sh
         tool/execute-tpcc.sh --scalefactor=100 --warehouses=4 typedb2
-        tool/typedb2/stop-server.sh
-        tool/typedb2/uninstall-server.sh
+        tool/typedb2/teardown.sh
     benchmark-tpcc-typedb3:
       image: typedb-ubuntu-22.04
       machine: 16-core-64-gb
       command: |
-        tool/typedb3/install-driver.sh
-        tool/typedb3/install-server.sh
-        tool/typedb3/start-server.sh
+        tool/typedb3/setup.sh
         tool/execute-tpcc.sh --scalefactor=100 --warehouses=4 typedb3
-        tool/typedb3/stop-server.sh
-        tool/typedb3/uninstall-server.sh
+        tool/typedb3/teardown.sh
     benchmark-tpcc-mongodb:
       image: typedb-ubuntu-22.04
       machine: 16-core-64-gb
       command: |
-        tool/mongodb/install-server.sh
-        tool/mongodb/install-driver.sh
-        tool/mongodb/start-server.sh
-        tool/mongodb/init-replica-set.sh
+        tool/mongodb/setup.sh
         tool/execute-tpcc.sh --scalefactor=100 --warehouses=4 mongodb
         tool/mongodb/stop-server.sh
