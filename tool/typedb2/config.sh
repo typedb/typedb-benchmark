@@ -1,0 +1,5 @@
+set -eu
+
+SERVER_VERSION="2.29.1"
+SERVER_CLOUDSMITH_REPO="public-release"
+DRIVER_VERSION="2.29.0"

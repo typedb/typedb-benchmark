@@ -1,0 +1,10 @@
+set -eu
+
+source tool/typedb2/config.sh
+
+DISTRIBUTION="typedb-all-linux-x86_64"
+DISTRIBUTION_DIR="$DISTRIBUTION-$SERVER_VERSION"
+DISTRIBUTION_TARGZ="$DISTRIBUTION_DIR.tar.gz"
+
+rm -rf "$DISTRIBUTION_DIR"
+rm "$DISTRIBUTION_TARGZ"
