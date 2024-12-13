@@ -15,10 +15,12 @@ build:
       image: typedb-ubuntu-22.04
       machine: 16-core-64-gb
       command: |
-        tool/install-typedb-driver.sh
-        tool/start-typedb-core.sh
+        tool/typedb3/install-driver.sh
+        tool/typedb3/install-server.sh
+        tool/typedb3/start-server.sh
         tool/execute-tpcc.sh --scalefactor=100 --warehouses=4 typedb3
-        tool/stop-typedb-core.sh
+        tool/typedb3/stop-server.sh
+        tool/typedb3/uninstall-server.sh
     benchmark-tpcc-mongodb:
       image: typedb-ubuntu-22.04
       machine: 16-core-64-gb
