@@ -1,6 +1,6 @@
 set -eu
 
-source tool/config.sh
+source tool/typedb3/config.sh
 
 # start server
 DISTRIBUTION="typedb-all-linux-x86_64"
