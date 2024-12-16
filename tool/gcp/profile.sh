@@ -1,3 +1,5 @@
+set -eu
+
 # cloud provider config
 PROJECT=vaticle-engineers
 ZONE=europe-west2-c
