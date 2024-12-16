@@ -1,5 +1,7 @@
 set -eu
 
+source tool/mongodb/config.sh
+
 echo 'installing server...'
 sudo apt-get install -y gnupg curl
 curl -fsSL https://www.mongodb.org/static/pgp/server-8.0.asc | sudo gpg -o /usr/share/keyrings/mongodb-server-8.0.gpg --dearmor
