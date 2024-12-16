@@ -16,19 +16,19 @@ build:
       machine: 16-core-64-gb
       command: |
         tool/typedb2/setup.sh
-        tool/execute-tpcc.sh --scalefactor=50 --warehouses=4 --clients=4 --duration=180 typedb2
+        tool/execute-tpcc.sh --scalefactor=30 --warehouses=4 typedb2
         tool/typedb2/teardown.sh
     benchmark-tpcc-typedb3:
       image: typedb-ubuntu-22.04
       machine: 16-core-64-gb
       command: |
         tool/typedb3/setup.sh
-        tool/execute-tpcc.sh --scalefactor=50 --warehouses=4 --clients=4 --duration=180 typedb3
+        tool/execute-tpcc.sh --scalefactor=30 --warehouses=4 typedb3
         tool/typedb3/teardown.sh
     benchmark-tpcc-mongodb:
       image: typedb-ubuntu-22.04
       machine: 16-core-64-gb
       command: |
         tool/mongodb/setup.sh
-        tool/execute-tpcc.sh --scalefactor=50 --warehouses=4 --clients=4 --duration=180 mongodb
+        tool/execute-tpcc.sh --scalefactor=30 --warehouses=4 mongodb
         tool/mongodb/stop-server.sh
