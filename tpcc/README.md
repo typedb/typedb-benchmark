@@ -32,24 +32,25 @@ There are 5 workloads (T1... T5):
   ```
 * Install python driver: `pip install typedb-driver==3.XXX`   
 
-#### Load data
+#### Benchmark
+##### Load data
 
 * Run typedb
 * Run the data loading:
 
   ```
-  tpcc.py --warehouses=X --scalefactor=100 --no-execute --reset --clients=Y typedb
+  tpcc.py --warehouses=X --scalefactor=100 --no-execute --reset --clients=Y typedb3
   ```
 
 **Note** Number of clients shouldn't be larger than number of warehouses (data is sharded by warehouse).
 
-#### Query the data
+##### Query the data
 
 * Run typedb
 * Run the workloads: 
 
   ```
-  tpcc.py --warehouses=X --scalefactor=100 --no-load --clients=Y typedb
+  tpcc.py --warehouses=X --scalefactor=100 --no-load --clients=Y typedb3
   ```
 
 ### TypeDB 2
@@ -59,7 +60,8 @@ There are 5 workloads (T1... T5):
 * Install TypeDB 2.28+
 * Install python driver: `pip install typedb==2.XXX`
 
-#### Load data
+#### Benchmark
+##### Load data
 
 * Run typedb
 * Run the data loading:
@@ -68,7 +70,7 @@ There are 5 workloads (T1... T5):
   tpcc.py --warehouses=X --scalefactor=100 --no-execute --reset --clients=Y typedb2
   ```
 
-#### Query the data
+##### Query the data
 
 * Run typedb
 * Run the workloads:
@@ -93,7 +95,7 @@ There are 5 workloads (T1... T5):
 
 #### Benchmark
 
-As before, replace `typedb` by `postgres`
+As with TypeDB 2 / 3, but supply `postgres` for the driver name instead
 
 ### MongoDB
 
@@ -109,6 +111,7 @@ As before, replace `typedb` by `postgres`
 
     ```
     mongod --replSet rs0 --bind_ip localhost --config /opt/homebrew/etc/mongod.conf
+    mongosh --eval 'rs.initiate()'
     ```
   * Without transactions
 
@@ -118,7 +121,7 @@ As before, replace `typedb` by `postgres`
 
 #### Benchmark
 
-As before.
+As with TypeDB 2 / 3, but supply `mongodb` for the driver name instead
 
 ### Neo4j
 

@@ -25,6 +25,15 @@ build:
         tool/typedb3/setup.sh
         tool/execute-tpcc.sh --scalefactor=30 --warehouses=4 typedb3
         tool/typedb3/teardown.sh
+    benchmark-tpcc-typedb3-verification:
+      image: typedb-ubuntu-22.04
+      machine: 16-core-64-gb
+      command: |
+        tool/postgres/setup.sh
+        tool/typedb3/setup.sh
+        tool/execute-tpcc.sh --scalefactor=100 --warehouses=4 typedb3 --reset --verify
+        tool/typedb3/teardown.sh
+        tool/postgres/stop-server.sh
     benchmark-tpcc-mongodb:
       image: typedb-ubuntu-22.04
       machine: 16-core-64-gb
