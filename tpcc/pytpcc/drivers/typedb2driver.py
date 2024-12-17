@@ -115,16 +115,14 @@ class Typedb2Driver(AbstractDriver):
     def loadTuples(self, tableName, tuples):
         if len(tuples) == 0: return
 
+        if tableName != "ITEM" and self.items_complete_event and not self.items_complete_event.is_set():
+            logging.info("Waiting for ITEM loading to be complete ...")
+            self.items_complete_event.wait()  # Will wait until items are complete
+            logging.info("ITEM loading complete! Proceeding...")
+
         with self.session.transaction(TransactionType.WRITE) as tx:
             write_query = [ ]
             is_update = False;
-
-            if tableName == "ITEM":
-                pass
-            elif self.items_complete_event and not self.items_complete_event.is_set():
-                logging.info("Waiting for ITEM loading to be complete ...")
-                self.items_complete_event.wait()  # Will wait until items are complete
-                logging.info("ITEM loading complete! Proceeding...")
 
             if tableName == "WAREHOUSE":
                 for tuple in tuples:
