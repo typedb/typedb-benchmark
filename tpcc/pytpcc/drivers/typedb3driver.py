@@ -156,15 +156,13 @@ class Typedb3Driver(AbstractDriver):
     def loadTuples(self, tableName, tuples):
         if len(tuples) == 0: return
 
+        if tableName != "ITEM" and self.items_complete_event and not self.items_complete_event.is_set():
+            logging.info("Waiting for ITEM loading to be complete ...")
+            self.items_complete_event.wait()  # We wait until item loading is complete
+            logging.info("ITEM loading complete! Proceeding...")
+
         with self.driver.transaction(self.database, TransactionType.WRITE) as tx:
             write_query = [ ]
-
-            if tableName == "ITEM":
-                pass
-            elif self.items_complete_event and not self.items_complete_event.is_set():
-                logging.info("Waiting for ITEM loading to be complete ...")
-                self.items_complete_event.wait()  # We wait until item loading is complete
-                logging.info("ITEM loading complete! Proceeding...")
 
             if tableName == "WAREHOUSE":
                 for tuple in tuples:
