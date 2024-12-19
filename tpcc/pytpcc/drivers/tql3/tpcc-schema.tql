@@ -12,7 +12,7 @@ define
     owns W_TAX,
     owns W_YTD;
 
-  attribute W_ID, value long;
+  attribute W_ID, value integer;
   attribute W_NAME, value string;
   attribute W_STREET_1, value string;
   attribute W_STREET_2, value string;
@@ -37,7 +37,7 @@ define
     owns D_YTD,
     owns D_NEXT_O_ID;
 
-  attribute D_ID, value long;
+  attribute D_ID, value integer;
   attribute D_NAME, value string;
   attribute D_STREET_1, value string;
   attribute D_STREET_2, value string;
@@ -46,7 +46,7 @@ define
   attribute D_ZIP, value string;
   attribute D_TAX, value double;
   attribute D_YTD, value double;
-  attribute D_NEXT_O_ID, value long;
+  attribute D_NEXT_O_ID, value integer;
 
   entity ITEM,
     plays STOCKING:item,
@@ -57,8 +57,8 @@ define
     owns I_PRICE,
     owns I_DATA;
 
-  attribute I_ID, value long;
-  attribute I_IM_ID, value long;
+  attribute I_ID, value integer;
+  attribute I_IM_ID, value integer;
   attribute I_NAME, value string;
   attribute I_PRICE, value double;
   attribute I_DATA, value string;
@@ -87,7 +87,7 @@ define
     owns C_DELIVERY_CNT,
     owns C_DATA;
 
-  attribute C_ID, value long;
+  attribute C_ID, value integer;
   attribute C_FIRST, value string;
   attribute C_MIDDLE, value string;
   attribute C_LAST, value string;
@@ -103,8 +103,8 @@ define
   attribute C_DISCOUNT, value double;
   attribute C_BALANCE, value double;
   attribute C_YTD_PAYMENT, value double;
-  attribute C_PAYMENT_CNT, value long;
-  attribute C_DELIVERY_CNT, value long;
+  attribute C_PAYMENT_CNT, value integer;
+  attribute C_DELIVERY_CNT, value integer;
   attribute C_DATA, value string;
  
   relation ORDER,
@@ -118,11 +118,11 @@ define
     owns O_ALL_LOCAL,
     owns O_NEW_ORDER;
 
-  attribute O_ID, value long;
+  attribute O_ID, value integer;
   attribute O_ENTRY_D, value datetime;
-  attribute O_CARRIER_ID, value long;
-  attribute O_OL_CNT, value long;
-  attribute O_ALL_LOCAL, value long;
+  attribute O_CARRIER_ID, value integer;
+  attribute O_OL_CNT, value integer;
+  attribute O_ALL_LOCAL, value integer;
   attribute O_NEW_ORDER, value boolean;
 
   relation ORDER_LINE,
@@ -135,10 +135,10 @@ define
     owns OL_AMOUNT,
     owns OL_DIST_INFO;
 
-  attribute OL_NUMBER, value long;
-  attribute OL_SUPPLY_W_ID, value long;
+  attribute OL_NUMBER, value integer;
+  attribute OL_SUPPLY_W_ID, value integer;
   attribute OL_DELIVERY_D, value datetime;
-  attribute OL_QUANTITY, value long;
+  attribute OL_QUANTITY, value integer;
   attribute OL_AMOUNT, value double;
   attribute OL_DIST_INFO, value string;
 
@@ -172,10 +172,10 @@ define
     owns S_DIST_9,
     owns S_DIST_10;
 
-  attribute S_QUANTITY, value long;
-  attribute S_YTD, value long;
-  attribute S_ORDER_CNT, value long;
-  attribute S_REMOTE_CNT, value long;
+  attribute S_QUANTITY, value integer;
+  attribute S_YTD, value integer;
+  attribute S_ORDER_CNT, value integer;
+  attribute S_REMOTE_CNT, value integer;
   attribute S_DATA, value string;
   attribute S_DIST_1, value string;
   attribute S_DIST_2, value string;
