@@ -2,9 +2,7 @@ set -eu
 
 # TPCC config
 DB=typedb3
-source tool/$DB/config.sh
-DB_SHORT="${DB:0:1}${DB: -1}"
-DB_VERSION_SHORT=${SERVER_VERSION:0:4}
+source tool/$DB/config.sh # export the DB version
 SCALE_FACTOR=1 # 0.5, 1
 WAREHOUSES=10 # 1, 5, 10, --- 100, 300, 500, 1000
 CLIENTS=1 # 4, 8, 16, 32, 48, 64
@@ -26,5 +24,7 @@ IMAGE=vaticle-ubuntu-2204-c212752a1d15bc145ca4382452e8a33a354362d6
 IMAGE_PROJECT=vaticle-factory-prod
 
 # extrapolation
+DB_SHORT="${DB:0:1}${DB: -1}"
+DB_VERSION_SHORT=${SERVER_VERSION:0:4}
 BENCH_ID=b-$USER-db$DB_SHORT-$DB_VERSION_SHORT-$MACHINE_TYPE_SHORT-$DISK_SIZE-sf$SCALE_FACTOR-w$WAREHOUSES-c$CLIENTS-dur$DURATION-r$RUN_NUM
 MACHINE_NAME=$BENCH_ID
