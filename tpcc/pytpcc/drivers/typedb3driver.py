@@ -490,8 +490,8 @@ $w isa WAREHOUSE, has W_ID {w_id}, has W_TAX $w_tax;
 $d isa DISTRICT, has D_ID {w_id * DPW + d_id}, has D_TAX $d_tax, has D_NEXT_O_ID $d_next_o_id;
 $c isa CUSTOMER, has C_ID {w_id * DPW * CPD + d_id * CPD + c_id}, 
 has C_DISCOUNT $c_discount, has C_LAST $c_last, has C_CREDIT $c_credit;
-$d_next_o_id_old = $d_next_o_id;
-$d_next_o_id_new = $d_next_o_id_old + 1;
+let $d_next_o_id_old = $d_next_o_id;
+let $d_next_o_id_new = $d_next_o_id_old + 1;
 delete 
 $d_next_o_id of $d;
 insert 
@@ -511,7 +511,7 @@ select $w_tax, $d_tax, $d_next_o_id_old, $c_discount, $c_last, $c_credit;"""
                 return (None, 0)
             w_tax = general_info[0].get('w_tax').as_attribute().get_value()
             d_tax = general_info[0].get('d_tax').as_attribute().get_value()
-            d_next_o_id = general_info[0].get('d_next_o_id_old').get_long()
+            d_next_o_id = general_info[0].get('d_next_o_id_old').get_integer()
             c_discount = general_info[0].get('c_discount').as_attribute().get_value()
             c_last = general_info[0].get('c_last').as_attribute().get_value()
             c_credit = general_info[0].get('c_credit').as_attribute().get_value()
@@ -590,7 +590,7 @@ has OL_NUMBER {ol_number}, has OL_SUPPLY_W_ID {ol_supply_w_id},
 has OL_QUANTITY {ol_quantity}, has OL_AMOUNT {ol_amount}, has OL_DIST_INFO "{s_dist_xx}";
 reduce $count = count;"""
                 self.start_checkpoint(q)
-                count = list(tx.query(q).resolve().as_concept_rows())[0].get('count').as_value().get_long()
+                count = list(tx.query(q).resolve().as_concept_rows())[0].get('count').as_value().get_integer()
                 self.end_checkpoint()
                 assert count == 1, "Expected 1 ORDER_LINE to be inserted"
 
@@ -661,7 +661,7 @@ reduce $sum = sum($ol_amount);
                 q = f"""
 match
 $c isa CUSTOMER, has C_ID {w_id * DPW * CPD + d_id * CPD + c_id}, has C_BALANCE $c_balance;
-$c_balance_new = $c_balance + {ol_total};
+let $c_balance_new = $c_balance + {ol_total};
 $o links (customer: $c), isa ORDER, has O_ID {no_o_id}, has O_NEW_ORDER $o_new_order, has O_CARRIER_ID $o_carrier_id;
 delete 
 $o_new_order of $o;
@@ -901,7 +901,7 @@ match
 $w isa WAREHOUSE, has W_ID {w_id}, has W_NAME $w_name, 
 has W_STREET_1 $w_street_1, has W_STREET_2 $w_street_2, 
 has W_CITY $w_city, has W_STATE $w_state, has W_ZIP $w_zip, has W_YTD $w_ytd;
-$w_ytd_new = $w_ytd + {h_amount};
+let $w_ytd_new = $w_ytd + {h_amount};
 delete $w_ytd of $w;
 insert $w has W_YTD == $w_ytd_new;
 select $w_name, $w_street_1, $w_street_2, $w_city, $w_state, $w_zip;
@@ -926,7 +926,7 @@ $d isa DISTRICT, has D_ID {w_id * DPW + d_id},
 has D_NAME $d_name, has D_STREET_1 $d_street_1, 
 has D_STREET_2 $d_street_2, has D_CITY $d_city, 
 has D_STATE $d_state, has D_ZIP $d_zip, has D_YTD $d_ytd;
-$d_ytd_new = $d_ytd + {h_amount};
+let $d_ytd_new = $d_ytd + {h_amount};
 delete $d_ytd of $d;
 insert $d has D_YTD == $d_ytd_new;
 select $d_name, $d_street_1, $d_street_2, $d_city, $d_state, $d_zip;
@@ -1062,7 +1062,7 @@ reduce $count = count;"""
             # Todo
             first_response = list(tx.query(q).resolve().as_concept_rows())[0]
             self.end_checkpoint()
-            result = first_response.get('count').get_long()
+            result = first_response.get('count').get_integer()
             
             tx.commit()
             
@@ -1089,7 +1089,7 @@ reduce $count = count;"""
                 else:
                     q = f"match $t isa {table}; reduce $count = count;"
                 result = list(txn.query(q).resolve().as_concept_rows())
-                count = result[0].get('count').get_long()
+                count = result[0].get('count').get_integer()
                 verification += f"    \"{table}\": {count}\n"
             verification += "}"
             return verification

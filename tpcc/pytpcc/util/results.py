@@ -255,7 +255,7 @@ class Results:
                 result_doc['txn'],
                 result_doc['warehouses'],
                 round(txn_new_order * 60 / duration), txn_new_order, duration,
-                total_retries, str(100.0 * total_retries / total_cnt)[:5],
+                total_retries, str(100.0 * total_retries / (total_cnt + 1))[:5],
                 "n/a",
                 u"%6.2f" % (1000 * lat[int(samples / 2)]), u"%6.2f" % (1000 * lat[int(samples / 100.0 * 75)]),
                 u"%6.2f" % (1000 * lat[int(samples / 100.0 * 90)]), u"%6.2f" % (1000 * lat[int(samples / 100.0 * 95)]),
