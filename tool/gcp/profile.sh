@@ -3,8 +3,8 @@ set -eu
 # TPCC config
 DB=typedb3
 source tool/$DB/config.sh # export the DB version
-SCALE_FACTOR=1 # 0.5, 1
-WAREHOUSES=10 # 1, 5, 10, --- 100, 300, 500, 1000
+SCALE_FACTOR=20 # 0.5, 1
+WAREHOUSES=1 # 1, 5, 10, --- 100, 300, 500, 1000
 CLIENTS=1 # 4, 8, 16, 32, 48, 64
 DURATION=600
 
