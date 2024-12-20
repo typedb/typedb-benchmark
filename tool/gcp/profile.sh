@@ -14,7 +14,7 @@ DISK_SIZE=200gb
 
 # run config
 # USER=... # your GCP SSH login username
-RUN_NUM=1
+RUN_NUM=2
 
 # cloud provider config
 PROJECT=vaticle-engineers
