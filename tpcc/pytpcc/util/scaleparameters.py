@@ -71,11 +71,12 @@ class ScaleParameters:
     ## DEF
 
     def __str__(self):
-        out =  "%d items\n" % self.items
-        out += "%d warehouses\n" % self.warehouses
-        out += "%d districts/warehouse\n" % self.districtsPerWarehouse
-        out += "%d customers/district\n" % self.customersPerDistrict
-        out += "%d initial new orders/district" % self.newOrdersPerDistrict
+        out = "%d Warehouses\n" % self.warehouses
+        out +=  "%d Items / Stock per warehouse \n" % self.items
+        out +=  "%d Total Stock \n" % self.items * self.warehouses
+        out += "%d Districts per warehouse\n" % self.districtsPerWarehouse
+        out += "%d Customers per district\n" % self.customersPerDistrict
+        out += "%d Initial new orders per district" % self.newOrdersPerDistrict
         return out
     ## DEF
 

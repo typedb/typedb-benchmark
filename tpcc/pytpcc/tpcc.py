@@ -260,8 +260,11 @@ if __name__ == '__main__':
         sys.exit(0)
 
     if args['seed']:
-        random.seed(args['seed'])
-
+        seed = args['seed']
+    else:
+        seed = int(time.time() * 1000) + os.getpid()
+    random.seed(seed)
+    print("Random seed set to:", seed)
 
     if args['workload']:
         constants.WORKLOAD = args['workload']
@@ -294,14 +297,13 @@ if __name__ == '__main__':
         verifier.loadConfig(verifierConfig)
 
     ## Create ScaleParameters
-    scaleParameters = scaleparameters.makeWithScaleFactor(args['warehouses'], args['scalefactor'])
-    if args['debug']:
-        logging.info("Scale Parameters:\n%s", scaleParameters)
+    scaleParameters  = scaleparameters.makeWithScaleFactor(args['warehouses'], args['scalefactor'])
 
     ## DATA LOADER!!!
     load_time = None
     if not args['no_load']:
         logging.info("Loading TPC-C benchmark data using %s", (driver))
+        logging.info(f"Data size:\n {scaleParameters} \n")
         load_start = time.time()
         if args['clients'] == 1:
             l = loader.Loader(

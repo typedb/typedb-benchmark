@@ -60,12 +60,17 @@ class Typedb3Driver(AbstractDriver):
         self.execution_timer = None
         self.items_complete_event = shared_event
         self.debug = None
+        self.stock_loaded = 0
+        self.items_loaded = 0
 
         # Set up TypeDB specific logger
         self.typedb_logger = logging.getLogger('typedb_logger')
         handler = logging.FileHandler('typedb.log')
         handler.setFormatter(logging.Formatter('%(asctime)s - %(message)s'))
         self.typedb_logger.addHandler(handler)
+        # Clear the log file
+        with open('typedb.log', 'w') as f:
+            f.write('')
     
     ## ----------------------------------------------
     ## makeDefaultConfig
@@ -146,8 +151,6 @@ class Typedb3Driver(AbstractDriver):
     ## loadStart
     ## ----------------------------------------------
     def loadStart(self):
-        with open('typedb.log', 'w') as f:
-            f.write('')
         return None
 
     ## ----------------------------------------------
@@ -413,7 +416,14 @@ class Typedb3Driver(AbstractDriver):
                 for p in promises:
                     p.resolve()
             tx.commit()
-            logging.info(f"Wrote {len(tuples)} instances of {tableName} with TPQ: {(time.time() - start_time) / len(tuples)}")
+            if tableName == "ITEM":
+                self.items_loaded += len(tuples)
+                logging.info(f"... done with {(self.items_loaded)} instances of ITEM (batch TPQ: {(time.time() - start_time) / len(tuples)})")
+            elif tableName == "STOCK":
+                self.stock_loaded += len(tuples)
+                logging.info(f"... done with {(self.stock_loaded)} instances of STOCK (batch TPQ: {(time.time() - start_time) / len(tuples)})")
+            else:
+                logging.info(f"Wrote {len(tuples)} instances of {tableName} with TPQ: {(time.time() - start_time) / len(tuples)}")
         return
 
     ## ----------------------------------------------
