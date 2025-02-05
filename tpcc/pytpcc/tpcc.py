@@ -268,7 +268,7 @@ if __name__ == '__main__':
     else:
         seed = int(time.time() * 1000) + os.getpid()
     random.seed(seed)
-    print("Random seed set to:", seed)
+    logging.info("Random seed set to: %s", seed)
 
     if args['workload']:
         constants.WORKLOAD = args['workload']
