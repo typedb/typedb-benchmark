@@ -146,7 +146,7 @@ class Typedb3Driver(AbstractDriver):
     ## loadStart
     ## ----------------------------------------------
     def loadStart(self):
-        with open('typedb_log.log', 'w') as f:
+        with open('typedb.log', 'w') as f:
             f.write('')
         return None
 
@@ -265,7 +265,7 @@ class Typedb3Driver(AbstractDriver):
     has C_BALANCE {c_balance}, has C_YTD_PAYMENT {c_ytd_payment},
     has C_PAYMENT_CNT {c_payment_cnt}, has C_DELIVERY_CNT {c_delivery_cnt},
     has C_DATA "{c_data}";
-"""
+    reduce $count = count;"""
                     write_query.append(q)
 
             if tableName == "ORDERS":
@@ -288,7 +288,7 @@ class Typedb3Driver(AbstractDriver):
     has O_ID {o_id},
     has O_ENTRY_D {o_entry_d}, has O_CARRIER_ID {o_carrier_id},
     has O_OL_CNT {o_ol_cnt}, has O_ALL_LOCAL {o_all_local}, has O_NEW_ORDER false;
-"""
+    reduce $count = count;"""
                     write_query.append(q)
 
             if tableName == "NEW_ORDER":
@@ -303,7 +303,7 @@ class Typedb3Driver(AbstractDriver):
     $o links (district: $d), isa ORDER, has O_ID {no_o_id}, has O_NEW_ORDER $status;
     delete $status of $o;
     insert $o has O_NEW_ORDER true;
-"""
+    reduce $count = count;"""
                     write_query.append(q)
 
             if tableName == "ORDER_LINE":
@@ -335,7 +335,7 @@ class Typedb3Driver(AbstractDriver):
     """ + has_ol_delivery_d + f"""
     has OL_QUANTITY {ol_quantity}, has OL_AMOUNT {ol_amount},
     has OL_DIST_INFO "{ol_dist_info}";
-"""
+    reduce $count = count;"""
                     write_query.append(q)
     
             if tableName == "STOCK":
@@ -356,7 +356,7 @@ class Typedb3Driver(AbstractDriver):
     $stock links (item: $i, warehouse: $w), isa STOCKING, 
     has S_QUANTITY {s_quantity}, has S_YTD {s_ytd}, has S_ORDER_CNT {s_order_cnt},
     has S_REMOTE_CNT {s_remote_cnt}, has S_DATA "{s_data}";
-"""
+    reduce $count = count;"""
                     write_query.append(q_stock)
     
                     for i in range(1, 11):
@@ -368,7 +368,7 @@ class Typedb3Driver(AbstractDriver):
     $stock links (item: $i, warehouse: $w), isa STOCKING;
     insert
     $stock has S_DIST_{i} "{tuple[2+i]}";
-"""
+    reduce $count = count;"""
                         write_query.append(q_stock_info)
 
     
@@ -388,7 +388,7 @@ class Typedb3Driver(AbstractDriver):
     insert 
     $history links (customer: $c), isa CUSTOMER_HISTORY,
     has H_DATE {h_date}, has H_AMOUNT {h_amount}, has H_DATA "{h_data}";
-"""
+    reduce $count = count;"""
                     write_query.append(q)
 
             if tableName not in DATA_COUNT:
@@ -396,12 +396,22 @@ class Typedb3Driver(AbstractDriver):
             DATA_COUNT[tableName] += len(tuples);
 
             start_time = time.time()
-            promises = [ ]
-            for q in write_query:
-                promises.append(tx.query(q))
+            if self.debug:
+                for q in write_query:
+                    with self.driver.transaction(self.database, TransactionType.WRITE) as tx_debug:
+                        self.start_checkpoint(q)
+                        result = list(tx_debug.query(q).resolve().as_concept_rows())[0]
+                        self.typedb_logger.debug(f"INSERT COUNT: {result.get('count').as_value().get_integer()}")
+                        self.end_checkpoint()
+                        tx_debug.commit()
 
-            for p in promises:
-                p.resolve()
+            else:
+                promises = [ ]
+                for q in write_query:
+                    promises.append(tx.query(q))
+    
+                for p in promises:
+                    p.resolve()
             tx.commit()
             logging.info(f"Wrote {len(tuples)} instances of {tableName} with TPQ: {(time.time() - start_time) / len(tuples)}")
         return

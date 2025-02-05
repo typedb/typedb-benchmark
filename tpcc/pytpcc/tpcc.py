@@ -182,6 +182,9 @@ def executorFunc(driverClass, scaleParameters, args, config, debug):
     config['execute'] = True
     config['reset'] = False
     driver.loadConfig(config)
+    # When debug is set globally pass this into driver, overwriting the driver-specific config
+    if config['debug'] and driver.debug:
+        driver.debug = True
 
     e = executor.Executor(driver, scaleParameters, None, stop_on_error=args['stop_on_error'])
     driver.executeStart()
