@@ -83,7 +83,7 @@ class PostgresDriver(AbstractDriver):
         "password": ("The password to connect to the PostgreSQL database", ""),
     }
     
-    def __init__(self, ddl, shared_event=None):
+    def __init__(self, ddl, shared_event=None, worker_id=0):
         super(PostgresDriver, self).__init__("postgres", ddl)
         self.conn = None
         self.cursor = None

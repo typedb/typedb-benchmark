@@ -23,7 +23,7 @@ class Neo4JDriver(AbstractDriver):
         "password": ("The password to connect to the Neo4j database", "password"), ## Neo4j requires setting this
     }
     
-    def __init__(self, ddl, shared_event=None):
+    def __init__(self, ddl, shared_event=None, worker_id=0):
         super(Neo4JDriver, self).__init__("neo4j", ddl)
         self.driver = None
         self.session = None

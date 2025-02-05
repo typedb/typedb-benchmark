@@ -23,6 +23,8 @@ import constants
 from drivers.abstractdriver import AbstractDriver
 from enum import Enum
 from multiprocessing import Event
+import textwrap
+
 
 ITEMS_COMPLETE = Event()
 
@@ -48,7 +50,7 @@ class Typedb3Driver(AbstractDriver):
         "debug": ("Enable debug-level logging", "0"),
     }
    
-    def __init__(self, ddl, shared_event=None):
+    def __init__(self, ddl, shared_event=None, worker_id="root"):
         super(Typedb3Driver, self).__init__("typedb", ddl)
         self.database = None
         self.addr = None
@@ -62,15 +64,15 @@ class Typedb3Driver(AbstractDriver):
         self.debug = None
         self.stock_loaded = 0
         self.items_loaded = 0
+        self.worker_id = worker_id
 
         # Set up TypeDB specific logger
-        self.typedb_logger = logging.getLogger('typedb_logger')
-        handler = logging.FileHandler('typedb.log')
+        filename = f'typedb_pid_{self.worker_id}.log'
+        open(filename, 'w').close() # Clear the file
+        self.typedb_logger = logging.getLogger('typedb3')
+        handler = logging.FileHandler(filename)
         handler.setFormatter(logging.Formatter('%(asctime)s - %(message)s'))
         self.typedb_logger.addHandler(handler)
-        # Clear the log file
-        with open('typedb.log', 'w') as f:
-            f.write('')
     
     ## ----------------------------------------------
     ## makeDefaultConfig
@@ -99,11 +101,10 @@ class Typedb3Driver(AbstractDriver):
             raise Exception(f"Did not open a driver for edition: {edition}")
 
         self.schema = str(config["schema"])
-
-        self.debug = bool(config["debug"])
+        self.debug = bool(int(config["debug"]))
+        self.execution_timer = time.time()
         if self.debug:
             self.typedb_logger.setLevel(logging.DEBUG)
-            self.execution_timer = time.time()
         else:
             self.typedb_logger.setLevel(logging.INFO)
 
@@ -131,21 +132,41 @@ class Typedb3Driver(AbstractDriver):
                 tx.query(define_query)
                 tx.commit()
             logging.debug("Committed schema")
+
         ## IF
 
     ## ----------------------------------------------
-    ## Simple execution timer
+    ## Logging functions
     ## ----------------------------------------------
     def start_checkpoint(self, q):
         if self.debug:
-            self.typedb_logger.debug(f"\n EXECUTING QUERY:\n{q}")
+            self.typedb_logger.debug(self.indent(f"\nEXECUTING QUERY:\n{q}", 1))
         return
 
     def end_checkpoint(self):
         if self.debug:
-            self.typedb_logger.debug(f"--- Time taken: {(time.time() - self.execution_timer)} ---\n\n")
+            self.typedb_logger.debug(self.indent(f"\nCOMPLETED QUERY (Time taken: {(time.time() - self.execution_timer)})\n", 1))
             self.execution_timer = time.time()
         return
+    
+    def log_start_workload(self, name):
+        if self.debug:
+            self.typedb_logger.debug(self.indent(f"\nSTARTING WORKLOAD: {name}\n", 0))
+        return
+    
+    def log_commit(self, name):
+        if self.debug:
+            self.typedb_logger.debug(self.indent(f"\nCOMMITTED WORKLOAD: {name}\n", 0))
+        return
+    
+    def log_failure(self, exception):
+        if self.debug:
+            self.typedb_logger.debug(f"\nFAILED: {exception}\n")
+        return
+    
+    def indent(self, text, tabs=1):
+        return textwrap.indent(text, tabs * "    ")
+        
     
     ## ----------------------------------------------
     ## loadStart
@@ -418,12 +439,12 @@ class Typedb3Driver(AbstractDriver):
             tx.commit()
             if tableName == "ITEM":
                 self.items_loaded += len(tuples)
-                logging.info(f"... done with {(self.items_loaded)} instances of ITEM (batch TPQ: {(time.time() - start_time) / len(tuples)})")
+                logging.info(f"client ({self.worker_id}) done with {(self.items_loaded)} instances of ITEM (batch TPQ: {(time.time() - start_time) / len(tuples)})")
             elif tableName == "STOCK":
                 self.stock_loaded += len(tuples)
-                logging.info(f"... done with {(self.stock_loaded)} instances of STOCK (batch TPQ: {(time.time() - start_time) / len(tuples)})")
+                logging.info(f"client ({self.worker_id}) done with {(self.stock_loaded)} instances of STOCK (batch TPQ: {(time.time() - start_time) / len(tuples)})")
             else:
-                logging.info(f"Wrote {len(tuples)} instances of {tableName} with TPQ: {(time.time() - start_time) / len(tuples)}")
+                logging.info(f"client ({self.worker_id}) wrote {len(tuples)} instances of {tableName} with TPQ: {(time.time() - start_time) / len(tuples)}")
         return
 
     ## ----------------------------------------------
@@ -460,8 +481,9 @@ class Typedb3Driver(AbstractDriver):
     ## ----------------------------------------------
     def doNewOrder(self, params):
 
+        name = "doNewOrder"
         if self.debug:
-            self.typedb_logger.debug("--- START doNewOrder ---")
+            self.log_start_workload(name)
 
         w_id = params["w_id"]
         d_id = params["d_id"]
@@ -492,10 +514,15 @@ has I_NAME $i_name, has I_PRICE $i_price,
 has I_DATA $i_data; 
 select $i_name, $i_price, $i_data;"""
                 self.start_checkpoint(q)
-                item = list(tx.query(q).resolve().as_concept_rows())
+                try:
+                    item = list(tx.query(q).resolve().as_concept_rows())
+                except Exception as e:
+                    self.log_failure(e)
+                    raise e
                 self.end_checkpoint()
                 if len(item) == 0:
-                    return (None, 0)
+                    return (None, 0) # This can happen, see TPC-C 2.4.2.3
+                                     # (in theory need to return some data here... for now simply "abort")
                 items.append({ 'name': item[0].get('i_name').as_attribute().get_value(), 
                                 'price': item[0].get('i_price').as_attribute().get_value(), 
                                 'data': item[0].get('i_data').as_attribute().get_value()})
@@ -522,12 +549,16 @@ has O_ENTRY_D {o_entry_d}, has O_CARRIER_ID {o_carrier_id},
 has O_OL_CNT {ol_cnt}, has O_ALL_LOCAL {all_local_int}, has O_NEW_ORDER true;
 select $w_tax, $d_tax, $d_next_o_id_old, $c_discount, $c_last, $c_credit;"""
             self.start_checkpoint(q)
-            general_info = list(tx.query(q).resolve().as_concept_rows())
+            try:
+                general_info = list(tx.query(q).resolve().as_concept_rows())
+            except Exception as e:
+                self.log_failure(e)
+                raise e
             self.end_checkpoint()
             
             if len(general_info) == 0:
                 logging.warning("No general info for warehouse %d" % w_id)
-                self.typedb_logger.debug("--- FAILED ---")
+                self.typedb_logger.debug("--- FAILED (data not found) ---")
                 return (None, 0)
             w_tax = general_info[0].get('w_tax').as_attribute().get_value()
             d_tax = general_info[0].get('d_tax').as_attribute().get_value()
@@ -557,7 +588,11 @@ has S_ORDER_CNT $s_order_cnt, has S_REMOTE_CNT $s_remote_cnt,
 has S_DIST_{d_id} $s_dist_xx;
 select $s_quantity, $s_data, $s_ytd, $s_order_cnt, $s_remote_cnt, $s_dist_xx;"""
                 self.start_checkpoint(q)
-                stock_info = list(tx.query(q).resolve().as_concept_rows())
+                try:
+                    stock_info = list(tx.query(q).resolve().as_concept_rows())
+                except Exception as e:
+                    self.log_failure(e)
+                    raise e
                 self.end_checkpoint()
 
                 if len(stock_info) == 0:
@@ -610,7 +645,11 @@ has OL_NUMBER {ol_number}, has OL_SUPPLY_W_ID {ol_supply_w_id},
 has OL_QUANTITY {ol_quantity}, has OL_AMOUNT {ol_amount}, has OL_DIST_INFO "{s_dist_xx}";
 reduce $count = count;"""
                 self.start_checkpoint(q)
-                count = list(tx.query(q).resolve().as_concept_rows())[0].get('count').as_value().get_integer()
+                try:
+                    count = list(tx.query(q).resolve().as_concept_rows())[0].get('count').as_value().get_integer()
+                except Exception as e:
+                    self.log_failure(e)
+                    raise e
                 self.end_checkpoint()
                 assert count == 1, "Expected 1 ORDER_LINE to be inserted"
 
@@ -621,7 +660,12 @@ reduce $count = count;"""
                 item_data.append( (i_name, s_quantity, brand_generic, i_price, ol_amount) )
             ## FOR
 
-            tx.commit()
+            try:
+                tx.commit()
+                self.log_commit(name)
+            except Exception as e:
+                self.log_failure(e)
+                raise e
             total *= (1 - c_discount) * (1 + w_tax + d_tax)
 
             ## Pack up values the client is missing (see TPC-C 2.4.3.5)
@@ -633,10 +677,10 @@ reduce $count = count;"""
     ## T2: doDelivery
     ## ----------------------------------------------
     def doDelivery(self, params):
-
+        name = "doDelivery"
         if self.debug:
-            self.typedb_logger.debug("--- START doDelivery ---")
-        
+            self.log_start_workload(name)
+
         w_id = params["w_id"]
         o_carrier_id = params["o_carrier_id"]
         ol_delivery_d = params["ol_delivery_d"].isoformat()[:-3]
@@ -652,7 +696,11 @@ $c isa CUSTOMER, has C_ID $c_id;
 select $o_id, $c_id;
 """
                 self.start_checkpoint(q)
-                new_order_info = list(tx.query(q).resolve().as_concept_rows())
+                try:
+                    new_order_info = list(tx.query(q).resolve().as_concept_rows())
+                except Exception as e:
+                    self.log_failure(e)
+                    raise e
                 self.end_checkpoint()
                 if len(new_order_info) == 0:
                     ## No orders for this district: skip it. Note: This must be reported if > 1%
@@ -670,7 +718,11 @@ select $ol_amount;
 reduce $sum = sum($ol_amount);
 """
                 self.start_checkpoint(q)
-                response = list(tx.query(q).resolve().as_concept_rows())[0]
+                try:
+                    response = list(tx.query(q).resolve().as_concept_rows())[0]
+                except Exception as e:
+                    self.log_failure(e)
+                    raise e
                 self.end_checkpoint()
                 ol_total = response.get("sum").as_value().get_double()
                 # If there are no order lines, SUM returns null. There should always be order lines.
@@ -697,7 +749,11 @@ insert
 $ol has OL_DELIVERY_D {ol_delivery_d};
 """
                 self.start_checkpoint(q)
-                tx.query(q).resolve()
+                try:
+                    tx.query(q).resolve()
+                except Exception as e:
+                    self.log_failure(e)
+                    raise e
                 self.end_checkpoint()
 
 #                 q = f"""
@@ -720,16 +776,21 @@ $ol has OL_DELIVERY_D {ol_delivery_d};
                 result.append((d_id, no_o_id))
             ## FOR
 
-            tx.commit()
+            try:
+                tx.commit()
+                self.log_commit(name)
+            except Exception as e:
+                self.log_failure(e)
+                raise e
         return (result,0)
 
     ## ----------------------------------------------
     ## T3: doOrderStatus
     ## ----------------------------------------------
     def doOrderStatus(self, params):
-
+        name = "doOrderStatus"
         if self.debug:
-            self.typedb_logger.debug("--- START doOrderStatus ---")
+            self.log_start_workload(name)
 
         w_id = params["w_id"]
         d_id = params["d_id"]
@@ -765,7 +826,11 @@ sort $c_first asc;
 """
                 self.start_checkpoint(q)
                 # Get the midpoint customer's id
-                all_customers = list(tx.query(q).resolve().as_concept_rows())
+                try:
+                    all_customers = list(tx.query(q).resolve().as_concept_rows())
+                except Exception as e:
+                    self.log_failure(e)
+                    raise e
                 self.end_checkpoint()
                 assert len(all_customers) > 0
                 index = (len(all_customers) - 1) // 2
@@ -791,7 +856,11 @@ select $o_id;
 sort $o_id desc;
 limit 1;"""
             self.start_checkpoint(q)
-            order = list(tx.query(q).resolve().as_concept_rows())
+            try:
+                order = list(tx.query(q).resolve().as_concept_rows())
+            except Exception as e:
+                self.log_failure(e)
+                raise e
             self.end_checkpoint()
             orderLines_data = [ ]
 
@@ -808,7 +877,11 @@ has OL_SUPPLY_W_ID $ol_supply_w_id, has OL_QUANTITY $ol_quantity,
 has OL_AMOUNT $ol_amount, has OL_DIST_INFO $ol_dist_info;
 select $i_id, $ol_supply_w_id, $ol_quantity, $ol_amount, $ol_dist_info;"""
                 self.start_checkpoint(q)
-                orderLines = list(tx.query(q).resolve().as_concept_rows())
+                try:
+                    orderLines = list(tx.query(q).resolve().as_concept_rows())
+                except Exception as e:
+                    self.log_failure(e)
+                    raise e
                 self.end_checkpoint()
                 for orderLine in orderLines:
                     orderLines_data.append([
@@ -828,9 +901,9 @@ select $i_id, $ol_supply_w_id, $ol_quantity, $ol_amount, $ol_dist_info;"""
     ## T4: doPayment
     ## ----------------------------------------------    
     def doPayment(self, params):
-
+        name = "doPayment"
         if self.debug:
-            self.typedb_logger.debug("--- START doPayment ---")
+            self.log_start_workload(name)
 
         w_id = params["w_id"]
         d_id = params["d_id"]
@@ -858,7 +931,11 @@ $c_state, $c_zip, $c_phone, $c_since, $c_credit, $c_credit_lim, $c_discount,
 $c_balance, $c_ytd_payment, $c_payment_cnt, $c_data;
 """
                 self.start_checkpoint(q)
-                customer = list(tx.query(q).resolve().as_concept_rows())
+                try:
+                    customer = list(tx.query(q).resolve().as_concept_rows())
+                except Exception as e:
+                    self.log_failure(e)
+                    raise e
                 self.end_checkpoint()
                 assert len(customer) == 1, f"doPayment: no customer found for w_id {w_id}, d_id {d_id}, c_id {c_id}"
                 customer = customer[0]
@@ -882,7 +959,11 @@ sort $c_first asc;
 """
                 self.start_checkpoint(q)
                 # Get the midpoint customer's id
-                all_customers = list(tx.query(q).resolve().as_concept_rows())
+                try:
+                    all_customers = list(tx.query(q).resolve().as_concept_rows())
+                except Exception as e:
+                    self.log_failure(e)
+                    raise e
                 self.end_checkpoint()
                 assert len(all_customers) > 0, f"doPayment: no customer found for w_id {w_id}, d_id {d_id}, c_last {c_last}"
                 namecnt = len(all_customers)
@@ -927,7 +1008,11 @@ insert $w has W_YTD == $w_ytd_new;
 select $w_name, $w_street_1, $w_street_2, $w_city, $w_state, $w_zip;
 """
             self.start_checkpoint(q)
-            warehouse = list(tx.query(q).resolve().as_concept_rows())
+            try:
+                warehouse = list(tx.query(q).resolve().as_concept_rows())
+            except Exception as e:
+                self.log_failure(e)
+                raise e
             self.end_checkpoint()
             assert len(warehouse) == 1
             warehouse_data = [
@@ -952,7 +1037,11 @@ insert $d has D_YTD == $d_ytd_new;
 select $d_name, $d_street_1, $d_street_2, $d_city, $d_state, $d_zip;
 """
             self.start_checkpoint(q)
-            district = list(tx.query(q).resolve().as_concept_rows())
+            try:
+                district = list(tx.query(q).resolve().as_concept_rows())
+            except Exception as e:
+                self.log_failure(e)
+                raise e
             self.end_checkpoint()
             assert len(district) == 1
             district_data = [
@@ -1010,7 +1099,11 @@ has C_PAYMENT_CNT {c_payment_cnt}, has C_DATA "{c_data}";
 $h links (customer: $c), isa CUSTOMER_HISTORY, has H_DATE {h_date}, has H_AMOUNT {h_amount}, has H_DATA "{h_data}";
 """            # TODO: if histories keep track of w_id's this needs to be changed as well
                 self.start_checkpoint(q)
-                tx.query(q).resolve()
+                try:
+                    tx.query(q).resolve()
+                except Exception as e:
+                    self.log_failure(e)
+                    raise e
                 self.end_checkpoint()
             else:
                 q = f"""
@@ -1028,7 +1121,11 @@ has C_PAYMENT_CNT {c_payment_cnt};
 $h links (customer: $c), isa CUSTOMER_HISTORY, has H_DATE {h_date}, has H_AMOUNT {h_amount}, has H_DATA "{h_data}";
 """             # TODO: if histories keep track of w_id's this needs to be changed as well
                 self.start_checkpoint(q)
-                tx.query(q).resolve()
+                try:
+                    tx.query(q).resolve()
+                except Exception as e:
+                    self.log_failure(e)
+                    raise e
                 self.end_checkpoint()
 
             # TPC-C 2.5.3.3: Must display the following fields:
@@ -1038,7 +1135,12 @@ $h links (customer: $c), isa CUSTOMER_HISTORY, has H_DATE {h_date}, has H_AMOUNT
             # C_DISCOUNT, C_BALANCE, the first 200 characters of C_DATA (only if C_CREDIT = "BC"),
             # H_AMOUNT, and H_DATE.
             
-            tx.commit()
+            try:
+                tx.commit()
+                self.log_commit(name)
+            except Exception as e:
+                self.log_failure(e)
+                raise e
             return ([ warehouse_data, district_data, customer_data ],0)
 
 
@@ -1047,9 +1149,9 @@ $h links (customer: $c), isa CUSTOMER_HISTORY, has H_DATE {h_date}, has H_AMOUNT
     ## T5: doStockLevel
     ## ----------------------------------------------    
     def doStockLevel(self, params):
-
+        name = "doStockLevel"
         if self.debug:
-            self.typedb_logger.debug("--- START doStockLevel ---")
+            self.log_start_workload(name)
 
         w_id = params["w_id"]
         d_id = params["d_id"]
@@ -1062,7 +1164,11 @@ $d isa DISTRICT, has D_ID {w_id * DPW + d_id}, has D_NEXT_O_ID $d_next_o_id;
 select $d_next_o_id;
 """
             self.start_checkpoint(q)
-            result = list(tx.query(q).resolve().as_concept_rows())
+            try:
+                result = list(tx.query(q).resolve().as_concept_rows())
+            except Exception as e:
+                self.log_failure(e)
+                raise e
             self.end_checkpoint()
             assert len(result) == 1, f"doStockLevel: no district found for w_id {w_id}, d_id {d_id}"
             o_id = result[0].get('d_next_o_id').as_attribute().get_value()
@@ -1079,12 +1185,20 @@ $o_id >= {o_id - 20};
 select $i;
 reduce $count = count;"""
             self.start_checkpoint(q)
-            # Todo
-            first_response = list(tx.query(q).resolve().as_concept_rows())[0]
+            try:
+                first_response = list(tx.query(q).resolve().as_concept_rows())[0]
+            except Exception as e:
+                self.log_failure(e)
+                raise e
             self.end_checkpoint()
             result = first_response.get('count').get_integer()
             
-            tx.commit()
+            try:
+                tx.commit()
+                self.log_commit(name)
+            except Exception as e:
+                self.log_failure(e)
+                raise e
             
             return (int(result),0)
            

@@ -43,7 +43,7 @@ class Typedb2Driver(AbstractDriver):
         "schema": ("Script-relative path to schema file", "tql/tpcc-schema.tql"),
     }
     
-    def __init__(self, ddl, shared_event=None):
+    def __init__(self, ddl, shared_event=None, worker_id=0):
         super(Typedb2Driver, self).__init__("typedb", ddl)
         self.database = None
         self.addr = None

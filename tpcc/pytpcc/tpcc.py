@@ -124,6 +124,9 @@ def loaderFunc(driverClass, scaleParameters, args, config, w_ids, items_complete
     config['reset'] = False
     config['warehouses'] = args['warehouses']
     driver.loadConfig(config)
+    # When debug is set globally pass this into driver, overwriting the driver-specific config
+    if args['debug'] and driver.debug is not None:
+        driver.debug = True
 
     try:
         loadItems = (1 in w_ids)
@@ -145,14 +148,13 @@ def loaderFunc(driverClass, scaleParameters, args, config, w_ids, items_complete
 def startExecution(driverClass, scaleParameters, args, config):
     logging.debug("Creating client pool with %d processes", args['clients'])
     pool = multiprocessing.Pool(args['clients'])
-    debug = logging.getLogger().isEnabledFor(logging.DEBUG)
     try:
         del args['config']
     except KeyError:
         print()
     worker_results = []
     for _ in range(args['clients']):
-        r = pool.apply_async(executorFunc, (driverClass, scaleParameters, args, config, debug,))
+        r = pool.apply_async(executorFunc, (driverClass, scaleParameters, args, config))
         worker_results.append(r)
     ## FOR
     pool.close()
@@ -174,8 +176,10 @@ def startExecution(driverClass, scaleParameters, args, config):
 ## ==============================================
 ## executorFunc
 ## ==============================================
-def executorFunc(driverClass, scaleParameters, args, config, debug):
-    driver = driverClass(args['ddl'])
+def executorFunc(driverClass, scaleParameters, args, config):
+    worker = multiprocessing.current_process()
+    driver = driverClass(args['ddl'], worker_id=worker.pid)
+
     assert driver != None, "No driver in executorFunc"
     logging.debug("Starting client execution: %s", driver)
 
@@ -183,7 +187,7 @@ def executorFunc(driverClass, scaleParameters, args, config, debug):
     config['reset'] = False
     driver.loadConfig(config)
     # When debug is set globally pass this into driver, overwriting the driver-specific config
-    if config['debug'] and driver.debug:
+    if config['debug'] and driver.debug is not None:
         driver.debug = True
 
     e = executor.Executor(driver, scaleParameters, None, stop_on_error=args['stop_on_error'])
@@ -286,6 +290,11 @@ if __name__ == '__main__':
         logging.info("Reseting database")
     config['warehouses'] = args['warehouses']
     driver.loadConfig(config)
+
+    # When debug is set globally pass this into driver, overwriting the driver-specific config
+    if args['debug'] and driver.debug is not None:
+        driver.debug = True
+
     if args['verify']:
         verifierDefaultConfig = verifier.makeDefaultConfig()
         verifierConfig = dict([(param, verifierDefaultConfig[param][1]) for param in verifierDefaultConfig.keys()])

@@ -4,7 +4,7 @@ attribute birthday,
 attribute browserUsed,
     value string;
 attribute classYear,
-    value long;
+    value integer;
 attribute content,
     value string;
 attribute creationDate,
@@ -16,7 +16,7 @@ attribute firstName,
 attribute gender,
     value string;
 attribute id,
-    value long;
+    value integer;
 attribute imageFile,
     value string;
 attribute language,
@@ -24,7 +24,7 @@ attribute language,
 attribute lastName,
     value string;
 attribute length,
-    value long;
+    value integer;
 attribute locationIP,
     value string;
 attribute name,
@@ -36,7 +36,7 @@ attribute title,
 attribute url,
     value string;
 attribute workFrom,
-    value long;
+    value integer;
 relation containerOf,
     relates contain,
     relates container;
