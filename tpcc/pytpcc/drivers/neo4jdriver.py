@@ -65,9 +65,6 @@ class Neo4JDriver(AbstractDriver):
                     session.run("DROP INDEX " + record["name"])
                 logging.info("Cleared all nodes and relationships from the database")
 
-        # Create indexes to improve lookup efficiency
-        self.create_indices()
-
     ## ----------------------------------------------
     ## create_indices
     ## ----------------------------------------------
@@ -76,10 +73,8 @@ class Neo4JDriver(AbstractDriver):
             session.run("CREATE INDEX IF NOT EXISTS FOR (i:ITEM) ON (i.I_ID)")
             session.run("CREATE INDEX IF NOT EXISTS FOR (w:WAREHOUSE) ON (w.W_ID)")
             session.run("CREATE INDEX IF NOT EXISTS FOR (d:DISTRICT) ON (d.D_ID)")
-            session.run("CREATE INDEX IF NOT EXISTS FOR (d:DISTRICT) ON (d.D_ID, d.D_NEXT_O_ID, d.D_TAX)")
             session.run("CREATE INDEX IF NOT EXISTS FOR (c:CUSTOMER) ON (c.C_ID)")
             session.run("CREATE INDEX IF NOT EXISTS FOR (c:CUSTOMER) ON (c.C_LAST)")
-            session.run("CREATE INDEX IF NOT EXISTS FOR (s:STOCK) ON (s.S_W_ID, s.S_I_ID)")
             session.run("CREATE INDEX IF NOT EXISTS FOR (s:STOCK) ON (s.S_I_ID)")
             session.run("CREATE INDEX IF NOT EXISTS FOR (o:ORDER) ON (o.O_NEW_ORDER)")
             session.run("CREATE INDEX IF NOT EXISTS FOR (o:ORDER) ON (o.O_ID)")
@@ -89,7 +84,7 @@ class Neo4JDriver(AbstractDriver):
     ## loadStart
     ## ----------------------------------------------
     def loadStart(self):
-        pass  # Neo4j doesn't require special handling for bulk loading
+        self.create_indices()
 
     ## ----------------------------------------------
     ## loadTuples
