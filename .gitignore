@@ -61,3 +61,4 @@ bazel-*
 # Profiling
 tpcc/profiling/
 ldbc/profiling/
+*.json

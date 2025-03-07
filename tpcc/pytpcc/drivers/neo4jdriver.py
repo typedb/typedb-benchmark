@@ -243,24 +243,6 @@ class Neo4JDriver(AbstractDriver):
                     s_dist_10=tuple[12], s_ytd=tuple[13], s_order_cnt=tuple[14],
                     s_remote_cnt=tuple[15], s_data=tuple[16])
 
-            elif tableName == "HISTORY":
-                for tuple in tuples:
-                    session.run("""
-                    MATCH (c:CUSTOMER {C_ID: $c_id}) 
-                           -[:BELONGS_TO]-> (d:DISTRICT {D_ID: $d_id}) 
-                           -[:BELONGS_TO]-> (w:WAREHOUSE {W_ID: $w_id})
-                    CREATE (h:HISTORY {
-                        H_DATE: $h_date,
-                        H_AMOUNT: $h_amount,
-                        H_DATA: $h_data
-                    })
-                    CREATE (h) -[:CUSTOMER_HISTORY]-> (c),
-                    (h) -[:DISTRICT_HISTORY]-> (d),
-                    (h) -[:WAREHOUSE_HISTORY]-> (w)
-                    """, 
-                    c_id=tuple[0], d_id=tuple[3], w_id=tuple[4],
-                    h_date=tuple[5].isoformat()[:-3], h_amount=tuple[6], h_data=tuple[7])
-
             logging.info("Committing %d queries for type %s" % (len(tuples), tableName))
 
     ## ----------------------------------------------
@@ -685,8 +667,8 @@ class Neo4JDriver(AbstractDriver):
                     c_data = (new_data + "|" + c['C_DATA'])[:constants.MAX_C_DATA]
                     update_query = """
                     MATCH (c:CUSTOMER {C_ID: $c_id}) 
-                      -[:BELONGS_TO]-> (:WAREHOUSE {W_ID: $c_w_id}) 
                       -[:BELONGS_TO]-> (:DISTRICT {D_ID: $c_d_id})
+                      -[:BELONGS_TO]-> (:WAREHOUSE {W_ID: $c_w_id}) 
                     SET c.C_BALANCE = $c_balance,
                         c.C_YTD_PAYMENT = $c_ytd_payment,
                         c.C_PAYMENT_CNT = $c_payment_cnt,
@@ -698,8 +680,8 @@ class Neo4JDriver(AbstractDriver):
                 else:
                     update_query = """
                     MATCH (c:CUSTOMER {C_ID: $c_id}) 
-                      -[:BELONGS_TO]-> (:WAREHOUSE {W_ID: $c_w_id}) 
                       -[:BELONGS_TO]-> (:DISTRICT {D_ID: $c_d_id})
+                      -[:BELONGS_TO]-> (:WAREHOUSE {W_ID: $c_w_id}) 
                     SET c.C_BALANCE = $c_balance,
                         c.C_YTD_PAYMENT = $c_ytd_payment,
                         c.C_PAYMENT_CNT = $c_payment_cnt
@@ -710,6 +692,7 @@ class Neo4JDriver(AbstractDriver):
 
                 history_query = """
                 MATCH (c:CUSTOMER {C_ID: $c_id}) 
+                  -[:BELONGS_TO]-> (:DISTRICT {D_ID: $c_d_id})
                   -[:BELONGS_TO]-> (:WAREHOUSE {W_ID: $c_w_id}) 
                   -[:BELONGS_TO]-> (:DISTRICT {D_ID: $c_d_id})
                 MATCH (d:DISTRICT {D_ID: $d_id}) -[:BELONGS_TO]-> (w:WAREHOUSE {W_ID: $w_id})
@@ -788,7 +771,8 @@ class Neo4JDriver(AbstractDriver):
             verification = "\n{\n"
             for table in tables:
                 if table == "ORDERS":
-                    q = "MATCH (o:ORDER) WHERE NOT o.O_NEW_ORDER RETURN count(o) as count"
+                    # Count orders that are not new orders
+                    q = "MATCH (o:ORDER) RETURN count(o) as count"
                 elif table == "NEW_ORDER":
                     q = "MATCH (o:ORDER) WHERE o.O_NEW_ORDER RETURN count(o) as count"
                 else:
