@@ -56,7 +56,6 @@ bazel-*
 
 # Vim
 *.swp
-/.py311_2x
 
 # Profiling
 tpcc/profiling/
