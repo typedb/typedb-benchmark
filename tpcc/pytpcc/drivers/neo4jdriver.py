@@ -20,7 +20,7 @@ class Neo4JDriver(AbstractDriver):
         "uri": ("The URI for the Neo4j database", "bolt://localhost:7687"),
         "database": ("The name of the Neo4j database", "neo4j"),
         "user": ("The username to connect to the Neo4j database", "neo4j"),
-        "password": ("The password to connect to the Neo4j database", "password"), ## Neo4j requires setting this
+        "password": ("The password to connect to the Neo4j database", "password"),  ## Neo4j requires setting this
     }
     
     def __init__(self, ddl, shared_event=None, worker_id=0):
@@ -57,34 +57,55 @@ class Neo4JDriver(AbstractDriver):
             logging.error(f"Failed to connect to Neo4j database: {e}")
             raise
 
-        if config["reset"]:
+        if config.get("reset"):
             with self.driver.session(database=self.database) as session:
-                # Clear the entire database
                 session.run("MATCH (n) DETACH DELETE n")
+                indexes = session.run("SHOW INDEXES YIELD name").data()
+                for record in indexes:
+                    session.run("DROP INDEX " + record["name"])
                 logging.info("Cleared all nodes and relationships from the database")
+
+    ## ----------------------------------------------
+    ## create_indices
+    ## ----------------------------------------------
+    def create_indices(self):
+        with self.driver.session(database=self.database) as session:
+            session.run("CREATE INDEX IF NOT EXISTS FOR (i:ITEM) ON (i.I_ID)")
+            session.run("CREATE INDEX IF NOT EXISTS FOR (w:WAREHOUSE) ON (w.W_ID)")
+            session.run("CREATE INDEX IF NOT EXISTS FOR (d:DISTRICT) ON (d.D_ID)")
+            session.run("CREATE INDEX IF NOT EXISTS FOR (c:CUSTOMER) ON (c.C_ID)")
+            session.run("CREATE INDEX IF NOT EXISTS FOR (c:CUSTOMER) ON (c.C_LAST)")
+            session.run("CREATE INDEX IF NOT EXISTS FOR (s:STOCK) ON (s.S_I_ID)")
+            session.run("CREATE INDEX IF NOT EXISTS FOR (o:ORDER) ON (o.O_NEW_ORDER)")
+            session.run("CREATE INDEX IF NOT EXISTS FOR (o:ORDER) ON (o.O_ID)")
+            logging.info("Indices created successfully")
 
     ## ----------------------------------------------
     ## loadStart
     ## ----------------------------------------------
     def loadStart(self):
-        pass  # Neo4j doesn't require special handling for bulk loading
+        self.create_indices()
 
     ## ----------------------------------------------
     ## loadTuples
     ## ----------------------------------------------
     def loadTuples(self, tableName, tuples):
-        if len(tuples) == 0: return
+        if len(tuples) == 0: 
+            return
 
         with self.driver.session(database=self.database) as session:
 
             if tableName == "ITEM":
-                pass
-            elif self.items_complete_event and not self.items_complete_event.is_set():
-                logging.info("Waiting for ITEM loading to be complete ...")
-                self.items_complete_event.wait()  # We wait until item loading is complete
-                logging.info("ITEM loading complete! Proceeding...")
+                for tuple in tuples:
+                    session.run("""
+                    CREATE (i:ITEM {
+                        I_ID: $i_id, I_IM_ID: $i_im_id, I_NAME: $i_name,
+                        I_PRICE: $i_price, I_DATA: $i_data
+                    })
+                    """, i_id=tuple[0], i_im_id=tuple[1], i_name=tuple[2],
+                    i_price=tuple[3], i_data=tuple[4])
 
-            if tableName == "WAREHOUSE":
+            elif tableName == "WAREHOUSE":
                 for tuple in tuples:
                     session.run("""
                     CREATE (w:WAREHOUSE {
@@ -101,9 +122,10 @@ class Neo4JDriver(AbstractDriver):
                     session.run("""
                     MATCH (w:WAREHOUSE {W_ID: $w_id})
                     CREATE (d:DISTRICT {
-                        D_ID: $d_id, D_NAME: $d_name, D_STREET_1: $d_street_1,
-                        D_STREET_2: $d_street_2, D_CITY: $d_city, D_STATE: $d_state,
-                        D_ZIP: $d_zip, D_TAX: $d_tax, D_YTD: $d_ytd, D_NEXT_O_ID: $d_next_o_id
+                        D_W_ID: $w_id, D_ID: $d_id, D_NAME: $d_name,
+                        D_STREET_1: $d_street_1, D_STREET_2: $d_street_2,
+                        D_CITY: $d_city, D_STATE: $d_state, D_ZIP: $d_zip,
+                        D_TAX: $d_tax, D_YTD: $d_ytd, D_NEXT_O_ID: $d_next_o_id
                     }) -[:BELONGS_TO]-> (w)
                     """, w_id=tuple[1], d_id=tuple[0], d_name=tuple[2], d_street_1=tuple[3],
                     d_street_2=tuple[4], d_city=tuple[5], d_state=tuple[6], d_zip=tuple[7],
@@ -120,8 +142,8 @@ class Neo4JDriver(AbstractDriver):
                         C_STATE: $c_state, C_ZIP: $c_zip, C_PHONE: $c_phone, C_SINCE: $c_since,
                         C_CREDIT: $c_credit, C_CREDIT_LIM: $c_credit_lim, C_DISCOUNT: $c_discount,
                         C_BALANCE: $c_balance, C_YTD_PAYMENT: $c_ytd_payment,
-                        C_PAYMENT_CNT: $c_payment_cnt, C_DELIVERY_CNT: $c_delivery_cnt,
-                        C_DATA: $c_data
+                        C_PAYMENT_CNT: $c_payment_cnt, C_DELIVERY_CNT: $c_delivery_cnt, C_DATA: $c_data,
+                        C_W_ID: $w_id, C_D_ID: $d_id
                     }) -[:BELONGS_TO]-> (d)
                     """, w_id=tuple[2], d_id=tuple[1], c_id=tuple[0], c_first=tuple[3],
                     c_middle=tuple[4], c_last=tuple[5], c_street_1=tuple[6], c_street_2=tuple[7],
@@ -147,7 +169,8 @@ class Neo4JDriver(AbstractDriver):
                            -[:BELONGS_TO]-> (:DISTRICT {D_ID: $d_id}) 
                            -[:BELONGS_TO]-> (:WAREHOUSE {W_ID: $w_id})
                     CREATE (o:ORDER {
-                        O_ID: $o_id, O_ENTRY_D: $o_entry_d, O_CARRIER_ID: $o_carrier_id,
+                        O_ID: $o_id, O_D_ID: $d_id, O_W_ID: $w_id, O_C_ID: $c_id,
+                        O_ENTRY_D: $o_entry_d, O_CARRIER_ID: $o_carrier_id,
                         O_OL_CNT: $o_ol_cnt, O_ALL_LOCAL: $o_all_local
                     }) -[:PLACED_BY]-> (c)
                     """, o_id=tuple[0], c_id=tuple[1], d_id=tuple[2], w_id=tuple[3],
@@ -173,8 +196,9 @@ class Neo4JDriver(AbstractDriver):
                            -[:BELONGS_TO]-> (:WAREHOUSE {W_ID: $w_id})
                     MATCH (i:ITEM {I_ID: $i_id})
                     CREATE (ol:ORDER_LINE {
-                        OL_NUMBER: $ol_number, OL_SUPPLY_W_ID: $ol_supply_w_id,
-                        OL_DELIVERY_D: $ol_delivery_d, OL_QUANTITY: $ol_quantity,
+                        OL_O_ID: $o_id, OL_D_ID: $d_id, OL_W_ID: $w_id,
+                        OL_NUMBER: $ol_number, OL_I_ID: $i_id,
+                        OL_SUPPLY_W_ID: $ol_supply_w_id, OL_QUANTITY: $ol_quantity,
                         OL_AMOUNT: $ol_amount, OL_DIST_INFO: $ol_dist_info
                     }) -[:PART_OF]-> (o),
                     (ol) -[:CONTAINS]-> (i)
@@ -204,6 +228,7 @@ class Neo4JDriver(AbstractDriver):
                     MATCH (i:ITEM {I_ID: $i_id})
                     MATCH (w:WAREHOUSE {W_ID: $w_id})
                     CREATE (s:STOCK {
+                        S_W_ID: $w_id, S_I_ID: $i_id,
                         S_QUANTITY: $s_quantity, S_DIST_01: $s_dist_01, S_DIST_02: $s_dist_02,
                         S_DIST_03: $s_dist_03, S_DIST_04: $s_dist_04, S_DIST_05: $s_dist_05,
                         S_DIST_06: $s_dist_06, S_DIST_07: $s_dist_07, S_DIST_08: $s_dist_08,
@@ -217,24 +242,6 @@ class Neo4JDriver(AbstractDriver):
                     s_dist_07=tuple[9], s_dist_08=tuple[10], s_dist_09=tuple[11],
                     s_dist_10=tuple[12], s_ytd=tuple[13], s_order_cnt=tuple[14],
                     s_remote_cnt=tuple[15], s_data=tuple[16])
-
-            elif tableName == "HISTORY":
-                for tuple in tuples:
-                    session.run("""
-                    MATCH (c:CUSTOMER {C_ID: $c_id}) 
-                           -[:BELONGS_TO]-> (d:DISTRICT {D_ID: $d_id}) 
-                           -[:BELONGS_TO]-> (w:WAREHOUSE {W_ID: $w_id})
-                    CREATE (h:HISTORY {
-                        H_DATE: $h_date,
-                        H_AMOUNT: $h_amount,
-                        H_DATA: $h_data
-                    })
-                    CREATE (h) -[:CUSTOMER_HISTORY]-> (c),
-                    (h) -[:DISTRICT_HISTORY]-> (d),
-                    (h) -[:WAREHOUSE_HISTORY]-> (w)
-                    """, 
-                    c_id=tuple[0], d_id=tuple[3], w_id=tuple[4],
-                    h_date=tuple[5].isoformat()[:-3], h_amount=tuple[6], h_data=tuple[7])
 
             logging.info("Committing %d queries for type %s" % (len(tuples), tableName))
 
@@ -331,10 +338,9 @@ class Neo4JDriver(AbstractDriver):
                     O_ENTRY_D: $o_entry_d,
                     O_CARRIER_ID: $o_carrier_id,
                     O_OL_CNT: $ol_cnt,
-                    O_ALL_LOCAL: $all_local
+                    O_ALL_LOCAL: $all_local,
+                    O_NEW_ORDER: true
                 }) -[:PLACED_BY]-> (c)
-                CREATE (no:NEW_ORDER {NO_O_ID: $d_next_o_id}) 
-                       -[:PLACED_BY]-> (:CUSTOMER {C_ID: $c_id})
                 """, w_id=w_id, d_id=d_id, c_id=c_id, d_next_o_id=d_next_o_id, o_entry_d=o_entry_d,
                      o_carrier_id=o_carrier_id, ol_cnt=ol_cnt, all_local=int(all_local))
 
@@ -417,8 +423,6 @@ class Neo4JDriver(AbstractDriver):
 
                 misc = [(w_tax, d_tax, d_next_o_id, total)]
                 return ([[c_discount, c_last, c_credit], misc, item_data], 0)
-            ## WITH
-        ## WITH
     
     ## ----------------------------------------------
     ## T2: doDelivery
@@ -457,7 +461,7 @@ class Neo4JDriver(AbstractDriver):
                       -[:PLACED_BY]-> (c:CUSTOMER)
                       -[:BELONGS_TO]-> (:DISTRICT {D_ID: $d_id})
                       -[:BELONGS_TO]-> (:WAREHOUSE {W_ID: $w_id})
-                    MATCH (o) <-[:PART_OF]- (ol:ORDER_LINE)
+                    MATCH (o)<-[:PART_OF]- (ol:ORDER_LINE)
                     RETURN sum(ol.OL_AMOUNT) as ol_total
                     """
                     ol_total_result = tx.run(ol_total_query, o_id=no_o_id, w_id=w_id, d_id=d_id).single()
@@ -487,14 +491,10 @@ class Neo4JDriver(AbstractDriver):
                     assert ol_total is not None, "ol_total is NULL: there are no order lines. This should not happen"
                     assert ol_total > 0.0
 
-                    # These must be logged in the "result file" according to TPC-C 2.7.2.2 (page 39)
-                    # We remove the queued time, completed time, w_id, and o_carrier_id: the client can figure them out
                     result.append((d_id, no_o_id))
 
                 tx.commit()
                 return (result, 0)
-            ## WITH
-        ## WITH
 
     ## ----------------------------------------------
     ## T3:doOrderStatus
@@ -533,7 +533,6 @@ class Neo4JDriver(AbstractDriver):
                     customers = list(tx.run(customers_query, c_last=c_last, w_id=w_id, d_id=d_id))
                     assert len(customers) > 0, f"doOrderStatus: no customers found for w_id {w_id}, d_id {d_id}, c_last {c_last}"
                     
-                    # Get the midpoint customer
                     index = (len(customers) - 1) // 2
                     customer = customers[index]
                     c_id = customer['c_id']
@@ -546,7 +545,6 @@ class Neo4JDriver(AbstractDriver):
                     customer['c_balance']
                 ]
 
-                # Get the latest order for this customer
                 order_query = """
                 MATCH (c:CUSTOMER {C_ID: $c_id}) 
                   -[:BELONGS_TO]-> (:DISTRICT {D_ID: $d_id})
@@ -562,7 +560,6 @@ class Neo4JDriver(AbstractDriver):
                 if order:
                     o_id = order['o_id']
                     
-                    # Get order lines
                     orderlines_query = """
                     MATCH (c:CUSTOMER {C_ID: $c_id}) 
                       -[:BELONGS_TO]-> (:DISTRICT {D_ID: $d_id})
@@ -572,8 +569,8 @@ class Neo4JDriver(AbstractDriver):
                            ol.OL_QUANTITY as ol_quantity, ol.OL_AMOUNT as ol_amount, 
                            ol.OL_DIST_INFO as ol_dist_info
                     """
-                    orderLines = tx.run(orderlines_query, o_id=o_id, w_id=w_id, d_id=d_id, c_id=c_id)
-                    for orderLine in orderLines:
+                    orderlines = tx.run(orderlines_query, o_id=o_id, w_id=w_id, d_id=d_id, c_id=c_id)
+                    for orderLine in orderlines:
                         orderLines_data.append([
                             orderLine['i_id'],
                             orderLine['ol_supply_w_id'],
@@ -586,8 +583,6 @@ class Neo4JDriver(AbstractDriver):
 
                 tx.commit()
                 return ([customer_data, [o_id] if o_id else [], orderLines_data], 0)
-            ## WITH
-        ## WITH
 
     ## ----------------------------------------------
     ## T4:doPayment
@@ -624,7 +619,6 @@ class Neo4JDriver(AbstractDriver):
                     customers = list(tx.run(customers_query, c_last=c_last, c_w_id=c_w_id, c_d_id=c_d_id))
                     assert len(customers) > 0, f"doPayment: no customer found for w_id {c_w_id}, d_id {c_d_id}, c_last {c_last}"
                     
-                    # Get the midpoint customer
                     index = (len(customers) - 1) // 2
                     customer = customers[index]
                 
@@ -638,14 +632,12 @@ class Neo4JDriver(AbstractDriver):
                     c['C_PAYMENT_CNT'], c['C_DATA']
                 ]
 
-                # Get warehouse data
                 warehouse_query = """
                 MATCH (w:WAREHOUSE {W_ID: $w_id})
                 RETURN w.W_NAME, w.W_STREET_1, w.W_STREET_2, w.W_CITY, w.W_STATE, w.W_ZIP
                 """
                 warehouse_data = tx.run(warehouse_query, w_id=w_id).single()
 
-                # Get district data
                 district_query = """
                 MATCH (d:DISTRICT {D_ID: $d_id}) 
                   -[:BELONGS_TO]-> (:WAREHOUSE {W_ID: $w_id})
@@ -653,7 +645,6 @@ class Neo4JDriver(AbstractDriver):
                 """
                 district_data = tx.run(district_query, d_id=d_id, w_id=w_id).single()
 
-                # Update warehouse and district YTD
                 tx.run("""
                 MATCH (w:WAREHOUSE {W_ID: $w_id})
                 SET w.W_YTD = w.W_YTD + $h_amount
@@ -667,7 +658,6 @@ class Neo4JDriver(AbstractDriver):
 
                 h_data = f"{warehouse_data[0]}    {district_data[0]}"
 
-                # Update customer
                 c_balance = c['C_BALANCE'] - h_amount
                 c_ytd_payment = c['C_YTD_PAYMENT'] + h_amount
                 c_payment_cnt = c['C_PAYMENT_CNT'] + 1
@@ -677,8 +667,8 @@ class Neo4JDriver(AbstractDriver):
                     c_data = (new_data + "|" + c['C_DATA'])[:constants.MAX_C_DATA]
                     update_query = """
                     MATCH (c:CUSTOMER {C_ID: $c_id}) 
-                      -[:BELONGS_TO]-> (:WAREHOUSE {W_ID: $c_w_id}) 
                       -[:BELONGS_TO]-> (:DISTRICT {D_ID: $c_d_id})
+                      -[:BELONGS_TO]-> (:WAREHOUSE {W_ID: $c_w_id}) 
                     SET c.C_BALANCE = $c_balance,
                         c.C_YTD_PAYMENT = $c_ytd_payment,
                         c.C_PAYMENT_CNT = $c_payment_cnt,
@@ -690,8 +680,8 @@ class Neo4JDriver(AbstractDriver):
                 else:
                     update_query = """
                     MATCH (c:CUSTOMER {C_ID: $c_id}) 
-                      -[:BELONGS_TO]-> (:WAREHOUSE {W_ID: $c_w_id}) 
                       -[:BELONGS_TO]-> (:DISTRICT {D_ID: $c_d_id})
+                      -[:BELONGS_TO]-> (:WAREHOUSE {W_ID: $c_w_id}) 
                     SET c.C_BALANCE = $c_balance,
                         c.C_YTD_PAYMENT = $c_ytd_payment,
                         c.C_PAYMENT_CNT = $c_payment_cnt
@@ -700,12 +690,12 @@ class Neo4JDriver(AbstractDriver):
                            c_balance=c_balance, c_ytd_payment=c_ytd_payment,
                            c_payment_cnt=c_payment_cnt)
 
-                # Create history record
                 history_query = """
                 MATCH (c:CUSTOMER {C_ID: $c_id}) 
+                  -[:BELONGS_TO]-> (:DISTRICT {D_ID: $c_d_id})
                   -[:BELONGS_TO]-> (:WAREHOUSE {W_ID: $c_w_id}) 
                   -[:BELONGS_TO]-> (:DISTRICT {D_ID: $c_d_id})
-                match (d:DISTRICT {D_ID: $d_id}) -[:BELONGS_TO]-> (w:WAREHOUSE {W_ID: $w_id})
+                MATCH (d:DISTRICT {D_ID: $d_id}) -[:BELONGS_TO]-> (w:WAREHOUSE {W_ID: $w_id})
                 CREATE (h:HISTORY {H_C_ID: $c_id, H_C_D_ID: $c_d_id, H_C_W_ID: $c_w_id,
                                    H_D_ID: $d_id, H_W_ID: $w_id, H_DATE: $h_date,
                                    H_AMOUNT: $h_amount, H_DATA: $h_data})
@@ -718,10 +708,7 @@ class Neo4JDriver(AbstractDriver):
 
                 tx.commit()
 
-                # TPC-C 2.5.3.3: Must display the following fields
                 return ([warehouse_data, district_data, customer_data], 0)        
-            ## WITH
-        ## WITH
     
     ## ----------------------------------------------
     ## T5: doStockLevel
@@ -733,7 +720,6 @@ class Neo4JDriver(AbstractDriver):
         
         with self.driver.session(database=self.database) as session:
             with session.begin_transaction() as tx:
-                # Get the next order ID for the district
                 district_query = """
                 MATCH (d:DISTRICT {D_ID: $d_id}) 
                   -[:BELONGS_TO]-> (:WAREHOUSE {W_ID: $w_id})
@@ -743,7 +729,6 @@ class Neo4JDriver(AbstractDriver):
                 assert result, f"doStockLevel: no district found for w_id {w_id}, d_id {d_id}"
                 o_id = result['d_next_o_id']
 
-                # Count distinct items with stock quantity below threshold
                 stock_count_query = """
                 MATCH (w:WAREHOUSE {W_ID: $w_id})
                   -[:STOCKED_BY]-> (s:STOCK) 
@@ -769,8 +754,6 @@ class Neo4JDriver(AbstractDriver):
                 tx.commit()
                 
                 return (int(stock_count), 0)
-            ## WITH
-        ## WITH
         
     ## ----------------------------------------------
     ## Post-execution verification
@@ -789,12 +772,10 @@ class Neo4JDriver(AbstractDriver):
             for table in tables:
                 if table == "ORDERS":
                     # Count orders that are not new orders
-                    q = "MATCH (o:ORDER) WHERE NOT o.O_NEW_ORDER RETURN count(o) as count"
+                    q = "MATCH (o:ORDER) RETURN count(o) as count"
                 elif table == "NEW_ORDER":
-                    # Count orders that are new orders
                     q = "MATCH (o:ORDER) WHERE o.O_NEW_ORDER RETURN count(o) as count"
                 else:
-                    # Count nodes with the given label
                     q = f"MATCH (n:{table}) RETURN count(n) as count"
                 
                 result = session.run(q).single()
