@@ -20,7 +20,7 @@ class Neo4JDriver(AbstractDriver):
         "uri": ("The URI for the Neo4j database", "bolt://localhost:7687"),
         "database": ("The name of the Neo4j database", "neo4j"),
         "user": ("The username to connect to the Neo4j database", "neo4j"),
-        "password": ("The password to connect to the Neo4j database", "password"),  ## Neo4j requires setting this
+        "password": ("The password to connect to the Neo4j database", "abcd1234"),  ## Neo4j requires setting this
     }
     
     def __init__(self, ddl, shared_event=None, worker_id=0):
@@ -90,7 +90,7 @@ class Neo4JDriver(AbstractDriver):
     ## loadTuples
     ## ----------------------------------------------
     def loadTuples(self, tableName, tuples):
-        if len(tuples) == 0: 
+        if len(tuples) == 0:
             return
 
         with self.driver.session(database=self.database) as session:
@@ -532,7 +532,7 @@ class Neo4JDriver(AbstractDriver):
                     """
                     customers = list(tx.run(customers_query, c_last=c_last, w_id=w_id, d_id=d_id))
                     assert len(customers) > 0, f"doOrderStatus: no customers found for w_id {w_id}, d_id {d_id}, c_last {c_last}"
-                    
+
                     index = (len(customers) - 1) // 2
                     customer = customers[index]
                     c_id = customer['c_id']
@@ -559,7 +559,7 @@ class Neo4JDriver(AbstractDriver):
                 orderLines_data = []
                 if order:
                     o_id = order['o_id']
-                    
+
                     orderlines_query = """
                     MATCH (c:CUSTOMER {C_ID: $c_id}) 
                       -[:BELONGS_TO]-> (:DISTRICT {D_ID: $d_id})
@@ -618,7 +618,7 @@ class Neo4JDriver(AbstractDriver):
                     """
                     customers = list(tx.run(customers_query, c_last=c_last, c_w_id=c_w_id, c_d_id=c_d_id))
                     assert len(customers) > 0, f"doPayment: no customer found for w_id {c_w_id}, d_id {c_d_id}, c_last {c_last}"
-                    
+
                     index = (len(customers) - 1) // 2
                     customer = customers[index]
                 
@@ -708,7 +708,7 @@ class Neo4JDriver(AbstractDriver):
 
                 tx.commit()
 
-                return ([warehouse_data, district_data, customer_data], 0)        
+                return ([warehouse_data, district_data, customer_data], 0)
     
     ## ----------------------------------------------
     ## T5: doStockLevel

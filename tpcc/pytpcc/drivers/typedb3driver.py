@@ -112,7 +112,7 @@ class Typedb3Driver(AbstractDriver):
         credentials = Credentials(self.user, self.password)
 
         if self.edition is EDITION.Core:
-            self.driver = TypeDB.core_driver(address=f"{self.addr}", credentials=credentials, driver_options=DriverOptions())
+            self.driver = TypeDB.driver(address=f"{self.addr}", credentials=credentials, driver_options=DriverOptions())
         if self.edition is EDITION.Cloud:
             raise "Unimplemented"
 
@@ -431,7 +431,7 @@ reduce $count = count;"""
             # batch into transactions of size COMMIT_BATCH_SIZE
             while write_query:
                 with self.driver.transaction(self.database, TransactionType.WRITE) as tx:
-                    # Take next 1000 queries
+                    # Take next 100 queries
                     current_batch = write_query[:COMMIT_BATCH_SIZE]
                     write_query = write_query[COMMIT_BATCH_SIZE:]
 
@@ -699,6 +699,7 @@ $d isa DISTRICT, has D_ID {w_id * DPW + d_id};
 $o links (customer: $c, district: $d), isa ORDER, has O_ID $o_id, has O_NEW_ORDER true;
 $c isa CUSTOMER, has C_ID $c_id;
 select $o_id, $c_id;
+limit 1;
 """
                 self.start_checkpoint(q)
                 try:

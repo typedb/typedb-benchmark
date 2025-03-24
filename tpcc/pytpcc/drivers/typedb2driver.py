@@ -591,6 +591,7 @@ $d isa DISTRICT, has D_ID {w_id * DPW + d_id};
 $o (customer: $c, district: $d) isa ORDER, has O_ID $o_id, has O_NEW_ORDER true;
 $c isa CUSTOMER, has C_ID $c_id;
 get $o_id, $c_id;
+limit 1;
 """
                     new_order_info = list(tx.query.get(q))
                     if len(new_order_info) == 0:
