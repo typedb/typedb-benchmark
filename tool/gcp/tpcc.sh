@@ -28,16 +28,16 @@ sleep 40
 tool/gcp/clone-repo.sh $(git rev-parse HEAD)
 
 # run in the background as the TypeDB process will block the execution otherwise
-tool/gcp/ssh-exec.sh "cd typedb-benchmark && tool/$DB/setup.sh >&/dev/null" 
+tool/gcp/ssh-exec.sh "cd typedb-benchmark && tool/$DB/setup.sh >/dev/null" 
 
 tool/gcp/ssh-exec.sh "
     cd typedb-benchmark && 
-        nohup tool/execute-tpcc.sh --no-execute --reset --scalefactor=$SCALE_FACTOR --warehouses=$WAREHOUSES --clients=$CLIENTS --duration=$DURATION $DB 2>&1 >/dev/null & wait \$!
+        nohup tool/execute-tpcc.sh --no-execute --reset --scalefactor=$SCALE_FACTOR --warehouses=$WAREHOUSES --clients=$CLIENTS --duration=$DURATION $DB >/dev/null & wait \$!
     "
 
 tool/gcp/ssh-exec.sh "
     cd typedb-benchmark && 
-        nohup tool/execute-tpcc.sh --no-load --scalefactor=$SCALE_FACTOR --warehouses=$WAREHOUSES --clients=$CLIENTS --duration=$DURATION $DB 2>&1 >/dev/null & wait \$!
+        nohup tool/execute-tpcc.sh --no-load --scalefactor=$SCALE_FACTOR --warehouses=$WAREHOUSES --clients=$CLIENTS --duration=$DURATION $DB >/dev/null & wait \$!
     "
 
 tool/gcp/download-result.sh
