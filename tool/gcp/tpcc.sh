@@ -25,7 +25,7 @@ echo Machine name: $MACHINE_NAME
 
 tool/gcp/create.sh
 sleep 40
-tool/gcp/clone-repo.sh
+tool/gcp/clone-repo.sh $(git rev-parse HEAD)
 
 # run in the background as the TypeDB process will block the execution otherwise
 tool/gcp/ssh-exec.sh "cd typedb-benchmark && tool/$DB/setup.sh >&/dev/null" 
