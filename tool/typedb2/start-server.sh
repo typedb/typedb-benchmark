@@ -5,7 +5,7 @@ source tool/typedb2/config.sh
 # start server
 DISTRIBUTION="typedb-all-linux-x86_64"
 DISTRIBUTION_DIR="$DISTRIBUTION-$SERVER_VERSION"
-./$DISTRIBUTION_DIR/typedb server &
+tmux new-session -d -s "typedb" "./$DISTRIBUTION_DIR/typedb server > ./$DISTRIBUTION_DIR/log"
 
 # wait until ready
 set +e

@@ -1,7 +1,5 @@
 set -eu
 
-source ./tool/gcp/profile.sh
-
 gcloud compute instances create $MACHINE_NAME \
     --project=$PROJECT \
     --zone=$ZONE \
