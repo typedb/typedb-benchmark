@@ -32,12 +32,12 @@ tool/gcp/ssh-exec.sh "cd typedb-benchmark && tool/$DB/setup.sh"
 
 tool/gcp/ssh-exec.sh "
     cd typedb-benchmark && 
-        nohup tool/execute-tpcc.sh --no-execute --reset --scalefactor=$SCALE_FACTOR --warehouses=$WAREHOUSES --clients=$CLIENTS --duration=$DURATION $DB >/dev/null & wait \$!
+        nohup tool/execute-tpcc.sh --no-execute --reset --scalefactor=$SCALE_FACTOR --warehouses=$WAREHOUSES --clients=$CLIENTS --duration=$DURATION $DB & wait \$!
     "
 
 tool/gcp/ssh-exec.sh "
     cd typedb-benchmark && 
-        nohup tool/execute-tpcc.sh --no-load --scalefactor=$SCALE_FACTOR --warehouses=$WAREHOUSES --clients=$CLIENTS --duration=$DURATION $DB >/dev/null & wait \$!
+        nohup tool/execute-tpcc.sh --no-load --scalefactor=$SCALE_FACTOR --warehouses=$WAREHOUSES --clients=$CLIENTS --duration=$DURATION $DB & wait \$!
     "
 
 tool/gcp/download-result.sh
