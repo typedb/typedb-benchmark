@@ -10,6 +10,7 @@ while [[ $RETRY_NUM -gt 0 ]]; do
   ((RETRY_NUM-=1))
   sleep $POLL_INTERVAL_SECS
 done
+set -e
 
 mongosh --eval 'rs.initiate()'
 
