@@ -28,7 +28,7 @@ sleep 40
 tool/gcp/clone-repo.sh $(git rev-parse HEAD)
 
 # run in the background as the TypeDB process will block the execution otherwise
-tool/gcp/ssh-exec.sh "cd typedb-benchmark && tool/$DB/setup.sh >/dev/null" 
+tool/gcp/ssh-exec.sh "cd typedb-benchmark && tool/$DB/setup.sh"
 
 tool/gcp/ssh-exec.sh "
     cd typedb-benchmark && 
