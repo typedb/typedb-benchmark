@@ -1,5 +1,7 @@
 set -eu
 
+source tool/neo4j/config.sh
+
 sudo add-apt-repository -y ppa:openjdk-r/ppa
 
 sudo mkdir -p /etc/apt/keyrings
