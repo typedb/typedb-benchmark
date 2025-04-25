@@ -1,8 +1,14 @@
 set -euo allexport
 
 usage() {
-    echo "Usage: $0 [-d <neo4j|mongodb|postgres|typedb2|typedb3>] [-s SCALE_FACTOR] [-w WAREHOUSES] [-c CLIENTS] [-t DURATION]" 1>&2
+    echo "Usage: $0 [-d <neo4j|mongodb|postgres|typedb2|typedb3>] [-s SCALE_FACTOR] [-w WAREHOUSES] [-c CLIENTS] [-t DURATION] [-k]" 1>&2
     echo "Default: $0 -d typedb3 -s 1 -w 1 -c 1 -t 600" 1>&2
+    echo "-d DATABASE       target database"
+    echo "-s SCALE_FACTOR   benchmark scale factor"
+    echo "-w WAREHOUSES     number of warehouses"
+    echo "-c CLIENTS        number of clients"
+    echo "-t DURATION       how long to run the execution portion of the benchmark (seconds)"
+    echo "-k                keep the server instance (default: deletes)"
     exit 1
 }
 
@@ -27,7 +33,6 @@ tool/gcp/create.sh
 sleep 40
 tool/gcp/clone-repo.sh $(git rev-parse HEAD)
 
-# run in the background as the TypeDB process will block the execution otherwise
 tool/gcp/ssh-exec.sh "cd typedb-benchmark && tool/$DB/setup.sh"
 
 tool/gcp/ssh-exec.sh "
