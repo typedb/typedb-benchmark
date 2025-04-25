@@ -21,7 +21,7 @@ ZONE=europe-west2-c
 IMAGE=vaticle-ubuntu-2204-c212752a1d15bc145ca4382452e8a33a354362d6
 IMAGE_PROJECT=vaticle-factory-prod
 
-# five digit random number with zero padding
+# four digit random number with zero padding
 ID=0000$RANDOM
 ID=${ID:(-4)}
 
