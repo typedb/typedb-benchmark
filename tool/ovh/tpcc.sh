@@ -33,17 +33,17 @@ tool/ovh/create.sh
 sleep 40
 tool/ovh/clone-repo.sh $(git rev-parse HEAD)
 
-tool/ovh/ssh-exec.sh "cd typedb-benchmark && tool/$DB/setup.sh"
+tool/ovh/ssh-exec.sh "'cd typedb-benchmark && tool/$DB/setup.sh'"
 
-tool/ovh/ssh-exec.sh "
+tool/ovh/ssh-exec.sh "'
     cd typedb-benchmark && 
         nohup tool/execute-tpcc.sh --no-execute --reset --scalefactor=$SCALE_FACTOR --warehouses=$WAREHOUSES --clients=$CLIENTS --duration=$DURATION $DB & wait \$!
-    "
+    '"
 
-tool/ovh/ssh-exec.sh "
+tool/ovh/ssh-exec.sh "'
     cd typedb-benchmark && 
         nohup tool/execute-tpcc.sh --no-load --scalefactor=$SCALE_FACTOR --warehouses=$WAREHOUSES --clients=$CLIENTS --duration=$DURATION $DB & wait \$!
-    "
+    '"
 
 tool/ovh/download-result.sh
 
