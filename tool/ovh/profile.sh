@@ -12,19 +12,13 @@ DURATION=${DURATION:-600}
 MACHINE_TYPE=b2-15
 
 # cloud provider config
-OS_AUTH_URL=https://auth.cloud.ovh.net/v3
-OS_IDENTITY_API_VERSION=3
-
-OS_USER_DOMAIN_NAME=${OS_USER_DOMAIN_NAME:-"Default"}
-OS_PROJECT_DOMAIN_NAME=${OS_PROJECT_DOMAIN_NAME:-"Default"}
-
 if [ ! -v OS_TENANT_ID -o ! -v OS_TENANT_NAME ]; then
-    echo "OS_TENANT_ID and OS_TENANT_NAME must be set"
+    echo "OS_TENANT_ID and OS_TENANT_NAME must be set; download and source openrc.sh"
     exit 1
 fi
 
 if [ ! -v OS_USERNAME -o ! -v OS_PASSWORD ]; then
-    echo "OS_USERNAME and OS_PASSWORD must be set"
+    echo "OS_USERNAME and OS_PASSWORD must be set; download and source openrc.sh"
     exit 1
 fi
 
@@ -32,8 +26,6 @@ if [ ! -v OS_KEY_ID -o ! -v OS_PRIVATE_KEY ]; then
     echo "OS_KEY_ID and OS_PRIVATE_KEY must be set"
     exit 1
 fi
-
-OS_REGION_NAME="UK1"
 
 PROJECT=vaticle-engineers
 ZONE=europe-west2-c
