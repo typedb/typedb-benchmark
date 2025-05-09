@@ -25,27 +25,27 @@ while getopts ":d:w:c:s:t:k" opt; do
     esac
 done
 
-source toool/ovh/profile.sh
+source tool/ovh/profile.sh
 
 echo Machine name: $MACHINE_NAME
 
-toool/ovh/create.sh
+tool/ovh/create.sh
 sleep 40
-toool/ovh/clone-repo.sh $(git rev-parse HEAD)
+tool/ovh/clone-repo.sh $(git rev-parse HEAD)
 
-toool/ovh/ssh-exec.sh "cd typedb-benchmark && tool/$DB/setup.sh"
+tool/ovh/ssh-exec.sh "cd typedb-benchmark && tool/$DB/setup.sh"
 
-toool/ovh/ssh-exec.sh "
+tool/ovh/ssh-exec.sh "
     cd typedb-benchmark && 
         nohup tool/execute-tpcc.sh --no-execute --reset --scalefactor=$SCALE_FACTOR --warehouses=$WAREHOUSES --clients=$CLIENTS --duration=$DURATION $DB & wait \$!
     "
 
-toool/ovh/ssh-exec.sh "
+tool/ovh/ssh-exec.sh "
     cd typedb-benchmark && 
         nohup tool/execute-tpcc.sh --no-load --scalefactor=$SCALE_FACTOR --warehouses=$WAREHOUSES --clients=$CLIENTS --duration=$DURATION $DB & wait \$!
     "
 
-toool/ovh/download-result.sh
+tool/ovh/download-result.sh
 
 if [[ -z $KEEP_SERVER ]]; then 
     openstack server delete $MACHINE_NAME
