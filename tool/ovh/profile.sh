@@ -18,8 +18,18 @@ OS_IDENTITY_API_VERSION=3
 OS_USER_DOMAIN_NAME=${OS_USER_DOMAIN_NAME:-"Default"}
 OS_PROJECT_DOMAIN_NAME=${OS_PROJECT_DOMAIN_NAME:-"Default"}
 
-if [ ! -v OS_TENANT_ID -o ! -v OS_TENANT_NAME -o ! -v OS_USERNAME -o ! -v OS_PASSWORD -o ! -v OS_KEY_ID -o ! -v OS_PRIVATE_KEY ]; then
-    echo "All of OS_TENANT_ID, OS_TENANT_NAME, OS_USERNAME, OS_PASSWORD must be set"
+if [ ! -v OS_TENANT_ID -o ! -v OS_TENANT_NAME ]; then
+    echo "OS_TENANT_ID and OS_TENANT_NAME must be set"
+    exit 1
+fi
+
+if [ ! -v OS_USERNAME -o ! -v OS_PASSWORD ]; then
+    echo "OS_USERNAME and OS_PASSWORD must be set"
+    exit 1
+fi
+
+if [ ! -v OS_KEY_ID -o ! -v OS_PRIVATE_KEY ]; then
+    echo "OS_KEY_ID and OS_PRIVATE_KEY must be set"
     exit 1
 fi
 
