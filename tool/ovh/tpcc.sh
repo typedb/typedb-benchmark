@@ -29,6 +29,16 @@ source tool/ovh/profile.sh
 
 echo Machine name: $MACHINE_NAME
 
+function cleanup {
+    tool/ovh/download-result.sh
+
+    if [[ -z $KEEP_SERVER ]]; then 
+        openstack server delete $MACHINE_NAME
+    fi
+}
+trap cleanup ERR
+trap cleanup EXIT
+
 tool/ovh/create.sh
 sleep 40
 tool/ovh/clone-repo.sh $(git rev-parse HEAD)
@@ -44,9 +54,3 @@ tool/ovh/ssh-exec.sh "'
     cd typedb-benchmark && . venv/bin/activate &&
         nohup tool/execute-tpcc.sh --no-load --scalefactor=$SCALE_FACTOR --warehouses=$WAREHOUSES --clients=$CLIENTS --duration=$DURATION $DB & wait \$!
     '"
-
-tool/ovh/download-result.sh
-
-if [[ -z $KEEP_SERVER ]]; then 
-    openstack server delete $MACHINE_NAME
-fi
