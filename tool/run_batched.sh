@@ -2,7 +2,7 @@
 
 # usage: for ...; do echo cmd; done | run_batched.sh
 
-MAX_JOBS=10
+MAX_JOBS=8
 
 while true; do
     CUR_JOBS=$(jobs | wc -l)
