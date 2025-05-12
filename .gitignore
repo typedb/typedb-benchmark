@@ -61,3 +61,6 @@ bazel-*
 tpcc/profiling/
 ldbc/profiling/
 *.json
+
+# OpenStack credentials
+openrc.sh
