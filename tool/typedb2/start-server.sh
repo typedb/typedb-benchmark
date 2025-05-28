@@ -9,7 +9,7 @@ tmux new-session -d -s "typedb" "./$DISTRIBUTION_DIR/typedb server > ./$DISTRIBU
 
 # wait until ready
 set +e
-POLL_INTERVAL_SECS=0.5
+POLL_INTERVAL_SECS=1
 RETRY_NUM=20
 while [[ $RETRY_NUM -gt 0 ]]; do
   lsof -i :1729 > /dev/null

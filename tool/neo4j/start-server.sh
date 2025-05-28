@@ -4,7 +4,7 @@ sudo nohup neo4j start >&/dev/null &
 
 # wait until ready
 set +e
-POLL_INTERVAL_SECS=0.5
+POLL_INTERVAL_SECS=1
 RETRY_NUM=20
 while [[ $RETRY_NUM -gt 0 ]]; do
   lsof -i :7687 > /dev/null
