@@ -694,7 +694,6 @@ class Neo4JDriver(AbstractDriver):
                 MATCH (c:CUSTOMER {C_ID: $c_id}) 
                   -[:BELONGS_TO]-> (:DISTRICT {D_ID: $c_d_id})
                   -[:BELONGS_TO]-> (:WAREHOUSE {W_ID: $c_w_id}) 
-                  -[:BELONGS_TO]-> (:DISTRICT {D_ID: $c_d_id})
                 MATCH (d:DISTRICT {D_ID: $d_id}) -[:BELONGS_TO]-> (w:WAREHOUSE {W_ID: $w_id})
                 CREATE (h:HISTORY {H_C_ID: $c_id, H_C_D_ID: $c_d_id, H_C_W_ID: $c_w_id,
                                    H_D_ID: $d_id, H_W_ID: $w_id, H_DATE: $h_date,
