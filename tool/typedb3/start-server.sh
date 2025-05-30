@@ -5,6 +5,7 @@ source tool/typedb3/config.sh
 # start server
 DISTRIBUTION="typedb-all-linux-x86_64"
 DISTRIBUTION_DIR="$DISTRIBUTION-$SERVER_VERSION"
+ulimit -n 10240
 tmux new-session -d -s "typedb" "./$DISTRIBUTION_DIR/typedb server --diagnostics.reporting.metrics false >& ./$DISTRIBUTION_DIR/log"
 
 # wait until ready
