@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2024 TypeDB
+# Copyright (C) 2022 Vaticle
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -15,50 +15,17 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 
-# Misc
-.DS_Store
-*.log
+load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
 
-# Temporary source files
-tmp/
+def typedb_dependencies():
+    git_repository(
+        name = "typedb_dependencies",
+        remote = "https://github.com/typedb/dependencies",
+        commit = "fac1121c903b0c9e5924d391a883e4a0749a82a2",  # sync-marker: do not remove this comment, this is used for sync-dependencies by @typedb_dependencies
+    )
 
-# IDE files
-.idea/
-.ijwb/
-*.iml
-.vscode
-.settings
-.project
-.classpath
-.factorypath
-.grok*
-
-# Compiled files
-target/
-bin/
-dist/
-
-# NPM
-node_modules/
-
-# Python
-__pycache__
-
-# Bazel
-bazel-*
-/ldbc/typeql/results
-iam/bazel-*
-
-# Local python env
-/.py311
-
-# TypeDB Studio
-.typedb_studio
-
-# Vim
-*.swp
-
-# Profiling
-tpcc/profiling/
-ldbc/profiling/
-*.json
+def typedb_simulation():
+    native.local_repository(
+        name = "typedb_simulation",
+        path = "../simulation",
+    )

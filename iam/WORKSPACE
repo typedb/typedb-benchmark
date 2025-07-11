@@ -1,0 +1,107 @@
+#
+# Copyright (C) 2022 TypeDB
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+#
+
+workspace(name = "typedb_iam")
+
+################################
+# Load @dependencies #
+################################
+
+load("//dependencies/typedb:repositories.bzl", "typedb_dependencies")
+typedb_dependencies()
+
+# Load //builder/java
+load("@typedb_dependencies//builder/java:deps.bzl", "rules_jvm_external")
+rules_jvm_external()
+
+# Load //builder/kotlin
+load("@typedb_dependencies//builder/kotlin:deps.bzl", "io_bazel_rules_kotlin")
+io_bazel_rules_kotlin()
+load("@io_bazel_rules_kotlin//kotlin:repositories.bzl", "kotlin_repositories")
+kotlin_repositories()
+load("@io_bazel_rules_kotlin//kotlin:core.bzl", "kt_register_toolchains")
+kt_register_toolchains()
+register_toolchains("//:kotlin_toolchain_strict_deps")
+
+# Load //tool/common
+load("@typedb_dependencies//tool/common:deps.bzl", "typedb_dependencies_ci_pip")
+typedb_dependencies_ci_pip()
+
+# Load //tool/checkstyle
+load("@typedb_dependencies//tool/checkstyle:deps.bzl", checkstyle_deps = "deps")
+checkstyle_deps()
+
+####################################
+# Load @typedb_bazel_distribution #
+####################################
+
+load("@typedb_dependencies//distribution:deps.bzl", "typedb_bazel_distribution")
+typedb_bazel_distribution()
+
+################################
+# Load @typedb_dependencies #
+################################
+
+# Load repositories
+load("//dependencies/typedb:repositories.bzl", "typedb_simulation")
+typedb_simulation()
+
+# Load artifact
+load("//dependencies/typedb:artifacts.bzl", "typedb_artifacts", "typedb_cluster_artifacts")
+typedb_artifacts()
+typedb_cluster_artifacts()
+
+############################
+# Load @maven dependencies #
+############################
+
+# Load maven
+load("//dependencies/maven:artifacts.bzl", typedb_benchmark_artifacts = "artifacts")
+
+load("@typedb_dependencies//library/maven:rules.bzl", "maven")
+maven(
+    typedb_benchmark_artifacts
+)
+
+# Load neo4j
+load("@rules_jvm_external//:defs.bzl", "maven_install")
+maven_install(
+    name = "neo4j",
+    artifacts = ["org.neo4j.driver:neo4j-java-driver:4.4.5"],
+#    repositories = [
+#        "https://repo1.maven.org/maven2",
+#    ],
+    strict_visibility = True,
+    version_conflict_policy = "pinned"
+)
+
+maven_install(
+    name = "typedb_maven_deps",
+    artifacts = [
+        "com.vaticle.typedb:typedb-driver:2.29.2",
+        "com.vaticle.typeql:typeql-common:2.28.6",
+        "com.vaticle.typeql:typeql-lang:2.28.6",
+        "com.vaticle.typeql:typeql-pattern:2.28.6",
+        "com.vaticle.typeql:typeql-query:2.28.6",
+    ],
+#    repositories = [
+#        "https://repo.typedb.com/public/public-release/maven/",
+#    ],
+     strict_visibility = True,
+     version_conflict_policy = "pinned"
+)
+

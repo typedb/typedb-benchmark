@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2024 TypeDB
+# Copyright (C) 2022 Vaticle
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -15,50 +15,11 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 
-# Misc
-.DS_Store
-*.log
+load("@typedb_dependencies//tool/checkstyle:rules.bzl", "checkstyle_test")
 
-# Temporary source files
-tmp/
-
-# IDE files
-.idea/
-.ijwb/
-*.iml
-.vscode
-.settings
-.project
-.classpath
-.factorypath
-.grok*
-
-# Compiled files
-target/
-bin/
-dist/
-
-# NPM
-node_modules/
-
-# Python
-__pycache__
-
-# Bazel
-bazel-*
-/ldbc/typeql/results
-iam/bazel-*
-
-# Local python env
-/.py311
-
-# TypeDB Studio
-.typedb_studio
-
-# Vim
-*.swp
-
-# Profiling
-tpcc/profiling/
-ldbc/profiling/
-*.json
+checkstyle_test(
+    name = "checkstyle",
+    include = glob(["*"]),
+    exclude = ["artifacts.snapshot"],
+    license_type = "agpl-header",
+)
