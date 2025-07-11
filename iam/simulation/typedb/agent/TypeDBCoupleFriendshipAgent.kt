@@ -16,8 +16,8 @@
  */
 package com.vaticle.typedb.iam.simulation.typedb.agent
 
-import com.vaticle.typedb.client.api.TypeDBSession
-import com.vaticle.typedb.client.api.TypeDBTransaction
+import com.vaticle.typedb.driver.api.TypeDBSession
+import com.vaticle.typedb.driver.api.TypeDBTransaction
 import com.vaticle.typedb.iam.simulation.common.concept.Country
 import com.vaticle.typedb.iam.simulation.common.Context
 import com.vaticle.typedb.iam.simulation.agent.CoupleFriendshipAgent
@@ -36,17 +36,21 @@ import com.vaticle.typedb.iam.simulation.typedb.Labels.RESIDENT
 import com.vaticle.typedb.iam.simulation.typedb.Labels.RESIDENTSHIP
 import com.vaticle.typedb.benchmark.framework.common.seed.RandomSource
 import com.vaticle.typedb.benchmark.framework.typedb.TypeDBSessionEx.readTransaction
-import com.vaticle.typedb.benchmark.framework.typedb.TypeDBClient
+import com.vaticle.typedb.benchmark.framework.typedb.TypeDBDriver
 import com.vaticle.typeql.lang.TypeQL.match
 import com.vaticle.typeql.lang.TypeQL.rel
-import com.vaticle.typeql.lang.TypeQL.`var`
+import com.vaticle.typeql.lang.TypeQL.cVar
 import java.time.LocalDateTime
 import java.util.stream.Collectors.toList
 
-class TypeDBCoupleFriendshipAgent(client: TypeDBClient, context: Context) :
+class TypeDBCoupleFriendshipAgent(client: TypeDBDriver, context: Context) :
     CoupleFriendshipAgent<TypeDBSession>(client, context) {
 
-    override fun run(session: TypeDBSession, partition: Country, random: RandomSource): List<Report> {
+    override val actionHandlers = mapOf(
+        "doAction" to ::doAction,
+    )
+
+    fun doAction(session: TypeDBSession, partition: Country, random: RandomSource): List<Report> {
         // This agent targets the expense of the `put` operation of reasoning. More specifically the cost of `get` to
         // check whether a relation is pre-existing
         session.readTransaction(infer = true).use { tx -> matchFriendships(tx, partition, context.today()) }
@@ -54,15 +58,15 @@ class TypeDBCoupleFriendshipAgent(client: TypeDBClient, context: Context) :
     }
 
     private fun matchFriendships(tx: TypeDBTransaction, country: Country, marriageBirthDate: LocalDateTime) {
-        tx.query().match(match(
-            `var`(COUNTRY).isa(COUNTRY).has(CODE, country.code),
-            `var`(X).isa(PERSON).has(BIRTH_DATE, marriageBirthDate),
-            rel(RESIDENT, `var`(X)).rel(RESIDENCE, `var`(CITY)).isa(RESIDENTSHIP),
-            rel(CONTAINED, `var`(CITY)).rel(CONTAINER, `var`(COUNTRY)).isa(CONTAINS),
-            `var`(Y).isa(PERSON),
-            rel(X).rel(Y).isa(FRIENDSHIP),
-            rel(X).rel(Y).isa(MARRIAGE)
-        )).collect(toList())
+        tx.query().get(match(
+            cVar(COUNTRY).isa(COUNTRY).has(CODE, country.code),
+            cVar(X).isa(PERSON).has(BIRTH_DATE, marriageBirthDate),
+            rel(RESIDENT, cVar(X)).rel(RESIDENCE, cVar(CITY)).isa(RESIDENTSHIP),
+            rel(CONTAINED, cVar(CITY)).rel(CONTAINER, cVar(COUNTRY)).isa(CONTAINS),
+            cVar(Y).isa(PERSON),
+            rel(cVar(X)).rel(cVar(Y)).isa(FRIENDSHIP),
+            rel(cVar(X)).rel(cVar(Y)).isa(MARRIAGE)
+        ).get()).collect(toList())
     }
 
     companion object {

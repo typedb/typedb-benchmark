@@ -25,7 +25,7 @@ import com.vaticle.typedb.benchmark.framework.common.seed.RandomSource
 import java.time.LocalDateTime
 
 abstract class NationalityAgent<SESSION> protected constructor(client: DBClient<SESSION>, context: Context) :
-    Agent<Country, SESSION, ModelParams>(client, context) {
+    Agent<Country, SESSION, Context>(client, context) {
     override val agentClass = NationalityAgent::class.java
     override val partitions = context.seedData.countries
 

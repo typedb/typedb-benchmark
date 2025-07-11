@@ -17,17 +17,24 @@
 
 agents:
   - name: "PersonAgent"
-    isEnabled: true
-    trace: true
+    action: "doAction"
+    actionsPerIteration: 1
+    trace: false
+
   - name: "FriendshipAgent"
-    isEnabled: true
-    trace: true
+    action: "doAction"
+    actionsPerIteration: 1
+    trace: false
+
   - name: "MarriageAgent"
-    isEnabled: true
-    trace: true
+    action: "doAction"
+    actionsPerIteration: 1
+    trace: false
+
   - name: "ParenthoodAgent"
-    isEnabled: true
-    trace: true
+    action: "doAction"
+    actionsPerIteration: 1
+    trace: false
 
 traceSampling:
   # Options: `"every"` for every K traces; `"log"` for logarithm with base N

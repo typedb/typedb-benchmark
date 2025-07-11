@@ -16,8 +16,8 @@
  */
 package com.vaticle.typedb.iam.simulation.typedb.agent
 
-import com.vaticle.typedb.client.api.TypeDBSession
-import com.vaticle.typedb.client.api.TypeDBTransaction
+import com.vaticle.typedb.driver.api.TypeDBSession
+import com.vaticle.typedb.driver.api.TypeDBTransaction
 import com.vaticle.typedb.iam.simulation.common.concept.Country
 import com.vaticle.typedb.iam.simulation.common.Context
 import com.vaticle.typedb.iam.simulation.agent.MaritalStatusAgent
@@ -34,17 +34,21 @@ import com.vaticle.typedb.iam.simulation.typedb.Labels.RESIDENT
 import com.vaticle.typedb.iam.simulation.typedb.Labels.RESIDENTSHIP
 import com.vaticle.typedb.benchmark.framework.common.seed.RandomSource
 import com.vaticle.typedb.benchmark.framework.typedb.TypeDBSessionEx.readTransaction
-import com.vaticle.typedb.benchmark.framework.typedb.TypeDBClient
+import com.vaticle.typedb.benchmark.framework.typedb.TypeDBDriver
 import com.vaticle.typeql.lang.TypeQL.match
 import com.vaticle.typeql.lang.TypeQL.rel
-import com.vaticle.typeql.lang.TypeQL.`var`
+import com.vaticle.typeql.lang.TypeQL.cVar
 import java.time.LocalDateTime
 import java.util.stream.Collectors.toList
 
-class TypeDBMaritalStatusAgent(client: TypeDBClient, context: Context) :
+class TypeDBMaritalStatusAgent(client: TypeDBDriver, context: Context) :
     MaritalStatusAgent<TypeDBSession>(client, context) {
 
-    override fun run(session: TypeDBSession, partition: Country, random: RandomSource): List<Report> {
+    override val actionHandlers = mapOf(
+        "doAction" to ::doAction,
+    )
+
+    fun doAction(session: TypeDBSession, partition: Country, random: RandomSource): List<Report> {
         session.readTransaction(infer = true).use { tx ->
             // Pick people who are exactly old enough to be married since this determines their status
             matchMaritalStatus(tx, partition, context.today().minusYears(context.model.ageOfAdulthood.toLong()))
@@ -53,11 +57,11 @@ class TypeDBMaritalStatusAgent(client: TypeDBClient, context: Context) :
     }
 
     private fun matchMaritalStatus(tx: TypeDBTransaction, country: Country, marriageBirthDate: LocalDateTime) {
-        tx.query().match(match(
-            `var`(PERSON).isa(PERSON).has(BIRTH_DATE, marriageBirthDate),
-            `var`(COUNTRY).isa(COUNTRY).has(CODE, country.code),
-            rel(RESIDENT, `var`(PERSON)).rel(RESIDENCE, `var`(CITY)).isa(RESIDENTSHIP),
-            rel(CONTAINED, `var`(CITY)).rel(CONTAINER, `var`(COUNTRY)).isa(CONTAINS)
-        )).collect(toList())
+        tx.query().get(match(
+            cVar(PERSON).isa(PERSON).has(BIRTH_DATE, marriageBirthDate),
+            cVar(COUNTRY).isa(COUNTRY).has(CODE, country.code),
+            rel(RESIDENT, cVar(PERSON)).rel(RESIDENCE, cVar(CITY)).isa(RESIDENTSHIP),
+            rel(CONTAINED, cVar(CITY)).rel(CONTAINER, cVar(COUNTRY)).isa(CONTAINS)
+        ).get()).collect(toList())
     }
 }

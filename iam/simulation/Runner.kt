@@ -24,7 +24,7 @@ import com.vaticle.typedb.iam.simulation.typedb.TypeDBSimulation
 import com.vaticle.typedb.benchmark.framework.common.params.Database
 import com.vaticle.typedb.benchmark.framework.common.params.Options
 
-class Runner : com.vaticle.typedb.benchmark.framework.Runner<ModelParams>() {
+class Runner : com.vaticle.typedb.benchmark.framework.Runner<Context>() {
 
     override fun initSimulation(options: Options, config: Config): com.vaticle.typedb.benchmark.framework.Simulation<*, *> {
         val context = Context.create(config = config, isTracing = options.tracing != null, isReporting = false)

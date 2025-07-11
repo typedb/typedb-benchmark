@@ -16,6 +16,7 @@
  */
 package com.vaticle.typedb.iam.simulation.neo4j
 
+import com.vaticle.typedb.benchmark.framework.common.seed.RandomSource
 import com.vaticle.typedb.iam.simulation.agent.PersonAgent
 import com.vaticle.typedb.iam.simulation.common.Util.printDuration
 import com.vaticle.typedb.iam.simulation.common.concept.City
@@ -95,7 +96,8 @@ class Neo4jSimulation private constructor(client: Neo4jClient, context: Context)
         tx.commit()
     }
 
-    override fun initData(nativeDriver: Driver) {
+    // TODO: Must use the randomSource
+    override fun initData(nativeDriver: Driver, randomSource: RandomSource) {
         LOGGER.info("Neo4j initialisation of world simulation data started ...")
         val start = Instant.now()
         initContinents(nativeDriver, context.seedData.global)

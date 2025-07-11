@@ -16,8 +16,8 @@
  */
 package com.vaticle.typedb.iam.simulation.typedb.agent
 
-import com.vaticle.typedb.client.api.TypeDBSession
-import com.vaticle.typedb.client.api.TypeDBTransaction
+import com.vaticle.typedb.driver.api.TypeDBSession
+import com.vaticle.typedb.driver.api.TypeDBTransaction
 import com.vaticle.typedb.iam.simulation.common.concept.Country
 import com.vaticle.typedb.iam.simulation.common.Context
 import com.vaticle.typedb.iam.simulation.agent.NationalityAgent
@@ -30,27 +30,31 @@ import com.vaticle.typedb.iam.simulation.typedb.Labels.NATIONALITY
 import com.vaticle.typedb.iam.simulation.typedb.Labels.PERSON
 import com.vaticle.typedb.benchmark.framework.common.seed.RandomSource
 import com.vaticle.typedb.benchmark.framework.typedb.TypeDBSessionEx.readTransaction
-import com.vaticle.typedb.benchmark.framework.typedb.TypeDBClient
+import com.vaticle.typedb.benchmark.framework.typedb.TypeDBDriver
 import com.vaticle.typeql.lang.TypeQL.match
 import com.vaticle.typeql.lang.TypeQL.rel
-import com.vaticle.typeql.lang.TypeQL.`var`
+import com.vaticle.typeql.lang.TypeQL.cVar
 import java.time.LocalDateTime
 import java.util.stream.Collectors.toList
 
-class TypeDBNationalityAgent(client: TypeDBClient, context: Context) :
+class TypeDBNationalityAgent(client: TypeDBDriver, context: Context) :
     NationalityAgent<TypeDBSession>(client, context) {
 
-    override fun run(session: TypeDBSession, partition: Country, random: RandomSource): List<Report> {
+    override val actionHandlers = mapOf(
+        "doAction" to ::doAction,
+    )
+
+    fun doAction(session: TypeDBSession, partition: Country, random: RandomSource): List<Report> {
         if (context.isReporting) throw RuntimeException("Reports are not comparable for reasoning agents.")
         session.readTransaction(infer = true).use { tx -> matchNationalities(tx, partition, context.today()) }
         return emptyList()
     }
 
     private fun matchNationalities(tx: TypeDBTransaction, country: Country, today: LocalDateTime) {
-        tx.query().match(match(
-            `var`(COUNTRY).isa(COUNTRY).has(CODE, country.code),
-            `var`(NATIONAL).isa(PERSON).has(BIRTH_DATE, today),
-            rel(NATIONAL, NATIONAL).rel(Labels.NATION, COUNTRY).isa(NATIONALITY)
-        )).collect(toList())
+        tx.query().get(match(
+            cVar(COUNTRY).isa(COUNTRY).has(CODE, country.code),
+            cVar(NATIONAL).isa(PERSON).has(BIRTH_DATE, today),
+            rel(NATIONAL, cVar(NATIONAL)).rel(Labels.NATION, cVar(COUNTRY)).isa(NATIONALITY)
+        ).get()).collect(toList())
     }
 }

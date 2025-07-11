@@ -55,8 +55,11 @@ import java.util.stream.Stream
 
 class Neo4jMarriageAgent(client: Neo4jClient, context: Context) : MarriageAgent<Session>(client, context) {
 
+    override val actionHandlers = mapOf(
+        "doAction" to ::doAction,
+    )
 
-    override fun run(session: Session, partition: Country, random: RandomSource): List<Report> {
+    fun doAction(session: Session, partition: Country, random: RandomSource): List<Report> {
         val reports = mutableListOf<Report>()
         session.writeTransaction { tx ->
             val partnerBirthDate = context.today().minusYears(context.model.ageOfAdulthood.toLong())

@@ -50,7 +50,11 @@ import java.util.stream.Stream
 
 class Neo4jFriendshipAgent(client: Neo4jClient, context: Context) : FriendshipAgent<Session>(client, context) {
 
-    override fun run(session: Session, partition: Country, random: RandomSource): List<Report> {
+    override val actionHandlers = mapOf(
+        "doAction" to ::doAction,
+    )
+
+    fun doAction(session: Session, partition: Country, random: RandomSource): List<Report> {
         val reports = mutableListOf<Report>()
         session.writeTransaction { tx ->
             val birthDate = context.today().minusYears(context.model.ageOfFriendship.toLong())

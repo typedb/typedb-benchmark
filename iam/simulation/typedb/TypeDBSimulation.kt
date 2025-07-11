@@ -16,7 +16,8 @@
  */
 package com.vaticle.typedb.iam.simulation.typedb
 
-import com.vaticle.typedb.client.api.TypeDBTransaction.Type.WRITE
+import com.vaticle.typedb.benchmark.framework.common.seed.RandomSource
+import com.vaticle.typedb.driver.api.TypeDBTransaction.Type.WRITE
 import com.vaticle.typedb.iam.simulation.agent.AgentFactory
 import com.vaticle.typedb.iam.simulation.agent.PersonAgent
 import com.vaticle.typedb.iam.simulation.common.Context
@@ -41,53 +42,54 @@ import com.vaticle.typedb.iam.simulation.typedb.Labels.LOCATION
 import com.vaticle.typedb.iam.simulation.typedb.Labels.NAME
 import com.vaticle.typedb.iam.simulation.typedb.Labels.UNIVERSITY
 import com.vaticle.typedb.iam.simulation.typedb.agent.TypeDBAgentFactory
-import com.vaticle.typedb.benchmark.framework.typedb.TypeDBClient
+import com.vaticle.typedb.benchmark.framework.typedb.TypeDBDriver
 import com.vaticle.typeql.lang.TypeQL.insert
 import com.vaticle.typeql.lang.TypeQL.match
 import com.vaticle.typeql.lang.TypeQL.rel
-import com.vaticle.typeql.lang.TypeQL.`var`
+import com.vaticle.typeql.lang.TypeQL.cVar
 import mu.KotlinLogging
 import java.io.File
 import java.nio.file.Paths
 import java.time.Instant
 
 class TypeDBSimulation private constructor(
-    client: TypeDBClient, context: Context
+    client: TypeDBDriver, context: Context
 ) : com.vaticle.typedb.benchmark.framework.typedb.TypeDBSimulation<Context>(client, context, TypeDBAgentFactory(client, context)) {
 
     override val agentPackage: String = PersonAgent::class.java.packageName
 
     override val name = "IAM"
 
-    override val schemaFile: File = Paths.get("iam-schema.tql").toFile()
+    override val schemaFiles: List<File> = listOf( Paths.get("iam-schema.tql").toFile())
 
-    override fun initData(nativeSession: com.vaticle.typedb.client.api.TypeDBSession) {
+    // TODO: Must use the randomSource
+    override fun initData(nativeSession: com.vaticle.typedb.driver.api.TypeDBSession, randomSource: RandomSource) {
         LOGGER.info("TypeDB initialisation of world simulation data started ...")
         val start = Instant.now()
         initContinents(nativeSession, context.seedData.global)
         LOGGER.info("TypeDB initialisation of world simulation data ended in: {}", printDuration(start, Instant.now()))
     }
 
-    private fun initContinents(session: com.vaticle.typedb.client.api.TypeDBSession, global: Global) {
+    private fun initContinents(session: com.vaticle.typedb.driver.api.TypeDBSession, global: Global) {
         global.continents.parallelStream().forEach { continent: Continent ->
             session.transaction(WRITE).use { tx ->
-                tx.query().insert(insert(`var`().isa(CONTINENT).has(CODE, continent.code).has(NAME, continent.name)))
+                tx.query().insert(insert(cVar().isa(CONTINENT).has(CODE, continent.code).has(NAME, continent.name)))
                 tx.commit()
             }
             initCountries(session, continent)
         }
     }
 
-    private fun initCountries(session: com.vaticle.typedb.client.api.TypeDBSession, continent: Continent) {
+    private fun initCountries(session: com.vaticle.typedb.driver.api.TypeDBSession, continent: Continent) {
         continent.countries.parallelStream().forEach { country: Country ->
             session.transaction(WRITE).use { tx ->
-                val countryVar = `var`(Y).isa(COUNTRY).has(CODE, country.code).has(NAME, country.name)
+                val countryVar = cVar(Y).isa(COUNTRY).has(CODE, country.code).has(NAME, country.name)
                 country.currencies.forEach { currency: Currency -> countryVar.has(CURRENCY, currency.code) }
                 tx.query().insert(
                     match(
-                        `var`(X).isa(CONTINENT).has(CODE, continent.code)
+                        cVar(X).isa(CONTINENT).has(CODE, continent.code)
                     ).insert(
-                        countryVar, rel(CONTAINER, X).rel(CONTAINED, Y).isa(CONTAINS)
+                        countryVar, rel(CONTAINER, cVar(X)).rel(CONTAINED, cVar(Y)).isa(CONTAINS)
                     )
                 )
                 // TODO: Currency should be an entity we relate to by relation
@@ -98,15 +100,15 @@ class TypeDBSimulation private constructor(
         }
     }
 
-    private fun initCities(session: com.vaticle.typedb.client.api.TypeDBSession, country: Country) {
+    private fun initCities(session: com.vaticle.typedb.driver.api.TypeDBSession, country: Country) {
         session.transaction(WRITE).use { tx ->
             country.cities.forEach { city: City ->
                 tx.query().insert(
                     match(
-                        `var`(X).isa(COUNTRY).has(CODE, country.code)
+                        cVar(X).isa(COUNTRY).has(CODE, country.code)
                     ).insert(
-                        `var`(Y).isa(CITY).has(CODE, city.code).has(NAME, city.name),
-                        rel(CONTAINER, X).rel(CONTAINED, Y).isa(CONTAINS)
+                        cVar(Y).isa(CITY).has(CODE, city.code).has(NAME, city.name),
+                        rel(CONTAINER, cVar(X)).rel(CONTAINED, cVar(Y)).isa(CONTAINS)
                     )
                 )
             }
@@ -114,15 +116,15 @@ class TypeDBSimulation private constructor(
         }
     }
 
-    private fun initUniversities(session: com.vaticle.typedb.client.api.TypeDBSession, country: Country) {
+    private fun initUniversities(session: com.vaticle.typedb.driver.api.TypeDBSession, country: Country) {
         session.transaction(WRITE).use { tx ->
             country.universities.forEach { university: University ->
                 tx.query().insert(
                     match(
-                        `var`(X).isa(COUNTRY).has(CODE, country.code)
+                        cVar(X).isa(COUNTRY).has(CODE, country.code)
                     ).insert(
-                        `var`(Y).isa(UNIVERSITY).has(NAME, university.name),
-                        rel(LOCATION, X).rel(LOCATED, Y).isa(LOCATES)
+                        cVar(Y).isa(UNIVERSITY).has(NAME, university.name),
+                        rel(LOCATION, cVar(X)).rel(LOCATED, cVar(Y)).isa(LOCATES)
                     )
                 )
             }
@@ -136,11 +138,11 @@ class TypeDBSimulation private constructor(
         private const val Y = "y"
 
         fun core(address: String, context: Context): TypeDBSimulation {
-            return TypeDBSimulation(TypeDBClient.core(address, context.dbName), context).apply { init() }
+            return TypeDBSimulation(TypeDBDriver.core(address, context.dbName), context).apply { init() }
         }
 
         fun cluster(address: String, context: Context): TypeDBSimulation {
-            return TypeDBSimulation(TypeDBClient.cluster(address, context.dbName), context).apply { init() }
+            return TypeDBSimulation(TypeDBDriver.cluster(address, context.dbName), context).apply { init() }
         }
     }
 }

@@ -51,7 +51,7 @@ class ComparisonTest {
             NEO4J = create(OPTIONS.neo4jAddress, create(config = CONFIG, isTracing = false, isReporting = true))
         }
 
-        override fun runChild(runner: org.junit.runner.Runner, notifier: RunNotifier) {
+        fun doActionChild(runner: org.junit.runner.Runner, notifier: RunNotifier) {
             iteration++
             Stream.of(NEO4J, TYPEDB).parallel().forEach { it.iterate() }
             super.runChild(runner, notifier)

@@ -23,7 +23,7 @@ import com.vaticle.typedb.benchmark.framework.Agent
 import com.vaticle.typedb.benchmark.framework.common.DBClient
 
 abstract class PersonAgent<SESSION> protected constructor(client: DBClient<SESSION>, context: Context) :
-    Agent<Country, SESSION, ModelParams>(client, context) {
+    Agent<Country, SESSION, Context>(client, context) {
     override val agentClass = PersonAgent::class.java
     override val partitions = context.seedData.countries
 }

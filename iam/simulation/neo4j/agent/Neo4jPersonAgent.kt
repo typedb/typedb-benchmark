@@ -48,7 +48,11 @@ import java.time.LocalDateTime
 
 class Neo4jPersonAgent(client: Neo4jClient, context: Context) : PersonAgent<Session>(client, context) {
 
-    override fun run(session: Session, partition: Country, random: RandomSource): List<Report> {
+    override val actionHandlers = mapOf(
+        "doAction" to ::doAction,
+    )
+
+    fun doAction(session: Session, partition: Country, random: RandomSource): List<Report> {
         val reports = mutableListOf<Report>()
         session.writeTransaction { tx ->
             for (i in 0 until context.model.populationGrowth) {

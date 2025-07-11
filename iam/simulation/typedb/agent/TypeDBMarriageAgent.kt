@@ -16,8 +16,8 @@
  */
 package com.vaticle.typedb.iam.simulation.typedb.agent
 
-import com.vaticle.typedb.client.api.TypeDBSession
-import com.vaticle.typedb.client.api.TypeDBTransaction
+import com.vaticle.typedb.driver.api.TypeDBSession
+import com.vaticle.typedb.driver.api.TypeDBTransaction
 import com.vaticle.typedb.iam.simulation.common.concept.Country
 import com.vaticle.typedb.iam.simulation.common.concept.Gender
 import com.vaticle.typedb.iam.simulation.common.concept.Marriage
@@ -42,21 +42,25 @@ import com.vaticle.typedb.iam.simulation.typedb.Labels.RESIDENCE
 import com.vaticle.typedb.iam.simulation.typedb.Labels.RESIDENT
 import com.vaticle.typedb.iam.simulation.typedb.Labels.RESIDENTSHIP
 import com.vaticle.typedb.iam.simulation.typedb.Labels.WIFE
-import com.vaticle.typedb.client.api.answer.ConceptMap
+import com.vaticle.typedb.driver.api.answer.ConceptMap
 import com.vaticle.typedb.benchmark.framework.common.seed.RandomSource
 import com.vaticle.typedb.benchmark.framework.typedb.TypeDBSessionEx.writeTransaction
-import com.vaticle.typedb.benchmark.framework.typedb.TypeDBClient
+import com.vaticle.typedb.benchmark.framework.typedb.TypeDBDriver
 import com.vaticle.typeql.lang.TypeQL.match
 import com.vaticle.typeql.lang.TypeQL.rel
-import com.vaticle.typeql.lang.TypeQL.`var`
+import com.vaticle.typeql.lang.TypeQL.cVar
 import java.time.LocalDateTime
 import java.util.Comparator
 import java.util.stream.Collectors.toList
 import java.util.stream.Stream
 
-class TypeDBMarriageAgent(client: TypeDBClient, context: Context) : MarriageAgent<TypeDBSession>(client, context) {
+class TypeDBMarriageAgent(client: TypeDBDriver, context: Context) : MarriageAgent<TypeDBSession>(client, context) {
 
-    override fun run(session: TypeDBSession, partition: Country, random: RandomSource): List<Report> {
+    override val actionHandlers = mapOf(
+        "doAction" to ::doAction,
+    )
+
+    fun doAction(session: TypeDBSession, partition: Country, random: RandomSource): List<Report> {
         val reports = mutableListOf<Report>()
         session.writeTransaction().use { tx ->
             val partnerBirthDate = context.today().minusYears(context.model.ageOfAdulthood.toLong())
@@ -85,13 +89,13 @@ class TypeDBMarriageAgent(client: TypeDBClient, context: Context) : MarriageAgen
     private fun matchPartner(
         tx: TypeDBTransaction, country: Country, birthDate: LocalDateTime, gender: Gender
     ): Stream<Person> {
-        return tx.query().match(match(
-            rel(CONTAINER, COUNTRY).rel(CONTAINED, CITY).isa(CONTAINS),
-            `var`(COUNTRY).isa(COUNTRY).has(CODE, country.code),
-            `var`(CITY).isa(CITY),
-            `var`(PERSON).isa(PERSON).has(EMAIL, `var`(EMAIL)).has(GENDER, gender.value).has(BIRTH_DATE, birthDate),
-            `var`().rel(RESIDENCE, `var`(CITY)).rel(RESIDENT, `var`(PERSON)).isa(RESIDENTSHIP)
-        )).map { conceptMap: ConceptMap -> Person(email = conceptMap[EMAIL].asAttribute().asString().value) }
+        return tx.query().get(match(
+            rel(CONTAINER, cVar(COUNTRY)).rel(CONTAINED, cVar(CITY)).isa(CONTAINS),
+            cVar(COUNTRY).isa(COUNTRY).has(CODE, country.code),
+            cVar(CITY).isa(CITY),
+            cVar(PERSON).isa(PERSON).has(EMAIL, cVar(EMAIL)).has(GENDER, gender.value).has(BIRTH_DATE, birthDate),
+            cVar().rel(RESIDENCE, cVar(CITY)).rel(RESIDENT, cVar(PERSON)).isa(RESIDENTSHIP)
+        ).get()).map { conceptMap: ConceptMap -> Person(email = conceptMap[EMAIL].asAttribute().value.asString()) }
     }
 
     private fun insertMarriage(
@@ -100,10 +104,10 @@ class TypeDBMarriageAgent(client: TypeDBClient, context: Context) : MarriageAgen
     ): Marriage? {
         tx.query().insert(
             match(
-                `var`(W).isa(PERSON).has(EMAIL, wifeEmail),
-                `var`(H).isa(PERSON).has(EMAIL, husbandEmail)
+                cVar(W).isa(PERSON).has(EMAIL, wifeEmail),
+                cVar(H).isa(PERSON).has(EMAIL, husbandEmail)
             ).insert(
-                rel(WIFE, W).rel(HUSBAND, H).isa(MARRIAGE)
+                rel(WIFE, cVar(W)).rel(HUSBAND, cVar(H)).isa(MARRIAGE)
                     .has(MARRIAGE_LICENCE, marriageLicence).has(MARRIAGE_DATE, marriageDate)
             )
         )
@@ -114,25 +118,25 @@ class TypeDBMarriageAgent(client: TypeDBClient, context: Context) : MarriageAgen
         tx: TypeDBTransaction, wifeEmail: String, husbandEmail: String,
         marriageLicence: String, marriageDate: LocalDateTime
     ): Marriage {
-        val answers = tx.query().match(
+        val answers = tx.query().get(
             match(
-                `var`(W).isa(PERSON).has(EMAIL, `var`(EW)),
-                `var`(EW).eq(wifeEmail),
-                `var`(H).isa(PERSON).has(EMAIL, `var`(EH)),
-                `var`(EH).eq(husbandEmail),
-                rel(WIFE, W).rel(HUSBAND, H).isa(MARRIAGE)
-                    .has(MARRIAGE_LICENCE, `var`(L))
-                    .has(MARRIAGE_DATE, `var`(D)),
-                `var`(D).eq(marriageDate),
-                `var`(L).eq(marriageLicence)
-            )[`var`(EW), `var`(EH), `var`(L), `var`(D)]
+                cVar(W).isa(PERSON).has(EMAIL, cVar(EW)),
+                cVar(EW).eq(wifeEmail),
+                cVar(H).isa(PERSON).has(EMAIL, cVar(EH)),
+                cVar(EH).eq(husbandEmail),
+                rel(WIFE, cVar(W)).rel(HUSBAND, cVar(H)).isa(MARRIAGE)
+                    .has(MARRIAGE_LICENCE, cVar(L))
+                    .has(MARRIAGE_DATE, cVar(D)),
+                cVar(D).eq(marriageDate),
+                cVar(L).eq(marriageLicence)
+            )[cVar(EW), cVar(EH), cVar(L), cVar(D)]
         ).collect(toList())
         assert(answers.size == 1)
         val inserted = answers[0]
-        val wife = Person(email = inserted[EW].asAttribute().asString().value)
-        val husband = Person(email = inserted[EH].asAttribute().asString().value)
-        val licence = inserted[L].asAttribute().asString().value
-        val date = inserted[D].asAttribute().asDateTime().value
+        val wife = Person(email = inserted[EW].asAttribute().value.asString())
+        val husband = Person(email = inserted[EH].asAttribute().value.asString())
+        val licence = inserted[L].asAttribute().value.asString()
+        val date = inserted[D].asAttribute().value.asDateTime()
         return Marriage(wife, husband, licence, date)
     }
 

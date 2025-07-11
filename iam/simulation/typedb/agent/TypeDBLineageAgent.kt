@@ -16,8 +16,8 @@
  */
 package com.vaticle.typedb.iam.simulation.typedb.agent
 
-import com.vaticle.typedb.client.api.TypeDBSession
-import com.vaticle.typedb.client.api.TypeDBTransaction
+import com.vaticle.typedb.driver.api.TypeDBSession
+import com.vaticle.typedb.driver.api.TypeDBTransaction
 import com.vaticle.typedb.iam.simulation.common.concept.Country
 import com.vaticle.typedb.iam.simulation.common.Context
 import com.vaticle.typedb.iam.simulation.agent.LineageAgent
@@ -37,29 +37,33 @@ import com.vaticle.typedb.iam.simulation.typedb.Labels.PERSON
 import com.vaticle.typedb.iam.simulation.typedb.Labels.PLACE
 import com.vaticle.typedb.benchmark.framework.common.seed.RandomSource
 import com.vaticle.typedb.benchmark.framework.typedb.TypeDBSessionEx.readTransaction
-import com.vaticle.typedb.benchmark.framework.typedb.TypeDBClient
+import com.vaticle.typedb.benchmark.framework.typedb.TypeDBDriver
 import com.vaticle.typeql.lang.TypeQL.match
 import com.vaticle.typeql.lang.TypeQL.rel
-import com.vaticle.typeql.lang.TypeQL.`var`
+import com.vaticle.typeql.lang.TypeQL.cVar
 import java.time.LocalDateTime
 import java.util.stream.Collectors.toList
 
-class TypeDBLineageAgent(client: TypeDBClient, context: Context) : LineageAgent<TypeDBSession>(client, context) {
+class TypeDBLineageAgent(client: TypeDBDriver, context: Context) : LineageAgent<TypeDBSession>(client, context) {
 
-    override fun run(session: TypeDBSession, partition: Country, random: RandomSource): List<Report> {
+    override val actionHandlers = mapOf(
+        "doAction" to ::doAction,
+    )
+
+    fun doAction(session: TypeDBSession, partition: Country, random: RandomSource): List<Report> {
         session.readTransaction(infer = true).use { tx -> matchLineages(tx, partition, context.startDay(), context.today()) }
         return emptyList()
     }
 
     private fun matchLineages(tx: TypeDBTransaction, country: Country, startDay: LocalDateTime, today: LocalDateTime) {
-        tx.query().match(match(
-            rel(CONTAINER, COUNTRY).rel(CONTAINED, CITY).isa(CONTAINS),
-            `var`(COUNTRY).isa(COUNTRY).has(CODE, country.code),
-            `var`(CITY).isa(CITY),
-            `var`(ANCESTOR).isa(PERSON).has(BIRTH_DATE, startDay),
-            `var`().rel(PLACE, `var`(CITY)).rel(CHILD, `var`(ANCESTOR)).isa(BIRTH_PLACE),
-            `var`(DESCENDENT).isa(PERSON).has(BIRTH_DATE, today),
-            rel(ANCESTOR, ANCESTOR).rel(DESCENDENT, DESCENDENT).isa(LINEAGE)
-        )).collect(toList())
+        tx.query().get(match(
+            rel(CONTAINER, cVar(COUNTRY)).rel(CONTAINED, cVar(CITY)).isa(CONTAINS),
+            cVar(COUNTRY).isa(COUNTRY).has(CODE, country.code),
+            cVar(CITY).isa(CITY),
+            cVar(ANCESTOR).isa(PERSON).has(BIRTH_DATE, startDay),
+            cVar().rel(PLACE, cVar(CITY)).rel(CHILD, cVar(ANCESTOR)).isa(BIRTH_PLACE),
+            cVar(DESCENDENT).isa(PERSON).has(BIRTH_DATE, today),
+            rel(ANCESTOR, cVar(ANCESTOR)).rel(DESCENDENT, cVar(DESCENDENT)).isa(LINEAGE)
+        ).get()).collect(toList())
     }
 }

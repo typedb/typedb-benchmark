@@ -16,8 +16,8 @@
  */
 package com.vaticle.typedb.iam.simulation.typedb.agent
 
-import com.vaticle.typedb.client.api.TypeDBSession
-import com.vaticle.typedb.client.api.TypeDBTransaction
+import com.vaticle.typedb.driver.api.TypeDBSession
+import com.vaticle.typedb.driver.api.TypeDBTransaction
 import com.vaticle.typedb.iam.simulation.common.concept.Country
 import com.vaticle.typedb.iam.simulation.common.Context
 import com.vaticle.typedb.iam.simulation.agent.GrandparenthoodAgent
@@ -37,30 +37,34 @@ import com.vaticle.typedb.iam.simulation.typedb.Labels.RESIDENT
 import com.vaticle.typedb.iam.simulation.typedb.Labels.RESIDENTSHIP
 import com.vaticle.typedb.benchmark.framework.common.seed.RandomSource
 import com.vaticle.typedb.benchmark.framework.typedb.TypeDBSessionEx.readTransaction
-import com.vaticle.typedb.benchmark.framework.typedb.TypeDBClient
+import com.vaticle.typedb.benchmark.framework.typedb.TypeDBDriver
 import com.vaticle.typeql.lang.TypeQL.match
 import com.vaticle.typeql.lang.TypeQL.rel
-import com.vaticle.typeql.lang.TypeQL.`var`
+import com.vaticle.typeql.lang.TypeQL.cVar
 import java.time.LocalDateTime
 import java.util.stream.Collectors.toList
 
-class TypeDBGrandparenthoodAgent(client: TypeDBClient, context: Context) :
+class TypeDBGrandparenthoodAgent(client: TypeDBDriver, context: Context) :
     GrandparenthoodAgent<TypeDBSession>(client, context) {
 
-    override fun run(session: TypeDBSession, partition: Country, random: RandomSource): List<Report> {
+    override val actionHandlers = mapOf(
+        "doAction" to ::doAction,
+    )
+
+    fun doAction(session: TypeDBSession, partition: Country, random: RandomSource): List<Report> {
         session.readTransaction(infer = true).use { tx -> matchGrandparents(tx, partition, context.today()) }
         return emptyList()
     }
 
     private fun matchGrandparents(tx: TypeDBTransaction, country: Country, birthDate: LocalDateTime) {
-        tx.query().match(
+        tx.query().get(
             match(
-                `var`(PERSON).isa(PERSON).has(BIRTH_DATE, birthDate),
-                `var`(COUNTRY).isa(COUNTRY).has(CODE, country.code),
-                rel(RESIDENT, `var`(PERSON)).rel(RESIDENCE, `var`(CITY)).isa(RESIDENTSHIP),
-                rel(CONTAINED, `var`(CITY)).rel(CONTAINER, `var`(COUNTRY)).isa(CONTAINS),
-                rel(GRANDPARENT, `var`(GP)).rel(GRANDCHILD, `var`(PERSON)).isa(GRANDPARENTHOOD)
-            )
+                cVar(PERSON).isa(PERSON).has(BIRTH_DATE, birthDate),
+                cVar(COUNTRY).isa(COUNTRY).has(CODE, country.code),
+                rel(RESIDENT, cVar(PERSON)).rel(RESIDENCE, cVar(CITY)).isa(RESIDENTSHIP),
+                rel(CONTAINED, cVar(CITY)).rel(CONTAINER, cVar(COUNTRY)).isa(CONTAINS),
+                rel(GRANDPARENT, cVar(GP)).rel(GRANDCHILD, cVar(PERSON)).isa(GRANDPARENTHOOD)
+            ).get()
         ).collect(toList())
     }
 

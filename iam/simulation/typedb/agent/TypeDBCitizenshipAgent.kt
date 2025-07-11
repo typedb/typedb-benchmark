@@ -16,8 +16,8 @@
  */
 package com.vaticle.typedb.iam.simulation.typedb.agent
 
-import com.vaticle.typedb.client.api.TypeDBSession
-import com.vaticle.typedb.client.api.TypeDBTransaction
+import com.vaticle.typedb.driver.api.TypeDBSession
+import com.vaticle.typedb.driver.api.TypeDBTransaction
 import com.vaticle.typedb.iam.simulation.common.concept.Country
 import com.vaticle.typedb.iam.simulation.common.Context
 import com.vaticle.typedb.iam.simulation.agent.CitizenshipAgent
@@ -29,16 +29,20 @@ import com.vaticle.typedb.iam.simulation.typedb.Labels.COUNTRY
 import com.vaticle.typedb.iam.simulation.typedb.Labels.PERSON
 import com.vaticle.typedb.benchmark.framework.common.seed.RandomSource
 import com.vaticle.typedb.benchmark.framework.typedb.TypeDBSessionEx.readTransaction
-import com.vaticle.typedb.benchmark.framework.typedb.TypeDBClient
+import com.vaticle.typedb.benchmark.framework.typedb.TypeDBDriver
 import com.vaticle.typeql.lang.TypeQL.match
 import com.vaticle.typeql.lang.TypeQL.rel
-import com.vaticle.typeql.lang.TypeQL.`var`
+import com.vaticle.typeql.lang.TypeQL.cVar
 import java.time.LocalDateTime
 import java.util.stream.Collectors.toList
 
-class TypeDBCitizenshipAgent(client: TypeDBClient, context: Context) : CitizenshipAgent<TypeDBSession>(client, context) {
+class TypeDBCitizenshipAgent(client: TypeDBDriver, context: Context) : CitizenshipAgent<TypeDBSession>(client, context) {
 
-    override fun run(session: TypeDBSession, partition: Country, random: RandomSource): List<Report> {
+    override val actionHandlers = mapOf(
+        "doAction" to ::doAction,
+    )
+
+    fun doAction(session: TypeDBSession, partition: Country, random: RandomSource): List<Report> {
         // Pick people who can be married since this is one interesting way they can become citizens
         session.readTransaction(infer = true).use { tx ->
             matchCitizenship(tx, partition, context.today().minusYears(context.model.ageOfAdulthood.toLong()))
@@ -47,10 +51,10 @@ class TypeDBCitizenshipAgent(client: TypeDBClient, context: Context) : Citizensh
     }
 
     private fun matchCitizenship(tx: TypeDBTransaction, country: Country, today: LocalDateTime) {
-        tx.query().match(match(
-            `var`(COUNTRY).isa(COUNTRY).has(CODE, country.code),
-            `var`(CITIZEN).isa(PERSON).has(BIRTH_DATE, today),
-            rel(CITIZEN, CITIZEN).rel(COUNTRY, COUNTRY).isa(CITIZENSHIP)
-        )).collect(toList())
+        tx.query().get(match(
+            cVar(COUNTRY).isa(COUNTRY).has(CODE, country.code),
+            cVar(CITIZEN).isa(PERSON).has(BIRTH_DATE, today),
+            rel(CITIZEN, cVar(CITIZEN)).rel(COUNTRY, cVar(COUNTRY)).isa(CITIZENSHIP)
+        ).get()).collect(toList())
     }
 }

@@ -56,7 +56,11 @@ import java.util.stream.Stream
 
 class Neo4jParenthoodAgent(client: Neo4jClient, context: Context) : ParenthoodAgent<Session>(client, context) {
 
-    override fun run(session: Session, partition: Country, random: RandomSource): List<Report> {
+    override val actionHandlers = mapOf(
+        "doAction" to ::doAction,
+    )
+
+    fun doAction(session: Session, partition: Country, random: RandomSource): List<Report> {
         val reports: MutableList<Report> = ArrayList()
         session.writeTransaction { tx ->
             val marriageDate = context.today().minusYears(context.model.yearsBeforeParenthood.toLong())

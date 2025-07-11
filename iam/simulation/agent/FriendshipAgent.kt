@@ -24,7 +24,7 @@ import com.vaticle.typedb.benchmark.framework.common.DBClient
 import kotlin.math.ln
 
 abstract class FriendshipAgent<SESSION> protected constructor(client: DBClient<SESSION>, context: Context) :
-    Agent<Country, SESSION, ModelParams>(client, context) {
+    Agent<Country, SESSION, Context>(client, context) {
     override val agentClass = FriendshipAgent::class.java
     override val partitions = context.seedData.countries
 
