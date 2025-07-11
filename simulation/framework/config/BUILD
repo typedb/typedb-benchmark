@@ -15,7 +15,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 
-load("@vaticle_dependencies//tool/checkstyle:rules.bzl", "checkstyle_test")
+load("@typedb_dependencies//tool/checkstyle:rules.bzl", "checkstyle_test")
 
 exports_files([
     "logback.xml",
@@ -24,5 +24,5 @@ exports_files([
 checkstyle_test(
     name = "checkstyle",
     include = glob(["*"]),
-    license_type = "agpl-header",
+    license_type = "apache-header",
 )

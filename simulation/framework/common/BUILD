@@ -16,7 +16,7 @@
 #
 
 load("@io_bazel_rules_kotlin//kotlin:jvm.bzl", "kt_jvm_library")
-load("@vaticle_dependencies//tool/checkstyle:rules.bzl", "checkstyle_test")
+load("@typedb_dependencies//tool/checkstyle:rules.bzl", "checkstyle_test")
 
 kt_jvm_library(
     name = "common",
@@ -24,7 +24,7 @@ kt_jvm_library(
     visibility = ["//visibility:public"],
     deps = [
         # External Vaticle Dependencies
-        "@vaticle_typedb_common//:common",
+        "@typedb_common//:common",
 
         # External Maven Dependencies
         "@maven//:com_google_code_findbugs_jsr305",
@@ -38,5 +38,5 @@ kt_jvm_library(
 checkstyle_test(
     name = "checkstyle",
     include = glob(["*", "*/*"]),
-    license_type = "agpl-header",
+    license_type = "apache-header",
 )

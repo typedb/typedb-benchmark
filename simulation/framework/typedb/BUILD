@@ -16,7 +16,7 @@
 #
 
 load("@io_bazel_rules_kotlin//kotlin:jvm.bzl", "kt_jvm_library")
-load("@vaticle_dependencies//tool/checkstyle:rules.bzl", "checkstyle_test")
+load("@typedb_dependencies//tool/checkstyle:rules.bzl", "checkstyle_test")
 
 kt_jvm_library(
     name = "typedb",
@@ -27,10 +27,17 @@ kt_jvm_library(
         "//framework:typedb-simulation-framework",
 
         # External Vaticle Dependencies
-        "@vaticle_typedb_client_java//api",
-        "@vaticle_typedb_client_java//:client-java",
-        "@vaticle_typedb_common//:common",
-        "@vaticle_typeql//java:typeql-lang",
+#        "@typedb_client_java//api",
+#        "@typedb_client_java//:client-java",
+#        "@typedb_common//:common",
+#        "@typedb_typeql//java:typeql-lang",
+
+        "@maven//:com_vaticle_typedb_typedb_driver",
+        "@maven//:com_vaticle_typeql_typeql_common",
+        "@maven//:com_vaticle_typeql_typeql_lang",
+        "@maven//:com_vaticle_typeql_typeql_pattern",
+        "@maven//:com_vaticle_typeql_typeql_query",
+
 
         # External Maven Dependencies
         "@maven//:io_github_microutils_kotlin_logging_jvm",
@@ -41,5 +48,5 @@ kt_jvm_library(
 checkstyle_test(
     name = "checkstyle",
     include = glob(["*", "*/*", "*/*/*"]),
-    license_type = "agpl-header",
+    license_type = "apache-header",
 )

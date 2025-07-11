@@ -52,6 +52,11 @@ checkstyle_deps()
 load("@typedb_dependencies//distribution:deps.bzl", "typedb_bazel_distribution")
 typedb_bazel_distribution()
 
+# Load //github
+load("@typedb_bazel_distribution//github:deps.bzl", "ghr_linux_tar", "ghr_osx_zip")
+ghr_linux_tar()
+ghr_osx_zip()
+
 ################################
 # Load @typedb_dependencies #
 ################################
