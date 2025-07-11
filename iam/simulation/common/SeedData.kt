@@ -22,10 +22,10 @@ import com.vaticle.typedb.iam.simulation.common.concept.Country
 import com.vaticle.typedb.iam.simulation.common.concept.Currency
 import com.vaticle.typedb.iam.simulation.common.concept.Global
 import com.vaticle.typedb.iam.simulation.common.concept.University
-import com.vaticle.typedb.simulation.common.Util.parse
-import com.vaticle.typedb.simulation.common.Util.readPair
-import com.vaticle.typedb.simulation.common.Util.readSingle
-import com.vaticle.typedb.simulation.common.Util.readTriple
+import com.vaticle.typedb.benchmark.framework.common.Util.parse
+import com.vaticle.typedb.benchmark.framework.common.Util.readPair
+import com.vaticle.typedb.benchmark.framework.common.Util.readSingle
+import com.vaticle.typedb.benchmark.framework.common.Util.readTriple
 import mu.KotlinLogging
 import java.nio.file.Paths
 

@@ -18,8 +18,8 @@ package com.vaticle.typedb.iam.simulation.common.concept
 
 import com.vaticle.typedb.iam.simulation.common.concept.Gender.FEMALE
 import com.vaticle.typedb.iam.simulation.common.concept.Gender.MALE
-import com.vaticle.typedb.simulation.common.Partition
-import com.vaticle.typedb.simulation.common.Util.buildTracker
+import com.vaticle.typedb.benchmark.framework.common.Partition
+import com.vaticle.typedb.benchmark.framework.common.Util.buildTracker
 
 class Continent(override val code: String, override val name: String) : Partition {
     val countries = mutableListOf<Country>()

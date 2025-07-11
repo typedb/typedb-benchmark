@@ -41,7 +41,7 @@ import com.vaticle.typedb.iam.simulation.typedb.Labels.LOCATION
 import com.vaticle.typedb.iam.simulation.typedb.Labels.NAME
 import com.vaticle.typedb.iam.simulation.typedb.Labels.UNIVERSITY
 import com.vaticle.typedb.iam.simulation.typedb.agent.TypeDBAgentFactory
-import com.vaticle.typedb.simulation.typedb.TypeDBClient
+import com.vaticle.typedb.benchmark.framework.typedb.TypeDBClient
 import com.vaticle.typeql.lang.TypeQL.insert
 import com.vaticle.typeql.lang.TypeQL.match
 import com.vaticle.typeql.lang.TypeQL.rel
@@ -53,7 +53,7 @@ import java.time.Instant
 
 class TypeDBSimulation private constructor(
     client: TypeDBClient, context: Context
-) : com.vaticle.typedb.simulation.typedb.TypeDBSimulation<Context>(client, context, TypeDBAgentFactory(client, context)) {
+) : com.vaticle.typedb.benchmark.framework.typedb.TypeDBSimulation<Context>(client, context, TypeDBAgentFactory(client, context)) {
 
     override val agentPackage: String = PersonAgent::class.java.packageName
 

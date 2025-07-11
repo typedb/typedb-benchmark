@@ -22,8 +22,8 @@ import com.vaticle.typedb.iam.simulation.common.ModelParams
 import com.vaticle.typedb.iam.simulation.neo4j.Neo4jSimulation
 import com.vaticle.typedb.iam.simulation.neo4j.Neo4jSimulation.Companion.create
 import com.vaticle.typedb.iam.simulation.typedb.TypeDBSimulation
-import com.vaticle.typedb.simulation.Agent
-import com.vaticle.typedb.simulation.common.params.Options.Companion.parseCLIOptions
+import com.vaticle.typedb.benchmark.framework.Agent
+import com.vaticle.typedb.benchmark.framework.common.params.Options.Companion.parseCLIOptions
 import org.junit.Assert
 import org.junit.Test
 import org.junit.runner.RunWith

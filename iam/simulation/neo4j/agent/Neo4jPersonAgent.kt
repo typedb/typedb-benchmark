@@ -39,8 +39,8 @@ import com.vaticle.typedb.iam.simulation.neo4j.Literals.RESIDES_IN
 import com.vaticle.typedb.iam.simulation.agent.PersonAgent
 import com.vaticle.typedb.iam.simulation.common.Util.address
 import com.vaticle.typedb.iam.simulation.common.concept.Country
-import com.vaticle.typedb.simulation.common.seed.RandomSource
-import com.vaticle.typedb.simulation.neo4j.Neo4jClient
+import com.vaticle.typedb.benchmark.framework.common.seed.RandomSource
+import com.vaticle.typedb.benchmark.framework.neo4j.Neo4jClient
 import org.neo4j.driver.Query
 import org.neo4j.driver.Session
 import org.neo4j.driver.Transaction

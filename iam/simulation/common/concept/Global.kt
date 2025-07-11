@@ -16,7 +16,7 @@
  */
 package com.vaticle.typedb.iam.simulation.common.concept
 
-import com.vaticle.typedb.simulation.common.Partition
+import com.vaticle.typedb.benchmark.framework.common.Partition
 
 class Global : Partition {
     val continents = mutableListOf<Continent>()

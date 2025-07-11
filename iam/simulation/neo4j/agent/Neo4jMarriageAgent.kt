@@ -42,8 +42,8 @@ import com.vaticle.typedb.iam.simulation.neo4j.Literals.PERSON_LABEL
 import com.vaticle.typedb.iam.simulation.neo4j.Literals.RESIDES_IN
 import com.vaticle.typedb.iam.simulation.neo4j.Literals.WIFE_EMAIL
 import com.vaticle.typedb.iam.simulation.agent.MarriageAgent
-import com.vaticle.typedb.simulation.common.seed.RandomSource
-import com.vaticle.typedb.simulation.neo4j.Neo4jClient
+import com.vaticle.typedb.benchmark.framework.common.seed.RandomSource
+import com.vaticle.typedb.benchmark.framework.neo4j.Neo4jClient
 import org.neo4j.driver.Query
 import org.neo4j.driver.Record
 import org.neo4j.driver.Session

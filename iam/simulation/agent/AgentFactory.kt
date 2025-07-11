@@ -17,8 +17,8 @@
 package com.vaticle.typedb.iam.simulation.agent
 
 import com.vaticle.typedb.iam.simulation.common.Context
-import com.vaticle.typedb.simulation.Agent
-import com.vaticle.typedb.simulation.common.DBClient
+import com.vaticle.typedb.benchmark.framework.Agent
+import com.vaticle.typedb.benchmark.framework.common.DBClient
 
 abstract class AgentFactory<CLIENT: DBClient<*>>(client: CLIENT, context: Context) : Agent.Factory() {
 

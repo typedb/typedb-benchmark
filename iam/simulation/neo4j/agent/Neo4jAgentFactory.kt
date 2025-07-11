@@ -18,7 +18,7 @@ package com.vaticle.typedb.iam.simulation.neo4j.agent
 
 import com.vaticle.typedb.iam.simulation.agent.AgentFactory
 import com.vaticle.typedb.iam.simulation.common.Context
-import com.vaticle.typedb.simulation.neo4j.Neo4jClient
+import com.vaticle.typedb.benchmark.framework.neo4j.Neo4jClient
 
 class Neo4jAgentFactory(client: Neo4jClient, context: Context) : AgentFactory<Neo4jClient>(client, context) {
 

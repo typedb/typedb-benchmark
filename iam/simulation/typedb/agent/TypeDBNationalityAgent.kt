@@ -28,9 +28,9 @@ import com.vaticle.typedb.iam.simulation.typedb.Labels.COUNTRY
 import com.vaticle.typedb.iam.simulation.typedb.Labels.NATIONAL
 import com.vaticle.typedb.iam.simulation.typedb.Labels.NATIONALITY
 import com.vaticle.typedb.iam.simulation.typedb.Labels.PERSON
-import com.vaticle.typedb.simulation.common.seed.RandomSource
-import com.vaticle.typedb.simulation.typedb.TypeDBSessionEx.readTransaction
-import com.vaticle.typedb.simulation.typedb.TypeDBClient
+import com.vaticle.typedb.benchmark.framework.common.seed.RandomSource
+import com.vaticle.typedb.benchmark.framework.typedb.TypeDBSessionEx.readTransaction
+import com.vaticle.typedb.benchmark.framework.typedb.TypeDBClient
 import com.vaticle.typeql.lang.TypeQL.match
 import com.vaticle.typeql.lang.TypeQL.rel
 import com.vaticle.typeql.lang.TypeQL.`var`

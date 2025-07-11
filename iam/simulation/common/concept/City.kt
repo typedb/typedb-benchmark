@@ -16,8 +16,8 @@
  */
 package com.vaticle.typedb.iam.simulation.common.concept
 
-import com.vaticle.typedb.simulation.common.Partition
-import com.vaticle.typedb.simulation.common.Util.buildTracker
+import com.vaticle.typedb.benchmark.framework.common.Partition
+import com.vaticle.typedb.benchmark.framework.common.Util.buildTracker
 
 class City(override val code: String, override val name: String, val country: Country) : Partition {
     private val hash: Int = code.hashCode()

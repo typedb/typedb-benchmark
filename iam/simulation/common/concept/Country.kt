@@ -16,8 +16,8 @@
  */
 package com.vaticle.typedb.iam.simulation.common.concept
 
-import com.vaticle.typedb.simulation.common.Partition
-import com.vaticle.typedb.simulation.common.Util.buildTracker
+import com.vaticle.typedb.benchmark.framework.common.Partition
+import com.vaticle.typedb.benchmark.framework.common.Util.buildTracker
 import java.util.Objects
 
 class Country(override val code: String, override val name: String, val continent: Continent) : Partition {

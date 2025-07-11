@@ -58,7 +58,7 @@ import com.vaticle.typedb.iam.simulation.neo4j.Literals.PURCHASE_LABEL
 import com.vaticle.typedb.iam.simulation.neo4j.Literals.REGION_LABEL
 import com.vaticle.typedb.iam.simulation.neo4j.Literals.UNIVERSITY_LABEL
 import com.vaticle.typedb.iam.simulation.neo4j.agent.Neo4jAgentFactory
-import com.vaticle.typedb.simulation.neo4j.Neo4jClient
+import com.vaticle.typedb.benchmark.framework.neo4j.Neo4jClient
 import mu.KotlinLogging
 import org.neo4j.driver.Driver
 import org.neo4j.driver.Query
@@ -66,7 +66,7 @@ import org.neo4j.driver.Session
 import java.time.Instant
 
 class Neo4jSimulation private constructor(client: Neo4jClient, context: Context)
-    : com.vaticle.typedb.simulation.neo4j.Neo4jSimulation<Context>(client, context, Neo4jAgentFactory(client, context)) {
+    : com.vaticle.typedb.benchmark.framework.neo4j.Neo4jSimulation<Context>(client, context, Neo4jAgentFactory(client, context)) {
 
     override val agentPackage: String = PersonAgent::class.java.packageName
 

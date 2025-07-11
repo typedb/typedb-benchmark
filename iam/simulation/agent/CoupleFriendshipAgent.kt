@@ -19,8 +19,8 @@ package com.vaticle.typedb.iam.simulation.agent
 import com.vaticle.typedb.iam.simulation.common.concept.Country
 import com.vaticle.typedb.iam.simulation.common.Context
 import com.vaticle.typedb.iam.simulation.common.ModelParams
-import com.vaticle.typedb.simulation.Agent
-import com.vaticle.typedb.simulation.common.DBClient
+import com.vaticle.typedb.benchmark.framework.Agent
+import com.vaticle.typedb.benchmark.framework.common.DBClient
 
 abstract class CoupleFriendshipAgent<SESSION> protected constructor(client: DBClient<SESSION>, context: Context)
     : Agent<Country, SESSION, ModelParams>(client, context) {
