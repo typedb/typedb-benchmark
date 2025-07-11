@@ -27,10 +27,10 @@ kt_jvm_library(
         "//framework:typedb-simulation-framework",
 
         # External Vaticle Dependencies
-        "@typedb_common//:common",
+        "@typedb_maven_deps//:com_vaticle_typedb_typedb_common",
 #        "@typedb_client_java//common",
 #        "@typedb_client_java//api",
-        "@maven//:com_vaticle_typedb_typedb_driver",
+        "@typedb_maven_deps//:com_vaticle_typedb_typedb_driver",
 
 
         # External Maven Dependencies

@@ -16,12 +16,12 @@
  */
 package com.vaticle.typedb.benchmark.framework.typedb
 
-import com.vaticle.typedb.client.api.TypeDBOptions
-import com.vaticle.typedb.client.api.TypeDBSession
-import com.vaticle.typedb.client.api.TypeDBTransaction.Type.READ
-import com.vaticle.typedb.client.api.TypeDBTransaction.Type.WRITE
+import com.vaticle.typedb.driver.api.TypeDBOptions
+import com.vaticle.typedb.driver.api.TypeDBSession
+import com.vaticle.typedb.driver.api.TypeDBTransaction.Type.READ
+import com.vaticle.typedb.driver.api.TypeDBTransaction.Type.WRITE
 
 object TypeDBSessionEx {
-    fun TypeDBSession.readTransaction(infer: Boolean) = transaction(READ, TypeDBOptions.core().infer(infer))
+    fun TypeDBSession.readTransaction(infer: Boolean) = transaction(READ, TypeDBOptions().infer(infer))
     fun TypeDBSession.writeTransaction() = transaction(WRITE)
 }

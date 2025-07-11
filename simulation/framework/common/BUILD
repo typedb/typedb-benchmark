@@ -24,10 +24,10 @@ kt_jvm_library(
     visibility = ["//visibility:public"],
     deps = [
         # External Vaticle Dependencies
-        "@typedb_common//:common",
+        "@typedb_maven_deps//:com_vaticle_typedb_typedb_common",
 
         # External Maven Dependencies
-        "@maven//:com_google_code_findbugs_jsr305",
+#        "@maven//:com_google_code_findbugs_jsr305",
         "@maven//:info_picocli_picocli",
         "@maven//:io_github_microutils_kotlin_logging_jvm",
         "@maven//:org_apache_commons_commons_csv",

@@ -27,10 +27,10 @@ kt_jvm_library(
         "//framework/common:common",
 
         # External Vaticle Dependencies
-        "@typedb_common//:common",
-
+        "@typedb_maven_deps//:com_vaticle_typedb_typedb_common",
+        "@typedb_maven_deps//:com_vaticle_factory_factory_tracing_client",
         # External Maven Dependencies
-        "@maven//:com_google_code_findbugs_jsr305",
+#        "@maven//:com_google_code_findbugs_jsr305",
         "@maven//:io_github_microutils_kotlin_logging_jvm",
         "@maven//:org_slf4j_slf4j_api",
     ],

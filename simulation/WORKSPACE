@@ -21,12 +21,11 @@ workspace(name = "typedb_benchmark")
 # Load @typedb_dependencies #
 ################################
 
-load("//dependencies/typedb:repositories.bzl", "typedb_dependencies", "typedb_common")
+load("//dependencies/typedb:repositories.bzl", "typedb_dependencies")
 typedb_dependencies()
-typedb_common()
 
 # Load //builder/java
-load("@typedb_dependencies//builder/java:deps.bzl", rules_jvm_external = "deps")
+load("@typedb_dependencies//builder/java:deps.bzl", "rules_jvm_external")
 rules_jvm_external()
 
 # Load //builder/kotlin
@@ -52,11 +51,11 @@ checkstyle_deps()
 
 load("@typedb_dependencies//distribution:deps.bzl", "typedb_bazel_distribution")
 typedb_bazel_distribution()
-
-# Load //github
-load("@typedb_bazel_distribution//github:deps.bzl", "ghr_linux_tar", "ghr_osx_zip")
-ghr_linux_tar()
-ghr_osx_zip()
+#
+## Load //github
+#load("@typedb_bazel_distribution//github:deps.bzl", "ghr_linux_tar", "ghr_osx_zip")
+#ghr_linux_tar()
+#ghr_osx_zip()
 
 
 ############################
@@ -76,9 +75,9 @@ load("@rules_jvm_external//:defs.bzl", "maven_install")
 maven_install(
     name = "neo4j",
     artifacts = ["org.neo4j.driver:neo4j-java-driver:4.4.5"],
-#    repositories = [
-#        "https://repo1.maven.org/maven2",
-#    ],
+    repositories = [
+        "https://repo1.maven.org/maven2",
+    ],
     strict_visibility = True,
     version_conflict_policy = "pinned"
 )
@@ -91,10 +90,14 @@ maven_install(
         "com.vaticle.typeql:typeql-lang:2.28.6",
         "com.vaticle.typeql:typeql-pattern:2.28.6",
         "com.vaticle.typeql:typeql-query:2.28.6",
+        "com.vaticle.typedb:typedb-common:2.28.6",
+        "com.vaticle.factory:factory-tracing-client:2.12.0",
+        "com.vaticle.factory:factory-tracing-protocol:2.12.0",
     ],
-#    repositories = [
-#        "https://repo.typedb.com/public/public-release/maven/",
-#    ],
+    repositories = [
+        "https://repo.typedb.com/public/public-release/maven/",
+        "https://repo1.maven.org/maven2",
+    ],
      strict_visibility = True,
      version_conflict_policy = "pinned"
 )

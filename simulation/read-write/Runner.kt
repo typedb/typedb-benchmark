@@ -21,7 +21,7 @@ import com.vaticle.typedb.benchmark.readwrite.common.Context
 import com.vaticle.typedb.benchmark.readwrite.common.ModelParams
 import com.vaticle.typedb.benchmark.framework.common.params.Database
 import com.vaticle.typedb.benchmark.framework.common.params.Options
-import com.vaticle.typedb.benchmark.framework.typedb.TypeDBClient
+import com.vaticle.typedb.benchmark.framework.typedb.TypeDBDriver
 import java.lang.IllegalArgumentException
 
 class Runner : com.vaticle.typedb.benchmark.framework.Runner<ModelParams>() {
@@ -29,8 +29,8 @@ class Runner : com.vaticle.typedb.benchmark.framework.Runner<ModelParams>() {
     override fun initSimulation(options: Options, config: Config): com.vaticle.typedb.benchmark.framework.Simulation<*, *> {
         val context = Context.create(config = config, isTracing = options.tracing != null, isReporting = false)
         return when (options.database) {
-            Database.TYPEDB -> ReadWriteBenchmark(TypeDBClient.core(options.address, context.dbName), context).apply { init() }
-            Database.TYPEDB_CLUSTER -> ReadWriteBenchmark(TypeDBClient.cluster(options.address, context.dbName), context).apply { init() }
+            Database.TYPEDB -> ReadWriteBenchmark(TypeDBDriver.core(options.address, context.dbName), context).apply { init() }
+            Database.TYPEDB_CLUSTER -> ReadWriteBenchmark(TypeDBDriver.cluster(options.address, context.dbName), context).apply { init() }
             Database.NEO4J -> throw IllegalArgumentException("Neo4j simulation is not implemented.")
         }
     }

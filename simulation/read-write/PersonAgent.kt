@@ -16,24 +16,24 @@
  */
 package com.vaticle.typedb.benchmark.readwrite
 
-import com.vaticle.typedb.client.api.TypeDBSession
+import com.vaticle.typedb.driver.api.TypeDBSession
 import com.vaticle.typedb.benchmark.readwrite.common.Context
-import com.vaticle.typedb.client.api.TypeDBTransaction
+import com.vaticle.typedb.driver.api.TypeDBTransaction
 import com.vaticle.typedb.benchmark.framework.Agent
 import com.vaticle.typedb.benchmark.framework.common.seed.RandomSource
-import com.vaticle.typedb.benchmark.framework.typedb.TypeDBClient
+import com.vaticle.typedb.benchmark.framework.typedb.TypeDBDriver
 
 import com.vaticle.typeql.lang.TypeQL
 import java.time.LocalDateTime
 import java.util.*
 
-public class PersonAgent(client: TypeDBClient, context: Context) :
+public class PersonAgent(client: TypeDBDriver, context: Context) :
         Agent<Context.DBPartition, TypeDBSession, Context>(client, context) {
 
     override val agentClass = PersonAgent::class.java
     override val partitions = context.partitions
 
-    val options = com.vaticle.typedb.client.api.TypeDBOptions.core().parallel(false);
+    val options = com.vaticle.typedb.driver.api.TypeDBOptions.core().parallel(false);
 
     val timeZero: LocalDateTime = LocalDateTime.now().withNano(0);
 

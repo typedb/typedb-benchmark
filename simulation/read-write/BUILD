@@ -33,10 +33,10 @@ kt_jvm_library(
 #        "@typedb_typeql//java/pattern",
 #        "@typedb_typeql//java/query",
 
-        "@maven//:com_vaticle_typeql_typeql_common",
-        "@maven//:com_vaticle_typeql_typeql_lang",
-        "@maven//:com_vaticle_typeql_typeql_pattern",
-        "@maven//:com_vaticle_typeql_typeql_query",
+        "@typedb_maven_deps//:com_vaticle_typeql_typeql_common",
+        "@typedb_maven_deps//:com_vaticle_typeql_typeql_lang",
+        "@typedb_maven_deps//:com_vaticle_typeql_typeql_pattern",
+        "@typedb_maven_deps//:com_vaticle_typeql_typeql_query",
 
         # External Maven Dependencies
         "@maven//:io_github_microutils_kotlin_logging_jvm",
