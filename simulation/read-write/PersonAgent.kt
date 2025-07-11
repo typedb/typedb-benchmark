@@ -24,6 +24,7 @@ import com.vaticle.typedb.benchmark.framework.common.seed.RandomSource
 import com.vaticle.typedb.benchmark.framework.typedb.TypeDBDriver
 
 import com.vaticle.typeql.lang.TypeQL
+import com.vaticle.typeql.lang.common.TypeQLToken
 import java.time.LocalDateTime
 import java.util.*
 
@@ -33,7 +34,7 @@ public class PersonAgent(client: TypeDBDriver, context: Context) :
     override val agentClass = PersonAgent::class.java
     override val partitions = context.partitions
 
-    val options = com.vaticle.typedb.driver.api.TypeDBOptions.core().parallel(false);
+    val options = com.vaticle.typedb.driver.api.TypeDBOptions().parallel(false);
 
     val timeZero: LocalDateTime = LocalDateTime.now().withNano(0);
 
@@ -137,13 +138,13 @@ public class PersonAgent(client: TypeDBDriver, context: Context) :
     ): List<Agent.Report> {
         session.transaction(TypeDBTransaction.Type.WRITE, options).use { tx ->
             val id: Int = 1 + randomSource.nextInt(dbPartition.idCtr.get())
-            tx.query().match(
+            tx.query().get(
                     TypeQL.match(
                             TypeQL.cVar("p1").isa("person").has("name", nameFrom(dbPartition.partitionId, id)),
                             TypeQL.rel("person", TypeQL.cVar("p1")).rel("person", TypeQL.cVar("p2")).isa("friendship"),
                             TypeQL.cVar("p2").isa("person").has("name", TypeQL.cVar("n2")),
-                    ).count()
-            ).get()
+                    ).get().aggregate(TypeQLToken.Aggregate.Method.COUNT, null)
+            ).resolve().get().asLong()
         }
         return listOf()
     }
@@ -155,14 +156,14 @@ public class PersonAgent(client: TypeDBDriver, context: Context) :
     ): List<Agent.Report> {
         session.transaction(TypeDBTransaction.Type.WRITE, options).use { tx ->
             val id: Int = 1 + randomSource.nextInt(dbPartition.idCtr.get())
-            tx.query().match(
+            tx.query().get(
                     TypeQL.match(
                             TypeQL.cVar("p1").isa("person").has("name", nameFrom(dbPartition.partitionId, id)),
                             TypeQL.rel("person", TypeQL.cVar("p1")).rel("person", TypeQL.cVar("p2")).isa("friendship"),
                             TypeQL.rel("person", TypeQL.cVar("p2")).rel("person", TypeQL.cVar("p3")).isa("friendship"),
                             TypeQL.cVar("p3").isa("person").has("name", TypeQL.cVar("n3")),
-                    ).count()
-            ).get()
+                    ).get().aggregate(TypeQLToken.Aggregate.Method.COUNT, null)
+            ).resolve().get().asLong()
         }
         return listOf()
     }
@@ -175,13 +176,13 @@ public class PersonAgent(client: TypeDBDriver, context: Context) :
         session.transaction(TypeDBTransaction.Type.WRITE, options).use { tx ->
             val postCode: Long =
                     postCodeFrom(dbPartition.partitionId, randomSource.nextInt(context.model.nPostCodes))
-            tx.query().match(
+            tx.query().get(
                     TypeQL.match(
                             TypeQL.cVar("p1").isa("person")
                                     .has("post-code", postCode)
                                     .has("name", TypeQL.cVar("name")),
-                    ).count()
-            ).get()
+                    ).get().aggregate(TypeQLToken.Aggregate.Method.COUNT, null)
+            ).resolve().get().asLong()
         }
         return listOf()
     }
@@ -193,12 +194,12 @@ public class PersonAgent(client: TypeDBDriver, context: Context) :
     ): List<Agent.Report> {
         session.transaction(TypeDBTransaction.Type.WRITE, options).use { tx ->
             val id: Int = 1 + randomSource.nextInt(dbPartition.idCtr.get())
-            tx.query().match(
+            tx.query().get(
                     TypeQL.match(
                             TypeQL.cVar("p1").isa("person")
                                     .has("name", nameFrom(dbPartition.partitionId, id))
                                     .has("address", TypeQL.cVar("addr")),
-                    )
+                    ).get()
             ).count()
         }
         return listOf()
