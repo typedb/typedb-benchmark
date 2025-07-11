@@ -35,11 +35,11 @@ checkstyle_test(
         "LICENSE",
         "README.md",
     ]),
-    license_type = "agpl-header",
+    license_type = "apache-header",
 )
 
 checkstyle_test(
     name = "checkstyle-license",
     include = ["LICENSE"],
-    license_type = "agpl-fulltext",
+    license_type = "apache-fulltext", # TODO: It's agpl everywhere but apparently that's an illegal value now
 )

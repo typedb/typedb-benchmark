@@ -38,5 +38,5 @@ checkstyle_test(
     name = "checkstyle",
     include = glob(["*"]),
     exclude = glob(["*.csv"]),
-    license_type = "agpl-header",
+    license_type = "apache-header",
 )

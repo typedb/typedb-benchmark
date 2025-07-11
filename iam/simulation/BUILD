@@ -28,9 +28,8 @@ kt_jvm_library(
         "//simulation/neo4j",
 
         # External Vaticle Dependencies
-        "@vaticle_factory_tracing//client",
         "@typedb_simulation//:typedb_simulation",
-        "@typedb_simulation//common",
+        "@typedb_simulation//framework:common",
 
         # External Maven Dependencies
         "@maven//:com_google_code_findbugs_jsr305",
@@ -50,5 +49,5 @@ java_binary(
 checkstyle_test(
     name = "checkstyle",
     include = glob(["*", "*/*"]),
-    license_type = "agpl-header",
+    license_type = "apache-header",
 )

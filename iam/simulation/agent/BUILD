@@ -26,7 +26,7 @@ kt_jvm_library(
         "//simulation/common",
 
         # External Vaticle Dependencies
-        "@vaticle_typedb_common//:common",
+        "@typedb_common//:common",
         "@typedb_simulation//:typedb_simulation",
         "@typedb_simulation//common",
 
@@ -43,5 +43,5 @@ kt_jvm_library(
 checkstyle_test(
     name = "checkstyle",
     include = glob(["*", "*/*"]),
-    license_type = "agpl-header",
+    license_type = "apache-header",
 )

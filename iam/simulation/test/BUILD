@@ -21,12 +21,12 @@ load("@typedb_bazel_distribution//artifact:rules.bzl", "artifact_extractor")
 
 artifact_extractor(
     name = "typedb-extractor-linux",
-    artifact = "@vaticle_typedb_artifact_linux//file",
+    artifact = "@typedb_artifact_linux//file",
 )
 
 artifact_extractor(
     name = "typedb-cluster-extractor-linux",
-    artifact = "@vaticle_typedb_cluster_artifact_linux//file",
+    artifact = "@typedb_cluster_artifact_linux//file",
 )
 
 kt_jvm_test(
@@ -51,5 +51,5 @@ kt_jvm_test(
 checkstyle_test(
     name = "checkstyle",
     include = glob(["*"]),
-    license_type = "agpl-header",
+    license_type = "apache-header",
 )

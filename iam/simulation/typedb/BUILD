@@ -27,18 +27,20 @@ kt_jvm_library(
         "//simulation/common",
 
         # External Vaticle Dependencies
-        "@vaticle_typedb_client_java//api",
-        "@vaticle_typedb_client_java//:client-java",
-        "@vaticle_typedb_common//:common",
+        "@typedb_client_java//api",
+        "@typedb_client_java//:client-java",
+#        "@typedb_common//:common",
         "@typedb_simulation//:typedb_simulation",
-        "@typedb_simulation//typedb",
-        "@vaticle_typeql//java:typeql-lang",
-        "@vaticle_typeql//java/pattern",
-        "@vaticle_typeql//java/query",
+        "@typedb_simulation//framework/typedb",
 
         # External Maven Dependencies
         "@maven//:io_github_microutils_kotlin_logging_jvm",
         "@maven//:org_slf4j_slf4j_api",
+
+        "@maven//:com_vaticle_typeql_typeql_lang",
+        "@maven//:com_vaticle_typeql_typeql_pattern",
+        "@maven//:com_vaticle_typeql_typeql_query",
+
     ],
     data = ["//:iam-schema.tql"],
 )
@@ -46,5 +48,5 @@ kt_jvm_library(
 checkstyle_test(
     name = "checkstyle",
     include = glob(["*", "*/*", "*/*/*"]),
-    license_type = "agpl-header",
+    license_type = "apache-header",
 )

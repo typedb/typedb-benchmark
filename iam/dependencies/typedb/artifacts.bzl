@@ -20,7 +20,7 @@ load("@typedb_dependencies//distribution:deployment.bzl", "deployment", "deploym
 
 def typedb_artifacts():
     native_artifact_files(
-        name = "typedb_artifacts",
+        name = "typedb_artifact",
         group_name = "typedb-all-{platform}",
         artifact_name = "typedb-all-{platform}-{version}.{ext}",
         tag_source = deployment["artifact"]["release"]["download"],
