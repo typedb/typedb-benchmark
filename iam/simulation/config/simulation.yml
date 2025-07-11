@@ -45,6 +45,9 @@ run:
   randomSeed: 1
   iterations: 100
   databaseName: "simulation"
+  partitions: 1
+  recreateDatabase: true
+  parallelism: 1
 
 model:
   populationGrowth: 10

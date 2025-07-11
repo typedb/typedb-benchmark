@@ -17,40 +17,63 @@
 
 agents:
   - name: "PersonAgent"
-    isEnabled: true
+    action: "doAction"
+    actionsPerIteration: 1
     trace: false
+
   - name: "FriendshipAgent"
-    isEnabled: true
+    action: "doAction"
+    actionsPerIteration: 1
     trace: false
+
   - name: "MarriageAgent"
-    isEnabled: true
+    action: "doAction"
+    actionsPerIteration: 1
     trace: false
+
   - name: "ParenthoodAgent"
-    isEnabled: true
+    action: "doAction"
+    actionsPerIteration: 1
     trace: false
+
   - name: "MaritalStatusAgent"
-    isEnabled: true
+    action: "doAction"
+    actionsPerIteration: 1
     trace: true
+
   - name: "GrandparenthoodAgent"
-    isEnabled: true
+    action: "doAction"
+    actionsPerIteration: 1
     trace: true
+
   - name: "LineageAgent"
-    isEnabled: true
+    action: "doAction"
+    actionsPerIteration: 1
     trace: true
+
   - name: "NationalityAgent"
-    isEnabled: true
+    action: "doAction"
+    actionsPerIteration: 1
     trace: true
+
   - name: "CitizenshipAgent"
-    isEnabled: true
+    action: "doAction"
+    actionsPerIteration: 1
     trace: true
+
   - name: "CoupleFriendshipAgent"
-    isEnabled: true
+    action: "doAction"
+    actionsPerIteration: 1
     trace: true
 
 traceSampling:
   # Options: `"every"` for every K traces; `"log"` for logarithm with base N
   function: "every"
   arg: 1
+  databaseName: "simulation"
+  partitions: 1
+  recreateDatabase: true
+  parallelism: 1
 
 run:
   randomSeed: 1

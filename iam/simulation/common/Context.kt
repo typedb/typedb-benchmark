@@ -17,6 +17,9 @@
 package com.vaticle.typedb.iam.simulation.common
 
 import mu.KotlinLogging
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.LocalTime
 
 class Context private constructor(seedData: SeedData, config: Config, isTracing: Boolean, isReporting: Boolean)
     : com.vaticle.typedb.benchmark.framework.Context<SeedData, ModelParams>(seedData, config, isTracing, isReporting) {
@@ -33,4 +36,14 @@ class Context private constructor(seedData: SeedData, config: Config, isTracing:
             return Context(seedData, config, isTracing, isReporting)
         }
     }
+
+
+    fun today(): LocalDateTime {
+        return startDay().plusYears((iterationNumber - 1).toLong())
+    }
+
+    fun startDay(): LocalDateTime {
+        return LocalDateTime.of(LocalDate.ofYearDay(2000, 1), LocalTime.of(0, 0, 0))
+    }
+
 }

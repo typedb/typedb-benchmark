@@ -32,7 +32,7 @@ class ReadWriteBenchmark internal constructor(client: TypeDBDriver, context: Con
     override val name = "ReadWriteBenchmark"
 
     override val schemaFiles = listOf(Paths.get("read-write/schema.tql").toFile())
-    private val options = TypeDBOptions.core().infer(true)
+    private val options = TypeDBOptions().infer(true)
 
     override fun initData(nativeSession: TypeDBSession, randomSource: RandomSource) {
         LOGGER.info("Nothing to initialise")
