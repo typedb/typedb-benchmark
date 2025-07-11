@@ -27,20 +27,19 @@ kt_jvm_library(
         "//simulation/common",
 
         # External Vaticle Dependencies
-        "@typedb_client_java//api",
-        "@typedb_client_java//:client-java",
-#        "@typedb_common//:common",
-        "@typedb_simulation//:typedb_simulation",
-        "@typedb_simulation//framework/typedb",
+        "@typedb_maven_deps//:com_vaticle_typedb_typedb_common",
+        "@typedb_maven_deps//:com_vaticle_typedb_typedb_driver",
+        "@typedb_maven_deps//:com_vaticle_typeql_typeql_builder",
+        "@typedb_maven_deps//:com_vaticle_typeql_typeql_lang",
+        "@typedb_maven_deps//:com_vaticle_typeql_typeql_pattern",
+        "@typedb_maven_deps//:com_vaticle_typeql_typeql_query",
+
+        "@typedb_simulation//framework:typedb-simulation-framework",
+        "@typedb_simulation//framework/typedb:typedb",
 
         # External Maven Dependencies
         "@maven//:io_github_microutils_kotlin_logging_jvm",
         "@maven//:org_slf4j_slf4j_api",
-
-        "@maven//:com_vaticle_typeql_typeql_lang",
-        "@maven//:com_vaticle_typeql_typeql_pattern",
-        "@maven//:com_vaticle_typeql_typeql_query",
-
     ],
     data = ["//:iam-schema.tql"],
 )

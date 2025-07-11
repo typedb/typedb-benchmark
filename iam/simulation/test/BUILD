@@ -21,12 +21,12 @@ load("@typedb_bazel_distribution//artifact:rules.bzl", "artifact_extractor")
 
 artifact_extractor(
     name = "typedb-extractor-linux",
-    artifact = "@typedb_artifact_linux//file",
+    artifact = "@typedb_artifact_linux-x86_64//file",
 )
 
 artifact_extractor(
     name = "typedb-cluster-extractor-linux",
-    artifact = "@typedb_cluster_artifact_linux//file",
+    artifact = "@typedb_cluster_artifact_linux-x86_64//file",
 )
 
 kt_jvm_test(

@@ -15,33 +15,10 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 
-load("@io_bazel_rules_kotlin//kotlin:jvm.bzl", "kt_jvm_library")
 load("@typedb_dependencies//tool/checkstyle:rules.bzl", "checkstyle_test")
-
-kt_jvm_library(
-    name = "agent",
-    srcs = glob(["*.kt", "*/*.kt"]),
-    visibility = ["//visibility:public"],
-    deps = [
-        "//simulation/common",
-
-        # External Vaticle Dependencies
-        "@typedb_simulation//framework:typedb-simulation-framework",
-        "@typedb_simulation//framework/common:common",
-        "@typedb_maven_deps//:com_vaticle_typedb_typedb_common",
-
-        # External Maven Dependencies
-        "@maven//:com_google_code_findbugs_jsr305",
-        "@maven//:info_picocli_picocli",
-        "@maven//:io_github_microutils_kotlin_logging_jvm",
-        "@maven//:org_slf4j_slf4j_api",
-        "@maven//:org_yaml_snakeyaml",
-    ],
-    data = ["//simulation/data"],
-)
 
 checkstyle_test(
     name = "checkstyle",
-    include = glob(["*", "*/*"]),
+    include = glob(["*"]),
     license_type = "apache-header",
 )

@@ -25,6 +25,7 @@ import com.vaticle.typedb.driver.api.TypeDBSession.Type.DATA
 import com.vaticle.typedb.driver.api.TypeDBTransaction.Type.READ
 import com.vaticle.typeql.lang.TypeQL.match
 import com.vaticle.typeql.lang.TypeQL.cVar
+import com.vaticle.typeql.lang.common.TypeQLToken
 import java.text.DecimalFormat
 import java.util.concurrent.ConcurrentHashMap
 
@@ -47,10 +48,10 @@ class TypeDBDriver private constructor(
         nativeClient.session(database, DATA).use { session ->
             session.transaction(READ).use { tx ->
                 val formatter = DecimalFormat("#,###")
-                val numberOfEntities = tx.query().get(match(cVar("x").isa("entity")).count()).get().asLong()
-                val numberOfAttributes = tx.query().get(match(cVar("x").isa("attribute")).count()).get().asLong()
-                val numberOfRelations = tx.query().get(match(cVar("x").isa("relation")).count()).get().asLong()
-                val numberOfThings = tx.query().get(match(cVar("x").isa("thing")).count()).get().asLong()
+                val numberOfEntities = tx.query().get(match(cVar("x").isa("entity")).get().aggregate(TypeQLToken.Aggregate.Method.COUNT, cVar("x"))).resolve().get().asLong()
+                val numberOfAttributes = tx.query().get(match(cVar("x").isa("attribute")).get().aggregate(TypeQLToken.Aggregate.Method.COUNT, cVar("x"))).resolve().get().asLong()
+                val numberOfRelations = tx.query().get(match(cVar("x").isa("relation")).get().aggregate(TypeQLToken.Aggregate.Method.COUNT, cVar("x"))).resolve().get().asLong()
+                val numberOfThings = tx.query().get(match(cVar("x").isa("thing")).get().aggregate(TypeQLToken.Aggregate.Method.COUNT, cVar("x"))).resolve().get().asLong()
                 str.append("Simulation statistic:").append("\n")
                 str.append("\n")
                 str.append("Count 'entity': ").append(formatter.format(numberOfEntities)).append("\n")

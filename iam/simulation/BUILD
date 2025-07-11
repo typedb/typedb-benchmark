@@ -28,8 +28,8 @@ kt_jvm_library(
         "//simulation/neo4j",
 
         # External Vaticle Dependencies
-        "@typedb_simulation//:typedb_simulation",
-        "@typedb_simulation//framework:common",
+        "@typedb_simulation//framework:typedb-simulation-framework",
+        "@typedb_simulation//framework/common:common",
 
         # External Maven Dependencies
         "@maven//:com_google_code_findbugs_jsr305",

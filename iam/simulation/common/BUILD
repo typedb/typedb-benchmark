@@ -24,9 +24,9 @@ kt_jvm_library(
     visibility = ["//visibility:public"],
     deps = [
         # External Vaticle Dependencies
-        "@typedb_common//:common",
-        "@typedb_simulation//common",
-        "@typedb_simulation//:typedb_simulation",
+        "@typedb_maven_deps//:com_vaticle_typedb_typedb_common",
+        "@typedb_simulation//framework/common:common",
+        "@typedb_simulation//framework:typedb-simulation-framework",
 
         # External Maven Dependencies
         "@maven//:com_google_code_findbugs_jsr305",
