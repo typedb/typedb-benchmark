@@ -1,3 +1,5 @@
+### Note: This has not been updated to TypeDB 3. It supports TypeDB 2.29
+
 ## TypeDB read-write benchmark
 
 This benchmark contains a 'minimal set of representative queries' to emulate a typical typedb workload.
