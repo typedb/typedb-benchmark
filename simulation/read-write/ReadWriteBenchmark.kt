@@ -16,15 +16,15 @@
  */
 package com.vaticle.typedb.benchmark.readwrite
 
-import com.vaticle.typedb.client.api.TypeDBOptions
-import com.vaticle.typedb.client.api.TypeDBSession
+import com.vaticle.typedb.driver.api.TypeDBOptions
+import com.vaticle.typedb.driver.api.TypeDBSession
 import com.vaticle.typedb.benchmark.readwrite.common.Context
 import com.vaticle.typedb.benchmark.framework.common.seed.RandomSource
-import com.vaticle.typedb.benchmark.framework.typedb.TypeDBClient
+import com.vaticle.typedb.benchmark.framework.typedb.TypeDBDriver
 import mu.KotlinLogging
 import java.nio.file.Paths
 
-class ReadWriteBenchmark internal constructor(client: TypeDBClient, context: Context) :
+class ReadWriteBenchmark internal constructor(client: TypeDBDriver, context: Context) :
     com.vaticle.typedb.benchmark.framework.typedb.TypeDBSimulation<Context>(client, context, AgentFactory(client, context)) {
 
     private val LOGGER = KotlinLogging.logger {}
@@ -32,7 +32,7 @@ class ReadWriteBenchmark internal constructor(client: TypeDBClient, context: Con
     override val name = "ReadWriteBenchmark"
 
     override val schemaFiles = listOf(Paths.get("read-write/schema.tql").toFile())
-    private val options = TypeDBOptions.core().infer(true)
+    private val options = TypeDBOptions().infer(true)
 
     override fun initData(nativeSession: TypeDBSession, randomSource: RandomSource) {
         LOGGER.info("Nothing to initialise")

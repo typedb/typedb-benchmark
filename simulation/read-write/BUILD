@@ -16,7 +16,7 @@
 #
 
 load("@io_bazel_rules_kotlin//kotlin:jvm.bzl", "kt_jvm_library")
-load("@vaticle_dependencies//tool/checkstyle:rules.bzl", "checkstyle_test")
+load("@typedb_dependencies//tool/checkstyle:rules.bzl", "checkstyle_test")
 
 kt_jvm_library(
     name = "benchmark-read-write",
@@ -29,9 +29,14 @@ kt_jvm_library(
         "//framework/common:common",
 
         # External Vaticle Dependencies
-        "@vaticle_typeql//java:typeql-lang",
-        "@vaticle_typeql//java/pattern",
-        "@vaticle_typeql//java/query",
+#        "@typedb_typeql//java:typeql-lang",
+#        "@typedb_typeql//java/pattern",
+#        "@typedb_typeql//java/query",
+
+        "@typedb_maven_deps//:com_vaticle_typeql_typeql_common",
+        "@typedb_maven_deps//:com_vaticle_typeql_typeql_lang",
+        "@typedb_maven_deps//:com_vaticle_typeql_typeql_pattern",
+        "@typedb_maven_deps//:com_vaticle_typeql_typeql_query",
 
         # External Maven Dependencies
         "@maven//:io_github_microutils_kotlin_logging_jvm",
@@ -53,5 +58,5 @@ checkstyle_test(
     name = "checkstyle",
     include = glob(["*", "*/*"]),
     exclude = ["README.md"],
-    license_type = "agpl-header",
+    license_type = "apache-header",
 )

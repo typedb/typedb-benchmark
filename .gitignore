@@ -47,6 +47,7 @@ __pycache__
 # Bazel
 bazel-*
 /ldbc/typeql/results
+iam/bazel-*
 
 # Local python env
 /.py311

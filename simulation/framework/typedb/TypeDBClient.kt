@@ -18,23 +18,24 @@ package com.vaticle.typedb.benchmark.framework.typedb
 
 import com.vaticle.typedb.benchmark.framework.common.Partition
 import com.vaticle.typedb.benchmark.framework.common.DBClient
-import com.vaticle.typedb.client.TypeDB
-import com.vaticle.typedb.client.api.TypeDBCredential
-import com.vaticle.typedb.client.api.TypeDBSession
-import com.vaticle.typedb.client.api.TypeDBSession.Type.DATA
-import com.vaticle.typedb.client.api.TypeDBTransaction.Type.READ
+import com.vaticle.typedb.driver.TypeDB
+import com.vaticle.typedb.driver.api.TypeDBCredential
+import com.vaticle.typedb.driver.api.TypeDBSession
+import com.vaticle.typedb.driver.api.TypeDBSession.Type.DATA
+import com.vaticle.typedb.driver.api.TypeDBTransaction.Type.READ
 import com.vaticle.typeql.lang.TypeQL.match
 import com.vaticle.typeql.lang.TypeQL.cVar
+import com.vaticle.typeql.lang.common.TypeQLToken
 import java.text.DecimalFormat
 import java.util.concurrent.ConcurrentHashMap
 
-class TypeDBClient private constructor(
-    private val nativeClient: com.vaticle.typedb.client.api.TypeDBClient,
+class TypeDBDriver private constructor(
+    private val nativeClient: com.vaticle.typedb.driver.api.TypeDBDriver,
     private val database: String
 ) : DBClient<TypeDBSession> {
     private val sessionMap = ConcurrentHashMap<String, TypeDBSession>()
 
-    fun unpack(): com.vaticle.typedb.client.api.TypeDBClient {
+    fun unpack(): com.vaticle.typedb.driver.api.TypeDBDriver {
         return nativeClient
     }
 
@@ -47,10 +48,10 @@ class TypeDBClient private constructor(
         nativeClient.session(database, DATA).use { session ->
             session.transaction(READ).use { tx ->
                 val formatter = DecimalFormat("#,###")
-                val numberOfEntities = tx.query().match(match(cVar("x").isa("entity")).count()).get().asLong()
-                val numberOfAttributes = tx.query().match(match(cVar("x").isa("attribute")).count()).get().asLong()
-                val numberOfRelations = tx.query().match(match(cVar("x").isa("relation")).count()).get().asLong()
-                val numberOfThings = tx.query().match(match(cVar("x").isa("thing")).count()).get().asLong()
+                val numberOfEntities = tx.query().get(match(cVar("x").isa("entity")).get().aggregate(TypeQLToken.Aggregate.Method.COUNT, null)).resolve().get().asLong()
+                val numberOfAttributes = tx.query().get(match(cVar("x").isa("attribute")).get().aggregate(TypeQLToken.Aggregate.Method.COUNT, null)).resolve().get().asLong()
+                val numberOfRelations = tx.query().get(match(cVar("x").isa("relation")).get().aggregate(TypeQLToken.Aggregate.Method.COUNT, null)).resolve().get().asLong()
+                val numberOfThings = tx.query().get(match(cVar("x").isa("thing")).get().aggregate(TypeQLToken.Aggregate.Method.COUNT, null)).resolve().get().asLong()
                 str.append("Simulation statistic:").append("\n")
                 str.append("\n")
                 str.append("Count 'entity': ").append(formatter.format(numberOfEntities)).append("\n")
@@ -79,12 +80,12 @@ class TypeDBClient private constructor(
     }
 
     companion object {
-        fun core(hostUri: String, database: String): TypeDBClient {
-            return TypeDBClient(TypeDB.coreClient(hostUri), database)
+        fun core(hostUri: String, database: String): TypeDBDriver {
+            return TypeDBDriver(TypeDB.coreDriver(hostUri), database)
         }
 
-        fun cluster(hostUri: String, database: String): TypeDBClient {
-            return TypeDBClient(TypeDB.clusterClient(hostUri, TypeDBCredential("admin", "password", false)), database)
+        fun cluster(hostUri: String, database: String): TypeDBDriver {
+            return TypeDBDriver(TypeDB.cloudDriver(hostUri, TypeDBCredential("admin", "password", false)), database)
         }
     }
 }

@@ -19,9 +19,9 @@ package com.vaticle.typedb.benchmark.framework.typedb
 import com.vaticle.typedb.benchmark.framework.common.Util.printDuration
 import com.vaticle.typedb.benchmark.framework.Context
 import com.vaticle.typedb.benchmark.framework.Simulation
-import com.vaticle.typedb.client.api.TypeDBSession.Type.DATA
-import com.vaticle.typedb.client.api.TypeDBSession.Type.SCHEMA
-import com.vaticle.typedb.client.api.TypeDBTransaction.Type.WRITE
+import com.vaticle.typedb.driver.api.TypeDBSession.Type.DATA
+import com.vaticle.typedb.driver.api.TypeDBSession.Type.SCHEMA
+import com.vaticle.typedb.driver.api.TypeDBTransaction.Type.WRITE
 import com.vaticle.typedb.benchmark.framework.Agent
 import com.vaticle.typedb.benchmark.framework.common.seed.RandomSource
 import com.vaticle.typeql.lang.TypeQL
@@ -35,8 +35,8 @@ import java.time.Instant
 import kotlin.streams.toList
 
 abstract class TypeDBSimulation<out CONTEXT: Context<*, *>> protected constructor(
-    client: TypeDBClient, context: CONTEXT, agentFactory: Agent.Factory
-): Simulation<TypeDBClient, CONTEXT>(client, context, agentFactory) {
+    client: TypeDBDriver, context: CONTEXT, agentFactory: Agent.Factory
+): Simulation<TypeDBDriver, CONTEXT>(client, context, agentFactory) {
 
     abstract val schemaFiles: List<File>
 
@@ -52,14 +52,14 @@ abstract class TypeDBSimulation<out CONTEXT: Context<*, *>> protected constructo
         }
     }
 
-    private fun initDatabase(nativeClient: com.vaticle.typedb.client.api.TypeDBClient) {
+    private fun initDatabase(nativeClient: com.vaticle.typedb.driver.api.TypeDBDriver) {
         if (nativeClient.databases().contains(context.dbName)) {
             nativeClient.databases()[context.dbName].delete()
         }
         nativeClient.databases().create(context.dbName)
     }
 
-    private fun initSchema(nativeClient: com.vaticle.typedb.client.api.TypeDBClient) {
+    private fun initSchema(nativeClient: com.vaticle.typedb.driver.api.TypeDBDriver) {
         if (schemaFiles.isEmpty()) throw IllegalStateException("No schema files provided for simulation.")
         nativeClient.session(context.dbName, SCHEMA).use { session ->
             LOGGER.info("TypeDB initialisation of $name simulation schema started ...")
@@ -83,7 +83,7 @@ abstract class TypeDBSimulation<out CONTEXT: Context<*, *>> protected constructo
         }
     }
 
-    protected abstract fun initData(nativeSession: com.vaticle.typedb.client.api.TypeDBSession, randomSource: RandomSource)
+    protected abstract fun initData(nativeSession: com.vaticle.typedb.driver.api.TypeDBSession, randomSource: RandomSource)
 
     companion object {
         private val LOGGER = KotlinLogging.logger {}

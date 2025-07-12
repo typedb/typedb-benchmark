@@ -15,7 +15,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 
-load("@vaticle_dependencies//tool/checkstyle:rules.bzl", "checkstyle_test")
+load("@typedb_dependencies//tool/checkstyle:rules.bzl", "checkstyle_test")
 load("@io_bazel_rules_kotlin//kotlin:core.bzl", "define_kt_toolchain")
 
 define_kt_toolchain(
@@ -34,11 +34,11 @@ checkstyle_test(
         "README.md",
         "docs/*",
     ]),
-    license_type = "agpl-header",
+    license_type = "apache-header",
 )
 
 checkstyle_test(
     name = "checkstyle-license",
     include = ["LICENSE"],
-    license_type = "agpl-fulltext",
+    license_type = "apache-fulltext",
 )

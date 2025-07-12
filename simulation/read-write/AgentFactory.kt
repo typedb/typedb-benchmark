@@ -18,13 +18,13 @@ package com.vaticle.typedb.benchmark.readwrite
 
 import com.vaticle.typedb.benchmark.readwrite.common.Context
 import com.vaticle.typedb.benchmark.framework.Agent
-import com.vaticle.typedb.benchmark.framework.typedb.TypeDBClient
+import com.vaticle.typedb.benchmark.framework.typedb.TypeDBDriver
 
-class AgentFactory(client: TypeDBClient, context: Context): Agent.Factory() {
+class AgentFactory(client: TypeDBDriver, context: Context): Agent.Factory() {
     override val map: Map<Class<out Agent<*, *, *>>, () -> Agent<*, *, *>> = mapOf(
         PersonAgent::class.java to { graph(client, context) },
     )
 
-    fun graph(client: TypeDBClient, context: Context) = PersonAgent(client, context)
+    fun graph(client: TypeDBDriver, context: Context) = PersonAgent(client, context)
 
 }
