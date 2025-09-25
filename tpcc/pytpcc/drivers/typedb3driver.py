@@ -112,7 +112,7 @@ class Typedb3Driver(AbstractDriver):
         credentials = Credentials(self.user, self.password)
 
         if self.edition is EDITION.Core:
-            self.driver = TypeDB.driver(address=f"{self.addr}", credentials=credentials, driver_options=DriverOptions())
+            self.driver = TypeDB.driver(address=f"{self.addr}", credentials=credentials, driver_options=DriverOptions(is_tls_enabled=False))
         if self.edition is EDITION.Cloud:
             raise "Unimplemented"
 
@@ -539,7 +539,7 @@ select $i_name, $i_price, $i_data;"""
             q = f"""
 match 
 $w isa WAREHOUSE, has W_ID {w_id}, has W_TAX $w_tax;
-$d isa DISTRICT, has D_ID {w_id * DPW + d_id}, has D_TAX $d_tax, has D_NEXT_O_ID $d_next_o_id;
+$d isa DISTRICT, links (warehouse: $w), has D_ID {w_id * DPW + d_id}, has D_TAX $d_tax, has D_NEXT_O_ID $d_next_o_id;
 $c isa CUSTOMER, has C_ID {w_id * DPW * CPD + d_id * CPD + c_id}, 
 has C_DISCOUNT $c_discount, has C_LAST $c_last, has C_CREDIT $c_credit;
 let $d_next_o_id_old = $d_next_o_id;
@@ -632,7 +632,7 @@ select $s_quantity, $s_data, $s_ytd, $s_order_cnt, $s_remote_cnt, $s_dist_xx;"""
 match
 $i isa ITEM, has I_ID {ol_i_id};
 $w isa WAREHOUSE, has W_ID {ol_supply_w_id};
-$d isa DISTRICT, has D_ID {w_id * DPW + d_id};
+$d isa DISTRICT, links (warehouse: $w), has D_ID {w_id * DPW + d_id};
 $o links (district: $d), isa ORDER, has O_ID {d_next_o_id};
 $s links (item: $i, warehouse: $w), isa STOCKING, 
 has S_QUANTITY $s_quantity, has S_YTD $s_ytd, 
@@ -695,7 +695,8 @@ reduce $count = count;"""
             for d_id in range(1, constants.DISTRICTS_PER_WAREHOUSE+1):
                 q = f"""
 match
-$d isa DISTRICT, has D_ID {w_id * DPW + d_id};
+$w isa WAREHOUSE, has W_ID { w_id };
+$d isa DISTRICT, links (warehouse: $w), has D_ID {w_id * DPW + d_id};
 $o links (customer: $c, district: $d), isa ORDER, has O_ID $o_id, has O_NEW_ORDER true;
 $c isa CUSTOMER, has C_ID $c_id;
 select $o_id, $c_id;
@@ -717,7 +718,8 @@ limit 1;
 
                 q = f"""
 match
-$d isa DISTRICT, has D_ID {w_id * DPW + d_id};
+$w isa WAREHOUSE, has W_ID { w_id };
+$d isa DISTRICT, links (warehouse: $w), has D_ID {w_id * DPW + d_id};
 $o links (district: $d), isa ORDER, has O_ID {no_o_id};
 $ol links (order: $o, item: $i),  isa ORDER_LINE, has OL_AMOUNT $ol_amount;
 select $ol_amount;
@@ -822,7 +824,8 @@ select $c_first, $c_middle, $c_last, $c_balance;
                 # TODO: check whether it's faster to constrain customer through C_ID range
                 q = f"""
 match
-$d isa DISTRICT, has D_ID {w_id * DPW + d_id};
+$w isa WAREHOUSE, has W_ID { w_id };
+$d isa DISTRICT, links (warehouse: $w), has D_ID {w_id * DPW + d_id};
 $c links (district: $d), isa CUSTOMER, has C_ID $c_id,
 has C_FIRST $c_first, has C_MIDDLE $c_middle, has C_LAST $c_last,
 has C_BALANCE $c_balance;
@@ -949,7 +952,8 @@ $c_balance, $c_ytd_payment, $c_payment_cnt, $c_data;
                 # TODO: check whether it's faster to constrain customer through C_ID range
                 q = f"""
 match
-$d isa DISTRICT, has D_ID {w_id * DPW + d_id};
+$w isa WAREHOUSE, has W_ID { w_id };
+$d isa DISTRICT, links (warehouse: $w), has D_ID {w_id * DPW + d_id};
 $c links (district: $d), isa CUSTOMER, has C_ID $c_id,
 has C_FIRST $c_first, has C_MIDDLE $c_middle, has C_LAST $c_last,
 has C_STREET_1 $c_street_1, has C_STREET_2 $c_street_2, has C_CITY $c_city,
@@ -1033,7 +1037,8 @@ select $w_name, $w_street_1, $w_street_2, $w_city, $w_state, $w_zip;
             # D_NAME, D_STREET_1, D_STREET_2, D_CITY, D_STATE, D_ZIP
             q = f"""
 match
-$d isa DISTRICT, has D_ID {w_id * DPW + d_id}, 
+$w isa WAREHOUSE, has W_ID { w_id };
+$d isa DISTRICT, links (warehouse: $w), has D_ID {w_id * DPW + d_id}, 
 has D_NAME $d_name, has D_STREET_1 $d_street_1, 
 has D_STREET_2 $d_street_2, has D_CITY $d_city, 
 has D_STATE $d_state, has D_ZIP $d_zip, has D_YTD $d_ytd;
@@ -1166,7 +1171,8 @@ $h links (customer: $c), isa CUSTOMER_HISTORY, has H_DATE {h_date}, has H_AMOUNT
         with self.driver.transaction(self.database, TransactionType.WRITE) as tx:
             q = f"""
 match
-$d isa DISTRICT, has D_ID {w_id * DPW + d_id}, has D_NEXT_O_ID $d_next_o_id;
+$w isa WAREHOUSE, has W_ID { w_id };
+$d isa DISTRICT, links (warehouse: $w), has D_ID {w_id * DPW + d_id}, has D_NEXT_O_ID $d_next_o_id;
 select $d_next_o_id;
 """
             self.start_checkpoint(q)
@@ -1182,7 +1188,7 @@ select $d_next_o_id;
             q = f"""
 match
 $w isa WAREHOUSE, has W_ID {w_id};
-$d isa DISTRICT, has D_ID {w_id * DPW + d_id};
+$d isa DISTRICT, links (warehouse: $w), has D_ID {w_id * DPW + d_id};
 $s links (item: $i, warehouse: $w), isa STOCKING, has S_QUANTITY < {threshold};
 $ol links  (item: $i, order: $o), isa ORDER_LINE;
 $o links (district: $d), isa ORDER, has O_ID $o_id;
