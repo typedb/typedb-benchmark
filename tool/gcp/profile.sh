@@ -16,7 +16,7 @@ DISK_SIZE=200gb
 # USER=... # your GCP SSH login username
 
 # cloud provider config
-PROJECT=vaticle-engineers
+PROJECT=typedb-engineers
 ZONE=europe-west2-c
 IMAGE=vaticle-ubuntu-2204-c212752a1d15bc145ca4382452e8a33a354362d6
 IMAGE_PROJECT=vaticle-factory-prod
