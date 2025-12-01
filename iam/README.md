@@ -5,7 +5,7 @@
 [![Stack Overflow](https://img.shields.io/badge/stackoverflow-typeql-3dce8c.svg)](https://stackoverflow.com/questions/tagged/typeql)
 
 ## Compatibility notice
-This repository has not been updated to TypeDB 3. It supports TypeDB 2.29.
+This package has not been updated to TypeDB 3. It supports TypeDB 2.29.
 
 However, you can see an updated TypeDB 3 sample schema and data at [Typedb Examples repository](https://github.com/typedb/typedb-examples/tree/master/use-cases/identity-and-access-management)
 
