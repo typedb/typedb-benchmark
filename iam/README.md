@@ -4,7 +4,10 @@
 [![Stack Overflow](https://img.shields.io/badge/stackoverflow-typedb-796de3.svg)](https://stackoverflow.com/questions/tagged/typedb)
 [![Stack Overflow](https://img.shields.io/badge/stackoverflow-typeql-3dce8c.svg)](https://stackoverflow.com/questions/tagged/typeql)
 
-### Note: This has not been updated to TypeDB 3. It supports TypeDB 2.29
+## Compatibility notice
+This repository has not been updated to TypeDB 3. It supports TypeDB 2.29.
+
+However, you can see an updated ssample schema and data in [Typedb Examples repository](https://github.com/typedb/typedb-examples/tree/master/use-cases/identity-and-access-management)
 
 ## TypeDB IAM: Open Source IAM Schema and Simulation
 
