@@ -30,7 +30,7 @@ COMMIT_BATCH_SIZE = 100
 ITEMS_COMPLETE = Event()
 
 class EDITION(Enum):
-    Cloud = 1
+    Cluster = 1
     Core = 2
 
 DPW = constants.DISTRICTS_PER_WAREHOUSE
@@ -43,8 +43,8 @@ DATA_COUNT = { }
 class Typedb3Driver(AbstractDriver):
     DEFAULT_CONFIG = {
         "database": ("Name of DB", "tpcc" ),
-        "addr": ("Address of server", "127.0.0.1:1729" ),
-        "edition": ("TypeDB Edition (Core or Cloud)", "Core" ),
+        "addr": ("Address(es) of server", "127.0.0.1:1729" ),
+        "edition": ("TypeDB Edition (Core or Cluster)", "Core" ),
         "user": ("DB User", "admin" ),
         "password": ("DB Password", "password"),
         "schema": ("Script-relative path to schema file", "tql3/tpcc-schema.tql"),
@@ -96,8 +96,8 @@ class Typedb3Driver(AbstractDriver):
         edition = config["edition"]
         if edition == "Core":
             self.edition = EDITION.Core
-        elif edition == "Cloud":
-            self.edition = EDITION.Cloud
+        elif edition == "Cluster":
+            self.edition = EDITION.Cluster
         else:
             raise Exception(f"Did not open a driver for edition: {edition}")
 
@@ -111,10 +111,14 @@ class Typedb3Driver(AbstractDriver):
 
         credentials = Credentials(self.user, self.password)
 
-        if self.edition is EDITION.Core:
-            self.driver = TypeDB.driver(address=f"{self.addr}", credentials=credentials, driver_options=DriverOptions())
-        if self.edition is EDITION.Cloud:
-            raise "Unimplemented"
+        driver_options = DriverOptions(DriverTlsConfig.disabled())
+
+        addresses = [a.strip() for a in self.addr.split(",") if a.strip()]
+        connect_target = addresses[0] if len(addresses) == 1 else addresses
+
+        if self.edition is EDITION.Core and len(addresses) != 1:
+            raise Exception(f"Core edition expects a single address, got {len(addresses)}: {self.addr}")
+        self.driver = TypeDB.driver(connect_target, credentials, driver_options)
 
         if config["reset"] and self.driver.databases.contains(self.database):
             self.typedb_logger.debug("Deleting database '%s'" % self.database)
