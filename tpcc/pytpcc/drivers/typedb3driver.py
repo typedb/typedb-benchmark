@@ -205,20 +205,21 @@ class Typedb3Driver(AbstractDriver):
             self.items_complete_event.wait()  # We wait until item loading is complete
             self.typedb_logger.info("ITEM loading complete! Proceeding...")
 
-        # Each table produces one (or, for the optional ORDER_LINE delivery date, two) constant query
-        # template(s) plus a list of parameter rows. Moving the values out of the query string into
-        # `given` rows keeps the template byte-identical across calls, so the server parses/compiles it
+        # Each table produces one (or, for the optional ORDER_LINE delivery date, two) constant
+        # query (or queries) plus a list of parameter rows. Moving the values out of the query string into
+        # `given` rows keeps the query string byte-identical across calls, so the server parses/compiles it
         # once and amortizes that cost across the whole batch (and across all later batches).
         queries = [ ]
 
         if tableName == "WAREHOUSE":
-            template = (
+            query = (
                 "given $w_id: integer, $w_name: string, $w_street_1: string, $w_street_2: string, "
                 "$w_city: string, $w_state: string, $w_zip: string, $w_tax: double, $w_ytd: double; "
                 "insert $warehouse isa WAREHOUSE, "
                 "has W_ID == $w_id, has W_NAME == $w_name, has W_STREET_1 == $w_street_1, "
                 "has W_STREET_2 == $w_street_2, has W_CITY == $w_city, has W_STATE == $w_state, "
                 "has W_ZIP == $w_zip, has W_TAX == $w_tax, has W_YTD == $w_ytd;"
+                " reduce $count = count;"
             )
             rows = [ ]
             for tuple in tuples:
@@ -227,10 +228,10 @@ class Typedb3Driver(AbstractDriver):
                     "w_street_2": tuple[3], "w_city": tuple[4], "w_state": tuple[5],
                     "w_zip": tuple[6], "w_tax": tuple[7], "w_ytd": tuple[8],
                 })
-            queries.append((template, rows))
+            queries.append((query, rows))
 
         if tableName == "DISTRICT":
-            template = (
+            query = (
                 "given $w_id: integer, $d_id: integer, $d_name: string, $d_street_1: string, "
                 "$d_street_2: string, $d_city: string, $d_state: string, $d_zip: string, "
                 "$d_tax: double, $d_ytd: double, $d_next_o_id: integer; "
@@ -240,6 +241,7 @@ class Typedb3Driver(AbstractDriver):
                 "has D_STREET_1 == $d_street_1, has D_STREET_2 == $d_street_2, "
                 "has D_CITY == $d_city, has D_STATE == $d_state, has D_ZIP == $d_zip, "
                 "has D_TAX == $d_tax, has D_YTD == $d_ytd, has D_NEXT_O_ID == $d_next_o_id;"
+                " reduce $count = count;"
             )
             rows = [ ]
             for tuple in tuples:
@@ -251,13 +253,14 @@ class Typedb3Driver(AbstractDriver):
                     "d_state": tuple[6], "d_zip": tuple[7], "d_tax": tuple[8],
                     "d_ytd": tuple[9], "d_next_o_id": tuple[10],
                 })
-            queries.append((template, rows))
+            queries.append((query, rows))
 
         if tableName == "ITEM":
-            template = (
+            query = (
                 "given $i_id: integer, $i_im_id: integer, $i_name: string, $i_price: double, $i_data: string; "
                 "insert $item isa ITEM, has I_ID == $i_id, has I_IM_ID == $i_im_id, "
                 "has I_NAME == $i_name, has I_PRICE == $i_price, has I_DATA == $i_data;"
+                " reduce $count = count;"
             )
             rows = [ ]
             for tuple in tuples:
@@ -265,10 +268,10 @@ class Typedb3Driver(AbstractDriver):
                     "i_id": tuple[0], "i_im_id": tuple[1], "i_name": tuple[2],
                     "i_price": tuple[3], "i_data": tuple[4],
                 })
-            queries.append((template, rows))
+            queries.append((query, rows))
 
         if tableName == "CUSTOMER":
-            template = (
+            query = (
                 "given $d_id: integer, $c_id: integer, $c_first: string, $c_middle: string, "
                 "$c_last: string, $c_street_1: string, $c_street_2: string, $c_city: string, "
                 "$c_state: string, $c_zip: string, $c_phone: string, $c_since: datetime, "
@@ -284,6 +287,7 @@ class Typedb3Driver(AbstractDriver):
                 "has C_BALANCE == $c_balance, has C_YTD_PAYMENT == $c_ytd_payment, "
                 "has C_PAYMENT_CNT == $c_payment_cnt, has C_DELIVERY_CNT == $c_delivery_cnt, "
                 "has C_DATA == $c_data;"
+                " reduce $count = count;"
             )
             rows = [ ]
             for tuple in tuples:
@@ -301,16 +305,17 @@ class Typedb3Driver(AbstractDriver):
                     "c_ytd_payment": tuple[17], "c_payment_cnt": tuple[18],
                     "c_delivery_cnt": tuple[19], "c_data": tuple[20],
                 })
-            queries.append((template, rows))
+            queries.append((query, rows))
 
         if tableName == "ORDERS":
-            template = (
+            query = (
                 "given $d_id: integer, $c_id: integer, $o_id: integer, $o_entry_d: datetime, "
                 "$o_carrier_id: integer, $o_ol_cnt: integer, $o_all_local: integer; "
                 "match $d isa DISTRICT, has D_ID == $d_id; $c isa CUSTOMER, has C_ID == $c_id; "
                 "insert $o links (customer: $c, district: $d), isa ORDER, "
                 "has O_ID == $o_id, has O_ENTRY_D == $o_entry_d, has O_CARRIER_ID == $o_carrier_id, "
                 "has O_OL_CNT == $o_ol_cnt, has O_ALL_LOCAL == $o_all_local, has O_NEW_ORDER false;"
+                " reduce $count = count;"
             )
             rows = [ ]
             for tuple in tuples:
@@ -324,15 +329,16 @@ class Typedb3Driver(AbstractDriver):
                     "o_id": o_id, "o_entry_d": tdb_datetime(tuple[4]),
                     "o_carrier_id": tuple[5], "o_ol_cnt": tuple[6], "o_all_local": tuple[7],
                 })
-            queries.append((template, rows))
+            queries.append((query, rows))
 
         if tableName == "NEW_ORDER":
-            template = (
+            query = (
                 "given $d_id: integer, $o_id: integer; "
                 "match $d isa DISTRICT, has D_ID == $d_id; "
                 "$o links (district: $d), isa ORDER, has O_ID == $o_id, has O_NEW_ORDER $status; "
                 "delete $status of $o; "
                 "insert $o has O_NEW_ORDER true;"
+                " reduce $count = count;"
             )
             rows = [ ]
             for tuple in tuples:
@@ -340,10 +346,10 @@ class Typedb3Driver(AbstractDriver):
                 no_d_id = tuple[1]
                 no_w_id = tuple[2]
                 rows.append({"d_id": no_w_id * DPW + no_d_id, "o_id": no_o_id})
-            queries.append((template, rows))
+            queries.append((query, rows))
 
         if tableName == "ORDER_LINE":
-            # OL_DELIVERY_D may be null (TPC-C spec): use a template with the attribute for rows that
+            # OL_DELIVERY_D may be null (TPC-C spec): use a query with the attribute for rows that
             # have a delivery date, and one without it for rows that don't.
             match_insert = (
                 "match $w isa WAREHOUSE, has W_ID == $w_id; "
@@ -353,20 +359,22 @@ class Typedb3Driver(AbstractDriver):
                 "insert $order_line links (order: $order, item: $item), isa ORDER_LINE, "
                 "has OL_NUMBER == $ol_number, has OL_SUPPLY_W_ID == $ol_supply_w_id, "
             )
-            template_with = (
+            query_with = (
                 "given $w_id: integer, $d_id: integer, $o_id: integer, $i_id: integer, "
                 "$ol_number: integer, $ol_supply_w_id: integer, $ol_delivery_d: datetime, "
                 "$ol_quantity: integer, $ol_amount: double, $ol_dist_info: string; "
                 + match_insert +
                 "has OL_DELIVERY_D == $ol_delivery_d, "
                 "has OL_QUANTITY == $ol_quantity, has OL_AMOUNT == $ol_amount, has OL_DIST_INFO == $ol_dist_info;"
+                " reduce $count = count;"
             )
-            template_without = (
+            query_without = (
                 "given $w_id: integer, $d_id: integer, $o_id: integer, $i_id: integer, "
                 "$ol_number: integer, $ol_supply_w_id: integer, "
                 "$ol_quantity: integer, $ol_amount: double, $ol_dist_info: string; "
                 + match_insert +
                 "has OL_QUANTITY == $ol_quantity, has OL_AMOUNT == $ol_amount, has OL_DIST_INFO == $ol_dist_info;"
+                " reduce $count = count;"
             )
             rows_with = [ ]
             rows_without = [ ]
@@ -385,12 +393,12 @@ class Typedb3Driver(AbstractDriver):
                     rows_with.append(row)
                 else:
                     rows_without.append(row)
-            queries.append((template_with, rows_with))
-            queries.append((template_without, rows_without))
+            queries.append((query_with, rows_with))
+            queries.append((query_without, rows_without))
 
         if tableName == "STOCK":
             # Combine the STOCKING insert and its 10 S_DIST_* attributes into a single insert.
-            template = (
+            query = (
                 "given $i_id: integer, $w_id: integer, $s_quantity: integer, $s_ytd: integer, "
                 "$s_order_cnt: integer, $s_remote_cnt: integer, $s_data: string, "
                 "$s_dist_1: string, $s_dist_2: string, $s_dist_3: string, $s_dist_4: string, "
@@ -404,6 +412,7 @@ class Typedb3Driver(AbstractDriver):
                 "has S_DIST_4 == $s_dist_4, has S_DIST_5 == $s_dist_5, has S_DIST_6 == $s_dist_6, "
                 "has S_DIST_7 == $s_dist_7, has S_DIST_8 == $s_dist_8, has S_DIST_9 == $s_dist_9, "
                 "has S_DIST_10 == $s_dist_10;"
+                " reduce $count = count;"
             )
             rows = [ ]
             for tuple in tuples:
@@ -415,15 +424,16 @@ class Typedb3Driver(AbstractDriver):
                 for i in range(1, 11):
                     row[f"s_dist_{i}"] = tuple[2 + i]
                 rows.append(row)
-            queries.append((template, rows))
+            queries.append((query, rows))
 
         if tableName == "HISTORY":
             # TODO: consider keeping track of warehouse w_id as well
-            template = (
+            query = (
                 "given $c_id: integer, $h_date: datetime, $h_amount: double, $h_data: string; "
                 "match $c isa CUSTOMER, has C_ID == $c_id; "
                 "insert $history links (customer: $c), isa CUSTOMER_HISTORY, "
                 "has H_DATE == $h_date, has H_AMOUNT == $h_amount, has H_DATA == $h_data;"
+                " reduce $count = count;"
             )
             rows = [ ]
             for tuple in tuples:
@@ -434,23 +444,23 @@ class Typedb3Driver(AbstractDriver):
                     "c_id": h_w_id * DPW * CPD + h_d_id * CPD + h_c_id,
                     "h_date": tdb_datetime(tuple[5]), "h_amount": tuple[6], "h_data": tuple[7],
                 })
-            queries.append((template, rows))
+            queries.append((query, rows))
 
         if tableName not in DATA_COUNT:
             DATA_COUNT[tableName] = 0;
         DATA_COUNT[tableName] += len(tuples);
 
         start_time = time.time()
-        for template, rows in queries:
+        for query, rows in queries:
             if self.debug:
-                self.start_checkpoint(template)
+                self.start_checkpoint(query)
             # One query call per transaction: the whole COMMIT_BATCH_SIZE batch of tuples is passed as
-            # `given_rows`, so the server executes the template once per input row in a single round trip.
+            # `given_rows`, so the server executes the query once per input row in a single round trip.
             while rows:
                 current_batch = rows[:COMMIT_BATCH_SIZE]
                 rows = rows[COMMIT_BATCH_SIZE:]
                 with self.driver.transaction(self.database, TransactionType.WRITE) as tx:
-                    tx.query(template, given_rows=current_batch).resolve()
+                    tx.query(query, given_rows=current_batch).resolve()
                     tx.commit()
             if self.debug:
                 self.end_checkpoint()
@@ -665,7 +675,7 @@ class Typedb3Driver(AbstractDriver):
                     "(item: $i, order: $o) isa ORDER_LINE, "
                     "has OL_NUMBER == $ol_number, has OL_SUPPLY_W_ID == $ol_supply_w_id, "
                     "has OL_QUANTITY == $ol_quantity, has OL_AMOUNT == $ol_amount, has OL_DIST_INFO == $ol_dist_info; "
-                    "reduce $count = count;"
+                    " reduce $count = count;"
                 )
                 self.start_checkpoint(q)
                 try:
@@ -1223,7 +1233,7 @@ class Typedb3Driver(AbstractDriver):
                 "$o_id < $o_id_max; "
                 "$o_id >= $o_id_min; "
                 "select $i; "
-                "reduce $count = count;"
+                " reduce $count = count;"
             )
             self.start_checkpoint(q)
             try:
