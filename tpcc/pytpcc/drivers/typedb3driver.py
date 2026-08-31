@@ -16,6 +16,8 @@ import calendar
 import logging
 from pprint import pformat
 import time
+import re
+
 from typedb.driver import *
 from typedb.common.datetime import Datetime
 
@@ -48,6 +50,22 @@ def tdb_datetime(dt):
 class EDITION(Enum):
     Cluster = 1
     Core = 2
+
+# Convert a raw python value to a driver `Value` concept, as required by the positional
+# `(variables, rows)` form of `given_rows`. Values that are already concepts pass through.
+try:
+    TypeDB.Concept.try_convert_to_value(0)  # probe: in driver 3.12.3 this raises NameError (missing `_Value` import)
+    _try_convert_to_value = TypeDB.Concept.try_convert_to_value
+except NameError:
+    from typedb.concept.value.value import _Value
+    _try_convert_to_value = _Value.try_convert_to_value
+
+def tdb_value(v):
+    return v if isinstance(v, Concept) else _try_convert_to_value(v)
+
+def given_variables(query):
+    """Variable names declared by the query's leading `given` clause, in declaration order."""
+    return re.findall(r"\$(\w+)\s*:", query[:query.index(";")])
 
 DPW = constants.DISTRICTS_PER_WAREHOUSE
 CPD = constants.CUSTOMERS_PER_DISTRICT
@@ -209,6 +227,9 @@ class Typedb3Driver(AbstractDriver):
         # query (or queries) plus a list of parameter rows. Moving the values out of the query string into
         # `given` rows keeps the query string byte-identical across calls, so the server parses/compiles it
         # once and amortizes that cost across the whole batch (and across all later batches).
+        # Rows are positional lists of `Value` concepts, ordered exactly as the query's `given`
+        # clause declares its variables, and passed via the `(variables, rows)` form of
+        # `given_rows` -- avoiding a per-row dict that the driver would only take apart again.
         queries = [ ]
 
         if tableName == "WAREHOUSE":
@@ -223,11 +244,7 @@ class Typedb3Driver(AbstractDriver):
             )
             rows = [ ]
             for tuple in tuples:
-                rows.append({
-                    "w_id": tuple[0], "w_name": tuple[1], "w_street_1": tuple[2],
-                    "w_street_2": tuple[3], "w_city": tuple[4], "w_state": tuple[5],
-                    "w_zip": tuple[6], "w_tax": tuple[7], "w_ytd": tuple[8],
-                })
+                rows.append([tdb_value(v) for v in tuple[:9]])
             queries.append((query, rows))
 
         if tableName == "DISTRICT":
@@ -247,12 +264,8 @@ class Typedb3Driver(AbstractDriver):
             for tuple in tuples:
                 d_id = tuple[0]
                 d_w_id = tuple[1]
-                rows.append({
-                    "w_id": d_w_id, "d_id": d_w_id * DPW + d_id, "d_name": tuple[2],
-                    "d_street_1": tuple[3], "d_street_2": tuple[4], "d_city": tuple[5],
-                    "d_state": tuple[6], "d_zip": tuple[7], "d_tax": tuple[8],
-                    "d_ytd": tuple[9], "d_next_o_id": tuple[10],
-                })
+                rows.append([tdb_value(v) for v in
+                             [d_w_id, d_w_id * DPW + d_id, *tuple[2:11]]])
             queries.append((query, rows))
 
         if tableName == "ITEM":
@@ -264,10 +277,7 @@ class Typedb3Driver(AbstractDriver):
             )
             rows = [ ]
             for tuple in tuples:
-                rows.append({
-                    "i_id": tuple[0], "i_im_id": tuple[1], "i_name": tuple[2],
-                    "i_price": tuple[3], "i_data": tuple[4],
-                })
+                rows.append([tdb_value(v) for v in tuple[:5]])
             queries.append((query, rows))
 
         if tableName == "CUSTOMER":
@@ -294,17 +304,10 @@ class Typedb3Driver(AbstractDriver):
                 c_id = tuple[0]
                 c_d_id = tuple[1]
                 c_w_id = tuple[2]
-                rows.append({
-                    "d_id": c_w_id * DPW + c_d_id,
-                    "c_id": c_w_id * DPW * CPD + c_d_id * CPD + c_id,
-                    "c_first": tuple[3], "c_middle": tuple[4], "c_last": tuple[5],
-                    "c_street_1": tuple[6], "c_street_2": tuple[7], "c_city": tuple[8],
-                    "c_state": tuple[9], "c_zip": tuple[10], "c_phone": tuple[11],
-                    "c_since": tdb_datetime(tuple[12]), "c_credit": tuple[13],
-                    "c_credit_lim": tuple[14], "c_discount": tuple[15], "c_balance": tuple[16],
-                    "c_ytd_payment": tuple[17], "c_payment_cnt": tuple[18],
-                    "c_delivery_cnt": tuple[19], "c_data": tuple[20],
-                })
+                rows.append([tdb_value(v) for v in
+                             [c_w_id * DPW + c_d_id,
+                              c_w_id * DPW * CPD + c_d_id * CPD + c_id,
+                              *tuple[3:12], tdb_datetime(tuple[12]), *tuple[13:21]]])
             queries.append((query, rows))
 
         if tableName == "ORDERS":
@@ -323,12 +326,10 @@ class Typedb3Driver(AbstractDriver):
                 o_c_id = tuple[1]
                 o_d_id = tuple[2]
                 o_w_id = tuple[3]
-                rows.append({
-                    "d_id": o_w_id * DPW + o_d_id,
-                    "c_id": o_w_id * DPW * CPD + o_d_id * CPD + o_c_id,
-                    "o_id": o_id, "o_entry_d": tdb_datetime(tuple[4]),
-                    "o_carrier_id": tuple[5], "o_ol_cnt": tuple[6], "o_all_local": tuple[7],
-                })
+                rows.append([tdb_value(v) for v in
+                             [o_w_id * DPW + o_d_id,
+                              o_w_id * DPW * CPD + o_d_id * CPD + o_c_id,
+                              o_id, tdb_datetime(tuple[4]), *tuple[5:8]]])
             queries.append((query, rows))
 
         if tableName == "NEW_ORDER":
@@ -345,7 +346,7 @@ class Typedb3Driver(AbstractDriver):
                 no_o_id = tuple[0]
                 no_d_id = tuple[1]
                 no_w_id = tuple[2]
-                rows.append({"d_id": no_w_id * DPW + no_d_id, "o_id": no_o_id})
+                rows.append([tdb_value(v) for v in [no_w_id * DPW + no_d_id, no_o_id]])
             queries.append((query, rows))
 
         if tableName == "ORDER_LINE":
@@ -382,17 +383,14 @@ class Typedb3Driver(AbstractDriver):
                 ol_o_id = tuple[0]
                 ol_d_id = tuple[1]
                 ol_w_id = tuple[2]
-                row = {
-                    "w_id": ol_w_id, "d_id": ol_w_id * DPW + ol_d_id, "o_id": ol_o_id,
-                    "i_id": tuple[4], "ol_number": tuple[3], "ol_supply_w_id": tuple[5],
-                    "ol_quantity": tuple[7], "ol_amount": tuple[8], "ol_dist_info": tuple[9],
-                }
+                row = [ol_w_id, ol_w_id * DPW + ol_d_id, ol_o_id,
+                       tuple[4], tuple[3], tuple[5]]
                 # See TPCC Spec: delivery date may be null
                 if tuple[6] is not None:
-                    row["ol_delivery_d"] = tdb_datetime(tuple[6])
-                    rows_with.append(row)
+                    row.append(tdb_datetime(tuple[6]))
+                    rows_with.append([tdb_value(v) for v in row + list(tuple[7:10])])
                 else:
-                    rows_without.append(row)
+                    rows_without.append([tdb_value(v) for v in row + list(tuple[7:10])])
             queries.append((query_with, rows_with))
             queries.append((query_without, rows_without))
 
@@ -416,14 +414,9 @@ class Typedb3Driver(AbstractDriver):
             )
             rows = [ ]
             for tuple in tuples:
-                row = {
-                    "i_id": tuple[0], "w_id": tuple[1], "s_quantity": tuple[2],
-                    "s_ytd": tuple[13], "s_order_cnt": tuple[14], "s_remote_cnt": tuple[15],
-                    "s_data": tuple[16],
-                }
-                for i in range(1, 11):
-                    row[f"s_dist_{i}"] = tuple[2 + i]
-                rows.append(row)
+                rows.append([tdb_value(v) for v in
+                             [*tuple[:3], tuple[13], tuple[14], tuple[15], tuple[16],
+                              *tuple[3:13]]])
             queries.append((query, rows))
 
         if tableName == "HISTORY":
@@ -440,10 +433,9 @@ class Typedb3Driver(AbstractDriver):
                 h_c_id = tuple[0]
                 h_d_id = tuple[3]
                 h_w_id = tuple[4]
-                rows.append({
-                    "c_id": h_w_id * DPW * CPD + h_d_id * CPD + h_c_id,
-                    "h_date": tdb_datetime(tuple[5]), "h_amount": tuple[6], "h_data": tuple[7],
-                })
+                rows.append([tdb_value(v) for v in
+                             [h_w_id * DPW * CPD + h_d_id * CPD + h_c_id,
+                              tdb_datetime(tuple[5]), tuple[6], tuple[7]]])
             queries.append((query, rows))
 
         if tableName not in DATA_COUNT:
@@ -454,13 +446,14 @@ class Typedb3Driver(AbstractDriver):
         for query, rows in queries:
             if self.debug:
                 self.start_checkpoint(query)
+            variables = given_variables(query)
             # One query call per transaction: the whole COMMIT_BATCH_SIZE batch of tuples is passed as
             # `given_rows`, so the server executes the query once per input row in a single round trip.
             while rows:
                 current_batch = rows[:COMMIT_BATCH_SIZE]
                 rows = rows[COMMIT_BATCH_SIZE:]
                 with self.driver.transaction(self.database, TransactionType.WRITE) as tx:
-                    tx.query(query, given_rows=current_batch).resolve()
+                    tx.query(query, given_rows=(variables, current_batch)).resolve()
                     tx.commit()
             if self.debug:
                 self.end_checkpoint()
