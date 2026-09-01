@@ -542,14 +542,16 @@ class PostgresDriver(AbstractDriver):
         logging.info("POSTGRES:")
         logging.info(self.log_counts())
 
-    def log_counts(self):
+    def tableCounts(self):
+        """Per-table row counts, keyed by the standard TPC-C table names."""
         tables = ["ITEM", "WAREHOUSE", "DISTRICT", "CUSTOMER", "STOCK", "ORDERS", "NEW_ORDER", "ORDER_LINE", "HISTORY"]
-        verification = "\n{\n"
+        counts = { }
         for table in tables:
             self.cursor.execute(f"SELECT COUNT(*) FROM {table}")
-            count = self.cursor.fetchone()[0]
-            verification += f"    \"{table}\": {count}\n"
-        verification += "}"
-        return verification
+            counts[table] = self.cursor.fetchone()[0]
+        return counts
+
+    def log_counts(self):
+        return "\n{\n" + "".join(f'    "{table}": {count}\n' for table, count in self.tableCounts().items()) + "}"
         
 ## CLASS

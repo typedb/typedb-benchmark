@@ -1263,23 +1263,29 @@ class Typedb3Driver(AbstractDriver):
         self.typedb_logger.info("TypeDB3:")
         self.typedb_logger.info(self.get_counts())
 
-    def get_counts(self):      
-        tables = ["ITEM", "WAREHOUSE", "DISTRICT", "CUSTOMER", "STOCK", "ORDERS", "NEW_ORDER", "ORDER_LINE", "CUSTOMER_HISTORY"]
+    def tableCounts(self):
+        """Per-table row counts, keyed by the standard TPC-C table names so they can be
+        compared across systems (CUSTOMER_HISTORY is reported as HISTORY)."""
+        type_patterns = {
+            "ITEM": "ITEM",
+            "WAREHOUSE": "WAREHOUSE",
+            "DISTRICT": "DISTRICT",
+            "CUSTOMER": "CUSTOMER",
+            "STOCK": "STOCKING",
+            "ORDERS": "ORDER",
+            "NEW_ORDER": "ORDER, has O_NEW_ORDER true",
+            "ORDER_LINE": "ORDER_LINE",
+            "HISTORY": "CUSTOMER_HISTORY",
+        }
+        counts = { }
         with self.driver.transaction(self.database, TransactionType.READ) as txn:
-            verification = "\n{\n"
-            for table in tables:
-                if table == "ORDERS":
-                    q = f"match $t isa ORDER; reduce $count = count;"
-                elif table == "NEW_ORDER":
-                    q = f"match $t isa ORDER, has O_NEW_ORDER true; reduce $count = count;"
-                elif table == "STOCK":
-                    q = f"match $t isa STOCKING; reduce $count = count;"
-                else:
-                    q = f"match $t isa {table}; reduce $count = count;"
+            for table, pattern in type_patterns.items():
+                q = f"match $t isa {pattern}; reduce $count = count;"
                 result = list(txn.query(q).resolve().as_concept_rows())
-                count = result[0].get('count').get_integer()
-                verification += f"    \"{table}\": {count}\n"
-            verification += "}"
-            return verification
+                counts[table] = result[0].get('count').get_integer()
+        return counts
+
+    def get_counts(self):
+        return "\n{\n" + "".join(f'    "{table}": {count}\n' for table, count in self.tableCounts().items()) + "}"
 
 ## CLASS

@@ -201,6 +201,30 @@ def executorFunc(driverClass, scaleParameters, args, config):
 ## DEF
 
 ## ==============================================
+## verifyTableCounts
+## ==============================================
+def verifyTableCounts(driver, verifier, phase):
+    """Cross-check per-table row counts between the benchmarked system and the postgres
+    verifier; both systems were fed identical tuples/transactions, so any difference
+    means the data under test is wrong. Exits non-zero on a mismatch so CI fails."""
+    driver_counts = getattr(driver, "tableCounts", lambda: None)()
+    verifier_counts = getattr(verifier, "tableCounts", lambda: None)()
+    if driver_counts is None or verifier_counts is None:
+        logging.warning("%s verification: table count comparison is not supported by this driver", phase)
+        return
+    mismatches = [
+        (table, driver_counts.get(table), verifier_counts.get(table))
+        for table in sorted(set(driver_counts) | set(verifier_counts))
+        if driver_counts.get(table) != verifier_counts.get(table)
+    ]
+    if mismatches:
+        for table, count, verify_count in mismatches:
+            logging.error("%s VERIFICATION MISMATCH: %s has %s rows in %s but %s in postgres",
+                          phase, table, count, driver, verify_count)
+        sys.exit(1)
+    logging.info("%s verification passed: all table counts match postgres", phase)
+
+## ==============================================
 ## main
 ## ==============================================
 if __name__ == '__main__':
@@ -249,16 +273,6 @@ if __name__ == '__main__':
     driver = driverClass(args['ddl'])
     assert driver != None, "Failed to create '%s' driver" % args['system']
 
-    verifier = None
-    if args['verify']:
-        constants.VERIFY = True
-        constants.VERIFY_COUNT = args['verify']
-        verifierClass = createDriverClass('postgres')
-        verifier = verifierClass(args['ddl'])
-        assert verifier != None, "Failed to create postgres verifier"
-        if args['clients'] > 1:
-            logging.error("WARNING: Verifying with multiple clients is not supported yet")
-
     if args['print_config']:
         config = driver.makeDefaultConfig()
         print(driver.formatConfig(config))
@@ -297,7 +311,15 @@ if __name__ == '__main__':
     if args['debug'] and driver.debug is not None:
         driver.debug = True
 
+    ## Create and configure the postgres verifier (after --print-config's early exit,
+    ## since configuring it connects to postgres and resets its database)
+    verifier = None
     if args['verify']:
+        if args['clients'] > 1:
+            logging.error("WARNING: Verifying with multiple clients is not supported yet")
+        verifierClass = createDriverClass('postgres')
+        verifier = verifierClass(args['ddl'])
+        assert verifier != None, "Failed to create postgres verifier"
         verifierDefaultConfig = verifier.makeDefaultConfig()
         verifierConfig = dict([(param, verifierDefaultConfig[param][1]) for param in verifierDefaultConfig.keys()])
         verifierConfig['reset'] = args['reset']
@@ -340,6 +362,7 @@ if __name__ == '__main__':
             logging.info("LOAD VERIFICATION")
             driver.loadVerify()
             verifier.loadVerify()
+            verifyTableCounts(driver, verifier, "LOAD")
 
     ## IF
 
@@ -365,6 +388,7 @@ if __name__ == '__main__':
             logging.info("EXECUTION VERIFICATION")
             driver.executeVerify()
             verifier.executeVerify()
+            verifyTableCounts(driver, verifier, "EXECUTION")
     ## IF
 
 ## MAIN
