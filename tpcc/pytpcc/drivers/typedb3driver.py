@@ -12,10 +12,12 @@
 from __future__ import with_statement
 
 import os
+import calendar
 import logging
 from pprint import pformat
 import time
 from typedb.driver import *
+from typedb.common.datetime import Datetime
 
 import sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -26,8 +28,22 @@ from multiprocessing import Event
 import textwrap
 
 
-COMMIT_BATCH_SIZE = 100
+COMMIT_BATCH_SIZE = 1000
 ITEMS_COMPLETE = Event()
+
+
+def tdb_datetime(dt):
+    """Convert a (naive) Python datetime into a TypeDB plain-``datetime`` Value concept for use as a
+    ``given`` row parameter.
+
+    Stores millisecond precision to match the previous ``isoformat()[:-3]`` literal behaviour, and is
+    machine-timezone independent: the wall-clock components are interpreted as UTC via ``calendar.timegm``
+    and serialized through a UTC-offset ``Datetime`` so the driver's internal ``.timestamp()`` round-trip
+    does not apply the local offset.
+    """
+    seconds = calendar.timegm(dt.timetuple())
+    millis = dt.microsecond // 1000
+    return TypeDB.Concept.new_datetime(Datetime.utcfromtimestamp(seconds, millis * 1_000_000, offset_seconds=0))
 
 class EDITION(Enum):
     Cluster = 1
@@ -189,263 +205,265 @@ class Typedb3Driver(AbstractDriver):
             self.items_complete_event.wait()  # We wait until item loading is complete
             self.typedb_logger.info("ITEM loading complete! Proceeding...")
 
-        write_query = [ ]
+        # Each table produces one (or, for the optional ORDER_LINE delivery date, two) constant
+        # query (or queries) plus a list of parameter rows. Moving the values out of the query string into
+        # `given` rows keeps the query string byte-identical across calls, so the server parses/compiles it
+        # once and amortizes that cost across the whole batch (and across all later batches).
+        queries = [ ]
 
         if tableName == "WAREHOUSE":
+            query = (
+                "given $w_id: integer, $w_name: string, $w_street_1: string, $w_street_2: string, "
+                "$w_city: string, $w_state: string, $w_zip: string, $w_tax: double, $w_ytd: double; "
+                "insert $warehouse isa WAREHOUSE, "
+                "has W_ID == $w_id, has W_NAME == $w_name, has W_STREET_1 == $w_street_1, "
+                "has W_STREET_2 == $w_street_2, has W_CITY == $w_city, has W_STATE == $w_state, "
+                "has W_ZIP == $w_zip, has W_TAX == $w_tax, has W_YTD == $w_ytd;"
+                " reduce $count = count;"
+            )
+            rows = [ ]
             for tuple in tuples:
-                w_id = tuple[0]
-                w_name = tuple[1]
-                w_street_1 = tuple[2]
-                w_street_2 = tuple[3]
-                w_city = tuple[4]
-                w_state = tuple[5]
-                w_zip = tuple[6]
-                w_tax = tuple[7]
-                w_ytd = tuple[8]
-
-                q = f"""
-insert 
-$warehouse isa WAREHOUSE, 
-has W_ID {w_id}, has W_NAME "{w_name}", has W_STREET_1 "{w_street_1}", 
-has W_STREET_2 "{w_street_2}", has W_CITY "{w_city}", has W_STATE "{w_state}", 
-has W_ZIP "{w_zip}", has W_TAX {w_tax}, has W_YTD {w_ytd};
-reduce $count = count;"""
-                write_query.append(q)
+                rows.append({
+                    "w_id": tuple[0], "w_name": tuple[1], "w_street_1": tuple[2],
+                    "w_street_2": tuple[3], "w_city": tuple[4], "w_state": tuple[5],
+                    "w_zip": tuple[6], "w_tax": tuple[7], "w_ytd": tuple[8],
+                })
+            queries.append((query, rows))
 
         if tableName == "DISTRICT":
+            query = (
+                "given $w_id: integer, $d_id: integer, $d_name: string, $d_street_1: string, "
+                "$d_street_2: string, $d_city: string, $d_state: string, $d_zip: string, "
+                "$d_tax: double, $d_ytd: double, $d_next_o_id: integer; "
+                "match $w isa WAREHOUSE, has W_ID == $w_id; "
+                "insert $district links (warehouse: $w), isa DISTRICT, "
+                "has D_ID == $d_id, has D_NAME == $d_name, "
+                "has D_STREET_1 == $d_street_1, has D_STREET_2 == $d_street_2, "
+                "has D_CITY == $d_city, has D_STATE == $d_state, has D_ZIP == $d_zip, "
+                "has D_TAX == $d_tax, has D_YTD == $d_ytd, has D_NEXT_O_ID == $d_next_o_id;"
+                " reduce $count = count;"
+            )
+            rows = [ ]
             for tuple in tuples:
                 d_id = tuple[0]
                 d_w_id = tuple[1]
-                d_name = tuple[2]
-                d_street_1 = tuple[3]
-                d_street_2 = tuple[4]
-                d_city = tuple[5]
-                d_state = tuple[6]
-                d_zip = tuple[7]
-                d_tax = tuple[8]
-                d_ytd = tuple[9]
-                d_next_o_id = tuple[10]
-
-                q = f"""
-match 
-$w isa WAREHOUSE, has W_ID {d_w_id};
-insert 
-$district links (warehouse: $w), isa DISTRICT,
-has D_ID {d_w_id * DPW + d_id}, has D_NAME "{d_name}",
-has D_STREET_1 "{d_street_1}", has D_STREET_2 "{d_street_2}",
-has D_CITY "{d_city}", has D_STATE "{d_state}", has D_ZIP "{d_zip}",
-has D_TAX {d_tax}, has D_YTD {d_ytd}, has D_NEXT_O_ID {d_next_o_id};
-reduce $count = count;"""
-                write_query.append(q)
+                rows.append({
+                    "w_id": d_w_id, "d_id": d_w_id * DPW + d_id, "d_name": tuple[2],
+                    "d_street_1": tuple[3], "d_street_2": tuple[4], "d_city": tuple[5],
+                    "d_state": tuple[6], "d_zip": tuple[7], "d_tax": tuple[8],
+                    "d_ytd": tuple[9], "d_next_o_id": tuple[10],
+                })
+            queries.append((query, rows))
 
         if tableName == "ITEM":
+            query = (
+                "given $i_id: integer, $i_im_id: integer, $i_name: string, $i_price: double, $i_data: string; "
+                "insert $item isa ITEM, has I_ID == $i_id, has I_IM_ID == $i_im_id, "
+                "has I_NAME == $i_name, has I_PRICE == $i_price, has I_DATA == $i_data;"
+                " reduce $count = count;"
+            )
+            rows = [ ]
             for tuple in tuples:
-                i_id = tuple[0]
-                i_im_id = tuple[1]
-                i_name = tuple[2]
-                i_price = tuple[3]
-                i_data = tuple[4]
-
-                q = f"""
-insert 
-$item isa ITEM,
-has I_ID {i_id}, has I_IM_ID {i_im_id}, has I_NAME "{i_name}",
-has I_PRICE {i_price}, has I_DATA "{i_data}";
-reduce $count = count;"""
-                write_query.append(q)
+                rows.append({
+                    "i_id": tuple[0], "i_im_id": tuple[1], "i_name": tuple[2],
+                    "i_price": tuple[3], "i_data": tuple[4],
+                })
+            queries.append((query, rows))
 
         if tableName == "CUSTOMER":
+            query = (
+                "given $d_id: integer, $c_id: integer, $c_first: string, $c_middle: string, "
+                "$c_last: string, $c_street_1: string, $c_street_2: string, $c_city: string, "
+                "$c_state: string, $c_zip: string, $c_phone: string, $c_since: datetime, "
+                "$c_credit: string, $c_credit_lim: double, $c_discount: double, $c_balance: double, "
+                "$c_ytd_payment: double, $c_payment_cnt: integer, $c_delivery_cnt: integer, $c_data: string; "
+                "match $d isa DISTRICT, has D_ID == $d_id; "
+                "insert $customer links (district: $d), isa CUSTOMER, "
+                "has C_ID == $c_id, has C_FIRST == $c_first, has C_MIDDLE == $c_middle, has C_LAST == $c_last, "
+                "has C_STREET_1 == $c_street_1, has C_STREET_2 == $c_street_2, "
+                "has C_CITY == $c_city, has C_STATE == $c_state, has C_ZIP == $c_zip, "
+                "has C_PHONE == $c_phone, has C_SINCE == $c_since, has C_CREDIT == $c_credit, "
+                "has C_CREDIT_LIM == $c_credit_lim, has C_DISCOUNT == $c_discount, "
+                "has C_BALANCE == $c_balance, has C_YTD_PAYMENT == $c_ytd_payment, "
+                "has C_PAYMENT_CNT == $c_payment_cnt, has C_DELIVERY_CNT == $c_delivery_cnt, "
+                "has C_DATA == $c_data;"
+                " reduce $count = count;"
+            )
+            rows = [ ]
             for tuple in tuples:
                 c_id = tuple[0]
                 c_d_id = tuple[1]
                 c_w_id = tuple[2]
-                c_first = tuple[3]
-                c_middle = tuple[4]
-                c_last = tuple[5]
-                c_street_1 = tuple[6]
-                c_street_2 = tuple[7]
-                c_city = tuple[8]
-                c_state = tuple[9]
-                c_zip = tuple[10]
-                c_phone = tuple[11]
-                c_since = tuple[12].isoformat()[:-3]
-                c_credit = tuple[13]
-                c_credit_lim = tuple[14]
-                c_discount = tuple[15]
-                c_balance = tuple[16]
-                c_ytd_payment = tuple[17]
-                c_payment_cnt = tuple[18]
-                c_delivery_cnt = tuple[19]
-                c_data = tuple[20]
-
-                q = f"""
-match
-$d isa DISTRICT, has D_ID {c_w_id * DPW + c_d_id};
-insert 
-$customer links (district: $d), isa CUSTOMER,
-has C_ID {c_w_id * DPW * CPD + c_d_id * CPD + c_id}, 
-has C_FIRST "{c_first}", has C_MIDDLE "{c_middle}", has C_LAST "{c_last}",
-has C_STREET_1 "{c_street_1}", has C_STREET_2 "{c_street_2}",
-has C_CITY "{c_city}", has C_STATE "{c_state}", has C_ZIP "{c_zip}",
-has C_PHONE "{c_phone}", has C_SINCE {c_since}, has C_CREDIT "{c_credit}",
-has C_CREDIT_LIM {c_credit_lim}, has C_DISCOUNT {c_discount},
-has C_BALANCE {c_balance}, has C_YTD_PAYMENT {c_ytd_payment},
-has C_PAYMENT_CNT {c_payment_cnt}, has C_DELIVERY_CNT {c_delivery_cnt},
-has C_DATA "{c_data}";
-reduce $count = count;"""
-                write_query.append(q)
+                rows.append({
+                    "d_id": c_w_id * DPW + c_d_id,
+                    "c_id": c_w_id * DPW * CPD + c_d_id * CPD + c_id,
+                    "c_first": tuple[3], "c_middle": tuple[4], "c_last": tuple[5],
+                    "c_street_1": tuple[6], "c_street_2": tuple[7], "c_city": tuple[8],
+                    "c_state": tuple[9], "c_zip": tuple[10], "c_phone": tuple[11],
+                    "c_since": tdb_datetime(tuple[12]), "c_credit": tuple[13],
+                    "c_credit_lim": tuple[14], "c_discount": tuple[15], "c_balance": tuple[16],
+                    "c_ytd_payment": tuple[17], "c_payment_cnt": tuple[18],
+                    "c_delivery_cnt": tuple[19], "c_data": tuple[20],
+                })
+            queries.append((query, rows))
 
         if tableName == "ORDERS":
+            query = (
+                "given $d_id: integer, $c_id: integer, $o_id: integer, $o_entry_d: datetime, "
+                "$o_carrier_id: integer, $o_ol_cnt: integer, $o_all_local: integer; "
+                "match $d isa DISTRICT, has D_ID == $d_id; $c isa CUSTOMER, has C_ID == $c_id; "
+                "insert $o links (customer: $c, district: $d), isa ORDER, "
+                "has O_ID == $o_id, has O_ENTRY_D == $o_entry_d, has O_CARRIER_ID == $o_carrier_id, "
+                "has O_OL_CNT == $o_ol_cnt, has O_ALL_LOCAL == $o_all_local, has O_NEW_ORDER false;"
+                " reduce $count = count;"
+            )
+            rows = [ ]
             for tuple in tuples:
                 o_id = tuple[0]
                 o_c_id = tuple[1]
                 o_d_id = tuple[2]
                 o_w_id = tuple[3]
-                o_entry_d = tuple[4].isoformat()[:-3]
-                o_carrier_id = tuple[5]
-                o_ol_cnt = tuple[6]
-                o_all_local = tuple[7]
-
-                q = f"""
-match 
-$d isa DISTRICT, has D_ID {o_w_id * DPW + o_d_id};
-$c isa CUSTOMER, has C_ID {o_w_id * DPW * CPD + o_d_id * CPD + o_c_id};
-insert 
-$o links (customer: $c, district: $d), isa ORDER,
-has O_ID {o_id},
-has O_ENTRY_D {o_entry_d}, has O_CARRIER_ID {o_carrier_id},
-has O_OL_CNT {o_ol_cnt}, has O_ALL_LOCAL {o_all_local}, has O_NEW_ORDER false;
-reduce $count = count;"""
-                write_query.append(q)
+                rows.append({
+                    "d_id": o_w_id * DPW + o_d_id,
+                    "c_id": o_w_id * DPW * CPD + o_d_id * CPD + o_c_id,
+                    "o_id": o_id, "o_entry_d": tdb_datetime(tuple[4]),
+                    "o_carrier_id": tuple[5], "o_ol_cnt": tuple[6], "o_all_local": tuple[7],
+                })
+            queries.append((query, rows))
 
         if tableName == "NEW_ORDER":
+            query = (
+                "given $d_id: integer, $o_id: integer; "
+                "match $d isa DISTRICT, has D_ID == $d_id; "
+                "$o links (district: $d), isa ORDER, has O_ID == $o_id, has O_NEW_ORDER $status; "
+                "delete $status of $o; "
+                "insert $o has O_NEW_ORDER true;"
+                " reduce $count = count;"
+            )
+            rows = [ ]
             for tuple in tuples:
                 no_o_id = tuple[0]
                 no_d_id = tuple[1]
                 no_w_id = tuple[2]
-
-                q = f"""
-match 
-$d isa DISTRICT, has D_ID {no_w_id * DPW + no_d_id};
-$o links (district: $d), isa ORDER, has O_ID {no_o_id}, has O_NEW_ORDER $status;
-delete $status of $o;
-insert $o has O_NEW_ORDER true;
-reduce $count = count;"""
-                write_query.append(q)
+                rows.append({"d_id": no_w_id * DPW + no_d_id, "o_id": no_o_id})
+            queries.append((query, rows))
 
         if tableName == "ORDER_LINE":
+            # OL_DELIVERY_D may be null (TPC-C spec): use a query with the attribute for rows that
+            # have a delivery date, and one without it for rows that don't.
+            match_insert = (
+                "match $w isa WAREHOUSE, has W_ID == $w_id; "
+                "$d isa DISTRICT, has D_ID == $d_id; "
+                "$order links (district: $d), isa ORDER, has O_ID == $o_id; "
+                "$item has I_ID == $i_id; "
+                "insert $order_line links (order: $order, item: $item), isa ORDER_LINE, "
+                "has OL_NUMBER == $ol_number, has OL_SUPPLY_W_ID == $ol_supply_w_id, "
+            )
+            query_with = (
+                "given $w_id: integer, $d_id: integer, $o_id: integer, $i_id: integer, "
+                "$ol_number: integer, $ol_supply_w_id: integer, $ol_delivery_d: datetime, "
+                "$ol_quantity: integer, $ol_amount: double, $ol_dist_info: string; "
+                + match_insert +
+                "has OL_DELIVERY_D == $ol_delivery_d, "
+                "has OL_QUANTITY == $ol_quantity, has OL_AMOUNT == $ol_amount, has OL_DIST_INFO == $ol_dist_info;"
+                " reduce $count = count;"
+            )
+            query_without = (
+                "given $w_id: integer, $d_id: integer, $o_id: integer, $i_id: integer, "
+                "$ol_number: integer, $ol_supply_w_id: integer, "
+                "$ol_quantity: integer, $ol_amount: double, $ol_dist_info: string; "
+                + match_insert +
+                "has OL_QUANTITY == $ol_quantity, has OL_AMOUNT == $ol_amount, has OL_DIST_INFO == $ol_dist_info;"
+                " reduce $count = count;"
+            )
+            rows_with = [ ]
+            rows_without = [ ]
             for tuple in tuples:
                 ol_o_id = tuple[0]
                 ol_d_id = tuple[1]
                 ol_w_id = tuple[2]
-                ol_number = tuple[3]
-                ol_i_id = tuple[4]
-                ol_supply_w_id = tuple[5]
+                row = {
+                    "w_id": ol_w_id, "d_id": ol_w_id * DPW + ol_d_id, "o_id": ol_o_id,
+                    "i_id": tuple[4], "ol_number": tuple[3], "ol_supply_w_id": tuple[5],
+                    "ol_quantity": tuple[7], "ol_amount": tuple[8], "ol_dist_info": tuple[9],
+                }
                 # See TPCC Spec: delivery date may be null
                 if tuple[6] is not None:
-                    has_ol_delivery_d = f"has OL_DELIVERY_D {tuple[6].isoformat()[:-3]},"
+                    row["ol_delivery_d"] = tdb_datetime(tuple[6])
+                    rows_with.append(row)
                 else:
-                    has_ol_delivery_d = ""
-                ol_quantity = tuple[7]
-                ol_amount = tuple[8]
-                ol_dist_info = tuple[9]
-
-                q = f"""
-match 
-$w isa WAREHOUSE, has W_ID {ol_w_id};
-$d isa DISTRICT, has D_ID {ol_w_id * DPW + ol_d_id};
-$order links (district: $d), isa ORDER, has O_ID {ol_o_id};
-$item has I_ID {ol_i_id};
-insert 
-$order_line links (order: $order, item: $item), isa ORDER_LINE,
-has OL_NUMBER {ol_number}, has OL_SUPPLY_W_ID {ol_supply_w_id},
-""" + has_ol_delivery_d + f"""
-has OL_QUANTITY {ol_quantity}, has OL_AMOUNT {ol_amount},
-has OL_DIST_INFO "{ol_dist_info}";
-reduce $count = count;"""
-                write_query.append(q)
+                    rows_without.append(row)
+            queries.append((query_with, rows_with))
+            queries.append((query_without, rows_without))
 
         if tableName == "STOCK":
+            # Combine the STOCKING insert and its 10 S_DIST_* attributes into a single insert.
+            query = (
+                "given $i_id: integer, $w_id: integer, $s_quantity: integer, $s_ytd: integer, "
+                "$s_order_cnt: integer, $s_remote_cnt: integer, $s_data: string, "
+                "$s_dist_1: string, $s_dist_2: string, $s_dist_3: string, $s_dist_4: string, "
+                "$s_dist_5: string, $s_dist_6: string, $s_dist_7: string, $s_dist_8: string, "
+                "$s_dist_9: string, $s_dist_10: string; "
+                "match $i isa ITEM, has I_ID == $i_id; $w isa WAREHOUSE, has W_ID == $w_id; "
+                "insert $stock links (item: $i, warehouse: $w), isa STOCKING, "
+                "has S_QUANTITY == $s_quantity, has S_YTD == $s_ytd, has S_ORDER_CNT == $s_order_cnt, "
+                "has S_REMOTE_CNT == $s_remote_cnt, has S_DATA == $s_data, "
+                "has S_DIST_1 == $s_dist_1, has S_DIST_2 == $s_dist_2, has S_DIST_3 == $s_dist_3, "
+                "has S_DIST_4 == $s_dist_4, has S_DIST_5 == $s_dist_5, has S_DIST_6 == $s_dist_6, "
+                "has S_DIST_7 == $s_dist_7, has S_DIST_8 == $s_dist_8, has S_DIST_9 == $s_dist_9, "
+                "has S_DIST_10 == $s_dist_10;"
+                " reduce $count = count;"
+            )
+            rows = [ ]
             for tuple in tuples:
-                s_i_id = tuple[0]
-                s_w_id = tuple[1]
-                s_quantity = tuple[2]
-                s_ytd = tuple[13]
-                s_order_cnt = tuple[14]
-                s_remote_cnt = tuple[15]
-                s_data = tuple[16]
-
-                q_stock = f"""
-match 
-$i isa ITEM, has I_ID {s_i_id};   
-$w isa WAREHOUSE, has W_ID {s_w_id};
-insert 
-$stock links (item: $i, warehouse: $w), isa STOCKING, 
-has S_QUANTITY {s_quantity}, has S_YTD {s_ytd}, has S_ORDER_CNT {s_order_cnt},
-has S_REMOTE_CNT {s_remote_cnt}, has S_DATA "{s_data}";
-reduce $count = count;"""
-                write_query.append(q_stock)
-
+                row = {
+                    "i_id": tuple[0], "w_id": tuple[1], "s_quantity": tuple[2],
+                    "s_ytd": tuple[13], "s_order_cnt": tuple[14], "s_remote_cnt": tuple[15],
+                    "s_data": tuple[16],
+                }
                 for i in range(1, 11):
-
-                    q_stock_info = f"""
-match 
-$i isa ITEM, has I_ID {s_i_id};
-$w isa WAREHOUSE, has W_ID {s_w_id};   
-$stock links (item: $i, warehouse: $w), isa STOCKING;
-insert
-$stock has S_DIST_{i} "{tuple[2+i]}";
-reduce $count = count;"""
-                    write_query.append(q_stock_info)
-
+                    row[f"s_dist_{i}"] = tuple[2 + i]
+                rows.append(row)
+            queries.append((query, rows))
 
         if tableName == "HISTORY":
+            # TODO: consider keeping track of warehouse w_id as well
+            query = (
+                "given $c_id: integer, $h_date: datetime, $h_amount: double, $h_data: string; "
+                "match $c isa CUSTOMER, has C_ID == $c_id; "
+                "insert $history links (customer: $c), isa CUSTOMER_HISTORY, "
+                "has H_DATE == $h_date, has H_AMOUNT == $h_amount, has H_DATA == $h_data;"
+                " reduce $count = count;"
+            )
+            rows = [ ]
             for tuple in tuples:
                 h_c_id = tuple[0]
                 h_d_id = tuple[3]
                 h_w_id = tuple[4]
-                h_date = tuple[5].isoformat()[:-3]
-                h_amount = tuple[6]
-                h_data = tuple[7]
-
-                # TODO: consider keeping track of warehouse w_id as well
-                q = f"""
-match 
-$c isa CUSTOMER, has C_ID {h_w_id * DPW * CPD + h_d_id * CPD + h_c_id};
-insert 
-$history links (customer: $c), isa CUSTOMER_HISTORY,
-has H_DATE {h_date}, has H_AMOUNT {h_amount}, has H_DATA "{h_data}";
-reduce $count = count;"""
-                write_query.append(q)
+                rows.append({
+                    "c_id": h_w_id * DPW * CPD + h_d_id * CPD + h_c_id,
+                    "h_date": tdb_datetime(tuple[5]), "h_amount": tuple[6], "h_data": tuple[7],
+                })
+            queries.append((query, rows))
 
         if tableName not in DATA_COUNT:
             DATA_COUNT[tableName] = 0;
         DATA_COUNT[tableName] += len(tuples);
 
         start_time = time.time()
-        if self.debug:
-            for q in write_query:
-                with self.driver.transaction(self.database, TransactionType.WRITE) as tx_debug:
-                    self.start_checkpoint(q)
-                    result = list(tx_debug.query(q).resolve().as_concept_rows())[0]
-                    self.typedb_logger.debug(f"INSERT COUNT: {result.get('count').as_value().get_integer()}")
-                    self.end_checkpoint()
-                    tx_debug.commit()
-        else:
-            # batch into transactions of size COMMIT_BATCH_SIZE
-            while write_query:
+        for query, rows in queries:
+            if self.debug:
+                self.start_checkpoint(query)
+            # One query call per transaction: the whole COMMIT_BATCH_SIZE batch of tuples is passed as
+            # `given_rows`, so the server executes the query once per input row in a single round trip.
+            while rows:
+                current_batch = rows[:COMMIT_BATCH_SIZE]
+                rows = rows[COMMIT_BATCH_SIZE:]
                 with self.driver.transaction(self.database, TransactionType.WRITE) as tx:
-                    # Take next 100 queries
-                    current_batch = write_query[:COMMIT_BATCH_SIZE]
-                    write_query = write_query[COMMIT_BATCH_SIZE:]
-
-                    # Submit queries and resolve promises
-                    promises = [ ]
-                    for q in current_batch:
-                        promises.append(tx.query(q))
-                    for p in promises:
-                        p.resolve()
+                    tx.query(query, given_rows=current_batch).resolve()
                     tx.commit()
+            if self.debug:
+                self.end_checkpoint()
         if tableName == "ITEM":
             self.items_loaded += len(tuples)
             self.typedb_logger.info(f"client ({self.worker_id}) done with {(self.items_loaded)} instances of ITEM (batch TPQ: {(time.time() - start_time) / len(tuples)})")
@@ -497,7 +515,7 @@ reduce $count = count;"""
         w_id = params["w_id"]
         d_id = params["d_id"]
         c_id = params["c_id"]
-        o_entry_d = params["o_entry_d"].isoformat()[:-3]
+        o_entry_d = params["o_entry_d"]
         i_ids = params["i_ids"]
         i_w_ids = params["i_w_ids"]
         i_qtys = params["i_qtys"]
@@ -516,15 +534,15 @@ reduce $count = count;"""
 
         with self.driver.transaction(self.database, TransactionType.WRITE) as tx:
             for i in range(len(i_ids)):
-                q = f"""
-match 
-$i isa ITEM, has I_ID {i_ids[i]}, 
-has I_NAME $i_name, has I_PRICE $i_price, 
-has I_DATA $i_data; 
-select $i_name, $i_price, $i_data;"""
+                q = (
+                    "given $i_id: integer; "
+                    "match $i isa ITEM, has I_ID == $i_id, "
+                    "has I_NAME $i_name, has I_PRICE $i_price, has I_DATA $i_data; "
+                    "select $i_name, $i_price, $i_data;"
+                )
                 self.start_checkpoint(q)
                 try:
-                    item = list(tx.query(q).resolve().as_concept_rows())
+                    item = list(tx.query(q, given_rows=[{"i_id": i_ids[i]}]).resolve().as_concept_rows())
                 except Exception as e:
                     self.log_failure(e)
                     raise e
@@ -540,26 +558,31 @@ select $i_name, $i_price, $i_data;"""
             all_local_int = 1 if all_local else 0
             ol_cnt = len(i_ids)
             o_carrier_id = constants.NULL_CARRIER_ID
-            q = f"""
-match 
-$w isa WAREHOUSE, has W_ID {w_id}, has W_TAX $w_tax;
-$d isa DISTRICT, has D_ID {w_id * DPW + d_id}, has D_TAX $d_tax, has D_NEXT_O_ID $d_next_o_id;
-$c isa CUSTOMER, has C_ID {w_id * DPW * CPD + d_id * CPD + c_id}, 
-has C_DISCOUNT $c_discount, has C_LAST $c_last, has C_CREDIT $c_credit;
-let $d_next_o_id_old = $d_next_o_id;
-let $d_next_o_id_new = $d_next_o_id_old + 1;
-delete 
-$d_next_o_id of $d;
-insert 
-$d has D_NEXT_O_ID == $d_next_o_id_new;
-$order links (district: $d, customer: $c), isa ORDER,
-has O_ID == $d_next_o_id_old,
-has O_ENTRY_D {o_entry_d}, has O_CARRIER_ID {o_carrier_id},
-has O_OL_CNT {ol_cnt}, has O_ALL_LOCAL {all_local_int}, has O_NEW_ORDER true;
-select $w_tax, $d_tax, $d_next_o_id_old, $c_discount, $c_last, $c_credit;"""
+            q = (
+                "given $w_id: integer, $d_id: integer, $c_id: integer, $o_entry_d: datetime, "
+                "$o_carrier_id: integer, $o_ol_cnt: integer, $o_all_local: integer; "
+                "match $w isa WAREHOUSE, has W_ID == $w_id, has W_TAX $w_tax; "
+                "$d isa DISTRICT, has D_ID == $d_id, has D_TAX $d_tax, has D_NEXT_O_ID $d_next_o_id; "
+                "$c isa CUSTOMER, has C_ID == $c_id, "
+                "has C_DISCOUNT $c_discount, has C_LAST $c_last, has C_CREDIT $c_credit; "
+                "let $d_next_o_id_old = $d_next_o_id; "
+                "let $d_next_o_id_new = $d_next_o_id_old + 1; "
+                "delete $d_next_o_id of $d; "
+                "insert $d has D_NEXT_O_ID == $d_next_o_id_new; "
+                "$order links (district: $d, customer: $c), isa ORDER, "
+                "has O_ID == $d_next_o_id_old, "
+                "has O_ENTRY_D == $o_entry_d, has O_CARRIER_ID == $o_carrier_id, "
+                "has O_OL_CNT == $o_ol_cnt, has O_ALL_LOCAL == $o_all_local, has O_NEW_ORDER true; "
+                "select $w_tax, $d_tax, $d_next_o_id_old, $c_discount, $c_last, $c_credit;"
+            )
             self.start_checkpoint(q)
             try:
-                general_info = list(tx.query(q).resolve().as_concept_rows())
+                general_info = list(tx.query(q, given_rows=[{
+                    "w_id": w_id, "d_id": w_id * DPW + d_id,
+                    "c_id": w_id * DPW * CPD + d_id * CPD + c_id,
+                    "o_entry_d": tdb_datetime(o_entry_d), "o_carrier_id": o_carrier_id,
+                    "o_ol_cnt": ol_cnt, "o_all_local": all_local_int,
+                }]).resolve().as_concept_rows())
             except Exception as e:
                 self.log_failure(e)
                 raise e
@@ -587,18 +610,19 @@ select $w_tax, $d_tax, $d_next_o_id_old, $c_discount, $c_last, $c_credit;"""
                 i_price = items[i]['price']
 
                 # Query: get stock info of item i
-                q = f"""
-match
-$i isa ITEM, has I_ID {ol_i_id}; 
-$w isa WAREHOUSE, has W_ID {ol_supply_w_id};
-$s links (item: $i, warehouse: $w), isa STOCKING, 
-has S_QUANTITY $s_quantity, has S_DATA $s_data, has S_YTD $s_ytd, 
-has S_ORDER_CNT $s_order_cnt, has S_REMOTE_CNT $s_remote_cnt, 
-has S_DIST_{d_id} $s_dist_xx;
-select $s_quantity, $s_data, $s_ytd, $s_order_cnt, $s_remote_cnt, $s_dist_xx;"""
+                q = (
+                    "given $i_id: integer, $w_id: integer; "
+                    "match $i isa ITEM, has I_ID == $i_id; "
+                    "$w isa WAREHOUSE, has W_ID == $w_id; "
+                    "$s links (item: $i, warehouse: $w), isa STOCKING, "
+                    "has S_QUANTITY $s_quantity, has S_DATA $s_data, has S_YTD $s_ytd, "
+                    "has S_ORDER_CNT $s_order_cnt, has S_REMOTE_CNT $s_remote_cnt, "
+                    f"has S_DIST_{d_id} $s_dist_xx; "
+                    "select $s_quantity, $s_data, $s_ytd, $s_order_cnt, $s_remote_cnt, $s_dist_xx;"
+                )
                 self.start_checkpoint(q)
                 try:
-                    stock_info = list(tx.query(q).resolve().as_concept_rows())
+                    stock_info = list(tx.query(q, given_rows=[{"i_id": ol_i_id, "w_id": ol_supply_w_id}]).resolve().as_concept_rows())
                 except Exception as e:
                     self.log_failure(e)
                     raise e
@@ -632,30 +656,35 @@ select $s_quantity, $s_data, $s_ytd, $s_order_cnt, $s_remote_cnt, $s_dist_xx;"""
 
                 ol_amount = ol_quantity * i_price
                 # Query: update stock info of item i
-                q = f"""
-match
-$i isa ITEM, has I_ID {ol_i_id};
-$w isa WAREHOUSE, has W_ID {ol_supply_w_id};
-$d isa DISTRICT, has D_ID {w_id * DPW + d_id};
-$o links (district: $d), isa ORDER, has O_ID {d_next_o_id};
-$s links (item: $i, warehouse: $w), isa STOCKING, 
-has S_QUANTITY $s_quantity, has S_YTD $s_ytd, 
-has S_ORDER_CNT $s_order_cnt, has S_REMOTE_CNT $s_remote_cnt;
-delete 
-$s_quantity of $s;
-$s_ytd of $s;
-$s_order_cnt of $s;
-$s_remote_cnt of $s;
-insert 
-$s has S_QUANTITY {s_quantity}, has S_YTD {s_ytd}, 
-has S_ORDER_CNT {s_order_cnt}, has S_REMOTE_CNT {s_remote_cnt};
-(item: $i, order: $o) isa ORDER_LINE, 
-has OL_NUMBER {ol_number}, has OL_SUPPLY_W_ID {ol_supply_w_id}, 
-has OL_QUANTITY {ol_quantity}, has OL_AMOUNT {ol_amount}, has OL_DIST_INFO "{s_dist_xx}";
-reduce $count = count;"""
+                q = (
+                    "given $i_id: integer, $w_id: integer, $d_id: integer, $o_id: integer, "
+                    "$s_quantity: integer, $s_ytd: integer, $s_order_cnt: integer, $s_remote_cnt: integer, "
+                    "$ol_number: integer, $ol_supply_w_id: integer, $ol_quantity: integer, "
+                    "$ol_amount: double, $ol_dist_info: string; "
+                    "match $i isa ITEM, has I_ID == $i_id; "
+                    "$w isa WAREHOUSE, has W_ID == $w_id; "
+                    "$d isa DISTRICT, has D_ID == $d_id; "
+                    "$o links (district: $d), isa ORDER, has O_ID == $o_id; "
+                    "$s links (item: $i, warehouse: $w), isa STOCKING, "
+                    "has S_QUANTITY $s_quantity_old, has S_YTD $s_ytd_old, "
+                    "has S_ORDER_CNT $s_order_cnt_old, has S_REMOTE_CNT $s_remote_cnt_old; "
+                    "delete $s_quantity_old of $s; $s_ytd_old of $s; "
+                    "$s_order_cnt_old of $s; $s_remote_cnt_old of $s; "
+                    "insert $s has S_QUANTITY == $s_quantity, has S_YTD == $s_ytd, "
+                    "has S_ORDER_CNT == $s_order_cnt, has S_REMOTE_CNT == $s_remote_cnt; "
+                    "(item: $i, order: $o) isa ORDER_LINE, "
+                    "has OL_NUMBER == $ol_number, has OL_SUPPLY_W_ID == $ol_supply_w_id, "
+                    "has OL_QUANTITY == $ol_quantity, has OL_AMOUNT == $ol_amount, has OL_DIST_INFO == $ol_dist_info; "
+                    " reduce $count = count;"
+                )
                 self.start_checkpoint(q)
                 try:
-                    count = list(tx.query(q).resolve().as_concept_rows())[0].get('count').as_value().get_integer()
+                    count = list(tx.query(q, given_rows=[{
+                        "i_id": ol_i_id, "w_id": ol_supply_w_id, "d_id": w_id * DPW + d_id, "o_id": d_next_o_id,
+                        "s_quantity": s_quantity, "s_ytd": s_ytd, "s_order_cnt": s_order_cnt,
+                        "s_remote_cnt": s_remote_cnt, "ol_number": ol_number, "ol_supply_w_id": ol_supply_w_id,
+                        "ol_quantity": ol_quantity, "ol_amount": ol_amount, "ol_dist_info": s_dist_xx,
+                    }]).resolve().as_concept_rows())[0].get('count').as_value().get_integer()
                 except Exception as e:
                     self.log_failure(e)
                     raise e
@@ -692,22 +721,22 @@ reduce $count = count;"""
 
         w_id = params["w_id"]
         o_carrier_id = params["o_carrier_id"]
-        ol_delivery_d = params["ol_delivery_d"].isoformat()[:-3]
+        ol_delivery_d = params["ol_delivery_d"]
 
         with self.driver.transaction(self.database, TransactionType.WRITE) as tx:
             result = [ ]
             for d_id in range(1, constants.DISTRICTS_PER_WAREHOUSE+1):
-                q = f"""
-match
-$d isa DISTRICT, has D_ID {w_id * DPW + d_id};
-$o links (customer: $c, district: $d), isa ORDER, has O_ID $o_id, has O_NEW_ORDER true;
-$c isa CUSTOMER, has C_ID $c_id;
-select $o_id, $c_id;
-limit 1;
-"""
+                q = (
+                    "given $d_id: integer; "
+                    "match $d isa DISTRICT, has D_ID == $d_id; "
+                    "$o links (customer: $c, district: $d), isa ORDER, has O_ID $o_id, has O_NEW_ORDER true; "
+                    "$c isa CUSTOMER, has C_ID $c_id; "
+                    "select $o_id, $c_id; "
+                    "limit 1;"
+                )
                 self.start_checkpoint(q)
                 try:
-                    new_order_info = list(tx.query(q).resolve().as_concept_rows())
+                    new_order_info = list(tx.query(q, given_rows=[{"d_id": w_id * DPW + d_id}]).resolve().as_concept_rows())
                 except Exception as e:
                     self.log_failure(e)
                     raise e
@@ -719,17 +748,17 @@ limit 1;
                 no_o_id = new_order_info[0].get('o_id').as_attribute().get_value()
                 c_id = new_order_info[0].get('c_id').as_attribute().get_value() % CPD
 
-                q = f"""
-match
-$d isa DISTRICT, has D_ID {w_id * DPW + d_id};
-$o links (district: $d), isa ORDER, has O_ID {no_o_id};
-$ol links (order: $o, item: $i),  isa ORDER_LINE, has OL_AMOUNT $ol_amount;
-select $ol_amount;
-reduce $sum = sum($ol_amount);
-"""
+                q = (
+                    "given $d_id: integer, $o_id: integer; "
+                    "match $d isa DISTRICT, has D_ID == $d_id; "
+                    "$o links (district: $d), isa ORDER, has O_ID == $o_id; "
+                    "$ol links (order: $o, item: $i), isa ORDER_LINE, has OL_AMOUNT $ol_amount; "
+                    "select $ol_amount; "
+                    "reduce $sum = sum($ol_amount);"
+                )
                 self.start_checkpoint(q)
                 try:
-                    response = list(tx.query(q).resolve().as_concept_rows())[0]
+                    response = list(tx.query(q, given_rows=[{"d_id": w_id * DPW + d_id, "o_id": no_o_id}]).resolve().as_concept_rows())[0]
                 except Exception as e:
                     self.log_failure(e)
                     raise e
@@ -740,27 +769,27 @@ reduce $sum = sum($ol_amount);
                 assert ol_total > 0.0
 
                 
-                q = f"""
-match
-$c isa CUSTOMER, has C_ID {w_id * DPW * CPD + d_id * CPD + c_id}, has C_BALANCE $c_balance;
-let $c_balance_new = $c_balance + {ol_total};
-$o links (customer: $c), isa ORDER, has O_ID {no_o_id}, has O_NEW_ORDER $o_new_order, has O_CARRIER_ID $o_carrier_id;
-delete 
-$o_new_order of $o;
-$o_carrier_id of $o;
-$c_balance of $c;
-insert 
-$o has O_NEW_ORDER false, has O_CARRIER_ID {o_carrier_id};
-$c has C_BALANCE == $c_balance_new;
-select $o;
-match 
-$ol links  (order: $o), isa ORDER_LINE;
-insert
-$ol has OL_DELIVERY_D {ol_delivery_d};
-"""
+                q = (
+                    "given $c_id: integer, $ol_total: double, $o_id: integer, "
+                    "$carrier_id: integer, $ol_delivery_d: datetime; "
+                    "match $c isa CUSTOMER, has C_ID == $c_id, has C_BALANCE $c_balance; "
+                    "let $c_balance_new = $c_balance + $ol_total; "
+                    "$o links (customer: $c), isa ORDER, has O_ID == $o_id, "
+                    "has O_NEW_ORDER $o_new_order, has O_CARRIER_ID $o_carrier_id; "
+                    "delete $o_new_order of $o; $o_carrier_id of $o; $c_balance of $c; "
+                    "insert $o has O_NEW_ORDER false, has O_CARRIER_ID == $carrier_id; "
+                    "$c has C_BALANCE == $c_balance_new; "
+                    "select $o, $ol_delivery_d; "
+                    "match $ol links (order: $o), isa ORDER_LINE; "
+                    "insert $ol has OL_DELIVERY_D == $ol_delivery_d;"
+                )
                 self.start_checkpoint(q)
                 try:
-                    tx.query(q).resolve()
+                    tx.query(q, given_rows=[{
+                        "c_id": w_id * DPW * CPD + d_id * CPD + c_id, "ol_total": ol_total,
+                        "o_id": no_o_id, "carrier_id": o_carrier_id,
+                        "ol_delivery_d": tdb_datetime(ol_delivery_d),
+                    }]).resolve()
                 except Exception as e:
                     self.log_failure(e)
                     raise e
@@ -812,32 +841,32 @@ $ol has OL_DELIVERY_D {ol_delivery_d};
         with self.driver.transaction(self.database, TransactionType.WRITE) as tx:
             result = [ ]
             if c_id != None:
-                q = f"""
-match
-$c isa CUSTOMER, has C_ID {w_id * DPW * CPD + d_id * CPD + c_id},
-has C_FIRST $c_first, has C_MIDDLE $c_middle, has C_LAST $c_last,
-has C_BALANCE $c_balance;
-select $c_first, $c_middle, $c_last, $c_balance;
-"""
-                customer = list(tx.query(q).resolve().as_concept_rows())
+                q = (
+                    "given $c_id: integer; "
+                    "match $c isa CUSTOMER, has C_ID == $c_id, "
+                    "has C_FIRST $c_first, has C_MIDDLE $c_middle, has C_LAST $c_last, "
+                    "has C_BALANCE $c_balance; "
+                    "select $c_first, $c_middle, $c_last, $c_balance;"
+                )
+                customer = list(tx.query(q, given_rows=[{"c_id": w_id * DPW * CPD + d_id * CPD + c_id}]).resolve().as_concept_rows())
                 assert len(customer) == 1, f"doOrderStatus: no customer found for w_id {w_id}, d_id {d_id}, c_id {c_id}"
                 customer = customer[0]
             else:
                 # TODO: check whether it's faster to constrain customer through C_ID range
-                q = f"""
-match
-$d isa DISTRICT, has D_ID {w_id * DPW + d_id};
-$c links (district: $d), isa CUSTOMER, has C_ID $c_id,
-has C_FIRST $c_first, has C_MIDDLE $c_middle, has C_LAST $c_last,
-has C_BALANCE $c_balance;
-$c_last == "{c_last}";
-select $c_id, $c_first, $c_middle, $c_last,$c_balance;
-sort $c_first asc;
-"""
+                q = (
+                    "given $d_id: integer, $last: string; "
+                    "match $d isa DISTRICT, has D_ID == $d_id; "
+                    "$c links (district: $d), isa CUSTOMER, has C_ID $c_id, "
+                    "has C_FIRST $c_first, has C_MIDDLE $c_middle, has C_LAST $c_last, "
+                    "has C_BALANCE $c_balance; "
+                    "$c_last == $last; "
+                    "select $c_id, $c_first, $c_middle, $c_last, $c_balance; "
+                    "sort $c_first asc;"
+                )
                 self.start_checkpoint(q)
                 # Get the midpoint customer's id
                 try:
-                    all_customers = list(tx.query(q).resolve().as_concept_rows())
+                    all_customers = list(tx.query(q, given_rows=[{"d_id": w_id * DPW + d_id, "last": c_last}]).resolve().as_concept_rows())
                 except Exception as e:
                     self.log_failure(e)
                     raise e
@@ -858,16 +887,17 @@ sort $c_first asc;
             ]
 
 
-            q = f"""
-match
-$c isa CUSTOMER, has C_ID {w_id * DPW * CPD + d_id * CPD + c_id};
-$o links (customer: $c), isa ORDER, has O_ID $o_id;
-select $o_id;
-sort $o_id desc;
-limit 1;"""
+            q = (
+                "given $c_id: integer; "
+                "match $c isa CUSTOMER, has C_ID == $c_id; "
+                "$o links (customer: $c), isa ORDER, has O_ID $o_id; "
+                "select $o_id; "
+                "sort $o_id desc; "
+                "limit 1;"
+            )
             self.start_checkpoint(q)
             try:
-                order = list(tx.query(q).resolve().as_concept_rows())
+                order = list(tx.query(q, given_rows=[{"c_id": w_id * DPW * CPD + d_id * CPD + c_id}]).resolve().as_concept_rows())
             except Exception as e:
                 self.log_failure(e)
                 raise e
@@ -877,18 +907,19 @@ limit 1;"""
             if len(order) > 0:
                 o_id = order[0].get('o_id').as_attribute().get_value()
                 # OL_I_ID, OL_SUPPLY_W_ID, OL_QUANTITY, OL_AMOUNT, OL_DIST_INFO 
-                q = f"""
-match
-$c isa CUSTOMER, has C_ID {w_id * DPW * CPD + d_id * CPD + c_id};
-$o links (customer: $c), isa ORDER, has O_ID {o_id};
-$i isa ITEM, has I_ID $i_id;
-$ol links (order: $o, item: $i), isa ORDER_LINE, 
-has OL_SUPPLY_W_ID $ol_supply_w_id, has OL_QUANTITY $ol_quantity, 
-has OL_AMOUNT $ol_amount, has OL_DIST_INFO $ol_dist_info;
-select $i_id, $ol_supply_w_id, $ol_quantity, $ol_amount, $ol_dist_info;"""
+                q = (
+                    "given $c_id: integer, $o_id: integer; "
+                    "match $c isa CUSTOMER, has C_ID == $c_id; "
+                    "$o links (customer: $c), isa ORDER, has O_ID == $o_id; "
+                    "$i isa ITEM, has I_ID $i_id; "
+                    "$ol links (order: $o, item: $i), isa ORDER_LINE, "
+                    "has OL_SUPPLY_W_ID $ol_supply_w_id, has OL_QUANTITY $ol_quantity, "
+                    "has OL_AMOUNT $ol_amount, has OL_DIST_INFO $ol_dist_info; "
+                    "select $i_id, $ol_supply_w_id, $ol_quantity, $ol_amount, $ol_dist_info;"
+                )
                 self.start_checkpoint(q)
                 try:
-                    orderLines = list(tx.query(q).resolve().as_concept_rows())
+                    orderLines = list(tx.query(q, given_rows=[{"c_id": w_id * DPW * CPD + d_id * CPD + c_id, "o_id": o_id}]).resolve().as_concept_rows())
                 except Exception as e:
                     self.log_failure(e)
                     raise e
@@ -922,27 +953,27 @@ select $i_id, $ol_supply_w_id, $ol_quantity, $ol_amount, $ol_dist_info;"""
         c_d_id = params["c_d_id"]
         c_id = params["c_id"]
         c_last = params["c_last"]
-        h_date = params["h_date"].isoformat()[:-3]
+        h_date = params["h_date"]
 
         with self.driver.transaction(self.database, TransactionType.WRITE) as tx:
             if c_id != None:
-                q = f"""
-match
-$c isa CUSTOMER, has C_ID $c_id,
-has C_FIRST $c_first, has C_MIDDLE $c_middle, has C_LAST $c_last,
-has C_STREET_1 $c_street_1, has C_STREET_2 $c_street_2, has C_CITY $c_city,
-has C_STATE $c_state, has C_ZIP $c_zip, has C_PHONE $c_phone,
-has C_SINCE $c_since, has C_CREDIT $c_credit, has C_CREDIT_LIM $c_credit_lim,
-has C_DISCOUNT $c_discount, has C_BALANCE $c_balance, has C_YTD_PAYMENT $c_ytd_payment, 
-has C_PAYMENT_CNT $c_payment_cnt, has C_DATA $c_data;
-$c_id == {w_id * DPW * CPD + d_id * CPD + c_id};
-select $c_id, $c_first, $c_middle, $c_last, $c_street_1, $c_street_2, $c_city,
-$c_state, $c_zip, $c_phone, $c_since, $c_credit, $c_credit_lim, $c_discount,
-$c_balance, $c_ytd_payment, $c_payment_cnt, $c_data;
-"""
+                q = (
+                    "given $cid_val: integer; "
+                    "match $c isa CUSTOMER, has C_ID $c_id, "
+                    "has C_FIRST $c_first, has C_MIDDLE $c_middle, has C_LAST $c_last, "
+                    "has C_STREET_1 $c_street_1, has C_STREET_2 $c_street_2, has C_CITY $c_city, "
+                    "has C_STATE $c_state, has C_ZIP $c_zip, has C_PHONE $c_phone, "
+                    "has C_SINCE $c_since, has C_CREDIT $c_credit, has C_CREDIT_LIM $c_credit_lim, "
+                    "has C_DISCOUNT $c_discount, has C_BALANCE $c_balance, has C_YTD_PAYMENT $c_ytd_payment, "
+                    "has C_PAYMENT_CNT $c_payment_cnt, has C_DATA $c_data; "
+                    "$c_id == $cid_val; "
+                    "select $c_id, $c_first, $c_middle, $c_last, $c_street_1, $c_street_2, $c_city, "
+                    "$c_state, $c_zip, $c_phone, $c_since, $c_credit, $c_credit_lim, $c_discount, "
+                    "$c_balance, $c_ytd_payment, $c_payment_cnt, $c_data;"
+                )
                 self.start_checkpoint(q)
                 try:
-                    customer = list(tx.query(q).resolve().as_concept_rows())
+                    customer = list(tx.query(q, given_rows=[{"cid_val": w_id * DPW * CPD + d_id * CPD + c_id}]).resolve().as_concept_rows())
                 except Exception as e:
                     self.log_failure(e)
                     raise e
@@ -951,26 +982,26 @@ $c_balance, $c_ytd_payment, $c_payment_cnt, $c_data;
                 customer = customer[0]
             else:
                 # TODO: check whether it's faster to constrain customer through C_ID range
-                q = f"""
-match
-$d isa DISTRICT, has D_ID {w_id * DPW + d_id};
-$c links (district: $d), isa CUSTOMER, has C_ID $c_id,
-has C_FIRST $c_first, has C_MIDDLE $c_middle, has C_LAST $c_last,
-has C_STREET_1 $c_street_1, has C_STREET_2 $c_street_2, has C_CITY $c_city,
-has C_STATE $c_state, has C_ZIP $c_zip, has C_PHONE $c_phone,
-has C_SINCE $c_since, has C_CREDIT $c_credit, has C_CREDIT_LIM $c_credit_lim,
-has C_DISCOUNT $c_discount, has C_BALANCE $c_balance, has C_YTD_PAYMENT $c_ytd_payment, 
-has C_PAYMENT_CNT $c_payment_cnt, has C_DATA $c_data;
-$c_last == "{c_last}";
-select $c_id, $c_first, $c_middle, $c_last, $c_street_1, $c_street_2, $c_city,
-$c_state, $c_zip, $c_phone, $c_since, $c_credit, $c_credit_lim, $c_discount,
-$c_balance, $c_ytd_payment, $c_payment_cnt, $c_data;
-sort $c_first asc;
-"""
+                q = (
+                    "given $d_id: integer, $last: string; "
+                    "match $d isa DISTRICT, has D_ID == $d_id; "
+                    "$c links (district: $d), isa CUSTOMER, has C_ID $c_id, "
+                    "has C_FIRST $c_first, has C_MIDDLE $c_middle, has C_LAST $c_last, "
+                    "has C_STREET_1 $c_street_1, has C_STREET_2 $c_street_2, has C_CITY $c_city, "
+                    "has C_STATE $c_state, has C_ZIP $c_zip, has C_PHONE $c_phone, "
+                    "has C_SINCE $c_since, has C_CREDIT $c_credit, has C_CREDIT_LIM $c_credit_lim, "
+                    "has C_DISCOUNT $c_discount, has C_BALANCE $c_balance, has C_YTD_PAYMENT $c_ytd_payment, "
+                    "has C_PAYMENT_CNT $c_payment_cnt, has C_DATA $c_data; "
+                    "$c_last == $last; "
+                    "select $c_id, $c_first, $c_middle, $c_last, $c_street_1, $c_street_2, $c_city, "
+                    "$c_state, $c_zip, $c_phone, $c_since, $c_credit, $c_credit_lim, $c_discount, "
+                    "$c_balance, $c_ytd_payment, $c_payment_cnt, $c_data; "
+                    "sort $c_first asc;"
+                )
                 self.start_checkpoint(q)
                 # Get the midpoint customer's id
                 try:
-                    all_customers = list(tx.query(q).resolve().as_concept_rows())
+                    all_customers = list(tx.query(q, given_rows=[{"d_id": w_id * DPW + d_id, "last": c_last}]).resolve().as_concept_rows())
                 except Exception as e:
                     self.log_failure(e)
                     raise e
@@ -1007,19 +1038,19 @@ sort $c_first asc;
             c_payment_cnt = customer_data[16] + 1
             c_data = customer_data[17]
             # W_NAME, W_STREET_1, W_STREET_2, W_CITY, W_STATE, W_ZIP
-            q = f"""
-match
-$w isa WAREHOUSE, has W_ID {w_id}, has W_NAME $w_name, 
-has W_STREET_1 $w_street_1, has W_STREET_2 $w_street_2, 
-has W_CITY $w_city, has W_STATE $w_state, has W_ZIP $w_zip, has W_YTD $w_ytd;
-let $w_ytd_new = $w_ytd + {h_amount};
-delete $w_ytd of $w;
-insert $w has W_YTD == $w_ytd_new;
-select $w_name, $w_street_1, $w_street_2, $w_city, $w_state, $w_zip;
-"""
+            q = (
+                "given $w_id: integer, $h_amount: double; "
+                "match $w isa WAREHOUSE, has W_ID == $w_id, has W_NAME $w_name, "
+                "has W_STREET_1 $w_street_1, has W_STREET_2 $w_street_2, "
+                "has W_CITY $w_city, has W_STATE $w_state, has W_ZIP $w_zip, has W_YTD $w_ytd; "
+                "let $w_ytd_new = $w_ytd + $h_amount; "
+                "delete $w_ytd of $w; "
+                "insert $w has W_YTD == $w_ytd_new; "
+                "select $w_name, $w_street_1, $w_street_2, $w_city, $w_state, $w_zip;"
+            )
             self.start_checkpoint(q)
             try:
-                warehouse = list(tx.query(q).resolve().as_concept_rows())
+                warehouse = list(tx.query(q, given_rows=[{"w_id": w_id, "h_amount": h_amount}]).resolve().as_concept_rows())
             except Exception as e:
                 self.log_failure(e)
                 raise e
@@ -1035,20 +1066,20 @@ select $w_name, $w_street_1, $w_street_2, $w_city, $w_state, $w_zip;
             ]
 
             # D_NAME, D_STREET_1, D_STREET_2, D_CITY, D_STATE, D_ZIP
-            q = f"""
-match
-$d isa DISTRICT, has D_ID {w_id * DPW + d_id}, 
-has D_NAME $d_name, has D_STREET_1 $d_street_1, 
-has D_STREET_2 $d_street_2, has D_CITY $d_city, 
-has D_STATE $d_state, has D_ZIP $d_zip, has D_YTD $d_ytd;
-let $d_ytd_new = $d_ytd + {h_amount};
-delete $d_ytd of $d;
-insert $d has D_YTD == $d_ytd_new;
-select $d_name, $d_street_1, $d_street_2, $d_city, $d_state, $d_zip;
-"""
+            q = (
+                "given $d_id: integer, $h_amount: double; "
+                "match $d isa DISTRICT, has D_ID == $d_id, "
+                "has D_NAME $d_name, has D_STREET_1 $d_street_1, "
+                "has D_STREET_2 $d_street_2, has D_CITY $d_city, "
+                "has D_STATE $d_state, has D_ZIP $d_zip, has D_YTD $d_ytd; "
+                "let $d_ytd_new = $d_ytd + $h_amount; "
+                "delete $d_ytd of $d; "
+                "insert $d has D_YTD == $d_ytd_new; "
+                "select $d_name, $d_street_1, $d_street_2, $d_city, $d_state, $d_zip;"
+            )
             self.start_checkpoint(q)
             try:
-                district = list(tx.query(q).resolve().as_concept_rows())
+                district = list(tx.query(q, given_rows=[{"d_id": w_id * DPW + d_id, "h_amount": h_amount}]).resolve().as_concept_rows())
             except Exception as e:
                 self.log_failure(e)
                 raise e
@@ -1094,45 +1125,53 @@ select $d_name, $d_street_1, $d_street_2, $d_city, $d_state, $d_zip;
                 c_data = (newData + "|" + c_data)
                 if len(c_data) > constants.MAX_C_DATA: c_data = c_data[:constants.MAX_C_DATA]
                 # "updateBCCustomer": "UPDATE CUSTOMER SET C_BALANCE = ?, C_YTD_PAYMENT = ?, C_PAYMENT_CNT = ?, C_DATA = ? WHERE C_W_ID = ? AND C_D_ID = ? AND C_ID = ?", # c_balance, c_ytd_payment, c_payment_cnt, c_data, c_w_id, c_d_id, c_id
-                q = f"""
-match
-$c isa CUSTOMER, has C_ID {c_w_id * DPW * CPD + c_d_id * CPD + c_id}, 
-has C_BALANCE $c_balance, has C_YTD_PAYMENT $c_ytd_payment, 
-has C_PAYMENT_CNT $c_payment_cnt, has C_DATA $c_data;
-delete 
-$c_balance of $c; 
-$c_ytd_payment of $c;
-$c_payment_cnt of $c; 
-$c_data of $c;
-insert $c has C_BALANCE {c_balance}, has C_YTD_PAYMENT {c_ytd_payment}, 
-has C_PAYMENT_CNT {c_payment_cnt}, has C_DATA "{c_data}";
-$h links (customer: $c), isa CUSTOMER_HISTORY, has H_DATE {h_date}, has H_AMOUNT {h_amount}, has H_DATA "{h_data}";
-"""            # TODO: if histories keep track of w_id's this needs to be changed as well
+                q = (
+                    "given $c_id: integer, $c_balance: double, $c_ytd_payment: double, "
+                    "$c_payment_cnt: integer, $c_data: string, $h_date: datetime, "
+                    "$h_amount: double, $h_data: string; "
+                    "match $c isa CUSTOMER, has C_ID == $c_id, "
+                    "has C_BALANCE $c_balance_old, has C_YTD_PAYMENT $c_ytd_payment_old, "
+                    "has C_PAYMENT_CNT $c_payment_cnt_old, has C_DATA $c_data_old; "
+                    "delete $c_balance_old of $c; $c_ytd_payment_old of $c; "
+                    "$c_payment_cnt_old of $c; $c_data_old of $c; "
+                    "insert $c has C_BALANCE == $c_balance, has C_YTD_PAYMENT == $c_ytd_payment, "
+                    "has C_PAYMENT_CNT == $c_payment_cnt, has C_DATA == $c_data; "
+                    "$h links (customer: $c), isa CUSTOMER_HISTORY, "
+                    "has H_DATE == $h_date, has H_AMOUNT == $h_amount, has H_DATA == $h_data;"
+                )            # TODO: if histories keep track of w_id's this needs to be changed as well
                 self.start_checkpoint(q)
                 try:
-                    tx.query(q).resolve()
+                    tx.query(q, given_rows=[{
+                        "c_id": c_w_id * DPW * CPD + c_d_id * CPD + c_id,
+                        "c_balance": c_balance, "c_ytd_payment": c_ytd_payment,
+                        "c_payment_cnt": c_payment_cnt, "c_data": c_data,
+                        "h_date": tdb_datetime(h_date), "h_amount": h_amount, "h_data": h_data,
+                    }]).resolve()
                 except Exception as e:
                     self.log_failure(e)
                     raise e
                 self.end_checkpoint()
             else:
-                q = f"""
-match
-$c isa CUSTOMER, has C_ID {c_w_id * DPW * CPD + c_d_id * CPD + c_id}, 
-has C_BALANCE $c_balance, has C_YTD_PAYMENT $c_ytd_payment, 
-has C_PAYMENT_CNT $c_payment_cnt;
-delete 
-$c_balance of $c; 
-$c_ytd_payment of $c;
-$c_payment_cnt of $c;
-insert 
-$c has C_BALANCE {c_balance}, has C_YTD_PAYMENT {c_ytd_payment}, 
-has C_PAYMENT_CNT {c_payment_cnt};
-$h links (customer: $c), isa CUSTOMER_HISTORY, has H_DATE {h_date}, has H_AMOUNT {h_amount}, has H_DATA "{h_data}";
-"""             # TODO: if histories keep track of w_id's this needs to be changed as well
+                q = (
+                    "given $c_id: integer, $c_balance: double, $c_ytd_payment: double, "
+                    "$c_payment_cnt: integer, $h_date: datetime, $h_amount: double, $h_data: string; "
+                    "match $c isa CUSTOMER, has C_ID == $c_id, "
+                    "has C_BALANCE $c_balance_old, has C_YTD_PAYMENT $c_ytd_payment_old, "
+                    "has C_PAYMENT_CNT $c_payment_cnt_old; "
+                    "delete $c_balance_old of $c; $c_ytd_payment_old of $c; $c_payment_cnt_old of $c; "
+                    "insert $c has C_BALANCE == $c_balance, has C_YTD_PAYMENT == $c_ytd_payment, "
+                    "has C_PAYMENT_CNT == $c_payment_cnt; "
+                    "$h links (customer: $c), isa CUSTOMER_HISTORY, "
+                    "has H_DATE == $h_date, has H_AMOUNT == $h_amount, has H_DATA == $h_data;"
+                )             # TODO: if histories keep track of w_id's this needs to be changed as well
                 self.start_checkpoint(q)
                 try:
-                    tx.query(q).resolve()
+                    tx.query(q, given_rows=[{
+                        "c_id": c_w_id * DPW * CPD + c_d_id * CPD + c_id,
+                        "c_balance": c_balance, "c_ytd_payment": c_ytd_payment,
+                        "c_payment_cnt": c_payment_cnt, "h_date": tdb_datetime(h_date),
+                        "h_amount": h_amount, "h_data": h_data,
+                    }]).resolve()
                 except Exception as e:
                     self.log_failure(e)
                     raise e
@@ -1168,14 +1207,14 @@ $h links (customer: $c), isa CUSTOMER_HISTORY, has H_DATE {h_date}, has H_AMOUNT
         threshold = params["threshold"]
         
         with self.driver.transaction(self.database, TransactionType.WRITE) as tx:
-            q = f"""
-match
-$d isa DISTRICT, has D_ID {w_id * DPW + d_id}, has D_NEXT_O_ID $d_next_o_id;
-select $d_next_o_id;
-"""
+            q = (
+                "given $d_id: integer; "
+                "match $d isa DISTRICT, has D_ID == $d_id, has D_NEXT_O_ID $d_next_o_id; "
+                "select $d_next_o_id;"
+            )
             self.start_checkpoint(q)
             try:
-                result = list(tx.query(q).resolve().as_concept_rows())
+                result = list(tx.query(q, given_rows=[{"d_id": w_id * DPW + d_id}]).resolve().as_concept_rows())
             except Exception as e:
                 self.log_failure(e)
                 raise e
@@ -1183,20 +1222,25 @@ select $d_next_o_id;
             assert len(result) == 1, f"doStockLevel: no district found for w_id {w_id}, d_id {d_id}"
             o_id = result[0].get('d_next_o_id').as_attribute().get_value()
 
-            q = f"""
-match
-$w isa WAREHOUSE, has W_ID {w_id};
-$d isa DISTRICT, has D_ID {w_id * DPW + d_id};
-$s links (item: $i, warehouse: $w), isa STOCKING, has S_QUANTITY < {threshold};
-$ol links  (item: $i, order: $o), isa ORDER_LINE;
-$o links (district: $d), isa ORDER, has O_ID $o_id;
-$o_id < {o_id};
-$o_id >= {o_id - 20};
-select $i;
-reduce $count = count;"""
+            q = (
+                "given $w_id: integer, $d_id: integer, $threshold: integer, "
+                "$o_id_max: integer, $o_id_min: integer; "
+                "match $w isa WAREHOUSE, has W_ID == $w_id; "
+                "$d isa DISTRICT, has D_ID == $d_id; "
+                "$s links (item: $i, warehouse: $w), isa STOCKING, has S_QUANTITY < $threshold; "
+                "$ol links (item: $i, order: $o), isa ORDER_LINE; "
+                "$o links (district: $d), isa ORDER, has O_ID $o_id; "
+                "$o_id < $o_id_max; "
+                "$o_id >= $o_id_min; "
+                "select $i; "
+                " reduce $count = count;"
+            )
             self.start_checkpoint(q)
             try:
-                first_response = list(tx.query(q).resolve().as_concept_rows())[0]
+                first_response = list(tx.query(q, given_rows=[{
+                    "w_id": w_id, "d_id": w_id * DPW + d_id, "threshold": threshold,
+                    "o_id_max": o_id, "o_id_min": o_id - 20,
+                }]).resolve().as_concept_rows())[0]
             except Exception as e:
                 self.log_failure(e)
                 raise e

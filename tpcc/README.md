@@ -26,11 +26,13 @@ There are 5 workloads (T1... T5):
 
 #### Set up
 
-* Install TypeDB or run from source
+* Install TypeDB **3.12.0 or later**, or run from source
   ```
   cargo run --package typedb_server_bin --bin typedb_server_bin --release
   ```
-* Install python driver: `pip install typedb-driver==3.XXX`   
+* Install python driver: `pip install "typedb-driver>=3.12.0"`
+
+**Version requirements**: the TypeDB 3 driver (`typedb3`) parameterizes all queries with the TypeQL `given` clause, executing constant query templates with input rows passed via the driver's `given_rows` argument (data loading sends each commit batch as a single multi-row `given_rows` call). This requires TypeDB server **3.12.0+** (first release with the `given` stage) and python `typedb-driver` **3.12.0+** (first release with `given_rows`).
 
 #### Benchmark
 ##### Load data
